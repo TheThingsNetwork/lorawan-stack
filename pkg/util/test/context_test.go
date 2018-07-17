@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	. "go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
@@ -74,9 +73,9 @@ func TestContextParent(t *testing.T) {
 			OK: true,
 		},
 		{
-			Name: "rights.NewContext",
+			Name: "rights.NewContextWithFetcher",
 			NewContext: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, []ttnpb.Right{ttnpb.RIGHT_APPLICATION_DEVICES_WRITE})
+				return rights.NewContextWithFetcher(ctx, nil)
 			},
 			OK: true,
 		},

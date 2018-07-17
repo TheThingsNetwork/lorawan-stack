@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -135,11 +136,18 @@ func TestLink(t *testing.T) {
 			return nil, ctx.Err()
 		}
 	}
+
 	link.ContextFunc = func() context.Context {
-		return metadata.NewIncomingContext(ctx, metadata.MD{
-			"id":            []string{registeredGatewayID},
-			"authorization": []string{"Bearer dummy-token"},
+		ctx := metadata.NewIncomingContext(ctx, metadata.MD{
+			"id": []string{registeredGatewayID},
 		})
+		ctx = rights.NewContextWithFetcher(
+			ctx,
+			rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+				return []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK}, nil
+			}),
+		)
+		return ctx
 	}
 
 	gsStart := time.Now()

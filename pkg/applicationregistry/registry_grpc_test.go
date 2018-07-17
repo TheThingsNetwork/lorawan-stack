@@ -35,21 +35,32 @@ import (
 
 var _ ttnpb.AsApplicationRegistryServer = &RegistryRPC{}
 
+var (
+	ctxWithoutRights = rights.NewContextWithFetcher(
+		test.Context(),
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+			return []ttnpb.Right{}, nil
+		}),
+	)
+	ctxWithRights = rights.NewContextWithFetcher(
+		test.Context(),
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+			return []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC}, nil
+		}),
+	)
+)
+
 func TestRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
 	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-	})
-
-	app, err := ar.SetApplication(test.Context(), &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err := ar.SetApplication(ctxWithoutRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err = ar.SetApplication(ctxWithRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	pb.CreatedAt = app.GetCreatedAt()
 	pb.UpdatedAt = app.GetUpdatedAt()
 	if !a.So(err, should.BeNil) {
@@ -59,31 +70,31 @@ func TestRegistryRPC(t *testing.T) {
 		pretty.Ldiff(t, app, pb)
 	}
 
-	app, err = ar.GetApplication(test.Context(), &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(ctxWithoutRights, &pb.ApplicationIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 	if !a.So(app, should.Resemble, pb) {
 		pretty.Ldiff(t, app, pb)
 	}
 
-	v, err := ar.DeleteApplication(test.Context(), &pb.ApplicationIdentifiers)
+	v, err := ar.DeleteApplication(ctxWithoutRights, &pb.ApplicationIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(v, should.BeNil)
 
-	v, err = ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.DeleteApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.Equal, ttnpb.Empty)
 
-	app, err = ar.GetApplication(test.Context(), &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(ctxWithoutRights, &pb.ApplicationIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrApplicationNotFound)
 	a.So(app, should.BeNil)
 }
@@ -92,17 +103,13 @@ func TestSetApplicationNoProcessor(t *testing.T) {
 	a := assertions.New(t)
 	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-	})
-
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 	a.So(validate.ID(pb.GetApplicationID()), should.BeNil)
 
-	_, err := ar.SetApplication(test.Context(), &ttnpb.SetApplicationRequest{Application: *pb})
+	_, err := ar.SetApplication(ctxWithoutRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	v, err := ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	v, err := ar.SetApplication(ctxWithRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -111,7 +118,7 @@ func TestSetApplicationNoProcessor(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	v, err = ar.SetApplication(ctxWithRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyApplications)
 	a.So(v, should.BeNil)
 }
@@ -120,13 +127,9 @@ func TestGetApplication(t *testing.T) {
 	a := assertions.New(t)
 	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-	})
-
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	v, err := ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err := ar.GetApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrApplicationNotFound)
 	a.So(v, should.BeNil)
 
@@ -135,7 +138,7 @@ func TestGetApplication(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.GetApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -146,7 +149,7 @@ func TestGetApplication(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.GetApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyApplications)
 	a.So(v, should.BeNil)
 }
@@ -155,13 +158,9 @@ func TestDeleteApplication(t *testing.T) {
 	a := assertions.New(t)
 	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-	})
-
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	v, err := ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err := ar.DeleteApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrApplicationNotFound)
 	a.So(v, should.BeNil)
 
@@ -170,7 +169,7 @@ func TestDeleteApplication(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.DeleteApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -188,7 +187,7 @@ func TestDeleteApplication(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.DeleteApplication(ctxWithRights, &pb.ApplicationIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyApplications)
 	a.So(v, should.BeNil)
 }
@@ -211,26 +210,22 @@ func TestSetApplicationProcessor(t *testing.T) {
 
 	a := assertions.New(t)
 
-	app, err := ar.SetApplication(test.Context(), &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err := ar.SetApplication(ctxWithoutRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-	})
-
 	procErr = errors.New("err")
-	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err = ar.SetApplication(ctxWithRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.HaveSameErrorDefinitionAs, ErrProcessorFailed)
 	a.So(app, should.BeNil)
 
 	procErr = errTest.WithAttributes("foo", "bar")
-	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err = ar.SetApplication(ctxWithRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.Resemble, procErr)
 	a.So(app, should.BeNil)
 
 	procErr = nil
-	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err = ar.SetApplication(ctxWithRights, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)
 	pb.CreatedAt = app.GetCreatedAt()
 	pb.UpdatedAt = app.GetUpdatedAt()
