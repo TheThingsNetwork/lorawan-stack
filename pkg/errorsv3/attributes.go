@@ -70,7 +70,7 @@ func supported(v interface{}) interface{} {
 	case reflect.String:
 		return rv.String()
 	default:
-		panic(fmt.Sprintf("Only primitive types are supported as error message format arguments (got %T)", v))
+		panic(fmt.Sprintf("only primitive types are supported as error message format arguments (got %T)", v))
 	}
 }
 

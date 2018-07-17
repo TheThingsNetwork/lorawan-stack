@@ -20,10 +20,10 @@ type causer interface {
 
 func (e *Error) setCause(cause error) {
 	if cause == nil {
-		panic("Error cause should not be set if nil")
+		panic("error cause should not be set if nil")
 	}
 	if e.cause != nil {
-		panic("Error cause should not be overwritten, you're probably doing the a.WithCause(b) the wrong way around")
+		panic("error cause should not be overwritten, you're probably doing the a.WithCause(b) the wrong way around")
 	}
 	if convertedCause, ok := From(cause); ok {
 		e.cause = convertedCause

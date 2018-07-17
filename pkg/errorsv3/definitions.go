@@ -115,12 +115,12 @@ func define(code uint32, name, messageFormat string, publicAttributes ...string)
 
 	fullName := def.FullName()
 	if Definitions[fullName] != nil {
-		panic(fmt.Errorf("Error %s already defined", fullName))
+		panic(fmt.Errorf("error %s already defined", fullName))
 	}
 
 	parsedMessageFormat, err := formatter.Parse(messageFormat)
 	if err != nil {
-		panic(fmt.Errorf("Could not parse message format `%s` for %s: %s", messageFormat, fullName, err))
+		panic(fmt.Errorf("could not parse message format `%s` for %s: %s", messageFormat, fullName, err))
 	}
 	def.parsedMessageFormat = parsedMessageFormat
 
