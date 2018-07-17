@@ -40,13 +40,9 @@ const Button = function ({
     [style.secondary]: secondary,
     [style.naked]: naked,
     [style.busy]: busy,
-    [style.withIcon]: icon !== undefined,
+    [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.error]: error && !busy,
-  })
-
-  const classnameIcon = classnames({
-    [style.icon]: message !== undefined,
   })
 
   const handleClick = function (evt) {
@@ -64,7 +60,7 @@ const Button = function ({
       {...rest}
     >
       <div className={style.content}>
-        {icon ? <Icon className={classnameIcon} nudgeUp icon={icon} /> : null}
+        {icon ? <Icon className={style.icon} nudgeUp icon={icon} /> : null}
         {busy ? <Spinner className={style.spinner} small after={200} /> : null}
         {message ? <Message content={message} /> : null}
       </div>

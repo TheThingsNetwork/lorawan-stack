@@ -13,6 +13,7 @@
 // limitations under the License.
 
 $button($color)
+  one-liner()
   background: $color
   border-radius: $br.m
   border: 0
@@ -20,7 +21,6 @@ $button($color)
   font-weight: 600
   cursor: pointer
   color: white
-  white-space: nowrap
 
   &:not(.busy) span:last-child
     vertical-align: middle
@@ -74,7 +74,7 @@ $button($color)
 .button
   font: inherit
   display: inline-block
-  padding: $cs.xs $cs.l
+  padding: $cs.s $cs.l
   border-radius: 3px
   transition: color 150ms, background 150ms, border 200ms
   $button($c-active-blue)
@@ -91,12 +91,15 @@ $button($color)
   &.withIcon
     padding-left: $cs.m
 
+    span:first-child
+      margin-right: $cs.xs
+
   &.onlyIcon
     padding-left: $cs.s
     padding-right: $cs.s
 
 .icon
-  margin-right: $cs.xs
+  line-height: 0.8
 
 @keyframes shake
   0%
