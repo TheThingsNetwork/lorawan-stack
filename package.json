@@ -55,7 +55,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "tcomb": "^3.2.24",
-    "webpack": "^4.0.0",
+    "webpack": "^4.16.1",
     "webpack-cli": "^2.0.14",
     "webpack-livereload-plugin": "^2.1.1",
     "webpack-serve": "^2.0.2",
