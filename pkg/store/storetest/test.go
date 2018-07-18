@@ -74,13 +74,27 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 	a.So(m, should.BeNil)
 
 	i := 0
-	err = s.Range(nil, 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+	total, err := s.Range(nil, "", 100, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 	a.So(err, should.NotBeNil)
+	a.So(total, should.Equal, 0)
 	a.So(i, should.Equal, 0)
 
 	i = 0
-	err = s.Range(make(map[string]interface{}), 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+	total, err = s.Range(make(map[string]interface{}), "", 100, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 	a.So(err, should.NotBeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	i = 0
+	total, err = s.Range(make(map[string]interface{}), "", 0, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+	a.So(err, should.NotBeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	i = 0
+	total, err = s.Range(make(map[string]interface{}), "", 0, 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+	a.So(err, should.NotBeNil)
+	a.So(total, should.Equal, 0)
 	a.So(i, should.Equal, 0)
 
 	err = s.Update(nil, nil)
@@ -222,33 +236,36 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(found, should.Resemble, tc.Stored)
 
 			i := 0
-			err = s.Range(tc.Stored, 10, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			total, err := s.Range(tc.Stored, "", 10, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.Stored)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			i = 0
-			err = s.Range(tc.Filter, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			total, err = s.Range(tc.Filter, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.Stored)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			i = 0
-			err = s.Range(tc.Filter, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			total, err = s.Range(tc.Filter, "", 0, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.Stored)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			err = s.Update(id, tc.Updated)
@@ -261,23 +278,25 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(found, should.Resemble, tc.AfterUpdate)
 
 			i = 0
-			err = s.Range(tc.AfterUpdate, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			total, err = s.Range(tc.AfterUpdate, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.AfterUpdate)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			i = 0
-			err = s.Range(tc.Filter, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			total, err = s.Range(tc.Filter, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.AfterUpdate)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			err = s.Delete(id)
@@ -290,13 +309,15 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(found, should.Equal, nil)
 
 			i = 0
-			err = s.Range(tc.AfterUpdate, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+			total, err = s.Range(tc.AfterUpdate, "", 1, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 0)
 			a.So(i, should.Equal, 0)
 
 			i = 0
-			err = s.Range(tc.Filter, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+			total, err = s.Range(tc.Filter, "", 1, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 0)
 			a.So(i, should.Equal, 0)
 		})
 	}
@@ -579,10 +600,12 @@ func (gs GenericMapStore) Find(id store.PrimaryKey) (map[string]interface{}, err
 }
 
 // Range is a generic Range.
-func (gs GenericMapStore) Range(filter map[string]interface{}, n uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
-	return reflectValueToError(gs.store.MethodByName("Range").Call([]reflect.Value{
+func (gs GenericMapStore) Range(filter map[string]interface{}, orderBy string, count, offset uint64, f func(store.PrimaryKey, map[string]interface{}) bool) (uint64, error) {
+	ret := gs.store.MethodByName("Range").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(filter)),
-		reflect.ValueOf(n),
+		reflect.ValueOf(orderBy),
+		reflect.ValueOf(count),
+		reflect.ValueOf(offset),
 		reflect.MakeFunc(reflect.FuncOf(
 			[]reflect.Type{reflect.TypeOf((*store.PrimaryKey)(nil)).Elem(), reflect.TypeOf(gs.fromIfaceMap(map[string]interface{}{}))},
 			[]reflect.Type{reflect.TypeOf(false)},
@@ -594,7 +617,8 @@ func (gs GenericMapStore) Range(filter map[string]interface{}, n uint64, f func(
 				})
 			},
 		),
-	})[0])
+	})
+	return ret[0].Uint(), reflectValueToError(ret[1])
 }
 
 // Update is a generic Update.

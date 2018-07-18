@@ -56,7 +56,7 @@ type NewResultFunc func() interface{}
 type Client interface {
 	Create(v interface{}, fields ...string) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
-	Range(filter interface{}, newResult NewResultFunc, batchSize uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error
+	Range(filter interface{}, newResult NewResultFunc, orderBy string, count, offset uint64, f func(PrimaryKey, interface{}) bool, fields ...string) (uint64, error)
 	Update(id PrimaryKey, v interface{}, fields ...string) error
 	Delete(id PrimaryKey) error
 }
@@ -106,14 +106,14 @@ func (cl *typedMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return marshaling.UnmarshalMap(m, v)
 }
 
-func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
+func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc, orderBy string, count, offset uint64, f func(PrimaryKey, interface{}) bool, fields ...string) (uint64, error) {
 	fm, err := marshaling.MarshalMap(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	var ierr error
-	err = cl.TypedMapStore.Range(filterFields(fm, fields...), n, func(k PrimaryKey, v map[string]interface{}) bool {
+	more, err := cl.TypedMapStore.Range(filterFields(fm, fields...), orderBy, count, offset, func(k PrimaryKey, v map[string]interface{}) bool {
 		iface := newResult()
 		if ierr = marshaling.UnmarshalMap(v, iface); ierr != nil {
 			return false
@@ -122,9 +122,9 @@ func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc
 	})
 
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return ierr
+	return more, ierr
 }
 
 func (cl *typedMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
@@ -205,14 +205,14 @@ func (cl *byteMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return marshaling.UnmarshalByteMap(m, v)
 }
 
-func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
+func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc, orderBy string, count, offset uint64, f func(PrimaryKey, interface{}) bool, fields ...string) (uint64, error) {
 	fm, err := marshaling.MarshalByteMap(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	var ierr error
-	err = cl.ByteMapStore.Range(filterByteFields(fm, fields...), n, func(k PrimaryKey, v map[string][]byte) bool {
+	more, err := cl.ByteMapStore.Range(filterByteFields(fm, fields...), orderBy, count, offset, func(k PrimaryKey, v map[string][]byte) bool {
 		iface := newResult()
 		if ierr = marshaling.UnmarshalByteMap(v, iface); ierr != nil {
 			return false
@@ -221,9 +221,9 @@ func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc,
 	})
 
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return ierr
+	return more, ierr
 }
 
 func (cl *byteMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {

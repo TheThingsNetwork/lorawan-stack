@@ -275,9 +275,9 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 }
 
 // Range implements store.ByteMapStore.
-func (s *Store) Range(filter map[string][]byte, batchSize uint64, f func(store.PrimaryKey, map[string][]byte) bool) error {
+func (s *Store) Range(filter map[string][]byte, orderBy string, count, offset uint64, f func(store.PrimaryKey, map[string][]byte) bool) (uint64, error) {
 	if len(filter) == 0 {
-		return store.ErrEmptyFilter.New(nil)
+		return 0, store.ErrEmptyFilter.New(nil)
 	}
 
 	idxKeys := make([]string, 0, len(filter))
@@ -290,73 +290,92 @@ func (s *Store) Range(filter map[string][]byte, batchSize uint64, f func(store.P
 		}
 	}
 	if len(idxKeys) == 0 {
-		return errors.New("At least one index key must be specified")
+		return 0, errors.New("at least one index key must be specified")
 	}
 
-	return s.Redis.Watch(func(tx *redis.Tx) error {
+	if offset > math.MaxUint32 {
+		return 0, errors.New("offset is too high")
+	}
+
+	sort := &redis.Sort{
+		By:     orderBy,
+		Alpha:  true,
+		Offset: int64(offset),
+	}
+
+	if len(fieldFilter) == 0 && count <= math.MaxInt64 {
+		sort.Count = int64(count)
+	}
+
+	var cmds map[string]*stringBytesMapCmd
+	var total int64
+	if err := s.Redis.Watch(func(tx *redis.Tx) (err error) {
 		key := s.key(s.newID().String())
 
-		n, err := tx.SInterStore(key, idxKeys...).Result()
+		total, err = tx.SInterStore(key, idxKeys...).Result()
 		if err != nil {
 			return err
 		}
 		defer tx.Del(key)
-		if n == 0 {
+		if total == 0 {
 			return nil
 		}
 
-		if batchSize > math.MaxInt64 {
-			batchSize = math.MaxInt64
+		ids, err := tx.Sort(key, sort).Result()
+		if err != nil {
+			return err
 		}
 
-		var ids []string
-		var c uint64
-		for {
-			ids, c, err = tx.SScan(key, c, "", int64(batchSize)).Result()
-			if err != nil {
-				return err
+		cmds = make(map[string]*stringBytesMapCmd, len(ids))
+		_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+			for _, str := range ids {
+				cmds[str] = newStringBytesMapCmd(p.HGetAll(s.key(str)))
 			}
+			return nil
+		})
+		return err
+	}, idxKeys...); err != nil {
+		return 0, err
+	}
 
-			cmds := make(map[ulid.ULID]*stringBytesMapCmd, len(ids))
-			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
-				for _, str := range ids {
-					id, err := ulid.Parse(str)
-					if err != nil {
-						return errors.NewWithCausef(err, "Failed to parse %s as ULID, database inconsistent", str)
-					}
-					cmds[id] = newStringBytesMapCmd(p.HGetAll(s.key(str)))
-				}
-				return nil
-			})
-			if err != nil {
-				return err
-			}
+	// exec indicates whether f shall be executed or not.
+	exec := true
+outer:
+	for str, cmd := range cmds {
+		m, err := cmd.Result()
+		if err != nil {
+			return 0, err
+		}
 
-		outer:
-			for id, cmd := range cmds {
-				m, err := cmd.Result()
-				if err != nil {
-					return err
-				}
-				if len(m) == 0 {
-					continue
-				}
-				for _, k := range fieldFilter {
-					if !bytes.Equal(m[k], filter[k]) {
-						continue outer
-					}
-				}
-				if !f(id, m) {
-					return nil
-				}
-			}
+		if len(m) == 0 {
+			total--
+			continue
+		}
 
-			if c == 0 {
-				break
+		for _, k := range fieldFilter {
+			if !bytes.Equal(m[k], filter[k]) {
+				total--
+				continue outer
 			}
 		}
-		return nil
-	}, idxKeys...)
+
+		if !exec {
+			continue
+		}
+
+		id, err := ulid.Parse(str)
+		if err != nil {
+			return 0, errors.NewWithCausef(err, "failed to parse %s as ULID, database inconsistent", str)
+		}
+
+		if exec = f(id, m); !exec && len(fieldFilter) == 0 {
+			break
+		}
+		// If iteration is stopped by f, but len(fieldFilter) > 0, there may still be
+		// values in cmds, which do not match the fieldFilter,
+		// hence we have to keep iterating to ensure the correctness of more.
+	}
+	return uint64(total), nil
 }
 
 func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {

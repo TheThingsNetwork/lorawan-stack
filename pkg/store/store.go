@@ -52,12 +52,13 @@ type Trimmer interface {
 //
 // Range calls f sequentially for each key and value present in the store.
 // If f returns false, range stops the iteration.
+// If orderBy is set to non-empty string, Range will iterate over the values in order of increasing values of the field.
+// If count > 0, then Range will do it's best effort to iterate over at most count devices.
+// If count == 0, then Range will iterate over all matching devices.
+// Note, that Range provides no guarantees on the count of devices iterated over if count > 0 and
+// it's caller's responsibility to handle cases where such are required.
+// Range starts iteration at the index specified by the offset. Offset it 0-indexed.
 //
-// Range does not necessarily correspond to any consistent snapshot of the TypedMapStore's
-// contents: no key will be visited more than once, but if the value for any key
-// is stored or deleted concurrently, Range may reflect any mapping for that key
-// from any point during the Range call.
-
 // If batchSize argument is non-zero, Range will retrieve elements
 // from the underlying store in chunks of (approximately) batchSize elements.
 //
@@ -65,7 +66,7 @@ type Trimmer interface {
 type TypedMapStore interface {
 	Create(fields map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
-	Range(filter map[string]interface{}, batchSize uint64, f func(PrimaryKey, map[string]interface{}) bool) error
+	Range(filter map[string]interface{}, orderBy string, count, offset uint64, f func(PrimaryKey, map[string]interface{}) bool) (uint64, error)
 	Update(id PrimaryKey, diff map[string]interface{}) error
 	Deleter
 }
@@ -79,20 +80,18 @@ type TypedMapStore interface {
 //
 // Range calls f sequentially for each key and value present in the store.
 // If f returns false, range stops the iteration.
-//
-// Range does not necessarily correspond to any consistent snapshot of the ByteMapStore's
-// contents: no key will be visited more than once, but if the value for any key
-// is stored or deleted concurrently, Range may reflect any mapping for that key
-// from any point during the Range call.
-
-// If batchSize argument is non-zero, Range will retrieve elements
-// from the underlying store in chunks of (approximately) batchSize elements.
+// If orderBy is set to non-empty string, Range will iterate over the values in order of increasing values of the field.
+// If count > 0, then Range will do it's best effort to iterate over at most count devices.
+// If count == 0, then Range will iterate over all matching devices.
+// Note, that Range provides no guarantees on the count of devices iterated over if count > 0 and
+// it's caller's responsibility to handle cases where such are required.
+// Range starts iteration at the index specified by the offset. Offset it 0-indexed.
 //
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 type ByteMapStore interface {
 	Create(fields map[string][]byte) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string][]byte, error)
-	Range(filter map[string][]byte, batchSize uint64, f func(PrimaryKey, map[string][]byte) bool) error
+	Range(filter map[string][]byte, orderBy string, count, offset uint64, f func(PrimaryKey, map[string][]byte) bool) (uint64, error)
 	Update(id PrimaryKey, diff map[string][]byte) error
 	Deleter
 }

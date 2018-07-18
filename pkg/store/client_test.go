@@ -185,13 +185,14 @@ func TestTypedClient(t *testing.T) {
 			}
 
 			i := 0
-			err = cl.Range(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
+			total, err := cl.Range(v, newResult, "", 1, 0, func(k PrimaryKey, v interface{}) bool {
 				i++
 				a.So(k, should.Resemble, key)
 				a.So(pretty.Diff(v, tc.Stored), should.BeEmpty)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			err = cl.Update(key, tc.Updated, tc.Fields...)
@@ -206,13 +207,14 @@ func TestTypedClient(t *testing.T) {
 			}
 
 			i = 0
-			err = cl.Range(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
+			total, err = cl.Range(v, newResult, "", 1, 0, func(k PrimaryKey, v interface{}) bool {
 				i++
 				a.So(k, should.Resemble, key)
 				a.So(pretty.Diff(v, tc.AfterUpdate), should.BeEmpty)
 				return true
 			})
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 1)
 			a.So(i, should.Equal, 1)
 
 			err = cl.Delete(key)
@@ -223,8 +225,9 @@ func TestTypedClient(t *testing.T) {
 			a.So(err, should.BeNil)
 
 			i = 0
-			err = cl.Range(v, newResult, 1, func(k PrimaryKey, v interface{}) bool { i++; return true })
+			total, err = cl.Range(v, newResult, "", 1, 0, func(k PrimaryKey, v interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
+			a.So(total, should.Equal, 0)
 			a.So(i, should.Equal, 0)
 		})
 	}
