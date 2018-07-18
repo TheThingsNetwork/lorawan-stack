@@ -23,6 +23,7 @@ CACHE_DIR ?= .cache
 # Webpack
 WEBPACK ?= $(BINARIES_DIR)/webpack
 WEBPACK_FLAGS ?= --colors $(if $(CI),,--progress)
+WEBPACK_SERVE ?= $(BINARIES_DIR)/webpack-serve
 
 # The config file to use for client
 WEBPACK_CONFIG ?= $(CONFIG_DIR)/webpack.config.js
@@ -49,6 +50,10 @@ js.build-watch: js.webpack-main
 js.build: js.build-dll js.build-main
 
 js.watch: js.build-dll js.build-watch
+
+js.serve: $(WEBPACK_CONFIG_BUILT)
+	@$(log) "Serving via webpack-serve, make sure stack is running for the api proxy to work"
+	@$(JS_ENV) $(WEBPACK_SERVE) $(WEBPACK_CONFIG_BUILT)
 
 js.webpack-main:
 	@$(log) "building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
