@@ -1,4 +1,6 @@
-extends: ttn
+extends: 
+  - ttn
+  - plugin:jest/recommended
 
 parser: babel-eslint
 
@@ -9,7 +11,21 @@ settings:
   flowtype:
     onlyFilesWithFlowAnnotation: true
 
+env:
+  node: true
+  jest: true
+
+globals:
+  shallow: true
+  render: true
+  mount: true
+  snapshotDiff: true
+
 rules:
+  jest/no-large-snapshots: 
+    - warn
+    - maxSize: 400
+
   # Warn on missing JsDoc definitions
   valid-jsdoc:
     - warn

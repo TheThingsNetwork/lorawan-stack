@@ -151,9 +151,6 @@
     }
   },
   "eslintConfig": {
-    "extends": "./config/eslintrc.yaml",
-    "parserOptions": {
-      "ecmaVersion": 2015
-    }
+    "extends": "./config/eslintrc.yaml"
   }
 }
