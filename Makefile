@@ -14,7 +14,7 @@
 
 HEADER_EXTRA_FILES = Makefile
 
-PRE_COMMIT = headers.check-staged js.lint-staged styl.lint-staged
+PRE_COMMIT = headers.check-staged js.lint-staged styl.lint-staged snap.lint-staged
 COMMIT_MSG = git.commit-msg-log git.commit-msg-length git.commit-msg-empty git.commit-msg-prefix git.commit-msg-phrase git.commit-msg-casing
 
 SUPPORT_LOCALES = en
@@ -29,6 +29,7 @@ include .make/protos/main.make
 include .make/js/main.make
 include .make/dev.make
 include .make/styl/main.make
+include .make/snap/main.make
 
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
@@ -45,7 +46,7 @@ deps: go.deps js.deps
 
 test: go.test js.test
 
-quality: go.quality js.quality styl.quality
+quality: go.quality js.quality styl.quality snap.quality
 
 # stack binary
 ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
