@@ -19,13 +19,15 @@ import style from './icon.styl'
 
 // A map of hardcoded names to their corresponding icons.
 const hardcoded = {
-  gateway: 'wifi_tethering',
-  application: 'layers',
-  collaborator: 'supervisor_account',
   devices: 'devices',
   settings: 'tune',
   integration: 'settings_ethernet',
   data: 'poll',
+  sort: 'arrow_drop_down',
+  overview: 'apps',
+  application: 'web_asset',
+  gateway: 'router',
+  organization: 'people',
 }
 
 export default function ({

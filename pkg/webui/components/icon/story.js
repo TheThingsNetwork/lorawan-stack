@@ -18,9 +18,6 @@ import { storiesOf } from '@storybook/react'
 import Icon from '.'
 
 const icons = [
-  'application',
-  'gateway',
-  'collaborator',
   'devices',
   'integration',
   'settings',
@@ -31,6 +28,11 @@ const icons = [
   'dashboard',
   'transform',
   'data',
+  'sort',
+  'overview',
+  'application',
+  'gateway',
+  'organization',
 ]
 
 storiesOf('Icon', module)
