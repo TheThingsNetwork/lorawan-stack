@@ -23,13 +23,6 @@ var (
 		Code:          1,
 		Type:          errors.InvalidArgument,
 	}
-	// ErrProcessorFailed is returned if the arguments didn't pass a specifically-defined
-	// argument processor.
-	ErrProcessorFailed = &errors.ErrDescriptor{
-		MessageFormat: "Failed to process arguments",
-		Code:          2,
-		Type:          errors.InvalidArgument,
-	}
 	// ErrUnmarshalPayloadFailed is returned when a payload couldn't be unmarshalled.
 	ErrUnmarshalPayloadFailed = &errors.ErrDescriptor{
 		MessageFormat: "Failed to unmarshal payload",
@@ -64,7 +57,6 @@ var (
 
 func init() {
 	ErrInvalidArgument.Register()
-	ErrProcessorFailed.Register()
 	ErrUnmarshalPayloadFailed.Register()
 	ErrMarshalPayloadFailed.Register()
 	ErrCorruptRegistry.Register()
