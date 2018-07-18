@@ -21,7 +21,6 @@
   font-weight: 400
   src: url('https://fonts.gstatic.com/s/materialicons/v32/2fcrYFNaTjcS6g4U3t-Y5UEw0lE80llgEseQY3FEmqw.woff2') format('woff2')
 
-
 normalize-css()
 
 html, body
@@ -30,7 +29,7 @@ html, body
 
 body
   font-family: $font-family
-  line-height: $line-height
+  line-height: $line-height-base
   color: $tc-deep-gray
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
@@ -39,14 +38,23 @@ body
   & > div
     height: 100%
 
+::-webkit-scrollbar
+  width: .5em
+
+::-webkit-scrollbar-thumb
+  background-color: darker($c-backdrop)
+
+::-webkit-scrollbar-track
+  padding: 2px
+
 h1
-  font-size: $fs.xxl
+  h1()
 
 h2
-  font-size: $fs.xl
+  h2()
 
 h3
-  font-size: $fs.l
+  h3()
 
 ul li:not(:last-child)
   margin-bottom: $cs.s
