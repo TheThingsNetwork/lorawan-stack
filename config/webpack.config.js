@@ -19,8 +19,11 @@ import webpack from 'webpack'
 
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import LiveReloadPlugin from 'webpack-livereload-plugin'
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
+
+import convert from 'koa-connect'
+import history from 'connect-history-api-fallback'
+import proxy from 'http-proxy-middleware'
 
 import nib from 'nib'
 
@@ -61,11 +64,11 @@ export default {
     ],
   },
   output: {
-    filename: '[name].[chunkhash].js',
-    chunkFilename: '[name].[chunkhash].js',
+    filename: '[name].[hash].js',
+    chunkFilename: '[name].[hash].js',
     path: path.resolve(context, PUBLIC_DIR),
-    publicPath: '{{.Root}}/',
     crossOriginLoading: 'anonymous',
+    publicPath: '/',
   },
   optimization: {
     splitChunks: {
@@ -192,9 +195,23 @@ export default {
       new AddAssetHtmlPlugin({
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
-      new LiveReloadPlugin(),
     ],
   }),
+  serve: {
+    content: 'public',
+    devMiddleware: { stats: 'minimal' },
+    add (app, middleware, options) {
+      // Add new api routes here, to proxy them
+      app.use(convert(proxy([ '/api', '/console/api', '/oauth/api' ],
+        { target: 'http://localhost:1885' })))
+      app.use(convert(history({
+        rewrites: [
+          { from: /\/console(\/[a-zA-Z0-9_/.-]*)?$/, to: '/console.html' },
+          { from: /\/oauth(\/[a-zA-Z0-9_/.-]*)?$/, to: '/oauth.html' },
+        ],
+      })))
+    },
+  },
 }
 
 function filterLocales (context, request, callback) {
