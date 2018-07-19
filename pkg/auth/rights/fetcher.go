@@ -31,6 +31,14 @@ type Fetcher interface {
 }
 
 // FetcherFunc is a function that implements the Fetcher interface.
+//
+// A FetcherFunc that returns all Application rights for any Application,
+// would look like this:
+//
+//    fetcher := rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+//    	return ttnpb.AllApplicationRights(), nil
+//    })
+//
 type FetcherFunc func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error)
 
 // ApplicationRights implements the Fetcher interface.

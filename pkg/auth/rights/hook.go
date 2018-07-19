@@ -26,9 +26,27 @@ import (
 var errNoFetcher = errors.DefineInternal("missing_fetcher", "no fetcher found in context")
 
 // HookName denotes the unique name that components should use to register this hook.
+//
+// Services that need the hook should register it with:
+//
+//     hooks.RegisterUnaryHook("/ttn.lorawan.v3.SomeService", rights.HookName, rights.Hook)
+//
+// The hook does not support streaming RPCs.
 const HookName = "rights-fetcher"
 
 // Hook for fetching the rights for a request.
+//
+// This hook requires a Fetcher in the context, which should be inserted by other
+// middleware, such as the fillcontext middleware, where you could do:
+//
+//     ctx = rights.NewContextWithFetcher(ctx, fetcher)
+//
+// It is recommended to wrap the Identity Server fetcher with a cache:
+//
+//     fetcher = rights.NewInMemoryCache(fetcher, successTTL, errorTTL)
+//
+// Also note that all RPCs for which this hook is executed, need to take an
+// argument that implements the ttnpb.Identifiers interface.
 func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		fetcher, ok := fetcherFromContext(ctx)
