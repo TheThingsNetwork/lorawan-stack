@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pagination has only a single page should match snapshot 1`] = `
+<ul
+  className=""
+>
+  <li
+    className=" disabled"
+  >
+    <a
+      onClick={[Function]}
+      onKeyPress={[Function]}
+      role="button"
+      tabIndex="0"
+    >
+      <Component
+        aria-label="Go to the previous page"
+        icon="navigate_before"
+        small={true}
+      />
+    </a>
+  </li>
+  <PageView
+    activeClassName="selected"
+    key="0"
+    onClick={[Function]}
+    page={1}
+    selected={true}
+  />
+  <li
+    className=" disabled"
+  >
+    <a
+      onClick={[Function]}
+      onKeyPress={[Function]}
+      role="button"
+      tabIndex="0"
+    >
+      <Component
+        aria-label="Go to the next page"
+        icon="navigate_next"
+        small={true}
+      />
+    </a>
+  </li>
+</ul>
+`;
+
+exports[`Pagination has several pages should match snapshot 1`] = `
+<ul
+  className=""
+>
+  <li
+    className=" disabled"
+  >
+    <a
+      onClick={[Function]}
+      onKeyPress={[Function]}
+      role="button"
+      tabIndex="0"
+    >
+      <Component
+        aria-label="Go to the previous page"
+        icon="navigate_before"
+        small={true}
+      />
+    </a>
+  </li>
+  <PageView
+    activeClassName="selected"
+    key="0"
+    onClick={[Function]}
+    page={1}
+    selected={true}
+  />
+  <PageView
+    activeClassName="selected"
+    key="1"
+    onClick={[Function]}
+    page={2}
+    selected={false}
+  />
+  <PageView
+    activeClassName="selected"
+    key="2"
+    onClick={[Function]}
+    page={3}
+    selected={false}
+  />
+  <li
+    className=""
+  >
+    <a
+      onClick={[Function]}
+      onKeyPress={[Function]}
+      role="button"
+      tabIndex="0"
+    >
+      <Component
+        aria-label="Go to the next page"
+        icon="navigate_next"
+        small={true}
+      />
+    </a>
+  </li>
+</ul>
+`;
