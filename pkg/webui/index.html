@@ -7,5 +7,10 @@
   </head>
   <body>
     <div id="app"></div>
+    <% if (!htmlWebpackPlugin.options.devServerBuild) { %>
+    <script>window.ASSETS_ROOT=<%= webpackConfig.output.publicPath %>;window.ENV={{.Env}};</script>
+    <% } else { %>
+      <script>window.ENV={"console":<%= htmlWebpackPlugin.options.title==='console' %>,"default_language":"en", "mount":"/<%= htmlWebpackPlugin.options.title %>"};</script>
+    <% } %>
   </body>
 </html>

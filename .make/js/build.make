@@ -51,6 +51,7 @@ js.build: js.build-dll js.build-main
 
 js.watch: js.build-dll js.build-watch
 
+js.serve: DEV_SERVER_BUILD = true
 js.serve: $(WEBPACK_CONFIG_BUILT)
 	@$(log) "Serving via webpack-serve, make sure stack is running for the api proxy to work"
 	@$(JS_ENV) $(WEBPACK_SERVE) $(WEBPACK_CONFIG_BUILT)

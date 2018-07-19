@@ -37,11 +37,18 @@ const {
   SUPPORT_LOCALES = 'en',
 } = process.env
 
+const DEV_SERVER_BUILD = process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_BUILD === 'true'
+const ASSETS_ROOT = DEV_SERVER_BUILD ? '/assets' : '{{.Root}}'
+
 const context = path.resolve(CONTEXT)
 const production = NODE_ENV === 'production'
 const src = path.resolve('.', 'pkg/webui')
 const include = [ src ]
 const modules = [ path.resolve(context, 'node_modules') ]
+const publicPath = ASSETS_ROOT
+const publicPathRegExp = publicPath.replace('/', '\\/')
+const publicPathScheme = new RegExp(`${publicPathRegExp}\\/.*$`)
+const publicPathReplace = new RegExp(`^${publicPathRegExp}`)
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
@@ -68,7 +75,7 @@ export default {
     chunkFilename: '[name].[hash].js',
     path: path.resolve(context, PUBLIC_DIR),
     crossOriginLoading: 'anonymous',
-    publicPath: '/',
+    publicPath,
   },
   optimization: {
     splitChunks: {
@@ -107,7 +114,12 @@ export default {
         include,
         use: [
           'css-hot-loader',
-          MiniCssExtractPlugin.loader,
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: './',
+            },
+          },
           {
             loader: 'css-loader',
             options: {
@@ -158,9 +170,11 @@ export default {
       }),
       new HtmlWebpackPlugin({
         chunks: [ 'vendor', 'console' ],
+        title: 'console',
         filename: path.resolve(PUBLIC_DIR, 'console.html'),
         showErrors: false,
         template: path.resolve(src, 'index.html'),
+        devServerBuild: DEV_SERVER_BUILD,
         minify: {
           html5: true,
           collapseWhitespace: true,
@@ -168,9 +182,11 @@ export default {
       }),
       new HtmlWebpackPlugin({
         chunks: [ 'vendor', 'oauth' ],
+        title: 'oauth',
         filename: path.resolve(PUBLIC_DIR, 'oauth.html'),
         showErrors: false,
         template: path.resolve(src, 'index.html'),
+        devServerBuild: DEV_SERVER_BUILD,
         minify: {
           html5: true,
           collapseWhitespace: true,
@@ -206,6 +222,7 @@ export default {
         { target: 'http://localhost:1885' })))
       app.use(convert(history({
         rewrites: [
+          { from: publicPathScheme, to: ({ parsedUrl }) => (`${parsedUrl.pathname.replace(publicPathReplace, '')}`) },
           { from: /\/console(\/[a-zA-Z0-9_/.-]*)?$/, to: '/console.html' },
           { from: /\/oauth(\/[a-zA-Z0-9_/.-]*)?$/, to: '/oauth.html' },
         ],
