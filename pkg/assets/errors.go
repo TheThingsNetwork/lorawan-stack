@@ -26,7 +26,7 @@ import (
 
 var (
 	errInvalidConfiguration = errors.DefineInvalidArgument("configuration", "invalid configuration")
-	errTemplateNotFound     = errors.DefineNotFound("not_found", "template `{name}` not found", "name")
+	errTemplateNotFound     = errors.DefineNotFound("template_not_found", "template `{name}` not found")
 	errHTTP                 = errors.Define("http", "HTTP error: {message}")
 )
 
