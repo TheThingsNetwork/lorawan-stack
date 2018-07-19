@@ -33,6 +33,8 @@ func (c *Component) initRights() {
 
 	if c.config.Rights.TTL > 0 {
 		fetcher = rights.NewInMemoryCache(fetcher, c.config.Rights.TTL, c.config.Rights.TTL)
+	} else {
+		c.Logger().Warn("No rights TTL configured")
 	}
 
 	c.rightsFetcher = fetcher
