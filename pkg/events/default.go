@@ -40,7 +40,9 @@ func Publish(evt Event) {
 
 // PublishEvent creates an event and emits it on the default event pubsub.
 // Event names are dot-separated for namespacing.
-// Event identifiers and data will in most cases be marshaled to JSON, but ideally has (embedded) proto messages.
+// Event identifiers identify the TTN entities that are related to the event.
+// System events have nil identifiers.
+// Event data will in most cases be marshaled to JSON, but ideally is a proto message.
 func PublishEvent(ctx context.Context, name string, identifiers ttnpb.Identifiers, data interface{}) {
 	localEvent := local(New(ctx, name, identifiers, data))
 	localEvent = localEvent.withCaller()
