@@ -19,10 +19,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
+	"sync/atomic"
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/assets/templates"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/events/fs"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
@@ -48,6 +52,7 @@ type Config struct {
 // directly read from the file system.
 type Assets struct {
 	*component.Component
+	logger log.Interface
 	config Config
 	fs     http.FileSystem
 }
@@ -56,17 +61,17 @@ type Assets struct {
 func New(c *component.Component, config Config) (*Assets, error) {
 	assets := &Assets{
 		Component: c,
-		config:    config,
+		logger: log.FromContext(c.Context()).WithFields(log.Fields(
+			"namespace", "assets",
+			"mount", config.Mount,
+		)),
+		config: config,
 	}
-	logger := log.FromContext(assets.Context()).WithFields(log.Fields(
-		"namespace", "assets",
-		"mount", config.Mount,
-	))
 
 	for _, path := range config.SearchPath {
 		if s, err := os.Stat(path); !os.IsNotExist(err) && s.IsDir() {
 			assets.fs = http.Dir(path)
-			logger = logger.WithField("path", path)
+			assets.logger = assets.logger.WithField("path", path)
 			break
 		}
 	}
@@ -74,10 +79,10 @@ func New(c *component.Component, config Config) (*Assets, error) {
 		if config.CDN == "" {
 			return nil, errInvalidConfiguration
 		}
-		logger = logger.WithField("cdn", config.CDN)
+		assets.logger = assets.logger.WithField("cdn", config.CDN)
 	}
 
-	logger.Debug("Serving assets")
+	assets.logger.Debug("Serving assets")
 	c.RegisterWeb(assets)
 
 	return assets, nil
@@ -103,31 +108,46 @@ func (a *Assets) RegisterRoutes(server *web.Server) {
 // AppHandler returns an echo.HandlerFunc that renders an application.
 func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 	var (
-		t    *template.Template
-		err  error
+		tv   atomic.Value
 		data = templates.Data{
 			Env: env,
 		}
+		logger = a.logger.WithField("template", name)
 	)
 	if a.fs != nil {
-		t, err = a.loadTemplate(name)
-		if err == nil {
-			data.Root = a.config.Mount
+		data.Root = a.config.Mount
+		loadTemplate := func() {
+			t, err := a.loadTemplate(name)
+			if err != nil {
+				logger.WithError(err).Error("Could not load template")
+				return
+			}
+			tv.Store(t)
+			logger.Debug("Loaded template")
+		}
+		loadTemplate()
+		if httpFS, ok := a.fs.(http.Dir); ok {
+			relName := filepath.Join(string(httpFS), name)
+			fs.Watch(relName, events.HandlerFunc(func(evt events.Event) {
+				if evt.Name() != "fs.write" {
+					return
+				}
+				loadTemplate()
+			}))
 		}
 	} else {
-		t = templates.App
 		appData, ok := a.config.Apps[name]
-		if !ok {
-			err = errTemplateNotFound
-		} else {
-			data.Data = appData
+		if ok {
 			data.Root = a.config.CDN
+			data.Data = appData
+			tv.Store(templates.App)
 		}
 	}
 
 	return func(c echo.Context) error {
-		if err != nil {
-			return err
+		t, ok := tv.Load().(*template.Template)
+		if !ok || t == nil {
+			return errTemplateNotFound.WithAttributes("name", name)
 		}
 		c.Response().WriteHeader(http.StatusOK)
 		return t.Execute(c.Response().Writer, data)
