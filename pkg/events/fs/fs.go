@@ -118,11 +118,12 @@ func NewWatcher(pubsub events.PubSub) (Watcher, error) {
 }
 
 // DefaultWatcher is the default filesystem Watcher.
+// This watcher works on top of an isolated events PubSub.
 var DefaultWatcher Watcher
 
 func init() {
 	var err error
-	DefaultWatcher, err = NewWatcher(events.DefaultPubSub)
+	DefaultWatcher, err = NewWatcher(events.NewPubSub())
 	if err != nil {
 		log.WithError(err).Warn("Could not initialize filesystem watcher")
 	}
