@@ -17,24 +17,55 @@ package component
 import (
 	"crypto/tls"
 	"net"
+	"sync/atomic"
+	"time"
 
 	"github.com/soheilhy/cmux"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/events/fs"
 )
 
 func (c *Component) tlsConfig() (*tls.Config, error) {
 	if c.config.TLS.Certificate == "" || c.config.TLS.Key == "" {
 		return nil, errors.New("No TLS certificate or key specified")
 	}
-	certificate, err := tls.LoadX509KeyPair(c.config.TLS.Certificate, c.config.TLS.Key)
-	if err != nil {
+	var cv atomic.Value
+	loadCertificate := func() error {
+		certificate, err := tls.LoadX509KeyPair(c.config.TLS.Certificate, c.config.TLS.Key)
+		if err != nil {
+			return err
+		}
+		cv.Store([]tls.Certificate{certificate})
+		c.Logger().Debug("Loaded TLS certificate")
+		return nil
+	}
+	if err := loadCertificate(); err != nil {
 		return nil, err
 	}
-	certificates := []tls.Certificate{certificate}
+	debounce := make(chan struct{}, 1)
+	fs.Watch(c.config.TLS.Certificate, events.HandlerFunc(func(evt events.Event) {
+		if evt.Name() != "fs.write" {
+			return
+		}
+		// We have to debounce this; OpenSSL typically causes a lot of write events.
+		select {
+		case debounce <- struct{}{}:
+			time.AfterFunc(5*time.Second, func() {
+				if err := loadCertificate(); err != nil {
+					c.Logger().WithError(err).Error("Could not reload TLS certificate")
+					return
+				}
+				<-debounce
+			})
+		default:
+		}
+	}))
+
 	return &tls.Config{
 		GetConfigForClient: func(info *tls.ClientHelloInfo) (*tls.Config, error) {
 			tlsConfig := &tls.Config{
-				Certificates:             certificates,
+				Certificates:             cv.Load().([]tls.Certificate),
 				PreferServerCipherSuites: true,
 			}
 			for _, proto := range info.SupportedProtos {
