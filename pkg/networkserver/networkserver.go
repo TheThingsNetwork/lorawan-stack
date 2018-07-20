@@ -484,17 +484,13 @@ type NsGsClientFunc func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnp
 
 // PeerGetter is the interface, which wraps GetPeer method.
 type PeerGetter interface {
-	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) cluster.Peer
+	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer
 }
 
 // NewGatewayServerPeerGetterFunc returns a NsGsClientFunc, which uses g to retrieve Gateway Server clients.
 func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
 	return func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
-		p := g.GetPeer(
-			ttnpb.PeerInfo_GATEWAY_SERVER,
-			[]string{fmt.Sprintf("gtw=%s", unique.ID(ctx, id))},
-			nil,
-		)
+		p := g.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, id)
 		if p == nil {
 			return nil, errGatewayServerNotFound
 		}
@@ -1614,6 +1610,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 
 		go func() {
+			// TODO: cluster.GetPeer(ctx, ttnpb.PeerInfo_APPLICATION_SERVER, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
+			// If not handled by cluster, try ns.applicationServers[uid].
+
 			ns.applicationServersMu.RLock()
 			cl, ok := ns.applicationServers[uid]
 			ns.applicationServersMu.RUnlock()
