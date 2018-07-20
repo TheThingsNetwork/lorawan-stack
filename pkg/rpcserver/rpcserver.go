@@ -183,6 +183,15 @@ func New(ctx context.Context, opts ...Option) *Server {
 				"uri":  []string{req.RequestURI},
 			}
 		}),
+		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
+			switch s {
+			case "x-total-count":
+				return "X-Total-Count", true
+			case "link":
+				return "Link", true
+			}
+			return s, false
+		}),
 	)
 	return server
 }
