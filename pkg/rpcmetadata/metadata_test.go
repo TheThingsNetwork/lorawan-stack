@@ -34,7 +34,9 @@ func TestMD(t *testing.T) {
 		ServiceVersion: "1.2.3-dev",
 		NetAddress:     "localhost",
 		Limit:          12,
-		Offset:         34,
+		Page:           34,
+		Host:           "hostfoo",
+		URI:            "fooURI",
 	}
 
 	ctx := md1.ToOutgoingContext(context.Background())
@@ -49,7 +51,9 @@ func TestMD(t *testing.T) {
 	a.So(md2.ServiceVersion, should.Equal, md1.ServiceVersion)
 	a.So(md2.NetAddress, should.Equal, md1.NetAddress)
 	a.So(md2.Limit, should.Equal, md1.Limit)
-	a.So(md2.Offset, should.Equal, md1.Offset)
+	a.So(md2.Page, should.Equal, md1.Page)
+	a.So(md2.Host, should.Equal, md1.Host)
+	a.So(md2.URI, should.Equal, md1.URI)
 
 	a.So(md1.RequireTransportSecurity(), should.BeTrue)
 	a.So(md2.RequireTransportSecurity(), should.BeFalse)

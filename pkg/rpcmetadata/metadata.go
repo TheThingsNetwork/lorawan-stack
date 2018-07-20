@@ -31,9 +31,19 @@ type MD struct {
 	ServiceType    string
 	ServiceVersion string
 	NetAddress     string
-	Limit          uint64
-	Offset         uint64
 	AllowInsecure  bool
+
+	// Limit is the limit of elements to display per-page.
+	Limit uint64
+
+	// Page is the page of elements to display.
+	Page uint64
+
+	// Host is the hostname the request is directed to.
+	Host string
+
+	// URI is the URI the request is directed to.
+	URI string
 }
 
 // GetRequestMetadata returns the request metadata with per-rpc credentials
@@ -69,11 +79,17 @@ func (m MD) ToMetadata() metadata.MD {
 	if m.NetAddress != "" {
 		pairs = append(pairs, "net-address", m.NetAddress)
 	}
+	if m.Host != "" {
+		pairs = append(pairs, "host", m.Host)
+	}
+	if m.URI != "" {
+		pairs = append(pairs, "uri", m.URI)
+	}
 	if m.Limit != 0 {
 		pairs = append(pairs, "limit", strconv.FormatUint(m.Limit, 10))
 	}
-	if m.Offset != 0 {
-		pairs = append(pairs, "offset", strconv.FormatUint(m.Offset, 10))
+	if m.Page != 0 {
+		pairs = append(pairs, "page", strconv.FormatUint(m.Page, 10))
 	}
 	return metadata.Pairs(pairs...)
 }
@@ -111,11 +127,17 @@ func FromMetadata(md metadata.MD) (m MD) {
 	if netAddress, ok := md["net-address"]; ok && len(netAddress) > 0 {
 		m.NetAddress = netAddress[0]
 	}
+	if host, ok := md["host"]; ok && len(host) > 0 {
+		m.Host = host[0]
+	}
+	if uri, ok := md["uri"]; ok && len(uri) > 0 {
+		m.URI = uri[0]
+	}
 	if limit, ok := md["limit"]; ok && len(limit) > 0 {
 		m.Limit, _ = strconv.ParseUint(limit[0], 10, 64)
 	}
-	if offset, ok := md["offset"]; ok && len(offset) > 0 {
-		m.Offset, _ = strconv.ParseUint(offset[0], 10, 64)
+	if page, ok := md["page"]; ok && len(page) > 0 {
+		m.Page, _ = strconv.ParseUint(page[0], 10, 64)
 	}
 	return
 }

@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/metadata"
 )
 
 // APIPrefix for the HTTP handler
@@ -176,6 +177,12 @@ func New(ctx context.Context, opts ...Option) *Server {
 	server.ServeMux = runtime.NewServeMux(
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
+			return metadata.MD{
+				"host": []string{req.Host},
+				"uri":  []string{req.RequestURI},
+			}
+		}),
 	)
 	return server
 }
