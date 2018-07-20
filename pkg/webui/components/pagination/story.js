@@ -13,50 +13,30 @@
 // limitations under the License.
 
 
-import React, { Component } from 'react'
-import bind from 'autobind-decorator'
+import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { withInfo } from '@storybook/addon-info'
 
 import Pagination from '.'
 
-@bind
-class Example extends Component {
-
-  state = {
-    currentPage: 0,
-  }
-
-  onPageChange (page) {
-    this.setState({ currentPage: page.selected })
-  }
-
-  render () {
-    return (
-      <Pagination
-        onPageChange={this.onPageChange}
-        {...this.props}
-      />
-    )
-  }
-}
-
-const Separator = () => (<div style={{ height: '20px' }} />)
-
 storiesOf('Pagination', module)
+  .addDecorator((story, context) => withInfo({
+    inline: true,
+    header: false,
+    propTables: [ Pagination ],
+  })(story)(context))
   .add('Default', () =>
     (
       <div>
-        <Example
+        <Pagination
           pageCount={1}
         />
-        <Separator />
-        <Example
+        <Pagination
           pageCount={3}
           initialPage={0}
           marginPagesDisplayed={2}
         />
-        <Separator />
-        <Example
+        <Pagination
           pageCount={3}
           initialPage={2}
           marginPagesDisplayed={2}
@@ -65,7 +45,7 @@ storiesOf('Pagination', module)
     )
   ).add('All pages (without gaps)', () =>
     (
-      <Example
+      <Pagination
         pageCount={10}
         pageRangeDisplayed={10}
       />
@@ -73,20 +53,17 @@ storiesOf('Pagination', module)
   ).add('With gaps', () =>
     (
       <div>
-        <Separator />
-        <Example
+        <Pagination
           pageCount={20}
           marginPagesDisplayed={2}
         />
-        <Separator />
-        <Example
+        <Pagination
           pageCount={9}
           initialPage={4}
           pageRangeDisplayed={1}
           marginPagesDisplayed={2}
         />
-        <Separator />
-        <Example
+        <Pagination
           pageCount={9}
           initialPage={4}
           pageRangeDisplayed={3}

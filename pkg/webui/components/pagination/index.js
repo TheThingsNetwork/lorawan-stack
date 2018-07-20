@@ -57,10 +57,26 @@ const Pagination = function (props) {
 }
 
 Pagination.propTypes = {
+  /** The total number of pages */
   pageCount: PropTypes.number.isRequired,
+  /**
+   * The number of pages to be displayed. If is bigger than
+   * pageCount, then all pages will be displayed without gaps.
+   */
   pageRangeDisplayed: PropTypes.number,
+  /**
+   * The number of pages to be displayed in the beginning/end of
+   * the component. For example, marginPagesDisplayed = 2, then the
+   * component will display at most two pages as margins:
+   * [<][1][2]...[10]...[19][20][>]
+   *
+   */
   marginPagesDisplayed: PropTypes.number,
+  /** The initial page number to be selected when the component
+   * gets rendered for the first time. Is 0-based.
+   * */
   initialPage: PropTypes.number,
+  /** An onClick handler that gets called with the new page number */
   onPageChange: PropTypes.func.isRequired,
 }
 
