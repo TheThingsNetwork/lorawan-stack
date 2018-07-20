@@ -28,20 +28,6 @@ type GsNsServer struct {
 	messageReceived chan string
 }
 
-func (s GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
-	go func() {
-		s.messageReceived <- "StartServingGateway"
-	}()
-	return ttnpb.Empty, nil
-}
-
-func (s GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
-	go func() {
-		s.messageReceived <- "StopServingGateway"
-	}()
-	return ttnpb.Empty, nil
-}
-
 func (s GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
 	go func() {
 		s.messageReceived <- "HandleUplink"

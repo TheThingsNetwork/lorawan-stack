@@ -177,22 +177,7 @@ func TestLink(t *testing.T) {
 		wg.Done()
 	}()
 
-	t.Run("StartServingGateway", func(t *testing.T) {
-		select {
-		case msg := <-ns.messageReceived:
-			if msg != "StartServingGateway" {
-				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
-			}
-		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
-		}
-
-		select {
-		case up <- &ttnpb.GatewayUp{GatewayStatus: ttnpb.NewPopulatedGatewayStatus(test.Randy, false)}:
-		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called Link.Recv() to receive the status message. This might be due to an unexpected error in the GatewayServer.Link() function.")
-		}
-	})
+	// TODO: monitor cluster claim on IDs https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 
 	t.Run("Join request", func(t *testing.T) {
 		join := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -262,14 +247,7 @@ func TestLink(t *testing.T) {
 	cancel()
 	wg.Wait()
 
-	select {
-	case msg := <-ns.messageReceived:
-		if msg != "StopServingGateway" {
-			t.Fatal("Expected Gateway Server to call StopServingGateway on the Network Server, instead received", msg)
-		}
-	case <-time.After(nsReceptionTimeout):
-		t.Fatal("The Gateway Server never called the Network Server's StopServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
-	}
+	// TODO: monitor cluster claim on IDs https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 
 	gs.Close()
 }

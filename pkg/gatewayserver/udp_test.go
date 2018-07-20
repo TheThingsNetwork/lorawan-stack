@@ -153,6 +153,8 @@ func testPullData(gatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t 
 			_, err = conn.Read(make([]byte, 2)) // Receive ACK
 			a.So(err, should.BeNil)
 
+			// TODO: monitor cluster claim on IDs https://github.com/TheThingsIndustries/lorawan-stack/issues/941
+			// TODO: monitor unclaim after timeout
 			if tc.success {
 				select {
 				case msg := <-ns.messageReceived:

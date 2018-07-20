@@ -40,7 +40,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -792,42 +791,6 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.En
 	return ttnpb.Empty, dev.Store(
 		"QueuedApplicationDownlinks",
 	)
-}
-
-// StartServingGateway is called by the Gateway Server to indicate that it is serving a gateway.
-func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	if err := clusterauth.Authorized(ctx); err != nil {
-		return nil, err
-	}
-
-	uid := unique.ID(ctx, gtwID)
-	if uid == "" {
-		return nil, errMissingGatewayID
-	}
-
-	gsID := rpcmetadata.FromIncomingContext(ctx).ID
-	// TODO: Associate the GS ID with the gateway uid in the cluster once
-	// https://github.com/TheThingsIndustries/ttn/issues/506#issuecomment-385963158 is resolved
-	_ = gsID
-	return ttnpb.Empty, nil
-}
-
-// StopServingGateway is called by the Gateway Server to indicate that it is no longer serving a gateway.
-func (ns *NetworkServer) StopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	if err := clusterauth.Authorized(ctx); err != nil {
-		return nil, err
-	}
-
-	uid := unique.ID(ctx, id)
-	if uid == "" {
-		return nil, errMissingGatewayID
-	}
-
-	gsID := rpcmetadata.FromIncomingContext(ctx).ID
-	// TODO: Deassociate the GS ID with the gateway uid in the cluster once
-	// https://github.com/TheThingsIndustries/ttn/issues/506#issuecomment-385963158 is resolved
-	_ = gsID
-	return ttnpb.Empty, nil
 }
 
 type accumulator struct {

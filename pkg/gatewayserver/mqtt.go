@@ -265,12 +265,12 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 
 	// TODO: Claim identifiers: https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 	logger.Debug("MQTT connection opened")
-	g.signalStartServingGateway(ctx, &handler.id)
+	g.signalStartServingGateway(ctx, handler.id)
 
 	go func() {
 		<-ctx.Done()
 		logger.Debug("MQTT connection closed")
-		g.signalStopServingGateway(g.Context(), &handler.id)
+		g.signalStopServingGateway(g.Context(), handler.id)
 	}()
 
 	readErr := make(chan error)

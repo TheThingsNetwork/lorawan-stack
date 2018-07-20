@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
@@ -78,22 +77,13 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 	return errors
 }
 
-func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
-	if err := g.forAllNS(func(nsClient ttnpb.GsNsClient) error {
-		_, err := nsClient.StartServingGateway(ctx, id, g.Component.WithClusterAuth())
-		return err
-	}); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not signal Network Server when gateway connected")
-	}
+func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) {
+	// TODO: cluster.ClaimIDs(ctx, id) https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 }
 
-func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
-	if err := g.forAllNS(func(nsClient ttnpb.GsNsClient) error {
-		_, err := nsClient.StopServingGateway(ctx, id, g.Component.WithClusterAuth())
-		return err
-	}); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not signal Network Server when gateway disconnected")
-	}
+func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) {
+	// NOTE: ctx may already be canceled.
+	// TODO: cluster.ReleaseIDs(ctx, id) https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 }
 
 func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
@@ -164,15 +154,11 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 
 	g.setupConnection(uid, connectionInfo)
 
-	go g.signalStartServingGateway(ctx, &id)
+	g.signalStartServingGateway(ctx, id)
 
 	go func() {
 		<-ctx.Done()
-		// TODO: Add tenant extraction when #433 is merged
-		stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
-		g.signalStopServingGateway(stopCtx, &id)
-		cancel()
-
+		g.signalStopServingGateway(ctx, id)
 		g.connectionsMu.Lock()
 		if oldConnection := g.connections[uid]; oldConnection == connectionInfo {
 			delete(g.connections, uid)

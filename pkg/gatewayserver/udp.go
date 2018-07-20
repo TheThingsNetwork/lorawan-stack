@@ -127,7 +127,7 @@ func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnSta
 	g.setupConnection(uid, conn)
 
 	// TODO: Claim identifiers: https://github.com/TheThingsIndustries/lorawan-stack/issues/941
-	go g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
+	go g.signalStartServingGateway(ctx, gtw.GatewayIdentifiers)
 
 	conn.ctx = ctx
 	return nil
