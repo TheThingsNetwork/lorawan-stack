@@ -82,7 +82,7 @@ func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id *ttnpb
 		_, err := nsClient.StartServingGateway(ctx, id, g.Component.ClusterAuth())
 		return err
 	}); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not signal NS when gateway connected")
+		log.FromContext(ctx).WithError(err).Error("Could not signal Network Server when gateway connected")
 	}
 }
 
@@ -91,7 +91,7 @@ func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id *ttnpb.
 		_, err := nsClient.StopServingGateway(ctx, id, g.Component.ClusterAuth())
 		return err
 	}); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not signal NS when gateway disconnected")
+		log.FromContext(ctx).WithError(err).Error("Could not signal Network Server when gateway disconnected")
 	}
 }
 
@@ -105,7 +105,7 @@ func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
 	g.connectionsMu.Unlock()
 }
 
-// Link the gateway to the gateway server. The authentication information will
+// Link the gateway to the Gateway Server. The authentication information will
 // be used to determine the gateway ID. If no authentication information is present,
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {

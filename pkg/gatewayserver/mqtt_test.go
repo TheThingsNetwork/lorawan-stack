@@ -61,10 +61,10 @@ func TestMQTTConnection(t *testing.T) {
 		},
 	})
 	is.rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_LINK}
-	logger.WithField("address", isAddr).Info("Started mock identity server")
+	logger.WithField("address", isAddr).Info("Started mock Identity Server")
 
 	ns, nsAddr := StartMockGsNsServer(ctx)
-	logger.WithField("address", nsAddr).Info("Started mock network server")
+	logger.WithField("address", nsAddr).Info("Started mock Network Server")
 
 	mqttAddress := "127.0.0.1:9883"
 	c := component.MustNew(logger, &component.Config{
@@ -88,18 +88,18 @@ func TestMQTTConnection(t *testing.T) {
 		},
 	})
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Gateway server could not be initialized:", err)
+		t.Fatal("Gateway Server could not be initialized:", err)
 	}
 
 	err = gs.Start()
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Gateway server could not start:", err)
+		t.Fatal("Gateway Server could not start:", err)
 	}
 
 	gsStart := time.Now()
 	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil || gs.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, []string{}, nil) == nil {
 		if time.Since(gsStart) > nsReceptionTimeout {
-			t.Fatal("Identity server and network server were not initialized in time by the gateway server - timeout")
+			t.Fatal("Identity Server and Network Server were not initialized in time by the Gateway Server - timeout")
 		}
 		time.Sleep(2 * time.Millisecond)
 	}
@@ -126,7 +126,7 @@ func TestMQTTConnection(t *testing.T) {
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "StartServingGateway" {
-				t.Fatal("Expected GS to call StartServingGateway on the NS, instead received", msg)
+				t.Fatal("Expected Gateway Server to call StartServingGateway on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the join request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
@@ -162,7 +162,7 @@ func TestMQTTConnection(t *testing.T) {
 			select {
 			case msg := <-ns.messageReceived:
 				if msg != "HandleUplink" {
-					t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
+					t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 				}
 			case <-time.After(nsReceptionTimeout):
 				t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
@@ -270,7 +270,7 @@ func TestMQTTConnection(t *testing.T) {
 			select {
 			case msg := <-ns.messageReceived:
 				if msg != "StopServingGateway" {
-					t.Fatal("Expected GS to call StopServingGateway on the NS, instead received", msg)
+					t.Fatal("Expected Gateway Server to call StopServingGateway on the Network Server, instead received", msg)
 				}
 			case <-time.After(nsReceptionTimeout):
 				t.Fatal("The Gateway Server never called the Network Server's StopServingGateway to handle the join request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")

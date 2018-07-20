@@ -24,8 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 )
 
-// ErrIdentityServerLoadData is returned when the data couldn't be loaded into the identity server.
-var ErrIdentityServerLoadData = errors.Define("identity_server_load_data", "could not load identity server data")
+// ErrIdentityServerLoadData is returned when the data couldn't be loaded into the Identity Server.
+var ErrIdentityServerLoadData = errors.Define("identity_server_load_data", "could not load Identity Server data")
 
 var (
 	initConfigName = "ttn-lw-identity-server"

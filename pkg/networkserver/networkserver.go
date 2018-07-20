@@ -140,7 +140,7 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	}
 }
 
-// NsGsClientFunc is the function used to get gateway server.
+// NsGsClientFunc is the function used to get Gateway Server.
 type NsGsClientFunc func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error)
 
 // PeerGetter is the interface, which wraps GetPeer method.
@@ -148,7 +148,7 @@ type PeerGetter interface {
 	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) cluster.Peer
 }
 
-// NewGatewayServerPeerGetterFunc returns a NsGsClientFunc, which uses g to retrieve gateway server clients.
+// NewGatewayServerPeerGetterFunc returns a NsGsClientFunc, which uses g to retrieve Gateway Server clients.
 func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
 	return func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
 		p := g.GetPeer(
@@ -219,7 +219,7 @@ func WithCollectionDoneFunc(fn WindowEndFunc) Option {
 }
 
 // WithNsGsClientFunc overrides the default NsGsClientFunc, which
-// is used to get the gateway server for a gateway identifiers.
+// is used to get the Gateway Server for a gateway identifiers.
 func WithNsGsClientFunc(fn NsGsClientFunc) Option {
 	return func(ns *NetworkServer) {
 		ns.gsClient = fn
@@ -704,7 +704,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 			cl, err := ns.gsClient(ctx, md.GatewayIdentifiers)
 			if err != nil {
-				logger.WithError(err).Debug("Could not get gateway server")
+				logger.WithError(err).Debug("Could not get Gateway Server")
 				continue
 			}
 
@@ -735,7 +735,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	for i, err := range errs {
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
-	logger.Warn("all gateway servers failed to schedule the downlink")
+	logger.Warn("all Gateway Servers failed to schedule the downlink")
 	return errScheduleFailed
 }
 

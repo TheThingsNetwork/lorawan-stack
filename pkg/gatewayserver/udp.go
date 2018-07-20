@@ -134,7 +134,7 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 
 	gtw, err := g.getGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: firstPacket.GatewayEUI})
 	if err != nil {
-		logger.WithError(err).Error("Could not retrieve gateway information from the gateway server")
+		logger.WithError(err).Error("Could not retrieve gateway information from the Gateway Server")
 		return
 	}
 

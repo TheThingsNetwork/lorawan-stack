@@ -23,7 +23,7 @@ import (
 
 var errInvalidJoinAcceptMessageSize = errInvalidSize("join_accept_message", "Join-accept message", "16 or 32")
 
-// EncryptJoinAccept uses AES Decrypt to encrypt a JoinAccept message
+// EncryptJoinAccept uses AES Decrypt to encrypt a join-accept message
 // - The payload contains JoinNonce/AppNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType) | MIC
 // - In LoRaWAN 1.0, the AppKey is used
 // - In LoRaWAN 1.1, the NwkKey is used in reply to a JoinRequest
@@ -43,7 +43,7 @@ func EncryptJoinAccept(key types.AES128Key, payload []byte) (encrypted []byte, e
 	return
 }
 
-// DecryptJoinAccept uses AES Encrypt to decrypt a JoinAccept message
+// DecryptJoinAccept uses AES Encrypt to decrypt a join-accept message
 // - The returned payload contains JoinNonce/AppNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType) | MIC
 // - In LoRaWAN 1.0, the AppKey is used
 // - In LoRaWAN 1.1, the NwkKey or JSEncKey is used
@@ -64,7 +64,7 @@ func DecryptJoinAccept(key types.AES128Key, encrypted []byte) (payload []byte, e
 
 var errInvalidJoinRequestPayloadSize = errInvalidSize("join_request_payload", "Join-request payload", "19")
 
-// ComputeJoinRequestMIC computes the Message Integrity Code for a JoinRequest message
+// ComputeJoinRequestMIC computes the Message Integrity Code for a join-request message
 // - The payload contains MHDR | JoinEUI/AppEUI | DevEUI | DevNonce
 // - In LoRaWAN 1.0, the AppKey is used
 // - In LoRaWAN 1.1, the NwkKey is used
@@ -124,7 +124,7 @@ func ComputeRejoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, 
 
 var errInvalidJoinAcceptPayloadSize = errInvalidSize("join_accept_payload", "JoinAccept payload", "13 or 29")
 
-// ComputeLegacyJoinAcceptMIC computes the Message Integrity Code for a JoinAccept message
+// ComputeLegacyJoinAcceptMIC computes the Message Integrity Code for a join-accept message
 // - The payload contains MHDR | JoinNonce/AppNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType)
 // - In LoRaWAN 1.0, the AppKey is used
 // - In LoRaWAN 1.1 with OptNeg=0, the NwkKey is used
@@ -144,9 +144,9 @@ func ComputeLegacyJoinAcceptMIC(key types.AES128Key, payload []byte) (mic [4]byt
 	return
 }
 
-// ComputeJoinAcceptMIC computes the Message Integrity Code for a JoinAccept message
+// ComputeJoinAcceptMIC computes the Message Integrity Code for a join-accept message
 // - The payload contains MHDR | JoinNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType)
-// - the joinReqType is 0xFF in reply to a JoinRequest or the rejoin type in reply to a RejoinRequest
+// - the joinReqType is 0xFF in reply to a join-request or the rejoin type in reply to a RejoinRequest
 func ComputeJoinAcceptMIC(jsIntKey types.AES128Key, joinReqType byte, joinEUI types.EUI64, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
 	if n := len(payload); n != 13 && n != 29 {
 		return mic, errInvalidJoinAcceptPayloadSize.WithAttributes("size", len(payload))

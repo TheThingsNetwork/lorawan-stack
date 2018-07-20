@@ -227,7 +227,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		a.So(err, should.BeError)
 	})
 
-	t.Run("No GS matching", func(t *testing.T) {
+	t.Run("No Gateway Server matching", func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))

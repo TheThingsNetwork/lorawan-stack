@@ -181,7 +181,7 @@ func TestLink(t *testing.T) {
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "StartServingGateway" {
-				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
+				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
@@ -206,7 +206,7 @@ func TestLink(t *testing.T) {
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "HandleUplink" {
-				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
+				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
@@ -228,7 +228,7 @@ func TestLink(t *testing.T) {
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "HandleUplink" {
-				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
+				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
@@ -241,7 +241,7 @@ func TestLink(t *testing.T) {
 	select {
 	case msg := <-ns.messageReceived:
 		if msg != "StopServingGateway" {
-			t.Fatal("Expected GS to call StopServingGateway on the NS, instead received", msg)
+			t.Fatal("Expected Gateway Server to call StopServingGateway on the Network Server, instead received", msg)
 		}
 	case <-time.After(nsReceptionTimeout):
 		t.Fatal("The Gateway Server never called the Network Server's StopServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")

@@ -78,7 +78,7 @@ func fetcherFromContext(ctx context.Context) (Fetcher, bool) {
 	return nil, false
 }
 
-// NewIdentityServerFetcher returns a new rights fetcher that fetches from the identity server returned by getConn.
+// NewIdentityServerFetcher returns a new rights fetcher that fetches from the Identity Server returned by getConn.
 // The allowInsecure argument indicates whether it's allowed to send credentials over connections without TLS.
 func NewIdentityServerFetcher(getConn func(ctx context.Context) *grpc.ClientConn, allowInsecure bool) Fetcher {
 	return &identityServerFetcher{getConn: getConn, allowInsecure: allowInsecure}
@@ -91,7 +91,7 @@ type identityServerFetcher struct {
 
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "no authentication found in call headers")
 
-var errNoISConn = errors.DefineUnavailable("no_identity_server_conn", "no connection to identity server")
+var errNoISConn = errors.DefineUnavailable("no_identity_server_conn", "no connection to Identity Server")
 
 func (f identityServerFetcher) forwardAuth(ctx context.Context) (context.Context, rpcmetadata.MD, error) {
 	md := rpcmetadata.FromIncomingContext(ctx)

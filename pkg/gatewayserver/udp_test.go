@@ -80,10 +80,10 @@ func testPushData(eui types.EUI64, ns *GsNsServer) func(t *testing.T) {
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "HandleUplink" {
-				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
+				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The gateway server never called the network server's HandleUplink to handle the PUSH_DATA.")
+			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the PUSH_DATA.")
 		}
 
 		conn.Close()
@@ -115,10 +115,10 @@ func testPullData(gatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t 
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "StartServingGateway" {
-				t.Fatal("Expected GS to call StartServingGateway on the NS, instead received", msg)
+				t.Fatal("Expected Gateway Server to call StartServingGateway on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The gateway server never called the network server's StartServingGateway to handle the PULL_DATA.")
+			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the PULL_DATA.")
 		}
 	}
 }
@@ -197,18 +197,18 @@ func TestUDP(t *testing.T) {
 		UDPAddress: testUDPAddress,
 	})
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Gateway server could not be initialized:", err)
+		t.Fatal("Gateway Server could not be initialized:", err)
 	}
 
 	err = gs.Start()
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Gateway server could not start:", err)
+		t.Fatal("Gateway Server could not start:", err)
 	}
 
 	gsStart := time.Now()
 	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil || gs.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, []string{}, nil) == nil {
 		if time.Since(gsStart) > nsReceptionTimeout {
-			t.Fatal("Identity server and network server were not initialized in time by the gateway server - timeout")
+			t.Fatal("Identity Server and Network Server were not initialized in time by the Gateway Server - timeout")
 		}
 		time.Sleep(2 * time.Millisecond)
 	}

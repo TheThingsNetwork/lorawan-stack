@@ -134,9 +134,9 @@ type Band struct {
 	// ReceiveDelay2 is the default Rx2 window timing in seconds (ReceiveDelay1 + 1s)
 	ReceiveDelay2 time.Duration
 
-	// ReceiveDelay1 is the default JoinAccept window timing in seconds
+	// ReceiveDelay1 is the default join-accept window timing in seconds
 	JoinAcceptDelay1 time.Duration
-	// ReceiveDelay2 is the JoinAccept window timing in seconds
+	// ReceiveDelay2 is the join-accept window timing in seconds
 	JoinAcceptDelay2 time.Duration
 	// MaxFCntGap
 	MaxFCntGap uint
