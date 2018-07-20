@@ -26,6 +26,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/fs"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestWatcher(t *testing.T) {
@@ -41,6 +42,8 @@ func TestWatcher(t *testing.T) {
 
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_SYNC, 0644)
 	a.So(err, should.BeNil)
+
+	time.Sleep(test.Delay)
 
 	var i int
 	var expected = []string{
@@ -59,14 +62,32 @@ func TestWatcher(t *testing.T) {
 	}))
 	a.So(err, should.BeNil)
 
+	time.Sleep(test.Delay)
+
 	file.WriteString("Hello, World!")
+
+	time.Sleep(test.Delay)
+
 	file.Chmod(0640)
 
 	file.Close()
 
+	time.Sleep(test.Delay)
+
 	os.Remove(filename)
 
-	wg.Wait()
+	time.Sleep(test.Delay)
+
+	ch := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+	select {
+	case <-ch:
+	case <-time.After(10 * time.Second):
+		t.Fatal("Did not receive all expected events")
+	}
 }
 
 func Example() {
