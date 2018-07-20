@@ -71,7 +71,7 @@ func newMockLink() *mockLink {
 	}
 }
 
-func TestLink(t *testing.T) {
+func TestLinkGateway(t *testing.T) {
 	a := assertions.New(t)
 
 	logger := test.GetLogger(t)
@@ -168,7 +168,7 @@ func TestLink(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		err := gs.Link(link)
+		err := gs.LinkGateway(link)
 		select {
 		case <-ctx.Done():
 		default:
@@ -184,7 +184,7 @@ func TestLink(t *testing.T) {
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{join}}:
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called Link.Recv() to receive the join-request. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called Link.Recv() to receive the join request. This might be due to an unexpected error in the GatewayServer.LinkGateway() function.")
 		}
 
 		select {
@@ -193,7 +193,7 @@ func TestLink(t *testing.T) {
 				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join-request. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join-request. This might be due to an unexpected error in the GatewayServer.LinkGateway() function.")
 		}
 	})
 
@@ -205,7 +205,7 @@ func TestLink(t *testing.T) {
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{uplink}}:
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called Link.Recv() to receive the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called Link.Recv() to receive the uplink. This might be due to an unexpected error in the GatewayServer.LinkGateway() function.")
 		}
 
 		select {
@@ -214,7 +214,7 @@ func TestLink(t *testing.T) {
 				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.LinkGateway() function.")
 		}
 	})
 

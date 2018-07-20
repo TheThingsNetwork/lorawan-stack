@@ -105,7 +105,7 @@ func (c *connectionData) addDownlinkObservation() {
 type gRPCConnection struct {
 	connectionData
 
-	link   ttnpb.GtwGs_LinkServer
+	link   ttnpb.GtwGs_LinkGatewayServer
 	cancel context.CancelFunc
 	gtw    *ttnpb.Gateway
 }

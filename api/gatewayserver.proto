@@ -48,10 +48,10 @@ message GetFrequencyPlanRequest {
 
 // The GtwGs service connects a gateway to a Gateway Server.
 service GtwGs {
-  // Link the gateway to the Gateway Server. The authentication information will
-  // be used to determine the gateway ID. If no authentication information is present,
-  // this gateway may not be used for downlink.
-  rpc Link(stream GatewayUp) returns (stream GatewayDown);
+  // LinkGateway links the gateway to the Gateway Server. The authentication information
+  // will be used to determine the gateway ID. If no authentication information
+  // is present, this gateway may not be used for downlink.
+  rpc LinkGateway(stream GatewayUp) returns (stream GatewayDown);
   // GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
   rpc GetFrequencyPlan(GetFrequencyPlanRequest) returns (FrequencyPlan);
 }

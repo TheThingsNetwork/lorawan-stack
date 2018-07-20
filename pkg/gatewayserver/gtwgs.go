@@ -96,10 +96,10 @@ func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
 	g.connectionsMu.Unlock()
 }
 
-// Link the gateway to the Gateway Server. The authentication information will
+// LinkGateway links the gateway to the Gateway Server. The authentication information will
 // be used to determine the gateway ID. If no authentication information is present,
 // this gateway may not be used for downlink.
-func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
+func (g *GatewayServer) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	ctx := link.Context()
 	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
