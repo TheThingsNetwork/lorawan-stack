@@ -71,7 +71,7 @@ func TestPeers(t *testing.T) {
 	var peer cluster.Peer
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
-		peer = c.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, nil)
+		peer = c.GetPeer(context.Background(), ttnpb.PeerInfo_NETWORK_SERVER, nil)
 		if peer != nil {
 			break
 		}
@@ -85,15 +85,15 @@ func TestPeers(t *testing.T) {
 	a.So(conn, should.NotBeNil)
 
 	for _, role := range unusedRoles {
-		peer = c.GetPeer(role, nil, nil)
+		peer = c.GetPeer(context.Background(), role, nil)
 		a.So(peer, should.BeNil)
 	}
 
-	peers := c.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, nil)
+	peers := c.GetPeers(context.Background(), ttnpb.PeerInfo_NETWORK_SERVER)
 	a.So(peers, should.HaveLength, 1)
 
 	for _, role := range unusedRoles {
-		peers = c.GetPeers(role, nil)
+		peers = c.GetPeers(context.Background(), role)
 		a.So(peers, should.HaveLength, 0)
 	}
 }

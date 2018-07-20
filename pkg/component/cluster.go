@@ -15,6 +15,8 @@
 package component
 
 import (
+	"context"
+
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -29,12 +31,24 @@ func (c *Component) initCluster() (err error) {
 
 // GetPeers returns cluster peers with the given role and the given tags.
 // See package ../cluster for more information.
-func (c *Component) GetPeers(role ttnpb.PeerInfo_Role, tags []string) []cluster.Peer {
-	return c.cluster.GetPeers(role, tags)
+func (c *Component) GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []cluster.Peer {
+	return c.cluster.GetPeers(ctx, role)
 }
 
 // GetPeer returns a cluster peer with the given role and the given tags.
 // See package ../cluster for more information.
-func (c *Component) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) cluster.Peer {
-	return c.cluster.GetPeer(role, tags, shardKey)
+func (c *Component) GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer {
+	return c.cluster.GetPeer(ctx, role, ids)
+}
+
+// ClaimIDs claims the identifiers in the cluster.
+// See package ../cluster for more information.
+func (c *Component) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+	return c.cluster.ClaimIDs(ctx, ids)
+}
+
+// UnclaimIDs unclaims the identifiers in the cluster.
+// See package ../cluster for more information.
+func (c *Component) UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+	return c.cluster.UnclaimIDs(ctx, ids)
 }

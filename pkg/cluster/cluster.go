@@ -39,16 +39,25 @@ type Cluster interface {
 	Join() error
 	// Leave the cluster.
 	Leave() error
-	// GetPeers returns peers with the given role and the given tags.
-	GetPeers(role ttnpb.PeerInfo_Role, tags []string) []Peer
-	// GetPeer returns a peer with the given role and the given tags.
-	// If the cluster contains more than one peer, the shardKey is used to select the right peer.
-	// Tagging and sharding is not part of the reference implementation. The idea of tagging is another layer of filtering
-	// peers, which allows network operators to have dedicated instances for premium customers, tenants or separated
-	// environments. The idea of sharding is that if multiple peers match the filters, we can still consistently select
-	// a single peer. The shardKey is usually the DevAddr or DevEUI to make sure duplicate messages arrive at the same NS,
-	// or any other identifier (such as an AppID) that helps achieve external consistency for API calls.
-	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer
+
+	// GetPeers returns peers with the given role.
+	GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []Peer
+	// GetPeer returns a peer with the given role, and a responsibility for the
+	// given identifiers. If the identifiers are nil, this function returns a random
+	// peer from the list that would be returned by GetPeers.
+	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) Peer
+
+	// ClaimIDs can be used to indicate that the current peer takes
+	// responsibility for entities identified by ids.
+	// Claiming an already claimed ID will transfer the claim (without notifying
+	// the previous holder). Releasing a non-claimed ID is a no-op. An error may
+	// only be returned if the claim/unclaim couldn't be communicated with the cluster.
+	ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+	// UnclaimIDs can be used to indicate that the current peer
+	// releases responsibility for entities identified by ids.
+	// The specified context ctx may already be done before calling this function.
+	UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+
 	// Auth returns a gRPC CallOption that can be used to identify the component within the cluster.
 	Auth() grpc.CallOption
 	// WithVerifiedSource verifies if the caller providing this context is a component from the cluster, and returns a
@@ -195,16 +204,11 @@ func (c *cluster) Leave() error {
 	return nil
 }
 
-func (c *cluster) GetPeers(role ttnpb.PeerInfo_Role, tags []string) []Peer {
+func (c *cluster) GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []Peer {
 	var matches []Peer
 	for _, peer := range c.peers {
 		if !peer.HasRole(role) {
 			continue
-		}
-		for _, tag := range tags {
-			if !peer.HasTag(tag) {
-				continue
-			}
 		}
 		if conn := peer.Conn(); conn != nil && conn.GetState() == connectivity.Ready {
 			matches = append(matches, peer)
@@ -213,11 +217,23 @@ func (c *cluster) GetPeers(role ttnpb.PeerInfo_Role, tags []string) []Peer {
 	return matches
 }
 
-func (c *cluster) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer {
-	matches := c.GetPeers(role, tags)
+func (c *cluster) GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) Peer {
+	matches := c.GetPeers(ctx, role)
 	if len(matches) == 1 {
-		// TODO: Select the right SubConn for shardKey?
 		return matches[0]
 	}
+	// The reference cluster only has a single instance of each component, so we don't need to filter on IDs.
+	return nil
+}
+
+// ClaimIDs is a no-op in the reference implementation.
+// The reference cluster only has a single instance of each component, so we don't need to claim.
+func (c *cluster) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+	return nil
+}
+
+// UnclaimIDs is a no-op in the reference implementation.
+// The reference cluster only has a single instance of each component, so we don't need to unclaim.
+func (c *cluster) UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
 	return nil
 }

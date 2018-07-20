@@ -65,7 +65,9 @@ func TestCluster(t *testing.T) {
 		Join:              []string{lis.Addr().String()},
 	}}
 
-	c, err := New(test.Context(), config, []rpcserver.Registerer{}...)
+	ctx := test.Context()
+
+	c, err := New(ctx, config, []rpcserver.Registerer{}...)
 	a.So(err, should.BeNil)
 
 	a.So(c.Join(), should.BeNil)
@@ -76,7 +78,7 @@ func TestCluster(t *testing.T) {
 	var is Peer
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
-		is = c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+		is = c.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
 		if is != nil {
 			break
 		}
@@ -85,13 +87,13 @@ func TestCluster(t *testing.T) {
 		t.FailNow()
 	}
 
-	gs := c.GetPeer(ttnpb.PeerInfo_GATEWAY_SERVER, nil, nil)
+	gs := c.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, nil)
 	a.So(gs, should.NotBeNil)
-	ns := c.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, nil)
+	ns := c.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, nil)
 	a.So(ns, should.NotBeNil)
-	as := c.GetPeer(ttnpb.PeerInfo_APPLICATION_SERVER, nil, nil)
+	as := c.GetPeer(ctx, ttnpb.PeerInfo_APPLICATION_SERVER, nil)
 	a.So(as, should.NotBeNil)
-	js := c.GetPeer(ttnpb.PeerInfo_JOIN_SERVER, nil, nil)
+	js := c.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, nil)
 	a.So(js, should.NotBeNil)
 
 	a.So(c.Leave(), should.BeNil)
