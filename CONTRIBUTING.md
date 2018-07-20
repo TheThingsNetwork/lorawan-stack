@@ -162,11 +162,11 @@ In case both of the words have an implementation-specific meaning, the variable 
 | entity                                                  | name    |
 | :-----------------------------------------------------: | :-----: |
 | wait group                                              | wg      |
-| gateway server                                          | gs      |
-| network server                                          | ns      |
-| join server                                             | js      |
-| application server                                      | as      |
-| identity server                                         | is      |
+| Gateway Server                                          | gs      |
+| Network Server                                          | ns      |
+| Join Server                                             | js      |
+| Application Server                                      | as      |
+| Identity Server                                         | is      |
 
 In case one of the words specifies the meaning of the variable in a specific language construct context, the variable name is the combination of abbrevations of the words. 
 
@@ -177,12 +177,12 @@ meaning is obvious from the context.
 
 | entity                          | name    |
 | :-----------------------------: | :-----: |
-| gateway id                      | gtwID   |
+| gateway ID                      | gtwID   |
 | gateway EUI                     | gtwEUI  |
-| application id                  | appID   |
+| application ID                  | appID   |
 | application EUI                 | appEUI  |
-| device id                       | devID   |
-| user id                         | userID  |
+| device ID                       | devID   |
+| user ID                         | userID  |
 
 ### Events
 
