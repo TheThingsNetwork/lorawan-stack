@@ -138,6 +138,9 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 
 	// Set up HTML routes.
 	index := console.assets.AppHandler("console.html", env)
-	group.GET("/", index)
+
+	if console.config.mount != "" && console.config.mount != "/" {
+		group.GET("", index)
+	}
 	group.GET("/*", index)
 }

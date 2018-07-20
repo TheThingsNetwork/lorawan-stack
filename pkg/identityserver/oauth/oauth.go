@@ -170,6 +170,10 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 
 	group.GET("/register", index, s.RedirectToAccount)
 	group.GET("/login", index, s.RedirectToNext)
+
+	if s.config.mount != "" && s.config.mount != "/" {
+		group.GET("", index)
+	}
 	group.GET("/*", index)
 }
 
