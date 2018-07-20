@@ -16,7 +16,10 @@ package test
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"strconv"
+	"sync"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -24,7 +27,7 @@ import (
 )
 
 func TestSameElements(t *testing.T) {
-	for i, tc := range []struct {
+	for _, tc := range []struct {
 		A    interface{}
 		B    interface{}
 		Same bool
@@ -60,12 +63,67 @@ func TestSameElements(t *testing.T) {
 			false,
 		},
 		{
+			[]string{"a", "b"},
+			[][]byte{{'a'}, {'b'}},
+			false,
+		},
+		{
+			map[string]interface{}{"a": 42, "b": 77},
+			map[string]int{"a": 42, "b": 77},
+			true,
+		},
+		{
+			map[string]io.Writer{},
+			[0]int{},
+			true,
+		},
+		{
+			func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
+			map[string]interface{}{"42": 42, "77": "b"},
+			true,
+		},
+		{
+			func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
+			map[string]interface{}{"42": 42.2, "77": "b"},
+			false,
+		},
+		{
 			[]int{42},
 			[]int{42},
 			true,
 		},
+		{
+			[]byte("ttn"),
+			"ttn",
+			true,
+		},
+		{
+			[]byte("foo"),
+			"bar",
+			false,
+		},
+		{
+			[2]int{42, 43},
+			[]int{43, 42},
+			true,
+		},
+		{
+			[3]int{42, 43, 43},
+			[]int{43, 42},
+			false,
+		},
+		{
+			"hello",
+			"olleh",
+			true,
+		},
+		{
+			"foo",
+			"fof",
+			false,
+		},
 	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%v/%v", tc.A, tc.B), func(t *testing.T) {
 			a := assertions.New(t)
 
 			a.So(SameElementsDeep(tc.A, tc.B), should.Equal, tc.Same)

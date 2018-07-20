@@ -75,49 +75,140 @@ func DiffEqual(x, y interface{}) bool {
 	return len(pretty.Diff(x, y)) == 0
 }
 
+// Ranger represents an entity, which can be ranged over(e.g. sync.Map).
+type Ranger interface {
+	Range(f func(k, v interface{}) bool)
+}
+
+type indexRanger struct {
+	reflect.Value
+}
+
+func (rv indexRanger) Range(f func(k, v interface{}) bool) {
+	for i := 0; i < rv.Len(); i++ {
+		if !f(nil, rv.Index(i).Interface()) {
+			return
+		}
+	}
+}
+
+type mapRanger struct {
+	reflect.Value
+}
+
+func (rv mapRanger) Range(f func(k, v interface{}) bool) {
+	for _, k := range rv.MapKeys() {
+		if !f(k.Interface(), rv.MapIndex(k).Interface()) {
+			return
+		}
+	}
+}
+
+func wrapRanger(v interface{}) (Ranger, bool) {
+	r, ok := v.(Ranger)
+	if ok {
+		return r, ok
+	}
+
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.String, reflect.Slice, reflect.Array:
+		return indexRanger{rv}, true
+	case reflect.Map:
+		return mapRanger{rv}, true
+	}
+	return nil, false
+}
+
 // SameElements reports whether xs and ys represent the same multiset of elements
 // under equality given by eq.
 // Signature of eq must be func(A, B) bool, where A, B are types, which
 // elements of xs and ys can be assigned to respectively.
-// It panics if reflect.Kind of xs or ys is not a slice.
+// It panics if either xs or ys is not one of:
+// 1. string, slice, array or map kind
+// 2. value, which implements Ranger interface(e.g. sync.Map)
 func SameElements(eq interface{}, xs, ys interface{}) bool {
+	if xs == nil || ys == nil {
+		return xs == ys
+	}
+
 	ev := reflect.ValueOf(eq)
 	if ev.Kind() != reflect.Func {
-		panic(fmt.Sprintf("Expected kind of eq to be a function, got: %s", ev.Kind()))
+		panic(fmt.Errorf("expected kind of eq to be a function, got: %s", ev.Kind()))
 	}
 
-	xv := reflect.ValueOf(xs)
-	if xv.Kind() != reflect.Slice {
-		panic(fmt.Sprintf("Expected kind of xs to be a slice, got: %s", xv.Kind()))
+	xr, ok := wrapRanger(xs)
+	if !ok {
+		panic(fmt.Errorf("cannot range over values of type %T", xs))
 	}
 
-	yv := reflect.ValueOf(ys)
-	if yv.Kind() != reflect.Slice {
-		panic(fmt.Sprintf("Expected kind of ys to be a slice, got: %s", yv.Kind()))
+	yr, ok := wrapRanger(ys)
+	if !ok {
+		panic(fmt.Errorf("cannot range over values of type %T", ys))
 	}
 
-	n := xv.Len()
-	if n != yv.Len() {
-		return false
+	// NOTE: A hashmap cannot be used directly here, as []byte is unhashable.
+	type entry struct {
+		key    interface{}
+		values []reflect.Value
+		found  map[int]bool
 	}
+	var entries []*entry
 
-	bm := make([]bool, n)
-
-outer:
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			if !bm[j] && ev.Call([]reflect.Value{xv.Index(i), yv.Index(j)})[0].Bool() {
-				bm[j] = true
-				continue outer
+	findEntry := func(k interface{}) *entry {
+		for _, e := range entries {
+			if reflect.DeepEqual(e.key, k) {
+				return e
 			}
 		}
+		return nil
+	}
+
+	xr.Range(func(k, v interface{}) bool {
+		e := findEntry(k)
+		if e == nil {
+			e = &entry{
+				key:   k,
+				found: map[int]bool{},
+			}
+			entries = append(entries, e)
+		}
+		e.values = append(e.values, reflect.ValueOf(v))
+		return true
+	})
+
+	ok = true
+	yr.Range(func(k, yv interface{}) bool {
+		e := findEntry(k)
+		if e == nil {
+			ok = false
+			return false
+		}
+
+		for i, v := range e.values {
+			if e.found[i] {
+				continue
+			}
+
+			if ev.Call([]reflect.Value{v, reflect.ValueOf(yv)})[0].Bool() {
+				ok = true
+				e.found[i] = true
+				return true
+			}
+		}
+		ok = false
+		return false
+	})
+
+	if !ok {
 		return false
 	}
 
-	// Check if all values in ys have been marked
-	for _, v := range bm {
-		if !v {
-			return false
+	for _, e := range entries {
+		for i := range e.values {
+			if !e.found[i] {
+				return false
+			}
 		}
 	}
 	return true
