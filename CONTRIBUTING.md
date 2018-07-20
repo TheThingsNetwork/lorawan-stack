@@ -192,6 +192,16 @@ The event name is usually of the form `component.entity.action`. Examples are `n
 
 The event description describes the event in simple English. The description is capitalized by the frontend, so the message should be lowercase, and typically doesn't end with a period.
 
+### Errors
+
+Errors are defined with ``errors.Define("error_name", "error description with `{attribute_value}`")``
+
+Error definitions must be defined as close to the return statements as possible; in the same package, and preferably above the concerning function(s). Do not export the error definitions unless they are meaningful to other packages, i.e. for testing the exact error definition.
+
+The error name in snake case is a short and unique identifier of the error within the package. There is no need to append `_failed` or `_error` or prepend `failed_to_` as an error already indicates something went wrong. Be consistent in wording (i.e. prefer the more descriptive `missing_field` over `no_field`), order (i.e. prefer the more clear `missing_field` over `field_missing`) and do not use entity abbreviations.
+
+The error description in lower case, with only names in title case, is a concise plain English text that is human readable and understandable. Do not end the description with a dot. You may use attributes, in snake case, in backticks (`` ` ``) and curly braces (`{ }`). Only provide primitive types as attribute values using `WithAttributes()`.
+
 ### Comments
 
 Code should be as self-explanatory as possible. However, comments should be used to respect Go formatting guidelines, to generate insightful documentation with [Godoc](https://godoc.org/go.thethings.network/lorawan-stack), and to explain what can not be expressed by pure code. Comments should be English sentences, and documentation-generating comments should be closed by a period. Comments can also be used to indicate steps to take in the future (*TODOs*), if they reference the GitHub issue to track this *TODO*.
