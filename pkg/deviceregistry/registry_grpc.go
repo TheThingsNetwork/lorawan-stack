@@ -16,6 +16,10 @@ package deviceregistry
 
 import (
 	"context"
+	"fmt"
+	"math"
+	"path"
+	"strconv"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -23,10 +27,13 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
-const defaultListCount = 100
+var defaultListCount uint64 = 10
 
 // RegistryRPC implements the device registry gRPC service.
 type RegistryRPC struct {
@@ -56,12 +63,6 @@ func WithSetDeviceProcessor(fn func(ctx context.Context, create bool, dev *ttnpb
 	return func(r *RegistryRPC) { r.setDeviceProcessor = fn }
 }
 
-var componentsDiminutives = map[ttnpb.PeerInfo_Role]string{
-	ttnpb.PeerInfo_APPLICATION_SERVER: "As",
-	ttnpb.PeerInfo_NETWORK_SERVER:     "Ns",
-	ttnpb.PeerInfo_JOIN_SERVER:        "Js",
-}
-
 // NewRPC returns a new instance of RegistryRPC
 func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRPC, error) {
 	rpc := &RegistryRPC{
@@ -76,20 +77,73 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 	return rpc, nil
 }
 
+// setPaginationHeaders sets the pagination headers on the underlying gRPC transport stream present in ctx.
+// setPaginationHeaders sets:
+// - 'x-total-count' - total count of results.
+// - 'link' - as defined in the RFC 5988. It is only set if limit != 0 and url != "".
+func setPaginationHeaders(ctx context.Context, url string, limit, page, total uint64) error {
+	md := metadata.MD{
+		"x-total-count": []string{strconv.FormatUint(total, 10)},
+	}
+	if limit == 0 || url == "" {
+		return grpc.SetHeader(ctx, md)
+	}
+
+	linkf := fmt.Sprintf(`<%s?page=%%d&per_page=%d>; rel="%%s"`, url, limit)
+
+	n := uint64(math.Ceil(float64(total) / float64(limit)))
+	if n == 0 {
+		n = 1
+	}
+
+	md["link"] = make([]string, 0, 4)
+
+	md["link"] = append(md["link"], fmt.Sprintf(linkf, 1, "first"))
+	if page > 1 && page <= n {
+		md["link"] = append(md["link"], fmt.Sprintf(linkf, page-1, "prev"))
+	}
+	if page < n {
+		md["link"] = append(md["link"], fmt.Sprintf(linkf, page+1, "next"))
+	}
+	md["link"] = append(md["link"], fmt.Sprintf(linkf, n, "last"))
+
+	return grpc.SetHeader(ctx, md)
+}
+
 // ListDevices lists devices matching filter in underlying registry.
 func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevices, error) {
 	if err := rights.RequireApplication(ctx, filter.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
+	md := rpcmetadata.FromIncomingContext(ctx)
+
+	count := defaultListCount
+	if md.Limit > 0 {
+		count = md.Limit
+	}
+
+	page := md.Page
+	if page == 0 {
+		page = 1
+	}
+
+	offset := uint64(0)
+	if page > 1 {
+		// Page is 1-indexed
+		offset = (page - 1) * count
+	}
+
 	eds := make([]*ttnpb.EndDevice, 0, defaultListCount)
-	if err := RangeByIdentifiers(r.Interface, filter, defaultListCount, func(dev *Device) bool {
+	total, err := RangeByIdentifiers(r.Interface, filter, "", count, offset, func(dev *Device) bool {
 		eds = append(eds, dev.EndDevice)
-		return true
-	}); err != nil {
+		return count == 0 || uint64(len(eds)) < count
+	})
+	if err != nil {
 		return nil, err
 	}
-	return &ttnpb.EndDevices{EndDevices: eds}, nil
+
+	return &ttnpb.EndDevices{EndDevices: eds}, setPaginationHeaders(ctx, path.Join(md.Host, md.URI), count, page, total)
 }
 
 // GetDevice returns the device associated with id in underlying registry, if found.

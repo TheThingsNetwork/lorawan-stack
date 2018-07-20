@@ -24,9 +24,22 @@ import (
 )
 
 // Interface represents the interface exposed by the *Registry.
+//
+// Create stores application data and returns a new *Application.
+// It may modify CreatedAt and UpdatedAt fields of a and may return error if either of them is set to non-zero value on a.
+//
+// Range calls f sequentially for each application stored, matching specified application fields.
+// If f returns false, Range stops the iteration.
+// If orderBy is set to non-empty string, it represents the fieldpath of the field, which the applications, that Range will iterate over will be sorted by.
+// If count > 0, then Range will do it's best effort to iterate over at most count applications.
+// If count == 0, then Range will iterate over all matching applications.
+// Note, that Range provides no guarantees on the count of applications iterated over if count > 0 and
+// it's caller's responsibility to handle cases where such are required.
+// Range starts iteration at the index specified by the offset. Offset it 0-indexed.
+// If len(fields) == 0, then Range uses all fields in a to match applications.
 type Interface interface {
 	Create(a *ttnpb.Application, fields ...string) (*Application, error)
-	Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) error
+	Range(a *ttnpb.Application, orderBy string, count, offset uint64, f func(*Application) bool, fields ...string) (uint64, error)
 }
 
 var _ Interface = &Registry{}
@@ -43,8 +56,8 @@ func New(s store.Client) *Registry {
 	}
 }
 
-// Create stores applications data in underlying store.Interface and returns a new *Application.
-// It modifies CreatedAt and UpdatedAt fields of a and returns error if either of them is non-zero on a.
+// Create implements Interface.
+// Create modifies CreatedAt and UpdatedAt fields of ed and returns error if either of them is set to non-zero value on ed.
 func (r *Registry) Create(a *ttnpb.Application, fields ...string) (app *Application, err error) {
 	defer func(start time.Time) {
 		if err != nil {
@@ -67,18 +80,8 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (app *Applicat
 	return newApplication(a, r.store, id), nil
 }
 
-// Range calls f sequentially for each application stored, matching specified application fields.
-// If f returns false, range stops the iteration.
-//
-// Range does not necessarily correspond to any consistent snapshot of the Registry's
-// contents: no application will be visited more than once, but if the device is
-// created or deleted concurrently, Range may or may not call f on that device.
-//
-// If batchSize argument is non-zero, Range will retrieve applications
-// from the underlying store in chunks of (approximately) batchSize applications.
-//
-// If len(fields) == 0, then Range uses all fields in a to match applications.
-func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) (err error) {
+// Range implements Interface.
+func (r *Registry) Range(a *ttnpb.Application, orderBy string, count, offset uint64, f func(*Application) bool, fields ...string) (total uint64, err error) {
 	defer func(start time.Time) {
 		if err != nil {
 			return
@@ -89,12 +92,12 @@ func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Applica
 	}(time.Now())
 
 	if a == nil {
-		return errNilApplication
+		return 0, errNilApplication
 	}
 	return r.store.Range(
 		a,
 		func() interface{} { return &ttnpb.Application{} },
-		batchSize,
+		orderBy, count, offset,
 		func(k store.PrimaryKey, v interface{}) bool {
 			return f(newApplication(v.(*ttnpb.Application), r.store, k))
 		},
@@ -107,48 +110,35 @@ var Identifiers = []string{
 	"ApplicationIdentifiers.ApplicationID",
 }
 
-// RangeByIdentifiers calls f sequentially for each application stored in r, matching specified application identifiers.
-// If f returns false, range stops the iteration.
-//
-// Range does not necessarily correspond to any consistent snapshot of the Intefaces's
-// contents: no application will be visited more than once, but if the device is
-// created or deleted concurrently, Range may or may not call f on that device.
-//
-// If batchSize argument is non-zero, Range will retrieve applications
-// from the underlying store in chunks of (approximately) batchSize applications.
-func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, batchSize uint64, f func(*Application) bool) error {
+// RangeByIdentifiers is a helper function, which allows ranging over r by matching identifiers instead of *ttnpb.Application.
+func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, orderBy string, count, offset uint64, f func(*Application) bool) (uint64, error) {
 	if id == nil {
-		return errNilIdentifiers
+		return 0, errNilIdentifiers
 	}
 
 	fields := make([]string, 0, 1)
 	if id.ApplicationID != "" {
 		fields = append(fields, "ApplicationIdentifiers.ApplicationID")
 	}
-	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, batchSize, f, fields...)
+	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, orderBy, count, offset, f, fields...)
 }
 
 // FindByIdentifiers searches for exactly one application matching specified application identifiers in r.
 func FindByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers) (*Application, error) {
 	var app *Application
-	var i uint64
-	err := RangeByIdentifiers(r, id, 1, func(a *Application) bool {
-		i++
-		if i > 1 {
-			return false
-		}
+	total, err := RangeByIdentifiers(r, id, "", 1, 0, func(a *Application) bool {
 		app = a
-		return true
+		return false
 	})
 	if err != nil {
 		return nil, err
 	}
-	switch i {
-	case 0:
+
+	switch {
+	case total == 0:
 		return nil, errApplicationNotFound
-	case 1:
-		return app, nil
-	default:
+	case total > 1:
 		return nil, errTooManyApplications
 	}
+	return app, nil
 }

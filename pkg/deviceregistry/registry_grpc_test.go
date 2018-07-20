@@ -16,6 +16,7 @@ package deviceregistry_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -27,27 +28,41 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	. "go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
-var (
-	ctxWithoutRights = rights.NewContextWithFetcher(
-		context.Background(),
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
-			return []ttnpb.Right{}, nil
-		}),
-	)
-	ctxWithRights = rights.NewContextWithFetcher(
-		context.Background(),
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
-			return []ttnpb.Right{ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE}, nil
-		}),
-	)
+const (
+	uri              = "foo/bar"
+	host             = "test"
+	defaultListCount = 2
 )
+
+func init() {
+	SetDefaultListCount(defaultListCount)
+}
+
+func newContext(md *rpcmetadata.MD, s grpc.ServerTransportStream, rs ...ttnpb.Right) context.Context {
+	ctx := rights.NewContextWithFetcher(
+		test.Context(),
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+			return rs, nil
+		}),
+	)
+	if s != nil {
+		ctx = grpc.NewContextWithServerTransportStream(ctx, s)
+	}
+	if md != nil {
+		ctx = md.ToIncomingContext(ctx)
+	}
+	return ctx
+}
 
 func TestRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
@@ -55,11 +70,31 @@ func TestRegistryRPC(t *testing.T) {
 
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	dev, err := dr.SetDevice(ctxWithoutRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	ctx := newContext(
+		nil,
+		&test.MockServerTransportStream{
+			MockServerStream: &test.MockServerStream{
+				SetHeaderFunc: func(md metadata.MD) error {
+					return nil
+				},
+				SendHeaderFunc: func(md metadata.MD) error {
+					t.Fatal("SendHeader must not be called")
+					return errors.New("SendHeader must not be called")
+				},
+				SetTrailerFunc: func(md metadata.MD) {
+					t.Fatal("SetTrailer must not be called")
+				},
+			},
+		},
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	)
+
+	dev, err := dr.SetDevice(newContext(nil, nil), &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(dev, should.BeNil)
 
-	dev, err = dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	pb.CreatedAt = dev.GetCreatedAt()
 	pb.UpdatedAt = dev.GetUpdatedAt()
 	if !a.So(err, should.BeNil) {
@@ -69,43 +104,47 @@ func TestRegistryRPC(t *testing.T) {
 		pretty.Ldiff(t, dev, pb)
 	}
 
-	devs, err := dr.ListDevices(ctxWithoutRights, &pb.EndDeviceIdentifiers)
+	devs, err := dr.ListDevices(newContext(nil, nil), &pb.EndDeviceIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	a.So(devs, should.BeNil)
 
-	devs, err = dr.ListDevices(ctxWithRights, &pb.EndDeviceIdentifiers)
+	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 		devs.EndDevices[0].CreatedAt = pb.GetCreatedAt()
 		devs.EndDevices[0].UpdatedAt = pb.GetUpdatedAt()
 		a.So(pretty.Diff(devs.EndDevices[0], pb), should.BeEmpty)
 	}
 
-	_, err = dr.DeleteDevice(ctxWithoutRights, &pb.EndDeviceIdentifiers)
+	_, err = dr.DeleteDevice(newContext(nil, nil), &pb.EndDeviceIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	v, err := dr.DeleteDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.Equal, ttnpb.Empty)
 
-	_, err = dr.ListDevices(ctxWithoutRights, &pb.EndDeviceIdentifiers)
+	_, err = dr.ListDevices(newContext(nil, nil), &pb.EndDeviceIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	devs, err = dr.ListDevices(ctxWithRights, &pb.EndDeviceIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(devs.EndDevices, should.BeEmpty)
+	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
+	if a.So(err, should.BeNil) && a.So(devs, should.NotBeNil) {
+		a.So(devs.EndDevices, should.BeEmpty)
+	}
 }
 
 func TestSetDeviceNoProcessor(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
+	ctx := newContext(nil, nil, ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE)
+
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	_, err := dr.SetDevice(ctxWithoutRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	_, err := dr.SetDevice(newContext(nil, nil), &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	dev, err := dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
 	pb.CreatedAt = dev.GetCreatedAt()
 	pb.UpdatedAt = dev.GetUpdatedAt()
@@ -119,7 +158,7 @@ func TestSetDeviceNoProcessor(t *testing.T) {
 		pb.Location = ttnpb.NewPopulatedLocation(test.Randy, false)
 	}
 
-	dev, err = dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{
 		Device: *pb,
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"location.latitude"},
@@ -151,37 +190,229 @@ func TestSetDeviceNoProcessor(t *testing.T) {
 		t.FailNow()
 	}
 
-	dev, err = dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyDevices)
 	a.So(dev, should.BeNil)
 }
 
 func TestListDevices(t *testing.T) {
-	a := assertions.New(t)
-	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+	for _, tc := range []struct {
+		Host, URI   string
+		Limit, Page uint64
+		ShouldList  bool
+		Headers     map[string][]string
+	}{
+		{"", "", 0, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 1, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 0, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 1, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 2, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 2, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 0, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 1, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"", "", 2, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+		}},
+		{"foohost", "", 0, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, defaultListCount),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, defaultListCount),
+			},
+		}},
+		{"foohost", "", 1, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, 1),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, 1),
+			},
+		}},
+		{"foohost", "", 0, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, defaultListCount),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, defaultListCount),
+			},
+		}},
+		{"foohost", "", 1, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, 1),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, 1),
+			},
+		}},
+		{"foohost", "", 2, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, 2),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, 2),
+			},
+		}},
+		{"foohost", "", 2, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, 2),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, 2),
+			},
+		}},
+		{"foohost", "", 0, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, defaultListCount),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, defaultListCount),
+			},
+		}},
+		{"foohost", "", 1, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, 1),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, 1),
+			},
+		}},
+		{"foohost", "", 2, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="first"`, 2),
+				fmt.Sprintf(`<foohost?page=1&per_page=%d>; rel="last"`, 2),
+			},
+		}},
+		{"foohost", "bar/42", 0, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, defaultListCount),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, defaultListCount),
+			},
+		}},
+		{"foohost", "bar/42", 1, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, 1),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, 1),
+			},
+		}},
+		{"foohost", "bar/42", 0, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, defaultListCount),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, defaultListCount),
+			},
+		}},
+		{"foohost", "bar/42", 1, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, 1),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, 1),
+			},
+		}},
+		{"foohost", "bar/42", 2, 0, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, 2),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, 2),
+			},
+		}},
+		{"foohost", "bar/42", 2, 1, true, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, 2),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, 2),
+			},
+		}},
+		{"foohost", "bar/42", 0, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, defaultListCount),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, defaultListCount),
+			},
+		}},
+		{"foohost", "bar/42", 1, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, 1),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, 1),
+			},
+		}},
+		{"foohost", "bar/42", 2, 2, false, map[string][]string{
+			"x-total-count": {"1"},
+			"link": {
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="first"`, 2),
+				fmt.Sprintf(`<foohost/bar/42?page=1&per_page=%d>; rel="last"`, 2),
+			},
+		}},
+	} {
+		t.Run(fmt.Sprintf("host:'%s'/uri:'%s'/limit:%d/page:%d", tc.Host, tc.URI, tc.Limit, tc.Page), func(t *testing.T) {
+			a := assertions.New(t)
+			dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	dev1, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
+			setHeaderMD := make(chan metadata.MD, 1)
+			setHeaderErr := make(chan error, 1)
 
-	dev2, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
+			ctx := newContext(
+				&rpcmetadata.MD{
+					Limit: tc.Limit,
+					Page:  tc.Page,
+					URI:   tc.URI,
+					Host:  tc.Host,
+				},
+				&test.MockServerTransportStream{
+					MockServerStream: &test.MockServerStream{
+						SetHeaderFunc: func(md metadata.MD) error {
+							setHeaderMD <- md
+							return <-setHeaderErr
+						},
+						SendHeaderFunc: func(md metadata.MD) error {
+							t.Fatal("SendHeader must not be called")
+							return errors.New("SendHeader must not be called")
+						},
+						SetTrailerFunc: func(md metadata.MD) {
+							t.Fatal("SetTrailer must not be called")
+						},
+					},
+				},
+				ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+			)
 
-	devs, err := dr.ListDevices(ctxWithRights, &dev1.EndDeviceIdentifiers)
-	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
-		devs.EndDevices[0].CreatedAt = dev1.EndDevice.GetCreatedAt()
-		devs.EndDevices[0].UpdatedAt = dev1.EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(devs.EndDevices[0], dev1.EndDevice), should.BeEmpty)
-	}
+			dev, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 
-	devs, err = dr.ListDevices(ctxWithRights, &dev2.EndDeviceIdentifiers)
-	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
-		devs.EndDevices[0].CreatedAt = dev2.EndDevice.GetCreatedAt()
-		devs.EndDevices[0].UpdatedAt = dev2.EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(devs.EndDevices[0], dev2.EndDevice), should.BeEmpty)
+			select {
+			case setHeaderErr <- nil:
+			case <-time.After(test.Delay):
+				t.Fatal("Timed out waiting for error to be consumed by SetHeader")
+			}
+
+			devs, err := dr.ListDevices(ctx, &dev.EndDeviceIdentifiers)
+			a.So(err, should.BeNil)
+			if tc.ShouldList && a.So(devs.EndDevices, should.HaveLength, 1) {
+				a.So(pretty.Diff(devs.EndDevices[0], dev.EndDevice), should.BeEmpty)
+			}
+
+			select {
+			case md := <-setHeaderMD:
+				a.So(md, should.HaveSameElements, tc.Headers, test.SameElementsDeep)
+
+			case <-time.After(test.Delay):
+				t.Fatal("Timed out waiting for SetHeader to be called")
+			}
+		})
 	}
 }
 
@@ -189,9 +420,11 @@ func TestGetDevice(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
+	ctx := newContext(nil, nil, ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE)
+
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.GetDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrDeviceNotFound)
 	a.So(v, should.BeNil)
 
@@ -200,7 +433,7 @@ func TestGetDevice(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.GetDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -211,7 +444,7 @@ func TestGetDevice(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.GetDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyDevices)
 	a.So(v, should.BeNil)
 }
@@ -220,9 +453,11 @@ func TestDeleteDevice(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
+	ctx := newContext(nil, nil, ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE)
+
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.DeleteDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrDeviceNotFound)
 	a.So(v, should.BeNil)
 
@@ -231,7 +466,7 @@ func TestDeleteDevice(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.DeleteDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -249,7 +484,7 @@ func TestDeleteDevice(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.DeleteDevice(ctxWithRights, &pb.EndDeviceIdentifiers)
+	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyDevices)
 	a.So(v, should.BeNil)
 }
@@ -272,22 +507,24 @@ func TestSetDeviceProcessor(t *testing.T) {
 
 	a := assertions.New(t)
 
-	dev, err := dr.SetDevice(ctxWithoutRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err := dr.SetDevice(newContext(nil, nil), &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(dev, should.BeNil)
 
+	ctx := newContext(nil, nil, ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE)
+
 	procErr = errors.New("err")
-	dev, err = dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.HaveSameErrorDefinitionAs, ErrProcessorFailed)
 	a.So(dev, should.BeNil)
 
 	procErr = errTest.WithAttributes("foo", "bar")
-	dev, err = dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.Resemble, procErr)
 	a.So(dev, should.BeNil)
 
 	procErr = nil
-	dev, err = dr.SetDevice(ctxWithRights, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
 	pb.CreatedAt = dev.GetCreatedAt()
 	pb.UpdatedAt = dev.GetUpdatedAt()

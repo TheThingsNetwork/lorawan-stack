@@ -17,6 +17,7 @@ package applicationregistry_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
@@ -33,133 +34,7 @@ func TestRegistry(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
-	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
-
-	app, err := r.Create(deepcopy.Copy(pb).(*ttnpb.Application))
-	if !a.So(err, should.BeNil) {
-		return
-	}
-	if a.So(app, should.NotBeNil) {
-		pb.CreatedAt = app.Application.GetCreatedAt()
-		pb.UpdatedAt = app.Application.GetUpdatedAt()
-		a.So(app.Application, should.Resemble, pb)
-	}
-
-	i := 0
-	err = r.Range(pb, 1, func(found *Application) bool {
-		i++
-		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
-		return true
-	}, "ApplicationIdentifiers")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(i, should.Equal, 1)
-
-	updated := ttnpb.NewPopulatedApplication(test.Randy, false)
-	for app.Application.ApplicationIdentifiers.Equal(updated.ApplicationIdentifiers) {
-		updated = ttnpb.NewPopulatedApplication(test.Randy, false)
-	}
-	app.Application = updated
-
-	if !a.So(app.Store(), should.BeNil) {
-		return
-	}
-
-	i = 0
-	err = r.Range(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
-	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-
-	pb = updated
-
-	i = 0
-	err = r.Range(pb, 1, func(found *Application) bool {
-		i++
-		pb.UpdatedAt = found.Application.GetUpdatedAt()
-		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
-		return true
-	}, "ApplicationIdentifiers")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(i, should.Equal, 1)
-
-	a.So(app.Delete(), should.BeNil)
-
-	i = 0
-	err = r.Range(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
-	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-}
-
-func TestFindApplicationByIdentifiers(t *testing.T) {
-	a := assertions.New(t)
-	r := New(store.NewTypedMapStoreClient(mapstore.New()))
-
-	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
-
-	app, err := r.Create(deepcopy.Copy(pb).(*ttnpb.Application))
-	if !a.So(err, should.BeNil) {
-		return
-	}
-	if a.So(app, should.NotBeNil) {
-		pb.CreatedAt = app.Application.GetCreatedAt()
-		pb.UpdatedAt = app.Application.GetUpdatedAt()
-		a.So(app.Application, should.Resemble, pb)
-	}
-
-	i := 0
-	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
-		i++
-		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
-		return true
-	})
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(i, should.Equal, 1)
-
-	updated := ttnpb.NewPopulatedApplication(test.Randy, false)
-	for app.Application.ApplicationIdentifiers.Equal(updated.ApplicationIdentifiers) {
-		updated = ttnpb.NewPopulatedApplication(test.Randy, false)
-	}
-	app.Application = updated
-
-	if !a.So(app.Store(), should.BeNil) {
-		return
-	}
-
-	i = 0
-	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
-	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-
-	pb = updated
-
-	i = 0
-	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
-		i++
-		pb.UpdatedAt = found.Application.GetUpdatedAt()
-		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
-		return true
-	})
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(i, should.Equal, 1)
-
-	a.So(app.Delete(), should.BeNil)
-
-	i = 0
-	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
-	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-}
-
-func TestFindOneApplicationByIdentifiers(t *testing.T) {
-	a := assertions.New(t)
-	r := New(store.NewTypedMapStoreClient(mapstore.New()))
+	start := time.Now()
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
@@ -169,29 +44,171 @@ func TestFindOneApplicationByIdentifiers(t *testing.T) {
 
 	app, err := r.Create(deepcopy.Copy(pb).(*ttnpb.Application))
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
+	a.So([]time.Time{start, app.Application.GetCreatedAt(), time.Now()}, should.BeChronological)
+	a.So(app.Application.GetCreatedAt(), should.Equal, app.Application.GetUpdatedAt())
 	if a.So(app, should.NotBeNil) {
 		pb.CreatedAt = app.Application.GetCreatedAt()
 		pb.UpdatedAt = app.Application.GetUpdatedAt()
 		a.So(app.Application, should.Resemble, pb)
 	}
+
+	i := 0
+	total, err := r.Range(pb, "", 1, 0, func(found *Application) bool {
+		i++
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return false
+	}, "ApplicationIdentifiers")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(total, should.Equal, 1)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 0, func(found *Application) bool {
+		i++
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return false
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(total, should.Equal, 1)
+	a.So(i, should.Equal, 1)
 
 	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 	a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
 
-	app, err = r.Create(deepcopy.Copy(pb).(*ttnpb.Application))
+	dev2, err := r.Create(deepcopy.Copy(pb).(*ttnpb.Application))
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
-	if a.So(app, should.NotBeNil) {
-		pb.CreatedAt = app.Application.GetCreatedAt()
-		pb.UpdatedAt = app.Application.GetUpdatedAt()
-		a.So(app.Application, should.Resemble, pb)
+	a.So([]time.Time{start, dev2.Application.GetCreatedAt(), time.Now()}, should.BeChronological)
+	a.So(dev2.Application.GetCreatedAt(), should.Equal, dev2.Application.GetUpdatedAt())
+	if a.So(dev2, should.NotBeNil) {
+		pb2 := deepcopy.Copy(pb).(*ttnpb.Application)
+		pb2.CreatedAt = dev2.Application.GetCreatedAt()
+		pb2.UpdatedAt = dev2.Application.GetUpdatedAt()
+		a.So(pretty.Diff(dev2.Application, pb2), should.BeEmpty)
 	}
+
+	i = 0
+	total, err = r.Range(pb, "", 1, 0, func(found *Application) bool { i++; return false }, "ApplicationIdentifiers")
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 0, 0, func(found *Application) bool { i++; return true })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 2)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 0, 0, func(found *Application) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 0, func(found *Application) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 0, 1, func(found *Application) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 1, func(found *Application) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
+
+	err = dev2.Delete()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	updated := ttnpb.NewPopulatedApplication(test.Randy, false)
+	for app.Application.ApplicationIdentifiers.Equal(updated.ApplicationIdentifiers) {
+		updated = ttnpb.NewPopulatedApplication(test.Randy, false)
+	}
+	app.Application = updated
+
+	if !a.So(app.Store(), should.BeNil) {
+		t.FailNow()
+	}
+
+	i = 0
+	total, err = r.Range(pb, "", 1, 0, func(*Application) bool { i++; return false }, "ApplicationIdentifiers")
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 0, func(*Application) bool { i++; return false })
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
+
+	pb = updated
+
+	i = 0
+	total, err = r.Range(pb, "", 1, 0, func(found *Application) bool {
+		i++
+		pb.UpdatedAt = found.Application.GetUpdatedAt()
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return false
+	}, "ApplicationIdentifiers")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(total, should.Equal, 1)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 0, func(found *Application) bool {
+		i++
+		pb.UpdatedAt = found.Application.GetUpdatedAt()
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return false
+	})
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 1)
+	a.So(i, should.Equal, 1)
+
+	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+
+	if !a.So(app.Delete(), should.BeNil) {
+		t.FailNow()
+	}
+
+	i = 0
+	total, err = r.Range(pb, "", 1, 0, func(*Application) bool { i++; return false }, "ApplicationIdentifiers")
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 0, func(*Application) bool { i++; return false })
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
 
 	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
 	a.So(err, should.NotBeNil)

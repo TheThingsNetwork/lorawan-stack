@@ -17,6 +17,7 @@ package deviceregistry_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
@@ -35,69 +36,7 @@ func TestRegistry(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
-	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-
-	dev, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
-	if !a.So(err, should.BeNil) {
-		return
-	}
-	if a.So(dev, should.NotBeNil) {
-		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
-		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, pb)
-	}
-
-	i := 0
-	err = r.Range(pb, 1, func(found *Device) bool {
-		i++
-		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
-		return true
-	}, "EndDeviceIdentifiers")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(i, should.Equal, 1)
-
-	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
-		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	}
-	dev.EndDevice = updated
-
-	if !a.So(dev.Store(), should.BeNil) {
-		return
-	}
-
-	i = 0
-	err = r.Range(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
-	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-
-	pb = updated
-
-	i = 0
-	err = r.Range(pb, 1, func(found *Device) bool {
-		i++
-		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
-		return true
-	}, "EndDeviceIdentifiers")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(i, should.Equal, 1)
-
-	a.So(dev.Delete(), should.BeNil)
-
-	i = 0
-	err = r.Range(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
-	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-}
-
-func TestFindDeviceByIdentifiers(t *testing.T) {
-	a := assertions.New(t)
-	r := New(store.NewTypedMapStoreClient(mapstore.New()))
+	start := time.Now()
 
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	pb.Attributes = &pbtypes.Struct{
@@ -117,10 +56,16 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		},
 	}
 
+	found, err := FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
+
 	dev, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
+	a.So([]time.Time{start, dev.EndDevice.GetCreatedAt(), time.Now()}, should.BeChronological)
+	a.So(dev.EndDevice.GetCreatedAt(), should.Equal, dev.EndDevice.GetUpdatedAt())
 	if a.So(dev, should.NotBeNil) {
 		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
 		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
@@ -128,13 +73,86 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	}
 
 	i := 0
-	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
+	total, err := r.Range(pb, "", 1, 0, func(found *Device) bool {
 		i++
 		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
-		return true
-	})
-	a.So(err, should.BeNil)
+		return false
+	}, "EndDeviceIdentifiers")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(total, should.Equal, 1)
 	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 0, func(found *Device) bool {
+		i++
+		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+		return false
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(total, should.Equal, 1)
+	a.So(i, should.Equal, 1)
+
+	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+
+	dev2, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So([]time.Time{start, dev2.EndDevice.GetCreatedAt(), time.Now()}, should.BeChronological)
+	a.So(dev2.EndDevice.GetCreatedAt(), should.Equal, dev2.EndDevice.GetUpdatedAt())
+	if a.So(dev2, should.NotBeNil) {
+		pb2 := deepcopy.Copy(pb).(*ttnpb.EndDevice)
+		pb2.CreatedAt = dev2.EndDevice.GetCreatedAt()
+		pb2.UpdatedAt = dev2.EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(dev2.EndDevice, pb2), should.BeEmpty)
+	}
+
+	i = 0
+	total, err = r.Range(pb, "", 1, 0, func(found *Device) bool { i++; return false }, "EndDeviceIdentifiers")
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 0, 0, func(found *Device) bool { i++; return true })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 2)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 0, 0, func(found *Device) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 0, func(found *Device) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 0, 1, func(found *Device) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 1, func(found *Device) bool { i++; return false })
+	a.So(total, should.Equal, 2)
+	a.So(i, should.Equal, 1)
+
+	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
+
+	err = dev2.Delete()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
@@ -143,69 +161,72 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	dev.EndDevice = updated
 
 	if !a.So(dev.Store(), should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	i = 0
-	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
+	total, err = r.Range(pb, "", 1, 0, func(*Device) bool { i++; return false }, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
 	a.So(i, should.Equal, 0)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 0, func(*Device) bool { i++; return false })
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
 
 	pb = updated
 
 	i = 0
-	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
+	total, err = r.Range(pb, "", 1, 0, func(found *Device) bool {
 		i++
 		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
 		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
-		return true
-	})
-	a.So(err, should.BeNil)
+		return false
+	}, "EndDeviceIdentifiers")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(total, should.Equal, 1)
 	a.So(i, should.Equal, 1)
 
-	a.So(dev.Delete(), should.BeNil)
-
 	i = 0
-	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 0, func(found *Device) bool {
+		i++
+		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+		return false
+	})
 	a.So(err, should.BeNil)
-	a.So(i, should.Equal, 0)
-}
-
-func TestFindOneDeviceByIdentifiers(t *testing.T) {
-	a := assertions.New(t)
-	r := New(store.NewTypedMapStoreClient(mapstore.New()))
-
-	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-
-	found, err := FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
-	a.So(found, should.BeNil)
-
-	dev, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
-	if !a.So(err, should.BeNil) {
-		return
-	}
-	if a.So(dev, should.NotBeNil) {
-		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
-		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, pb)
-	}
+	a.So(total, should.Equal, 1)
+	a.So(i, should.Equal, 1)
 
 	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 	a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
 
-	dev, err = r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
-	if !a.So(err, should.BeNil) {
-		return
+	if !a.So(dev.Delete(), should.BeNil) {
+		t.FailNow()
 	}
-	if a.So(dev, should.NotBeNil) {
-		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
-		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, pb)
-	}
+
+	i = 0
+	total, err = r.Range(pb, "", 1, 0, func(*Device) bool { i++; return false }, "EndDeviceIdentifiers")
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
+
+	i = 0
+	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 0, func(*Device) bool { i++; return false })
+	a.So(err, should.BeNil)
+	a.So(total, should.Equal, 0)
+	a.So(i, should.Equal, 0)
 
 	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)

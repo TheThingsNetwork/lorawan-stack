@@ -19,3 +19,7 @@ var (
 	ErrTooManyDevices  = errTooManyDevices
 	ErrProcessorFailed = errProcessorFailed
 )
+
+func SetDefaultListCount(n uint64) {
+	defaultListCount = n
+}

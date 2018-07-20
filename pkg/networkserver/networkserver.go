@@ -925,13 +925,13 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 
 	var devs []*deviceregistry.Device
 
-	if err := ns.registry.Range(
+	_, err := ns.registry.Range(
 		&ttnpb.EndDevice{
 			Session: &ttnpb.Session{
 				DevAddr: pld.DevAddr,
 			},
 		},
-		0,
+		"", 0, 0,
 		func(d *deviceregistry.Device) bool {
 			if d.MACState == nil {
 				return true
@@ -940,18 +940,19 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 			return true
 		},
 		"Session.DevAddr",
-	); err != nil {
+	)
+	if err != nil {
 		logger.WithError(err).Warn("Failed to search for device in registry by active DevAddr")
 		return nil, err
 	}
 
-	if err := ns.registry.Range(
+	_, err = ns.registry.Range(
 		&ttnpb.EndDevice{
 			SessionFallback: &ttnpb.Session{
 				DevAddr: pld.DevAddr,
 			},
 		},
-		0,
+		"", 0, 0,
 		func(d *deviceregistry.Device) bool {
 			d.EndDeviceIdentifiers.DevAddr = &d.SessionFallback.DevAddr
 			d.Session = d.SessionFallback
@@ -963,7 +964,8 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 			return true
 		},
 		"SessionFallback.DevAddr",
-	); err != nil {
+	)
+	if err != nil {
 		logger.WithError(err).Warn("Failed to search for device in registry by fallback DevAddr")
 		return nil, err
 	}
