@@ -188,19 +188,32 @@ meaning is obvious from the context.
 
 Events are defined with `events.Define("event_name", "event description")`
 
-The event name is usually of the form `component.entity.action`. Examples are `ns.up.receive_duplicate` and `is.user.update`. We have some exceptions, such as `ns.up.join.forward`, which is specifically used for join messages. The Device Registry (which is used by both the NS, AS and JS) currently publishes events such as `device.create`. In the future we may also add component prefixes there.
+The event name is usually of the form `component.entity.action`. Examples are `ns.up.receive_duplicate` and `is.user.update`. We have some exceptions, such as `ns.up.join.forward`, which is specifically used for join messages. The Device Registry (which is used by both the NS, AS and JS) currently publishes events such as `device.create`. In the future we may also add component prefixes there. See below for naming conventions.
 
 The event description describes the event in simple English. The description is capitalized by the frontend, so the message should be lowercase, and typically doesn't end with a period.
 
 ### Errors
 
-Errors are defined with ``errors.Define("error_name", "error description with `{attribute_value}`")``
+Errors are defined with ``errors.Define<Type>("error_name", "error description with `{attribute_value}`")``
 
 Error definitions must be defined as close to the return statements as possible; in the same package, and preferably above the concerning function(s). Do not export the error definitions unless they are meaningful to other packages, i.e. for testing the exact error definition.
 
+Prefer using a specific error type, i.e. `errors.DefineInvalidArgument()`. If you are using a cause (using `WithCause()`), you may use `Define()` to fallback to the cause's type.
+
 The error name in snake case is a short and unique identifier of the error within the package. There is no need to append `_failed` or `_error` or prepend `failed_to_` as an error already indicates something went wrong. Be consistent in wording (i.e. prefer the more descriptive `missing_field` over `no_field`), order (i.e. prefer the more clear `missing_field` over `field_missing`) and do not use entity abbreviations.
 
-The error description in lower case, with only names in title case, is a concise plain English text that is human readable and understandable. Do not end the description with a dot. You may use attributes, in snake case, in backticks (`` ` ``) and curly braces (`{ }`). Only provide primitive types as attribute values using `WithAttributes()`.
+The error description in lower case, with only names in title case, is a concise plain English text that is human readable and understandable. Do not end the description with a dot. You may use attributes, in snake case, in the description defined between backticks (`` ` ``) by putting the key in curly braces (`{ }`). See below for naming conventions. Only provide primitive types as attribute values using `WithAttributes()`.
+
+### Logging field keys, event and error names and error attribute names
+
+Any `name` defined in the following statements:
+
+- Logging field key: `logger.WithField("name", "value")`
+- Event name: `events.Define("name", "description")`
+- Error name: `errors.Define("name", "description")`
+- Error attribute: ``errors.Define("example", "description `{name}`")``
+
+Shall be snake case, optionally having an event name prepended with a dotted namespace, see above. The spacer `_` shall be used in LoRaWAN terms: `DevAddr` is `dev_addr`, `AppSKey` is `app_s_key`, etc.
 
 ### Comments
 
