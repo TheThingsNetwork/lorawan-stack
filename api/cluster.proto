@@ -39,5 +39,5 @@ message PeerInfo {
   }
 
   // Tags of the peer
-  repeated string tags = 4;
+  map <string,string> tags = 4;
 }

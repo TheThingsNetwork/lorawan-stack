@@ -32,15 +32,13 @@ type Peer interface {
 	// HasRole returns true iff the peer has the given role
 	HasRole(ttnpb.PeerInfo_Role) bool
 	// Tags announced by the peer
-	Tags() []string
-	// HasTag returns true iff the peer has the given tag
-	HasTag(string) bool
+	Tags() map[string]string
 }
 
 type peer struct {
 	name  string
 	roles []ttnpb.PeerInfo_Role
-	tags  []string
+	tags  map[string]string
 
 	target string
 
@@ -52,22 +50,12 @@ type peer struct {
 func (p *peer) Name() string                 { return p.name }
 func (p *peer) Conn() *grpc.ClientConn       { return p.conn }
 func (p *peer) Roles() []ttnpb.PeerInfo_Role { return p.roles }
-func (p *peer) Tags() []string               { return p.tags }
+func (p *peer) Tags() map[string]string      { return p.tags }
 
 func (p *peer) HasRole(wanted ttnpb.PeerInfo_Role) bool {
 	roles := p.Roles()
 	for _, role := range roles {
 		if role == wanted {
-			return true
-		}
-	}
-	return false
-}
-
-func (p *peer) HasTag(wanted string) bool {
-	tags := p.Tags()
-	for _, tag := range tags {
-		if tag == wanted {
 			return true
 		}
 	}
