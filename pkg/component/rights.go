@@ -24,7 +24,7 @@ import (
 
 func (c *Component) initRights() {
 	fetcher := rights.NewIdentityServerFetcher(func(ctx context.Context) *grpc.ClientConn {
-		peer := c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+		peer := c.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
 		if peer == nil {
 			return nil
 		}
