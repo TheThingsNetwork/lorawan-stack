@@ -675,7 +675,7 @@ func TestByteMapStore(t testingT, newStore func() store.ByteMapStore) {
 
 					var buf bytes.Buffer
 					if err := gob.NewEncoder(&buf).Encode(&v); err != nil {
-						panic(errors.Errorf("Failed to gob-encode %s value %s to bytes: %s", k, v, err))
+						panic(errors.Errorf("failed to gob-encode %s value %s to bytes: %s", k, v, err))
 					}
 					ret[k] = buf.Bytes()
 				}
@@ -697,7 +697,7 @@ func TestByteMapStore(t testingT, newStore func() store.ByteMapStore) {
 
 					var dv interface{}
 					if err := gob.NewDecoder(bytes.NewReader(v)).Decode(&dv); err != nil {
-						panic(errors.Errorf("Failed to gob-decode %s value %s to interface: %s", k, v, err))
+						panic(errors.Errorf("failed to gob-decode %s value %s to interface: %s", k, v, err))
 					}
 					ret[k] = dv
 				}

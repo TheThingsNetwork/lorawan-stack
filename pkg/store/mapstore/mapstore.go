@@ -62,7 +62,7 @@ func (s *MapStore) Create(fields map[string]interface{}) (store.PrimaryKey, erro
 // Find implements store.TypedMapStore.
 func (s *MapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	if id == nil {
-		return nil, store.ErrNilKey.New(nil)
+		return nil, store.ErrNilKey
 	}
 
 	s.mu.RLock()
@@ -75,7 +75,7 @@ func (s *MapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 // Range implements store.TypedMapStore.
 func (s *MapStore) Range(filter map[string]interface{}, orderBy string, count, offset uint64, f func(store.PrimaryKey, map[string]interface{}) bool) (uint64, error) {
 	if len(filter) == 0 {
-		return 0, store.ErrEmptyFilter.New(nil)
+		return 0, store.ErrEmptyFilter
 	}
 
 	s.mu.RLock()
@@ -134,7 +134,7 @@ outer:
 // Update implements store.TypedMapStore.
 func (s *MapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 	if len(diff) == 0 {
 		return nil
@@ -168,7 +168,7 @@ func (s *MapStore) Update(id store.PrimaryKey, diff map[string]interface{}) erro
 // Delete implements store.TypedMapStore.
 func (s *MapStore) Delete(id store.PrimaryKey) error {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 
 	s.mu.Lock()

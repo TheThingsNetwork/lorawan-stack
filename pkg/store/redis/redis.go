@@ -27,7 +27,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/store"
 )
 
@@ -104,7 +103,7 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 			return err
 		}
 		if i != 0 {
-			return errors.Errorf("A key %s already exists", key)
+			return store.ErrKeyAlreadyExists.WithAttributes("key", key)
 		}
 		_, err = tx.Pipelined(func(p redis.Pipeliner) error {
 			for _, k := range idxAdd {
@@ -122,7 +121,7 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 // Delete implements store.Deleter.
 func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 	key := s.key(id.String())
 	return s.Redis.Watch(func(tx *redis.Tx) error {
@@ -155,7 +154,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 // Update implements store.ByteMapStore.
 func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) error {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 	if len(diff) == 0 {
 		return nil
@@ -264,7 +263,7 @@ func newStringBytesMapCmd(c *redis.StringStringMapCmd) *stringBytesMapCmd {
 // Find implements store.ByteMapStore.
 func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 	if id == nil {
-		return nil, store.ErrNilKey.New(nil)
+		return nil, store.ErrNilKey
 	}
 
 	m, err := newStringBytesMapCmd(s.Redis.HGetAll(s.key(id.String()))).Result()
@@ -277,7 +276,7 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 // Range implements store.ByteMapStore.
 func (s *Store) Range(filter map[string][]byte, orderBy string, count, offset uint64, f func(store.PrimaryKey, map[string][]byte) bool) (uint64, error) {
 	if len(filter) == 0 {
-		return 0, store.ErrEmptyFilter.New(nil)
+		return 0, store.ErrEmptyFilter
 	}
 
 	idxKeys := make([]string, 0, len(filter))
@@ -290,11 +289,11 @@ func (s *Store) Range(filter map[string][]byte, orderBy string, count, offset ui
 		}
 	}
 	if len(idxKeys) == 0 {
-		return 0, errors.New("at least one index key must be specified")
+		return 0, errNoIndexKeys
 	}
 
 	if offset > math.MaxUint32 {
-		return 0, errors.New("offset is too high")
+		return 0, errOffsetTooHigh
 	}
 
 	sort := &redis.Sort{
@@ -365,7 +364,9 @@ outer:
 
 		id, err := ulid.Parse(str)
 		if err != nil {
-			return 0, errors.NewWithCausef(err, "failed to parse %s as ULID, database inconsistent", str)
+			return 0, store.ErrInconsistentStore.WithCause(
+				errParseULID.WithAttributes("ulid", str),
+			)
 		}
 
 		if exec = f(id, m); !exec && len(fieldFilter) == 0 {
@@ -392,7 +393,7 @@ func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 // Find implements store.ByteSetStore.
 func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 	if len(bs) == 0 {
 		return nil
@@ -416,7 +417,7 @@ func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 // FindSet implements store.ByteSetStore.
 func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
-		return nil, store.ErrNilKey.New(nil)
+		return nil, store.ErrNilKey
 	}
 	return bs, s.Redis.SMembers(s.key(id.String())).ScanSlice(&bs)
 }
@@ -424,7 +425,7 @@ func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 // Contains implements store.ByteSetStore.
 func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 	if id == nil {
-		return false, store.ErrNilKey.New(nil)
+		return false, store.ErrNilKey
 	}
 	return s.Redis.SIsMember(s.key(id.String()), b).Result()
 }
@@ -432,7 +433,7 @@ func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 // Remove implements store.ByteSetStore.
 func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 	if len(bs) == 0 {
 		return nil
@@ -451,20 +452,14 @@ func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 // Append implements store.ByteListStore.
 func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
-		return store.ErrNilKey.New(nil)
+		return store.ErrNilKey
 	}
 	if len(bs) == 0 {
 		return nil
 	}
 
-	n, err := s.Redis.RPush(s.key(id.String()), bs).Result()
-	if err != nil {
-		return err
-	}
-	if n < int64(len(bs)) {
-		return errors.Errorf("Expected to store %d values, stored %d", len(bs), n)
-	}
-	return nil
+	_, err := s.Redis.RPush(s.key(id.String()), bs).Result()
+	return err
 }
 
 // CreateList implements store.ByteListStore.
@@ -483,7 +478,7 @@ func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
 // FindList implements store.ByteListStore.
 func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
-		return nil, store.ErrNilKey.New(nil)
+		return nil, store.ErrNilKey
 	}
 	return bs, s.Redis.LRange(s.key(id.String()), 0, -1).ScanSlice(&bs)
 }
@@ -491,7 +486,7 @@ func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 // Len implements store.ByteListStore.
 func (s *Store) Len(id store.PrimaryKey) (int64, error) {
 	if id == nil {
-		return 0, store.ErrNilKey.New(nil)
+		return 0, store.ErrNilKey
 	}
 	return s.Redis.LLen(s.key(id.String())).Result()
 }
@@ -499,7 +494,7 @@ func (s *Store) Len(id store.PrimaryKey) (int64, error) {
 // Pop implements store.ByteListStore.
 func (s *Store) Pop(id store.PrimaryKey) (bs []byte, err error) {
 	if id == nil {
-		return nil, store.ErrNilKey.New(nil)
+		return nil, store.ErrNilKey
 	}
 	return s.Redis.LPop(s.key(id.String())).Bytes()
 }

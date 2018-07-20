@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store
+package redis
 
 import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 // ErrEmptyFilter represents an error returned, when filter specified is empty.
 var (
-	ErrEmptyFilter       = errors.DefineInvalidArgument("empty_filter", "filter is empty")
-	ErrNilKey            = errors.DefineInvalidArgument("nil_key", "nil key specified")
-	ErrKeyAlreadyExists  = errors.DefineFailedPrecondition("key_exists", "key {key} already exists")
-	ErrInconsistentStore = errors.DefineCorruption("inconsistent_store", "store state is inconsistent")
+	errParseULID     = errors.DefineInvalidArgument("parse_ulid", "failed to parse `{ulid}` as a valid ULID")
+	errNoIndexKeys   = errors.DefineInvalidArgument("no_index_keys", "at least one index key must be specified")
+	errOffsetTooHigh = errors.DefineInvalidArgument("offset_too_high", "offset specified is too high")
 )
