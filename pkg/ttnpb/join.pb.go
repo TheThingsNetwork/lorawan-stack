@@ -22,7 +22,7 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// Join Request
+// Join-request
 type JoinRequest struct {
 	// Raw uplink bytes (PHYPayload)
 	RawPayload []byte `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
@@ -90,7 +90,7 @@ func (m *JoinRequest) GetCFList() *CFList {
 	return nil
 }
 
-// Answer to the Join Request
+// Answer to the Join-request
 type JoinResponse struct {
 	// Raw uplink bytes (PHYPayload)
 	RawPayload []byte `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`

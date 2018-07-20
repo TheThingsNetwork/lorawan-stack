@@ -352,7 +352,7 @@ func (msg JoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 18 {
-		return errors.Errorf("expected length of encoded Join-Request payload to be 18, got %d", len(b))
+		return errors.Errorf("expected length of encoded join-request payload to be 18, got %d", len(b))
 	}
 	copy(msg.JoinEUI[:], b[0:8])
 	copy(msg.DevEUI[:], b[8:16])
@@ -389,7 +389,7 @@ func (msg RejoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
 }
 
 // UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-// If message type is a Join-Accept, only the Encrypted field is populated in
+// If message type is a join-accept, only the Encrypted field is populated in
 // the payload. You should decrypt that value and supply it to UnmarshalLoRaWAN of the payload struct to populate it. MIC should be set manually(i.e. msg.MIC = decrypted[len(decrypted)-4:]) after decryption.
 func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	msg.RejoinType = RejoinType(b[0])
@@ -442,11 +442,11 @@ func (msg Message) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	case MType_JOIN_REQUEST:
 		pld := msg.GetJoinRequestPayload()
 		if pld == nil {
-			return nil, errors.New("Join-Request payload is empty")
+			return nil, errors.New("join-request payload is empty")
 		}
 		dst, err = pld.AppendLoRaWAN(dst)
 		if err != nil {
-			return nil, errors.NewWithCause(err, "failed to encode Join-Request payload")
+			return nil, errors.NewWithCause(err, "failed to encode join-request payload")
 		}
 	case MType_REJOIN_REQUEST:
 		pld := msg.GetRejoinRequestPayload()
@@ -455,16 +455,16 @@ func (msg Message) AppendLoRaWAN(dst []byte) ([]byte, error) {
 		}
 		dst, err = pld.AppendLoRaWAN(dst)
 		if err != nil {
-			return nil, errors.NewWithCause(err, "failed to encode Rejoin-Request payload")
+			return nil, errors.NewWithCause(err, "failed to encode rejoin-request payload")
 		}
 	case MType_JOIN_ACCEPT:
 		pld := msg.GetJoinAcceptPayload()
 		if pld == nil {
-			return nil, errors.New("Join-Accept payload is empty")
+			return nil, errors.New("join-accept payload is empty")
 		}
 		n := len(pld.Encrypted)
 		if n != 16 && n != 32 {
-			return nil, errors.Errorf("expected length of encrypted Join-Accept payload to be equal to 16 or 32, got %d", n)
+			return nil, errors.Errorf("expected length of encrypted join-accept payload to be equal to 16 or 32, got %d", n)
 		}
 		dst = append(dst, pld.Encrypted...)
 	default:
@@ -495,7 +495,7 @@ func (msg Message) MarshalLoRaWAN() ([]byte, error) {
 }
 
 // UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-// If message type is a Join-Accept, only the Encrypted field is populated in
+// If message type is a join-accept, only the Encrypted field is populated in
 // the payload. You should decrypt that value and supply it to UnmarshalLoRaWAN of the payload struct to populate it. MIC should be set manually(i.e. msg.MIC = decrypted[len(decrypted)-4:]) after decryption.
 func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 	n := len(b)
@@ -523,11 +523,11 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 	case MType_JOIN_REQUEST:
 		if n != 23 {
 			// MHDR(1) + Payload(18) + MIC(4)
-			return errors.Errorf("expected length of Join-Request PHYPayload to be 23, got %d", n)
+			return errors.Errorf("expected length of join-request PHYPayload to be 23, got %d", n)
 		}
 		pld := &JoinRequestPayload{}
 		if err := pld.UnmarshalLoRaWAN(b[1:19]); err != nil {
-			return errors.NewWithCause(err, "failed to decode Join-Request MACPayload")
+			return errors.NewWithCause(err, "failed to decode join-request MACPayload")
 		}
 		msg.Payload = &Message_JoinRequestPayload{pld}
 		msg.MIC = b[19:]
@@ -541,18 +541,18 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 			micIdx = 15
 		}
 		if n != micIdx+4 {
-			return errors.Errorf("expected length of Rejoin-Request PHYPayload to be %d, got %d", micIdx+4, n)
+			return errors.Errorf("expected length of rejoin-request PHYPayload to be %d, got %d", micIdx+4, n)
 		}
 		pld := &RejoinRequestPayload{}
 		if err := pld.UnmarshalLoRaWAN(b[1:micIdx]); err != nil {
-			return errors.NewWithCause(err, "failed to decode Rejoin-Request MACPayload")
+			return errors.NewWithCause(err, "failed to decode rejoin-request MACPayload")
 		}
 		msg.Payload = &Message_RejoinRequestPayload{pld}
 		msg.MIC = b[micIdx:]
 	case MType_JOIN_ACCEPT:
 		if n != 17 && n != 33 {
 			// MHDR(1) + Payload(16|32)
-			return errors.Errorf("expected length of Join-Accept PHYPayload to be equal to 17 or 33, got %d", n)
+			return errors.Errorf("expected length of join-accept PHYPayload to be equal to 17 or 33, got %d", n)
 		}
 		msg.Payload = &Message_JoinAcceptPayload{&JoinAcceptPayload{Encrypted: b[1:]}}
 	default:

@@ -25,7 +25,7 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// Join Request
+// Join-request
 message JoinRequest {
   option (gogoproto.populate) = false;
 
@@ -57,7 +57,7 @@ message JoinRequest {
   reserved 9; // Reserved for CFListType
 }
 
-// Answer to the Join Request
+// Answer to the Join-request
 message JoinResponse {
   // Raw uplink bytes (PHYPayload)
   bytes raw_payload = 1;

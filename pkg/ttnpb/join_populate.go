@@ -42,7 +42,7 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to encode join request message to LoRaWAN"))
+		panic(errors.NewWithCause(err, "failed to encode join-request message to LoRaWAN"))
 	}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
 	devEUI := msg.GetJoinRequestPayload().DevEUI

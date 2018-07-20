@@ -129,7 +129,7 @@ func TestMQTTConnection(t *testing.T) {
 				t.Fatal("Expected Gateway Server to call StartServingGateway on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the join request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
+			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the join-request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
 		}
 	})
 	if !ok {
@@ -165,7 +165,7 @@ func TestMQTTConnection(t *testing.T) {
 					t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 				}
 			case <-time.After(nsReceptionTimeout):
-				t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
+				t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join-request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
 			}
 		})
 		if !ok {
@@ -273,7 +273,7 @@ func TestMQTTConnection(t *testing.T) {
 					t.Fatal("Expected Gateway Server to call StopServingGateway on the Network Server, instead received", msg)
 				}
 			case <-time.After(nsReceptionTimeout):
-				t.Fatal("The Gateway Server never called the Network Server's StopServingGateway to handle the join request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
+				t.Fatal("The Gateway Server never called the Network Server's StopServingGateway to handle the join-request. This might be due to an unexpected error in the GatewayServer.handleMQTTConnection() function.")
 			}
 		})
 	})

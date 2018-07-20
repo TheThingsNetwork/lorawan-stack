@@ -36,11 +36,11 @@ var (
 	evtDropData    = events.Define("ns.up.data.drop", "drop data message")
 	evtForwardData = events.Define("ns.up.data.forward", "forward data message")
 
-	evtDropJoin    = events.Define("ns.up.join.drop", "drop join request")
-	evtForwardJoin = events.Define("ns.up.join.forward", "forward join request")
+	evtDropJoin    = events.Define("ns.up.join.drop", "drop join-request")
+	evtForwardJoin = events.Define("ns.up.join.forward", "forward join-request")
 
-	evtDropRejoin    = events.Define("ns.up.rejoin.drop", "drop rejoin request")
-	evtForwardRejoin = events.Define("ns.up.rejoin.forward", "forward rejoin request")
+	evtDropRejoin    = events.Define("ns.up.rejoin.drop", "drop rejoin-request")
+	evtForwardRejoin = events.Define("ns.up.rejoin.forward", "forward rejoin-request")
 )
 
 const (

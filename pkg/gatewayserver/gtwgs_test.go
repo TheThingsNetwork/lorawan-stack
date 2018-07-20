@@ -194,13 +194,13 @@ func TestLink(t *testing.T) {
 		}
 	}
 
-	// Join request
+	// Join-request
 	{
 		join := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{join}}:
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called Link.Recv() to receive the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called Link.Recv() to receive the join-request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
 		select {
@@ -209,7 +209,7 @@ func TestLink(t *testing.T) {
 				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
 			}
 		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join-request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
 

@@ -255,7 +255,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			err = errNoDevAddr
 			return
 		}
-		logger = logger.WithField("devaddr", *uplink.DevAddr)
+		logger = logger.WithField("dev_addr", *uplink.DevAddr)
 		var devAddrBytes []byte
 		devAddrBytes, err = uplink.DevAddr.Marshal()
 		if err != nil {
@@ -267,7 +267,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			err = errNoDevEUI
 			return
 		}
-		logger = logger.WithField("deveui", uplink.DevEUI.String())
+		logger = logger.WithField("dev_eui", uplink.DevEUI.String())
 		var devEUIBytes []byte
 		devEUIBytes, err = uplink.DevEUI.Marshal()
 		if err != nil {

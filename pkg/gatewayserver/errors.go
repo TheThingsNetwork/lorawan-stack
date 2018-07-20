@@ -49,6 +49,6 @@ var (
 	errCouldNotBeScheduled          = errors.Define("schedule", "could not schedule downlink")
 	errCouldNotComputeTOAOfDownlink = errors.Define("compute_toa_of_downlink", "could not compute the time on air of a downlink")
 
-	errNoDevAddr = errors.DefineInvalidArgument("no_devaddr_specified", "no DevAddr specified")
-	errNoDevEUI  = errors.DefineInvalidArgument("no_deveui_specified", "no DevEUI specified")
+	errNoDevAddr = errors.DefineInvalidArgument("no_dev_addr_specified", "no DevAddr specified")
+	errNoDevEUI  = errors.DefineInvalidArgument("no_dev_eui_specified", "no DevEUI specified")
 )

@@ -405,7 +405,7 @@ type MACParameters struct {
 	Rx2DataRateIndex uint32 `protobuf:"varint,11,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3" json:"rx2_data_rate_index,omitempty"`
 	// Frequency for Rx2.
 	Rx2Frequency uint64 `protobuf:"varint,12,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
-	// Time within which a rejoin request must be sent.
+	// Time within which a rejoin-request must be sent.
 	RejoinTimePeriodicity RejoinTimePeriod `protobuf:"varint,13,opt,name=rejoin_time_periodicity,json=rejoinTimePeriodicity,proto3,enum=ttn.lorawan.v3.RejoinTimePeriod" json:"rejoin_time_periodicity,omitempty"`
 	// Frequency of the class B ping slot.
 	PingSlotFrequency uint64 `protobuf:"varint,15,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`

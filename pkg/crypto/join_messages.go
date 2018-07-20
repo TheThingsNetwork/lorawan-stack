@@ -21,7 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-var errInvalidJoinAcceptMessageSize = errInvalidSize("join_accept_message", "Join-accept message", "16 or 32")
+var errInvalidJoinAcceptMessageSize = errInvalidSize("join_accept_message", "join-accept message", "16 or 32")
 
 // EncryptJoinAccept uses AES Decrypt to encrypt a join-accept message
 // - The payload contains JoinNonce/AppNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType) | MIC
@@ -62,7 +62,7 @@ func DecryptJoinAccept(key types.AES128Key, encrypted []byte) (payload []byte, e
 	return
 }
 
-var errInvalidJoinRequestPayloadSize = errInvalidSize("join_request_payload", "Join-request payload", "19")
+var errInvalidJoinRequestPayloadSize = errInvalidSize("join_request_payload", "join-request payload", "19")
 
 // ComputeJoinRequestMIC computes the Message Integrity Code for a join-request message
 // - The payload contains MHDR | JoinEUI/AppEUI | DevEUI | DevNonce
@@ -85,9 +85,9 @@ func ComputeJoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, er
 }
 
 var (
-	errrInvalidRejoinRequestSize    = errInvalidSize("rejoin_request", "Rejoin-request", "15 or 20")
-	errrInvalidRejoinRequestType0_2 = errInvalidSize("rejoin_request_0_2", "Rejoin-request type 0 or 2", "15")
-	errrInvalidRejoinRequestType1   = errInvalidSize("rejoin_request_1", "Rejoin-request type 1", "20")
+	errrInvalidRejoinRequestSize    = errInvalidSize("rejoin_request", "rejoin-request", "15 or 20")
+	errrInvalidRejoinRequestType0_2 = errInvalidSize("rejoin_request_0_2", "rejoin-request type 0 or 2", "15")
+	errrInvalidRejoinRequestType1   = errInvalidSize("rejoin_request_1", "rejoin-request type 1", "20")
 )
 
 // ComputeRejoinRequestMIC computes the Message Integrity Code for a RejoinRequest message

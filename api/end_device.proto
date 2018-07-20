@@ -180,7 +180,7 @@ message MACParameters {
   // Frequency for Rx2.
   uint64 rx2_frequency = 12;
 
-  // Time within which a rejoin request must be sent.
+  // Time within which a rejoin-request must be sent.
   RejoinTimePeriod rejoin_time_periodicity = 13;
 
   reserved 14; // RFU: RejoinCountPeriod rejoin_count_periodicity = 14;

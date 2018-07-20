@@ -1424,7 +1424,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 
 		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
-			logger.WithError(err).Debug("Failed to schedule join accept")
+			logger.WithError(err).Debug("Failed to schedule join-accept")
 			return err
 		}
 
@@ -1463,7 +1463,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			}); err != nil {
 				logger.WithField(
 					"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-				).WithError(err).Errorf("Failed to send Join Accept to AS")
+				).WithError(err).Errorf("Failed to send Join-accept to AS")
 			}
 		}()
 		return nil
