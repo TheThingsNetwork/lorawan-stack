@@ -19,6 +19,7 @@ import (
 	"context"
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/getsentry/raven-go"
@@ -32,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -178,10 +180,19 @@ func New(ctx context.Context, opts ...Option) *Server {
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
-			return metadata.MD{
-				"host": []string{req.Host},
-				"uri":  []string{req.RequestURI},
+			md := rpcmetadata.MD{
+				Host: req.Host,
+				URI:  req.RequestURI,
 			}
+
+			q := req.URL.Query()
+			md.Page, _ = strconv.ParseUint(q.Get("page"), 10, 64)
+			if md.Page == 0 {
+				md.Page = 1
+			}
+			md.Limit, _ = strconv.ParseUint(q.Get("per_page"), 10, 64)
+
+			return md.ToMetadata()
 		}),
 		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
 			switch s {
