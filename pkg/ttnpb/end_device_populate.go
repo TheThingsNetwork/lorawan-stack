@@ -129,7 +129,21 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	return out
 }
 
-func NewPopulatedMACParameters(r randyEndDevice, _ bool) *MACParameters {
+func newPopulatedFrequency(r randyEndDevice) uint64 {
+	return uint64(r.Int63()) + uint64(r.Int63())
+}
+
+func NewPopulatedMACParameters_Channel(r randyEndDevice, _ bool) *MACParameters_Channel {
+	maxDR := r.Intn(8)
+	return &MACParameters_Channel{
+		UplinkFrequency:   newPopulatedFrequency(r),
+		DownlinkFrequency: newPopulatedFrequency(r),
+		MinDataRateIndex:  uint32(r.Intn(1 + maxDR)),
+		MaxDataRateIndex:  uint32(maxDR),
+	}
+}
+
+func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out := &MACParameters{}
 	out.MaxEIRP = r.Float32()
 	out.UplinkDwellTime = r.Intn(2) == 0
@@ -140,12 +154,17 @@ func NewPopulatedMACParameters(r randyEndDevice, _ bool) *MACParameters {
 	out.ADRAckLimit = r.Uint32()
 	out.ADRAckDelay = r.Uint32()
 	out.DutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
+	out.Channels = make([]*MACParameters_Channel, r.Intn(255))
+	for i := range out.Channels {
+		out.Channels[i] = NewPopulatedMACParameters_Channel(r, easy)
+	}
 	out.Rx1Delay = r.Uint32()
 	out.Rx1DataRateOffset = r.Uint32() % 6
 	out.Rx2DataRateIndex = r.Uint32() % 16
-	out.Rx2Frequency = 868300000
+	out.Rx2Frequency = newPopulatedFrequency(r)
 	out.RejoinTimePeriodicity = RejoinTimePeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
-	out.PingSlotFrequency = uint64(r.Uint32())
+	out.PingSlotFrequency = newPopulatedFrequency(r)
 	out.PingSlotDataRateIndex = r.Uint32()
+	out.BeaconFrequency = newPopulatedFrequency(r)
 	return out
 }

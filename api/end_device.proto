@@ -40,6 +40,87 @@ message Session {
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
+// MACParameters represent the parameters of the device's MAC layer (active or desired).
+// This is used internally by the Network Server and is read only.
+message MACParameters {
+  option (gogoproto.populate) = false;
+
+  // Maximum EIRP power (in dBm).
+  float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
+
+  // Uplink dwell time is set (400ms).
+  bool uplink_dwell_time = 2;
+
+  // Downlink dwell time is set (400ms).
+  bool downlink_dwell_time = 3;
+
+  // ADR: data rate index to use.
+  uint32 adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex"];
+
+  // ADR: transmission power index to use.
+  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex"];
+
+  // ADR: number of retransmissions.
+  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans"];
+
+  // ADR: number of messages to wait before setting ADRAckReq.
+  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit"];
+
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
+  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay"];
+
+  // Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
+  uint32 rx1_delay = 9;
+
+  // Data rate offset for Rx1.
+  uint32 rx1_data_rate_offset = 10;
+
+  // Data rate index for Rx2.
+  uint32 rx2_data_rate_index = 11;
+
+  // Frequency for Rx2 (in Hz).
+  uint64 rx2_frequency = 12;
+
+  // Time within which a rejoin-request must be sent.
+  RejoinTimePeriod rejoin_time_periodicity = 13;
+
+  reserved 14; // RFU: RejoinCountPeriod rejoin_count_periodicity = 14;
+
+  AggregatedDutyCycle duty_cycle = 15;
+
+  message Channel {
+    option (gogoproto.populate) = false;
+
+    // Uplink frequency of the channel (in Hz).
+    uint64 uplink_frequency = 1;
+
+    // Downlink frequency of the channel (in Hz).
+    uint64 downlink_frequency = 2;
+
+    // Index of the minimum data rate for uplink.
+    uint32 min_data_rate_index = 3;
+
+    // Index of the maximum data rate for uplink.
+    uint32 max_data_rate_index = 4;
+
+    // Channel is masked for ADR.
+    bool masked = 5;
+  }
+
+  // Rx1 channel settings.
+  repeated Channel channels = 16;
+
+  // Frequency of the class B ping slot (in Hz).
+  uint64 ping_slot_frequency = 17;
+
+  // Data rate index of the class B ping slot.
+  uint32 ping_slot_data_rate_index = 18;
+
+  // Frequency of the class B beacon (in Hz).
+  uint64 beacon_frequency = 19;
+}
+
+
 message EndDeviceFormatters {
   // Type of formatter used to process uplink messages.
   PayloadFormatter up_formatter = 1;
@@ -139,62 +220,6 @@ message MACSettings {
   google.protobuf.Timestamp class_c_timeout = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
 
-// MACParameters represent the parameters of the device's MAC layer (active or desired).
-// This is used internally by the Network Server and is read only.
-message MACParameters {
-  option (gogoproto.populate) = false;
-
-  // Maximum EIRP power (in dBm).
-  float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
-
-  // Uplink dwell time is set (400ms).
-  bool uplink_dwell_time = 2;
-
-  // Downlink dwell time is set (400ms).
-  bool downlink_dwell_time = 3;
-
-  // ADR: data rate index to use.
-  uint32 adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex"];
-
-  // ADR: transmission power index to use.
-  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex"];
-
-  // ADR: number of retransmissions.
-  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans"];
-
-  // ADR: number of messages to wait before setting ADRAckReq.
-  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit"];
-
-  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
-  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay"];
-
-  // Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
-  uint32 rx1_delay = 9;
-
-  // Data rate offset for Rx1.
-  uint32 rx1_data_rate_offset = 10;
-
-  // Data rate index for Rx2.
-  uint32 rx2_data_rate_index = 11;
-
-  // Frequency for Rx2.
-  uint64 rx2_frequency = 12;
-
-  // Time within which a rejoin-request must be sent.
-  RejoinTimePeriod rejoin_time_periodicity = 13;
-
-  reserved 14; // RFU: RejoinCountPeriod rejoin_count_periodicity = 14;
-
-  // Frequency of the class B ping slot.
-  uint64 ping_slot_frequency = 15;
-
-  // Data rate index of the class B ping slot.
-  uint32 ping_slot_data_rate_index = 16;
-
-  // Aggregated duty cycle of the device.
-  AggregatedDutyCycle duty_cycle = 17;
-}
-
 // MACState represents the state of MAC layer of the device.
 // MACState is reset on each join for OTAA or ResetInd for ABP devices.
 // This is used internally by the Network Server and is read only.
@@ -219,7 +244,7 @@ message MACState {
   // Time when a new confirmed downlink message or MAC command is ready to be scheduled for class C.
   google.protobuf.Timestamp next_confirmed_downlink_at = 6 [(gogoproto.stdtime) = true];
 
-  // Periodicity of the class B ping slot
+  // Periodicity of the class B ping slot.
   PingSlotPeriod ping_slot_periodicity = 7;
 
   // A confirmed application downlink, for which an acknowledgment is expected to arrive.

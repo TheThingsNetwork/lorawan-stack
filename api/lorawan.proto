@@ -358,7 +358,7 @@ message MACCommand {
   message TxParamSetupReq {
     // MaxEIRPIndex indicates the maximum EIRP value in dBm, indexed by the following table:
     // [ 8 10 12 13 14 16 18 20 21 24 26 27 29 30 33 36 ]
-    uint32 max_eirp_index = 1 [(gogoproto.customname) = "MaxEIRPIndex"];
+    DeviceEIRP max_eirp_index = 1 [(gogoproto.customname) = "MaxEIRPIndex"];
     bool uplink_dwell_time = 2;
     bool downlink_dwell_time = 3;
   }
@@ -370,9 +370,9 @@ message MACCommand {
   }
   message ADRParamSetupReq {
     // ADRAckLimitExponent is the exponent e that configures the ADR_ACK_LIMIT = 2^e messages
-    uint32 adr_ack_limit_exponent = 1 [(gogoproto.customname) = "ADRAckLimitExponent"];
+    ADRAckLimitExponent adr_ack_limit_exponent = 1 [(gogoproto.customname) = "ADRAckLimitExponent"];
     // ADRAckDelayExponent is the exponent e that configures the ADR_ACK_DELAY = 2^e messages
-    uint32 adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent"];
+    ADRAckDelayExponent adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent"];
   }
   message DeviceTimeAns {
     google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -514,4 +514,65 @@ enum RejoinTimePeriod {
   REJOIN_TIME_14 = 14;
   // Every ~1.1 year
   REJOIN_TIME_15 = 15;
+}
+
+// DeviceEIRP indicates the device's EIRP value levels.
+enum DeviceEIRP {
+  option (gogoproto.goproto_enum_prefix) = false;
+  DEVICE_EIRP_8  = 0;
+  DEVICE_EIRP_10 = 1;
+  DEVICE_EIRP_12 = 2;
+  DEVICE_EIRP_13 = 3;
+  DEVICE_EIRP_14 = 4;
+  DEVICE_EIRP_16 = 5;
+  DEVICE_EIRP_18 = 6;
+  DEVICE_EIRP_20 = 7;
+  DEVICE_EIRP_21 = 8;
+  DEVICE_EIRP_24 = 9;
+  DEVICE_EIRP_26 = 10;
+  DEVICE_EIRP_27 = 11;
+  DEVICE_EIRP_29 = 12;
+  DEVICE_EIRP_30 = 13;
+  DEVICE_EIRP_33 = 14;
+  DEVICE_EIRP_36 = 15;
+}
+
+enum ADRAckLimitExponent {
+  option (gogoproto.goproto_enum_prefix) = false;
+  ADR_ACK_LIMIT_1     = 0;
+  ADR_ACK_LIMIT_2     = 1;
+  ADR_ACK_LIMIT_4     = 2;
+  ADR_ACK_LIMIT_8     = 3;
+  ADR_ACK_LIMIT_16    = 4;
+  ADR_ACK_LIMIT_32    = 5;
+  ADR_ACK_LIMIT_64    = 6;
+  ADR_ACK_LIMIT_128   = 7;
+  ADR_ACK_LIMIT_256   = 8;
+  ADR_ACK_LIMIT_512   = 9;
+  ADR_ACK_LIMIT_1024  = 10;
+  ADR_ACK_LIMIT_2048  = 11;
+  ADR_ACK_LIMIT_4096  = 12;
+  ADR_ACK_LIMIT_8192  = 13;
+  ADR_ACK_LIMIT_16384 = 14;
+  ADR_ACK_LIMIT_32768 = 15;
+}
+
+enum ADRAckDelayExponent {
+  option (gogoproto.goproto_enum_prefix) = false;
+  ADR_ACK_DELAY_1     = 0;
+  ADR_ACK_DELAY_2     = 1;
+  ADR_ACK_DELAY_4     = 2;
+  ADR_ACK_DELAY_8     = 3;
+  ADR_ACK_DELAY_16    = 4;
+  ADR_ACK_DELAY_32    = 5;
+  ADR_ACK_DELAY_64    = 6;
+  ADR_ACK_DELAY_128   = 7;
+  ADR_ACK_DELAY_256   = 8;
+  ADR_ACK_DELAY_512   = 9;
+  ADR_ACK_DELAY_1024  = 10;
+  ADR_ACK_DELAY_2048  = 11;
+  ADR_ACK_DELAY_4096  = 12;
+  ADR_ACK_DELAY_8192  = 13;
+  ADR_ACK_DELAY_16384 = 14;
+  ADR_ACK_DELAY_32768 = 15;
 }

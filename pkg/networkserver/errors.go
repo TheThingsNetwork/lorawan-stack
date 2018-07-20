@@ -50,6 +50,7 @@ var (
 	errScheduleFailed            = errors.Define("schedule", "all Gateway Servers failed to schedule the downlink")
 	errScheduleTooSoon           = errors.DefineUnavailable("schedule_too_soon", "confirmed downlink is scheduled too soon")
 	errUnknownBand               = errors.Define("unknown_band", "band is unknown")
+	errUnknownChannel            = errors.Define("unknown_chanel", "channel is unknown")
 	errUnknownFrequencyPlan      = errors.Define("unknown_frequency_plan", "frequency plan is unknown")
 	errUnknownMACState           = errors.DefineFailedPrecondition("unknown_mac_state", "MAC state is unknown")
 	errUnmarshalPayloadFailed    = errors.DefineInvalidArgument("unmarshal_payload", "failed to unmarshal payload")

@@ -16,6 +16,7 @@ package ttnpb
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math"
@@ -35,6 +36,234 @@ func boolToByte(b bool) byte {
 		return 1
 	}
 	return 0
+}
+
+// DeviceEIRPToFloat32 returns v as a float32 value.
+func DeviceEIRPToFloat32(v DeviceEIRP) float32 {
+	switch v {
+	case DEVICE_EIRP_36:
+		return 36
+	case DEVICE_EIRP_33:
+		return 33
+	case DEVICE_EIRP_30:
+		return 30
+	case DEVICE_EIRP_29:
+		return 29
+	case DEVICE_EIRP_27:
+		return 27
+	case DEVICE_EIRP_26:
+		return 26
+	case DEVICE_EIRP_24:
+		return 24
+	case DEVICE_EIRP_21:
+		return 21
+	case DEVICE_EIRP_20:
+		return 20
+	case DEVICE_EIRP_18:
+		return 18
+	case DEVICE_EIRP_16:
+		return 16
+	case DEVICE_EIRP_14:
+		return 14
+	case DEVICE_EIRP_13:
+		return 13
+	case DEVICE_EIRP_12:
+		return 12
+	case DEVICE_EIRP_10:
+		return 10
+	case DEVICE_EIRP_8:
+		return 8
+	}
+	panic(fmt.Errorf("unknown DeviceEIRP value `%d`", v))
+}
+
+// Float32ToDeviceEIRP returns v as a highest possible DeviceEIRP.
+func Float32ToDeviceEIRP(v float32) DeviceEIRP {
+	switch {
+	case v >= 36:
+		return DEVICE_EIRP_36
+	case v >= 33:
+		return DEVICE_EIRP_33
+	case v >= 30:
+		return DEVICE_EIRP_30
+	case v >= 29:
+		return DEVICE_EIRP_29
+	case v >= 27:
+		return DEVICE_EIRP_27
+	case v >= 26:
+		return DEVICE_EIRP_26
+	case v >= 24:
+		return DEVICE_EIRP_24
+	case v >= 21:
+		return DEVICE_EIRP_21
+	case v >= 20:
+		return DEVICE_EIRP_20
+	case v >= 18:
+		return DEVICE_EIRP_18
+	case v >= 16:
+		return DEVICE_EIRP_16
+	case v >= 14:
+		return DEVICE_EIRP_14
+	case v >= 13:
+		return DEVICE_EIRP_13
+	case v >= 12:
+		return DEVICE_EIRP_12
+	case v >= 10:
+		return DEVICE_EIRP_10
+	}
+	return DEVICE_EIRP_8
+}
+
+// ADRAckLimitExponentToUint32 returns v as a uint32 value.
+func ADRAckLimitExponentToUint32(v ADRAckLimitExponent) uint32 {
+	switch v {
+	case ADR_ACK_LIMIT_32768:
+		return 32768
+	case ADR_ACK_LIMIT_16384:
+		return 16384
+	case ADR_ACK_LIMIT_8192:
+		return 8192
+	case ADR_ACK_LIMIT_4096:
+		return 4096
+	case ADR_ACK_LIMIT_2048:
+		return 2048
+	case ADR_ACK_LIMIT_1024:
+		return 1024
+	case ADR_ACK_LIMIT_512:
+		return 512
+	case ADR_ACK_LIMIT_256:
+		return 256
+	case ADR_ACK_LIMIT_128:
+		return 128
+	case ADR_ACK_LIMIT_64:
+		return 64
+	case ADR_ACK_LIMIT_32:
+		return 32
+	case ADR_ACK_LIMIT_16:
+		return 16
+	case ADR_ACK_LIMIT_8:
+		return 8
+	case ADR_ACK_LIMIT_4:
+		return 4
+	case ADR_ACK_LIMIT_2:
+		return 2
+	case ADR_ACK_LIMIT_1:
+		return 1
+	}
+	panic(fmt.Errorf("unknown ADRAckLimitExponent value `%d`", v))
+}
+
+// Uint32ToADRAckLimitExponent returns v as a highest possible ADRAckLimitExponent.
+func Uint32ToADRAckLimitExponent(v uint32) ADRAckLimitExponent {
+	switch {
+	case v >= 32768:
+		return ADR_ACK_LIMIT_32768
+	case v >= 16384:
+		return ADR_ACK_LIMIT_16384
+	case v >= 8192:
+		return ADR_ACK_LIMIT_8192
+	case v >= 4096:
+		return ADR_ACK_LIMIT_4096
+	case v >= 2048:
+		return ADR_ACK_LIMIT_2048
+	case v >= 1024:
+		return ADR_ACK_LIMIT_1024
+	case v >= 512:
+		return ADR_ACK_LIMIT_512
+	case v >= 256:
+		return ADR_ACK_LIMIT_256
+	case v >= 128:
+		return ADR_ACK_LIMIT_128
+	case v >= 64:
+		return ADR_ACK_LIMIT_64
+	case v >= 32:
+		return ADR_ACK_LIMIT_32
+	case v >= 16:
+		return ADR_ACK_LIMIT_16
+	case v >= 8:
+		return ADR_ACK_LIMIT_8
+	case v >= 4:
+		return ADR_ACK_LIMIT_4
+	case v >= 2:
+		return ADR_ACK_LIMIT_2
+	}
+	return ADR_ACK_LIMIT_1
+}
+
+// ADRAckDelayExponentToUint32 returns v as a uint32 value.
+func ADRAckDelayExponentToUint32(v ADRAckDelayExponent) uint32 {
+	switch v {
+	case ADR_ACK_DELAY_32768:
+		return 32768
+	case ADR_ACK_DELAY_16384:
+		return 16384
+	case ADR_ACK_DELAY_8192:
+		return 8192
+	case ADR_ACK_DELAY_4096:
+		return 4096
+	case ADR_ACK_DELAY_2048:
+		return 2048
+	case ADR_ACK_DELAY_1024:
+		return 1024
+	case ADR_ACK_DELAY_512:
+		return 512
+	case ADR_ACK_DELAY_256:
+		return 256
+	case ADR_ACK_DELAY_128:
+		return 128
+	case ADR_ACK_DELAY_64:
+		return 64
+	case ADR_ACK_DELAY_32:
+		return 32
+	case ADR_ACK_DELAY_16:
+		return 16
+	case ADR_ACK_DELAY_8:
+		return 8
+	case ADR_ACK_DELAY_4:
+		return 4
+	case ADR_ACK_DELAY_2:
+		return 2
+	case ADR_ACK_DELAY_1:
+		return 1
+	}
+	panic(fmt.Errorf("unknown ADRAckDelayExponent value `%d`", v))
+}
+
+// Uint32ToADRAckDelayExponent returns v as a highest possible ADRAckDelayExponent.
+func Uint32ToADRAckDelayExponent(v uint32) ADRAckDelayExponent {
+	switch {
+	case v >= 32768:
+		return ADR_ACK_DELAY_32768
+	case v >= 16384:
+		return ADR_ACK_DELAY_16384
+	case v >= 8192:
+		return ADR_ACK_DELAY_8192
+	case v >= 4096:
+		return ADR_ACK_DELAY_4096
+	case v >= 2048:
+		return ADR_ACK_DELAY_2048
+	case v >= 1024:
+		return ADR_ACK_DELAY_1024
+	case v >= 512:
+		return ADR_ACK_DELAY_512
+	case v >= 256:
+		return ADR_ACK_DELAY_256
+	case v >= 128:
+		return ADR_ACK_DELAY_128
+	case v >= 64:
+		return ADR_ACK_DELAY_64
+	case v >= 32:
+		return ADR_ACK_DELAY_32
+	case v >= 16:
+		return ADR_ACK_DELAY_16
+	case v >= 8:
+		return ADR_ACK_DELAY_8
+	case v >= 4:
+		return ADR_ACK_DELAY_4
+	case v >= 2:
+		return ADR_ACK_DELAY_2
+	}
+	return ADR_ACK_DELAY_1
 }
 
 // AppendLoRaWAN appends the marshaled ResetInd payload to the slice.
@@ -541,11 +770,7 @@ func (cmd *MACCommand_RxTimingSetupReq_) UnmarshalLoRaWAN(b []byte) error {
 
 // AppendLoRaWAN appends the marshaled TxParamSetupReq payload to the slice.
 func (cmd *MACCommand_TxParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
-	var b byte
-	if cmd.MaxEIRPIndex > 15 {
-		return nil, errors.Errorf("expected MaxEIRPIndex to be less or equal to %d, got %d", 15, cmd.MaxEIRPIndex)
-	}
-	b = byte(cmd.MaxEIRPIndex)
+	b := byte(cmd.MaxEIRPIndex)
 	if cmd.UplinkDwellTime {
 		b |= (1 << 4)
 	}
@@ -561,7 +786,8 @@ func (cmd *MACCommand_TxParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return newLengthUnequalError(1, len(b))
 	}
-	cmd.MaxEIRPIndex = uint32(b[0] & 0xf)
+
+	cmd.MaxEIRPIndex = DeviceEIRP(b[0] & 0xf)
 	cmd.UplinkDwellTime = (b[0]>>4)&1 == 1
 	cmd.DownlinkDwellTime = (b[0]>>5)&1 == 1
 	return nil
@@ -635,15 +861,16 @@ func (cmd *MACCommand_RekeyConf_) UnmarshalLoRaWAN(b []byte) error {
 
 // AppendLoRaWAN appends the marshaled ADRParamSetupReq payload to the slice.
 func (cmd *MACCommand_ADRParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
-	if cmd.ADRAckDelayExponent > 15 {
-		return nil, errors.Errorf("expected ADRAckDelayExponent to be less or equal to 15, got %d", cmd.ADRAckDelayExponent)
+	if 1 > cmd.ADRAckDelayExponent || cmd.ADRAckDelayExponent > 32768 {
+		return nil, errors.Errorf("expected ADRAckDelay to be between 1 and 32768, got %d", cmd.ADRAckDelayExponent)
 	}
 	b := byte(cmd.ADRAckDelayExponent)
 
-	if cmd.ADRAckLimitExponent > 15 {
-		return nil, errors.Errorf("expected ADRAckLimitExponent to be less or equal to 15, got %d", cmd.ADRAckLimitExponent)
+	if 1 > cmd.ADRAckLimitExponent || cmd.ADRAckLimitExponent > 32768 {
+		return nil, errors.Errorf("expected ADRAckLimit to be between 1 and 32768, got %d", cmd.ADRAckLimitExponent)
 	}
 	b |= byte(cmd.ADRAckLimitExponent) << 4
+
 	dst = append(dst, b)
 	return dst, nil
 }
@@ -653,8 +880,8 @@ func (cmd *MACCommand_ADRParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return newLengthUnequalError(1, len(b))
 	}
-	cmd.ADRAckDelayExponent = uint32(b[0] & 0xf)
-	cmd.ADRAckLimitExponent = uint32(b[0] >> 4)
+	cmd.ADRAckDelayExponent = ADRAckDelayExponent(b[0] & 0xf)
+	cmd.ADRAckLimitExponent = ADRAckLimitExponent(b[0] >> 4)
 	return nil
 }
 

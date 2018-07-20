@@ -579,6 +579,10 @@ func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 }
 
 func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
+	if dev.MACState == nil {
+		return errUnknownMACState
+	}
+
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
@@ -613,21 +617,26 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 		}
 		mds = dev.RecentUplinks[len(dev.RecentUplinks)-1].RxMetadata
 	} else {
+		drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.Rx1DataRateOffset, dev.MACState.DownlinkDwellTime)
+		if err != nil {
+			return err
+		}
+
 		chIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
 		if err != nil {
 			return err
 		}
-		if uint(chIdx) >= uint(len(fp.Channels)) {
+		if uint(chIdx) >= uint(len(dev.MACState.DownlinkChannels)) {
 			return errChannelIndexTooHigh
 		}
 
-		if dev.MACState == nil {
-			return errUnknownMACState
+		ch := dev.MACState.DownlinkChannels[int(chIdx)]
+		if ch == nil {
+			return errChannelUnknown
 		}
 
-		drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.Rx1DataRateOffset, dev.MACState.DownlinkDwellTime)
-		if err != nil {
-			return err
+		if ch.MinDataRateIndex > chIdx || chIdx > ch.MaxDataRateIndex {
+			return errInvalidDataRate
 		}
 
 		rx1 := tx{
@@ -636,7 +645,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				CodingRate:            "4/5",
 				PolarizationInversion: true,
 				ChannelIndex:          chIdx,
-				Frequency:             uint64(fp.Channels[chIdx].Frequency),
+				Frequency:             uint64(ch.Frequency),
 				TxPower:               int32(band.DefaultMaxEIRP),
 			},
 		}

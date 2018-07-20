@@ -176,7 +176,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"TxParamSetupReq",
 			&MACCommand_TxParamSetupReq{
-				MaxEIRPIndex:      0xf,
+				MaxEIRPIndex:      DEVICE_EIRP_36,
 				UplinkDwellTime:   false,
 				DownlinkDwellTime: true,
 			},
@@ -222,8 +222,8 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"ADRParamSetupReq",
 			&MACCommand_ADRParamSetupReq{
-				ADRAckDelayExponent: 0x2,
-				ADRAckLimitExponent: 0x4,
+				ADRAckDelayExponent: ADR_ACK_DELAY_4,
+				ADRAckLimitExponent: ADR_ACK_LIMIT_16,
 			},
 			[]byte{0x0C, 0x42},
 			false,

@@ -47,12 +47,12 @@ It has these top-level messages:
 	ApplicationCollaborator
 	GatewayCollaborator
 	Session
+	MACParameters
 	EndDeviceFormatters
 	EndDeviceBrand
 	EndDeviceModel
 	EndDeviceVersion
 	MACSettings
-	MACParameters
 	MACState
 	EndDevice
 	EndDevices

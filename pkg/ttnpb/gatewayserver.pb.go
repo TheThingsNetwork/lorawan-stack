@@ -227,7 +227,7 @@ func (m *FrequencyPlan_Channel_ForceDataRate) GetIndex() uint32 {
 
 type FrequencyPlan_LBTConfiguration struct {
 	RSSITarget float32 `protobuf:"fixed32,1,opt,name=rssi_target,json=rssiTarget,proto3" json:"rssi_target,omitempty" yaml:"rssi-target"`
-	// RSSIOffset describes the LBT config-specific RSSI offset
+	// RSSIOffset describes the LBT config-specific RSSI offset.
 	RSSIOffset float32 `protobuf:"fixed32,2,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty" yaml:"rssi-offset"`
 	ScanTime   int32   `protobuf:"varint,3,opt,name=scan_time,json=scanTime,proto3" json:"scan_time,omitempty" yaml:"scan-time"`
 }

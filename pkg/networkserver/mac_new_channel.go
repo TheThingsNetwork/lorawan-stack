@@ -34,11 +34,21 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 
 		req := cmd.GetNewChannelReq()
 
-		// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/292)
-		_ = req.MinDataRateIndex
-		_ = req.MaxDataRateIndex
-		_ = req.ChannelIndex
-		_ = req.Frequency
+		if uint(req.ChannelIndex) >= uint(len(dev.MACState.Channels)) {
+			dev.MACState.Channels = append(dev.MACState.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MACState.Channels))))...)
+		}
+
+		ch := dev.MACState.Channels[req.ChannelIndex]
+		if ch == nil {
+			dev.MACState.Channels[req.ChannelIndex] = ch
+			ch = &ttnpb.MACParameters_Channel{
+				DownlinkFrequency: req.Frequency,
+			}
+		}
+
+		ch.UplinkFrequency = req.Frequency
+		ch.MinDataRateIndex = req.MinDataRateIndex
+		ch.MinDataRateIndex = req.MaxDataRateIndex
 
 	}, dev.MACState.PendingRequests...)
 	return

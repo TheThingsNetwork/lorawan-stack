@@ -68,7 +68,7 @@ message FrequencyPlan {
 
   message LBTConfiguration {
     float rssi_target = 1 [(gogoproto.customname) = "RSSITarget",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
-    // RSSIOffset describes the LBT config-specific RSSI offset
+    // RSSIOffset describes the LBT config-specific RSSI offset.
     float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset",  (gogoproto.moretags) = "yaml:\"rssi-offset\""];
     int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time\""];
   }
