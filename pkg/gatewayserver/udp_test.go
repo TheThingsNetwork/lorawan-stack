@@ -155,16 +155,6 @@ func testPullData(gatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t 
 
 			// TODO: monitor cluster claim on IDs https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 			// TODO: monitor unclaim after timeout
-			// if tc.success {
-			// 	select {
-			// 	case msg := <-ns.messageReceived:
-			// 		if msg != "StartServingGateway" {
-			// 			t.Fatal("Expected Gateway Server to call StartServingGateway on the Network Server, instead received", msg)
-			// 		}
-			// 	case <-time.After(nsReceptionTimeout):
-			// 		t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the PULL_DATA.")
-			// 	}
-			// }
 		}
 	}
 }

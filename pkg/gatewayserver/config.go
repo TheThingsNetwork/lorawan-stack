@@ -22,9 +22,6 @@ type MQTTConfig struct {
 
 // Config represents the Gateway Server configuration.
 type Config struct {
-	NSTags []string `name:"network-servers.tags" description:"Network Server tags to accept to connect to"`
-
-	UDPAddress string `name:"udp.listen" description:"Address for the UDP endpoint to listen on"`
-
-	MQTT MQTTConfig `name:"mqtt"`
+	UDPAddress string     `name:"udp.listen" description:"Address for the UDP endpoint to listen on"`
+	MQTT       MQTTConfig `name:"mqtt"`
 }
