@@ -135,7 +135,7 @@ func NewPopulatedMACParameters(r randyEndDevice, _ bool) *MACParameters {
 	out.UplinkDwellTime = r.Intn(2) == 0
 	out.DownlinkDwellTime = r.Intn(2) == 0
 	out.ADRDataRateIndex = r.Uint32()
-	out.ADRTXPowerIndex = r.Uint32()
+	out.ADRTxPowerIndex = r.Uint32()
 	out.ADRNbTrans = r.Uint32()
 	out.ADRAckLimit = r.Uint32()
 	out.ADRAckDelay = r.Uint32()

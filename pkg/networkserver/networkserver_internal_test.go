@@ -102,7 +102,7 @@ func (cl *MockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.Downli
 }
 
 func TestGenerateAndScheduleDownlink(t *testing.T) {
-	newRX2 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice) *ttnpb.DownlinkMessage {
+	newRx2 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice) *ttnpb.DownlinkMessage {
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
 		st := dev.MACState
 		drIdx := st.Rx2DataRateIndex
@@ -155,8 +155,8 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		return msg
 	}
 
-	newRX1 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) *ttnpb.DownlinkMessage {
-		msg := newRX2(down, fp, dev)
+	newRx1 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) *ttnpb.DownlinkMessage {
+		msg := newRx2(down, fp, dev)
 
 		sets := up.Settings
 		st := dev.MACState
@@ -330,7 +330,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		wg.Add(len(mds))
 
 		slots := []*ttnpb.DownlinkMessage{
-			newRX1(
+			newRx1(
 				down,
 				test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan),
 				dev.EndDevice,
@@ -445,13 +445,13 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		wg.Add(len(mds) * 2)
 
 		slots := []*ttnpb.DownlinkMessage{
-			newRX1(
+			newRx1(
 				down,
 				test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan),
 				dev.EndDevice,
 				up,
 			),
-			newRX2(
+			newRx2(
 				down,
 				test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan),
 				dev.EndDevice,

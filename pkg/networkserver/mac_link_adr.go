@@ -42,7 +42,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		_ = req.ChannelMaskControl
 
 		dev.MACState.ADRDataRateIndex = req.DataRateIndex
-		dev.MACState.ADRTXPowerIndex = req.TxPowerIndex
+		dev.MACState.ADRTxPowerIndex = req.TxPowerIndex
 
 	}, dev.MACState.PendingRequests...)
 	return

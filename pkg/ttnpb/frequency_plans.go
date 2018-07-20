@@ -58,10 +58,10 @@ func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 			DataRate:  ext.PingSlot.DataRate,
 		}
 	}
-	if ext.RX2 != nil {
-		f.RX2 = &FrequencyPlan_Channel{
-			Frequency: ext.RX2.Frequency,
-			DataRate:  ext.RX2.DataRate,
+	if ext.Rx2 != nil {
+		f.Rx2 = &FrequencyPlan_Channel{
+			Frequency: ext.Rx2.Frequency,
+			DataRate:  ext.Rx2.DataRate,
 		}
 	}
 	if ext.MaxEIRP != 0.0 {

@@ -654,7 +654,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	}
 
 	if uint(dev.MACState.Rx2DataRateIndex) > uint(len(band.DataRates)) {
-		return errInvalidRX2DataRateIndex
+		return errInvalidRx2DataRateIndex
 	}
 
 	rx2 := tx{

@@ -47,12 +47,12 @@ func TestStatusPacket(t *testing.T) {
 	a.So(d, should.NotBeNil)
 	a.So(d.Stat, should.NotBeNil)
 	a.So(*d.Stat.Alti, should.Equal, 66)
-	a.So(d.Stat.RXNb, should.Equal, 0)
-	a.So(d.Stat.RXOK, should.Equal, 0)
-	a.So(d.Stat.RXFW, should.Equal, 0)
+	a.So(d.Stat.RxNb, should.Equal, 0)
+	a.So(d.Stat.RxOk, should.Equal, 0)
+	a.So(d.Stat.RxFW, should.Equal, 0)
 	a.So(d.Stat.ACKR, should.AlmostEqual, 0.0)
 	a.So(d.Stat.DWNb, should.Equal, 0)
-	a.So(d.Stat.TXNb, should.Equal, 0)
+	a.So(d.Stat.TxNb, should.Equal, 0)
 }
 func TestUplinkPacket(t *testing.T) {
 	uplinkPacket := `{

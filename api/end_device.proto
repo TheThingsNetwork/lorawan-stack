@@ -157,7 +157,7 @@ message MACParameters {
   uint32 adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex"];
 
   // ADR: transmission power index to use.
-  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTXPowerIndex"];
+  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex"];
 
   // ADR: number of retransmissions.
   uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans"];

@@ -70,7 +70,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					MACParameters: ttnpb.MACParameters{
 						ADRDataRateIndex: 4,
-						ADRTXPowerIndex:  42,
+						ADRTxPowerIndex:  42,
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
@@ -101,7 +101,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					MACParameters: ttnpb.MACParameters{
 						ADRDataRateIndex: 5,
-						ADRTXPowerIndex:  43,
+						ADRTxPowerIndex:  43,
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},

@@ -96,7 +96,7 @@ message FrequencyPlan {
   Channel ping_slot = 9 [(gogoproto.moretags) = "yaml:\"ping-slot,omitempty\""];
 
   // Override band settings for Rx2.
-  Channel rx2 = 10 [(gogoproto.customname) = "RX2", (gogoproto.moretags) = "yaml:\"rx2,omitempty\""];
+  Channel rx2 = 10 [(gogoproto.customname) = "Rx2", (gogoproto.moretags) = "yaml:\"rx2,omitempty\""];
 
   // Override MaxEIRP devices should respect (in dBm).
   float max_eirp = 18 [(gogoproto.customname) = "MaxEIRP", (gogoproto.moretags) = "yaml:\"max-eirp\""];

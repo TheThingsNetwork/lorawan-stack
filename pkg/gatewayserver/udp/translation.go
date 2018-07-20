@@ -194,12 +194,12 @@ func addVersions(status *ttnpb.GatewayStatus, stat Stat) {
 }
 
 func addMetrics(status *ttnpb.GatewayStatus, stat Stat) {
-	status.Metrics["rxnb"] = float32(stat.RXNb)
-	status.Metrics["rxok"] = float32(stat.RXOK)
-	status.Metrics["rxfw"] = float32(stat.RXFW)
+	status.Metrics["rxnb"] = float32(stat.RxNb)
+	status.Metrics["rxok"] = float32(stat.RxOk)
+	status.Metrics["rxfw"] = float32(stat.RxFW)
 	status.Metrics["ackr"] = float32(stat.ACKR)
 	status.Metrics["dwnb"] = float32(stat.DWNb)
-	status.Metrics["txnb"] = float32(stat.TXNb)
+	status.Metrics["txnb"] = float32(stat.TxNb)
 	if stat.Temp != nil {
 		status.Metrics["temp"] = float32(*stat.Temp)
 	}
