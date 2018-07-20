@@ -134,8 +134,22 @@ dev.git-diff:
 dev.ttn-lw-stack.start: ttn-lw-stack
 	./release/ttn-lw-stack-$(GOOS)-$(GOARCH) start --log.level=debug
 
+dev.ttn-lw-stack.start-dev: ttn-lw-stack
+	./release/ttn-lw-stack-$(GOOS)-$(GOARCH) start --log.level=debug \
+	--console.public-url=http://localhost:8080/console \
+	--is.oauth.public-url=http://localhost:8080/oauth \
+	--console.identity-server-url=http://localhost:8080/oauth
+
 dev.ttn-lw-identity-server.start: ttn-lw-identity-server
 	./release/ttn-lw-identity-server-$(GOOS)-$(GOARCH) start --log.level=debug
+
+dev.ttn-lw-identity-server.init: ttn-lw-identity-server
+	./release/ttn-lw-identity-server-$(GOOS)-$(GOARCH) init
+
+dev.ttn-lw-identity-server.init-dev: ttn-lw-identity-server
+	./release/ttn-lw-identity-server-$(GOOS)-$(GOARCH) init \
+	--initial-data.console.skip-authorization=false \
+	--initial-data.console.redirect-uri=http://localhost:8080/console/oauth/callback
 
 dev.ttn-lw-gateway-server.start: ttn-lw-gateway-server
 	./release/ttn-lw-gateway-server-$(GOOS)-$(GOARCH) start --log.level=debug
