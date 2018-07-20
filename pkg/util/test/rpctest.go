@@ -114,3 +114,29 @@ func (s *MockClientStream) CloseSend() error {
 	}
 	return s.CloseSendFunc()
 }
+
+// MockServerTransportStream is a mock grpc.ServerTransportStream.
+type MockServerTransportStream struct {
+	*MockServerStream
+	MethodFunc     func() string
+	SetTrailerFunc func(metadata.MD) error
+}
+
+// Method calls s.MethodFunc.
+func (s *MockServerTransportStream) Method() string {
+	if s.MethodFunc == nil {
+		return ""
+	}
+	return s.MethodFunc()
+}
+
+// Method calls s.SetTrailerFunc or s.MockServerStream.SetTrailer if s.SetTrailerFunc is nil.
+func (s *MockServerTransportStream) SetTrailer(md metadata.MD) error {
+	if s.SetTrailerFunc != nil {
+		return s.SetTrailerFunc(md)
+	}
+	if s.MockServerStream != nil {
+		s.MockServerStream.SetTrailer(md)
+	}
+	return nil
+}
