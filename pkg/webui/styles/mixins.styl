@@ -41,6 +41,41 @@ border-subtle($side = '')
     $prefix = ''
   border{$prefix + $side}: 1px solid $c-divider-subtle
 
+material-icon()
+  font-family: 'Material Icons'
+  font-weight: normal
+  font-style: normal
+  font-size: 1.3rem
+  line-height: 1
+  letter-spacing: normal
+  text-transform: none
+  display: inline-block
+  white-space: nowrap
+  word-wrap: normal
+  direction: ltr
+  vertical-align: middle
+  font-feature-settings: 'liga'
+
+pseudo-border($size, $color)
+  &:before
+    position: absolute
+    bottom: 0
+    left: 0
+    height: $size
+    display: block
+    width: 100%
+    background: $color
+    content: ''
+    {block}
+
+pseudo-border-animated($size, $color)
+  +pseudo-border($size, $color)
+    transform: scaleX(0)
+    transition: transform .2s, width .4s cubic-bezier(1, 0, 0, 1) .2s
+
+  &:hover:before
+    transform: scaleX(1)
+
 
 
 // COLORS
@@ -188,4 +223,17 @@ media-query-min($min)
 media-query-between($min, $max)
   @media screen and (min-width: $min + 1) and (max-width: $max)
     {block} // @stylint ignore
+
+
+// FUNCTIONAL
+// ==========
+
+// Removes default browser focus styles and adds custom ones for the
+// .focus-visible class added automatically on focused elements.
+focus-visible()
+  &:global(.focus-visible)
+    {block}
+
+  &:focus
+    outline: 0
 

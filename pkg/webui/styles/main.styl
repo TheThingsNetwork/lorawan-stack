@@ -61,3 +61,10 @@ ul li:not(:last-child)
 
 a
   color: $tc-active
+
+// Remove focus from elements when targeted by a mouse.
+// The `focus-visible` class is added on focusable elements
+// automatically when in focus.
+// See https://github.com/WICG/focus-visible
+:global(.js-focus-visible) :focus:not(:global(.focus-visible))
+  outline: 0
