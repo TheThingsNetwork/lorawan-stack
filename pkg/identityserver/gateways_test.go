@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc/metadata"
@@ -183,7 +184,7 @@ func TestPullConfiguration(t *testing.T) {
 
 			authString := fmt.Sprintf("Bearer %s", key.GetKey())
 			gtwCtx := metadata.NewIncomingContext(userCtx, metadata.MD{
-				"id":            []string{gtw.GatewayIdentifiers.UniqueID(userCtx)},
+				"id":            []string{unique.ID(userCtx, gtw.GatewayIdentifiers)},
 				"authorization": []string{authString},
 			})
 
@@ -475,7 +476,7 @@ func TestUpdateNotification(t *testing.T) {
 		GatewayID: "hello",
 	}
 	subscription := make(chan []string, 1)
-	s.pullConfigChans[gtwIDs.UniqueID(context.Background())] = subscription
+	s.pullConfigChans[unique.ID(context.Background(), gtwIDs)] = subscription
 
 	// Sending []string
 	for _, data := range []interface{}{

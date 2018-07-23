@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 const forever = time.Duration(math.MaxInt64)
@@ -532,7 +533,7 @@ func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, 
 	}
 
 	updateCh := make(chan []string, 1)
-	uid := gtwIDs.UniqueID(ctx)
+	uid := unique.ID(ctx, gtwIDs)
 	s.pullConfigMu.Lock()
 	if existing, ok := s.pullConfigChans[uid]; ok {
 		close(existing)
@@ -595,7 +596,7 @@ func (s *gatewayService) Notify(evt events.Event) {
 	case "is.gateway.update":
 		s.pullConfigMu.RLock()
 		for _, gtwID := range gtwIDs {
-			uid := gtwID.UniqueID(ctx)
+			uid := unique.ID(ctx, gtwID)
 
 			updateCh, ok := s.pullConfigChans[uid]
 			if !ok {
