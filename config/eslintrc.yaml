@@ -1,4 +1,4 @@
-extends: 
+extends:
   - ttn
   - plugin:jest/recommended
 
@@ -22,9 +22,13 @@ globals:
   snapshotDiff: true
 
 rules:
-  jest/no-large-snapshots: 
+  jest/no-large-snapshots:
     - warn
     - maxSize: 400
+
+  # Warn on console occurrences
+  no-console:
+    - warn
 
   # Warn on missing JsDoc definitions
   valid-jsdoc:
