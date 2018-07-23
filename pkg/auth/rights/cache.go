@@ -22,13 +22,14 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var now = time.Now // override this in unit tests
 
-func newReq(ctx context.Context, uid ttnpb.UniqueIdentifier) cachedReq {
+func newReq(ctx context.Context, id ttnpb.Identifiers) cachedReq {
 	md := rpcmetadata.FromIncomingContext(ctx)
-	return cachedReq{UniqueID: uid.UniqueID(ctx), AuthType: md.AuthType, AuthValue: md.AuthValue}
+	return cachedReq{UniqueID: unique.ID(ctx, id), AuthType: md.AuthType, AuthValue: md.AuthValue}
 }
 
 type cachedReq struct {

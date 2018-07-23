@@ -19,6 +19,7 @@ import (
 
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var errMissingApplicationRights = errors.DefinePermissionDenied(
@@ -55,7 +56,7 @@ func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers,
 		rights.ApplicationRights = map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{appID: appRights}
 	}
 	if !rights.IncludesApplicationRights(appID, required...) {
-		return errMissingApplicationRights.WithAttributes("uid", appID.UniqueID(ctx))
+		return errMissingApplicationRights.WithAttributes("uid", unique.ID(ctx, appID))
 	}
 	return nil
 }
@@ -79,7 +80,7 @@ func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, require
 		rights.GatewayRights = map[ttnpb.GatewayIdentifiers][]ttnpb.Right{gtwID: gtwRights}
 	}
 	if !rights.IncludesGatewayRights(gtwID, required...) {
-		return errMissingGatewayRights.WithAttributes("uid", gtwID.UniqueID(ctx))
+		return errMissingGatewayRights.WithAttributes("uid", unique.ID(ctx, gtwID))
 	}
 	return nil
 }
@@ -103,7 +104,7 @@ func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifier
 		rights.OrganizationRights = map[ttnpb.OrganizationIdentifiers][]ttnpb.Right{orgID: orgRights}
 	}
 	if !rights.IncludesOrganizationRights(orgID, required...) {
-		return errMissingOrganizationRights.WithAttributes("uid", orgID.UniqueID(ctx))
+		return errMissingOrganizationRights.WithAttributes("uid", unique.ID(ctx, orgID))
 	}
 	return nil
 }

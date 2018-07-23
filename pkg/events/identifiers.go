@@ -19,6 +19,7 @@ import (
 	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 // IdentifierFilter can be used as a layer on top of a PubSub to filter events
@@ -65,27 +66,27 @@ func (f *identifierFilter) Subscribe(ctx context.Context, ids ttnpb.Identifiers,
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	for _, id := range cids.ApplicationIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		f.applicationIDs[uid] = append(f.applicationIDs[uid], handler)
 	}
 	for _, id := range cids.ClientIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		f.clientIDs[uid] = append(f.clientIDs[uid], handler)
 	}
 	for _, id := range cids.DeviceIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		f.deviceIDs[uid] = append(f.deviceIDs[uid], handler)
 	}
 	for _, id := range cids.GatewayIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		f.gatewayIDs[uid] = append(f.gatewayIDs[uid], handler)
 	}
 	for _, id := range cids.OrganizationIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		f.organizationIDs[uid] = append(f.organizationIDs[uid], handler)
 	}
 	for _, id := range cids.UserIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		f.userIDs[uid] = append(f.userIDs[uid], handler)
 	}
 }
@@ -95,7 +96,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	for _, id := range cids.ApplicationIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		for i, registered := range f.applicationIDs[uid] {
 			if registered == handler {
 				f.applicationIDs[uid] = append(f.applicationIDs[uid][:i], f.applicationIDs[uid][i+1:]...)
@@ -107,7 +108,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 		}
 	}
 	for _, id := range cids.ClientIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		for i, registered := range f.clientIDs[uid] {
 			if registered == handler {
 				f.clientIDs[uid] = append(f.clientIDs[uid][:i], f.clientIDs[uid][i+1:]...)
@@ -119,7 +120,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 		}
 	}
 	for _, id := range cids.DeviceIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		for i, registered := range f.deviceIDs[uid] {
 			if registered == handler {
 				f.deviceIDs[uid] = append(f.deviceIDs[uid][:i], f.deviceIDs[uid][i+1:]...)
@@ -131,7 +132,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 		}
 	}
 	for _, id := range cids.GatewayIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		for i, registered := range f.gatewayIDs[uid] {
 			if registered == handler {
 				f.gatewayIDs[uid] = append(f.gatewayIDs[uid][:i], f.gatewayIDs[uid][i+1:]...)
@@ -143,7 +144,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 		}
 	}
 	for _, id := range cids.OrganizationIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		for i, registered := range f.organizationIDs[uid] {
 			if registered == handler {
 				f.organizationIDs[uid] = append(f.organizationIDs[uid][:i], f.organizationIDs[uid][i+1:]...)
@@ -155,7 +156,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 		}
 	}
 	for _, id := range cids.UserIDs {
-		uid := id.UniqueID(ctx)
+		uid := unique.ID(ctx, id)
 		for i, registered := range f.userIDs[uid] {
 			if registered == handler {
 				f.userIDs[uid] = append(f.userIDs[uid][:i], f.userIDs[uid][i+1:]...)
@@ -176,22 +177,22 @@ func (f *identifierFilter) Notify(evt Event) {
 	}
 	f.mu.RLock()
 	for _, id := range ids.ApplicationIDs {
-		matched = append(matched, f.applicationIDs[id.UniqueID(evt.Context())]...)
+		matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), id)]...)
 	}
 	for _, id := range ids.ClientIDs {
-		matched = append(matched, f.clientIDs[id.UniqueID(evt.Context())]...)
+		matched = append(matched, f.clientIDs[unique.ID(evt.Context(), id)]...)
 	}
 	for _, id := range ids.DeviceIDs {
-		matched = append(matched, f.deviceIDs[id.UniqueID(evt.Context())]...)
+		matched = append(matched, f.deviceIDs[unique.ID(evt.Context(), id)]...)
 	}
 	for _, id := range ids.GatewayIDs {
-		matched = append(matched, f.gatewayIDs[id.UniqueID(evt.Context())]...)
+		matched = append(matched, f.gatewayIDs[unique.ID(evt.Context(), id)]...)
 	}
 	for _, id := range ids.OrganizationIDs {
-		matched = append(matched, f.organizationIDs[id.UniqueID(evt.Context())]...)
+		matched = append(matched, f.organizationIDs[unique.ID(evt.Context(), id)]...)
 	}
 	for _, id := range ids.UserIDs {
-		matched = append(matched, f.userIDs[id.UniqueID(evt.Context())]...)
+		matched = append(matched, f.userIDs[unique.ID(evt.Context(), id)]...)
 	}
 	f.mu.RUnlock()
 	notified := make(map[Handler]struct{}, len(matched))
