@@ -16,6 +16,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
+import * as user from '../../../actions/user'
 
 import Button from '../../../components/button'
 
@@ -30,7 +31,7 @@ export default class Login extends React.PureComponent {
   }
 
   logout () {
-    this.props.dispatch({ type: 'LOGOUT' })
+    this.props.dispatch(user.logout())
   }
 
   render () {

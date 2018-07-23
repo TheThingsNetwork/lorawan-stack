@@ -23,6 +23,8 @@ import Spinner from '../../../components/spinner'
 import Icon from '../../../components/icon'
 import Message from '../../../components/message'
 
+import { getClient } from '../../../actions/client'
+
 import style from './authorize.styl'
 
 @connect(function (state, props) {
@@ -42,7 +44,7 @@ export default class Authorize extends PureComponent {
   componentDidMount () {
     const { dispatch, client_id } = this.props
 
-    dispatch({ type: 'GET_CLIENT', client_id })
+    dispatch(getClient(client_id))
   }
 
   async handleLogout () {
