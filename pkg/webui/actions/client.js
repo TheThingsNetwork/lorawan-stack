@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import PropTypes from 'prop-types'
-import actions from '../lib/action'
+export const getClient = clientId => (
+  { type: 'GET_CLIENT', clientId }
+)
 
-export default actions('errors', {
-  // fatal is a fatal error in the app
-  fatal: {
-    error: PropTypes.any,
-  },
+export const getClientFailure = clientId => (
+  { type: 'GET_CLIENT_FAILURE', clientId }
+)
 
-  // uncaught is an uncaught error in the app
-  uncaught: {
-    error: PropTypes.any,
-  },
-})
+export const getClientSuccess = clientData => (
+  { type: 'GET_CLIENT_SUCCESS', clientData }
+)
+
