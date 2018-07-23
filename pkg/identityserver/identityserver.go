@@ -230,8 +230,9 @@ type InitialAdminData struct {
 // InitialConsoleData is the data that will be used to create the Console OAuth client when
 // the Identity Server is freshly installed.
 type InitialConsoleData struct {
-	ClientSecret string `name:"client-secret" description:"Console OAuth client secret"`
-	RedirectURI  string `name:"redirect-uri" description:"Console OAuth client redirect URI"`
+	ClientSecret      string `name:"client-secret" description:"console OAuth client secret"`
+	RedirectURI       string `name:"redirect-uri" description:"console OAuth client redirect URI"`
+	SkipAuthorization bool   `name:"skip-authorization" description:"Skip authorization of Console"`
 }
 
 // Validate returns error if InitialData is not valid.
@@ -298,7 +299,7 @@ func (is *IdentityServer) Init(data InitialData) error {
 			Description:       "The Console is the official The Things Network web application.",
 			Secret:            data.Console.ClientSecret,
 			RedirectURI:       data.Console.RedirectURI,
-			SkipAuthorization: true,
+			SkipAuthorization: data.Console.SkipAuthorization,
 			State:             ttnpb.STATE_APPROVED,
 			CreatorIDs: ttnpb.UserIdentifiers{
 				UserID: data.Admin.UserID,

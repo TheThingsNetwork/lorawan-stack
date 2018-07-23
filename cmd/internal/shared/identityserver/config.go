@@ -44,7 +44,8 @@ var DefaultIdentityServerInitialData = identityserver.InitialData{
 		Password: "admin",
 	},
 	Console: identityserver.InitialConsoleData{
-		ClientSecret: "console",
-		RedirectURI:  fmt.Sprintf("%s/oauth/callback", shared.DefaultConsolePublicURL),
+		ClientSecret:      "console",
+		RedirectURI:       fmt.Sprintf("%s/oauth/callback", shared.DefaultConsolePublicURL),
+		SkipAuthorization: true,
 	},
 }
