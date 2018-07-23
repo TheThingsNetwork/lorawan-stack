@@ -20,6 +20,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
@@ -33,7 +34,7 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	}
 
 	g.connectionsMu.Lock()
-	connection, ok := g.connections[id.UniqueID(ctx)]
+	connection, ok := g.connections[unique.ID(ctx, id)]
 	g.connectionsMu.Unlock()
 
 	if !ok {

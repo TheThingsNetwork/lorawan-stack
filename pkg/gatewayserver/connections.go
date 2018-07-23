@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 const (
@@ -260,7 +261,7 @@ func (c *mqttConnection) send(down *ttnpb.DownlinkMessage) error {
 		return errCouldNotBeScheduled.WithCause(err)
 	}
 
-	uid := c.gateway().GatewayIdentifiers.UniqueID(c.sess.Context())
+	uid := unique.ID(c.sess.Context(), c.gateway().GatewayIdentifiers)
 	topicParts := []string{V3TopicPrefix, uid, DownlinkTopicSuffix}
 	pkt := &packet.PublishPacket{
 		TopicName:  topic.Join(topicParts),

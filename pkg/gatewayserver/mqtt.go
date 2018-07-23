@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 )
 
@@ -108,7 +109,7 @@ func (h *mqttConnectionHandler) deliverMQTTStatus(pkt *packet.PublishPacket, _ c
 }
 
 func (h *mqttConnectionHandler) Connect(info *auth.Info) error {
-	identifiers, err := ttnpb.GatewayIdentifiersFromUniqueID(info.Username)
+	identifiers, err := unique.ToGatewayID(info.Username)
 	if err != nil {
 		return err
 	}
@@ -123,11 +124,11 @@ func (h *mqttConnectionHandler) Connect(info *auth.Info) error {
 	if err != nil {
 		return err
 	}
-	h.connection.gtw, err = is.GetGateway(h.Context(), identifiers)
+	h.connection.gtw, err = is.GetGateway(h.Context(), &identifiers)
 	if err != nil {
 		return err
 	}
-	resp, err := is.ListGatewayRights(h.Context(), identifiers, grpc.PerRPCCredentials(md))
+	resp, err := is.ListGatewayRights(h.Context(), &identifiers, grpc.PerRPCCredentials(md))
 	if err != nil {
 		return err
 	}
@@ -161,13 +162,13 @@ func (h *mqttConnectionHandler) Subscribe(info *auth.Info, requestedTopic string
 	if err != nil {
 		return
 	}
-	identifiers, err := ttnpb.GatewayIdentifiersFromUniqueID(info.Username)
+	identifiers, err := unique.ToGatewayID(info.Username)
 	if err != nil {
 		return "", 0, err
 	}
 
 	if h.connection.scheduler == nil {
-		fp, err := h.gs.getGatewayFrequencyPlan(h.gs.Context(), identifiers)
+		fp, err := h.gs.getGatewayFrequencyPlan(h.gs.Context(), &identifiers)
 		if err != nil {
 			return "", 0, err
 		}
@@ -251,19 +252,19 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 
 	uid := session.AuthInfo().Username
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
-	gtwIDs, err := ttnpb.GatewayIdentifiersFromUniqueID(uid)
+	gtwIDs, err := unique.ToGatewayID(uid)
 	if err != nil {
 		logger.WithError(err).Warn("Could not extract gateway identifiers")
 		return
 	}
 
 	logger.Debug("MQTT connection opened")
-	g.signalStartServingGateway(ctx, gtwIDs)
+	g.signalStartServingGateway(ctx, &gtwIDs)
 
 	go func() {
 		<-ctx.Done()
 		logger.Debug("MQTT connection closed")
-		g.signalStopServingGateway(g.Context(), gtwIDs)
+		g.signalStopServingGateway(g.Context(), &gtwIDs)
 	}()
 
 	readErr := make(chan error)

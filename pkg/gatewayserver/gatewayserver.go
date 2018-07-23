@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 	"google.golang.org/grpc"
 )
@@ -129,7 +130,7 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 	}
 
 	gs.connectionsMu.Lock()
-	connection, ok := gs.connections[id.UniqueID(ctx)]
+	connection, ok := gs.connections[unique.ID(ctx, id)]
 	gs.connectionsMu.Unlock()
 
 	if !ok {

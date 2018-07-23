@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
@@ -121,7 +122,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	if err := validate.ID(id.GetGatewayID()); err != nil {
 		return err
 	}
-	uid := id.UniqueID(ctx)
+	uid := unique.ID(ctx, id)
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = log.NewContext(ctx, logger)
 

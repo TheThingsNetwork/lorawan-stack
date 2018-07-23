@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 const gatewayInMemory = time.Hour
@@ -158,7 +159,7 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 
 	logger.Info("Gateway information and frequency plan fetched")
 
-	g.setupConnection(gtw.GatewayIdentifiers.UniqueID(ctx), connection)
+	g.setupConnection(unique.ID(ctx, gtw.GatewayIdentifiers), connection)
 	ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
 	g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
 	cancel()
