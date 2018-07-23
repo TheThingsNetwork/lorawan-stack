@@ -22,6 +22,7 @@ import { IntlProvider } from 'react-intl'
 import CancelablePromise from 'cancelable-promise'
 
 import { withEnv } from '../../lib/env'
+import log, { error } from '../../lib/log'
 
 const defaultLanguage = 'en'
 const xx = 'xx'
@@ -62,7 +63,7 @@ export default class UserLocale extends React.PureComponent {
 
     if (dev) {
       window.addEventListener('keydown', this.onKeydown)
-      console.info('Press alt + X to toggle the xx locale')
+      log('Press alt + X to toggle the xx locale')
     }
   }
 
@@ -80,7 +81,7 @@ export default class UserLocale extends React.PureComponent {
   }
 
   fail (err) {
-    console.error(err)
+    error(err)
     this.setState({ messages: null })
   }
 
@@ -106,7 +107,7 @@ export default class UserLocale extends React.PureComponent {
 
     // load locale polyfill if need be
     if (!window.Intl) {
-      console.log(`Polyfilling locale ${locale} for language ${language}`)
+      log(`Polyfilling locale ${locale} for language ${language}`)
       promises.push(import('intl'))
       promises.push(import(/* webpackChunkName: "locale.[request]" */ `intl/locale-data/jsonp/${locale}`))
     }

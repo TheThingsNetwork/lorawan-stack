@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* global process */
-
 import React from 'react'
 import { FormattedMessage } from 'react-intl'
 
+import { warn } from '../../lib/log'
+
 const warned = {}
-const warn = function (message) {
-  if (process.env.NODE_ENV !== 'production' && !warned[message]) {
+const warning = function (message) {
+  if (!warned[message]) {
     warned[message] = true
-    console.warn(`Message is not translated: "${message}"`)
+    warn(`Message is not translated: "${message}"`)
   }
 }
 
@@ -41,7 +41,7 @@ const Message = function ({
   }
 
   if (typeof content === 'string') {
-    warn(content)
+    warning(content)
     return <Component {...rest}>{content}</Component>
   }
 

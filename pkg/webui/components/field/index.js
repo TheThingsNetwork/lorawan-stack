@@ -17,6 +17,7 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
 import from from '../../lib/from'
+import { warn } from '../../lib/log'
 
 import Icon from '../icon'
 import Input from '../input'
@@ -37,7 +38,7 @@ const component = function (type) {
     return Input
 
   default:
-    console.warn('No type matches', type)
+    warn('No type matches', type)
     return Input
   }
 }

@@ -42,7 +42,6 @@ export default class OAuth extends React.PureComponent {
 
       window.location = url(this.props.location)
     } catch (error) {
-      console.error('yup', error.response)
       this.setState({
         error: error.response.data.message,
       })

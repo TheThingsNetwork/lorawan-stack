@@ -13,6 +13,7 @@
 // limitations under the License.
 
 /* global process */
+/* eslint-disable no-alert, no-console */
 
 import fs from 'fs'
 import path from 'path'
