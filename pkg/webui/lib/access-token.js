@@ -37,3 +37,9 @@ export default async function () {
 
   return token
 }
+
+export function clear () {
+  if (localStorage.accessToken) {
+    localStorage.removeItem('accessToken')
+  }
+}
