@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
@@ -30,7 +31,7 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 
 	maxSNR := msg.RxMetadata[0].SNR
 	for _, md := range msg.RxMetadata {
-		gtws[md.GatewayIdentifiers.UniqueID(ctx)] = struct{}{}
+		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
 
 		snr := md.SNR
 		if snr <= maxSNR {

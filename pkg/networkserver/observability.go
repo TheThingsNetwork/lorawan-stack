@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -172,7 +173,7 @@ func registerMergeMetadata(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb
 	if numGateways > 1 {
 		uniqueGateways := make(map[string]struct{}, len(msg.RxMetadata))
 		for _, meta := range msg.RxMetadata {
-			uniqueGateways[meta.GatewayIdentifiers.UniqueID(ctx)] = struct{}{}
+			uniqueGateways[unique.ID(ctx, meta.GatewayIdentifiers)] = struct{}{}
 		}
 		numGateways = len(uniqueGateways)
 	}

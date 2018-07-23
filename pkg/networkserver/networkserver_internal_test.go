@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -292,7 +293,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 				defer wg.Done()
 				a.So(ctx, should.Resemble, scheduleCtx)
 
-				cl, ok := gateways[id.UniqueID(ctx)]
+				cl, ok := gateways[unique.ID(ctx, id)]
 				if !ok {
 					t.Error("Non-existing gateway lookup")
 					return nil, errors.New("Not found")
@@ -349,7 +350,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			}
 
 			var n uint32
-			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &MockNsGsClient{
+			gateways[unique.ID(scheduleCtx, md.GatewayIdentifiers)] = &MockNsGsClient{
 				MockClientStream: &test.MockClientStream{},
 				ScheduleDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 					defer atomic.AddUint32(&cnt, 1)
@@ -407,7 +408,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 				defer wg.Done()
 				a.So(ctx, should.Resemble, scheduleCtx)
 
-				cl, ok := gateways[id.UniqueID(ctx)]
+				cl, ok := gateways[unique.ID(ctx, id)]
 				if !ok {
 					t.Error("Non-existing gateway lookup")
 					return nil, errors.New("Not found")
@@ -472,7 +473,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			slots[1].TxMetadata.Timestamp += uint64(time.Second.Nanoseconds())
 
 			var n uint32
-			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &MockNsGsClient{
+			gateways[unique.ID(scheduleCtx, md.GatewayIdentifiers)] = &MockNsGsClient{
 				MockClientStream: &test.MockClientStream{},
 				ScheduleDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 					defer atomic.AddUint32(&cnt, 1)

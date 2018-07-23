@@ -43,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -153,7 +154,7 @@ func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
 	return func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
 		p := g.GetPeer(
 			ttnpb.PeerInfo_GATEWAY_SERVER,
-			[]string{fmt.Sprintf("gtw=%s", id.UniqueID(ctx))},
+			[]string{fmt.Sprintf("gtw=%s", unique.ID(ctx, id))},
 			nil,
 		)
 		if p == nil {
@@ -362,7 +363,7 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 	}
 
 	ctx := stream.Context()
-	uid := id.UniqueID(ctx)
+	uid := unique.ID(ctx, id)
 
 	events.Publish(evtStartApplicationLink(ctx, id, nil))
 	defer events.Publish(evtEndApplicationLink(ctx, id, err))
@@ -456,7 +457,7 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.En
 
 // StartServingGateway is called by the Gateway Server to indicate that it is serving a gateway.
 func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	uid := gtwID.UniqueID(ctx)
+	uid := unique.ID(ctx, gtwID)
 	if uid == "" {
 		return nil, errMissingGatewayID
 	}
@@ -470,7 +471,7 @@ func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.G
 
 // StopServingGateway is called by the Gateway Server to indicate that it is no longer serving a gateway.
 func (ns *NetworkServer) StopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	uid := id.UniqueID(ctx)
+	uid := unique.ID(ctx, id)
 	if uid == "" {
 		return nil, errMissingGatewayID
 	}
@@ -580,7 +581,7 @@ func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
+		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
 
 	msg := &ttnpb.DownlinkMessage{
@@ -745,7 +746,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
+		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
 
 	if dev.MACState == nil {
@@ -1115,12 +1116,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
+		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
 
 	updateTimeout := appQueueUpdateTimeout
 
-	uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+	uid := unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
 	if uid == "" {
 		return errMissingApplicationID
 	}
@@ -1439,7 +1440,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			return err
 		}
 
-		uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+		uid := unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
 		if uid == "" {
 			return errMissingApplicationID
 		}
