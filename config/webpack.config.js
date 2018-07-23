@@ -218,8 +218,16 @@ export default {
     hotClient: { allEntries: true },
     add (app, middleware, options) {
       // Add new api routes here, to proxy them
-      app.use(convert(proxy([ '/api', '/console/api', '/oauth/api' ],
-        { target: 'http://localhost:1885' })))
+      app.use(convert(proxy([
+        '/api',
+        '/console/api',
+        '/console/oauth',
+        '/console/auth',
+        '/oauth/api',
+        '/oauth/authorize',
+        '/oauth/token',
+      ],
+      { target: 'http://localhost:1885' })))
       app.use(convert(history({
         rewrites: [
           { from: publicPathScheme, to: ({ parsedUrl }) => (`${parsedUrl.pathname.replace(publicPathReplace, '')}`) },
