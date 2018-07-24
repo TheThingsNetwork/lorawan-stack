@@ -1,4 +1,1104 @@
 {
+  "enum:CHANNEL_MASKS": {
+    "id": "enum:CHANNEL_MASKS",
+    "defaultMessage": "channel masks",
+    "translations": {
+      "en": "channel masks"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_ADR_PARAM_SETUP": {
+    "id": "enum:CID_ADR_PARAM_SETUP",
+    "defaultMessage": "adaptive data rate parameters",
+    "translations": {
+      "en": "adaptive data rate parameters"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_BEACON_FREQ": {
+    "id": "enum:CID_BEACON_FREQ",
+    "defaultMessage": "beacon frequency",
+    "translations": {
+      "en": "beacon frequency"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_BEACON_TIMING": {
+    "id": "enum:CID_BEACON_TIMING",
+    "defaultMessage": "beacon timing",
+    "translations": {
+      "en": "beacon timing"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_DEVICE_MODE": {
+    "id": "enum:CID_DEVICE_MODE",
+    "defaultMessage": "device mode",
+    "translations": {
+      "en": "device mode"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_DEVICE_TIME": {
+    "id": "enum:CID_DEVICE_TIME",
+    "defaultMessage": "device time",
+    "translations": {
+      "en": "device time"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_DEV_STATUS": {
+    "id": "enum:CID_DEV_STATUS",
+    "defaultMessage": "device status",
+    "translations": {
+      "en": "device status"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_DL_CHANNEL": {
+    "id": "enum:CID_DL_CHANNEL",
+    "defaultMessage": "downlink channel",
+    "translations": {
+      "en": "downlink channel"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_DUTY_CYCLE": {
+    "id": "enum:CID_DUTY_CYCLE",
+    "defaultMessage": "duty cycle",
+    "translations": {
+      "en": "duty cycle"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_FORCE_REJOIN": {
+    "id": "enum:CID_FORCE_REJOIN",
+    "defaultMessage": "force rejoin",
+    "translations": {
+      "en": "force rejoin"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_LINK_ADR": {
+    "id": "enum:CID_LINK_ADR",
+    "defaultMessage": "adaptive data rate",
+    "translations": {
+      "en": "adaptive data rate"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_LINK_CHECK": {
+    "id": "enum:CID_LINK_CHECK",
+    "defaultMessage": "link check",
+    "translations": {
+      "en": "link check"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_NEW_CHANNEL": {
+    "id": "enum:CID_NEW_CHANNEL",
+    "defaultMessage": "new channel",
+    "translations": {
+      "en": "new channel"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_PING_SLOT_CHANNEL": {
+    "id": "enum:CID_PING_SLOT_CHANNEL",
+    "defaultMessage": "ping slot channel",
+    "translations": {
+      "en": "ping slot channel"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_PING_SLOT_INFO": {
+    "id": "enum:CID_PING_SLOT_INFO",
+    "defaultMessage": "ping slot info",
+    "translations": {
+      "en": "ping slot info"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_REJOIN_PARAM_SETUP": {
+    "id": "enum:CID_REJOIN_PARAM_SETUP",
+    "defaultMessage": "rejoin parameters",
+    "translations": {
+      "en": "rejoin parameters"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_REKEY": {
+    "id": "enum:CID_REKEY",
+    "defaultMessage": "rekey",
+    "translations": {
+      "en": "rekey"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RESET": {
+    "id": "enum:CID_RESET",
+    "defaultMessage": "reset",
+    "translations": {
+      "en": "reset"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RFU_0": {
+    "id": "enum:CID_RFU_0",
+    "defaultMessage": "RFU",
+    "translations": {
+      "en": "RFU"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RX_PARAM_SETUP": {
+    "id": "enum:CID_RX_PARAM_SETUP",
+    "defaultMessage": "receive parameters",
+    "translations": {
+      "en": "receive parameters"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RX_TIMING_SETUP": {
+    "id": "enum:CID_RX_TIMING_SETUP",
+    "defaultMessage": "receive timing",
+    "translations": {
+      "en": "receive timing"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_TX_PARAM_SETUP": {
+    "id": "enum:CID_TX_PARAM_SETUP",
+    "defaultMessage": "transmit parameters",
+    "translations": {
+      "en": "transmit parameters"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONFIRMED_DOWN": {
+    "id": "enum:CONFIRMED_DOWN",
+    "defaultMessage": "confirmed downlink",
+    "translations": {
+      "en": "confirmed downlink"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONFIRMED_UP": {
+    "id": "enum:CONFIRMED_UP",
+    "defaultMessage": "confirmed uplink",
+    "translations": {
+      "en": "confirmed uplink"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTEXT": {
+    "id": "enum:CONTEXT",
+    "defaultMessage": "renew context",
+    "translations": {
+      "en": "renew context"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:FORMATTER_CAYENNELPP": {
+    "id": "enum:FORMATTER_CAYENNELPP",
+    "defaultMessage": "Cayenne LPP",
+    "translations": {
+      "en": "Cayenne LPP"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:FORMATTER_GRPC_SERVICE": {
+    "id": "enum:FORMATTER_GRPC_SERVICE",
+    "defaultMessage": "gRPC service",
+    "translations": {
+      "en": "gRPC service"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:FORMATTER_JAVASCRIPT": {
+    "id": "enum:FORMATTER_JAVASCRIPT",
+    "defaultMessage": "JavaScript",
+    "translations": {
+      "en": "JavaScript"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:FORMATTER_NONE": {
+    "id": "enum:FORMATTER_NONE",
+    "defaultMessage": "no formatter",
+    "translations": {
+      "en": "no formatter"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:FORMATTER_REPOSITORY": {
+    "id": "enum:FORMATTER_REPOSITORY",
+    "defaultMessage": "defined by end device type repository",
+    "translations": {
+      "en": "defined by end device type repository"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:FREQUENCIES": {
+    "id": "enum:FREQUENCIES",
+    "defaultMessage": "frequencies",
+    "translations": {
+      "en": "frequencies"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:GRANT_AUTHORIZATION_CODE": {
+    "id": "enum:GRANT_AUTHORIZATION_CODE",
+    "defaultMessage": "authorization code",
+    "translations": {
+      "en": "authorization code"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:GRANT_PASSWORD": {
+    "id": "enum:GRANT_PASSWORD",
+    "defaultMessage": "username and password",
+    "translations": {
+      "en": "username and password"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:GRANT_REFRESH_TOKEN": {
+    "id": "enum:GRANT_REFRESH_TOKEN",
+    "defaultMessage": "refresh token",
+    "translations": {
+      "en": "refresh token"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:JOIN_ACCEPT": {
+    "id": "enum:JOIN_ACCEPT",
+    "defaultMessage": "join accept",
+    "translations": {
+      "en": "join accept"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:JOIN_REQUEST": {
+    "id": "enum:JOIN_REQUEST",
+    "defaultMessage": "join request",
+    "translations": {
+      "en": "join request"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:KEYS": {
+    "id": "enum:KEYS",
+    "defaultMessage": "renew keys",
+    "translations": {
+      "en": "renew keys"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:PLACEMENT_INDOOR": {
+    "id": "enum:PLACEMENT_INDOOR",
+    "defaultMessage": "indoor",
+    "translations": {
+      "en": "indoor"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:PLACEMENT_OUTDOOR": {
+    "id": "enum:PLACEMENT_OUTDOOR",
+    "defaultMessage": "outdoor",
+    "translations": {
+      "en": "outdoor"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:PROPRIETARY": {
+    "id": "enum:PROPRIETARY",
+    "defaultMessage": "proprietary",
+    "translations": {
+      "en": "proprietary"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:REJOIN_REQUEST": {
+    "id": "enum:REJOIN_REQUEST",
+    "defaultMessage": "rejoin request",
+    "translations": {
+      "en": "rejoin request"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_DELETE": {
+    "id": "enum:RIGHT_APPLICATION_DELETE",
+    "defaultMessage": "delete application",
+    "translations": {
+      "en": "delete application"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_DEVICES_READ": {
+    "id": "enum:RIGHT_APPLICATION_DEVICES_READ",
+    "defaultMessage": "view devices in application",
+    "translations": {
+      "en": "view devices in application"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_DEVICES_WRITE": {
+    "id": "enum:RIGHT_APPLICATION_DEVICES_WRITE",
+    "defaultMessage": "register devices in application",
+    "translations": {
+      "en": "register devices in application"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_INFO": {
+    "id": "enum:RIGHT_APPLICATION_INFO",
+    "defaultMessage": "view application information",
+    "translations": {
+      "en": "view application information"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_LINK": {
+    "id": "enum:RIGHT_APPLICATION_LINK",
+    "defaultMessage": "link to an Application Server for traffic exchange, i.e. read uplink and write downlink (API keys only)",
+    "translations": {
+      "en": "link to an Application Server for traffic exchange, i.e. read uplink and write downlink (API keys only)"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_SETTINGS_API_KEYS": {
+    "id": "enum:RIGHT_APPLICATION_SETTINGS_API_KEYS",
+    "defaultMessage": "view and edit application API keys",
+    "translations": {
+      "en": "view and edit application API keys"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_SETTINGS_BASIC": {
+    "id": "enum:RIGHT_APPLICATION_SETTINGS_BASIC",
+    "defaultMessage": "edit basic application settings",
+    "translations": {
+      "en": "edit basic application settings"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_SETTINGS_COLLABORATORS": {
+    "id": "enum:RIGHT_APPLICATION_SETTINGS_COLLABORATORS",
+    "defaultMessage": "view and edit application collaborators",
+    "translations": {
+      "en": "view and edit application collaborators"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE": {
+    "id": "enum:RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE",
+    "defaultMessage": "write downlink application traffic",
+    "translations": {
+      "en": "write downlink application traffic"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_TRAFFIC_READ": {
+    "id": "enum:RIGHT_APPLICATION_TRAFFIC_READ",
+    "defaultMessage": "read application traffic (uplink and downlink)",
+    "translations": {
+      "en": "read application traffic (uplink and downlink)"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_TRAFFIC_UP_WRITE": {
+    "id": "enum:RIGHT_APPLICATION_TRAFFIC_UP_WRITE",
+    "defaultMessage": "write uplink application traffic",
+    "translations": {
+      "en": "write uplink application traffic"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_DELETE": {
+    "id": "enum:RIGHT_GATEWAY_DELETE",
+    "defaultMessage": "delete gateway",
+    "translations": {
+      "en": "delete gateway"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_INFO": {
+    "id": "enum:RIGHT_GATEWAY_INFO",
+    "defaultMessage": "view gateway information",
+    "translations": {
+      "en": "view gateway information"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_LINK": {
+    "id": "enum:RIGHT_GATEWAY_LINK",
+    "defaultMessage": "link to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only)",
+    "translations": {
+      "en": "link to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only)"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_LOCATION_READ": {
+    "id": "enum:RIGHT_GATEWAY_LOCATION_READ",
+    "defaultMessage": "view gateway location",
+    "translations": {
+      "en": "view gateway location"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_SETTINGS_API_KEYS": {
+    "id": "enum:RIGHT_GATEWAY_SETTINGS_API_KEYS",
+    "defaultMessage": "view and edit gateway API keys",
+    "translations": {
+      "en": "view and edit gateway API keys"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_SETTINGS_BASIC": {
+    "id": "enum:RIGHT_GATEWAY_SETTINGS_BASIC",
+    "defaultMessage": "edit basic gateway settings",
+    "translations": {
+      "en": "edit basic gateway settings"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_SETTINGS_COLLABORATORS": {
+    "id": "enum:RIGHT_GATEWAY_SETTINGS_COLLABORATORS",
+    "defaultMessage": "view and edit gateway collaborators",
+    "translations": {
+      "en": "view and edit gateway collaborators"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_STATUS_READ": {
+    "id": "enum:RIGHT_GATEWAY_STATUS_READ",
+    "defaultMessage": "view gateway status",
+    "translations": {
+      "en": "view gateway status"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE": {
+    "id": "enum:RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE",
+    "defaultMessage": "write downlink gateway traffic",
+    "translations": {
+      "en": "write downlink gateway traffic"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_TRAFFIC_READ": {
+    "id": "enum:RIGHT_GATEWAY_TRAFFIC_READ",
+    "defaultMessage": "read gateway traffic",
+    "translations": {
+      "en": "read gateway traffic"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_INVALID": {
+    "id": "enum:RIGHT_INVALID",
+    "defaultMessage": "invalid",
+    "translations": {
+      "en": "invalid"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_APPLICATIONS_CREATE": {
+    "id": "enum:RIGHT_ORGANIZATION_APPLICATIONS_CREATE",
+    "defaultMessage": "register an application under the organization",
+    "translations": {
+      "en": "register an application under the organization"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_APPLICATIONS_LIST": {
+    "id": "enum:RIGHT_ORGANIZATION_APPLICATIONS_LIST",
+    "defaultMessage": "list the applications the organization is collaborator of",
+    "translations": {
+      "en": "list the applications the organization is collaborator of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_DELETE": {
+    "id": "enum:RIGHT_ORGANIZATION_DELETE",
+    "defaultMessage": "delete organization",
+    "translations": {
+      "en": "delete organization"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_GATEWAYS_CREATE": {
+    "id": "enum:RIGHT_ORGANIZATION_GATEWAYS_CREATE",
+    "defaultMessage": "register a gateway under the organization",
+    "translations": {
+      "en": "register a gateway under the organization"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_GATEWAYS_LIST": {
+    "id": "enum:RIGHT_ORGANIZATION_GATEWAYS_LIST",
+    "defaultMessage": "list the gateways the organization is collaborator of",
+    "translations": {
+      "en": "list the gateways the organization is collaborator of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_INFO": {
+    "id": "enum:RIGHT_ORGANIZATION_INFO",
+    "defaultMessage": "view organization information",
+    "translations": {
+      "en": "view organization information"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_SETTINGS_API_KEYS": {
+    "id": "enum:RIGHT_ORGANIZATION_SETTINGS_API_KEYS",
+    "defaultMessage": "view and edit organization API keys",
+    "translations": {
+      "en": "view and edit organization API keys"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_SETTINGS_BASIC": {
+    "id": "enum:RIGHT_ORGANIZATION_SETTINGS_BASIC",
+    "defaultMessage": "edit basic organization settings",
+    "translations": {
+      "en": "edit basic organization settings"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_SETTINGS_MEMBERS": {
+    "id": "enum:RIGHT_ORGANIZATION_SETTINGS_MEMBERS",
+    "defaultMessage": "view and edit organization members",
+    "translations": {
+      "en": "view and edit organization members"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_ADMIN": {
+    "id": "enum:RIGHT_USER_ADMIN",
+    "defaultMessage": "perform administrative actions on behalf of the user",
+    "translations": {
+      "en": "perform administrative actions on behalf of the user"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_APPLICATIONS_CREATE": {
+    "id": "enum:RIGHT_USER_APPLICATIONS_CREATE",
+    "defaultMessage": "register an application under the user account",
+    "translations": {
+      "en": "register an application under the user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_APPLICATIONS_LIST": {
+    "id": "enum:RIGHT_USER_APPLICATIONS_LIST",
+    "defaultMessage": "list applications the user is a collaborator of",
+    "translations": {
+      "en": "list applications the user is a collaborator of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_AUTHORIZED_CLIENTS": {
+    "id": "enum:RIGHT_USER_AUTHORIZED_CLIENTS",
+    "defaultMessage": "view authorized, authorize and de-authorize OAuth clients of the user",
+    "translations": {
+      "en": "view authorized, authorize and de-authorize OAuth clients of the user"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_CLIENTS": {
+    "id": "enum:RIGHT_USER_CLIENTS",
+    "defaultMessage": "create, list, view, update and delete OAuth clients under the user account",
+    "translations": {
+      "en": "create, list, view, update and delete OAuth clients under the user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_DELETE": {
+    "id": "enum:RIGHT_USER_DELETE",
+    "defaultMessage": "delete user account",
+    "translations": {
+      "en": "delete user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_GATEWAYS_CREATE": {
+    "id": "enum:RIGHT_USER_GATEWAYS_CREATE",
+    "defaultMessage": "register a gateway under the user account",
+    "translations": {
+      "en": "register a gateway under the user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_GATEWAYS_LIST": {
+    "id": "enum:RIGHT_USER_GATEWAYS_LIST",
+    "defaultMessage": "list gateways the user is collaborator of",
+    "translations": {
+      "en": "list gateways the user is collaborator of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_INFO": {
+    "id": "enum:RIGHT_USER_INFO",
+    "defaultMessage": "view user information",
+    "translations": {
+      "en": "view user information"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_ORGANIZATIONS_CREATE": {
+    "id": "enum:RIGHT_USER_ORGANIZATIONS_CREATE",
+    "defaultMessage": "create an organization under the user account",
+    "translations": {
+      "en": "create an organization under the user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_ORGANIZATIONS_LIST": {
+    "id": "enum:RIGHT_USER_ORGANIZATIONS_LIST",
+    "defaultMessage": "list organizations the user is a member of",
+    "translations": {
+      "en": "list organizations the user is a member of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_SETTINGS_API_KEYS": {
+    "id": "enum:RIGHT_USER_SETTINGS_API_KEYS",
+    "defaultMessage": "view and edit user API keys",
+    "translations": {
+      "en": "view and edit user API keys"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_SETTINGS_BASIC": {
+    "id": "enum:RIGHT_USER_SETTINGS_BASIC",
+    "defaultMessage": "edit basic user settings",
+    "translations": {
+      "en": "edit basic user settings"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SESSION": {
+    "id": "enum:SESSION",
+    "defaultMessage": "renew session",
+    "translations": {
+      "en": "renew session"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_BT_RSSI_GEOLOCATION": {
+    "id": "enum:SOURCE_BT_RSSI_GEOLOCATION",
+    "defaultMessage": "estimated with Bluetooth RSSI geolocation",
+    "translations": {
+      "en": "estimated with Bluetooth RSSI geolocation"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_COMBINED_GEOLOCATION": {
+    "id": "enum:SOURCE_COMBINED_GEOLOCATION",
+    "defaultMessage": "estimated by a combination of geolocation sources",
+    "translations": {
+      "en": "estimated by a combination of geolocation sources"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_GPS": {
+    "id": "enum:SOURCE_GPS",
+    "defaultMessage": "determined by GPS",
+    "translations": {
+      "en": "determined by GPS"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_IP_GEOLOCATION": {
+    "id": "enum:SOURCE_IP_GEOLOCATION",
+    "defaultMessage": "estimated with IP geolocation",
+    "translations": {
+      "en": "estimated with IP geolocation"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_LORA_RSSI_GEOLOCATION": {
+    "id": "enum:SOURCE_LORA_RSSI_GEOLOCATION",
+    "defaultMessage": "estimated with LoRa RSSI geolocation",
+    "translations": {
+      "en": "estimated with LoRa RSSI geolocation"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_LORA_TDOA_GEOLOCATION": {
+    "id": "enum:SOURCE_LORA_TDOA_GEOLOCATION",
+    "defaultMessage": "estimated with LoRa TDOA geolocation",
+    "translations": {
+      "en": "estimated with LoRa TDOA geolocation"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_REGISTRY": {
+    "id": "enum:SOURCE_REGISTRY",
+    "defaultMessage": "set in and updated from a registry",
+    "translations": {
+      "en": "set in and updated from a registry"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_UNKNOWN": {
+    "id": "enum:SOURCE_UNKNOWN",
+    "defaultMessage": "unknown location source",
+    "translations": {
+      "en": "unknown location source"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:SOURCE_WIFI_RSSI_GEOLOCATION": {
+    "id": "enum:SOURCE_WIFI_RSSI_GEOLOCATION",
+    "defaultMessage": "estimated with WiFi RSSI geolocation",
+    "translations": {
+      "en": "estimated with WiFi RSSI geolocation"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:STATE_APPROVED": {
+    "id": "enum:STATE_APPROVED",
+    "defaultMessage": "reviewed and approved",
+    "translations": {
+      "en": "reviewed and approved"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:STATE_PENDING": {
+    "id": "enum:STATE_PENDING",
+    "defaultMessage": "pending review",
+    "translations": {
+      "en": "pending review"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:STATE_REJECTED": {
+    "id": "enum:STATE_REJECTED",
+    "defaultMessage": "reviewed and rejected",
+    "translations": {
+      "en": "reviewed and rejected"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:UNCONFIRMED_DOWN": {
+    "id": "enum:UNCONFIRMED_DOWN",
+    "defaultMessage": "unconfirmed downlink",
+    "translations": {
+      "en": "unconfirmed downlink"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:UNCONFIRMED_UP": {
+    "id": "enum:UNCONFIRMED_UP",
+    "defaultMessage": "unconfirmed uplink",
+    "translations": {
+      "en": "unconfirmed uplink"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "event:application.create": {
     "id": "event:application.create",
     "defaultMessage": "Create Application",
