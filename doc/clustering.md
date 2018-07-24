@@ -1,3 +1,2 @@
-# Clustering in The Things Network Stack
+# Clustering
 
-> TODO (@htdvisser)

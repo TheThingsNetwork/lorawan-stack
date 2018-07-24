@@ -1,3 +1,2 @@
 # Logging
 
-> TODO (@htdvisser)

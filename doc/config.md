@@ -1,3 +1,2 @@
-# Configuration of The Things Network Stack
+# Configuration
 
-> TODO (@htdvisser): Explain different configuration

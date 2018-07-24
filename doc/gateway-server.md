@@ -32,7 +32,7 @@ Each gateway server has a list of network servers to connect to.
 
 ### Device Address Prefixes
 
-
+> TODO
 
 ### Peering
 

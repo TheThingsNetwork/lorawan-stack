@@ -1,17 +1,19 @@
-# Setting up The Things Network Stack
+# The Things Network Stack for LoRaWAN
 
-> TODO (@htdvisser)
+## Setup
 
-## Dependencies
+> TODO
+
+### Dependencies
 
 > TODO: Minimal required dependencies: CockroachDB and Redis
 
-## Configuration
+### Configuration
 
 > TODO: Explain minimal required configuration.
 > TODO: Link to `config.md` for more info.
 
-## Running the `ttn-stack`
+### Running the `ttn-lw-stack`
 
-> TODO: Running the `ttn-stack` locally
+> TODO: Running the `ttn-lw-stack` locally
 > TODO: Link to examples for advanced (Systemd, Docker) deployments

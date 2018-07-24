@@ -1,3 +1,0 @@
-# Device Registry
-
-> TODO (@rvolosatovs)
