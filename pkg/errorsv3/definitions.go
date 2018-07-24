@@ -19,6 +19,7 @@ import (
 	"regexp"
 
 	"github.com/gotnospirit/messageformat"
+	"go.thethings.network/lorawan-stack/pkg/i18n"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -138,6 +139,10 @@ nextArg:
 	def.setGRPCStatus() // store the (marshaled) gRPC status message.
 
 	Definitions[fullName] = &def
+
+	desc := i18n.Define(fmt.Sprintf("error:%s", fullName), def.messageFormat)
+	desc.SetSource(3)
+
 	return def
 }
 

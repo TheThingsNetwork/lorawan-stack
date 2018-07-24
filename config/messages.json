@@ -1099,6 +1099,2195 @@
       "file": "i18n.go"
     }
   },
+  "error:cmd/internal/shared:application_server_initialize": {
+    "id": "error:cmd/internal/shared:application_server_initialize",
+    "defaultMessage": "could not initialize Application Server",
+    "translations": {
+      "en": "could not initialize Application Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:base_component_initialize": {
+    "id": "error:cmd/internal/shared:base_component_initialize",
+    "defaultMessage": "could not initialize base component",
+    "translations": {
+      "en": "could not initialize base component"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:console_initialize": {
+    "id": "error:cmd/internal/shared:console_initialize",
+    "defaultMessage": "could not initialize Console",
+    "translations": {
+      "en": "could not initialize Console"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:gateway_server_initialize": {
+    "id": "error:cmd/internal/shared:gateway_server_initialize",
+    "defaultMessage": "could not initialize Gateway Server",
+    "translations": {
+      "en": "could not initialize Gateway Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:identity_server_initialize": {
+    "id": "error:cmd/internal/shared:identity_server_initialize",
+    "defaultMessage": "could not initialize Identity Server",
+    "translations": {
+      "en": "could not initialize Identity Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:join_server_initialize": {
+    "id": "error:cmd/internal/shared:join_server_initialize",
+    "defaultMessage": "could not initialize Join Server",
+    "translations": {
+      "en": "could not initialize Join Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:network_server_initialize": {
+    "id": "error:cmd/internal/shared:network_server_initialize",
+    "defaultMessage": "could not initialize Network Server",
+    "translations": {
+      "en": "could not initialize Network Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/ttn-lw-identity-server/commands:identity_server_load_data": {
+    "id": "error:cmd/ttn-lw-identity-server/commands:identity_server_load_data",
+    "defaultMessage": "could not load Identity Server data",
+    "translations": {
+      "en": "could not load Identity Server data"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-identity-server/commands",
+      "file": "init.go"
+    }
+  },
+  "error:pkg/applicationregistry:application_not_found": {
+    "id": "error:pkg/applicationregistry:application_not_found",
+    "defaultMessage": "application not found",
+    "translations": {
+      "en": "application not found"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationregistry:nil_application": {
+    "id": "error:pkg/applicationregistry:nil_application",
+    "defaultMessage": "application specified is nil",
+    "translations": {
+      "en": "application specified is nil"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationregistry:nil_identifiers": {
+    "id": "error:pkg/applicationregistry:nil_identifiers",
+    "defaultMessage": "identifiers specified are nil",
+    "translations": {
+      "en": "identifiers specified are nil"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationregistry:processor_failed": {
+    "id": "error:pkg/applicationregistry:processor_failed",
+    "defaultMessage": "failed to process arguments",
+    "translations": {
+      "en": "failed to process arguments"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationregistry:too_many_applications": {
+    "id": "error:pkg/applicationregistry:too_many_applications",
+    "defaultMessage": "too many applications found",
+    "translations": {
+      "en": "too many applications found"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/assets:http": {
+    "id": "error:pkg/assets:http",
+    "defaultMessage": "HTTP error: {message}",
+    "translations": {
+      "en": "HTTP error: {message}"
+    },
+    "description": {
+      "package": "pkg/assets",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/assets:local_not_found": {
+    "id": "error:pkg/assets:local_not_found",
+    "defaultMessage": "assets not found in search path `{search_path}` and no CDN specified",
+    "translations": {
+      "en": "assets not found in search path `{search_path}` and no CDN specified"
+    },
+    "description": {
+      "package": "pkg/assets",
+      "file": "assets.go"
+    }
+  },
+  "error:pkg/assets:missing_location": {
+    "id": "error:pkg/assets:missing_location",
+    "defaultMessage": "missing assets location; specify local search path or CDN",
+    "translations": {
+      "en": "missing assets location; specify local search path or CDN"
+    },
+    "description": {
+      "package": "pkg/assets",
+      "file": "assets.go"
+    }
+  },
+  "error:pkg/assets:template_not_found": {
+    "id": "error:pkg/assets:template_not_found",
+    "defaultMessage": "template `{name}` not found",
+    "translations": {
+      "en": "template `{name}` not found"
+    },
+    "description": {
+      "package": "pkg/assets",
+      "file": "assets.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:invalid_pbkdf2_format": {
+    "id": "error:pkg/auth/pbkdf2:invalid_pbkdf2_format",
+    "defaultMessage": "password hash has invalid PBKDF2 format",
+    "translations": {
+      "en": "password hash has invalid PBKDF2 format"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:pbkdf2_iterations": {
+    "id": "error:pkg/auth/pbkdf2:pbkdf2_iterations",
+    "defaultMessage": "could not determine number of iterations from `{iterations}`",
+    "translations": {
+      "en": "could not determine number of iterations from `{iterations}`"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:pbkdf2_key_length": {
+    "id": "error:pkg/auth/pbkdf2:pbkdf2_key_length",
+    "defaultMessage": "could not determine key length",
+    "translations": {
+      "en": "could not determine key length"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:unknown_algorithm": {
+    "id": "error:pkg/auth/pbkdf2:unknown_algorithm",
+    "defaultMessage": "algorithm `{alg}` unknown",
+    "translations": {
+      "en": "algorithm `{alg}` unknown"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "algorithm.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:zero_length_salt": {
+    "id": "error:pkg/auth/pbkdf2:zero_length_salt",
+    "defaultMessage": "password salt can not have zero length",
+    "translations": {
+      "en": "password salt can not have zero length"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/rights:missing_application_rights": {
+    "id": "error:pkg/auth/rights:missing_application_rights",
+    "defaultMessage": "missing rights for application `{uid}`",
+    "translations": {
+      "en": "missing rights for application `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:missing_fetcher": {
+    "id": "error:pkg/auth/rights:missing_fetcher",
+    "defaultMessage": "no fetcher found in context",
+    "translations": {
+      "en": "no fetcher found in context"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "hook.go"
+    }
+  },
+  "error:pkg/auth/rights:missing_gateway_rights": {
+    "id": "error:pkg/auth/rights:missing_gateway_rights",
+    "defaultMessage": "missing rights for gateway `{uid}`",
+    "translations": {
+      "en": "missing rights for gateway `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:missing_organization_rights": {
+    "id": "error:pkg/auth/rights:missing_organization_rights",
+    "defaultMessage": "missing rights for organization `{uid}`",
+    "translations": {
+      "en": "missing rights for organization `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:no_identity_server_conn": {
+    "id": "error:pkg/auth/rights:no_identity_server_conn",
+    "defaultMessage": "no connection to Identity Server",
+    "translations": {
+      "en": "no connection to Identity Server"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "fetcher.go"
+    }
+  },
+  "error:pkg/auth/rights:unauthenticated": {
+    "id": "error:pkg/auth/rights:unauthenticated",
+    "defaultMessage": "no authentication found in call headers",
+    "translations": {
+      "en": "no authentication found in call headers"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "fetcher.go"
+    }
+  },
+  "error:pkg/auth:invalid_hash": {
+    "id": "error:pkg/auth:invalid_hash",
+    "defaultMessage": "invalid password hash",
+    "translations": {
+      "en": "invalid password hash"
+    },
+    "description": {
+      "package": "pkg/auth",
+      "file": "password.go"
+    }
+  },
+  "error:pkg/auth:invalid_token_key_segmentation": {
+    "id": "error:pkg/auth:invalid_token_key_segmentation",
+    "defaultMessage": "invalid segmentation of API Key or Access Token",
+    "translations": {
+      "en": "invalid segmentation of API Key or Access Token"
+    },
+    "description": {
+      "package": "pkg/auth",
+      "file": "jose.go"
+    }
+  },
+  "error:pkg/auth:unknown_hashing_method": {
+    "id": "error:pkg/auth:unknown_hashing_method",
+    "defaultMessage": "password hashing method `{method}` unknown",
+    "translations": {
+      "en": "password hashing method `{method}` unknown"
+    },
+    "description": {
+      "package": "pkg/auth",
+      "file": "password.go"
+    }
+  },
+  "error:pkg/band:band_not_found": {
+    "id": "error:pkg/band:band_not_found",
+    "defaultMessage": "band `{band_id}` not found",
+    "translations": {
+      "en": "band `{band_id}` not found"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/band:data_rate_index_too_high": {
+    "id": "error:pkg/band:data_rate_index_too_high",
+    "defaultMessage": "data rate index must be lower or equal to {max}",
+    "translations": {
+      "en": "data rate index must be lower or equal to {max}"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/band:data_rate_offset_too_high": {
+    "id": "error:pkg/band:data_rate_offset_too_high",
+    "defaultMessage": "data rate offset must be lower or equal to {max}",
+    "translations": {
+      "en": "data rate offset must be lower or equal to {max}"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/band:lorawan_version_unsupported": {
+    "id": "error:pkg/band:lorawan_version_unsupported",
+    "defaultMessage": "LoRaWAN Regional Parameters version not supported; supported versions: {supported}",
+    "translations": {
+      "en": "LoRaWAN Regional Parameters version not supported; supported versions: {supported}"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/band:unknown_lorawan_version": {
+    "id": "error:pkg/band:unknown_lorawan_version",
+    "defaultMessage": "unknown LoRaWAN version",
+    "translations": {
+      "en": "unknown LoRaWAN version"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/cluster:auth_type": {
+    "id": "error:pkg/cluster:auth_type",
+    "defaultMessage": "cluster auth type `{auth_type}` is not supported",
+    "translations": {
+      "en": "cluster auth type `{auth_type}` is not supported"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "auth.go"
+    }
+  },
+  "error:pkg/cluster:cluster_key": {
+    "id": "error:pkg/cluster:cluster_key",
+    "defaultMessage": "invalid cluster key",
+    "translations": {
+      "en": "invalid cluster key"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "auth.go"
+    }
+  },
+  "error:pkg/cluster:no_cluster_key": {
+    "id": "error:pkg/cluster:no_cluster_key",
+    "defaultMessage": "missing cluster key auth",
+    "translations": {
+      "en": "missing cluster key auth"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "auth.go"
+    }
+  },
+  "error:pkg/cluster:peer_connection": {
+    "id": "error:pkg/cluster:peer_connection",
+    "defaultMessage": "connection to peer `{name}` on `{address}` failed",
+    "translations": {
+      "en": "connection to peer `{name}` on `{address}` failed"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/console:extract_path_from_public_url": {
+    "id": "error:pkg/console:extract_path_from_public_url",
+    "defaultMessage": "could not extract path from public URL `{url}`",
+    "translations": {
+      "en": "could not extract path from public URL `{url}`"
+    },
+    "description": {
+      "package": "pkg/console",
+      "file": "console.go"
+    }
+  },
+  "error:pkg/console:oauth_not_configured": {
+    "id": "error:pkg/console:oauth_not_configured",
+    "defaultMessage": "no OAuth client ID and/or secret configured for the Console",
+    "translations": {
+      "en": "no OAuth client ID and/or secret configured for the Console"
+    },
+    "description": {
+      "package": "pkg/console",
+      "file": "console.go"
+    }
+  },
+  "error:pkg/crypto:corrupt_key": {
+    "id": "error:pkg/crypto:corrupt_key",
+    "defaultMessage": "corrupt key data",
+    "translations": {
+      "en": "corrupt key data"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "keywrap.go"
+    }
+  },
+  "error:pkg/crypto:join_accept_message_size": {
+    "id": "error:pkg/crypto:join_accept_message_size",
+    "defaultMessage": "invalid join-accept message size of {size} bytes, expected 16 or 32 bytes",
+    "translations": {
+      "en": "invalid join-accept message size of {size} bytes, expected 16 or 32 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:join_accept_payload_size": {
+    "id": "error:pkg/crypto:join_accept_payload_size",
+    "defaultMessage": "invalid JoinAccept payload size of {size} bytes, expected 13 or 29 bytes",
+    "translations": {
+      "en": "invalid JoinAccept payload size of {size} bytes, expected 13 or 29 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:join_request_payload_size": {
+    "id": "error:pkg/crypto:join_request_payload_size",
+    "defaultMessage": "invalid join-request payload size of {size} bytes, expected 19 bytes",
+    "translations": {
+      "en": "invalid join-request payload size of {size} bytes, expected 19 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:key_length_size": {
+    "id": "error:pkg/crypto:key_length_size",
+    "defaultMessage": "invalid key length size of {size} bytes, expected 16, 24 or 32 bytes",
+    "translations": {
+      "en": "invalid key length size of {size} bytes, expected 16, 24 or 32 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:rejoin_request_0_2_size": {
+    "id": "error:pkg/crypto:rejoin_request_0_2_size",
+    "defaultMessage": "invalid rejoin-request type 0 or 2 size of {size} bytes, expected 15 bytes",
+    "translations": {
+      "en": "invalid rejoin-request type 0 or 2 size of {size} bytes, expected 15 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:rejoin_request_1_size": {
+    "id": "error:pkg/crypto:rejoin_request_1_size",
+    "defaultMessage": "invalid rejoin-request type 1 size of {size} bytes, expected 20 bytes",
+    "translations": {
+      "en": "invalid rejoin-request type 1 size of {size} bytes, expected 20 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:rejoin_request_size": {
+    "id": "error:pkg/crypto:rejoin_request_size",
+    "defaultMessage": "invalid rejoin-request size of {size} bytes, expected 15 or 20 bytes",
+    "translations": {
+      "en": "invalid rejoin-request size of {size} bytes, expected 15 or 20 bytes"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/deviceregistry:device_not_found": {
+    "id": "error:pkg/deviceregistry:device_not_found",
+    "defaultMessage": "device not found",
+    "translations": {
+      "en": "device not found"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/deviceregistry:nil_device": {
+    "id": "error:pkg/deviceregistry:nil_device",
+    "defaultMessage": "device specified is nil",
+    "translations": {
+      "en": "device specified is nil"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/deviceregistry:nil_identifiers": {
+    "id": "error:pkg/deviceregistry:nil_identifiers",
+    "defaultMessage": "identifiers specified are nil",
+    "translations": {
+      "en": "identifiers specified are nil"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/deviceregistry:processor_failed": {
+    "id": "error:pkg/deviceregistry:processor_failed",
+    "defaultMessage": "failed to process arguments",
+    "translations": {
+      "en": "failed to process arguments"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/deviceregistry:too_many_devices": {
+    "id": "error:pkg/deviceregistry:too_many_devices",
+    "defaultMessage": "too many devices found",
+    "translations": {
+      "en": "too many devices found"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/errorsv3:odd_kv": {
+    "id": "error:pkg/errorsv3:odd_kv",
+    "defaultMessage": "Odd number of key-value elements",
+    "translations": {
+      "en": "Odd number of key-value elements"
+    },
+    "description": {
+      "package": "pkg/errorsv3",
+      "file": "attributes.go"
+    }
+  },
+  "error:pkg/fetch:fetch_file": {
+    "id": "error:pkg/fetch:fetch_file",
+    "defaultMessage": "could not fetch file `{filename}`",
+    "translations": {
+      "en": "could not fetch file `{filename}`"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/fetch:file_not_found": {
+    "id": "error:pkg/fetch:file_not_found",
+    "defaultMessage": "file `{filename}` not found",
+    "translations": {
+      "en": "file `{filename}` not found"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/fetch:read_file": {
+    "id": "error:pkg/fetch:read_file",
+    "defaultMessage": "could not read file `{filename}`",
+    "translations": {
+      "en": "could not read file `{filename}`"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/frequencyplans:fetch": {
+    "id": "error:pkg/frequencyplans:fetch",
+    "defaultMessage": "fetching failed",
+    "translations": {
+      "en": "fetching failed"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:frequency_plan_not_found": {
+    "id": "error:pkg/frequencyplans:frequency_plan_not_found",
+    "defaultMessage": "frequency plan `{id}` not found",
+    "translations": {
+      "en": "frequency plan `{id}` not found"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:id_not_specified": {
+    "id": "error:pkg/frequencyplans:id_not_specified",
+    "defaultMessage": "ID of the frequency plan not specified",
+    "translations": {
+      "en": "ID of the frequency plan not specified"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:read_base_frequency_plan": {
+    "id": "error:pkg/frequencyplans:read_base_frequency_plan",
+    "defaultMessage": "could not read the base `{base_id}` of frequency plan `{id}`",
+    "translations": {
+      "en": "could not read the base `{base_id}` of frequency plan `{id}`"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:read_frequency_plan": {
+    "id": "error:pkg/frequencyplans:read_frequency_plan",
+    "defaultMessage": "could not read the frequency plan `{id}`",
+    "translations": {
+      "en": "could not read the frequency plan `{id}`"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:read_list": {
+    "id": "error:pkg/frequencyplans:read_list",
+    "defaultMessage": "could not read the list of frequency plans",
+    "translations": {
+      "en": "could not read the list of frequency plans"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:unmarshal_file": {
+    "id": "error:pkg/frequencyplans:unmarshal_file",
+    "defaultMessage": "could not unmarshal file",
+    "translations": {
+      "en": "could not unmarshal file"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:duty_cycle_full": {
+    "id": "error:pkg/gatewayserver/scheduling:duty_cycle_full",
+    "defaultMessage": "duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}",
+    "translations": {
+      "en": "duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:dwell_time_required": {
+    "id": "error:pkg/gatewayserver/scheduling:dwell_time_required",
+    "defaultMessage": "packet time-on-air duration is greater than this band's dwell time ({packet_duration} \u003e {dwell_time})",
+    "translations": {
+      "en": "packet time-on-air duration is greater than this band's dwell time ({packet_duration} \u003e {dwell_time})"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:negative_duration": {
+    "id": "error:pkg/gatewayserver/scheduling:negative_duration",
+    "defaultMessage": "duration cannot be negative",
+    "translations": {
+      "en": "duration cannot be negative"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:no_sub_band_found": {
+    "id": "error:pkg/gatewayserver/scheduling:no_sub_band_found",
+    "defaultMessage": "no sub-band found for frequency {frequency} Hz",
+    "translations": {
+      "en": "no sub-band found for frequency {frequency} Hz"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:retrieve_fp_band": {
+    "id": "error:pkg/gatewayserver/scheduling:retrieve_fp_band",
+    "defaultMessage": "could not retrieve the band associated with the frequency plan",
+    "translations": {
+      "en": "could not retrieve the band associated with the frequency plan"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:time_off_air_required": {
+    "id": "error:pkg/gatewayserver/scheduling:time_off_air_required",
+    "defaultMessage": "time-off-air constraints prevent scheduling",
+    "translations": {
+      "en": "time-off-air constraints prevent scheduling"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:window_overlap": {
+    "id": "error:pkg/gatewayserver/scheduling:window_overlap",
+    "defaultMessage": "window overlap",
+    "translations": {
+      "en": "window overlap"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduling.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:decoding_payload_from_b64": {
+    "id": "error:pkg/gatewayserver/udp:decoding_payload_from_b64",
+    "defaultMessage": "could not decode payload from base64",
+    "translations": {
+      "en": "could not decode payload from base64"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:gateway_not_connected": {
+    "id": "error:pkg/gatewayserver/udp:gateway_not_connected",
+    "defaultMessage": "gateway not connected",
+    "translations": {
+      "en": "gateway not connected"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:marshal_packet_to_udp_format": {
+    "id": "error:pkg/gatewayserver/udp:marshal_packet_to_udp_format",
+    "defaultMessage": "failed to marshal packet to UDP format",
+    "translations": {
+      "en": "failed to marshal packet to UDP format"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:marshal_payload_to_lorawan": {
+    "id": "error:pkg/gatewayserver/udp:marshal_payload_to_lorawan",
+    "defaultMessage": "failed to marshalling payload to LoRaWAN format",
+    "translations": {
+      "en": "failed to marshalling payload to LoRaWAN format"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:no_connection_associated": {
+    "id": "error:pkg/gatewayserver/udp:no_connection_associated",
+    "defaultMessage": "no gateway connection associated to this packet",
+    "translations": {
+      "en": "no gateway connection associated to this packet"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:no_gateway_eui": {
+    "id": "error:pkg/gatewayserver/udp:no_gateway_eui",
+    "defaultMessage": "packet is not long enough to contain the gateway EUI",
+    "translations": {
+      "en": "packet is not long enough to contain the gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:parse_bandwidth": {
+    "id": "error:pkg/gatewayserver/udp:parse_bandwidth",
+    "defaultMessage": "could not parse bandwidth",
+    "translations": {
+      "en": "could not parse bandwidth"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:parse_spreading_factor": {
+    "id": "error:pkg/gatewayserver/udp:parse_spreading_factor",
+    "defaultMessage": "could not parse spreading factor",
+    "translations": {
+      "en": "could not parse spreading factor"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:unknown_modulation": {
+    "id": "error:pkg/gatewayserver/udp:unknown_modulation",
+    "defaultMessage": "unknown modulation `{modulation}`",
+    "translations": {
+      "en": "unknown modulation `{modulation}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:unmarshal_eui": {
+    "id": "error:pkg/gatewayserver/udp:unmarshal_eui",
+    "defaultMessage": "failed to unmarshal an EUI",
+    "translations": {
+      "en": "failed to unmarshal an EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:unmarshal_payload_to_lorawan": {
+    "id": "error:pkg/gatewayserver/udp:unmarshal_payload_to_lorawan",
+    "defaultMessage": "failed to unmarshal payload from LoRaWAN",
+    "translations": {
+      "en": "failed to unmarshal payload from LoRaWAN"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/udp:unmarshal_timestamp": {
+    "id": "error:pkg/gatewayserver/udp:unmarshal_timestamp",
+    "defaultMessage": "failed to unmarshal timestamp",
+    "translations": {
+      "en": "failed to unmarshal timestamp"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:api_key_needs_rights": {
+    "id": "error:pkg/gatewayserver:api_key_needs_rights",
+    "defaultMessage": "API key needs the following rights for the gateway `{gateway_uid}` to perform this operation: {rights}",
+    "translations": {
+      "en": "API key needs the following rights for the gateway `{gateway_uid}` to perform this operation: {rights}"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:api_version": {
+    "id": "error:pkg/gatewayserver:api_version",
+    "defaultMessage": "invalid API version tag `{version}`",
+    "translations": {
+      "en": "invalid API version tag `{version}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:authentication_type": {
+    "id": "error:pkg/gatewayserver:authentication_type",
+    "defaultMessage": "received `{passed}` authentication type, but expected `{expected}`",
+    "translations": {
+      "en": "received `{passed}` authentication type, but expected `{expected}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:compute_toa_of_downlink": {
+    "id": "error:pkg/gatewayserver:compute_toa_of_downlink",
+    "defaultMessage": "could not compute the time on air of a downlink",
+    "translations": {
+      "en": "could not compute the time on air of a downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:gateway_not_connected": {
+    "id": "error:pkg/gatewayserver:gateway_not_connected",
+    "defaultMessage": "gateway `{gateway_id}` not connected",
+    "translations": {
+      "en": "gateway `{gateway_id}` not connected"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:list_gateway_rights": {
+    "id": "error:pkg/gatewayserver:list_gateway_rights",
+    "defaultMessage": "could not list gateway rights for the passed authentication method",
+    "translations": {
+      "en": "could not list gateway rights for the passed authentication method"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:marshal_to_protobuf": {
+    "id": "error:pkg/gatewayserver:marshal_to_protobuf",
+    "defaultMessage": "could not marshal to protobuf",
+    "translations": {
+      "en": "could not marshal to protobuf"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_credentials_passed": {
+    "id": "error:pkg/gatewayserver:no_credentials_passed",
+    "defaultMessage": "no credentials passed",
+    "translations": {
+      "en": "no credentials passed"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_dev_addr_specified": {
+    "id": "error:pkg/gatewayserver:no_dev_addr_specified",
+    "defaultMessage": "no DevAddr specified",
+    "translations": {
+      "en": "no DevAddr specified"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_dev_eui_specified": {
+    "id": "error:pkg/gatewayserver:no_dev_eui_specified",
+    "defaultMessage": "no DevEUI specified",
+    "translations": {
+      "en": "no DevEUI specified"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_identity_server_found": {
+    "id": "error:pkg/gatewayserver:no_identity_server_found",
+    "defaultMessage": "no Identity Server found",
+    "translations": {
+      "en": "no Identity Server found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_metadata": {
+    "id": "error:pkg/gatewayserver:no_metadata",
+    "defaultMessage": "No metadata present",
+    "translations": {
+      "en": "No metadata present"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_network_server_found": {
+    "id": "error:pkg/gatewayserver:no_network_server_found",
+    "defaultMessage": "no Network Server found for this message",
+    "translations": {
+      "en": "no Network Server found for this message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_pull_data_received": {
+    "id": "error:pkg/gatewayserver:no_pull_data_received",
+    "defaultMessage": "no PULL_DATA received in the last `{delay}`",
+    "translations": {
+      "en": "no PULL_DATA received in the last `{delay}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_ready_connection_to_is": {
+    "id": "error:pkg/gatewayserver:no_ready_connection_to_is",
+    "defaultMessage": "no ready connection to the Identity Server",
+    "translations": {
+      "en": "no ready connection to the Identity Server"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:protocol_translation": {
+    "id": "error:pkg/gatewayserver:protocol_translation",
+    "defaultMessage": "could not translate from the protobuf format to UDP",
+    "translations": {
+      "en": "could not translate from the protobuf format to UDP"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:retrieve_gateway_info": {
+    "id": "error:pkg/gatewayserver:retrieve_gateway_info",
+    "defaultMessage": "could not retrieve information about the gateway",
+    "translations": {
+      "en": "could not retrieve information about the gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:retrieve_gtw_frequency_plan": {
+    "id": "error:pkg/gatewayserver:retrieve_gtw_frequency_plan",
+    "defaultMessage": "could not retrieve the frequency plan `{fp_id}` of the gateway",
+    "translations": {
+      "en": "could not retrieve the frequency plan `{fp_id}` of the gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:schedule": {
+    "id": "error:pkg/gatewayserver:schedule",
+    "defaultMessage": "could not schedule downlink",
+    "translations": {
+      "en": "could not schedule downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:topic_format": {
+    "id": "error:pkg/gatewayserver:topic_format",
+    "defaultMessage": "unsupported topic format `{topic}`",
+    "translations": {
+      "en": "unsupported topic format `{topic}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:topic_rights": {
+    "id": "error:pkg/gatewayserver:topic_rights",
+    "defaultMessage": "permission denied to subscribe to `{topic}`",
+    "translations": {
+      "en": "permission denied to subscribe to `{topic}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:udp_socket": {
+    "id": "error:pkg/gatewayserver:udp_socket",
+    "defaultMessage": "could not open UDP socket",
+    "translations": {
+      "en": "could not open UDP socket"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:unmarshal_from_protobuf": {
+    "id": "error:pkg/gatewayserver:unmarshal_from_protobuf",
+    "defaultMessage": "could not unmarshal message from protobuf",
+    "translations": {
+      "en": "could not unmarshal message from protobuf"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/identityserver:other_pull_configuration_stream_opened": {
+    "id": "error:pkg/identityserver:other_pull_configuration_stream_opened",
+    "defaultMessage": "another `PullConfiguration` stream opened",
+    "translations": {
+      "en": "another `PullConfiguration` stream opened"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/identityserver:wrong_gateway_for_api_key": {
+    "id": "error:pkg/identityserver:wrong_gateway_for_api_key",
+    "defaultMessage": "api key has no rights for gateway `{gateway_id}`",
+    "translations": {
+      "en": "api key has no rights for gateway `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:address_mismatch": {
+    "id": "error:pkg/joinserver:address_mismatch",
+    "defaultMessage": "{component} address mismatch",
+    "translations": {
+      "en": "{component} address mismatch"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:dev_nonce_reused": {
+    "id": "error:pkg/joinserver:dev_nonce_reused",
+    "defaultMessage": "DevNonce has already been used",
+    "translations": {
+      "en": "DevNonce has already been used"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:dev_nonce_too_high": {
+    "id": "error:pkg/joinserver:dev_nonce_too_high",
+    "defaultMessage": "DevNonce is too high",
+    "translations": {
+      "en": "DevNonce is too high"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:dev_nonce_too_small": {
+    "id": "error:pkg/joinserver:dev_nonce_too_small",
+    "defaultMessage": "DevNonce is too small",
+    "translations": {
+      "en": "DevNonce is too small"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:encrypt_payload": {
+    "id": "error:pkg/joinserver:encrypt_payload",
+    "defaultMessage": "failed to encrypt JoinAccept",
+    "translations": {
+      "en": "failed to encrypt JoinAccept"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:forward_join_request": {
+    "id": "error:pkg/joinserver:forward_join_request",
+    "defaultMessage": "failed to forward JoinRequest",
+    "translations": {
+      "en": "failed to forward JoinRequest"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:lorawan_version": {
+    "id": "error:pkg/joinserver:lorawan_version",
+    "defaultMessage": "unsupported LoRaWAN version: {version}",
+    "translations": {
+      "en": "unsupported LoRaWAN version: {version}"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:mac_version_mismatch": {
+    "id": "error:pkg/joinserver:mac_version_mismatch",
+    "defaultMessage": "Device MAC version mismatch, in registry: {registered}, selected: {selected}",
+    "translations": {
+      "en": "Device MAC version mismatch, in registry: {registered}, selected: {selected}"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:marshal_payload": {
+    "id": "error:pkg/joinserver:marshal_payload",
+    "defaultMessage": "failed to marshal payload",
+    "translations": {
+      "en": "failed to marshal payload"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:mic_check": {
+    "id": "error:pkg/joinserver:mic_check",
+    "defaultMessage": "MIC check failed",
+    "translations": {
+      "en": "MIC check failed"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:mic_compute": {
+    "id": "error:pkg/joinserver:mic_compute",
+    "defaultMessage": "failed to compute MIC",
+    "translations": {
+      "en": "failed to compute MIC"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:mic_mismatch": {
+    "id": "error:pkg/joinserver:mic_mismatch",
+    "defaultMessage": "MIC mismatch",
+    "translations": {
+      "en": "MIC mismatch"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_app_key": {
+    "id": "error:pkg/joinserver:missing_app_key",
+    "defaultMessage": "AppKey is missing",
+    "translations": {
+      "en": "AppKey is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_app_s_key": {
+    "id": "error:pkg/joinserver:missing_app_s_key",
+    "defaultMessage": "AppSKey is missing",
+    "translations": {
+      "en": "AppSKey is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_dev_addr": {
+    "id": "error:pkg/joinserver:missing_dev_addr",
+    "defaultMessage": "DevAddr is missing",
+    "translations": {
+      "en": "DevAddr is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_dev_eui": {
+    "id": "error:pkg/joinserver:missing_dev_eui",
+    "defaultMessage": "DevEUI is missing",
+    "translations": {
+      "en": "DevEUI is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_f_nwk_s_int_key": {
+    "id": "error:pkg/joinserver:missing_f_nwk_s_int_key",
+    "defaultMessage": "FNwkSIntKey is missing",
+    "translations": {
+      "en": "FNwkSIntKey is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_join_eui": {
+    "id": "error:pkg/joinserver:missing_join_eui",
+    "defaultMessage": "JoinEUI is missing",
+    "translations": {
+      "en": "JoinEUI is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_join_request": {
+    "id": "error:pkg/joinserver:missing_join_request",
+    "defaultMessage": "JoinRequest is missing",
+    "translations": {
+      "en": "JoinRequest is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_nwk_key": {
+    "id": "error:pkg/joinserver:missing_nwk_key",
+    "defaultMessage": "NwkKey is missing",
+    "translations": {
+      "en": "NwkKey is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_nwk_s_enc_key": {
+    "id": "error:pkg/joinserver:missing_nwk_s_enc_key",
+    "defaultMessage": "NwkSEncKey is missing",
+    "translations": {
+      "en": "NwkSEncKey is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_payload": {
+    "id": "error:pkg/joinserver:missing_payload",
+    "defaultMessage": "message payload is missing",
+    "translations": {
+      "en": "message payload is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_s_nwk_s_int_key": {
+    "id": "error:pkg/joinserver:missing_s_nwk_s_int_key",
+    "defaultMessage": "SNwkSIntKey is missing",
+    "translations": {
+      "en": "SNwkSIntKey is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_session": {
+    "id": "error:pkg/joinserver:missing_session",
+    "defaultMessage": "Session is missing",
+    "translations": {
+      "en": "Session is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:missing_session_key_id": {
+    "id": "error:pkg/joinserver:missing_session_key_id",
+    "defaultMessage": "SessionKeyID is missing",
+    "translations": {
+      "en": "SessionKeyID is missing"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:payload_length": {
+    "id": "error:pkg/joinserver:payload_length",
+    "defaultMessage": "expected length of payload to be equal to 23 got {length}",
+    "translations": {
+      "en": "expected length of payload to be equal to 23 got {length}"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:payload_type": {
+    "id": "error:pkg/joinserver:payload_type",
+    "defaultMessage": "wrong payload type: {type}",
+    "translations": {
+      "en": "wrong payload type: {type}"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:session_key_id_mismatch": {
+    "id": "error:pkg/joinserver:session_key_id_mismatch",
+    "defaultMessage": "SessionKeyID mismatch",
+    "translations": {
+      "en": "SessionKeyID mismatch"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:unknown_app_eui": {
+    "id": "error:pkg/joinserver:unknown_app_eui",
+    "defaultMessage": "AppEUI specified is not known",
+    "translations": {
+      "en": "AppEUI specified is not known"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:unmarshal_payload": {
+    "id": "error:pkg/joinserver:unmarshal_payload",
+    "defaultMessage": "failed to unmarshal payload",
+    "translations": {
+      "en": "failed to unmarshal payload"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:channel_index_too_high": {
+    "id": "error:pkg/networkserver:channel_index_too_high",
+    "defaultMessage": "channel index is too high",
+    "translations": {
+      "en": "channel index is too high"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:cid_out_of_range": {
+    "id": "error:pkg/networkserver:cid_out_of_range",
+    "defaultMessage": "CID must be in range from {min} to {max}",
+    "translations": {
+      "en": "CID must be in range from {min} to {max}"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:compute_mic": {
+    "id": "error:pkg/networkserver:compute_mic",
+    "defaultMessage": "failed to compute MIC",
+    "translations": {
+      "en": "failed to compute MIC"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:configuration": {
+    "id": "error:pkg/networkserver:configuration",
+    "defaultMessage": "invalid configuration",
+    "translations": {
+      "en": "invalid configuration"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:data_rate": {
+    "id": "error:pkg/networkserver:data_rate",
+    "defaultMessage": "invalid data rate",
+    "translations": {
+      "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:decryption": {
+    "id": "error:pkg/networkserver:decryption",
+    "defaultMessage": "decryption failed",
+    "translations": {
+      "en": "decryption failed"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:device_not_found": {
+    "id": "error:pkg/networkserver:device_not_found",
+    "defaultMessage": "device not found",
+    "translations": {
+      "en": "device not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:device_registry_initialization": {
+    "id": "error:pkg/networkserver:device_registry_initialization",
+    "defaultMessage": "Device Registry initialization failed",
+    "translations": {
+      "en": "Device Registry initialization failed"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:device_store": {
+    "id": "error:pkg/networkserver:device_store",
+    "defaultMessage": "failed to store device",
+    "translations": {
+      "en": "failed to store device"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:duplicate_cid_handler": {
+    "id": "error:pkg/networkserver:duplicate_cid_handler",
+    "defaultMessage": "a handler for MAC command with CID {cid} is already registered",
+    "translations": {
+      "en": "a handler for MAC command with CID {cid} is already registered"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:duplicate_subscription": {
+    "id": "error:pkg/networkserver:duplicate_subscription",
+    "defaultMessage": "another subscription already started",
+    "translations": {
+      "en": "another subscription already started"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:empty_session": {
+    "id": "error:pkg/networkserver:empty_session",
+    "defaultMessage": "session in empty",
+    "translations": {
+      "en": "session in empty"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:f_cnt_too_high": {
+    "id": "error:pkg/networkserver:f_cnt_too_high",
+    "defaultMessage": "FCnt is too high",
+    "translations": {
+      "en": "FCnt is too high"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:frequency_plan": {
+    "id": "error:pkg/networkserver:frequency_plan",
+    "defaultMessage": "invalid frequency plan",
+    "translations": {
+      "en": "invalid frequency plan"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:gateway_server_not_found": {
+    "id": "error:pkg/networkserver:gateway_server_not_found",
+    "defaultMessage": "Gateway Server not found",
+    "translations": {
+      "en": "Gateway Server not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:join": {
+    "id": "error:pkg/networkserver:join",
+    "defaultMessage": "all Join Servers failed to handle join",
+    "translations": {
+      "en": "all Join Servers failed to handle join"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:lora_and_fsk": {
+    "id": "error:pkg/networkserver:lora_and_fsk",
+    "defaultMessage": "both LoRa and FSK modulation is specified",
+    "translations": {
+      "en": "both LoRa and FSK modulation is specified"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:mac_encode": {
+    "id": "error:pkg/networkserver:mac_encode",
+    "defaultMessage": "failed to encode MAC commands",
+    "translations": {
+      "en": "failed to encode MAC commands"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:mac_encrypt": {
+    "id": "error:pkg/networkserver:mac_encrypt",
+    "defaultMessage": "failed to encrypt MAC commands",
+    "translations": {
+      "en": "failed to encrypt MAC commands"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:mac_request_not_found": {
+    "id": "error:pkg/networkserver:mac_request_not_found",
+    "defaultMessage": "MAC response received, but corresponding request not found",
+    "translations": {
+      "en": "MAC response received, but corresponding request not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:marshal_payload": {
+    "id": "error:pkg/networkserver:marshal_payload",
+    "defaultMessage": "failed to marshal payload",
+    "translations": {
+      "en": "failed to marshal payload"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:missing_application_id": {
+    "id": "error:pkg/networkserver:missing_application_id",
+    "defaultMessage": "application ID is unknown",
+    "translations": {
+      "en": "application ID is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:missing_f_nwk_s_int_key": {
+    "id": "error:pkg/networkserver:missing_f_nwk_s_int_key",
+    "defaultMessage": "FNwkSIntKey is unknown",
+    "translations": {
+      "en": "FNwkSIntKey is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:missing_gateway_id": {
+    "id": "error:pkg/networkserver:missing_gateway_id",
+    "defaultMessage": "gateway ID is unknown",
+    "translations": {
+      "en": "gateway ID is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:missing_nwk_s_enc_key": {
+    "id": "error:pkg/networkserver:missing_nwk_s_enc_key",
+    "defaultMessage": "NwkSEncKey is unknown",
+    "translations": {
+      "en": "NwkSEncKey is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:missing_payload": {
+    "id": "error:pkg/networkserver:missing_payload",
+    "defaultMessage": "message payload is missing",
+    "translations": {
+      "en": "message payload is missing"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:missing_s_nwk_s_int_key": {
+    "id": "error:pkg/networkserver:missing_s_nwk_s_int_key",
+    "defaultMessage": "SNwkSIntKey is unknown",
+    "translations": {
+      "en": "SNwkSIntKey is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:raw_payload_too_long": {
+    "id": "error:pkg/networkserver:raw_payload_too_long",
+    "defaultMessage": "length of RawPayload must not be less than 4",
+    "translations": {
+      "en": "length of RawPayload must not be less than 4"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:rx2_data_rate_index": {
+    "id": "error:pkg/networkserver:rx2_data_rate_index",
+    "defaultMessage": "invalid Rx2 data rate index",
+    "translations": {
+      "en": "invalid Rx2 data rate index"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:schedule": {
+    "id": "error:pkg/networkserver:schedule",
+    "defaultMessage": "all Gateway Servers failed to schedule the downlink",
+    "translations": {
+      "en": "all Gateway Servers failed to schedule the downlink"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:schedule_too_soon": {
+    "id": "error:pkg/networkserver:schedule_too_soon",
+    "defaultMessage": "confirmed downlink is scheduled too soon",
+    "translations": {
+      "en": "confirmed downlink is scheduled too soon"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_band": {
+    "id": "error:pkg/networkserver:unknown_band",
+    "defaultMessage": "band is unknown",
+    "translations": {
+      "en": "band is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_chanel": {
+    "id": "error:pkg/networkserver:unknown_chanel",
+    "defaultMessage": "channel is unknown",
+    "translations": {
+      "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_frequency_plan": {
+    "id": "error:pkg/networkserver:unknown_frequency_plan",
+    "defaultMessage": "frequency plan is unknown",
+    "translations": {
+      "en": "frequency plan is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_mac_state": {
+    "id": "error:pkg/networkserver:unknown_mac_state",
+    "defaultMessage": "MAC state is unknown",
+    "translations": {
+      "en": "MAC state is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unmarshal_payload": {
+    "id": "error:pkg/networkserver:unmarshal_payload",
+    "defaultMessage": "failed to unmarshal payload",
+    "translations": {
+      "en": "failed to unmarshal payload"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unsupported_lorawan_version": {
+    "id": "error:pkg/networkserver:unsupported_lorawan_version",
+    "defaultMessage": "unsupported LoRaWAN version: {version}",
+    "translations": {
+      "en": "unsupported LoRaWAN version: {version}"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:uplink_not_found": {
+    "id": "error:pkg/networkserver:uplink_not_found",
+    "defaultMessage": "uplink not found",
+    "translations": {
+      "en": "uplink not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/rpcserver:rpc_recovered": {
+    "id": "error:pkg/rpcserver:rpc_recovered",
+    "defaultMessage": "Internal Server Error",
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/rpcserver",
+      "file": "rpcserver.go"
+    }
+  },
+  "error:pkg/store/redis:no_index_keys": {
+    "id": "error:pkg/store/redis:no_index_keys",
+    "defaultMessage": "at least one index key must be specified",
+    "translations": {
+      "en": "at least one index key must be specified"
+    },
+    "description": {
+      "package": "pkg/store/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/store/redis:offset_too_high": {
+    "id": "error:pkg/store/redis:offset_too_high",
+    "defaultMessage": "offset specified is too high",
+    "translations": {
+      "en": "offset specified is too high"
+    },
+    "description": {
+      "package": "pkg/store/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/store/redis:parse_ulid": {
+    "id": "error:pkg/store/redis:parse_ulid",
+    "defaultMessage": "failed to parse `{ulid}` as a valid ULID",
+    "translations": {
+      "en": "failed to parse `{ulid}` as a valid ULID"
+    },
+    "description": {
+      "package": "pkg/store/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/store:empty_filter": {
+    "id": "error:pkg/store:empty_filter",
+    "defaultMessage": "filter is empty",
+    "translations": {
+      "en": "filter is empty"
+    },
+    "description": {
+      "package": "pkg/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/store:inconsistent_store": {
+    "id": "error:pkg/store:inconsistent_store",
+    "defaultMessage": "store state is inconsistent",
+    "translations": {
+      "en": "store state is inconsistent"
+    },
+    "description": {
+      "package": "pkg/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/store:key_exists": {
+    "id": "error:pkg/store:key_exists",
+    "defaultMessage": "key {key} already exists",
+    "translations": {
+      "en": "key {key} already exists"
+    },
+    "description": {
+      "package": "pkg/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/store:nil_key": {
+    "id": "error:pkg/store:nil_key",
+    "defaultMessage": "nil key specified",
+    "translations": {
+      "en": "nil key specified"
+    },
+    "description": {
+      "package": "pkg/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/types:data_rate": {
+    "id": "error:pkg/types:data_rate",
+    "defaultMessage": "invalid data rate",
+    "translations": {
+      "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "data_rate.go"
+    }
+  },
+  "error:pkg/types:dev_addr_prefix": {
+    "id": "error:pkg/types:dev_addr_prefix",
+    "defaultMessage": "invalid DevAddr prefix",
+    "translations": {
+      "en": "invalid DevAddr prefix"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "devaddr.go"
+    }
+  },
+  "error:pkg/types:eui_prefix": {
+    "id": "error:pkg/types:eui_prefix",
+    "defaultMessage": "invalid EUI prefix",
+    "translations": {
+      "en": "invalid EUI prefix"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "eui.go"
+    }
+  },
+  "error:pkg/types:invalid_json": {
+    "id": "error:pkg/types:invalid_json",
+    "defaultMessage": "invalid JSON: `{json}`",
+    "translations": {
+      "en": "invalid JSON: `{json}`"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "types.go"
+    }
+  },
+  "error:pkg/types:invalid_length": {
+    "id": "error:pkg/types:invalid_length",
+    "defaultMessage": "invalid slice length",
+    "translations": {
+      "en": "invalid slice length"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "types.go"
+    }
+  },
+  "error:pkg/types:net_id_bits": {
+    "id": "error:pkg/types:net_id_bits",
+    "defaultMessage": "too many bits set in NetID",
+    "translations": {
+      "en": "too many bits set in NetID"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "netid.go"
+    }
+  },
+  "error:pkg/types:net_id_type": {
+    "id": "error:pkg/types:net_id_type",
+    "defaultMessage": "NetID type must be lower or equal to 7",
+    "translations": {
+      "en": "NetID type must be lower or equal to 7"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "netid.go"
+    }
+  },
+  "error:pkg/types:nwk_addr_bits": {
+    "id": "error:pkg/types:nwk_addr_bits",
+    "defaultMessage": "too many bits set in NwkAddr",
+    "translations": {
+      "en": "too many bits set in NwkAddr"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "devaddr.go"
+    }
+  },
+  "error:pkg/types:src_type": {
+    "id": "error:pkg/types:src_type",
+    "defaultMessage": "invalid type for src",
+    "translations": {
+      "en": "invalid type for src"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "types.go"
+    }
+  },
+  "error:pkg/unique:format": {
+    "id": "error:pkg/unique:format",
+    "defaultMessage": "invalid format in value `{value}`",
+    "translations": {
+      "en": "invalid format in value `{value}`"
+    },
+    "description": {
+      "package": "pkg/unique",
+      "file": "unique.go"
+    }
+  },
+  "error:pkg/validate:bandwidth": {
+    "id": "error:pkg/validate:bandwidth",
+    "defaultMessage": "invalid bandwidth",
+    "translations": {
+      "en": "invalid bandwidth"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "lorawan.go"
+    }
+  },
+  "error:pkg/validate:coding_rate": {
+    "id": "error:pkg/validate:coding_rate",
+    "defaultMessage": "invalid coding rate",
+    "translations": {
+      "en": "invalid coding rate"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "lorawan.go"
+    }
+  },
+  "error:pkg/validate:spreading_factor": {
+    "id": "error:pkg/validate:spreading_factor",
+    "defaultMessage": "invalid spreading factor",
+    "translations": {
+      "en": "invalid spreading factor"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "lorawan.go"
+    }
+  },
   "event:application.create": {
     "id": "event:application.create",
     "defaultMessage": "Create Application",
