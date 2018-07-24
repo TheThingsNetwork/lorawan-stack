@@ -35,20 +35,20 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		req := cmd.GetNewChannelReq()
 
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.Channels)) {
-			dev.MACState.Channels = append(dev.MACState.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MACState.Channels))))...)
+			dev.MACState.MACParameters.Channels = append(dev.MACState.MACParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MACState.MACParameters.Channels))))...)
 		}
 
-		ch := dev.MACState.Channels[req.ChannelIndex]
+		ch := dev.MACState.MACParameters.Channels[req.ChannelIndex]
 		if ch == nil {
-			dev.MACState.Channels[req.ChannelIndex] = ch
 			ch = &ttnpb.MACParameters_Channel{
 				DownlinkFrequency: req.Frequency,
 			}
+			dev.MACState.MACParameters.Channels[req.ChannelIndex] = ch
 		}
 
 		ch.UplinkFrequency = req.Frequency
 		ch.MinDataRateIndex = req.MinDataRateIndex
-		ch.MinDataRateIndex = req.MaxDataRateIndex
+		ch.MaxDataRateIndex = req.MaxDataRateIndex
 
 	}, dev.MACState.PendingRequests...)
 	return

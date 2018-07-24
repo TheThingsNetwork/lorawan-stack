@@ -42,19 +42,23 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name: "limit 42, delay 24",
+			Name: "limit 32768, delay 1024",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ADRParamSetupReq{
-							ADRAckLimitExponent: 42,
-							ADRAckDelayExponent: 24,
+							ADRAckLimitExponent: ttnpb.ADR_ACK_LIMIT_32768,
+							ADRAckDelayExponent: ttnpb.ADR_ACK_DELAY_1024,
 						}).MACCommand(),
 					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
+					MACParameters: ttnpb.MACParameters{
+						ADRAckLimit: 32768,
+						ADRAckDelay: 1024,
+					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},

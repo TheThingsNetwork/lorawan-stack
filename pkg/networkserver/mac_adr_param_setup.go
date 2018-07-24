@@ -24,9 +24,16 @@ func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err erro
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetADRParamSetupReq()
 
-		// TODO: Handle ADR parameters (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = req.ADRAckDelayExponent
-		_ = req.ADRAckLimitExponent
+		dev.MACState.MACParameters.ADRAckDelay = ttnpb.ADRAckDelayExponentToUint32(req.ADRAckDelayExponent)
+		dev.MACState.MACParameters.ADRAckLimit = ttnpb.ADRAckLimitExponentToUint32(req.ADRAckLimitExponent)
+
+		if ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredMACParameters.ADRAckDelay) == req.ADRAckDelayExponent {
+			dev.MACState.DesiredMACParameters.ADRAckDelay = dev.MACState.MACParameters.ADRAckDelay
+		}
+
+		if ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredMACParameters.ADRAckLimit) == req.ADRAckLimitExponent {
+			dev.MACState.DesiredMACParameters.ADRAckLimit = dev.MACState.MACParameters.ADRAckLimit
+		}
 
 	}, dev.MACState.PendingRequests...)
 	return

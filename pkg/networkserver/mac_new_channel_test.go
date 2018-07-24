@@ -70,7 +70,20 @@ func TestHandleNewChannelAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/292)
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							nil,
+							nil,
+							nil,
+							nil,
+							{
+								DownlinkFrequency: 42,
+								UplinkFrequency:   42,
+								MinDataRateIndex:  2,
+								MaxDataRateIndex:  3,
+							},
+						},
+					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},

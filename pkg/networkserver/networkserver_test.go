@@ -548,6 +548,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -574,6 +582,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -592,6 +601,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -618,6 +635,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -637,6 +655,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_0,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -667,6 +693,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -686,6 +713,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_0,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -717,6 +752,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -735,6 +771,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -766,6 +810,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -787,6 +832,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -829,6 +882,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -849,6 +903,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -881,6 +943,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -902,6 +965,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
+						MACParameters: ttnpb.MACParameters{
+							Channels: []*ttnpb.MACParameters_Channel{
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+							},
+						},
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -944,6 +1015,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Settings.ChannelIndex %= 4
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -1345,7 +1417,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			UplinkMessage *ttnpb.UplinkMessage
 		}{
 			{
-				"1.1",
+				"1.1/nil session",
 				&ttnpb.EndDevice{
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -1361,6 +1433,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
+					msg.Settings.ChannelIndex %= 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1370,7 +1443,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1",
+				"1.1/active session",
 				&ttnpb.EndDevice{
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -1386,6 +1459,59 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
+					msg.Settings.ChannelIndex %= 3
+
+					jr := msg.Payload.GetJoinRequestPayload()
+					jr.DevEUI = DevEUI
+					jr.JoinEUI = JoinEUI
+
+					return msg
+				}(),
+			},
+			{
+				"1.0.2",
+				&ttnpb.EndDevice{
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0_2,
+					},
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DevEUI:                 &DevEUI,
+						JoinEUI:                &JoinEUI,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
+					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
+					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+				},
+				func() *ttnpb.UplinkMessage {
+					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
+					msg.Settings.ChannelIndex %= 3
+
+					jr := msg.Payload.GetJoinRequestPayload()
+					jr.DevEUI = DevEUI
+					jr.JoinEUI = JoinEUI
+
+					return msg
+				}(),
+			},
+			{
+				"1.0.1",
+				&ttnpb.EndDevice{
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0_1,
+					},
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DevEUI:                 &DevEUI,
+						JoinEUI:                &JoinEUI,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
+					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
+					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+				},
+				func() *ttnpb.UplinkMessage {
+					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
+					msg.Settings.ChannelIndex %= 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1411,6 +1537,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
+					msg.Settings.ChannelIndex %= 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI

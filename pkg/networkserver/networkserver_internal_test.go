@@ -165,7 +165,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		drIdx := test.Must(band.Rx1DataRate(sets.DataRateIndex, st.Rx1DataRateOffset, st.DownlinkDwellTime)).(uint32)
 
 		msg.Settings.ChannelIndex = test.Must(band.Rx1Channel(sets.ChannelIndex)).(uint32)
-		msg.Settings.Frequency = uint64(fp.Channels[msg.Settings.ChannelIndex].Frequency)
+		msg.Settings.Frequency = uint64(st.MACParameters.Channels[int(msg.Settings.ChannelIndex)].DownlinkFrequency)
 		msg.Settings.DataRateIndex = drIdx
 
 		test.Must(nil, setDownlinkModulation(&msg.Settings, band.DataRates[drIdx]))
@@ -322,6 +322,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			*types.NewPopulatedAES128Key(test.Randy),
 			false,
 		)
+		up.Settings.ChannelIndex %= uint32(len(ed.MACState.MACParameters.Channels))
 
 		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
 		sort.SliceStable(mds, func(i, j int) bool {
@@ -437,6 +438,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			*types.NewPopulatedAES128Key(test.Randy),
 			false,
 		)
+		up.Settings.ChannelIndex %= uint32(len(ed.MACState.MACParameters.Channels))
 
 		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
 		sort.SliceStable(mds, func(i, j int) bool {

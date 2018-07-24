@@ -33,6 +33,7 @@ var (
 	errGatewayServerNotFound     = errors.DefineNotFound("gateway_server_not_found", "Gateway Server not found")
 	errInvalidConfiguration      = errors.DefineInvalidArgument("configuration", "invalid configuration")
 	errInvalidDataRate           = errors.DefineInvalidArgument("data_rate", "invalid data rate")
+	errInvalidFrequencyPlan      = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
 	errInvalidRx2DataRateIndex   = errors.DefineInvalidArgument("rx2_data_rate_index", "invalid Rx2 data rate index")
 	errJoinFailed                = errors.Define("join", "all Join Servers failed to handle join")
 	errLoRaAndFSK                = errors.DefineInvalidArgument("lora_and_fsk", "both LoRa and FSK modulation is specified")

@@ -42,12 +42,12 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name: "EIRP 42, dwell time both",
+			Name: "EIRP 26, dwell time both",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_TxParamSetupReq{
-							MaxEIRPIndex:      42,
+							MaxEIRPIndex:      ttnpb.DEVICE_EIRP_26,
 							DownlinkDwellTime: true,
 							UplinkDwellTime:   true,
 						}).MACCommand(),
@@ -57,6 +57,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					MACParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
 						DownlinkDwellTime: true,
 						UplinkDwellTime:   true,
 					},

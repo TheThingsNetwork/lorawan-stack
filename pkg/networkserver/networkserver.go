@@ -101,15 +101,77 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	// NOTE: dev.MACState.MACParameters must not contain pointer values at this point.
 	dev.MACState.DesiredMACParameters = dev.MACState.MACParameters
 
-	if dev.EndDeviceVersion.DefaultMACParameters != nil {
-		dev.MACState.MACParameters = *dev.EndDeviceVersion.DefaultMACParameters
+	dev.MACState.MACParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
+	dev.MACState.DesiredMACParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(dev.MACState.MACParameters.Channels)), float64(len(fp.Channels)))))
+
+	if len(band.DownlinkChannels) > len(band.UplinkChannels) {
+		// NOTE: In case the spec changes and this assumption is not valid anymore,
+		// the implementation of this function won't be valid and has to be changed.
+		return errInvalidFrequencyPlan
 	}
 
-	dev.MACState.DesiredMACParameters.UplinkDwellTime = fp.UplinkDwellTime != nil
-	dev.MACState.DesiredMACParameters.DownlinkDwellTime = fp.DownlinkDwellTime != nil
+	for i, upCh := range band.UplinkChannels {
+		ch := &ttnpb.MACParameters_Channel{
+			UplinkFrequency:   upCh.Frequency,
+			DownlinkFrequency: upCh.Frequency,
+			MinDataRateIndex:  uint32(upCh.DataRateIndexes[0]),
+			MaxDataRateIndex:  uint32(upCh.DataRateIndexes[len(upCh.DataRateIndexes)-1]),
+		}
+		if len(band.DownlinkChannels) > i {
+			ch.DownlinkFrequency = band.DownlinkChannels[i].Frequency
+		}
 
-	// TODO: Set additional parameters in MACState.DesiredMACParameters from fp,
-	// once https://github.com/TheThingsIndustries/ttn/issues/857 is resolved.
+		dev.MACState.MACParameters.Channels[i] = ch
+
+		chCopy := *ch
+		dev.MACState.DesiredMACParameters.Channels[i] = &chCopy
+	}
+
+	for i, fpCh := range fp.Channels {
+		ch := dev.MACState.DesiredMACParameters.Channels[i]
+		if ch == nil {
+			ch = &ttnpb.MACParameters_Channel{}
+			dev.MACState.DesiredMACParameters.Channels[i] = ch
+		}
+
+		ch.UplinkFrequency = uint64(fpCh.Frequency)
+		ch.DownlinkFrequency = uint64(fpCh.Frequency)
+
+		if ch.MinDataRateIndex > fpCh.DataRate.GetIndex() || fpCh.DataRate.GetIndex() > ch.MaxDataRateIndex {
+			return errInvalidFrequencyPlan
+		}
+		// TODO: This should fixed once https://github.com/TheThingsIndustries/lorawan-stack/issues/927 is resolved.
+		ch.MinDataRateIndex = fpCh.DataRate.GetIndex()
+		ch.MaxDataRateIndex = fpCh.DataRate.GetIndex()
+	}
+
+	if fp.UplinkDwellTime != nil {
+		dev.MACState.DesiredMACParameters.UplinkDwellTime = true
+	}
+
+	if fp.DownlinkDwellTime != nil {
+		dev.MACState.DesiredMACParameters.DownlinkDwellTime = true
+	}
+
+	if fp.Rx2 != nil {
+		dev.MACState.DesiredMACParameters.Rx2Frequency = uint64(fp.Rx2.Frequency)
+		dev.MACState.DesiredMACParameters.Rx2DataRateIndex = fp.Rx2.DataRate.Index
+	}
+
+	if fp.PingSlot != nil {
+		if fp.PingSlot.DataRate != nil {
+			dev.MACState.DesiredMACParameters.PingSlotDataRateIndex = fp.PingSlot.DataRate.Index
+		}
+		dev.MACState.DesiredMACParameters.PingSlotFrequency = uint64(fp.PingSlot.Frequency)
+	}
+
+	if fp.MaxEIRP > 0 {
+		dev.MACState.DesiredMACParameters.MaxEIRP = float32(math.Min(float64(dev.MACState.MaxEIRP), float64(fp.MaxEIRP)))
+	}
+
+	if dev.EndDeviceVersion.DefaultMACParameters != nil {
+		dev.MACState.MACParameters = deepcopy.Copy(*dev.EndDeviceVersion.DefaultMACParameters).(ttnpb.MACParameters)
+	}
 
 	return nil
 }
@@ -626,17 +688,13 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 		if err != nil {
 			return err
 		}
-		if uint(chIdx) >= uint(len(dev.MACState.DownlinkChannels)) {
+		if uint(chIdx) >= uint(len(dev.MACState.Channels)) {
 			return errChannelIndexTooHigh
 		}
 
-		ch := dev.MACState.DownlinkChannels[int(chIdx)]
-		if ch == nil {
-			return errChannelUnknown
-		}
-
-		if ch.MinDataRateIndex > chIdx || chIdx > ch.MaxDataRateIndex {
-			return errInvalidDataRate
+		ch := dev.MACState.Channels[int(chIdx)]
+		if ch == nil || ch.DownlinkFrequency == 0 {
+			return errUnknownChannel
 		}
 
 		rx1 := tx{
@@ -645,7 +703,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				CodingRate:            "4/5",
 				PolarizationInversion: true,
 				ChannelIndex:          chIdx,
-				Frequency:             uint64(ch.Frequency),
+				Frequency:             ch.DownlinkFrequency,
 				TxPower:               int32(band.DefaultMaxEIRP),
 			},
 		}
@@ -768,10 +826,9 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 	}
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
-	if dev.MACState.MACParameters != dev.MACState.DesiredMACParameters {
-		// TODO: Diff MACParameters and DesiredMACParameters and add commands to dev.MACState.PendingRequests.
-		// (https://github.com/TheThingsIndustries/ttn/issues/837)
-	}
+
+	// TODO: Diff MACParameters and DesiredMACParameters and add commands to dev.MACState.PendingRequests.
+	// (https://github.com/TheThingsIndustries/ttn/issues/837)
 
 	if len(dev.MACState.PendingRequests) == 0 &&
 		len(dev.MACState.QueuedResponses) == 0 &&
