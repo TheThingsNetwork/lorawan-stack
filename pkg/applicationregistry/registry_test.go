@@ -99,31 +99,37 @@ func TestRegistry(t *testing.T) {
 
 	i = 0
 	total, err = r.Range(pb, "", 1, 0, func(found *Application) bool { i++; return false }, "ApplicationIdentifiers")
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 0, 0, func(found *Application) bool { i++; return true })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 2)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 0, 0, func(found *Application) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 0, func(found *Application) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 0, 1, func(found *Application) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, "", 1, 1, func(found *Application) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 

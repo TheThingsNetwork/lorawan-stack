@@ -117,31 +117,37 @@ func TestRegistry(t *testing.T) {
 
 	i = 0
 	total, err = r.Range(pb, "", 1, 0, func(found *Device) bool { i++; return false }, "EndDeviceIdentifiers")
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 0, 0, func(found *Device) bool { i++; return true })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 2)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 0, 0, func(found *Device) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 0, func(found *Device) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 0, 1, func(found *Device) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
 	i = 0
 	total, err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, "", 1, 1, func(found *Device) bool { i++; return false })
+	a.So(err, should.BeNil)
 	a.So(total, should.Equal, 2)
 	a.So(i, should.Equal, 1)
 
