@@ -15,13 +15,13 @@
 package events_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -32,29 +32,29 @@ func TestIdentifierFilter(t *testing.T) {
 
 	filter := events.NewIdentifierFilter()
 
-	evtAppFoo := events.New(context.Background(), "test", ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, "hello foo")
-	evtAppBar := events.New(context.Background(), "test", ttnpb.ApplicationIdentifiers{ApplicationID: "bar"}, "hello bar")
+	evtAppFoo := events.New(test.Context(), "test", ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, "hello foo")
+	evtAppBar := events.New(test.Context(), "test", ttnpb.ApplicationIdentifiers{ApplicationID: "bar"}, "hello bar")
 
-	evtCliFoo := events.New(context.Background(), "test", ttnpb.ClientIdentifiers{ClientID: "foo"}, "hello foo")
-	evtCliBar := events.New(context.Background(), "test", ttnpb.ClientIdentifiers{ClientID: "bar"}, "hello bar")
+	evtCliFoo := events.New(test.Context(), "test", ttnpb.ClientIdentifiers{ClientID: "foo"}, "hello foo")
+	evtCliBar := events.New(test.Context(), "test", ttnpb.ClientIdentifiers{ClientID: "bar"}, "hello bar")
 
-	evtDevFoo := events.New(context.Background(), "test", ttnpb.EndDeviceIdentifiers{
+	evtDevFoo := events.New(test.Context(), "test", ttnpb.EndDeviceIdentifiers{
 		DeviceID:               "foo",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
 	}, "hello foo")
-	evtDevBar := events.New(context.Background(), "test", ttnpb.EndDeviceIdentifiers{
+	evtDevBar := events.New(test.Context(), "test", ttnpb.EndDeviceIdentifiers{
 		DeviceID:               "bar",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "bar"},
 	}, "hello bar")
 
-	evtGtwFoo := events.New(context.Background(), "test", ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "hello foo")
-	evtGtwBar := events.New(context.Background(), "test", ttnpb.GatewayIdentifiers{GatewayID: "bar"}, "hello bar")
+	evtGtwFoo := events.New(test.Context(), "test", ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "hello foo")
+	evtGtwBar := events.New(test.Context(), "test", ttnpb.GatewayIdentifiers{GatewayID: "bar"}, "hello bar")
 
-	evtOrgFoo := events.New(context.Background(), "test", ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, "hello foo")
-	evtOrgBar := events.New(context.Background(), "test", ttnpb.OrganizationIdentifiers{OrganizationID: "bar"}, "hello bar")
+	evtOrgFoo := events.New(test.Context(), "test", ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, "hello foo")
+	evtOrgBar := events.New(test.Context(), "test", ttnpb.OrganizationIdentifiers{OrganizationID: "bar"}, "hello bar")
 
-	evtUsrFoo := events.New(context.Background(), "test", ttnpb.UserIdentifiers{UserID: "foo"}, "hello foo")
-	evtUsrBar := events.New(context.Background(), "test", ttnpb.UserIdentifiers{UserID: "bar"}, "hello bar")
+	evtUsrFoo := events.New(test.Context(), "test", ttnpb.UserIdentifiers{UserID: "foo"}, "hello foo")
+	evtUsrBar := events.New(test.Context(), "test", ttnpb.UserIdentifiers{UserID: "bar"}, "hello bar")
 
 	fooIDs := &ttnpb.CombinedIdentifiers{
 		ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
@@ -65,7 +65,7 @@ func TestIdentifierFilter(t *testing.T) {
 		UserIDs:         []*ttnpb.UserIdentifiers{{UserID: "foo"}},
 	}
 
-	filter.Subscribe(context.Background(), fooIDs, ch)
+	filter.Subscribe(test.Context(), fooIDs, ch)
 
 	filter.Notify(evtAppBar)
 	filter.Notify(evtAppFoo)
@@ -103,7 +103,7 @@ func TestIdentifierFilter(t *testing.T) {
 	a.So(<-ch, should.Equal, evtUsrFoo)
 	a.So(ch, should.BeEmpty)
 
-	filter.Unsubscribe(context.Background(), fooIDs, ch)
+	filter.Unsubscribe(test.Context(), fooIDs, ch)
 
 	filter.Notify(evtAppFoo)
 	filter.Notify(evtCliFoo)

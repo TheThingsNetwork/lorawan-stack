@@ -15,13 +15,13 @@
 package identityserver
 
 import (
-	"context"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -68,7 +68,7 @@ func TestClient(t *testing.T) {
 	a.So(found, should.EqualFieldsWithIgnores(ClientGeneratedFields...), cli)
 
 	// Fetch client without authorization credentials.
-	found, err = is.clientService.GetClient(context.Background(), &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
+	found, err = is.clientService.GetClient(test.Context(), &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found.ClientIdentifiers.ClientID, should.Equal, cli.ClientIdentifiers.ClientID)
 	a.So(found.Description, should.Equal, cli.Description)

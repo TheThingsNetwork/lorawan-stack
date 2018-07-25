@@ -15,7 +15,6 @@
 package gatewayserver_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -47,7 +46,7 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 		logger.Fatal("Gateway Server could not start")
 	}
 
-	_, err = gs.ScheduleDownlink(log.NewContext(context.Background(), logger), &ttnpb.DownlinkMessage{
+	_, err = gs.ScheduleDownlink(log.NewContext(test.Context(), logger), &ttnpb.DownlinkMessage{
 		TxMetadata: ttnpb.TxMetadata{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "unknown-downlink",

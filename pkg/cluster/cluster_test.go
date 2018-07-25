@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -39,7 +40,7 @@ func init() {
 		log.WithLevel(log.DebugLevel),
 		log.WithHandler(log.NewCLI(os.Stdout)),
 	)
-	ctx = log.NewContext(context.Background(), logger.WithField("namespace", "cluster"))
+	ctx = log.NewContext(test.Context(), logger.WithField("namespace", "cluster"))
 	rpclog.ReplaceGrpcLogger(logger.WithField("namespace", "grpc"))
 }
 
@@ -64,7 +65,7 @@ func TestCluster(t *testing.T) {
 		Join:              []string{lis.Addr().String()},
 	}}
 
-	c, err := New(context.Background(), config, []rpcserver.Registerer{}...)
+	c, err := New(test.Context(), config, []rpcserver.Registerer{}...)
 	a.So(err, should.BeNil)
 
 	a.So(c.Join(), should.BeNil)

@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 var currentTime time.Time
@@ -45,7 +46,7 @@ func TestCache(t *testing.T) {
 
 	mockFetcher.applicationError, mockFetcher.gatewayError, mockFetcher.organizationError = mockErr, mockErr, mockErr
 
-	ctxA := context.WithValue(context.Background(), "ctx", "A")
+	ctxA := context.WithValue(test.Context(), "ctx", "A")
 	res := fetchRights(ctxA, "foo", c)
 
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)
@@ -58,7 +59,7 @@ func TestCache(t *testing.T) {
 
 	timeTravel(31 * time.Second) // Error responses should be cached for 1 minute.
 
-	ctxB := context.WithValue(context.Background(), "ctx", "B")
+	ctxB := context.WithValue(test.Context(), "ctx", "B")
 	res = fetchRights(ctxB, "foo", c)
 
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)

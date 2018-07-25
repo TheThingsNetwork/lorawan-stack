@@ -57,7 +57,7 @@ func newMockLink() *mockLink {
 	return &mockLink{
 		MockServerStream: &test.MockServerStream{
 			MockStream: &test.MockStream{
-				ContextFunc: func() context.Context { return context.Background() },
+				ContextFunc: func() context.Context { return test.Context() },
 				SendMsgFunc: func(interface{}) error { return nil },
 				RecvMsgFunc: func(interface{}) error { return nil },
 			},
@@ -72,7 +72,7 @@ func TestLink(t *testing.T) {
 	a := assertions.New(t)
 
 	logger := test.GetLogger(t)
-	ctx := log.NewContext(context.Background(), logger)
+	ctx := log.NewContext(test.Context(), logger)
 	ctx, cancel := context.WithCancel(ctx)
 
 	store, err := test.NewFrequencyPlansStore()
@@ -268,7 +268,7 @@ func TestGetFrequencyPlan(t *testing.T) {
 		logger.Fatal("Gateway Server could not start")
 	}
 
-	fp, err := gs.GetFrequencyPlan(context.Background(), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
+	fp, err := gs.GetFrequencyPlan(test.Context(), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
 	a.So(err, should.BeNil)
 	a.So(fp.BandID, should.Equal, "EU_863_870")
 	a.So(len(fp.Channels), should.Equal, 8)

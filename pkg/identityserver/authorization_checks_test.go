@@ -15,7 +15,6 @@
 package identityserver
 
 import (
-	"context"
 	"strconv"
 	"testing"
 
@@ -23,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -73,7 +73,7 @@ func TestEnforceUserRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceUserRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.rights...)
+			err := is.enforceUserRights(newContextWithAuthorizationData(test.Context(), tc.authorizationData), tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -138,7 +138,7 @@ func TestEnforceAdmin(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceAdmin(newContextWithAuthorizationData(context.Background(), tc.authorizationData))
+			err := is.enforceAdmin(newContextWithAuthorizationData(test.Context(), tc.authorizationData))
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -280,7 +280,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceApplicationRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.appIDs, tc.rights...)
+			err := is.enforceApplicationRights(newContextWithAuthorizationData(test.Context(), tc.authorizationData), tc.appIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -422,7 +422,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceGatewayRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.gtwIDs, tc.rights...)
+			err := is.enforceGatewayRights(newContextWithAuthorizationData(test.Context(), tc.authorizationData), tc.gtwIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -564,7 +564,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceOrganizationRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.orgIDs, tc.rights...)
+			err := is.enforceOrganizationRights(newContextWithAuthorizationData(test.Context(), tc.authorizationData), tc.orgIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {

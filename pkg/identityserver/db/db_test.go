@@ -15,7 +15,6 @@
 package db
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -79,7 +78,7 @@ func clean(t testing.TB) Database {
 	registry := migrations.NewRegistry()
 	registry.Register(1, "1_foo_schema", schema, "DROP TABLE IF EXISTS foo")
 
-	db, err := Open(context.Background(), fmt.Sprintf(address, database), registry)
+	db, err := Open(test.Context(), fmt.Sprintf(address, database), registry)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
 		return nil

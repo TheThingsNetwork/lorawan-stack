@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -119,7 +120,7 @@ func TestHook(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ctx := context.Background()
+			ctx := test.Context()
 			if tt.Fetcher != nil {
 				ctx = NewContextWithFetcher(ctx, tt.Fetcher)
 			}

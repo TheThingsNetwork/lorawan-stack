@@ -158,7 +158,7 @@ func TestUDP(t *testing.T) {
 	a := assertions.New(t)
 
 	logger := test.GetLogger(t)
-	ctx := log.NewContext(context.Background(), logger)
+	ctx := log.NewContext(test.Context(), logger)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

@@ -21,6 +21,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -90,7 +91,7 @@ func (s *mockStream) SetTrailer(metadata.MD)       {}
 func TestRegistration(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 	unaryInterceptor := UnaryServerInterceptor()
 	callUnary := func(fullMethod string) {
 		unaryInterceptor(ctx, "test", &grpc.UnaryServerInfo{
@@ -149,7 +150,7 @@ func TestRegistration(t *testing.T) {
 func TestErrorHook(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 	interceptor := UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{
@@ -179,7 +180,7 @@ func TestErrorHook(t *testing.T) {
 func TestOrder(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 	interceptor := UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{
@@ -210,7 +211,7 @@ func TestOrder(t *testing.T) {
 func TestHookContext(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.WithValue(context.Background(), "global-value", 1337)
+	ctx := context.WithValue(test.Context(), "global-value", 1337)
 	interceptor := UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{

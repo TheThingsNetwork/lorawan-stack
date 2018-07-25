@@ -54,7 +54,7 @@ var (
 )
 
 func newTestCtx(ids ttnpb.UserIdentifiers) context.Context {
-	return newContextWithAuthorizationData(context.Background(), &authorizationData{
+	return newContextWithAuthorizationData(test.Context(), &authorizationData{
 		EntityIdentifiers: ids,
 		Source:            auth.Token,
 		Rights:            ttnpb.AllRights(),

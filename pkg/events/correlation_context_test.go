@@ -15,18 +15,18 @@
 package events_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestCorrelationContext(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 	a.So(events.CorrelationIDsFromContext(ctx), should.BeEmpty)
 
 	// Add random correlation ID:

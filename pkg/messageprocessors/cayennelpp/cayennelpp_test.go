@@ -15,7 +15,6 @@
 package cayennelpp
 
 import (
-	"context"
 	"testing"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
@@ -23,13 +22,14 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestEncode(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
@@ -116,7 +116,7 @@ func TestEncode(t *testing.T) {
 func TestDecode(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 	host := New()
 
 	model := &ttnpb.EndDeviceVersion{

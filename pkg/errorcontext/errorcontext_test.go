@@ -21,13 +21,14 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var err error
 
 func ExampleErrorContext() {
-	ctx, cancel := errorcontext.New(context.Background())
+	ctx, cancel := errorcontext.New(test.Context())
 	defer cancel(nil)
 
 	go func() {
@@ -53,7 +54,7 @@ func TestErrorContext(t *testing.T) {
 
 	{
 		err := errors.New("foo")
-		ctx, cancel := errorcontext.New(context.Background())
+		ctx, cancel := errorcontext.New(test.Context())
 		cancel(err)
 		select {
 		case <-ctx.Done():
@@ -68,7 +69,7 @@ func TestErrorContext(t *testing.T) {
 	}
 
 	{
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(test.Context())
 		ctx, _ = errorcontext.New(ctx)
 		cancel()
 		select {

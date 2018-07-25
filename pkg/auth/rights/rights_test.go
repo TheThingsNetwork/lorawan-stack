@@ -15,18 +15,18 @@
 package rights
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestContext(t *testing.T) {
 	a := assertions.New(t)
 
-	rights, ok := FromContext(context.Background())
+	rights, ok := FromContext(test.Context())
 	a.So(ok, should.BeFalse)
 	a.So(rights, should.Resemble, Rights{})
 
@@ -42,7 +42,7 @@ func TestContext(t *testing.T) {
 		},
 	}
 
-	ctx := newContext(context.Background(), fooRights)
+	ctx := newContext(test.Context(), fooRights)
 
 	rights, ok = FromContext(ctx)
 	a.So(ok, should.BeTrue)

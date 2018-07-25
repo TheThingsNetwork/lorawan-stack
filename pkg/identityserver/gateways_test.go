@@ -446,7 +446,7 @@ type dummyEvent struct {
 }
 
 func (d dummyEvent) Context() context.Context {
-	return log.NewContext(context.Background(), test.GetLogger(d.t))
+	return log.NewContext(test.Context(), test.GetLogger(d.t))
 }
 
 func (d dummyEvent) Name() string {
@@ -476,7 +476,7 @@ func TestUpdateNotification(t *testing.T) {
 		GatewayID: "hello",
 	}
 	subscription := make(chan []string, 1)
-	s.pullConfigChans[unique.ID(context.Background(), gtwIDs)] = subscription
+	s.pullConfigChans[unique.ID(test.Context(), gtwIDs)] = subscription
 
 	// Sending []string
 	for _, data := range []interface{}{

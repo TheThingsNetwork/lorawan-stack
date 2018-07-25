@@ -15,18 +15,18 @@
 package identityserver
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestAuthorizationDataContext(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(authorizationDataFromContext(context.Background()), should.Resemble, new(authorizationData))
+	a.So(authorizationDataFromContext(test.Context()), should.Resemble, new(authorizationData))
 
 	authorizationData := &authorizationData{
 		EntityIdentifiers: ttnpb.ApplicationIdentifiers{
@@ -35,7 +35,7 @@ func TestAuthorizationDataContext(t *testing.T) {
 		Source: "bar",
 		Rights: ttnpb.AllApplicationRights(),
 	}
-	ctx := newContextWithAuthorizationData(context.Background(), authorizationData)
+	ctx := newContextWithAuthorizationData(test.Context(), authorizationData)
 
 	a.So(authorizationDataFromContext(ctx), should.Resemble, authorizationData)
 }

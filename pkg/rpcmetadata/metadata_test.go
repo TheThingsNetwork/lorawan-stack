@@ -15,10 +15,10 @@
 package rpcmetadata
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc/metadata"
 )
@@ -39,7 +39,7 @@ func TestMD(t *testing.T) {
 		URI:            "fooURI",
 	}
 
-	ctx := md1.ToOutgoingContext(context.Background())
+	ctx := md1.ToOutgoingContext(test.Context())
 	md, _ := metadata.FromOutgoingContext(ctx)
 	ctx = metadata.NewIncomingContext(ctx, md)
 
@@ -59,18 +59,18 @@ func TestMD(t *testing.T) {
 	a.So(md2.RequireTransportSecurity(), should.BeFalse)
 
 	{
-		md, err := md1.GetRequestMetadata(context.Background())
+		md, err := md1.GetRequestMetadata(test.Context())
 		a.So(err, should.BeNil)
 		a.So(md, should.Resemble, map[string]string{"authorization": "Key foo"})
 	}
 
 	{
-		md, err := md2.GetRequestMetadata(context.Background())
+		md, err := md2.GetRequestMetadata(test.Context())
 		a.So(err, should.BeNil)
 		a.So(md, should.BeEmpty)
 	}
 
-	ctx = metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Key foo"))
+	ctx = metadata.NewIncomingContext(test.Context(), metadata.Pairs("authorization", "Key foo"))
 	md3 := FromIncomingContext(ctx)
 	a.So(md3.AuthType, should.Equal, "Key")
 	a.So(md3.AuthValue, should.Equal, "foo")

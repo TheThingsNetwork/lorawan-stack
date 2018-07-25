@@ -15,7 +15,6 @@
 package identityserver
 
 import (
-	"context"
 	"sort"
 	"testing"
 	"time"
@@ -29,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -63,7 +63,7 @@ func TestUsersBlacklistedIDs(t *testing.T) {
 
 	// Can't create users using the blacklisted IDs.
 	for _, id := range newTestSettings().BlacklistedIDs {
-		_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+		_, err := is.userService.CreateUser(test.Context(), &ttnpb.CreateUserRequest{
 			User: ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserID: id}},
 		})
 		a.So(err, should.NotBeNil)
@@ -95,7 +95,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 
 	// Can't create an account using an email that is not whitelisted.
 	user.UserIdentifiers.Email = "antonio@antonio.com"
-	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err = is.userService.CreateUser(test.Context(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.NotBeNil)
@@ -103,7 +103,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 
 	// But it does with a whitelisted email domain.
 	user.UserIdentifiers.Email = "antonio@foo.bar"
-	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err = is.userService.CreateUser(test.Context(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.BeNil)
@@ -190,13 +190,13 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 
 	ctx := newTestCtx(sids)
 
-	_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err := is.userService.CreateUser(test.Context(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.BeNil)
 
 	// Can't retrieve profile with empty authorization credentials.
-	found, err := is.userService.GetUser(context.Background(), ttnpb.Empty)
+	found, err := is.userService.GetUser(test.Context(), ttnpb.Empty)
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(err, should.DescribeError, common.ErrPermissionDenied)
@@ -224,7 +224,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
 		token := data.Token
 
-		_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+		_, err = is.userService.ValidateUserEmail(test.Context(), &ttnpb.ValidateUserEmailRequest{
 			Token: token,
 		})
 		a.So(err, should.BeNil)
@@ -339,7 +339,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(err, should.BeNil)
 
 	// Check that the old validation token doesnt work because we requested a new one.
-	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+	_, err = is.userService.ValidateUserEmail(test.Context(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.NotBeNil)
@@ -359,7 +359,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(token, should.NotBeEmpty)
 
 	// Validate the email.
-	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+	_, err = is.userService.ValidateUserEmail(test.Context(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.BeNil)

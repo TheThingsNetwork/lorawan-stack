@@ -15,13 +15,13 @@
 package unique_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	. "go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -54,7 +54,7 @@ func TestValidity(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%T", tc), func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(func() { ID(context.Background(), tc) }, should.Panic)
+			a.So(func() { ID(test.Context(), tc) }, should.Panic)
 		})
 	}
 }
@@ -138,7 +138,7 @@ func TestRoundtrip(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%T", tc.ID), func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(ID(context.Background(), tc.ID), should.Equal, tc.Expected)
+			a.So(ID(test.Context(), tc.ID), should.Equal, tc.Expected)
 			if tc.Parser != nil {
 				parsed, err := tc.Parser(tc.Expected)
 				if a.So(err, should.BeNil) {

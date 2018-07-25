@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -54,16 +55,16 @@ func TestRequire(t *testing.T) {
 	a := assertions.New(t)
 
 	a.So(func() {
-		RequireApplication(context.Background(), ttnpb.ApplicationIdentifiers{}, ttnpb.RIGHT_APPLICATION_INFO)
+		RequireApplication(test.Context(), ttnpb.ApplicationIdentifiers{}, ttnpb.RIGHT_APPLICATION_INFO)
 	}, should.Panic)
 	a.So(func() {
-		RequireGateway(context.Background(), ttnpb.GatewayIdentifiers{}, ttnpb.RIGHT_GATEWAY_INFO)
+		RequireGateway(test.Context(), ttnpb.GatewayIdentifiers{}, ttnpb.RIGHT_GATEWAY_INFO)
 	}, should.Panic)
 	a.So(func() {
-		RequireOrganization(context.Background(), ttnpb.OrganizationIdentifiers{}, ttnpb.RIGHT_ORGANIZATION_INFO)
+		RequireOrganization(test.Context(), ttnpb.OrganizationIdentifiers{}, ttnpb.RIGHT_ORGANIZATION_INFO)
 	}, should.Panic)
 
-	fooCtx := newContext(context.Background(), Rights{
+	fooCtx := newContext(test.Context(), Rights{
 		ApplicationRights: map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{
 			{ApplicationID: "foo"}: {ttnpb.RIGHT_APPLICATION_INFO},
 		},
@@ -86,7 +87,7 @@ func TestRequire(t *testing.T) {
 	a.So(errors.IsPermissionDenied(barRes.OrgErr), should.BeTrue)
 
 	mockErr := errors.New("mock")
-	errFetchCtx := NewContextWithFetcher(context.Background(), &mockFetcher{
+	errFetchCtx := NewContextWithFetcher(test.Context(), &mockFetcher{
 		applicationError:  mockErr,
 		gatewayError:      mockErr,
 		organizationError: mockErr,
@@ -97,7 +98,7 @@ func TestRequire(t *testing.T) {
 	a.So(errFetchRes.OrgErr, should.Resemble, mockErr)
 
 	errPermissionDenied := status.New(codes.PermissionDenied, "permission denied").Err()
-	permissionDeniedFetchCtx := NewContextWithFetcher(context.Background(), &mockFetcher{
+	permissionDeniedFetchCtx := NewContextWithFetcher(test.Context(), &mockFetcher{
 		applicationError:  errPermissionDenied,
 		gatewayError:      errPermissionDenied,
 		organizationError: errPermissionDenied,

@@ -24,6 +24,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -112,7 +113,7 @@ func TestFetcherFunc(t *testing.T) {
 		return fetcher.rights, fetcher.err
 	})
 
-	res := fetchRights(context.Background(), "foo", f)
+	res := fetchRights(test.Context(), "foo", f)
 	a.So(res.AppErr, should.Resemble, fetcher.err)
 	a.So(res.GtwErr, should.Resemble, fetcher.err)
 	a.So(res.OrgErr, should.Resemble, fetcher.err)
@@ -151,7 +152,7 @@ func TestIdentityServerFetcher(t *testing.T) {
 	unavailableFetcher := NewIdentityServerFetcher(func(context.Context) *grpc.ClientConn {
 		return nil
 	}, false)
-	unavailableRes := fetchRights(context.Background(), "foo", unavailableFetcher)
+	unavailableRes := fetchRights(test.Context(), "foo", unavailableFetcher)
 	a.So(errors.IsUnavailable(unavailableRes.AppErr), should.BeTrue)
 	a.So(errors.IsUnavailable(unavailableRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnavailable(unavailableRes.OrgErr), should.BeTrue)
@@ -160,13 +161,13 @@ func TestIdentityServerFetcher(t *testing.T) {
 		return cc
 	}, false)
 
-	bgRes := fetchRights(context.Background(), "foo", onlySecureFetcher)
+	bgRes := fetchRights(test.Context(), "foo", onlySecureFetcher)
 	a.So(errors.IsUnauthenticated(bgRes.AppErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(bgRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(bgRes.OrgErr), should.BeTrue)
 
 	authCtx := metadata.NewIncomingContext(
-		context.Background(),
+		test.Context(),
 		metadata.Pairs("authorization", "Bearer token"),
 	)
 

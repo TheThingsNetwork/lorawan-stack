@@ -15,7 +15,6 @@
 package scheduling_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -23,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -35,7 +35,7 @@ func emptyEUFrequencyPlan() ttnpb.FrequencyPlan {
 func TestEmptyScheduler(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), emptyEUFrequencyPlan())
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), emptyEUFrequencyPlan())
 	a.So(err, should.BeNil)
 
 	askingTime := scheduling.SystemTime(time.Now().Add(time.Minute))
@@ -54,7 +54,7 @@ func TestEmptyScheduler(t *testing.T) {
 func TestInexistantBand(t *testing.T) {
 	a := assertions.New(t)
 
-	_, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{})
+	_, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{})
 	a.So(err, should.NotBeNil)
 }
 
@@ -62,7 +62,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 	a := assertions.New(t)
 
 	dwellTime := time.Microsecond
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID:            string(band.EU_863_870),
 		DownlinkDwellTime: &dwellTime,
 	})
@@ -75,7 +75,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 func TestScheduleAnytime(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -96,7 +96,7 @@ func TestScheduleAnytime(t *testing.T) {
 func TestScheduleAnytime2(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -119,7 +119,7 @@ func TestScheduleAnytime2(t *testing.T) {
 func TestScheduleAnytimeFullDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -145,7 +145,7 @@ func TestScheduleAnytimeFullDutyCycle(t *testing.T) {
 func TestScheduleAnytimeFullDutyCycleAfterRegisteredEmission(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -165,7 +165,7 @@ func TestScheduleAnytimeFullDutyCycleAfterRegisteredEmission(t *testing.T) {
 func TestScheduleFullDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -188,7 +188,7 @@ func TestScheduleFullDutyCycle(t *testing.T) {
 func TestScheduleOrdering(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -211,7 +211,7 @@ func TestTimeOffAirError(t *testing.T) {
 	a := assertions.New(t)
 
 	toa := time.Minute
-	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 		TimeOffAir: &ttnpb.FrequencyPlan_TimeOffAir{
 			Duration: &toa,

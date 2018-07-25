@@ -24,6 +24,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -55,7 +56,7 @@ func TestEvents(t *testing.T) {
 
 	pubsub.Subscribe("**", allEvents)
 
-	ctx := events.ContextWithCorrelationID(context.Background(), t.Name())
+	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 
 	pubsub.Publish(events.New(ctx, "test.evt0", nil, nil))
 	a.So(<-newTotal, should.Equal, 1)
@@ -109,7 +110,7 @@ func Example() {
 	}))
 
 	// You can send any arbitrary event; you don't have to pass any identifiers or data.
-	events.PublishEvent(context.Background(), "test.hello_world", nil, nil)
+	events.PublishEvent(test.Context(), "test.hello_world", nil, nil)
 
 	// Defining the event is not mandatory, but will be needed in order to translate the descriptions.
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
@@ -118,7 +119,7 @@ func Example() {
 
 	// These variables come from the request or you got them from the db or something.
 	var (
-		ctx      = context.Background()
+		ctx      = test.Context()
 		dev      ttnpb.EndDevice
 		requests []ttnpb.MACCommand_LinkADRReq
 	)

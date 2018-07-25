@@ -15,7 +15,6 @@
 package cluster
 
 import (
-	"context"
 	"encoding/hex"
 	"fmt"
 	"testing"
@@ -29,7 +28,7 @@ import (
 )
 
 func TestVerifySource(t *testing.T) {
-	ctx := log.NewContext(context.Background(), test.GetLogger(t))
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	key := []byte{0x2A, 0x9C, 0x2C, 0x3C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C}
 

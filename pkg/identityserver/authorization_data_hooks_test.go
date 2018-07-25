@@ -15,7 +15,6 @@
 package identityserver
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -25,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc/metadata"
 )
@@ -320,7 +320,7 @@ func TestBuildauthorizationData(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx := metadata.NewIncomingContext(
-				context.Background(),
+				test.Context(),
 				metadata.Pairs("authorization", fmt.Sprintf("%s %s", tc.authType, tc.authValue)),
 			)
 

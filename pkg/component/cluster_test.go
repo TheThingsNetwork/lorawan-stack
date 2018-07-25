@@ -39,7 +39,7 @@ func TestPeers(t *testing.T) {
 	}
 	defer lis.Close()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(test.Context())
 	defer cancel()
 
 	srv := rpcserver.New(ctx)

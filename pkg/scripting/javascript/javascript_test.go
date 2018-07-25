@@ -15,20 +15,20 @@
 package javascript_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/scripting"
 	. "go.thethings.network/lorawan-stack/pkg/scripting/javascript"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestRun(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 
 	script := `
 		(function () {
@@ -48,7 +48,7 @@ func TestRun(t *testing.T) {
 func TestRunError(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 
 	script := `
 		(function () {
@@ -64,7 +64,7 @@ func TestRunError(t *testing.T) {
 func TestRunStackOverflow(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 
 	script := `
 		(function () {
@@ -82,7 +82,7 @@ func TestRunStackOverflow(t *testing.T) {
 func TestRunTimeout(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := context.Background()
+	ctx := test.Context()
 
 	script := `
 		(function () {

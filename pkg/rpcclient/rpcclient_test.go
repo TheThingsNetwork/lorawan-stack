@@ -15,13 +15,13 @@
 package rpcclient_test
 
 import (
-	"context"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestOptions(t *testing.T) {
-	rpcclient.DefaultDialOptions(context.Background())
+	rpcclient.DefaultDialOptions(test.Context())
 	// not really anything to test here
 }

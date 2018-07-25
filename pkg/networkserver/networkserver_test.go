@@ -66,7 +66,7 @@ func init() {
 }
 
 func contextWithKey() context.Context {
-	return metadata.NewIncomingContext(context.Background(), metadata.MD{
+	return metadata.NewIncomingContext(test.Context(), metadata.MD{
 		"authorization": []string{fmt.Sprintf("Basic %s", Keys[0])},
 	})
 }
@@ -110,13 +110,13 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = ns.DownlinkQueueReplace(context.Background(), &ttnpb.DownlinkQueueRequest{})
+	_, err = ns.DownlinkQueueReplace(test.Context(), &ttnpb.DownlinkQueueRequest{})
 	a.So(err, should.NotBeNil)
 
 	req := ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
 	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
 
-	_, err = ns.DownlinkQueueReplace(context.Background(), req)
+	_, err = ns.DownlinkQueueReplace(test.Context(), req)
 	a.So(err, should.BeNil)
 
 	dev, err = dev.Load()
@@ -133,7 +133,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	}
 	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
 
-	_, err = ns.DownlinkQueueReplace(context.Background(), req)
+	_, err = ns.DownlinkQueueReplace(test.Context(), req)
 	a.So(err, should.BeNil)
 
 	dev, err = dev.Load()
@@ -166,7 +166,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = ns.DownlinkQueuePush(context.Background(), &ttnpb.DownlinkQueueRequest{})
+	_, err = ns.DownlinkQueuePush(test.Context(), &ttnpb.DownlinkQueueRequest{})
 	a.So(err, should.NotBeNil)
 
 	req := ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
@@ -177,7 +177,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 	downlinks := append(ed.QueuedApplicationDownlinks, req.Downlinks...)
 
-	_, err = ns.DownlinkQueuePush(context.Background(), req)
+	_, err = ns.DownlinkQueuePush(test.Context(), req)
 	a.So(err, should.BeNil)
 
 	dev, err = dev.Load()
@@ -192,7 +192,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
 	downlinks = append(downlinks, req.Downlinks...)
 
-	_, err = ns.DownlinkQueuePush(context.Background(), req)
+	_, err = ns.DownlinkQueuePush(test.Context(), req)
 	a.So(err, should.BeNil)
 
 	dev, err = dev.Load()
@@ -224,10 +224,10 @@ func TestDownlinkQueueList(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = ns.DownlinkQueueList(context.Background(), &ttnpb.EndDeviceIdentifiers{})
+	_, err = ns.DownlinkQueueList(test.Context(), &ttnpb.EndDeviceIdentifiers{})
 	a.So(err, should.NotBeNil)
 
-	downlinks, err := ns.DownlinkQueueList(context.Background(), &dev.EndDeviceIdentifiers)
+	downlinks, err := ns.DownlinkQueueList(test.Context(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
 
@@ -243,7 +243,7 @@ func TestDownlinkQueueList(t *testing.T) {
 		t.FailNow()
 	}
 
-	downlinks, err = ns.DownlinkQueueList(context.Background(), &dev.EndDeviceIdentifiers)
+	downlinks, err = ns.DownlinkQueueList(test.Context(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
 }
@@ -269,11 +269,11 @@ func TestDownlinkQueueClear(t *testing.T) {
 		t.FailNow()
 	}
 
-	e, err := ns.DownlinkQueueClear(context.Background(), &ttnpb.EndDeviceIdentifiers{})
+	e, err := ns.DownlinkQueueClear(test.Context(), &ttnpb.EndDeviceIdentifiers{})
 	a.So(err, should.NotBeNil)
 	a.So(e, should.BeNil)
 
-	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDeviceIdentifiers)
+	e, err = ns.DownlinkQueueClear(test.Context(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(e, should.NotBeNil)
 
@@ -296,7 +296,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 		t.FailNow()
 	}
 
-	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDeviceIdentifiers)
+	e, err = ns.DownlinkQueueClear(test.Context(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(e, should.NotBeNil)
 
@@ -502,7 +502,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = types.DevAddr{}
-			_, err := ns.HandleUplink(context.Background(), msg)
+			_, err := ns.HandleUplink(test.Context(), msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -512,7 +512,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Payload.GetMACPayload().FCnt = math.MaxUint16 + 1
-			_, err := ns.HandleUplink(context.Background(), msg)
+			_, err := ns.HandleUplink(test.Context(), msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -522,7 +522,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Settings.ChannelIndex = math.MaxUint8 + 1
-			_, err := ns.HandleUplink(context.Background(), msg)
+			_, err := ns.HandleUplink(test.Context(), msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -532,7 +532,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Settings.DataRateIndex = math.MaxUint8 + 1
-			_, err = ns.HandleUplink(context.Background(), msg)
+			_, err = ns.HandleUplink(test.Context(), msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -1179,7 +1179,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					t.FailNow()
 				}
 
-				ctx := context.WithValue(context.Background(), "answer", 42)
+				ctx := context.WithValue(test.Context(), "answer", 42)
 				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()
@@ -1441,7 +1441,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 		)).(*NetworkServer)
 		test.Must(nil, ns.Start())
 
-		_, err := ns.HandleUplink(context.Background(), ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
+		_, err := ns.HandleUplink(test.Context(), ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
 		a.So(err, should.NotBeNil)
 
 		req := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1455,7 +1455,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			t.FailNow()
 		}
 
-		_, err = ns.HandleUplink(context.Background(), req)
+		_, err = ns.HandleUplink(test.Context(), req)
 		a.So(err, should.NotBeNil)
 
 		for _, tc := range []struct {
@@ -1720,7 +1720,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 				}
 
-				ctx := context.WithValue(context.Background(), "answer", 42)
+				ctx := context.WithValue(test.Context(), "answer", 42)
 				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()
@@ -1973,18 +1973,18 @@ func TestHandleUplink(t *testing.T) {
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = nil
-	_, err = ns.HandleUplink(context.Background(), msg)
+	_, err = ns.HandleUplink(test.Context(), msg)
 	a.So(err, should.NotBeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = []byte{}
-	_, err = ns.HandleUplink(context.Background(), msg)
+	_, err = ns.HandleUplink(test.Context(), msg)
 	a.So(err, should.NotBeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Major = 1
-	_, err = ns.HandleUplink(context.Background(), msg)
+	_, err = ns.HandleUplink(test.Context(), msg)
 	a.So(err, should.NotBeNil)
 
 	t.Run("Uplink", HandleUplinkTest(conf))

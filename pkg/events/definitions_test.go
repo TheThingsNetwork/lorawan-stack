@@ -15,17 +15,17 @@
 package events_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestDefinitions(t *testing.T) {
 	a := assertions.New(t)
 	testEvent := events.Define("test", "Test Event")
-	evt := testEvent(context.Background(), nil, "err")
+	evt := testEvent(test.Context(), nil, "err")
 	a.So(evt.Name(), should.Equal, "test")
 }

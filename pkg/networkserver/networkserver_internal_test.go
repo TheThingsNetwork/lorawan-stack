@@ -197,7 +197,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
+		err := ns.generateAndScheduleDownlink(test.Context(), dev, nil, nil)
 		a.So(err, should.BeNil)
 	})
 
@@ -225,7 +225,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
+		err := ns.generateAndScheduleDownlink(test.Context(), dev, nil, nil)
 		a.So(err, should.BeError)
 	})
 
@@ -233,7 +233,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-		scheduleCtx := context.Background()
+		scheduleCtx := test.Context()
 
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), &component.Config{}),
@@ -261,7 +261,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		}
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
+		err := ns.generateAndScheduleDownlink(test.Context(), dev, nil, nil)
 		a.So(err, should.BeError)
 	})
 
@@ -270,7 +270,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		gateways := make(map[string]ttnpb.NsGsClient)
-		scheduleCtx := context.Background()
+		scheduleCtx := test.Context()
 		wg := &sync.WaitGroup{}
 
 		fpStore, err := test.NewFrequencyPlansStore()
@@ -377,7 +377,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.generateAndScheduleDownlink(context.Background(), dev, up, nil)
+		err = ns.generateAndScheduleDownlink(test.Context(), dev, up, nil)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
@@ -388,7 +388,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		gateways := make(map[string]ttnpb.NsGsClient)
-		scheduleCtx := context.Background()
+		scheduleCtx := test.Context()
 		wg := &sync.WaitGroup{}
 
 		fpStore, err := test.NewFrequencyPlansStore()
@@ -503,7 +503,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.generateAndScheduleDownlink(context.Background(), dev, up, nil)
+		err = ns.generateAndScheduleDownlink(test.Context(), dev, up, nil)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)

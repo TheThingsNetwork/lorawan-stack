@@ -34,7 +34,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"golang.org/x/net/context"
 )
 
 var (
@@ -71,41 +70,41 @@ func TestHandleJoin(t *testing.T) {
 
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
-	resp, err := js.HandleJoin(context.Background(), req)
+	resp, err := js.HandleJoin(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.EndDeviceIdentifiers.DevAddr = nil
-	resp, err = js.HandleJoin(context.Background(), req)
+	resp, err = js.HandleJoin(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
-	resp, err = js.HandleJoin(context.Background(), req)
+	resp, err = js.HandleJoin(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
-	resp, err = js.HandleJoin(context.Background(), req)
+	resp, err = js.HandleJoin(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{}
-	resp, err = js.HandleJoin(context.Background(), req)
+	resp, err = js.HandleJoin(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().DevEUI = types.EUI64{}
-	resp, err = js.HandleJoin(context.Background(), req)
+	resp, err = js.HandleJoin(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
-	resp, err = js.HandleJoin(context.Background(), ttnpb.NewPopulatedJoinRequest(test.Randy, false))
+	resp, err = js.HandleJoin(test.Context(), ttnpb.NewPopulatedJoinRequest(test.Randy, false))
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
@@ -923,7 +922,7 @@ func TestHandleJoin(t *testing.T) {
 
 			ctx := (rpcmetadata.MD{
 				NetAddress: nsAddr,
-			}).ToIncomingContext(context.Background())
+			}).ToIncomingContext(test.Context())
 
 			start := time.Now()
 			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
@@ -965,7 +964,7 @@ func TestHandleJoin(t *testing.T) {
 
 			a.So(pretty.Diff(ed, dev.EndDevice), should.BeEmpty)
 
-			resp, err = js.HandleJoin(context.Background(), tc.JoinRequest)
+			resp, err = js.HandleJoin(test.Context(), tc.JoinRequest)
 			a.So(err, should.BeError)
 			a.So(resp, should.BeNil)
 		})
@@ -986,13 +985,13 @@ func TestGetAppSKey(t *testing.T) {
 
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
-	resp, err := js.GetAppSKey(context.Background(), req)
+	resp, err := js.GetAppSKey(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.SessionKeyID = ""
-	resp, err = js.GetAppSKey(context.Background(), req)
+	resp, err = js.GetAppSKey(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
@@ -1166,7 +1165,7 @@ func TestGetAppSKey(t *testing.T) {
 
 			ctx := (rpcmetadata.MD{
 				NetAddress: asAddr,
-			}).ToIncomingContext(context.Background())
+			}).ToIncomingContext(test.Context())
 
 			resp, err := js.GetAppSKey(ctx, tc.KeyRequest)
 			if tc.Error != nil {
@@ -1198,13 +1197,13 @@ func TestGetNwkSKeys(t *testing.T) {
 
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
-	resp, err := js.GetNwkSKeys(context.Background(), req)
+	resp, err := js.GetNwkSKeys(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.SessionKeyID = ""
-	resp, err = js.GetNwkSKeys(context.Background(), req)
+	resp, err = js.GetNwkSKeys(test.Context(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
@@ -1410,7 +1409,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 			ctx := (rpcmetadata.MD{
 				NetAddress: nsAddr,
-			}).ToIncomingContext(context.Background())
+			}).ToIncomingContext(test.Context())
 
 			resp, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 			if tc.Error != nil {

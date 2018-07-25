@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func ExampleHandlerFunc() {
@@ -59,7 +60,7 @@ func ExampleChannel() {
 
 func ExampleContextHandler() {
 	// Usually the context comes from somewhere else (e.g. a streaming RPC):
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(test.Context())
 	defer cancel()
 
 	eventChan := make(events.Channel, 2)

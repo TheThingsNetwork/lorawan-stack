@@ -15,7 +15,6 @@
 package redis_test
 
 import (
-	"context"
 	"os"
 	"strconv"
 	"testing"
@@ -26,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -79,7 +79,7 @@ func TestRedisPubSub(t *testing.T) {
 
 	pubsub.Subscribe("redis.**", handler)
 
-	ctx := events.ContextWithCorrelationID(context.Background(), t.Name())
+	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 
 	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 

@@ -24,6 +24,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/util/rpctest"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -52,13 +53,13 @@ func TestFooBarExampleServer(t *testing.T) {
 	cli := rpctest.NewFooBarClient(cc)
 
 	{
-		bar, err := cli.Unary(context.Background(), &rpctest.Foo{Message: "foo"})
+		bar, err := cli.Unary(test.Context(), &rpctest.Foo{Message: "foo"})
 		a.So(err, should.BeNil)
 		a.So(bar.Message, should.Equal, "foofoo")
 	}
 
 	{
-		stream, err := cli.ClientStream(context.Background())
+		stream, err := cli.ClientStream(test.Context())
 		a.So(err, should.BeNil)
 		err = stream.Send(&rpctest.Foo{Message: "foo"})
 		a.So(err, should.BeNil)
@@ -68,7 +69,7 @@ func TestFooBarExampleServer(t *testing.T) {
 	}
 
 	{
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(test.Context())
 		stream, err := cli.ClientStream(ctx)
 		a.So(err, should.BeNil)
 		err = stream.Send(&rpctest.Foo{Message: "foo"})
@@ -79,7 +80,7 @@ func TestFooBarExampleServer(t *testing.T) {
 	}
 
 	{
-		stream, err := cli.ClientStream(context.Background())
+		stream, err := cli.ClientStream(test.Context())
 		a.So(err, should.BeNil)
 		err = stream.Send(&rpctest.Foo{Message: "foo"})
 		a.So(err, should.BeNil)
@@ -89,7 +90,7 @@ func TestFooBarExampleServer(t *testing.T) {
 	}
 
 	{
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(test.Context())
 		stream, err := cli.ServerStream(ctx, &rpctest.Foo{Message: "foo"})
 		a.So(err, should.BeNil)
 
@@ -109,7 +110,7 @@ func TestFooBarExampleServer(t *testing.T) {
 	}
 
 	{
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(test.Context())
 		stream, err := cli.BidiStream(ctx)
 		a.So(err, should.BeNil)
 

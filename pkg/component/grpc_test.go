@@ -120,7 +120,7 @@ func TestUnaryHook(t *testing.T) {
 	asClient := ttnpb.NewAsClient(grpcClient)
 	gsClient := ttnpb.NewGsClient(grpcClient)
 
-	ctx := context.Background()
+	ctx := test.Context()
 
 	// Failing calls
 	{

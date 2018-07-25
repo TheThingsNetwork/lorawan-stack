@@ -15,7 +15,6 @@
 package identityserver
 
 import (
-	"context"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -24,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -108,11 +108,11 @@ func TestAdminInvitations(t *testing.T) {
 		Name:     "HI",
 	}
 
-	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{User: user})
+	_, err = is.userService.CreateUser(test.Context(), &ttnpb.CreateUserRequest{User: user})
 	a.So(err, should.NotBeNil)
 	a.So(err, should.DescribeError, ErrInvitationTokenMissing)
 
-	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err = is.userService.CreateUser(test.Context(), &ttnpb.CreateUserRequest{
 		User:            user,
 		InvitationToken: token,
 	})
