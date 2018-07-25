@@ -32,9 +32,9 @@
     align-items: flex-start
 
   li > span
+    nudge('down', 3px)
     color: $c-info
     margin-right: $cs.xxs
-    nudge('down', 3px)
 
 .right
   +media-query($bp.s)
@@ -49,3 +49,22 @@
   h3
     one-liner()
     margin-bottom: $cs.m
+
+    span
+      one-liner()
+      nudge('up', 2px)
+      font-size: $fs.s
+      font-weight: 600
+      text-transform: uppercase
+      color: $c-active-blue
+      border: 1px solid $c-active-blue
+      border-radius: $br.s
+      padding: $cs.xxs
+      margin-left: $cs.xxs
+
+.login-info
+  color: $tc-deep-gray
+
+.redirect-info
+  span
+    color: $c-active-blue

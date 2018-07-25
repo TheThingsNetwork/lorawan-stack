@@ -19,6 +19,13 @@ import Icon from '../icon'
 import style from './story.styl'
 import Modal from '.'
 
+const bottomLine = (
+  <div>
+    <span className={style.loginInfo}>You are logged in as John Doe. <a href="#">Logout</a></span>
+    <span className={style.redirectInfo}>You will be redirected to <span>/test/test</span></span>
+  </div>
+)
+
 storiesOf('Modal', module)
   .add('Basic Modal', () => (
     <Modal
@@ -35,23 +42,23 @@ storiesOf('Modal', module)
     <Modal
       title="Request for Permission"
       subtitle="Console is requesting permission to do the following:"
-      bottomLine="Logged in as John Doe"
+      bottomLine={bottomLine}
       buttonMessage="Allow"
       approval
       logo
     >
       <div className={style.left}>
         <ul>
-          <li><Icon icon="check" className={style.icon} /> View your profile</li>
-          <li><Icon icon="check" className={style.icon} /> Make changes to your profile</li>
-          <li><Icon icon="check" className={style.icon} /> Perform administrative action</li>
-          <li><Icon icon="check" className={style.icon} /> List your applications</li>
-          <li><Icon icon="check" className={style.icon} /> Register new gateways in your account</li>
-          <li><Icon icon="check" className={style.icon} /> Create and edit devices of your applications</li>
+          <li><Icon icon="check" className={style.icon} />View your profile</li>
+          <li><Icon icon="check" className={style.icon} />Make changes to your profile</li>
+          <li><Icon icon="check" className={style.icon} />Perform administrative action</li>
+          <li><Icon icon="check" className={style.icon} />List your applications</li>
+          <li><Icon icon="check" className={style.icon} />Degister new gateways in your account</li>
+          <li><Icon icon="check" className={style.icon} />Create and edit devices of your applications</li>
         </ul>
       </div>
       <div className={style.right}>
-        <h3>Console</h3>
+        <h3>Console <span title="This application is an official TTN application">Official</span></h3>
         <p>The Console is the official The Things Network web application.</p>
       </div>
     </Modal>

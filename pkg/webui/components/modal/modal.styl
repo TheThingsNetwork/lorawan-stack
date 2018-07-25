@@ -89,15 +89,26 @@
   & > div:first-child
     align-items: center
     display: flex
+    color: $tc-subtle-gray
 
-    span
+    div > span
+      display: block
+
+    & > span
       nudge('up')
-      color: $tc-subtle-gray
       margin-right: $cs.m
 
   & > div:last-child
     display: flex
     align-items: center
+    +media-query($bp.xxs)
+      flex-direction: column
+      justify-content: flex-end
+      align-items: stretch
+
+      button:not(:last-child)
+        margin-right: 0
+        margin-bottom: $cs.s
 
 .logo
   width: 170px

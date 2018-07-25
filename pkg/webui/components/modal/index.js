@@ -31,7 +31,10 @@ export default class Modal extends React.PureComponent {
     ]),
     message: PropTypes.string,
     subtitle: PropTypes.string,
-    bottomLine: PropTypes.string,
+    bottomLine: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string,
+    ]),
     approval: PropTypes.bool,
     buttonMessage: PropTypes.string,
     cancelButtonMessage: PropTypes.string,
