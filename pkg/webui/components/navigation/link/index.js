@@ -16,45 +16,39 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-import style from './tab.styl'
+import { NavLink } from 'react-router-dom'
 
-const Tab = function ({
+import style from './link.styl'
+
+const NavigationLink = function ({
   className,
-  onClick,
-  isActive = false,
-  isDisabled,
   children,
-  ...rest
+  path,
+  exact,
+  activeClassName,
 }) {
   return (
-    <li
-      {...rest}
-      role="button"
-      onClick={onClick}
-      className={classnames(className, style.tab, {
-        [style.tabActive]: !isDisabled && isActive,
-        [style.tabDefault]: !isDisabled && !isActive,
-        [style.tabDisabled]: isDisabled,
-      })}
+    <NavLink
+      to={path}
+      exact={exact}
+      className={classnames(className, style.link)}
+      activeClassName={activeClassName}
     >
       {children}
-    </li>
+    </NavLink>
   )
 }
 
-Tab.propTypes = {
-  /** Function to be called when the tab gets clicked */
-  onClick: PropTypes.func.isRequired,
-  /** Boolean flag identifying whether the tab is active */
-  isActive: PropTypes.bool,
-  /** Boolean flag identifying whether the tab is disabled */
-  isDisabled: PropTypes.bool,
+NavigationLink.propTypes = {
+  /** The path for a link */
+  path: PropTypes.string.isRequired,
+  /** The name of a css class to be aplied on the active tab */
+  activeClassName: PropTypes.string,
+  /**
+   * Boolean flag identifying whether the path should
+   * be matched exactly
+   */
+  exact: PropTypes.bool.isRequired,
 }
 
-Tab.defaultProps = {
-  onClick: () => 0,
-  isActive: false,
-  isDisabled: false,
-}
-
-export default Tab
+export default NavigationLink

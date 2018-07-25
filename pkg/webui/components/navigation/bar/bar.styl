@@ -1,0 +1,43 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.link
+  position: relative
+  padding: $cs.xl
+  font-size: $fs.m
+  display: inline-block
+  color: $tc-deep-gray
+
+  pseudo-border-animated(3px, $c-divider)
+
+  & > .link
+    color: $c-icon-fill
+
+  &-active, &-active > .link
+    color: $c-active-blue
+
+  &-active
+    $hover-color = lighter($c-active-blue, 2)
+
+    +pseudo-border(3px, $c-active-blue)
+      transform: scaleX(1)
+
+    &:hover:before
+      background: $hover-color
+
+    &:hover
+      color: $hover-color
+
+.icon
+  margin-right: $cs.xs
