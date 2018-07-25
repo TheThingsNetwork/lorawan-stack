@@ -59,26 +59,26 @@ func (s *adminService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSett
 		}
 
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathSettingsBlacklistedIDs.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathSettingsBlacklistedIDs:
 				if req.Settings.BlacklistedIDs == nil {
 					req.Settings.BlacklistedIDs = []string{}
 				}
 				settings.BlacklistedIDs = req.Settings.BlacklistedIDs
-			case ttnpb.FieldPathSettingsUserRegistrationSkipValidation.MatchString(path):
+			case ttnpb.FieldPathSettingsUserRegistrationSkipValidation:
 				settings.SkipValidation = req.Settings.SkipValidation
-			case ttnpb.FieldPathSettingsUserRegistrationInvitationOnly.MatchString(path):
+			case ttnpb.FieldPathSettingsUserRegistrationInvitationOnly:
 				settings.InvitationOnly = req.Settings.InvitationOnly
-			case ttnpb.FieldPathSettingsUserRegistrationAdminApproval.MatchString(path):
+			case ttnpb.FieldPathSettingsUserRegistrationAdminApproval:
 				settings.AdminApproval = req.Settings.AdminApproval
-			case ttnpb.FieldPathSettingsValidationTokenTTL.MatchString(path):
+			case ttnpb.FieldPathSettingsValidationTokenTTL:
 				settings.ValidationTokenTTL = req.Settings.ValidationTokenTTL
-			case ttnpb.FieldPathSettingsAllowedEmails.MatchString(path):
+			case ttnpb.FieldPathSettingsAllowedEmails:
 				if req.Settings.AllowedEmails == nil {
 					req.Settings.AllowedEmails = []string{}
 				}
 				settings.AllowedEmails = req.Settings.AllowedEmails
-			case ttnpb.FieldPathSettingsInvitationTokenTTL.MatchString(path):
+			case ttnpb.FieldPathSettingsInvitationTokenTTL:
 				settings.InvitationTokenTTL = req.Settings.InvitationTokenTTL
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
@@ -243,10 +243,10 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 
 		newEmail := false
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathUserName.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathUserName:
 				user.Name = req.User.Name
-			case ttnpb.FieldPathUserEmail.MatchString(path):
+			case ttnpb.FieldPathUserEmail:
 				user.UserIdentifiers.Email = req.User.UserIdentifiers.Email
 
 				newEmail = strings.ToLower(user.UserIdentifiers.Email) != strings.ToLower(req.User.UserIdentifiers.Email)
@@ -257,11 +257,11 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 						user.ValidatedAt = timeValue(time.Time{})
 					}
 				}
-			case ttnpb.FieldPathUserAdmin.MatchString(path):
+			case ttnpb.FieldPathUserAdmin:
 				user.Admin = req.User.Admin
-			case ttnpb.FieldPathUserState.MatchString(path):
+			case ttnpb.FieldPathUserState:
 				user.State = req.User.State
-			case ttnpb.FieldPathUserRequirePasswordUpdate.MatchString(path):
+			case ttnpb.FieldPathUserRequirePasswordUpdate:
 				user.RequirePasswordUpdate = req.User.RequirePasswordUpdate
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
@@ -599,21 +599,21 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 		client := found.GetClient()
 
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathClientDescription.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathClientDescription:
 				client.Description = req.Client.Description
-			case ttnpb.FieldPathClientRedirectURI.MatchString(path):
+			case ttnpb.FieldPathClientRedirectURI:
 				client.RedirectURI = req.Client.RedirectURI
-			case ttnpb.FieldPathClientRights.MatchString(path):
+			case ttnpb.FieldPathClientRights:
 				if req.Client.Rights == nil {
 					req.Client.Rights = []ttnpb.Right{}
 				}
 				client.Rights = req.Client.Rights
-			case ttnpb.FieldPathClientSkipAuthorization.MatchString(path):
+			case ttnpb.FieldPathClientSkipAuthorization:
 				client.SkipAuthorization = req.Client.SkipAuthorization
-			case ttnpb.FieldPathClientState.MatchString(path):
+			case ttnpb.FieldPathClientState:
 				client.State = req.Client.State
-			case ttnpb.FieldPathClientGrants.MatchString(path):
+			case ttnpb.FieldPathClientGrants:
 				if req.Client.Grants == nil {
 					req.Client.Grants = []ttnpb.GrantType{}
 				}

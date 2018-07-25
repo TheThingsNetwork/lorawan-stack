@@ -14,26 +14,24 @@
 
 package ttnpb
 
-import "regexp"
+const (
+	// FieldPathOrganizationName is the field path for the organization name field.
+	FieldPathOrganizationName = "name"
+
+	// FieldPathOrganizationDescription is the field path for the organization description field.
+	FieldPathOrganizationDescription = "description"
+
+	// FieldPathOrganizationURL is the field path for the organization URL field.
+	FieldPathOrganizationURL = "url"
+
+	// FieldPathOrganizationLocation is the field path for the organization location field.
+	FieldPathOrganizationLocation = "location"
+
+	// FieldPathOrganizationEmail is the field path for the organization email field.
+	FieldPathOrganizationEmail = "email"
+)
 
 // GetOrganization returns the base Organization itself.
 func (d *Organization) GetOrganization() *Organization {
 	return d
 }
-
-var (
-	// FieldPathOrganizationName is the field path for the organization name field.
-	FieldPathOrganizationName = regexp.MustCompile(`^name$`)
-
-	// FieldPathOrganizationDescription is the field path for the organization description field.
-	FieldPathOrganizationDescription = regexp.MustCompile(`^description$`)
-
-	// FieldPathOrganizationURL is the field path for the organization URL field.
-	FieldPathOrganizationURL = regexp.MustCompile(`^url$`)
-
-	// FieldPathOrganizationLocation is the field path for the organization location field.
-	FieldPathOrganizationLocation = regexp.MustCompile(`^location$`)
-
-	// FieldPathOrganizationEmail is the field path for the organization email field.
-	FieldPathOrganizationEmail = regexp.MustCompile(`^email$`)
-)

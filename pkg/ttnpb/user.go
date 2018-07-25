@@ -14,7 +14,22 @@
 
 package ttnpb
 
-import "regexp"
+const (
+	// FieldPathUserName is the field path for the user name field.
+	FieldPathUserName = "name"
+
+	// FieldPathUserEmail is the field path for the user email field.
+	FieldPathUserEmail = "ids.email"
+
+	// FieldPathUserState is the field path for the user state field.
+	FieldPathUserState = "state"
+
+	// FieldPathUserAdmin is the field path for the user admin field.
+	FieldPathUserAdmin = "admin"
+
+	// FieldPathUserRequirePasswordUpdate is the field path for the user require password update field.
+	FieldPathUserRequirePasswordUpdate = "require_password_update"
+)
 
 // GetUser returns the base User itself.
 func (u *User) GetUser() *User {
@@ -27,20 +42,3 @@ func (u *User) Safe() *User {
 	copy.Password = ""
 	return &copy
 }
-
-var (
-	// FieldPathUserName is the field path for the user name field.
-	FieldPathUserName = regexp.MustCompile(`^name$`)
-
-	// FieldPathUserEmail is the field path for the user email field.
-	FieldPathUserEmail = regexp.MustCompile(`^ids.email$`)
-
-	// FieldPathUserState is the field path for the user state field.
-	FieldPathUserState = regexp.MustCompile(`^state$`)
-
-	// FieldPathUserAdmin is the field path for the user admin field.
-	FieldPathUserAdmin = regexp.MustCompile(`^admin$`)
-
-	// FieldPathUserRequirePasswordUpdate is the field path for the user require password update field.
-	FieldPathUserRequirePasswordUpdate = regexp.MustCompile(`^require_password_update$`)
-)

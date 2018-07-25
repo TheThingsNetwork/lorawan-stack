@@ -147,16 +147,16 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 		organization := found.GetOrganization()
 
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathOrganizationName.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathOrganizationName:
 				organization.Name = req.Organization.Name
-			case ttnpb.FieldPathOrganizationDescription.MatchString(path):
+			case ttnpb.FieldPathOrganizationDescription:
 				organization.Description = req.Organization.Description
-			case ttnpb.FieldPathOrganizationURL.MatchString(path):
+			case ttnpb.FieldPathOrganizationURL:
 				organization.URL = req.Organization.URL
-			case ttnpb.FieldPathOrganizationLocation.MatchString(path):
+			case ttnpb.FieldPathOrganizationLocation:
 				organization.Location = req.Organization.Location
-			case ttnpb.FieldPathOrganizationEmail.MatchString(path):
+			case ttnpb.FieldPathOrganizationEmail:
 				organization.Email = req.Organization.Email
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{

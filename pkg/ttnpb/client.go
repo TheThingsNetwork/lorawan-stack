@@ -16,7 +16,26 @@ package ttnpb
 
 import (
 	"crypto/subtle"
-	"regexp"
+)
+
+const (
+	// FieldPathClientDescription is the field path for the client description field.
+	FieldPathClientDescription = "description"
+
+	// FieldPathClientRedirectURI is the field path for the client redirect URI field.
+	FieldPathClientRedirectURI = "redirect_uri"
+
+	// FieldPathClientRights is the field path for the client rights field.
+	FieldPathClientRights = "rights"
+
+	// FieldPathClientSkipAuthorization is the field path for the client skip authorization field.
+	FieldPathClientSkipAuthorization = "skip_authorization"
+
+	// FieldPathClientState is the field path for the client state field.
+	FieldPathClientState = "state"
+
+	// FieldPathClientGrants is the field path for the client grants field.
+	FieldPathClientGrants = "grants"
 )
 
 // GetClient returns the base Client itself.
@@ -56,23 +75,3 @@ func (c *Client) HasGrant(grant GrantType) bool {
 
 	return false
 }
-
-var (
-	// FieldPathClientDescription is the field path for the client description field.
-	FieldPathClientDescription = regexp.MustCompile(`^description$`)
-
-	// FieldPathClientRedirectURI is the field path for the client redirect URI field.
-	FieldPathClientRedirectURI = regexp.MustCompile(`^redirect_uri$`)
-
-	// FieldPathClientRights is the field path for the client rights field.
-	FieldPathClientRights = regexp.MustCompile(`^rights$`)
-
-	// FieldPathClientSkipAuthorization is the field path for the client skip authorization field.
-	FieldPathClientSkipAuthorization = regexp.MustCompile(`^skip_authorization$`)
-
-	// FieldPathClientState is the field path for the client state field.
-	FieldPathClientState = regexp.MustCompile(`^state$`)
-
-	// FieldPathClientGrants is the field path for the client grants field.
-	FieldPathClientGrants = regexp.MustCompile(`^grants$`)
-)

@@ -15,6 +15,8 @@
 package ttnpb
 
 import (
+	"strings"
+
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
@@ -32,20 +34,20 @@ func (req *UpdateSettingsRequest) Validate() error {
 
 	var err error
 	for _, path := range paths {
-		switch true {
-		case FieldPathSettingsBlacklistedIDs.MatchString(path):
+		switch path {
+		case FieldPathSettingsBlacklistedIDs:
 			for _, id := range req.Settings.BlacklistedIDs {
 				err = validate.Field(id, validate.ID).DescribeFieldName("Blacklisted ID")
 				if err != nil {
 					validations = append(validations, err)
 				}
 			}
-		case FieldPathSettingsUserRegistrationSkipValidation.MatchString(path),
-			FieldPathSettingsUserRegistrationInvitationOnly.MatchString(path),
-			FieldPathSettingsUserRegistrationAdminApproval.MatchString(path),
-			FieldPathSettingsValidationTokenTTL.MatchString(path),
-			FieldPathSettingsAllowedEmails.MatchString(path),
-			FieldPathSettingsInvitationTokenTTL.MatchString(path):
+		case FieldPathSettingsUserRegistrationSkipValidation,
+			FieldPathSettingsUserRegistrationInvitationOnly,
+			FieldPathSettingsUserRegistrationAdminApproval,
+			FieldPathSettingsValidationTokenTTL,
+			FieldPathSettingsAllowedEmails,
+			FieldPathSettingsInvitationTokenTTL:
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
@@ -80,11 +82,11 @@ func (req *UpdateUserRequest) Validate() error {
 
 	var err error
 	for _, path := range paths {
-		switch true {
-		case FieldPathUserName.MatchString(path),
-			FieldPathUserAdmin.MatchString(path),
-			FieldPathUserRequirePasswordUpdate.MatchString(path):
-		case FieldPathUserEmail.MatchString(path):
+		switch path {
+		case FieldPathUserName,
+			FieldPathUserAdmin,
+			FieldPathUserRequirePasswordUpdate:
+		case FieldPathUserEmail:
 			err = validate.Field(req.User.UserIdentifiers.Email, validate.Email).DescribeFieldName("Email")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
@@ -156,8 +158,8 @@ func (req *UpdateApplicationRequest) Validate() error {
 	}
 
 	for _, path := range paths {
-		switch true {
-		case FieldPathApplicationDescription.MatchString(path):
+		switch path {
+		case FieldPathApplicationDescription:
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
@@ -252,36 +254,35 @@ func (req *UpdateGatewayRequest) Validate() error {
 
 	var err error
 	for _, path := range paths {
-		switch true {
-		case FieldPathGatewayDescription.MatchString(path):
-		case FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path),
-			FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path),
-			FieldPathGatewayPrivacySettingsContactable.MatchString(path),
-			FieldPathGatewayAutoUpdate.MatchString(path),
-			FieldPathGatewayPlatform.MatchString(path),
-			FieldPathGatewayAntennas.MatchString(path),
-			FieldPathGatewayAttributes.MatchString(path),
-			FieldPathGatewayDisableTxDelay.MatchString(path):
-		case FieldPathGatewayClusterAddress.MatchString(path):
+		switch path {
+		case FieldPathGatewayDescription,
+			FieldPathGatewayPrivacySettingsContactable,
+			FieldPathGatewayPrivacySettingsStatusPublic,
+			FieldPathGatewayPrivacySettingsLocationPublic,
+			FieldPathGatewayAutoUpdate,
+			FieldPathGatewayPlatform,
+			FieldPathGatewayAntennas,
+			FieldPathGatewayDisableTxDelay:
+		case FieldPathGatewayClusterAddress:
 			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address")
-		case FieldPathGatewayFrequencyPlanID.MatchString(path):
+		case FieldPathGatewayFrequencyPlanID:
 			err = validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID")
-		case FieldPathGatewayRadios.MatchString(path):
+		case FieldPathGatewayRadios:
 			for _, radio := range req.Gateway.Radios {
 				validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Radio Frequency"))
 			}
-		case FieldPathGatewayContactAccountIDs.MatchString(path):
+		case FieldPathGatewayContactAccountIDs:
 			if req.Gateway.ContactAccountIDs == nil {
 				continue
 			}
-
 			err = req.Gateway.ContactAccountIDs.Validate()
 		default:
-			return ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+			if !strings.HasPrefix(path, FieldPrefixGatewayAttributes) {
+				return ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
 		}
-
 		validations = append(validations, err)
 	}
 
@@ -398,12 +399,12 @@ func (req *UpdateClientRequest) Validate() error {
 
 	var err error
 	for _, path := range paths {
-		switch true {
-		case FieldPathClientDescription.MatchString(path):
+		switch path {
+		case FieldPathClientDescription:
 			err = validate.Field(req.Client.Description, validate.Required).DescribeFieldName("Description")
-		case FieldPathClientRedirectURI.MatchString(path):
+		case FieldPathClientRedirectURI:
 			err = validate.Field(req.Client.RedirectURI, validate.Required).DescribeFieldName("Redirect URI")
-		case FieldPathClientRights.MatchString(path):
+		case FieldPathClientRights:
 			err = validate.Field(req.Client.Rights, validate.MinLength(1), validate.In(validClientRights)).DescribeFieldName("Rights")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
@@ -431,12 +432,10 @@ func (req *UpdateOrganizationRequest) Validate() error {
 
 	var err error
 	for _, path := range paths {
-		switch true {
-		case FieldPathOrganizationName.MatchString(path),
-			FieldPathOrganizationDescription.MatchString(path),
-			FieldPathOrganizationURL.MatchString(path),
-			FieldPathOrganizationLocation.MatchString(path):
-		case FieldPathOrganizationEmail.MatchString(path):
+		switch path {
+		case FieldPathOrganizationName, FieldPathOrganizationDescription, FieldPathOrganizationURL,
+			FieldPathOrganizationLocation:
+		case FieldPathOrganizationEmail:
 			err = validate.Field(req.Organization.Email, validate.Email).DescribeFieldName("Email")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{

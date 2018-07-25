@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 	"math"
+	"strings"
 	"sync"
 	"time"
 
@@ -175,44 +176,49 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 func copyGatewayFields(recipient, origin *ttnpb.Gateway, paths []string) error {
 	// TODO: Make this function faster https://github.com/TheThingsIndustries/ttn/pull/851#discussion_r197744927
 	for _, path := range paths {
-		switch {
-		case ttnpb.FieldPathGatewayDescription.MatchString(path):
+		switch path {
+		case ttnpb.FieldPathGatewayDescription:
 			recipient.Description = origin.Description
-		case ttnpb.FieldPathGatewayFrequencyPlanID.MatchString(path):
+		case ttnpb.FieldPathGatewayFrequencyPlanID:
 			recipient.FrequencyPlanID = origin.FrequencyPlanID
-		case ttnpb.FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path):
-			recipient.PrivacySettings.StatusPublic = origin.PrivacySettings.StatusPublic
-		case ttnpb.FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path):
-			recipient.PrivacySettings.LocationPublic = origin.PrivacySettings.LocationPublic
-		case ttnpb.FieldPathGatewayPrivacySettingsContactable.MatchString(path):
-			recipient.PrivacySettings.Contactable = origin.PrivacySettings.Contactable
-		case ttnpb.FieldPathGatewayAutoUpdate.MatchString(path):
-			recipient.AutoUpdate = origin.AutoUpdate
-		case ttnpb.FieldPathGatewayPlatform.MatchString(path):
-			recipient.Platform = origin.Platform
-		case ttnpb.FieldPathGatewayAntennas.MatchString(path):
+		case ttnpb.FieldPathGatewayClusterAddress:
+			recipient.ClusterAddress = origin.ClusterAddress
+		case ttnpb.FieldPathGatewayAntennas:
 			if origin.Antennas == nil {
 				origin.Antennas = []ttnpb.GatewayAntenna{}
 			}
 			recipient.Antennas = origin.Antennas
-		case ttnpb.FieldPathGatewayAttributes.MatchString(path):
-			attr := ttnpb.FieldPathGatewayAttributes.FindStringSubmatch(path)[1]
-
+		case ttnpb.FieldPathGatewayRadios:
+			if origin.Radios == nil {
+				origin.Radios = []ttnpb.GatewayRadio{}
+			}
+			recipient.Radios = origin.Radios
+		case ttnpb.FieldPathGatewayPrivacySettingsStatusPublic:
+			recipient.PrivacySettings.StatusPublic = origin.PrivacySettings.StatusPublic
+		case ttnpb.FieldPathGatewayPrivacySettingsLocationPublic:
+			recipient.PrivacySettings.LocationPublic = origin.PrivacySettings.LocationPublic
+		case ttnpb.FieldPathGatewayPrivacySettingsContactable:
+			recipient.PrivacySettings.Contactable = origin.PrivacySettings.Contactable
+		case ttnpb.FieldPathGatewayAutoUpdate:
+			recipient.AutoUpdate = origin.AutoUpdate
+		case ttnpb.FieldPathGatewayPlatform:
+			recipient.Platform = origin.Platform
+		case ttnpb.FieldPathGatewayContactAccountIDs:
+			recipient.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: origin.ContactAccountIDs.GetUserID()}}
+		case ttnpb.FieldPathGatewayDisableTxDelay:
+			recipient.DisableTxDelay = origin.DisableTxDelay
+		default:
+			if !strings.HasPrefix(path, ttnpb.FieldPrefixGatewayAttributes) {
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+			attr := strings.TrimPrefix(path, ttnpb.FieldPrefixGatewayAttributes)
 			if value, ok := origin.Attributes[attr]; ok && len(value) > 0 {
 				recipient.Attributes[attr] = value
 			} else {
 				delete(recipient.Attributes, attr)
 			}
-		case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
-			recipient.ClusterAddress = origin.ClusterAddress
-		case ttnpb.FieldPathGatewayContactAccountIDs.MatchString(path):
-			recipient.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: origin.ContactAccountIDs.GetUserID()}}
-		case ttnpb.FieldPathGatewayDisableTxDelay.MatchString(path):
-			recipient.DisableTxDelay = origin.DisableTxDelay
-		default:
-			return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
 		}
 	}
 

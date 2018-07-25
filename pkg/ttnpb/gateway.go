@@ -17,10 +17,50 @@ package ttnpb
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"regexp"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+)
+
+const (
+	// FieldPathGatewayDescription is the field path for the gateway description field.
+	FieldPathGatewayDescription = "description"
+
+	// FieldPathGatewayFrequencyPlanID is the field path for the gateway frequency plan ID field.
+	FieldPathGatewayFrequencyPlanID = "frequency_plan_id"
+
+	// FieldPathGatewayClusterAddress is the field path for the gateway cluster address field.
+	FieldPathGatewayClusterAddress = "cluster_address"
+
+	// FieldPathGatewayAntennas is the field path for the antennas.
+	FieldPathGatewayAntennas = "antennas"
+
+	// FieldPathGatewayRadios is the field path for the radios.
+	FieldPathGatewayRadios = "radios"
+
+	// FieldPathGatewayPrivacySettingsStatusPublic is the field path for the gateway privacy setting status public field.
+	FieldPathGatewayPrivacySettingsStatusPublic = "privacy_settings.status_public"
+
+	// FieldPathGatewayPrivacySettingsLocationPublic is the field path for the gateway privacy setting location public field.
+	FieldPathGatewayPrivacySettingsLocationPublic = "privacy_settings.location_public"
+
+	// FieldPathGatewayPrivacySettingsContactable is the field path for the gateway privacy setting contactable field.
+	FieldPathGatewayPrivacySettingsContactable = "privacy_settings.contactable"
+
+	// FieldPathGatewayAutoUpdate is the field path for the gateway auto update field.
+	FieldPathGatewayAutoUpdate = "auto_update"
+
+	// FieldPathGatewayPlatform is the field path for the gateway platform field.
+	FieldPathGatewayPlatform = "platform"
+
+	// FieldPrefixGatewayAttributes is the field path prefix for an attribute in the attributes map.
+	FieldPrefixGatewayAttributes = "attributes."
+
+	// FieldPathGatewayContactAccountIDs is the field path for the gateway contact account identifiers field.
+	FieldPathGatewayContactAccountIDs = "contact_account_ids"
+
+	// FieldPathGatewayDisableTxDelay is the field path for the gateway disable Tx delay field.
+	FieldPathGatewayDisableTxDelay = "disable_tx_delay"
 )
 
 // GetGateway returns the base Gateway itself.
@@ -42,47 +82,6 @@ func (g *Gateway) SetAntennas(antennas []GatewayAntenna) {
 func (g *Gateway) SetRadios(radios []GatewayRadio) {
 	g.Radios = radios
 }
-
-var (
-	// FieldPathGatewayDescription is the field path for the gateway description field.
-	FieldPathGatewayDescription = regexp.MustCompile(`^description$`)
-
-	// FieldPathGatewayFrequencyPlanID is the field path for the gateway frequency plan ID field.
-	FieldPathGatewayFrequencyPlanID = regexp.MustCompile(`^frequency_plan_id$`)
-
-	// FieldPathGatewayClusterAddress is the field path for the gateway cluster address field.
-	FieldPathGatewayClusterAddress = regexp.MustCompile(`^cluster_address$`)
-
-	// FieldPathGatewayAntennas is the field path for the antennas.
-	FieldPathGatewayAntennas = regexp.MustCompile(`^antennas$`)
-
-	// FieldPathGatewayRadios is the field path for the radios.
-	FieldPathGatewayRadios = regexp.MustCompile(`^radios$`)
-
-	// FieldPathGatewayPrivacySettingsStatusPublic is the field path for the gateway privacy setting status public field.
-	FieldPathGatewayPrivacySettingsStatusPublic = regexp.MustCompile(`^privacy_settings.status_public$`)
-
-	// FieldPathGatewayPrivacySettingsLocationPublic is the field path for the gateway privacy setting location public field.
-	FieldPathGatewayPrivacySettingsLocationPublic = regexp.MustCompile(`^privacy_settings.location_public$`)
-
-	// FieldPathGatewayPrivacySettingsContactable is the field path for the gateway privacy setting contactable field.
-	FieldPathGatewayPrivacySettingsContactable = regexp.MustCompile(`^privacy_settings.contactable$`)
-
-	// FieldPathGatewayAutoUpdate is the field path for the gateway auto update field.
-	FieldPathGatewayAutoUpdate = regexp.MustCompile(`^auto_update$`)
-
-	// FieldPathGatewayPlatform is the field path for the gateway platform field.
-	FieldPathGatewayPlatform = regexp.MustCompile(`^platform$`)
-
-	// FieldPathGatewayAttributes is the field path for an attribute in the attributes map.
-	FieldPathGatewayAttributes = regexp.MustCompile(`^attributes\.(.+)$`)
-
-	// FieldPathGatewayContactAccountIDs is the field path for the gateway contact account identifiers field.
-	FieldPathGatewayContactAccountIDs = regexp.MustCompile(`^contact_account_ids$`)
-
-	// FieldPathGatewayDisableTxDelay is the field path for the gateway disable Tx delay field.
-	FieldPathGatewayDisableTxDelay = regexp.MustCompile(`^disable_tx_delay$`)
-)
 
 // gatewayPrivacySetting is an enum that defines the different gateway privacy settings.
 type gatewayPrivacySetting int32

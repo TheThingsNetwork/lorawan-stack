@@ -171,8 +171,8 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 		application = found.GetApplication()
 
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathApplicationDescription.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathApplicationDescription:
 				application.Description = req.Application.Description
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{

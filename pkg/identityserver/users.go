@@ -208,10 +208,10 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 
 		newEmail := false
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathUserName.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathUserName:
 				user.Name = req.User.Name
-			case ttnpb.FieldPathUserEmail.MatchString(path):
+			case ttnpb.FieldPathUserEmail:
 				if !isEmailAllowed(req.User.UserIdentifiers.Email, settings.AllowedEmails) {
 					return ErrEmailAddressNotAllowed.New(errors.Attributes{
 						"allowed_emails": settings.AllowedEmails,

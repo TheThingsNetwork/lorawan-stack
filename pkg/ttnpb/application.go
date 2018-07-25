@@ -14,14 +14,12 @@
 
 package ttnpb
 
-import "regexp"
+const (
+	// FieldPathApplicationDescription is the field path for the application description field.
+	FieldPathApplicationDescription = "description"
+)
 
 // GetApplication returns the base Application itself.
 func (d *Application) GetApplication() *Application {
 	return d
 }
-
-var (
-	// FieldPathApplicationDescription is the field path for the application description field.
-	FieldPathApplicationDescription = regexp.MustCompile(`^description$`)
-)

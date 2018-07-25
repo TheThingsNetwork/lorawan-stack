@@ -166,8 +166,8 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		}
 
 		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathClientDescription.MatchString(path):
+			switch path {
+			case ttnpb.FieldPathClientDescription:
 				client.Description = req.Client.Description
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
