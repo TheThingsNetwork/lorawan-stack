@@ -90,7 +90,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			DutyCycle:         ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:           band.DefaultMaxEIRP,
 			Rx1DataRateOffset: 0,
-			Rx2DataRateIndex:  ttnpb.DataRateIndex(band.DefaultRx2Parameters.DataRateIndex),
+			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
 			Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
 			Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
 			DownlinkDwellTime: band.DwellTime > 0,

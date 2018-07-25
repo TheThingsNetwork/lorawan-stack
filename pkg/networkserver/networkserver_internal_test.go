@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"math/rand"
 	"sort"
 	"sync"
 	"sync/atomic"
@@ -105,8 +106,8 @@ func (cl *MockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.Downli
 func TestGenerateAndScheduleDownlink(t *testing.T) {
 	newRx2 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice) *ttnpb.DownlinkMessage {
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-		st := dev.MACState
-		drIdx := st.Rx2DataRateIndex
+
+		drIdx := dev.MACState.Rx2DataRateIndex
 
 		msg := &ttnpb.DownlinkMessage{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
@@ -114,7 +115,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 				DataRateIndex:         drIdx,
 				CodingRate:            "4/5",
 				PolarizationInversion: true,
-				Frequency:             st.Rx2Frequency,
+				Frequency:             dev.MACState.Rx2Frequency,
 				TxPower:               int32(band.DefaultMaxEIRP),
 			},
 			RawPayload: test.Must((ttnpb.Message{
@@ -323,6 +324,8 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			false,
 		)
 		up.Settings.ChannelIndex %= uint32(len(ed.MACState.MACParameters.Channels))
+		ch := dev.MACState.Channels[up.Settings.ChannelIndex]
+		up.Settings.DataRateIndex = ttnpb.DataRateIndex(int(ch.MinDataRateIndex) + rand.Intn(1+int(ch.MaxDataRateIndex-ch.MinDataRateIndex)))
 
 		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
 		sort.SliceStable(mds, func(i, j int) bool {
@@ -439,6 +442,8 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			false,
 		)
 		up.Settings.ChannelIndex %= uint32(len(ed.MACState.MACParameters.Channels))
+		ch := dev.MACState.MACParameters.Channels[up.Settings.ChannelIndex]
+		up.Settings.DataRateIndex = ttnpb.DataRateIndex(int(ch.MinDataRateIndex) + rand.Intn(1+int(ch.MaxDataRateIndex-ch.MinDataRateIndex)))
 
 		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
 		sort.SliceStable(mds, func(i, j int) bool {

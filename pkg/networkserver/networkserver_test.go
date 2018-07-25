@@ -552,7 +552,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -582,7 +587,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -605,7 +611,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -635,7 +646,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -659,7 +671,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -693,7 +710,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -717,7 +735,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -752,7 +775,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -775,7 +799,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -810,7 +839,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -836,7 +866,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -882,7 +917,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -907,7 +943,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -943,7 +984,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -969,7 +1011,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   42,
+									DownlinkFrequency: 420,
+									MinDataRateIndex:  3,
+									MaxDataRateIndex:  4,
+								},
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 							},
 						},
@@ -1015,7 +1062,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
-					msg.Settings.ChannelIndex %= 4
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -1433,7 +1481,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex %= 3
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1459,7 +1508,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex %= 3
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1485,7 +1535,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex %= 3
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1511,7 +1562,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex %= 3
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1537,7 +1589,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex %= 3
+					msg.Settings.ChannelIndex = 2
+					msg.Settings.DataRateIndex = 3
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
