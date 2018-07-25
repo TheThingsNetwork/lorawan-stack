@@ -49,6 +49,8 @@ const (
 
 var (
 	ResetMACState = resetMACState
+	//GenerateDownlink = generateDownlink
+	//ErrNoDownlink    = errNoDownlink
 )
 
 func SetAppQueueUpdateTimeout(d time.Duration) {
@@ -157,20 +159,18 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		return msg
 	}
 
-	newRx1 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) *ttnpb.DownlinkMessage {
-		msg := newRx2(down, fp, dev)
+	newRx1 := func(appDown *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) *ttnpb.DownlinkMessage {
+		down := newRx2(appDown, fp, dev)
 
-		sets := up.Settings
-		st := dev.MACState
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-		drIdx := test.Must(band.Rx1DataRate(sets.DataRateIndex, st.Rx1DataRateOffset, st.DownlinkDwellTime)).(ttnpb.DataRateIndex)
+		drIdx := test.Must(band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.Rx1DataRateOffset, dev.MACState.DownlinkDwellTime)).(ttnpb.DataRateIndex)
 
-		msg.Settings.ChannelIndex = test.Must(band.Rx1Channel(sets.ChannelIndex)).(uint32)
-		msg.Settings.Frequency = uint64(st.MACParameters.Channels[int(msg.Settings.ChannelIndex)].DownlinkFrequency)
-		msg.Settings.DataRateIndex = drIdx
+		down.Settings.ChannelIndex = test.Must(band.Rx1Channel(up.Settings.ChannelIndex)).(uint32)
+		down.Settings.Frequency = uint64(dev.MACState.MACParameters.Channels[int(down.Settings.ChannelIndex)].DownlinkFrequency)
+		down.Settings.DataRateIndex = drIdx
 
-		test.Must(nil, setDownlinkModulation(&msg.Settings, band.DataRates[drIdx]))
-		return msg
+		test.Must(nil, setDownlinkModulation(&down.Settings, band.DataRates[drIdx]))
+		return down
 	}
 
 	t.Run("Empty queue", func(t *testing.T) {
@@ -193,12 +193,15 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = nil
+		ed.MACSettings.StatusCountPeriodicity = 0
+		ed.MACSettings.StatusTimePeriodicity = 0
 		ed.MACState.QueuedResponses = nil
-		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
+		ed.MACState.DesiredMACParameters = deepcopy.Copy(ed.MACState.MACParameters).(ttnpb.MACParameters)
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.generateAndScheduleDownlink(test.Context(), dev, nil, nil)
-		a.So(err, should.BeNil)
+		b, err := generateDownlink(test.Context(), dev, nil)
+		a.So(err, should.Resemble, errNoDownlink)
+		a.So(b, should.BeNil)
 	})
 
 	t.Run("No recent uplinks", func(t *testing.T) {
@@ -220,12 +223,27 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		for ed.MACState == nil || ed.Session == nil || len(ed.QueuedApplicationDownlinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.MACSettings.StatusCountPeriodicity = 0
+		ed.MACSettings.StatusTimePeriodicity = 0
 		ed.MACState.QueuedResponses = nil
-		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
+		ed.MACState.DesiredMACParameters = deepcopy.Copy(ed.MACState.MACParameters).(ttnpb.MACParameters)
+		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
+			{
+				FPort:          42,
+				FCnt:           42,
+				FRMPayload:     []byte("test"),
+				Confirmed:      false,
+				CorrelationIDs: nil,
+			},
+		}
 		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.generateAndScheduleDownlink(test.Context(), dev, nil, nil)
+		b, err := generateDownlink(test.Context(), dev, nil)
+		a.So(err, should.BeNil)
+		a.So(b, should.NotBeEmpty)
+
+		err = ns.scheduleDownlink(test.Context(), dev, nil, nil, b, false)
 		a.So(err, should.BeError)
 	})
 
@@ -254,14 +272,27 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		for ed.MACState == nil || ed.Session == nil || len(ed.RecentUplinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.MACSettings.StatusCountPeriodicity = 0
+		ed.MACSettings.StatusTimePeriodicity = 0
 		ed.MACState.QueuedResponses = nil
-		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
+		ed.MACState.DesiredMACParameters = deepcopy.Copy(ed.MACState.MACParameters).(ttnpb.MACParameters)
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
-			ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
+			{
+				FPort:          42,
+				FCnt:           42,
+				FRMPayload:     []byte("test"),
+				Confirmed:      false,
+				CorrelationIDs: nil,
+			},
 		}
+		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.generateAndScheduleDownlink(test.Context(), dev, nil, nil)
+		b, err := generateDownlink(test.Context(), dev, nil)
+		a.So(err, should.BeNil)
+		a.So(b, should.NotBeEmpty)
+
+		err = ns.scheduleDownlink(test.Context(), dev, nil, nil, b, false)
 		a.So(err, should.BeError)
 	})
 
@@ -270,7 +301,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		gateways := make(map[string]ttnpb.NsGsClient)
-		scheduleCtx := test.Context()
+		scheduleCtx := context.WithValue(test.Context(), "foo", "bar")
 		wg := &sync.WaitGroup{}
 
 		fpStore, err := test.NewFrequencyPlansStore()
@@ -304,17 +335,26 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		)).(*NetworkServer)
 		test.Must(nil, ns.Start())
 
-		down := ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)
+		down := &ttnpb.ApplicationDownlink{
+			FPort:          42,
+			FCnt:           42,
+			FRMPayload:     []byte("test"),
+			Confirmed:      false,
+			CorrelationIDs: nil,
+		}
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		for ed.MACState == nil || ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.MACSettings.StatusCountPeriodicity = 0
+		ed.MACSettings.StatusTimePeriodicity = 0
 		ed.MACState.QueuedResponses = nil
-		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
+		ed.MACState.DesiredMACParameters = deepcopy.Copy(ed.MACState.MACParameters).(ttnpb.MACParameters)
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			down,
 		}
+		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
 		up := ttnpb.NewPopulatedUplinkMessageUplink(
@@ -377,7 +417,11 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.generateAndScheduleDownlink(test.Context(), dev, up, nil)
+		b, err := generateDownlink(scheduleCtx, dev, up)
+		a.So(err, should.BeNil)
+		a.So(b, should.NotBeEmpty)
+
+		err = ns.scheduleDownlink(scheduleCtx, dev, up, nil, b, false)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
@@ -428,12 +472,15 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		for ed.MACState == nil || ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.MACSettings.StatusCountPeriodicity = 0
+		ed.MACSettings.StatusTimePeriodicity = 0
 		ed.MACState.QueuedResponses = nil
 		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			down,
 		}
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
+		dev.MACState.DesiredMACParameters = deepcopy.Copy(dev.MACState.MACParameters).(ttnpb.MACParameters)
 
 		up := ttnpb.NewPopulatedUplinkMessageUplink(
 			test.Randy,
@@ -442,7 +489,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			false,
 		)
 		up.Settings.ChannelIndex %= uint32(len(ed.MACState.MACParameters.Channels))
-		ch := dev.MACState.MACParameters.Channels[up.Settings.ChannelIndex]
+		ch := dev.MACState.Channels[up.Settings.ChannelIndex]
 		up.Settings.DataRateIndex = ttnpb.DataRateIndex(int(ch.MinDataRateIndex) + rand.Intn(1+int(ch.MaxDataRateIndex-ch.MinDataRateIndex)))
 
 		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
@@ -503,7 +550,11 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.generateAndScheduleDownlink(test.Context(), dev, up, nil)
+		b, err := generateDownlink(scheduleCtx, dev, up)
+		a.So(err, should.BeNil)
+		a.So(b, should.NotBeEmpty)
+
+		err = ns.scheduleDownlink(scheduleCtx, dev, up, nil, b, false)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
