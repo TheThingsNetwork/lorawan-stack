@@ -80,7 +80,7 @@ func init() {
 		}(),
 
 		Rx1Channel: channelIndexIdentity,
-		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
 			if offset > 5 {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
@@ -97,7 +97,7 @@ func init() {
 			case si >= 5:
 				return 5, nil
 			}
-			return uint32(si), nil
+			return ttnpb.DataRateIndex(si), nil
 		},
 
 		ImplementsCFList: true,

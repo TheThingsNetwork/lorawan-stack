@@ -162,7 +162,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		sets := up.Settings
 		st := dev.MACState
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-		drIdx := test.Must(band.Rx1DataRate(sets.DataRateIndex, st.Rx1DataRateOffset, st.DownlinkDwellTime)).(uint32)
+		drIdx := test.Must(band.Rx1DataRate(sets.DataRateIndex, st.Rx1DataRateOffset, st.DownlinkDwellTime)).(ttnpb.DataRateIndex)
 
 		msg.Settings.ChannelIndex = test.Must(band.Rx1Channel(sets.ChannelIndex)).(uint32)
 		msg.Settings.Frequency = uint64(st.MACParameters.Channels[int(msg.Settings.ChannelIndex)].DownlinkFrequency)

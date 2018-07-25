@@ -82,6 +82,25 @@ enum PHYVersion {
   PHY_V1_1_REV_B = 6;
 }
 
+enum DataRateIndex {
+  DATA_RATE_0  = 0;
+  DATA_RATE_1  = 1;
+  DATA_RATE_2  = 2;
+  DATA_RATE_3  = 3;
+  DATA_RATE_4  = 4;
+  DATA_RATE_5  = 5;
+  DATA_RATE_6  = 6;
+  DATA_RATE_7  = 7;
+  DATA_RATE_8  = 8;
+  DATA_RATE_9  = 9;
+  DATA_RATE_10 = 10;
+  DATA_RATE_11 = 11;
+  DATA_RATE_12 = 12;
+  DATA_RATE_13 = 13;
+  DATA_RATE_14 = 14;
+  DATA_RATE_15 = 15;
+}
+
 message MHDR {
   MType m_type  = 1;
   Major major   = 2;
@@ -153,7 +172,7 @@ message DLSettings {
   option (gogoproto.populate) = false;
 
   uint32 rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset"];
-  uint32 rx2_dr        = 2 [(gogoproto.customname) = "Rx2DR"];
+  DataRateIndex rx2_dr = 2 [(gogoproto.customname) = "Rx2DR"];
   // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater
   bool opt_neg         = 3 [(gogoproto.customname) = "OptNeg"];
 }
@@ -196,7 +215,7 @@ message TxSettings {
   Modulation modulation = 1;
 
   // LoRaWAN data rate index
-  uint32 data_rate_index = 2;
+  DataRateIndex data_rate_index = 2;
 
   // Bandwidth in Hz (derived from data_rate_index)
   uint32 bandwidth = 3;
@@ -300,7 +319,7 @@ message MACCommand {
     uint32 gateway_count = 2;
   }
   message LinkADRReq {
-    uint32 data_rate_index = 1;
+    DataRateIndex data_rate_index = 1;
     uint32 tx_power_index = 2;
     repeated bool channel_mask = 3;
     reserved 4; // for RFU 7th bit of Redundancy
@@ -316,7 +335,7 @@ message MACCommand {
     AggregatedDutyCycle max_duty_cycle = 1;
   }
   message RxParamSetupReq {
-    uint32 rx2_data_rate_index = 1;
+    DataRateIndex rx2_data_rate_index = 1;
     uint32 rx1_data_rate_offset = 2;
     uint64 rx2_frequency = 3;
   }
@@ -337,8 +356,8 @@ message MACCommand {
   message NewChannelReq {
     uint32 channel_index = 1;
     uint64 frequency = 2;
-    uint32 min_data_rate_index = 3;
-    uint32 max_data_rate_index = 4;
+    DataRateIndex min_data_rate_index = 3;
+    DataRateIndex max_data_rate_index = 4;
   }
   message NewChannelAns {
     bool frequency_ack = 1;
@@ -379,16 +398,16 @@ message MACCommand {
   }
   message ForceRejoinReq {
     uint32 rejoin_type = 1;
-    uint32 data_rate_index = 2;
+    DataRateIndex data_rate_index = 2;
     uint32 max_retries = 3;
     // PeriodExponent is the exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds
     uint32 period_exponent = 4;
   }
   message RejoinParamSetupReq {
     // MaxCountExponent is the exponent e that configures the rejoin counter = 2^(e+4) messages
-    uint32 max_count_exponent = 1;
+    RejoinCountExponent max_count_exponent = 1;
     // MaxTimeExponent is the exponent e that configures the rejoin timer = 2^(e+10) seconds
-    uint32 max_time_exponent = 2;
+    RejoinTimeExponent max_time_exponent = 2;
   }
   message RejoinParamSetupAns {
     bool max_time_exponent_ack = 1;
@@ -398,7 +417,7 @@ message MACCommand {
   }
   message PingSlotChannelReq {
     uint64 frequency = 1;
-    uint32 data_rate_index = 2;
+    DataRateIndex data_rate_index = 2;
   }
   message PingSlotChannelAns {
     bool frequency_ack = 1;
@@ -478,18 +497,38 @@ enum PingSlotPeriod {
   PING_EVERY_128S = 7;
 }
 
-enum RejoinTimePeriod {
+enum RejoinCountExponent {
+  option (gogoproto.goproto_enum_prefix) = false;
+  REJOIN_COUNT_16     = 0;
+  REJOIN_COUNT_32     = 1;
+  REJOIN_COUNT_64     = 2;
+  REJOIN_COUNT_128    = 3;
+  REJOIN_COUNT_256    = 4;
+  REJOIN_COUNT_512    = 5;
+  REJOIN_COUNT_1024   = 6;
+  REJOIN_COUNT_2048   = 7;
+  REJOIN_COUNT_4096   = 8;
+  REJOIN_COUNT_8192   = 9;
+  REJOIN_COUNT_16384  = 10;
+  REJOIN_COUNT_32768  = 11;
+  REJOIN_COUNT_65536  = 12;
+  REJOIN_COUNT_131072 = 13;
+  REJOIN_COUNT_262144 = 14;
+  REJOIN_COUNT_524288 = 15;
+}
+
+enum RejoinTimeExponent {
   // For calculations see https://github.com/TheThingsIndustries/lorawan-stack/pull/865#discussion_r201625341
 
   option (gogoproto.goproto_enum_prefix) = false;
   // Every ~17.1 minutes
-  REJOIN_TIME_0   = 0;
+  REJOIN_TIME_0  = 0;
   // Every ~34.1 minutes
-  REJOIN_TIME_1   = 1;
+  REJOIN_TIME_1  = 1;
   // Every ~1.1 hours
-  REJOIN_TIME_2   = 2;
+  REJOIN_TIME_2  = 2;
   // Every ~2.3 hours
-  REJOIN_TIME_3   = 3;
+  REJOIN_TIME_3  = 3;
   // Every ~4.6 hours
   REJOIN_TIME_4  = 4;
   // Every ~9.1 hours
@@ -497,11 +536,11 @@ enum RejoinTimePeriod {
   // Every ~18.2 hours
   REJOIN_TIME_6  = 6;
   // Every ~1.5 days
-  REJOIN_TIME_7 = 7;
+  REJOIN_TIME_7  = 7;
   // Every ~3.0 days
-  REJOIN_TIME_8 = 8;
+  REJOIN_TIME_8  = 8;
   // Every ~6.1 days
-  REJOIN_TIME_9 = 9;
+  REJOIN_TIME_9  = 9;
   // Every ~12.1 days
   REJOIN_TIME_10 = 10;
   // Every ~3.5 weeks

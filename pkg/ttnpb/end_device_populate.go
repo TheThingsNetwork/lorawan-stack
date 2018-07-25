@@ -16,6 +16,7 @@ package ttnpb
 
 import (
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 )
 
 func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
@@ -91,6 +92,27 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out.FrequencyPlanID = "EU_863_870"
 	out.MACSettings = NewPopulatedMACSettings(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
+	out.MACState.MACParameters.Channels = []*MACParameters_Channel{
+		{
+			UplinkFrequency:   868100000,
+			DownlinkFrequency: 868100000,
+			MinDataRateIndex:  0,
+			MaxDataRateIndex:  5,
+		},
+		{
+			UplinkFrequency:   868300000,
+			DownlinkFrequency: 868300000,
+			MinDataRateIndex:  0,
+			MaxDataRateIndex:  5,
+		},
+		{
+			UplinkFrequency:   868500000,
+			DownlinkFrequency: 868500000,
+			MinDataRateIndex:  0,
+			MaxDataRateIndex:  5,
+		},
+	}
+	out.MACState.DesiredMACParameters.Channels = deepcopy.Copy(out.MACState.MACParameters.Channels).([]*MACParameters_Channel)
 	if r.Intn(10) != 0 {
 		out.Location = NewPopulatedLocation(r, easy)
 	}
@@ -129,17 +151,21 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	return out
 }
 
-func newPopulatedFrequency(r randyEndDevice) uint64 {
+func NewPopulatedFrequency(r randyEndDevice, _ bool) uint64 {
 	return uint64(r.Int63()) + uint64(r.Int63())
 }
 
 func NewPopulatedMACParameters_Channel(r randyEndDevice, _ bool) *MACParameters_Channel {
-	maxDR := r.Intn(8)
+	drMin := NewPopulatedDataRateIndex(r, false)
+	drMax := NewPopulatedDataRateIndex(r, false)
+	if drMax < drMin {
+		drMax, drMin = drMin, drMax
+	}
 	return &MACParameters_Channel{
-		UplinkFrequency:   newPopulatedFrequency(r),
-		DownlinkFrequency: newPopulatedFrequency(r),
-		MinDataRateIndex:  uint32(r.Intn(1 + maxDR)),
-		MaxDataRateIndex:  uint32(maxDR),
+		UplinkFrequency:   NewPopulatedFrequency(r, false),
+		DownlinkFrequency: NewPopulatedFrequency(r, false),
+		MinDataRateIndex:  drMin,
+		MaxDataRateIndex:  drMax,
 	}
 }
 
@@ -148,7 +174,7 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out.MaxEIRP = r.Float32()
 	out.UplinkDwellTime = r.Intn(2) == 0
 	out.DownlinkDwellTime = r.Intn(2) == 0
-	out.ADRDataRateIndex = r.Uint32()
+	out.ADRDataRateIndex = NewPopulatedDataRateIndex(r, false)
 	out.ADRTxPowerIndex = r.Uint32()
 	out.ADRNbTrans = r.Uint32()
 	out.ADRAckLimit = r.Uint32()
@@ -160,11 +186,11 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	}
 	out.Rx1Delay = r.Uint32()
 	out.Rx1DataRateOffset = r.Uint32() % 6
-	out.Rx2DataRateIndex = r.Uint32() % 16
-	out.Rx2Frequency = newPopulatedFrequency(r)
-	out.RejoinTimePeriodicity = RejoinTimePeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
-	out.PingSlotFrequency = newPopulatedFrequency(r)
-	out.PingSlotDataRateIndex = r.Uint32()
-	out.BeaconFrequency = newPopulatedFrequency(r)
+	out.Rx2DataRateIndex = NewPopulatedDataRateIndex(r, false)
+	out.Rx2Frequency = NewPopulatedFrequency(r, false)
+	out.RejoinTimePeriodicity = RejoinTimeExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
+	out.PingSlotFrequency = NewPopulatedFrequency(r, false)
+	out.PingSlotDataRateIndex = NewPopulatedDataRateIndex(r, false)
+	out.BeaconFrequency = NewPopulatedFrequency(r, false)
 	return out
 }

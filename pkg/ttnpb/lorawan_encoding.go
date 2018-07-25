@@ -183,12 +183,12 @@ func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.Rx2DR > 15 {
 		return nil, errors.Errorf("expected Rx2DR to be less or equal to 15, got %d", msg.Rx2DR)
 	}
-	b := msg.Rx2DR
-	b |= (msg.Rx1DROffset << 4)
+	b := byte(msg.Rx2DR)
+	b |= byte(msg.Rx1DROffset << 4)
 	if msg.OptNeg {
 		b |= (1 << 7)
 	}
-	return append(dst, byte(b)), nil
+	return append(dst, b), nil
 }
 
 // MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
@@ -204,7 +204,7 @@ func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
 	v := uint32(b[0])
 	msg.OptNeg = (v >> 7) != 0
 	msg.Rx1DROffset = (v >> 4) & 0x7
-	msg.Rx2DR = v & 0xf
+	msg.Rx2DR = DataRateIndex(v & 0xf)
 	return nil
 }
 

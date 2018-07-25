@@ -50,7 +50,7 @@ func Example() {
 
 	downlink := ttnpb.DownlinkMessage{
 		Settings: ttnpb.TxSettings{
-			DataRateIndex:   uint32(drIdx),
+			DataRateIndex:   ttnpb.DataRateIndex(drIdx),
 			Frequency:       euBand.DownlinkChannels[chIdx].Frequency,
 			ChannelIndex:    chIdx,
 			Modulation:      ParseModulation(dr.Rate),

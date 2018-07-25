@@ -79,7 +79,7 @@ func init() {
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
 		Rx1Channel: channelIndexIdentity,
-		Rx1DataRate: func(idx, offset uint32, dwellTime bool) (uint32, error) {
+		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, dwellTime bool) (ttnpb.DataRateIndex, error) {
 			if offset > 7 {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 7)
 			}
@@ -97,11 +97,11 @@ func init() {
 
 			switch {
 			case si <= int(minDR):
-				return minDR, nil
+				return ttnpb.DataRateIndex(minDR), nil
 			case si >= 5:
 				return 5, nil
 			}
-			return uint32(si), nil
+			return ttnpb.DataRateIndex(si), nil
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{2, 923200000},

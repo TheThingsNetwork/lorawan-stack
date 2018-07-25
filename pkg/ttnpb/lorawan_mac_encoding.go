@@ -389,7 +389,7 @@ func (cmd *MACCommand_LinkADRReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 4 {
 		return newLengthUnequalError(4, len(b))
 	}
-	cmd.DataRateIndex = uint32(b[0] >> 4)
+	cmd.DataRateIndex = DataRateIndex(b[0] >> 4)
 	cmd.TxPowerIndex = uint32(b[0] & 0xf)
 	var chMask [16]bool
 	for i := uint8(0); i < 16; i++ {
@@ -486,7 +486,7 @@ func (cmd *MACCommand_RxParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error)
 	if cmd.Rx2DataRateIndex > 15 {
 		return nil, errors.Errorf("expected Rx2DR to be less or equal to 15, got %d", cmd.Rx2DataRateIndex)
 	}
-	dst = append(dst, byte(cmd.Rx2DataRateIndex|(cmd.Rx1DataRateOffset<<4)))
+	dst = append(dst, byte(cmd.Rx2DataRateIndex)|byte(cmd.Rx1DataRateOffset<<4))
 	if cmd.Rx2Frequency < 100000 || cmd.Rx2Frequency > maxUint24*100 {
 		return nil, errors.Errorf("expected Rx2Frequency to be between %d and %d, got %d", 100000, maxUint24*100, cmd.Rx2Frequency)
 	}
@@ -500,7 +500,7 @@ func (cmd *MACCommand_RxParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 		return newLengthUnequalError(4, len(b))
 	}
 	cmd.Rx1DataRateOffset = uint32((b[0] >> 4) & 0x7)
-	cmd.Rx2DataRateIndex = uint32(b[0] & 0xf)
+	cmd.Rx2DataRateIndex = DataRateIndex(b[0] & 0xf)
 	cmd.Rx2Frequency = parseUint64(b[1:4]) * 100
 	return nil
 }
@@ -625,8 +625,8 @@ func (cmd *MACCommand_NewChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	}
 	cmd.ChannelIndex = uint32(b[0])
 	cmd.Frequency = parseUint64(b[1:4]) * 100
-	cmd.MinDataRateIndex = uint32(b[4] & 0xf)
-	cmd.MaxDataRateIndex = uint32(b[4] >> 4)
+	cmd.MinDataRateIndex = DataRateIndex(b[4] & 0xf)
+	cmd.MaxDataRateIndex = DataRateIndex(b[4] >> 4)
 	return nil
 }
 
@@ -968,7 +968,7 @@ func (cmd *MACCommand_ForceRejoinReq) UnmarshalLoRaWAN(b []byte) error {
 	cmd.PeriodExponent = uint32(b[0] >> 3)
 	cmd.MaxRetries = uint32(b[0] & 0x7)
 	cmd.RejoinType = uint32(b[1] >> 4)
-	cmd.DataRateIndex = uint32(b[1] & 0xf)
+	cmd.DataRateIndex = DataRateIndex(b[1] & 0xf)
 	return nil
 }
 
@@ -1002,8 +1002,8 @@ func (cmd *MACCommand_RejoinParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return newLengthUnequalError(1, len(b))
 	}
-	cmd.MaxTimeExponent = uint32(b[0] >> 4)
-	cmd.MaxCountExponent = uint32(b[0] & 0xf)
+	cmd.MaxTimeExponent = RejoinTimeExponent(uint32(b[0] >> 4))
+	cmd.MaxCountExponent = RejoinCountExponent(uint32(b[0] & 0xf))
 	return nil
 }
 
@@ -1094,7 +1094,7 @@ func (cmd *MACCommand_PingSlotChannelReq) UnmarshalLoRaWAN(b []byte) error {
 		return newLengthUnequalError(4, len(b))
 	}
 	cmd.Frequency = parseUint64(b[0:3])
-	cmd.DataRateIndex = uint32(b[3] & 0xf)
+	cmd.DataRateIndex = DataRateIndex(b[3] & 0xf)
 	return nil
 }
 

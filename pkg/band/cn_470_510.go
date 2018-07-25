@@ -85,7 +85,7 @@ func init() {
 		},
 
 		Rx1Channel: channelIndexModulo(48),
-		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
 			if idx > 5 {
 				return 0, errDataRateIndexTooHigh.WithAttributes("max", 5)
 			}
@@ -93,14 +93,14 @@ func init() {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
 
-			si := int(idx - offset)
+			si := int(uint32(idx) - offset)
 			switch {
 			case si <= 0:
 				return 0, nil
 			case si >= 5:
 				return 5, nil
 			}
-			return uint32(si), nil
+			return ttnpb.DataRateIndex(si), nil
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{0, 505300000},

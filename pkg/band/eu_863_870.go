@@ -102,7 +102,7 @@ func init() {
 		},
 
 		Rx1Channel: channelIndexIdentity,
-		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
 			if idx > 7 {
 				return 0, errDataRateIndexTooHigh.WithAttributes("max", 7)
 			}
@@ -110,14 +110,14 @@ func init() {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
 
-			si := int(idx - offset)
+			si := int(uint32(idx) - offset)
 			switch {
 			case si <= 0:
 				return 0, nil
 			case si >= 7:
 				return 7, nil
 			}
-			return uint32(si), nil
+			return ttnpb.DataRateIndex(si), nil
 		},
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,

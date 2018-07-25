@@ -69,14 +69,14 @@ type Channel struct {
 }
 
 // Rx1DataRateFunc computes the Rx1 data rate index.
-type Rx1DataRateFunc func(idx, offset uint32, dwellTime bool) (uint32, error)
+type Rx1DataRateFunc func(idx ttnpb.DataRateIndex, offset uint32, dwellTime bool) (ttnpb.DataRateIndex, error)
 
 // Rx1ChannelFunc computes the Rx1 channel index.
 type Rx1ChannelFunc func(idx uint32) (uint32, error)
 
 // Rx2Parameters contains downlink datarate index and channel
 type Rx2Parameters struct {
-	DataRateIndex uint8
+	DataRateIndex ttnpb.DataRateIndex
 	Frequency     uint32
 }
 

@@ -22,6 +22,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
+func NewPopulatedDataRateIndex(r randyEndDevice, _ bool) DataRateIndex {
+	return DataRateIndex(r.Intn(16))
+}
+
 func NewPopulatedFHDR(r randyLorawan, easy bool) *FHDR {
 	out := &FHDR{}
 	out.DevAddr = *types.NewPopulatedDevAddr(r)
@@ -68,7 +72,7 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 	}
 	out.PolarizationInversion = r.Intn(2) == 0
 	out.ChannelIndex = r.Uint32() % 255
-	out.DataRateIndex = r.Uint32() % 8
+	out.DataRateIndex = NewPopulatedDataRateIndex(r, false)
 	return out
 }
 
@@ -91,7 +95,7 @@ func NewPopulatedMessage_JoinRequestPayload(r randyLorawan) *Message_JoinRequest
 func NewPopulatedDLSettings(r randyLorawan, easy bool) *DLSettings {
 	out := &DLSettings{}
 	out.Rx1DROffset = uint32(r.Intn(8))
-	out.Rx2DR = uint32(r.Intn(16))
+	out.Rx2DR = NewPopulatedDataRateIndex(r, easy)
 	return out
 }
 
