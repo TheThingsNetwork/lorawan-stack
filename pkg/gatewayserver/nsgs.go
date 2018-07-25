@@ -36,11 +36,14 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	g.connectionsMu.Lock()
 	connection, ok := g.connections[unique.ID(ctx, id)]
 	g.connectionsMu.Unlock()
-
 	if !ok {
 		return nil, errGatewayNotConnected.WithAttributes("gateway_id", id.GetGatewayID())
 	}
-	err := connection.send(down)
+	err := connection.schedule(down)
+	if err != nil {
+		return nil, errCouldNotBeScheduled.WithCause(err)
+	}
+	err = connection.send(down)
 	if err != nil {
 		return nil, err
 	}

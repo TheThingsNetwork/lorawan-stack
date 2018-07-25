@@ -47,7 +47,9 @@ type connection interface {
 
 	gateway() *ttnpb.Gateway
 	gatewayIdentifiers() ttnpb.GatewayIdentifiers
+
 	send(*ttnpb.DownlinkMessage) error
+	schedule(down *ttnpb.DownlinkMessage) error
 	Close() error
 }
 
@@ -114,9 +116,6 @@ type gRPCConnection struct {
 }
 
 func (c *gRPCConnection) send(down *ttnpb.DownlinkMessage) error {
-	if err := c.schedule(down); err != nil {
-		return errCouldNotBeScheduled.WithCause(err)
-	}
 	return c.link.Send(&ttnpb.GatewayDown{DownlinkMessage: down})
 }
 
@@ -194,9 +193,6 @@ func (c *udpConnection) send(down *ttnpb.DownlinkMessage) error {
 	if err != nil {
 		return errTranslationFromProtobuf
 	}
-	if err := c.schedule(down); err != nil {
-		return errCouldNotBeScheduled.WithCause(err)
-	}
 
 	pkt := *c.lastPullData()
 	pkt.PacketType = udp.PullResp
@@ -255,10 +251,6 @@ func (c *mqttConnection) send(down *ttnpb.DownlinkMessage) error {
 	data, err := down.Marshal()
 	if err != nil {
 		return errMarshalToProtobuf.WithCause(err)
-	}
-
-	if err := c.schedule(down); err != nil {
-		return errCouldNotBeScheduled.WithCause(err)
 	}
 
 	uid := unique.ID(c.sess.Context(), c.gateway().GatewayIdentifiers)
