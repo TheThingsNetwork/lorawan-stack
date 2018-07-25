@@ -62,14 +62,6 @@ func (ctx *MockContext) Value(key interface{}) interface{} {
 	return ctx.ValueFunc(key)
 }
 
-// DefaultContext is the default context.
-var DefaultContext = &MockContext{}
-
-// Context returns DefaultContext.
-func Context() context.Context {
-	return DefaultContext
-}
-
 var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
 
 // ContextParent returns the parent context of ctx and true if one is found, nil and false otherwise.
