@@ -166,10 +166,11 @@ func TestIdentityServerFetcher(t *testing.T) {
 	a.So(errors.IsUnauthenticated(bgRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(bgRes.OrgErr), should.BeTrue)
 
-	authCtx := metadata.NewIncomingContext(
-		test.Context(),
-		metadata.Pairs("authorization", "Bearer token"),
-	)
+	md := metadata.Pairs("authorization", "Bearer token")
+	if ctxMd, ok := metadata.FromIncomingContext(test.Context()); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	authCtx := metadata.NewIncomingContext(test.Context(), md)
 
 	authRes := fetchRights(authCtx, "foo", onlySecureFetcher)
 	a.So(errors.IsUnauthenticated(authRes.AppErr), should.BeTrue)
