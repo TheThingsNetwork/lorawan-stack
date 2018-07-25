@@ -25,22 +25,46 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+type customIdentifiers struct {
+}
+
+func (c customIdentifiers) IsZero() bool { return false }
+
+func (c customIdentifiers) CombinedIdentifiers() *ttnpb.CombinedIdentifiers {
+	return &ttnpb.CombinedIdentifiers{}
+}
+
+func TestValidity(t *testing.T) {
+	for _, tc := range []ttnpb.Identifiers{
+		nil,
+		(*ttnpb.ApplicationIdentifiers)(nil),
+		ttnpb.ApplicationIdentifiers{},
+		(*ttnpb.ClientIdentifiers)(nil),
+		ttnpb.ClientIdentifiers{},
+		(*ttnpb.EndDeviceIdentifiers)(nil),
+		ttnpb.EndDeviceIdentifiers{},
+		(*ttnpb.GatewayIdentifiers)(nil),
+		ttnpb.GatewayIdentifiers{},
+		(*ttnpb.OrganizationIdentifiers)(nil),
+		ttnpb.OrganizationIdentifiers{},
+		(*ttnpb.UserIdentifiers)(nil),
+		ttnpb.UserIdentifiers{},
+		customIdentifiers{},
+		&customIdentifiers{},
+	} {
+		t.Run(fmt.Sprintf("%T", tc), func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(func() { ID(context.Background(), tc) }, should.Panic)
+		})
+	}
+}
+
 func TestRoundtrip(t *testing.T) {
 	for _, tc := range []struct {
 		ID       ttnpb.Identifiers
 		Expected string
 		Parser   func(string) (ttnpb.Identifiers, error)
 	}{
-		{
-			nil,
-			"",
-			nil,
-		},
-		{
-			(*ttnpb.ApplicationIdentifiers)(nil),
-			"",
-			nil,
-		},
 		{
 			ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
 			"foo",
@@ -52,11 +76,6 @@ func TestRoundtrip(t *testing.T) {
 			func(uid string) (ttnpb.Identifiers, error) { return ToApplicationID(uid) },
 		},
 		{
-			(*ttnpb.ClientIdentifiers)(nil),
-			"",
-			nil,
-		},
-		{
 			ttnpb.ClientIdentifiers{ClientID: "foo"},
 			"foo",
 			func(uid string) (ttnpb.Identifiers, error) { return ToClientID(uid) },
@@ -65,11 +84,6 @@ func TestRoundtrip(t *testing.T) {
 			&ttnpb.ClientIdentifiers{ClientID: "foo"},
 			"foo",
 			func(uid string) (ttnpb.Identifiers, error) { return ToClientID(uid) },
-		},
-		{
-			(*ttnpb.EndDeviceIdentifiers)(nil),
-			"",
-			nil,
 		},
 		{
 			ttnpb.EndDeviceIdentifiers{
@@ -92,11 +106,6 @@ func TestRoundtrip(t *testing.T) {
 			func(uid string) (ttnpb.Identifiers, error) { return ToDeviceID(uid) },
 		},
 		{
-			(*ttnpb.GatewayIdentifiers)(nil),
-			"",
-			nil,
-		},
-		{
 			ttnpb.GatewayIdentifiers{GatewayID: "foo"},
 			"foo",
 			func(uid string) (ttnpb.Identifiers, error) { return ToGatewayID(uid) },
@@ -107,11 +116,6 @@ func TestRoundtrip(t *testing.T) {
 			func(uid string) (ttnpb.Identifiers, error) { return ToGatewayID(uid) },
 		},
 		{
-			(*ttnpb.OrganizationIdentifiers)(nil),
-			"",
-			nil,
-		},
-		{
 			ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
 			"foo",
 			func(uid string) (ttnpb.Identifiers, error) { return ToOrganizationID(uid) },
@@ -120,11 +124,6 @@ func TestRoundtrip(t *testing.T) {
 			&ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
 			"foo",
 			func(uid string) (ttnpb.Identifiers, error) { return ToOrganizationID(uid) },
-		},
-		{
-			(*ttnpb.UserIdentifiers)(nil),
-			"",
-			nil,
 		},
 		{
 			ttnpb.UserIdentifiers{UserID: "foo"},

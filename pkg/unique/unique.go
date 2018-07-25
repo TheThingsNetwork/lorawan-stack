@@ -22,41 +22,46 @@ import (
 
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
 // ID returns the unique identifier of the specified identifiers.
+// This function panics if id is nil, if it's zero, or if it's is not a
+// built-in identifiers type: ttnpb.ApplicationIdentifiers,
+// ttnpb.ClientIdentifiers, ttnpb.EndDeviceIdentifiers,
+// ttnpb.GatewayIdentifiers, ttnpb.OrganizationIdentifiers or
+// ttnpb.UserIdentifiers.
+// The reason for panicking is that taking the unique identifier of a nil or
+// zero value may result in unexpected and potentially harmful behavior.
 func ID(ctx context.Context, id ttnpb.Identifiers) string {
-	if id == nil {
-		return ""
+	if zeroer, ok := id.(validate.IsZeroer); !ok || zeroer.IsZero() {
+		panic(fmt.Errorf("Could not determine unique ID: the identifiers are zero"))
 	}
 	switch val := id.(type) {
 	case ttnpb.ApplicationIdentifiers:
 		return val.ApplicationID
 	case *ttnpb.ApplicationIdentifiers:
-		return val.GetApplicationID()
+		return val.ApplicationID
 	case ttnpb.ClientIdentifiers:
 		return val.ClientID
 	case *ttnpb.ClientIdentifiers:
-		return val.GetClientID()
+		return val.ClientID
 	case ttnpb.EndDeviceIdentifiers:
 		return fmt.Sprintf("%v:%v", val.ApplicationID, val.DeviceID)
 	case *ttnpb.EndDeviceIdentifiers:
-		if val == nil {
-			return ""
-		}
 		return fmt.Sprintf("%v:%v", val.ApplicationID, val.DeviceID)
 	case ttnpb.GatewayIdentifiers:
 		return val.GatewayID
 	case *ttnpb.GatewayIdentifiers:
-		return val.GetGatewayID()
+		return val.GatewayID
 	case ttnpb.OrganizationIdentifiers:
 		return val.OrganizationID
 	case *ttnpb.OrganizationIdentifiers:
-		return val.GetOrganizationID()
+		return val.OrganizationID
 	case ttnpb.UserIdentifiers:
 		return val.UserID
 	case *ttnpb.UserIdentifiers:
-		return val.GetUserID()
+		return val.UserID
 	default:
 		panic(fmt.Errorf("Could not determine unique ID: %T is not a valid ttnpb.Identifiers", id))
 	}
