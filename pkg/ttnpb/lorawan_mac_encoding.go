@@ -600,8 +600,8 @@ func (cmd *MACCommand_NewChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	}
 	dst = append(dst, byte(cmd.ChannelIndex))
 
-	if cmd.Frequency < 100000 || cmd.Frequency > maxUint24*100 {
-		return nil, errors.Errorf("expected Frequency to be between %d and %d, got %d", 100000, maxUint24*100, cmd.Frequency)
+	if cmd.Frequency > maxUint24*100 {
+		return nil, errors.Errorf("expected Frequency to be less or equal to %d, got %d", maxUint24*100, cmd.Frequency)
 	}
 	dst = appendUint64(dst, cmd.Frequency/100, 3)
 

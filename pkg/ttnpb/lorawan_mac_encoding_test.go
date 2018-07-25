@@ -151,6 +151,17 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			false,
 		},
 		{
+			"NewChannelReq/Freq 0",
+			&MACCommand_NewChannelReq{
+				ChannelIndex:     0xf,
+				Frequency:        0x0,
+				MaxDataRateIndex: 0x4,
+				MinDataRateIndex: 0x2,
+			},
+			[]byte{0x07, 0xf, 0x0, 0x0, 0x0, 0x42},
+			false,
+		},
+		{
 			"NewChannelAns",
 			&MACCommand_NewChannelAns{
 				FrequencyAck: false,
