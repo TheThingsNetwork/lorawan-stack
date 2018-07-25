@@ -98,7 +98,7 @@ export default class OAuth extends React.PureComponent {
 function url (location, omitQuery = false) {
   const query = Query.parse(location.search)
 
-  const next = query.n || '/'
+  const next = query.n || '/oauth'
 
   if (omitQuery) {
     return next.split('?')[0]

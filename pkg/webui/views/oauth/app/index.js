@@ -19,6 +19,7 @@ import { Provider } from 'react-redux'
 import WithLocale from '../../../components/with-locale'
 import { EnvProvider } from '../../../lib/env'
 
+import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import store from '../../../store'
@@ -30,14 +31,17 @@ export default class OAuthApp extends React.PureComponent {
     return (
       <EnvProvider env={env}>
         <Provider store={store}>
-          <WithLocale>
-            <BrowserRouter>
-              <Switch>
-                <Route path="/oauth/login" component={Login} />
-                <Route path="/oauth/authorize" component={Authorize} />
-              </Switch>
-            </BrowserRouter>
-          </WithLocale>
+          <Init>
+            <WithLocale>
+              <BrowserRouter>
+                <Switch>
+                  <Route path="/oauth" exact component={Landing} />
+                  <Route path="/oauth/login" component={Login} />
+                  <Route path="/oauth/authorize" component={Authorize} />
+                </Switch>
+              </BrowserRouter>
+            </WithLocale>
+          </Init>
         </Provider>
       </EnvProvider>
     )
