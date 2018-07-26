@@ -151,34 +151,34 @@ func TestContextRoot(t *testing.T) {
 				context.WithValue(
 					context.WithValue(
 						context.WithValue(
-							Context(), "A", nil),
+							&MockContext{}, "A", nil),
 						"B", nil),
 					struct{}{}, nil),
 				struct{}{}, nil),
-			Root: Context(),
+			Root: &MockContext{},
 		},
 		{
 			Name: "log.NewContext",
 			Context: log.NewContext(
 				log.NewContext(
-					Context(), log.Noop),
+					&MockContext{}, log.Noop),
 				log.Noop,
 			),
-			Root: Context(),
+			Root: &MockContext{},
 		},
 		{
 			Name: "errorcontext.New",
 			Context: log.NewContext(
 				log.NewContext(
-					Context(), log.Noop),
+					&MockContext{}, log.Noop),
 				log.Noop,
 			),
-			Root: Context(),
+			Root: &MockContext{},
 		},
 		{
 			Name:    "0",
-			Context: Context(),
-			Root:    Context(),
+			Context: &MockContext{},
+			Root:    &MockContext{},
 		},
 		{
 			Name:    "nil",
