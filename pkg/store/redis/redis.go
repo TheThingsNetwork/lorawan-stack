@@ -95,8 +95,8 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	if len(fields) == 0 {
 		return id, nil
 	}
-	key := s.key(id.String())
 
+	key := s.key(id.String())
 	return id, s.Redis.Watch(func(tx *redis.Tx) error {
 		i, err := tx.Exists(key).Result()
 		if err != nil {
@@ -123,6 +123,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	if id == nil {
 		return store.ErrNilKey
 	}
+
 	key := s.key(id.String())
 	return s.Redis.Watch(func(tx *redis.Tx) error {
 		var idxCurrent []interface{}
@@ -139,9 +140,9 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 			}
 		}
 		_, err = tx.Pipelined(func(p redis.Pipeliner) error {
-			for i, curr := range idxCurrent {
-				if curr != nil {
-					p.SRem(s.key(s.config.IndexKeys[i], curr.(string)), id.String())
+			for i, idx := range idxCurrent {
+				if idx != nil {
+					p.SRem(s.key(s.config.IndexKeys[i], hex.EncodeToString([]byte(idx.(string)))), id.String())
 				}
 			}
 			p.Del(key)

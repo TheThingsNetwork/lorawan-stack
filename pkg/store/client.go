@@ -113,7 +113,7 @@ func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc
 	}
 
 	var ierr error
-	more, err := cl.TypedMapStore.Range(filterFields(fm, fields...), orderBy, count, offset, func(k PrimaryKey, v map[string]interface{}) bool {
+	total, err := cl.TypedMapStore.Range(filterFields(fm, fields...), orderBy, count, offset, func(k PrimaryKey, v map[string]interface{}) bool {
 		iface := newResult()
 		if ierr = marshaling.UnmarshalMap(v, iface); ierr != nil {
 			return false
@@ -124,7 +124,7 @@ func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc
 	if err != nil {
 		return 0, err
 	}
-	return more, ierr
+	return total, ierr
 }
 
 func (cl *typedMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
@@ -212,7 +212,7 @@ func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc,
 	}
 
 	var ierr error
-	more, err := cl.ByteMapStore.Range(filterByteFields(fm, fields...), orderBy, count, offset, func(k PrimaryKey, v map[string][]byte) bool {
+	total, err := cl.ByteMapStore.Range(filterByteFields(fm, fields...), orderBy, count, offset, func(k PrimaryKey, v map[string][]byte) bool {
 		iface := newResult()
 		if ierr = marshaling.UnmarshalByteMap(v, iface); ierr != nil {
 			return false
@@ -223,7 +223,7 @@ func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc,
 	if err != nil {
 		return 0, err
 	}
-	return more, ierr
+	return total, ierr
 }
 
 func (cl *byteMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {

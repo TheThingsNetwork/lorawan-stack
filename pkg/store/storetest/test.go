@@ -18,6 +18,7 @@ package storetest
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"math"
 	"math/rand"
 	"reflect"
@@ -206,6 +207,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			map[string]interface{}{
 				"empty":   "",
 				"nil.nil": nil,
+				"a.a":     "test",
 			},
 			map[string]interface{}{
 				"nil": nil,
@@ -213,112 +215,117 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			map[string]interface{}{
 				"empty": "",
 				"nil":   nil,
+				"a.a":   "test",
 			},
 			map[string]interface{}{
 				"empty": "",
 				"foo":   nil,
+				"a.a":   "test",
 			},
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := assertions.New(t)
-
 			s := newStore()
+			for j := 0; j < 3; j++ {
+				t.Run(fmt.Sprintf("iteration %d", j), func(t *testing.T) {
+					a := assertions.New(t)
 
-			id, err := s.Create(tc.Stored)
-			if !a.So(err, should.BeNil) {
-				return
+					id, err := s.Create(tc.Stored)
+					if !a.So(err, should.BeNil) {
+						return
+					}
+					a.So(id, should.NotBeNil)
+
+					found, err := s.Find(id)
+					a.So(err, should.BeNil)
+					a.So(found, should.Resemble, tc.Stored)
+
+					i := 0
+					total, err := s.Range(tc.Stored, "", 10, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+						i++
+						a.So(k, should.Resemble, id)
+						a.So(v, should.Resemble, tc.Stored)
+						return true
+					})
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 1)
+					a.So(i, should.Equal, 1)
+
+					i = 0
+					total, err = s.Range(tc.Filter, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+						i++
+						a.So(k, should.Resemble, id)
+						a.So(v, should.Resemble, tc.Stored)
+						return true
+					})
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 1)
+					a.So(i, should.Equal, 1)
+
+					i = 0
+					total, err = s.Range(tc.Filter, "", 0, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+						i++
+						a.So(k, should.Resemble, id)
+						a.So(v, should.Resemble, tc.Stored)
+						return true
+					})
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 1)
+					a.So(i, should.Equal, 1)
+
+					err = s.Update(id, tc.Updated)
+					if !a.So(err, should.BeNil) {
+						return
+					}
+
+					found, err = s.Find(id)
+					a.So(err, should.BeNil)
+					a.So(found, should.Resemble, tc.AfterUpdate)
+
+					i = 0
+					total, err = s.Range(tc.AfterUpdate, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+						i++
+						a.So(k, should.Resemble, id)
+						a.So(v, should.Resemble, tc.AfterUpdate)
+						return true
+					})
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 1)
+					a.So(i, should.Equal, 1)
+
+					i = 0
+					total, err = s.Range(tc.Filter, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+						i++
+						a.So(k, should.Resemble, id)
+						a.So(v, should.Resemble, tc.AfterUpdate)
+						return true
+					})
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 1)
+					a.So(i, should.Equal, 1)
+
+					err = s.Delete(id)
+					if !a.So(err, should.BeNil) {
+						return
+					}
+
+					found, err = s.Find(id)
+					a.So(err, should.BeNil)
+					a.So(found, should.Equal, nil)
+
+					i = 0
+					total, err = s.Range(tc.AfterUpdate, "", 1, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 0)
+					a.So(i, should.Equal, 0)
+
+					i = 0
+					total, err = s.Range(tc.Filter, "", 1, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+					a.So(err, should.BeNil)
+					a.So(total, should.Equal, 0)
+					a.So(i, should.Equal, 0)
+				})
 			}
-			a.So(id, should.NotBeNil)
-
-			found, err := s.Find(id)
-			a.So(err, should.BeNil)
-			a.So(found, should.Resemble, tc.Stored)
-
-			i := 0
-			total, err := s.Range(tc.Stored, "", 10, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
-				i++
-				a.So(k, should.Resemble, id)
-				a.So(v, should.Resemble, tc.Stored)
-				return true
-			})
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 1)
-			a.So(i, should.Equal, 1)
-
-			i = 0
-			total, err = s.Range(tc.Filter, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
-				i++
-				a.So(k, should.Resemble, id)
-				a.So(v, should.Resemble, tc.Stored)
-				return true
-			})
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 1)
-			a.So(i, should.Equal, 1)
-
-			i = 0
-			total, err = s.Range(tc.Filter, "", 0, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
-				i++
-				a.So(k, should.Resemble, id)
-				a.So(v, should.Resemble, tc.Stored)
-				return true
-			})
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 1)
-			a.So(i, should.Equal, 1)
-
-			err = s.Update(id, tc.Updated)
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
-			found, err = s.Find(id)
-			a.So(err, should.BeNil)
-			a.So(found, should.Resemble, tc.AfterUpdate)
-
-			i = 0
-			total, err = s.Range(tc.AfterUpdate, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
-				i++
-				a.So(k, should.Resemble, id)
-				a.So(v, should.Resemble, tc.AfterUpdate)
-				return true
-			})
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 1)
-			a.So(i, should.Equal, 1)
-
-			i = 0
-			total, err = s.Range(tc.Filter, "", 1, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
-				i++
-				a.So(k, should.Resemble, id)
-				a.So(v, should.Resemble, tc.AfterUpdate)
-				return true
-			})
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 1)
-			a.So(i, should.Equal, 1)
-
-			err = s.Delete(id)
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
-			found, err = s.Find(id)
-			a.So(err, should.BeNil)
-			a.So(found, should.Equal, nil)
-
-			i = 0
-			total, err = s.Range(tc.AfterUpdate, "", 1, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 0)
-			a.So(i, should.Equal, 0)
-
-			i = 0
-			total, err = s.Range(tc.Filter, "", 1, 0, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
-			a.So(err, should.BeNil)
-			a.So(total, should.Equal, 0)
-			a.So(i, should.Equal, 0)
 		})
 	}
 }
