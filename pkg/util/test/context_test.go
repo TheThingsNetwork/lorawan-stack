@@ -168,11 +168,11 @@ func TestContextRoot(t *testing.T) {
 		},
 		{
 			Name: "errorcontext.New",
-			Context: log.NewContext(
-				log.NewContext(
-					&MockContext{}, log.Noop),
-				log.Noop,
-			),
+			Context: func() (ctx context.Context) {
+				ctx, _ = errorcontext.New(&MockContext{})
+				ctx, _ = errorcontext.New(ctx)
+				return
+			}(),
 			Root: &MockContext{},
 		},
 		{
