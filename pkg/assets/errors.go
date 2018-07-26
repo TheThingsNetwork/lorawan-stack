@@ -24,11 +24,7 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
-var (
-	errInvalidConfiguration = errors.DefineInvalidArgument("configuration", "invalid configuration")
-	errTemplateNotFound     = errors.DefineNotFound("template_not_found", "template `{name}` not found")
-	errHTTP                 = errors.Define("http", "HTTP error: {message}")
-)
+var errHTTP = errors.Define("http", "HTTP error: {message}")
 
 // Errors renders an error according to a negotiated content type.
 func (a *Assets) Errors(name string, env interface{}) echo.MiddlewareFunc {

@@ -20,11 +20,13 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/assets/templates"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/fs"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -57,6 +59,11 @@ type Assets struct {
 	fs     http.FileSystem
 }
 
+var (
+	errMissingLocation = errors.DefineInvalidArgument("missing_location", "missing assets location; specify local search path or CDN")
+	errLocalNotFound   = errors.DefineNotFound("local_not_found", "assets not found in search path `{search_path}` and no CDN specified")
+)
+
 // New creates a new assets instance.
 func New(c *component.Component, config Config) (*Assets, error) {
 	assets := &Assets{
@@ -77,7 +84,10 @@ func New(c *component.Component, config Config) (*Assets, error) {
 	}
 	if assets.fs == nil {
 		if config.CDN == "" {
-			return nil, errInvalidConfiguration
+			if len(config.SearchPath) > 0 {
+				return nil, errLocalNotFound.WithAttributes("search_path", strings.Join(config.SearchPath, ", "))
+			}
+			return nil, errMissingLocation
 		}
 		assets.logger = assets.logger.WithField("cdn", config.CDN)
 	}
@@ -104,6 +114,8 @@ func (a *Assets) RegisterRoutes(server *web.Server) {
 		server.Static(a.config.Mount, a.fs, middleware.Immutable)
 	}
 }
+
+var errTemplateNotFound = errors.DefineNotFound("template_not_found", "template `{name}` not found")
 
 // AppHandler returns an echo.HandlerFunc that renders an application.
 func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
