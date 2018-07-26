@@ -370,12 +370,9 @@ outer:
 			)
 		}
 
-		if exec = f(id, m); !exec && len(fieldFilter) == 0 {
-			break
+		if exec {
+			exec = f(id, m)
 		}
-		// If iteration is stopped by f, but len(fieldFilter) > 0, there may still be
-		// values in cmds, which do not match the fieldFilter,
-		// hence we have to keep iterating to ensure the correctness of more.
 	}
 	return uint64(total), nil
 }
