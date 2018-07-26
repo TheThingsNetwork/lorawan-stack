@@ -26,14 +26,12 @@ import (
 	"strings"
 )
 
-const defaultLanguage = "en"
+const defaultLanguage = "en" // The language of the messages written in Go files.
 
 // MessageDescriptor describes a translatable message.
 type MessageDescriptor struct {
-	ID             string            `json:"id"`
-	DefaultMessage string            `json:"defaultMessage,omitempty"`
-	Translations   map[string]string `json:"translations,omitempty"`
-	Description    struct {
+	Translations map[string]string `json:"translations,omitempty"`
+	Description  struct {
 		Package string `json:"package,omitempty"`
 		File    string `json:"file,omitempty"`
 	} `json:"description,omitempty"`
@@ -137,8 +135,6 @@ func (m MessageDescriptorMap) Define(id, message string) *MessageDescriptor {
 		panic(fmt.Errorf("Message %s already defined", id))
 	}
 	m[id] = &MessageDescriptor{
-		ID:             id,
-		DefaultMessage: message,
 		Translations: map[string]string{
 			defaultLanguage: message,
 		},
@@ -161,7 +157,7 @@ func (m MessageDescriptorMap) Merge(other MessageDescriptorMap) {
 		if m[id] == nil {
 			m[id] = other
 		} else {
-			if other.DefaultMessage != m[id].DefaultMessage {
+			if other.Translations[defaultLanguage] != m[id].Translations[defaultLanguage] {
 				m[id].updated = true
 			}
 			for language, translation := range other.Translations {
