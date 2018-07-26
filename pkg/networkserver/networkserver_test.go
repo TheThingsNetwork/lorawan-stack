@@ -586,6 +586,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: &FNwkSIntKey,
 							},
+							NwkSEncKey: &ttnpb.KeyEnvelope{
+								Key: &NwkSEncKey,
+							},
 						},
 					},
 				},
@@ -645,6 +648,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: &FNwkSIntKey,
 							},
+							NwkSEncKey: &ttnpb.KeyEnvelope{
+								Key: &NwkSEncKey,
+							},
 						},
 					},
 				},
@@ -703,6 +709,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: &FNwkSIntKey,
+							},
+							NwkSEncKey: &ttnpb.KeyEnvelope{
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -768,6 +777,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: &FNwkSIntKey,
+							},
+							NwkSEncKey: &ttnpb.KeyEnvelope{
+								Key: &NwkSEncKey,
 							},
 						},
 					},
