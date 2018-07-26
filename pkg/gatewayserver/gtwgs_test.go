@@ -138,9 +138,12 @@ func TestLink(t *testing.T) {
 	}
 
 	link.ContextFunc = func() context.Context {
-		ctx := metadata.NewIncomingContext(ctx, metadata.MD{
-			"id": []string{registeredGatewayID},
-		})
+		md := metadata.Pairs("id", registeredGatewayID)
+		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+			md = metadata.Join(ctxMd, md)
+		}
+		ctx = metadata.NewIncomingContext(ctx, md)
+
 		ctx = rights.NewContextWithFetcher(
 			ctx,
 			rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
