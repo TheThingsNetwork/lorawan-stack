@@ -114,14 +114,13 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-
+	if err = validate.ID(id.GetGatewayID()); err != nil {
+		return
+	}
 	if err = rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return
 	}
 
-	if err = validate.ID(id.GetGatewayID()); err != nil {
-		return
-	}
 	uid := unique.ID(ctx, id)
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = log.NewContext(ctx, logger)
@@ -198,7 +197,7 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, conn connecti
 	conn.addUpstreamObservations(upstreamMessage)
 
 	if upstreamMessage.GatewayStatus != nil {
-		registerReceiveStatus(ctx, conn.gateway().GatewayIdentifiers, upstreamMessage.GatewayStatus)
+		registerReceiveStatus(ctx, conn.gatewayIdentifiers(), upstreamMessage.GatewayStatus)
 		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
 	}
 	for _, uplink := range upstreamMessage.UplinkMessages {

@@ -69,12 +69,7 @@ func (c *connectionData) schedule(down *ttnpb.DownlinkMessage) (err error) {
 		return errCouldNotComputeTOAOfDownlink.WithCause(err)
 	}
 
-	err = c.scheduler.ScheduleAt(span, down.Settings.Frequency)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.scheduler.ScheduleAt(span, down.Settings.Frequency)
 }
 
 func (c *connectionData) getObservations() ttnpb.GatewayObservations {
@@ -157,6 +152,7 @@ func (c *udpConnState) syncClock(timestamp uint32) {
 }
 
 // Takes a timestamp in microseconds
+// TODO: Needs testing; https://github.com/TheThingsIndustries/lorawan-stack/issues/979
 func (c *udpConnState) realTime(timestamp uint32) (time.Time, bool) {
 	concentratorStart, ok := c.concentratorStart.Load().(time.Time)
 	if !ok {
@@ -204,6 +200,7 @@ func (c *udpConnState) send(down *ttnpb.DownlinkMessage) error {
 		return writePacket()
 	}
 
+	// TODO: Needs testing: https://github.com/TheThingsIndustries/lorawan-stack/issues/979
 	realTime, ok := c.realTime(pkt.Data.TxPacket.Tmst)
 	if !ok {
 		return writePacket()

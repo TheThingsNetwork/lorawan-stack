@@ -78,51 +78,22 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 }
 
 func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
-	logger := log.FromContext(ctx)
-	logger.WithField("packet_type", packet.PacketType.String()).Debug("Received packet")
-
-	gtwIDs := ttnpb.GatewayIdentifiers{EUI: packet.GatewayEUI}
+	logger := log.FromContext(ctx).WithField("packet_type", packet.PacketType.String())
+	logger.Debug("Received packet")
 
 	switch packet.PacketType {
 	case udp.PullData:
-		g.processPullData(ctx, packet, conn)
+		g.processPullData(log.NewContext(ctx, logger), packet, conn)
 	case udp.PushData:
-		if packet.Data == nil {
-			return
-		}
-
-		gtw := conn.gateway()
-		if gtw != nil {
-			gtwIDs.GatewayID = gtw.GetGatewayID()
-		}
-
-		upstream, err := udp.TranslateUpstream(*packet.Data, udp.UpstreamMetadata{
-			ID: gtwIDs,
-			IP: packet.GatewayAddr.IP.String(),
-		})
-		if err != nil {
-			logger.WithError(err).Error("Could not translate incoming packet")
-			return
-		}
-
-		if len(packet.Data.RxPacket) > 0 {
-			var maxTmst uint32
-			for _, rxMetadata := range packet.Data.RxPacket {
-				if rxMetadata.Tmst > maxTmst {
-					maxTmst = rxMetadata.Tmst
-				}
-			}
-			conn.syncClock(maxTmst)
-		}
-		g.handleUpstreamMessage(ctx, conn, upstream)
+		g.processPushData(log.NewContext(ctx, logger), packet, conn)
 	case udp.TxAck:
 		logger.Debug("Received downlink reception confirmation")
 		conn.hasSentTxAck.Store(true)
 	}
 }
 
-func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Packet, conn *udpConnState) {
-	conn.lastPullDataStorage.Store(firstPacket)
+func (g *GatewayServer) processPullData(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
+	conn.lastPullDataStorage.Store(packet)
 	conn.lastPullDataTime.Store(time.Now())
 
 	if _, ok := conn.gtw.Load().(*ttnpb.Gateway); ok {
@@ -133,7 +104,7 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 	logger := log.FromContext(ctx)
 	logger.Info("Fetching gateway information and frequency plan...")
 
-	gtw, err := g.getGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: firstPacket.GatewayEUI})
+	gtw, err := g.getGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: packet.GatewayEUI})
 	if err != nil {
 		logger.WithError(err).Error("Could not retrieve gateway information from the Gateway Server")
 		return
@@ -141,20 +112,18 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 
 	fpID := gtw.GetFrequencyPlanID()
 	logger = logger.WithField("frequency_plan_id", fpID)
-
 	fp, err := g.FrequencyPlans.GetByID(fpID)
 	if err != nil {
 		logger.WithError(err).Error("Could not retrieve frequency plan")
 		return
 	}
-
 	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
 	if err != nil {
 		logger.WithError(err).Error("Could not build a scheduler from the frequency plan")
 		return
 	}
-
 	conn.scheduler = scheduler
+
 	conn.gtw.Store(gtw)
 
 	logger.Info("Gateway information and frequency plan fetched")
@@ -163,4 +132,37 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 	ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
 	g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
 	cancel()
+}
+
+func (g *GatewayServer) processPushData(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
+	if packet.Data == nil {
+		return
+	}
+
+	gtwIDs := ttnpb.GatewayIdentifiers{EUI: packet.GatewayEUI}
+	gtw := conn.gateway()
+	if gtw != nil {
+		gtwIDs.GatewayID = gtw.GetGatewayID()
+	}
+
+	logger := log.FromContext(ctx)
+	upstream, err := udp.TranslateUpstream(*packet.Data, udp.UpstreamMetadata{
+		ID: gtwIDs,
+		IP: packet.GatewayAddr.IP.String(),
+	})
+	if err != nil {
+		logger.WithError(err).Error("Could not translate incoming packet")
+		return
+	}
+
+	if len(packet.Data.RxPacket) > 0 {
+		var maxTmst uint32
+		for _, rxMetadata := range packet.Data.RxPacket {
+			if rxMetadata.Tmst > maxTmst {
+				maxTmst = rxMetadata.Tmst
+			}
+		}
+		conn.syncClock(maxTmst)
+	}
+	g.handleUpstreamMessage(ctx, conn, upstream)
 }
