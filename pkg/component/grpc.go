@@ -20,7 +20,6 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/labstack/echo"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -104,11 +103,6 @@ func (c *Component) RegisterGRPC(s rpcserver.Registerer) {
 // WithClusterAuth that can be used to identify a component within a cluster.
 func (c *Component) WithClusterAuth() grpc.CallOption {
 	return c.cluster.Auth()
-}
-
-// EnsureClusterAuth verifies the caller of an RPC is part of the cluster, and returns an error otherwise.
-func (c *Component) EnsureClusterAuth(ctx context.Context) error {
-	return clusterauth.Authorized(ctx)
 }
 
 // ClusterAuthUnaryHook ensuring the caller of an RPC is part of the cluster.

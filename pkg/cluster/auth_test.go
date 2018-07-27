@@ -21,6 +21,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -41,7 +42,7 @@ func TestVerifySource(t *testing.T) {
 		a := assertions.New(t)
 
 		ctx := c.WithVerifiedSource(ctx)
-		a.So(errors.IsUnauthenticated(c.IsFromCluster(ctx)), should.BeTrue)
+		a.So(errors.IsUnauthenticated(clusterauth.Authorized(ctx)), should.BeTrue)
 	})
 
 	t.Run("invalid secret type", func(t *testing.T) {
@@ -51,7 +52,7 @@ func TestVerifySource(t *testing.T) {
 		ctx := metadata.NewIncomingContext(ctx, md)
 
 		ctx = c.WithVerifiedSource(ctx)
-		a.So(errors.IsInvalidArgument(c.IsFromCluster(ctx)), should.BeTrue)
+		a.So(errors.IsInvalidArgument(clusterauth.Authorized(ctx)), should.BeTrue)
 	})
 
 	t.Run("valid secret", func(t *testing.T) {
@@ -61,7 +62,7 @@ func TestVerifySource(t *testing.T) {
 		ctx := metadata.NewIncomingContext(ctx, md)
 
 		ctx = c.WithVerifiedSource(ctx)
-		a.So(c.IsFromCluster(ctx), should.BeNil)
+		a.So(clusterauth.Authorized(ctx), should.BeNil)
 	})
 
 	t.Run("wrong secret", func(t *testing.T) {
@@ -71,6 +72,6 @@ func TestVerifySource(t *testing.T) {
 		ctx := metadata.NewIncomingContext(ctx, md)
 
 		ctx = c.WithVerifiedSource(ctx)
-		a.So(errors.IsPermissionDenied(c.IsFromCluster(ctx)), should.BeTrue)
+		a.So(errors.IsPermissionDenied(clusterauth.Authorized(ctx)), should.BeTrue)
 	})
 }

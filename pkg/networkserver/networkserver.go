@@ -29,6 +29,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/mohae/deepcopy"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -519,7 +520,7 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.En
 
 // StartServingGateway is called by the Gateway Server to indicate that it is serving a gateway.
 func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	if err := ns.EnsureClusterAuth(ctx); err != nil {
+	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 
@@ -537,7 +538,7 @@ func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.G
 
 // StopServingGateway is called by the Gateway Server to indicate that it is no longer serving a gateway.
 func (ns *NetworkServer) StopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	if err := ns.EnsureClusterAuth(ctx); err != nil {
+	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 
@@ -1565,7 +1566,7 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMess
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
-	if err := ns.EnsureClusterAuth(ctx); err != nil {
+	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 

@@ -22,6 +22,7 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -47,7 +48,7 @@ type asImplementation struct {
 
 // Subscribe implements ttnpb.AsServer
 func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
-	if err := as.EnsureClusterAuth(stream.Context()); err != nil {
+	if err := clusterauth.Authorized(stream.Context()); err != nil {
 		return err
 	}
 	for {
@@ -66,7 +67,7 @@ type gsImplementation struct {
 
 // GetGatewayObservations implements ttnpb.GsServer
 func (gs *gsImplementation) GetGatewayObservations(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if err := gs.EnsureClusterAuth(ctx); err != nil {
+	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 	return &ttnpb.GatewayObservations{}, nil

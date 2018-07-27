@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/gogo/protobuf/types"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -28,7 +29,7 @@ import (
 //
 // This request requires the GatewayIdentifier to have a GatewayID.
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
-	if err := g.EnsureClusterAuth(ctx); err != nil {
+	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 

@@ -1052,6 +1052,33 @@
       "file": "assets.go"
     }
   },
+  "error:pkg/auth/cluster:auth_type": {
+    "translations": {
+      "en": "cluster auth type `{auth_type}` is not supported"
+    },
+    "description": {
+      "package": "pkg/auth/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/auth/cluster:cluster_key": {
+    "translations": {
+      "en": "invalid cluster key"
+    },
+    "description": {
+      "package": "pkg/auth/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/auth/cluster:missing_cluster_key": {
+    "translations": {
+      "en": "missing cluster key auth"
+    },
+    "description": {
+      "package": "pkg/auth/cluster",
+      "file": "cluster.go"
+    }
+  },
   "error:pkg/auth/pbkdf2:invalid_pbkdf2_format": {
     "translations": {
       "en": "password hash has invalid PBKDF2 format"
@@ -1221,33 +1248,6 @@
     "description": {
       "package": "pkg/band",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/cluster:auth_type": {
-    "translations": {
-      "en": "cluster auth type `{auth_type}` is not supported"
-    },
-    "description": {
-      "package": "pkg/cluster",
-      "file": "auth.go"
-    }
-  },
-  "error:pkg/cluster:cluster_key": {
-    "translations": {
-      "en": "invalid cluster key"
-    },
-    "description": {
-      "package": "pkg/cluster",
-      "file": "auth.go"
-    }
-  },
-  "error:pkg/cluster:no_cluster_key": {
-    "translations": {
-      "en": "missing cluster key auth"
-    },
-    "description": {
-      "package": "pkg/cluster",
-      "file": "auth.go"
     }
   },
   "error:pkg/cluster:peer_connection": {
