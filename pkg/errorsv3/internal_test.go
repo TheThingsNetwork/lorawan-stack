@@ -33,3 +33,5 @@ func TestMessageFormat(t *testing.T) {
 	a.So(err.publicAttributes, should.Contain, "foo")
 	a.So(err.publicAttributes, should.Contain, "bar")
 }
+
+var Supported = supported // Used by TestSupportedAttributes

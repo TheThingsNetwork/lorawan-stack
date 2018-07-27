@@ -15,8 +15,10 @@
 package errors
 
 import (
+	"encoding/hex"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type attributer interface {
@@ -69,9 +71,17 @@ func supported(v interface{}) interface{} {
 		return rv.Complex()
 	case reflect.String:
 		return rv.String()
-	default:
-		panic(fmt.Sprintf("only primitive types are supported as error message format arguments (got %T)", v))
+	case reflect.Slice, reflect.Array:
+		if rv.Type().Elem().Kind() != reflect.Uint8 {
+			break
+		}
+		buf := make([]byte, rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			buf[i] = byte(rv.Index(i).Uint())
+		}
+		return strings.ToUpper(hex.EncodeToString(buf))
 	}
+	panic(fmt.Sprintf("only primitive types are supported as error message format arguments (got %T)", v))
 }
 
 func kvToMap(kv ...interface{}) (map[string]interface{}, error) {
