@@ -115,12 +115,12 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
 
-	if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
-		return err
+	if err = rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+		return
 	}
 
-	if err := validate.ID(id.GetGatewayID()); err != nil {
-		return err
+	if err = validate.ID(id.GetGatewayID()); err != nil {
+		return
 	}
 	uid := unique.ID(ctx, id)
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
@@ -194,11 +194,11 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	}
 }
 
-func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInfo connection, upstreamMessage *ttnpb.GatewayUp) {
-	connectionInfo.addUpstreamObservations(upstreamMessage)
+func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, conn connection, upstreamMessage *ttnpb.GatewayUp) {
+	conn.addUpstreamObservations(upstreamMessage)
 
 	if upstreamMessage.GatewayStatus != nil {
-		registerReceiveStatus(ctx, connectionInfo.gateway().GatewayIdentifiers, upstreamMessage.GatewayStatus)
+		registerReceiveStatus(ctx, conn.gateway().GatewayIdentifiers, upstreamMessage.GatewayStatus)
 		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
 	}
 	for _, uplink := range upstreamMessage.UplinkMessages {
@@ -207,14 +207,14 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInf
 			fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()),
 		)...)
 		uplink.CorrelationIDs = events.CorrelationIDsFromContext(msgCtx)
-		registerReceiveUplink(msgCtx, connectionInfo.gatewayIdentifiers(), uplink)
-		g.handleUplink(msgCtx, uplink, connectionInfo)
+		registerReceiveUplink(msgCtx, conn.gatewayIdentifiers(), uplink)
+		g.handleUplink(msgCtx, uplink, conn)
 	}
 
 	return
 }
 
-func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, gwConnection connection) (err error) {
+func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, conn connection) (err error) {
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
@@ -224,11 +224,11 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		}
 	}()
 
-	gwMetadata := gwConnection.gateway()
+	gwMetadata := conn.gateway()
 	useLocationFromMetadata := gwMetadata != nil && len(gwMetadata.GetAntennas()) == 0
 
 	for _, antenna := range uplink.RxMetadata {
-		antenna.GatewayIdentifiers = gwConnection.gatewayIdentifiers()
+		antenna.GatewayIdentifiers = conn.gatewayIdentifiers()
 
 		index := int(antenna.GetAntennaIndex())
 		if !gwMetadata.GetPrivacySettings().LocationPublic {

@@ -30,10 +30,10 @@ import (
 
 const gatewayInMemory = time.Hour
 
-func (g *GatewayServer) runUDPEndpoint(ctx context.Context, udpConn *net.UDPConn) {
+func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn) {
 	gwStore := udp.NewGatewayStore(gatewayInMemory)
 
-	conn := udp.Handle(udpConn, gwStore, gwStore)
+	udpConn := udp.Handle(rawConn, gwStore, gwStore)
 
 	logger := log.FromContext(g.Context())
 	ctx, cancel := context.WithCancel(ctx)
@@ -41,15 +41,15 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, udpConn *net.UDPConn
 
 	go func() {
 		<-ctx.Done()
-		if err := conn.Close(); err != nil {
+		if err := udpConn.Close(); err != nil {
 			logger.WithError(err).Debug("Could not close UDP connection")
 		}
 	}()
 
-	udpGateways := map[types.EUI64]*udpConnection{}
+	udpGateways := map[types.EUI64]*udpConnState{}
 
 	for {
-		packet, err := conn.Read()
+		packet, err := udpConn.Read()
 		if err != nil && err != io.EOF {
 			logger.WithError(err).Error("Could not read incoming UDP packets")
 		}
@@ -67,17 +67,17 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, udpConn *net.UDPConn
 			logger.WithError(err).Error("Could not acknowledge incoming packet")
 		}
 
-		gatewayConnection, ok := udpGateways[*packet.GatewayEUI]
+		conn, ok := udpGateways[*packet.GatewayEUI]
 		if !ok {
-			gatewayConnection = &udpConnection{eui: packet.GatewayEUI}
-			udpGateways[*packet.GatewayEUI] = gatewayConnection
+			conn = &udpConnState{eui: packet.GatewayEUI}
+			udpGateways[*packet.GatewayEUI] = conn
 		}
 
-		go g.handleUpstreamUDPMessage(ctx, packet, gatewayConnection)
+		go g.handleUpstreamUDPMessage(ctx, packet, conn)
 	}
 }
 
-func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *udp.Packet, gateway *udpConnection) {
+func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
 	logger := log.FromContext(ctx)
 	logger.WithField("packet_type", packet.PacketType.String()).Debug("Received packet")
 
@@ -85,13 +85,13 @@ func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *ud
 
 	switch packet.PacketType {
 	case udp.PullData:
-		g.processPullData(ctx, packet, gateway)
+		g.processPullData(ctx, packet, conn)
 	case udp.PushData:
 		if packet.Data == nil {
 			return
 		}
 
-		gtw := gateway.gateway()
+		gtw := conn.gateway()
 		if gtw != nil {
 			gtwIDs.GatewayID = gtw.GetGatewayID()
 		}
@@ -112,20 +112,20 @@ func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *ud
 					maxTmst = rxMetadata.Tmst
 				}
 			}
-			gateway.syncClock(maxTmst)
+			conn.syncClock(maxTmst)
 		}
-		g.handleUpstreamMessage(ctx, gateway, upstream)
+		g.handleUpstreamMessage(ctx, conn, upstream)
 	case udp.TxAck:
 		logger.Debug("Received downlink reception confirmation")
-		gateway.hasSentTxAck.Store(true)
+		conn.hasSentTxAck.Store(true)
 	}
 }
 
-func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Packet, connection *udpConnection) {
-	connection.lastPullDataStorage.Store(firstPacket)
-	connection.lastPullDataTime.Store(time.Now())
+func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Packet, conn *udpConnState) {
+	conn.lastPullDataStorage.Store(firstPacket)
+	conn.lastPullDataTime.Store(time.Now())
 
-	if _, ok := connection.gtw.Load().(*ttnpb.Gateway); ok {
+	if _, ok := conn.gtw.Load().(*ttnpb.Gateway); ok {
 		// TODO: Add frequency plan refresh on a regular basis: https://github.com/TheThingsIndustries/ttn/issues/727
 		return
 	}
@@ -154,12 +154,12 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 		return
 	}
 
-	connection.scheduler = scheduler
-	connection.gtw.Store(gtw)
+	conn.scheduler = scheduler
+	conn.gtw.Store(gtw)
 
 	logger.Info("Gateway information and frequency plan fetched")
 
-	g.setupConnection(unique.ID(ctx, gtw.GatewayIdentifiers), connection)
+	g.setupConnection(unique.ID(ctx, gtw.GatewayIdentifiers), conn)
 	ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
 	g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
 	cancel()

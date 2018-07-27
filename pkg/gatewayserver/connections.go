@@ -132,7 +132,7 @@ func (c *gRPCConnection) Close() error {
 	return nil
 }
 
-type udpConnection struct {
+type udpConnState struct {
 	connectionData
 
 	gtw                 atomic.Value
@@ -145,19 +145,19 @@ type udpConnection struct {
 	eui *types.EUI64
 }
 
-func (c *udpConnection) hasJITQueue() bool {
+func (c *udpConnState) hasJITQueue() bool {
 	hasSentTxAck, ok := c.hasSentTxAck.Load().(bool)
 	return ok && hasSentTxAck
 }
 
 // Takes a timestamp in microseconds
-func (c *udpConnection) syncClock(timestamp uint32) {
+func (c *udpConnState) syncClock(timestamp uint32) {
 	start := time.Now().Add(-1 * time.Microsecond * time.Duration(timestamp))
 	c.concentratorStart.Store(start)
 }
 
 // Takes a timestamp in microseconds
-func (c *udpConnection) realTime(timestamp uint32) (time.Time, bool) {
+func (c *udpConnState) realTime(timestamp uint32) (time.Time, bool) {
 	concentratorStart, ok := c.concentratorStart.Load().(time.Time)
 	if !ok {
 		return time.Now(), false
@@ -170,12 +170,12 @@ func (c *udpConnection) realTime(timestamp uint32) (time.Time, bool) {
 	return t, true
 }
 
-func (c *udpConnection) lastPullData() *udp.Packet {
+func (c *udpConnState) lastPullData() *udp.Packet {
 	pkt, _ := c.lastPullDataStorage.Load().(*udp.Packet)
 	return pkt
 }
 
-func (c *udpConnection) pullDataExpired() bool {
+func (c *udpConnState) pullDataExpired() bool {
 	lastReceived, ok := c.lastPullDataTime.Load().(time.Time)
 	if !ok {
 		return true
@@ -183,7 +183,7 @@ func (c *udpConnection) pullDataExpired() bool {
 	return time.Since(lastReceived) > pullDataExpiration
 }
 
-func (c *udpConnection) send(down *ttnpb.DownlinkMessage) error {
+func (c *udpConnState) send(down *ttnpb.DownlinkMessage) error {
 	gtw := c.gateway()
 	if c.pullDataExpired() {
 		return errGatewayNotConnected.WithCause(errNoPULLDATAReceived.WithAttributes("delay", pullDataExpiration.String()))
@@ -213,12 +213,12 @@ func (c *udpConnection) send(down *ttnpb.DownlinkMessage) error {
 	return writePacket()
 }
 
-func (c *udpConnection) gateway() *ttnpb.Gateway {
+func (c *udpConnState) gateway() *ttnpb.Gateway {
 	gtw, _ := c.gtw.Load().(*ttnpb.Gateway)
 	return gtw
 }
 
-func (c *udpConnection) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
+func (c *udpConnState) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
 	gtw := c.gateway()
 	if gtw != nil {
 		return gtw.GatewayIdentifiers
@@ -229,7 +229,7 @@ func (c *udpConnection) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
 	}
 }
 
-func (c *udpConnection) Close() error { return nil }
+func (c *udpConnState) Close() error { return nil }
 
 type mqttConnection struct {
 	connectionData
