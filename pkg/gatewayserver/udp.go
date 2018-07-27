@@ -18,13 +18,13 @@ import (
 	"context"
 	"io"
 	"net"
+	"sync"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/udp"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
@@ -46,7 +46,7 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 		}
 	}()
 
-	udpGateways := map[types.EUI64]*udpConnState{}
+	udpGateways := &sync.Map{}
 
 	for {
 		packet, err := udpConn.Read()
@@ -67,14 +67,59 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 			logger.WithError(err).Error("Could not acknowledge incoming packet")
 		}
 
-		conn, ok := udpGateways[*packet.GatewayEUI]
-		if !ok {
-			conn = &udpConnState{eui: packet.GatewayEUI}
-			udpGateways[*packet.GatewayEUI] = conn
+		v, loaded := udpGateways.LoadOrStore(*packet.GatewayEUI, &udpConnState{eui: packet.GatewayEUI})
+		conn := v.(*udpConnState)
+
+		if !loaded {
+			go func() {
+				if err := g.setupUDPConnection(ctx, conn); err != nil {
+					udpGateways.Delete(*packet.GatewayEUI)
+				}
+			}()
 		}
 
 		go g.handleUpstreamUDPMessage(ctx, packet, conn)
 	}
+}
+
+func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnState) error {
+	// TODO: Add frequency plan refresh on a regular basis: https://github.com/TheThingsIndustries/ttn/issues/727
+
+	logger := log.FromContext(ctx)
+	logger.Info("Fetching gateway information and frequency plan...")
+
+	gtw, err := g.getGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: conn.eui})
+	if err != nil {
+		logger.WithError(err).Error("Could not retrieve gateway information from the Gateway Server")
+		return err
+	}
+
+	fpID := gtw.GetFrequencyPlanID()
+	logger = logger.WithField("frequency_plan_id", fpID)
+	fp, err := g.FrequencyPlans.GetByID(fpID)
+	if err != nil {
+		logger.WithError(err).Error("Could not retrieve frequency plan")
+		return err
+	}
+	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
+	if err != nil {
+		logger.WithError(err).Error("Could not build a scheduler from the frequency plan")
+		return err
+	}
+	conn.scheduler = scheduler
+
+	conn.gtw.Store(gtw)
+
+	logger.Info("Gateway information and frequency plan fetched")
+
+	g.setupConnection(unique.ID(ctx, gtw.GatewayIdentifiers), conn)
+	go func() {
+		ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
+		g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
+		cancel()
+	}()
+
+	return nil
 }
 
 func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
@@ -95,43 +140,6 @@ func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *ud
 func (g *GatewayServer) processPullData(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
 	conn.lastPullDataStorage.Store(packet)
 	conn.lastPullDataTime.Store(time.Now())
-
-	if _, ok := conn.gtw.Load().(*ttnpb.Gateway); ok {
-		// TODO: Add frequency plan refresh on a regular basis: https://github.com/TheThingsIndustries/ttn/issues/727
-		return
-	}
-
-	logger := log.FromContext(ctx)
-	logger.Info("Fetching gateway information and frequency plan...")
-
-	gtw, err := g.getGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: packet.GatewayEUI})
-	if err != nil {
-		logger.WithError(err).Error("Could not retrieve gateway information from the Gateway Server")
-		return
-	}
-
-	fpID := gtw.GetFrequencyPlanID()
-	logger = logger.WithField("frequency_plan_id", fpID)
-	fp, err := g.FrequencyPlans.GetByID(fpID)
-	if err != nil {
-		logger.WithError(err).Error("Could not retrieve frequency plan")
-		return
-	}
-	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
-	if err != nil {
-		logger.WithError(err).Error("Could not build a scheduler from the frequency plan")
-		return
-	}
-	conn.scheduler = scheduler
-
-	conn.gtw.Store(gtw)
-
-	logger.Info("Gateway information and frequency plan fetched")
-
-	g.setupConnection(unique.ID(ctx, gtw.GatewayIdentifiers), conn)
-	ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
-	g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
-	cancel()
 }
 
 func (g *GatewayServer) processPushData(ctx context.Context, packet *udp.Packet, conn *udpConnState) {
