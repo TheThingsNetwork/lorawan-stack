@@ -366,9 +366,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		ns.gsClient = NewGatewayServerPeerGetterFunc(ns.Component)
 	}
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.UnaryHook())
-	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.StreamHook())
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsApplicationDownlinkQueue", cluster.HookName, c.UnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsApplicationDownlinkQueue", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(ns)
 	return ns, nil
@@ -519,6 +519,10 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.En
 
 // StartServingGateway is called by the Gateway Server to indicate that it is serving a gateway.
 func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+	if err := ns.EnsureClusterAuth(ctx); err != nil {
+		return nil, err
+	}
+
 	uid := unique.ID(ctx, gtwID)
 	if uid == "" {
 		return nil, errMissingGatewayID
@@ -533,6 +537,10 @@ func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.G
 
 // StopServingGateway is called by the Gateway Server to indicate that it is no longer serving a gateway.
 func (ns *NetworkServer) StopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+	if err := ns.EnsureClusterAuth(ctx); err != nil {
+		return nil, err
+	}
+
 	uid := unique.ID(ctx, id)
 	if uid == "" {
 		return nil, errMissingGatewayID
@@ -781,7 +789,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				Timestamp:          md.Timestamp + uint64(s.Delay.Nanoseconds()),
 			}
 
-			_, err = cl.ScheduleDownlink(ctx, msg, ns.ClusterAuth())
+			_, err = cl.ScheduleDownlink(ctx, msg, ns.WithClusterAuth())
 			if err != nil {
 				errs = append(errs, err)
 				continue
@@ -1447,7 +1455,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 	var errs []error
 	for _, js := range ns.joinServers {
 		registerForwardUplink(ctx, dev.EndDevice, msg)
-		resp, err := js.HandleJoin(ctx, req, ns.ClusterAuth())
+		resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -1557,6 +1565,10 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMess
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
+	if err := ns.EnsureClusterAuth(ctx); err != nil {
+		return nil, err
+	}
+
 	ctx = events.ContextWithCorrelationID(ctx, append(
 		msg.CorrelationIDs,
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),

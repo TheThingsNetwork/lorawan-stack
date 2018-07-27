@@ -27,6 +27,7 @@ import (
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -468,6 +469,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
+		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), conf),
@@ -505,7 +508,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = types.DevAddr{}
-			_, err := ns.HandleUplink(test.Context(), msg)
+			_, err := ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -515,7 +518,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Payload.GetMACPayload().FCnt = math.MaxUint16 + 1
-			_, err := ns.HandleUplink(test.Context(), msg)
+			_, err := ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -525,7 +528,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Settings.ChannelIndex = math.MaxUint8 + 1
-			_, err := ns.HandleUplink(test.Context(), msg)
+			_, err := ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -535,7 +538,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Settings.DataRateIndex = math.MaxUint8 + 1
-			_, err = ns.HandleUplink(test.Context(), msg)
+			_, err = ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
@@ -1182,7 +1185,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					t.FailNow()
 				}
 
-				ctx := context.WithValue(test.Context(), "answer", 42)
+				ctx := context.WithValue(authorizedCtx, "answer", 42)
 				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()
@@ -1433,6 +1436,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
+		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), conf),
@@ -1444,7 +1449,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 		)).(*NetworkServer)
 		test.Must(nil, ns.Start())
 
-		_, err := ns.HandleUplink(test.Context(), ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
+		_, err := ns.HandleUplink(authorizedCtx, ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
 		a.So(err, should.NotBeNil)
 
 		req := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1458,7 +1463,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			t.FailNow()
 		}
 
-		_, err = ns.HandleUplink(test.Context(), req)
+		_, err = ns.HandleUplink(authorizedCtx, req)
 		a.So(err, should.NotBeNil)
 
 		for _, tc := range []struct {
@@ -1723,7 +1728,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 				}
 
-				ctx := context.WithValue(test.Context(), "answer", 42)
+				ctx := context.WithValue(authorizedCtx, "answer", 42)
 				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()
@@ -1955,6 +1960,8 @@ func TestHandleUplink(t *testing.T) {
 	}
 	defer fpStore.Destroy()
 
+	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+
 	conf := &component.Config{ServiceBase: config.ServiceBase{
 		FrequencyPlans: config.FrequencyPlans{
 			StoreDirectory: fpStore.Directory(),
@@ -1976,18 +1983,18 @@ func TestHandleUplink(t *testing.T) {
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = nil
-	_, err = ns.HandleUplink(test.Context(), msg)
+	_, err = ns.HandleUplink(authorizedCtx, msg)
 	a.So(err, should.NotBeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = []byte{}
-	_, err = ns.HandleUplink(test.Context(), msg)
+	_, err = ns.HandleUplink(authorizedCtx, msg)
 	a.So(err, should.NotBeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Major = 1
-	_, err = ns.HandleUplink(test.Context(), msg)
+	_, err = ns.HandleUplink(authorizedCtx, msg)
 	a.So(err, should.NotBeNil)
 
 	t.Run("Uplink", HandleUplinkTest(conf))
