@@ -72,8 +72,8 @@ func New(c *component.Component, conf *Config, rpcOptions ...deviceregistry.RPCO
 		registry:    conf.Registry,
 		euiPrefixes: conf.JoinEUIPrefixes,
 	}
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.UnaryHook())
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.UnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	c.RegisterGRPC(js)
 	return js, nil
 }
@@ -100,6 +100,10 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 
 // HandleJoin is called by the Network Server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
+	if err := js.EnsureClusterAuth(ctx); err != nil {
+		return nil, err
+	}
+
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {

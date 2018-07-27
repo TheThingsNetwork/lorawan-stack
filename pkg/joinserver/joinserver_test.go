@@ -23,6 +23,7 @@ import (
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
@@ -60,6 +61,8 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 func TestHandleJoin(t *testing.T) {
 	a := assertions.New(t)
 
+	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+
 	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
@@ -71,41 +74,41 @@ func TestHandleJoin(t *testing.T) {
 
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
-	resp, err := js.HandleJoin(test.Context(), req)
+	resp, err := js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.EndDeviceIdentifiers.DevAddr = nil
-	resp, err = js.HandleJoin(test.Context(), req)
+	resp, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
-	resp, err = js.HandleJoin(test.Context(), req)
+	resp, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
-	resp, err = js.HandleJoin(test.Context(), req)
+	resp, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{}
-	resp, err = js.HandleJoin(test.Context(), req)
+	resp, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().DevEUI = types.EUI64{}
-	resp, err = js.HandleJoin(test.Context(), req)
+	resp, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
-	resp, err = js.HandleJoin(test.Context(), ttnpb.NewPopulatedJoinRequest(test.Randy, false))
+	resp, err = js.HandleJoin(authorizedCtx, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
@@ -1205,7 +1208,7 @@ func TestHandleJoin(t *testing.T) {
 
 			ctx := (rpcmetadata.MD{
 				NetAddress: nsAddr,
-			}).ToIncomingContext(test.Context())
+			}).ToIncomingContext(authorizedCtx)
 
 			start := time.Now()
 			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
@@ -1248,7 +1251,7 @@ func TestHandleJoin(t *testing.T) {
 
 			a.So(pretty.Diff(ed, dev.EndDevice), should.BeEmpty)
 
-			resp, err = js.HandleJoin(test.Context(), tc.JoinRequest)
+			resp, err = js.HandleJoin(authorizedCtx, tc.JoinRequest)
 			a.So(err, should.BeError)
 			a.So(resp, should.BeNil)
 		})
@@ -1267,15 +1270,17 @@ func TestGetAppSKey(t *testing.T) {
 		},
 	)).(*JoinServer)
 
+	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
-	resp, err := js.GetAppSKey(test.Context(), req)
+	resp, err := js.GetAppSKey(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.SessionKeyID = ""
-	resp, err = js.GetAppSKey(test.Context(), req)
+	resp, err = js.GetAppSKey(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
@@ -1492,7 +1497,7 @@ func TestGetAppSKey(t *testing.T) {
 
 			ctx := (rpcmetadata.MD{
 				NetAddress: asAddr,
-			}).ToIncomingContext(test.Context())
+			}).ToIncomingContext(authorizedCtx)
 
 			resp, err := js.GetAppSKey(ctx, tc.KeyRequest)
 			if tc.ValidErr != nil {
@@ -1521,15 +1526,17 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 	)).(*JoinServer)
 
+	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
-	resp, err := js.GetNwkSKeys(test.Context(), req)
+	resp, err := js.GetNwkSKeys(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
 	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.SessionKeyID = ""
-	resp, err = js.GetNwkSKeys(test.Context(), req)
+	resp, err = js.GetNwkSKeys(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
 
@@ -1866,7 +1873,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 			ctx := (rpcmetadata.MD{
 				NetAddress: nsAddr,
-			}).ToIncomingContext(test.Context())
+			}).ToIncomingContext(authorizedCtx)
 
 			resp, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 			if tc.ValidErr != nil {
