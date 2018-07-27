@@ -22,6 +22,7 @@ import (
 
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -75,6 +76,7 @@ func TestLink(t *testing.T) {
 
 	logger := test.GetLogger(t)
 	ctx := log.NewContext(test.Context(), logger)
+	ctx = clusterauth.NewContext(ctx, nil)
 	ctx, cancel := context.WithCancel(ctx)
 
 	store, err := test.NewFrequencyPlansStore()
