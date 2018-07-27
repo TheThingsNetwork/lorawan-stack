@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/assets/testdata"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -35,6 +36,40 @@ type registererFunc func(s *web.Server)
 
 func (r registererFunc) RegisterRoutes(s *web.Server) {
 	r(s)
+}
+
+func TestInvalidConfig(t *testing.T) {
+	for _, tc := range []struct {
+		Name    string
+		Config  Config
+		TestErr func(err error) bool
+	}{
+		{
+			Name: "NoLocation",
+			Config: Config{
+				Mount: "/test",
+			},
+			TestErr: errors.IsInvalidArgument,
+		},
+		{
+			Name: "NotFound",
+			Config: Config{
+				Mount:      "/test",
+				SearchPath: []string{"invalidfolder"},
+			},
+			TestErr: errors.IsNotFound,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			httpAddress := "0.0.0.0:9185"
+			c := component.MustNew(test.GetLogger(t), &component.Config{
+				ServiceBase: config.ServiceBase{HTTP: config.HTTP{Listen: httpAddress}},
+			})
+			_, err := New(c, tc.Config)
+			a.So(tc.TestErr(err), should.BeTrue)
+		})
+	}
 }
 
 func TestAppHandler(t *testing.T) {
@@ -81,21 +116,41 @@ func TestAppHandler(t *testing.T) {
 			a.So(err, should.BeNil)
 
 			c.RegisterWeb(registererFunc(func(s *web.Server) {
-				index := as.AppHandler("app.html", tc.Name)
-				group := s.Group("/test")
-				group.GET("", index)
+				s.Group("/test").GET("/exists", as.AppHandler("app.html", tc.Name))
+				s.Group("/test").GET("/doesntexist", as.AppHandler("invalid.html", tc.Name))
 			}))
 
 			err = c.Start()
 			a.So(err, should.BeNil)
 
-			resp, err := http.Get(fmt.Sprintf("http://%s/test", httpAddress))
-			a.So(err, should.BeNil)
-			a.So(resp.StatusCode, should.Equal, http.StatusOK)
+			for _, itc := range []struct {
+				Path  string
+				Found bool
+			}{
+				{
+					Path:  "test/exists",
+					Found: true,
+				},
+				{
+					Path:  "test/doesntexist",
+					Found: false,
+				},
+			} {
+				t.Run(itc.Path, func(t *testing.T) {
+					a := assertions.New(t)
+					resp, err := http.Get(fmt.Sprintf("http://%s/%s", httpAddress, itc.Path))
+					a.So(err, should.BeNil)
 
-			buf, err := ioutil.ReadAll(resp.Body)
-			a.So(err, should.BeNil)
-			a.So(string(buf), should.Equal, tc.Expected)
+					if itc.Found {
+						a.So(resp.StatusCode, should.Equal, http.StatusOK)
+						buf, err := ioutil.ReadAll(resp.Body)
+						a.So(err, should.BeNil)
+						a.So(string(buf), should.Equal, tc.Expected)
+					} else {
+						a.So(resp.StatusCode, should.Equal, http.StatusNotFound)
+					}
+				})
+			}
 
 			c.Close()
 		})
