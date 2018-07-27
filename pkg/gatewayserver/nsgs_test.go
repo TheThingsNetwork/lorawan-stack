@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
@@ -46,7 +47,8 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 		logger.Fatal("Gateway Server could not start")
 	}
 
-	_, err = gs.ScheduleDownlink(log.NewContext(test.Context(), logger), &ttnpb.DownlinkMessage{
+	ctx := clusterauth.NewContext(test.Context(), nil)
+	_, err = gs.ScheduleDownlink(log.NewContext(ctx, logger), &ttnpb.DownlinkMessage{
 		TxMetadata: ttnpb.TxMetadata{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "unknown-downlink",

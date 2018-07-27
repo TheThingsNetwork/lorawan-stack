@@ -27,6 +27,7 @@ import (
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -44,6 +45,7 @@ func TestMQTTConnection(t *testing.T) {
 
 	logger := test.GetLogger(t)
 	ctx := log.NewContext(test.Context(), logger)
+	ctx = clusterauth.NewContext(ctx, nil)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

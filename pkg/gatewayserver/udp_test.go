@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -35,6 +36,8 @@ import (
 )
 
 const testUDPAddress = "127.0.0.1:8332"
+
+var authorizedCtx = clusterauth.NewContext(test.Context(), nil)
 
 func testPushData(eui types.EUI64, ns *GsNsServer) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -177,7 +180,7 @@ func testDownlink(registeredGatewayID string, gs *gatewayserver.GatewayServer, c
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
-		_, err := gs.ScheduleDownlink(test.Context(), downlink)
+		_, err := gs.ScheduleDownlink(authorizedCtx, downlink)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
@@ -199,6 +202,7 @@ func TestUDP(t *testing.T) {
 
 	logger := test.GetLogger(t)
 	ctx := log.NewContext(test.Context(), logger)
+	ctx = clusterauth.NewContext(ctx, nil)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

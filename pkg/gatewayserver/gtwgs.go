@@ -80,7 +80,7 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 
 func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
 	if err := g.forAllNS(func(nsClient ttnpb.GsNsClient) error {
-		_, err := nsClient.StartServingGateway(ctx, id, g.Component.ClusterAuth())
+		_, err := nsClient.StartServingGateway(ctx, id, g.Component.WithClusterAuth())
 		return err
 	}); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not signal Network Server when gateway connected")
@@ -89,7 +89,7 @@ func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id *ttnpb
 
 func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
 	if err := g.forAllNS(func(nsClient ttnpb.GsNsClient) error {
-		_, err := nsClient.StopServingGateway(ctx, id, g.Component.ClusterAuth())
+		_, err := nsClient.StopServingGateway(ctx, id, g.Component.WithClusterAuth())
 		return err
 	}); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not signal Network Server when gateway disconnected")
@@ -281,7 +281,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 	}
 
 	nsClient := ttnpb.NewGsNsClient(ns.Conn())
-	_, err = nsClient.HandleUplink(g.Context(), uplink, g.Component.ClusterAuth())
+	_, err = nsClient.HandleUplink(g.Context(), uplink, g.Component.WithClusterAuth())
 	return
 }
 

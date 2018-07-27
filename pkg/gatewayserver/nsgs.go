@@ -28,6 +28,10 @@ import (
 //
 // This request requires the GatewayIdentifier to have a GatewayID.
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
+	if err := g.EnsureClusterAuth(ctx); err != nil {
+		return nil, err
+	}
+
 	id := down.TxMetadata.GatewayIdentifiers
 	if err := validate.ID(id.GetGatewayID()); err != nil {
 		return nil, err
