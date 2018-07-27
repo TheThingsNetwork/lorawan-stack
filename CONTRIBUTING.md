@@ -225,6 +225,22 @@ Code should be as self-explanatory as possible. However, comments should be used
 
 + **Protobuf-generated files**, including Go files, are not tracked by `golint`. These do not need to respect the same comments guidelines as Go files, especially in regards to exported values.
 
+## Translations
+
+We do our best to make all text that could be visible to users available for translation. This means that all text of the console's user interface, as well as all text that it may forward from the backend, needs to be defined in such a way that it can be translated into other languages than English.
+
+### Backend Translations
+
+In our Go we make enum descriptions, error messages and event descriptions available for translation. Enum descriptions are defined in `pkg/ttnpb/i18n.go`. Error messages and event descriptions are defined with `errors.Define(...)` and `events.Define(...)` respectively. 
+
+These messages are then collected in the `config/messages.json` file, which will be processed in the frontend build process, but may also be used by other (native) user interfaces. When you define new enums, errors or events, or when you change them, the messages need to be updated into the `config/messages.json` file. This is done by running `make messages`. If you forget to do so, this will cause a CI failure.
+
+Adding translations of messages in other languages than English is a matter of adding key/value pairs to `translations` in `config/messages.json`.
+
+### Frontend Translations
+
+Translations of frontend messages are located in `pkg/webui/locales`.
+
 ## <a name="security-issues"></a>Security Issues
 
 We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please contact us directly. We can be reached on Slack, by email and a number of other communication platforms.
