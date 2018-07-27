@@ -28,6 +28,46 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+// MockContext is a mock context.Context.
+type MockContext struct {
+	DeadlineFunc func() (deadline time.Time, ok bool)
+	DoneFunc     func() <-chan struct{}
+	ErrFunc      func() error
+	ValueFunc    func(interface{}) interface{}
+}
+
+// Deadline calls DeadlineFunc.
+func (ctx *MockContext) Deadline() (deadline time.Time, ok bool) {
+	if ctx.DeadlineFunc == nil {
+		return time.Time{}, false
+	}
+	return ctx.DeadlineFunc()
+}
+
+// Done calls DoneFunc.
+func (ctx *MockContext) Done() <-chan struct{} {
+	if ctx.DoneFunc == nil {
+		return nil
+	}
+	return ctx.DoneFunc()
+}
+
+// Err calls ErrFunc.
+func (ctx *MockContext) Err() error {
+	if ctx.ErrFunc == nil {
+		return nil
+	}
+	return ctx.ErrFunc()
+}
+
+// Value calls ValueFunc.
+func (ctx *MockContext) Value(key interface{}) interface{} {
+	if ctx.ValueFunc == nil {
+		return nil
+	}
+	return ctx.ValueFunc(key)
+}
+
 func TestContextParent(t *testing.T) {
 	for _, tc := range []struct {
 		Name       string

@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -218,6 +219,29 @@ func TestMustMultiple(t *testing.T) {
 				vs := MustMultiple(tc.Values...)
 				a.So(vs, should.Resemble, tc.Values[:len(tc.Values)-1])
 			}
+		})
+	}
+}
+
+func TestWaitTimeout(t *testing.T) {
+	for _, tc := range []struct {
+		Timeout time.Duration
+		OK      bool
+	}{
+		{
+			Timeout: 10 * time.Millisecond,
+			OK:      false,
+		},
+		{
+			Timeout: 30 * time.Millisecond,
+			OK:      true,
+		},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Timeout), func(t *testing.T) {
+			a := assertions.New(t)
+
+			ok := WaitTimeout(tc.Timeout, func() { time.Sleep(20 * time.Millisecond) })
+			a.So(ok, should.Equal, tc.OK)
 		})
 	}
 }

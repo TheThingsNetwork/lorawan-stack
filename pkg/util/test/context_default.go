@@ -19,7 +19,7 @@ import (
 )
 
 // DefaultContext is the default context.
-var DefaultContext = &MockContext{}
+var DefaultContext = context.Background()
 
 // Context returns DefaultContext.
 func Context() context.Context {
