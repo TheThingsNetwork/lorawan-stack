@@ -150,7 +150,7 @@ func (e *Error) GRPCStatus() *status.Status {
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		res, err := handler(ctx, req)
-		if ttnErr, ok := From(err); ok && ttnErr != nil {
+		if ttnErr, ok := From(err); ok {
 			if ttnErr.correlationID == "" {
 				ttnErr.correlationID = hex.EncodeToString(uuid.NewV4().Bytes()) // Compliant with Sentry.
 			}
@@ -164,7 +164,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		err := handler(srv, stream)
-		if ttnErr, ok := From(err); ok && ttnErr != nil {
+		if ttnErr, ok := From(err); ok {
 			if ttnErr.correlationID == "" {
 				ttnErr.correlationID = hex.EncodeToString(uuid.NewV4().Bytes()) // Compliant with Sentry.
 			}
@@ -178,8 +178,8 @@ func StreamServerInterceptor() grpc.StreamServerInterceptor {
 func UnaryClientInterceptor() grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		err := invoker(ctx, method, req, reply, cc, opts...)
-		if err, ok := From(err); ok && err != nil {
-			return err
+		if ttnErr, ok := From(err); ok {
+			return ttnErr
 		}
 		return err
 	}
@@ -191,15 +191,15 @@ type wrappedStream struct {
 
 func (w wrappedStream) SendMsg(m interface{}) error {
 	err := w.ClientStream.SendMsg(m)
-	if err, ok := From(err); ok && err != nil {
-		return err
+	if ttnErr, ok := From(err); ok {
+		return ttnErr
 	}
 	return err
 }
 func (w wrappedStream) RecvMsg(m interface{}) error {
 	err := w.ClientStream.RecvMsg(m)
-	if err, ok := From(err); ok && err != nil {
-		return err
+	if ttnErr, ok := From(err); ok {
+		return ttnErr
 	}
 	return err
 }
@@ -208,8 +208,8 @@ func (w wrappedStream) RecvMsg(m interface{}) error {
 func StreamClientInterceptor() grpc.StreamClientInterceptor {
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		s, err := streamer(ctx, desc, cc, method, opts...)
-		if err, ok := From(err); ok && err != nil {
-			return nil, err
+		if ttnErr, ok := From(err); ok {
+			return nil, ttnErr
 		}
 		if err != nil {
 			return nil, err

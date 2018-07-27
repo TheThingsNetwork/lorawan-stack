@@ -25,8 +25,8 @@ func (e *Error) setCause(cause error) {
 	if e.cause != nil {
 		panic("error cause should not be overwritten, you're probably doing the a.WithCause(b) the wrong way around")
 	}
-	if convertedCause, ok := From(cause); ok {
-		e.cause = convertedCause
+	if ttnErr, ok := From(cause); ok {
+		e.cause = ttnErr
 	} else {
 		e.cause = cause
 	}

@@ -54,9 +54,9 @@ func HTTPStatusCode(err error) int {
 // ToHTTP writes the error to the HTTP response.
 func ToHTTP(in error, w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
-	if err, ok := From(in); ok {
-		w.WriteHeader(HTTPStatusCode(err))
-		return json.NewEncoder(w).Encode(err)
+	if ttnErr, ok := From(in); ok {
+		w.WriteHeader(HTTPStatusCode(ttnErr))
+		return json.NewEncoder(w).Encode(ttnErr)
 	}
 	w.WriteHeader(http.StatusInternalServerError)
 	return json.NewEncoder(w).Encode(in)

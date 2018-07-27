@@ -60,8 +60,8 @@ func Details(err error) []interface{} {
 	if c, ok := err.(detailer); ok {
 		return c.Details()
 	}
-	if err, ok := From(err); ok {
-		return err.Details()
+	if ttnErr, ok := From(err); ok {
+		return ttnErr.Details()
 	}
 	return nil
 }

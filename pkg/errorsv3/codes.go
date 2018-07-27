@@ -41,8 +41,8 @@ func code(err error) uint32 {
 	if c, ok := err.(coder); ok {
 		return c.Code()
 	}
-	if err, ok := From(err); ok {
-		return err.Code()
+	if ttnErr, ok := From(err); ok {
+		return ttnErr.Code()
 	}
 	return 0
 }
