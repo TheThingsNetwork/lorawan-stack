@@ -33,9 +33,18 @@ func From(err error) (out *Error, ok bool) {
 		return &err, true
 	case *Error:
 		if err == nil {
-			return nil, true
+			return nil, false // This is invalid.
 		}
 		return err, true
+	case Definition:
+		e := build(err, 0)
+		return &e, true
+	case *Definition:
+		if err == nil {
+			return nil, false // This is invalid.
+		}
+		e := build(*err, 0)
+		return &e, true
 	default:
 		if se, ok := err.(interface{ GRPCStatus() *status.Status }); ok {
 			err := FromGRPCStatus(se.GRPCStatus())
