@@ -40,7 +40,8 @@ func TestVerifySource(t *testing.T) {
 	t.Run("empty secret", func(t *testing.T) {
 		a := assertions.New(t)
 
-		a.So(errors.IsUnauthenticated(c.VerifySource(ctx)), should.BeTrue)
+		ctx := c.WithVerifiedSource(ctx)
+		a.So(errors.IsUnauthenticated(c.IsFromCluster(ctx)), should.BeTrue)
 	})
 
 	t.Run("invalid secret type", func(t *testing.T) {
@@ -49,7 +50,8 @@ func TestVerifySource(t *testing.T) {
 		md := metadata.Pairs("authorization", "Basic invalid-secret")
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		a.So(errors.IsInvalidArgument(c.VerifySource(ctx)), should.BeTrue)
+		ctx = c.WithVerifiedSource(ctx)
+		a.So(errors.IsInvalidArgument(c.IsFromCluster(ctx)), should.BeTrue)
 	})
 
 	t.Run("valid secret", func(t *testing.T) {
@@ -58,7 +60,8 @@ func TestVerifySource(t *testing.T) {
 		md := metadata.Pairs("authorization", fmt.Sprintf("ClusterKey %s", hex.EncodeToString(key)))
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		a.So(c.VerifySource(ctx), should.BeNil)
+		ctx = c.WithVerifiedSource(ctx)
+		a.So(c.IsFromCluster(ctx), should.BeNil)
 	})
 
 	t.Run("wrong secret", func(t *testing.T) {
@@ -67,6 +70,7 @@ func TestVerifySource(t *testing.T) {
 		md := metadata.Pairs("authorization", "ClusterKey 0102030405060708")
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		a.So(errors.IsPermissionDenied(c.VerifySource(ctx)), should.BeTrue)
+		ctx = c.WithVerifiedSource(ctx)
+		a.So(errors.IsPermissionDenied(c.IsFromCluster(ctx)), should.BeTrue)
 	})
 }

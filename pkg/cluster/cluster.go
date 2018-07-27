@@ -51,8 +51,13 @@ type Cluster interface {
 	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer
 	// Auth returns a gRPC CallOption that can be used to identify the component within the cluster.
 	Auth() grpc.CallOption
-	// VerifySource verifies if the caller providing this context is a component from the cluster.
-	VerifySource(context.Context) error
+	// WithVerifiedSource verifies if the caller providing this context is a component from the cluster, and returns a
+	// new context with that information.
+	WithVerifiedSource(context.Context) context.Context
+	// IsFromCluster returns an error if the caller could not be identified as part of the cluster.
+	// It operates by extracting the information from WithVerifiedSource, and panics if WithVerifiedSource was not
+	// called beforehand.
+	IsFromCluster(context.Context) error
 }
 
 // CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.

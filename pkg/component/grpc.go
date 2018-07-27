@@ -18,7 +18,9 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/labstack/echo"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -99,33 +101,36 @@ func (c *Component) RegisterGRPC(s rpcserver.Registerer) {
 	c.grpcSubsystems = append(c.grpcSubsystems, s)
 }
 
-// ClusterAuth that can be used to identify a component within a cluster.
-func (c *Component) ClusterAuth() grpc.CallOption {
+// WithClusterAuth that can be used to identify a component within a cluster.
+func (c *Component) WithClusterAuth() grpc.CallOption {
 	return c.cluster.Auth()
 }
 
-// UnaryHook ensuring the caller of an RPC is part of the cluster.
+// EnsureClusterAuth verifies the caller of an RPC is part of the cluster, and returns an error otherwise.
+func (c *Component) EnsureClusterAuth(ctx context.Context) error {
+	return clusterauth.Authorized(ctx)
+}
+
+// ClusterAuthUnaryHook ensuring the caller of an RPC is part of the cluster.
 // If a call can't be identified as coming from the cluster, it will be discarded.
-func (c *Component) UnaryHook() hooks.UnaryHandlerMiddleware {
+func (c *Component) ClusterAuthUnaryHook() hooks.UnaryHandlerMiddleware {
 	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			if err := c.cluster.VerifySource(ctx); err != nil {
-				return nil, err
-			}
+			ctx = c.cluster.WithVerifiedSource(ctx)
 			return next(ctx, req)
 		}
 	}
 }
 
-// StreamHook ensuring the caller of an RPC is part of the cluster.
+// ClusterAuthStreamHook ensuring the caller of an RPC is part of the cluster.
 // If a call can't be identified as coming from the cluster, it will be discarded.
-func (c *Component) StreamHook() hooks.StreamHandlerMiddleware {
+func (c *Component) ClusterAuthStreamHook() hooks.StreamHandlerMiddleware {
 	return func(hdl grpc.StreamHandler) grpc.StreamHandler {
 		return func(srv interface{}, stream grpc.ServerStream) error {
-			if err := c.cluster.VerifySource(stream.Context()); err != nil {
-				return err
-			}
-			return hdl(srv, stream)
+			wrapped := grpc_middleware.WrapServerStream(stream)
+			ctx := c.cluster.WithVerifiedSource(stream.Context())
+			wrapped.WrappedContext = ctx
+			return hdl(srv, wrapped)
 		}
 	}
 }

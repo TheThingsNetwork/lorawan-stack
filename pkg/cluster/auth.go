@@ -19,6 +19,7 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"google.golang.org/grpc"
@@ -46,7 +47,12 @@ var errInvalidClusterKey = errors.DefinePermissionDenied(
 	"invalid cluster key",
 )
 
-func (c *cluster) VerifySource(ctx context.Context) error {
+func (c *cluster) WithVerifiedSource(ctx context.Context) context.Context {
+	err := c.verifySource(ctx)
+	return clusterauth.NewContext(ctx, err)
+}
+
+func (c *cluster) verifySource(ctx context.Context) error {
 	md := rpcmetadata.FromIncomingContext(ctx)
 	switch md.AuthType {
 	case AuthType:
@@ -65,6 +71,10 @@ func (c *cluster) VerifySource(ctx context.Context) error {
 		}
 	}
 	return errInvalidClusterKey
+}
+
+func (c *cluster) IsFromCluster(ctx context.Context) error {
+	return clusterauth.Authorized(ctx)
 }
 
 func (c *cluster) Auth() grpc.CallOption {

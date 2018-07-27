@@ -40,11 +40,16 @@ var (
 )
 
 type asImplementation struct {
+	*component.Component
+
 	up chan *ttnpb.ApplicationUp
 }
 
 // Subscribe implements ttnpb.AsServer
 func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
+	if err := as.EnsureClusterAuth(stream.Context()); err != nil {
+		return err
+	}
 	for {
 		select {
 		case <-stream.Context().Done():
@@ -55,10 +60,15 @@ func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream t
 	}
 }
 
-type gsImplementation struct{}
+type gsImplementation struct {
+	*component.Component
+}
 
 // GetGatewayObservations implements ttnpb.GsServer
-func (gs *gsImplementation) GetGatewayObservations(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
+func (gs *gsImplementation) GetGatewayObservations(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
+	if err := gs.EnsureClusterAuth(ctx); err != nil {
+		return nil, err
+	}
 	return &ttnpb.GatewayObservations{}, nil
 }
 
@@ -92,12 +102,15 @@ func TestUnaryHook(t *testing.T) {
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(errors.StreamServerInterceptor(), hooks.StreamServerInterceptor())),
 	)
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs", cluster.HookName, c.UnaryHook())
-	hooks.RegisterStreamHook("/ttn.lorawan.v3.As", cluster.HookName, c.StreamHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterStreamHook("/ttn.lorawan.v3.As", cluster.HookName, c.ClusterAuthStreamHook())
 
-	as := &asImplementation{up: make(chan *ttnpb.ApplicationUp)}
+	as := &asImplementation{
+		Component: c,
+		up:        make(chan *ttnpb.ApplicationUp),
+	}
 	ttnpb.RegisterAsServer(s, as)
-	gs := &gsImplementation{}
+	gs := &gsImplementation{Component: c}
 	ttnpb.RegisterGsServer(s, gs)
 	go s.Serve(lis)
 	defer s.Stop()
@@ -140,9 +153,9 @@ func TestUnaryHook(t *testing.T) {
 
 	// Successful calls
 	{
-		_, err = gsClient.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{}, c.ClusterAuth())
+		_, err = gsClient.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{}, c.WithClusterAuth())
 		a.So(err, should.BeNil)
-		sub, err := asClient.Subscribe(ctx, &ttnpb.ApplicationIdentifiers{}, c.ClusterAuth())
+		sub, err := asClient.Subscribe(ctx, &ttnpb.ApplicationIdentifiers{}, c.WithClusterAuth())
 		a.So(err, should.BeNil)
 		go func() {
 			as.up <- &ttnpb.ApplicationUp{
