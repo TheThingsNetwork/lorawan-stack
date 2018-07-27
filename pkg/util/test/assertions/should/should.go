@@ -135,7 +135,7 @@ var (
 	// PointTo receives exactly two parameters and checks to see that they point to the same address.
 	PointTo = assertions.ShouldPointTo
 	// Resemble receives exactly two parameters and does a deep equal check (see reflect.DeepEqual)
-	Resemble = assertions.ShouldResemble
+	Resemble = testassertions.ShouldResemble
 	// StartWith receives exactly 2 string parameters and ensures that the first starts with the second.
 	StartWith = assertions.ShouldStartWith
 
