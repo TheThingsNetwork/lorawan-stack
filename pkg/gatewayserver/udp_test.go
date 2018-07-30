@@ -137,7 +137,7 @@ func testDownlink(registeredGatewayID string, gs *gatewayserver.GatewayServer, c
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
-		_, err := gs.ScheduleDownlink(gs.Context(), downlink)
+		_, err := gs.ScheduleDownlink(test.Context(), downlink)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
