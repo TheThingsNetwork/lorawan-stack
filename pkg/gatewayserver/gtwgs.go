@@ -50,12 +50,12 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 	gw, err := is.GetGateway(ctx, gatewayID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errCouldNotRetrieveGatewayInformation.WithCause(err)
+		return ttnpb.FrequencyPlan{}, errRetrieveGatewayInformation.WithCause(err)
 	}
 
 	fp, err := g.FrequencyPlans.GetByID(gw.FrequencyPlanID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errCouldNotRetrieveFrequencyPlanOfGateway.WithAttributes("fp_id", gw.FrequencyPlanID)
+		return ttnpb.FrequencyPlan{}, errRetrieveFrequencyPlanForGateway.WithAttributes("frequency_plan_id", gw.FrequencyPlanID)
 	}
 
 	return fp, nil
@@ -138,12 +138,12 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 
 	gtw, err := g.getGateway(ctx, &id)
 	if err != nil {
-		return errCouldNotRetrieveGatewayInformation.WithCause(err)
+		return errRetrieveGatewayInformation.WithCause(err)
 	}
 
 	fp, err := g.FrequencyPlans.GetByID(gtw.GetFrequencyPlanID())
 	if err != nil {
-		return errCouldNotRetrieveFrequencyPlanOfGateway.WithAttributes("fp_id", gtw.GetFrequencyPlanID()).WithCause(err)
+		return errRetrieveFrequencyPlanForGateway.WithAttributes("frequency_plan_id", gtw.GetFrequencyPlanID()).WithCause(err)
 	}
 
 	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
@@ -194,26 +194,25 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 }
 
 func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, conn connection, upstreamMessage *ttnpb.GatewayUp) {
-	conn.addUpstreamObservations(upstreamMessage)
-
 	if upstreamMessage.GatewayStatus != nil {
-		registerReceiveStatus(ctx, conn.gatewayIdentifiers(), upstreamMessage.GatewayStatus)
-		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
+		g.handleStatus(ctx, upstreamMessage.GatewayStatus, conn)
 	}
 	for _, uplink := range upstreamMessage.UplinkMessages {
-		msgCtx := events.ContextWithCorrelationID(ctx, append(
-			uplink.CorrelationIDs,
-			fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()),
-		)...)
-		uplink.CorrelationIDs = events.CorrelationIDsFromContext(msgCtx)
-		registerReceiveUplink(msgCtx, conn.gatewayIdentifiers(), uplink)
-		g.handleUplink(msgCtx, uplink, conn)
+		g.handleUplink(ctx, uplink, conn)
 	}
 
 	return
 }
 
 func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, conn connection) (err error) {
+	ctx = events.ContextWithCorrelationID(ctx, append(
+		uplink.CorrelationIDs,
+		fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()),
+	)...)
+	uplink.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	registerReceiveUplink(ctx, conn.gatewayIdentifiers(), uplink)
+	conn.addUplinkObservation()
+
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
@@ -286,7 +285,9 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 	return
 }
 
-func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayStatus) error {
+func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayStatus, conn connection) error {
+	registerReceiveStatus(ctx, conn.gatewayIdentifiers(), status)
+	conn.addStatusObservation(status)
 	log.FromContext(ctx).Debug("Received status message")
 	return nil
 }
@@ -295,7 +296,7 @@ func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayS
 func (g *GatewayServer) GetFrequencyPlan(ctx context.Context, r *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
 	fp, err := g.FrequencyPlans.GetByID(r.GetFrequencyPlanID())
 	if err != nil {
-		return nil, errCouldNotRetrieveFrequencyPlanOfGateway.WithAttributes("fp_id", r.GetFrequencyPlanID()).WithCause(err)
+		return nil, errRetrieveFrequencyPlanForGateway.WithAttributes("frequency_plan_id", r.GetFrequencyPlanID()).WithCause(err)
 	}
 
 	return &fp, nil

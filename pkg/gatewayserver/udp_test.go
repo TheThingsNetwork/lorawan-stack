@@ -66,24 +66,48 @@ func testPushData(eui types.EUI64, ns *GsNsServer) func(t *testing.T) {
 			t.FailNow()
 		}
 
+		pWithInvalidPushData := p
+		p.Data.RxPacket[0].Modu = "I N V A L I D"
+		pWithInvalidPushDataBytes, err := pWithInvalidPushData.MarshalBinary()
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
 		conn, err := net.Dial("udp", testUDPAddress)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
 
-		_, err = conn.Write(packetBytes)
-		a.So(err, should.BeNil)
+		for _, tc := range []struct {
+			content []byte
+			success bool
+		}{
+			{
+				content: packetBytes,
+				success: true,
+			},
+			{
+				content: pWithInvalidPushDataBytes,
+				success: false,
+			},
+		} {
+			_, err = conn.Write(tc.content)
+			a.So(err, should.BeNil)
 
-		_, err = conn.Read(make([]byte, 2)) // Receive ACK
-		a.So(err, should.BeNil)
+			_, err = conn.Read(make([]byte, 2)) // Receive ACK
+			a.So(err, should.BeNil)
 
-		select {
-		case msg := <-ns.messageReceived:
-			if msg != "HandleUplink" {
-				t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
+			if !tc.success {
+				continue
 			}
-		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the PUSH_DATA.")
+			select {
+			case msg := <-ns.messageReceived:
+				if msg != "HandleUplink" {
+					t.Fatal("Expected Gateway Server to call HandleUplink on the Network Server, instead received", msg)
+				}
+			case <-time.After(nsReceptionTimeout):
+				t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the PUSH_DATA.")
+			}
 		}
 
 		conn.Close()
@@ -94,31 +118,47 @@ func testPullData(gatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t 
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
-		p := udp.Packet{
-			GatewayEUI:      &gatewayEUI,
-			ProtocolVersion: udp.Version1,
-			Token:           [2]byte{0x11, 0x00},
-			PacketType:      udp.PullData,
-		}
-
-		packetBytes, err := p.MarshalBinary()
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-
-		_, err = conn.Write(packetBytes)
-		a.So(err, should.BeNil)
-
-		_, err = conn.Read(make([]byte, 2)) // Receive ACK
-		a.So(err, should.BeNil)
-
-		select {
-		case msg := <-ns.messageReceived:
-			if msg != "StartServingGateway" {
-				t.Fatal("Expected Gateway Server to call StartServingGateway on the Network Server, instead received", msg)
+		for _, tc := range []struct {
+			eui     *types.EUI64
+			success bool
+		}{
+			{
+				eui:     &types.EUI64{0xaa, 0xbb, 0x13, 0xe1, 0x00, 0x00, 0x89, 0xaa},
+				success: false,
+			},
+			{
+				eui:     &gatewayEUI,
+				success: true,
+			},
+		} {
+			p := udp.Packet{
+				GatewayEUI:      tc.eui,
+				ProtocolVersion: udp.Version1,
+				Token:           [2]byte{0x11, 0x00},
+				PacketType:      udp.PullData,
 			}
-		case <-time.After(nsReceptionTimeout):
-			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the PULL_DATA.")
+
+			packetBytes, err := p.MarshalBinary()
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			_, err = conn.Write(packetBytes)
+			a.So(err, should.BeNil)
+
+			_, err = conn.Read(make([]byte, 2)) // Receive ACK
+			a.So(err, should.BeNil)
+
+			if tc.success {
+				select {
+				case msg := <-ns.messageReceived:
+					if msg != "StartServingGateway" {
+						t.Fatal("Expected Gateway Server to call StartServingGateway on the Network Server, instead received", msg)
+					}
+				case <-time.After(nsReceptionTimeout):
+					t.Fatal("The Gateway Server never called the Network Server's StartServingGateway to handle the PULL_DATA.")
+				}
+			}
 		}
 	}
 }

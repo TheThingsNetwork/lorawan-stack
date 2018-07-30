@@ -24,23 +24,19 @@ import (
 
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 const mqttConnectionTimeout = 3 * time.Second
-
-var (
-	registeredGatewayUID = "registered-gateway"
-	registeredGatewayEUI = types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-)
 
 // TODO: Refactor TestMQTTConnection/TestUDP(/TestLink?)
 func TestMQTTConnection(t *testing.T) {
@@ -145,14 +141,42 @@ func TestMQTTConnection(t *testing.T) {
 	}
 
 	t.Run("v3API", func(t *testing.T) {
+		status := ttnpb.NewPopulatedGatewayStatus(test.Randy, false)
+		statusStart := time.Now()
+		statusTopic := topic.Join([]string{
+			gatewayserver.V3TopicPrefix,
+			registeredGatewayUID,
+			gatewayserver.StatusTopicSuffix,
+		})
+		ok = t.Run("Status", func(t *testing.T) {
+			a := assertions.New(t)
+
+			statusBytes, err := status.Marshal()
+			if !a.So(err, should.BeNil) {
+				t.Fatal("Could not marshal status")
+			}
+
+			token := client.Publish(statusTopic, 0x00, false, statusBytes)
+			if ok := token.WaitTimeout(mqttConnectionTimeout); !a.So(ok, should.BeTrue) {
+				t.Fatal("PUBLISH timed out")
+			}
+			if err := token.Error(); !a.So(err, should.BeNil) {
+				t.Fatal("PUBLISH returned an error")
+			}
+		})
+		if !ok {
+			t.FailNow()
+		}
+
+		uplinkStart := time.Now()
+		uplinkTopic := topic.Join([]string{
+			gatewayserver.V3TopicPrefix,
+			registeredGatewayUID,
+			gatewayserver.UplinkTopicSuffix,
+		})
 		ok := t.Run("Uplink", func(t *testing.T) {
 			a := assertions.New(t)
 
-			uplinkTopic := topic.Join([]string{
-				gatewayserver.V3TopicPrefix,
-				registeredGatewayUID,
-				gatewayserver.UplinkTopicSuffix,
-			})
 			uplink := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 			uplinkBytes, err := uplink.Marshal()
 			if !a.So(err, should.BeNil) {
@@ -195,6 +219,14 @@ func TestMQTTConnection(t *testing.T) {
 				{
 					success: false,
 					topic:   registeredGatewayUID,
+				},
+				{
+					success: false,
+					topic: topic.Join([]string{
+						"v2",
+						registeredGatewayUID,
+						gatewayserver.DownlinkTopicSuffix,
+					}),
 				},
 				{
 					success: true,
@@ -248,6 +280,7 @@ func TestMQTTConnection(t *testing.T) {
 			t.FailNow()
 		}
 
+		downlinksStart := time.Now()
 		ok = t.Run("Downlinks", func(t *testing.T) {
 			a := assertions.New(t)
 
@@ -271,6 +304,58 @@ func TestMQTTConnection(t *testing.T) {
 		if !ok {
 			t.FailNow()
 		}
+
+		ctx := rights.NewContextWithFetcher(ctx, rights.FetcherFunc(func(context.Context, ttnpb.Identifiers) ([]ttnpb.Right, error) {
+			return []ttnpb.Right{ttnpb.RIGHT_GATEWAY_STATUS_READ}, nil
+		}))
+		t.Run("Statistics", func(t *testing.T) {
+			a := assertions.New(t)
+			observations, err := gs.GetGatewayObservations(ctx, &gtwID)
+			a.So(err, should.BeNil)
+
+			if !a.So(*observations.GetLastDownlinkReceivedAt(), should.HappenAfter, downlinksStart) {
+				t.Fatal("Expected last downlink reception time to have been recorded, but it wasn't")
+			}
+			if !a.So(*observations.GetLastUplinkReceivedAt(), should.HappenAfter, uplinkStart) {
+				t.Fatal("Expected last uplink reception time to have been recorded, but it wasn't")
+			}
+			if !a.So(*observations.GetLastStatusReceivedAt(), should.HappenAfter, statusStart) {
+				t.Fatal("Expected last status reception time to have been recorded, but it wasn't")
+			}
+			a.So(pretty.Diff(observations.GetLastStatus(), status), should.BeEmpty)
+		})
+
+		t.Run("Invalid messages", func(t *testing.T) {
+			a := assertions.New(t)
+
+			invalidStatusSent := time.Now()
+			token := client.Publish(statusTopic, 0x00, false, []byte{0x00, 0xaa})
+			if ok := token.WaitTimeout(mqttConnectionTimeout); !a.So(ok, should.BeTrue) {
+				t.Fatal("PUBLISH timed out when sending the invalid uplink")
+			}
+			if err := token.Error(); !a.So(err, should.BeNil) {
+				t.Fatal("PUBLISH returned an error")
+			}
+
+			invalidUplinkSent := time.Now()
+			token = client.Publish(uplinkTopic, 0x00, false, []byte{0x00, 0xaa})
+			if ok := token.WaitTimeout(mqttConnectionTimeout); !a.So(ok, should.BeTrue) {
+				t.Fatal("PUBLISH timed out when sending the invalid uplink")
+			}
+			if err := token.Error(); !a.So(err, should.BeNil) {
+				t.Fatal("PUBLISH returned an error")
+			}
+
+			observations, err := gs.GetGatewayObservations(ctx, &gtwID)
+			a.So(err, should.BeNil)
+
+			if !a.So(*observations.GetLastStatusReceivedAt(), should.HappenBefore, invalidStatusSent) {
+				t.Fatal("Expected invalid status to not have been handled, but it was")
+			}
+			if !a.So(*observations.GetLastUplinkReceivedAt(), should.HappenBefore, invalidUplinkSent) {
+				t.Fatal("Expected invalid uplink to not have been handled, but it was")
+			}
+		})
 
 		t.Run("Disconnect", func(t *testing.T) {
 			client.Disconnect(0)

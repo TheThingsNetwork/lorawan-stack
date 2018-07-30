@@ -23,8 +23,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+)
+
+var (
+	registeredGatewayUID = "registered-gateway"
+	registeredGatewayEUI = types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 )
 
 func Example() {

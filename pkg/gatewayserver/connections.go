@@ -41,8 +41,9 @@ const (
 )
 
 type connection interface {
-	addUpstreamObservations(*ttnpb.GatewayUp)
-	addDownstreamObservations(*ttnpb.GatewayDown)
+	addUplinkObservation()
+	addStatusObservation(*ttnpb.GatewayStatus)
+	addDownlinkObservation()
 	getObservations() ttnpb.GatewayObservations
 
 	gateway() *ttnpb.Gateway
@@ -79,23 +80,22 @@ func (c *connectionData) getObservations() ttnpb.GatewayObservations {
 	return observations
 }
 
-func (c *connectionData) addUpstreamObservations(up *ttnpb.GatewayUp) {
+func (c *connectionData) addUplinkObservation() {
 	now := time.Now().UTC()
-
 	c.observationsMu.Lock()
-
-	if up.GatewayStatus != nil {
-		c.observations.LastStatus = up.GatewayStatus
-		c.observations.LastStatusReceivedAt = &now
-	}
-	if len(up.UplinkMessages) != 0 {
-		c.observations.LastUplinkReceivedAt = &now
-	}
-
+	c.observations.LastUplinkReceivedAt = &now
 	c.observationsMu.Unlock()
 }
 
-func (c *connectionData) addDownstreamObservations(down *ttnpb.GatewayDown) {
+func (c *connectionData) addStatusObservation(status *ttnpb.GatewayStatus) {
+	now := time.Now().UTC()
+	c.observationsMu.Lock()
+	c.observations.LastStatus = status
+	c.observations.LastStatusReceivedAt = &now
+	c.observationsMu.Unlock()
+}
+
+func (c *connectionData) addDownlinkObservation() {
 	now := time.Now().UTC()
 	c.observationsMu.Lock()
 	c.observations.LastDownlinkReceivedAt = &now

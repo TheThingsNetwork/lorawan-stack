@@ -1781,18 +1781,18 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver:retrieve_gateway_info": {
+  "error:pkg/gatewayserver:retrieve_gateway_frequency_plan": {
     "translations": {
-      "en": "could not retrieve information about the gateway"
+      "en": "could not retrieve the frequency plan `{frequency_plan_id}` of the gateway"
     },
     "description": {
       "package": "pkg/gatewayserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver:retrieve_gtw_frequency_plan": {
+  "error:pkg/gatewayserver:retrieve_gateway_info": {
     "translations": {
-      "en": "could not retrieve the frequency plan `{fp_id}` of the gateway"
+      "en": "could not retrieve information about the gateway"
     },
     "description": {
       "package": "pkg/gatewayserver",

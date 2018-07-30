@@ -48,7 +48,7 @@ func (h mqttConnectionHandler) Context() context.Context {
 const (
 	UplinkTopicSuffix   = "up"
 	DownlinkTopicSuffix = "down"
-	StatusTopicStatus   = "status"
+	StatusTopicSuffix   = "status"
 
 	V3TopicPrefix = "v3"
 )
@@ -82,7 +82,7 @@ func (h *mqttConnectionHandler) deliveryFunc(pkt *packet.PublishPacket) (deliver
 	switch pkt.TopicParts[2] {
 	case UplinkTopicSuffix:
 		return h.deliverMQTTUplink, nil
-	case StatusTopicStatus:
+	case StatusTopicSuffix:
 		return h.deliverMQTTStatus, nil
 	default:
 		return nil, errUnsupportedTopicFormat.WithAttributes("topic", pkt.TopicName)
@@ -99,14 +99,14 @@ func (h *mqttConnectionHandler) deliverMQTTUplink(pkt *packet.PublishPacket, con
 	return h.gs.handleUplink(h.Context(), up, conn)
 }
 
-func (h *mqttConnectionHandler) deliverMQTTStatus(pkt *packet.PublishPacket, _ connection) error {
+func (h *mqttConnectionHandler) deliverMQTTStatus(pkt *packet.PublishPacket, conn connection) error {
 	status := &ttnpb.GatewayStatus{}
 	err := status.Unmarshal(pkt.Message)
 	if err != nil {
 		return errUnmarshalFromProtobuf.WithCause(err)
 	}
 
-	return h.gs.handleStatus(h.Context(), status)
+	return h.gs.handleStatus(h.Context(), status, conn)
 }
 
 // CustomMQTTContextFiller allows for filling the context for the MQTT connection.

@@ -57,14 +57,13 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 			return
 		}
 
-		if packet.GatewayEUI == nil {
-			logger.Error("No gateway EUI in the packet, dropping the packet")
-			continue
+		gtwLogger := logger
+		if packet.GatewayEUI != nil {
+			gtwLogger = gtwLogger.WithField("gateway_eui", packet.GatewayEUI.String())
 		}
-		logger := logger.WithField("gateway_eui", packet.GatewayEUI.String())
-		ctx := log.NewContext(ctx, logger)
+		ctx := log.NewContext(ctx, gtwLogger)
 		if err := packet.Ack(); err != nil {
-			logger.WithError(err).Error("Could not acknowledge incoming packet")
+			gtwLogger.WithError(err).Error("Could not acknowledge incoming packet")
 		}
 
 		v, loaded := udpGateways.LoadOrStore(*packet.GatewayEUI, &udpConnState{eui: packet.GatewayEUI})

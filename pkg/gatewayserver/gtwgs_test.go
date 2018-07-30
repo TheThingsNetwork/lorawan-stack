@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -28,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc/metadata"
@@ -81,10 +83,12 @@ func TestLink(t *testing.T) {
 	}
 	defer store.Destroy()
 
-	registeredGatewayID := "registered-gateway"
+	gtwID, err := unique.ToGatewayID(registeredGatewayUID)
+	a.So(err, should.BeNil)
+
 	is, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
+			GatewayIdentifiers: gtwID,
 			FrequencyPlanID:    "EU_863_870",
 		},
 	})
@@ -138,7 +142,7 @@ func TestLink(t *testing.T) {
 	}
 
 	link.ContextFunc = func() context.Context {
-		md := metadata.Pairs("id", registeredGatewayID)
+		md := metadata.Pairs("id", gtwID.GatewayID)
 		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 			md = metadata.Join(ctxMd, md)
 		}
@@ -179,8 +183,7 @@ func TestLink(t *testing.T) {
 		wg.Done()
 	}()
 
-	// StartServingGateway
-	{
+	t.Run("StartServingGateway", func(t *testing.T) {
 		select {
 		case msg := <-ns.messageReceived:
 			if msg != "StartServingGateway" {
@@ -195,10 +198,9 @@ func TestLink(t *testing.T) {
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called Link.Recv() to receive the status message. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
-	}
+	})
 
-	// Join-request
-	{
+	t.Run("Join request", func(t *testing.T) {
 		join := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{join}}:
@@ -214,10 +216,9 @@ func TestLink(t *testing.T) {
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join-request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
-	}
+	})
 
-	// Uplink
-	{
+	t.Run("Uplink", func(t *testing.T) {
 		genericAESKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 		uplink := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy,
 			// Generic SNwkSIntKey and FNwkSIntKey
@@ -236,7 +237,33 @@ func TestLink(t *testing.T) {
 		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
-	}
+	})
+
+	t.Run("Downlink", func(t *testing.T) {
+		a := assertions.New(t)
+
+		downlink := ttnpb.NewPopulatedDownlinkMessage(test.Randy, false)
+		downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{
+			GatewayID: gtwID.GatewayID,
+		}
+		downlink.Settings.Frequency = 863000000
+		downlink.Settings.SpreadingFactor = 7
+		downlink.Settings.Bandwidth = 125000
+		downlink.Settings.CodingRate = "4/5"
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			receivedDown := <-down
+			a.So(pretty.Diff(downlink, receivedDown.DownlinkMessage), should.BeEmpty)
+			wg.Done()
+		}()
+		_, err := gs.ScheduleDownlink(ctx, downlink)
+
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		wg.Wait()
+	})
 
 	cancel()
 	wg.Wait()

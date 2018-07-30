@@ -39,8 +39,8 @@ var (
 	errUnmarshalFromProtobuf   = errors.DefineInvalidArgument("unmarshal_from_protobuf", "could not unmarshal message from protobuf")
 	errTranslationFromProtobuf = errors.DefineInternal("protocol_translation", "could not translate from the protobuf format to UDP")
 
-	errCouldNotRetrieveGatewayInformation     = errors.Define("retrieve_gateway_info", "could not retrieve information about the gateway")
-	errCouldNotRetrieveFrequencyPlanOfGateway = errors.Define("retrieve_gtw_frequency_plan", "could not retrieve the frequency plan `{fp_id}` of the gateway")
+	errRetrieveGatewayInformation      = errors.Define("retrieve_gateway_info", "could not retrieve information about the gateway")
+	errRetrieveFrequencyPlanForGateway = errors.Define("retrieve_gateway_frequency_plan", "could not retrieve the frequency plan `{frequency_plan_id}` of the gateway")
 
 	errCouldNotBeScheduled          = errors.Define("schedule", "could not schedule downlink")
 	errCouldNotComputeTOAOfDownlink = errors.Define("compute_toa_of_downlink", "could not compute the time on air of a downlink")
