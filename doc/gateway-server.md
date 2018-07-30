@@ -16,29 +16,37 @@ Many packet forwarders implementing this protocol do not implement any queuing s
 
 #### gRPC protocol
 
-Gateways can connect to a Gateway Server using [The Things Network's gRPC protocol](../api/gatewayserver.proto#L79).
+Gateways can connect to a Gateway Server using [The Things Network's gRPC protocol](../api/gatewayserver.proto).
 
 #### MQTT protocol
 
-Though it is not yet implemented, gateways will be able to connect to a Gateway Server using authenticated MQTT.
+Gateways can connect to a Gateway Server by exchanging [protobuf-encoded messages](../api/gatewayserver.proto) over MQTT. This preserves the security and bandwidth usage features of the gRPC protocol, and is compatible with environments for which gRPC is not available.
 
-## Public Gateway Information
+Clients should:
 
-## Status Messages
++ Set the broker address to the gateway server's [MQTT endpoint](networking.md).
 
-## Forwarding to Network Server
++ Set the ID of the gateway as username, and an API key with the `GATEWAY_INFO` and `GATEWAY_LINK` rights as password.
 
-Each gateway server has a list of network servers to connect to.
++ Use the `v3/<gateway ID>/up` topic to push uplinks, and the `v3/<gateway ID>/status` to push status messages.
 
-### Device Address Prefixes
++ Subscribe to the `v3/<gateway ID>/down` topic to pull downlinks.
 
-> TODO
+## Gateway Information
 
-### Peering
+While a gateway is connected, the Gateway Server collects statistics about the messages exchanged with the gateway, and about the status messages sent by the gateway. Those statistics can be retrieved using the `GetGatewayObservations` endpoint.
+
+## Communication with Network Server
+
+The main function of the Gateway Server is to establish a stable connection with gateways, and to serve as a relay between those gateways and the Network Servers.
+
+When routing an uplink, the Gateway Server decides which Network Server to send it to based on the `DevAddr` of the device. Join request are similarly routed based on the `DevEUI` of the device.
+
+The Gateway Server exchanges with Network Servers over gRPC - it signals connections of gateways using `StartServingGateway` and `StopServingGateway`, and pushes uplinks using `HandleUplink`. It exposes an endpoint, `ScheduleDownlink`, that the Network Server uses to send downlinks to gateways.
 
 ## Downlink Scheduling
 
-The gateway server keeps track of all downlinks emitted and to be emitted by gateways connected. The network server can request the scheduling of a downlink with the [`ScheduleDownlink` method](../api/gatewayserver.proto#L89), by attaching the **timestamp** at which a downlink should be sent. The gateway server does not decide which gateway sends a downlink, as this is decided by the network server.
+The gateway server keeps track of all downlinks emitted and to be emitted by gateways connected. The network server can request the scheduling of a downlink with the [`ScheduleDownlink` method](../api/gatewayserver.proto), by attaching the **timestamp** at which a downlink should be sent. The gateway server does not decide which gateway sends a downlink, as this is decided by the network server.
 
 The following checks are being done by the gateway server before scheduling a downlink:
 
@@ -48,4 +56,4 @@ The following checks are being done by the gateway server before scheduling a do
 
 + **Duty cycle**: Many countries have **duty cycle restrictions**, prohibiting a device for emitting for more than a certain percentage of time on a certain band. You can find more details in our [official documentation](https://www.thethingsnetwork.org/docs/lorawan/#eu-863-870-mhz-and-duty-cycle).
 
-+ **Dwell time**: Some countries, such as the USA, are subject to **dwell time regulations** - meaning the duration of an transmission can't exceed a certain period.
++ **Dwell time**: Some countries, such as the United States, are subject to **dwell time regulations** - meaning the duration of an transmission can't exceed a certain period.
