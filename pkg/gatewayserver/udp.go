@@ -69,16 +69,15 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 
 		v, loaded := udpGateways.LoadOrStore(*packet.GatewayEUI, &udpConnState{eui: packet.GatewayEUI})
 		conn := v.(*udpConnState)
-
-		if !loaded {
-			go func() {
+		go func() {
+			if !loaded {
 				if err := g.setupUDPConnection(ctx, conn); err != nil {
 					udpGateways.Delete(*packet.GatewayEUI)
+					return
 				}
-			}()
-		}
-
-		go g.handleUpstreamUDPMessage(ctx, packet, conn)
+			}
+			g.handleUpstreamUDPMessage(conn.ctx, packet, conn)
+		}()
 	}
 }
 
@@ -127,7 +126,7 @@ func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnSta
 
 	g.setupConnection(uid, conn)
 
-	// TODO: Claim identifiers here (https://github.com/TheThingsIndustries/lorawan-stack/issues/941)
+	// TODO: Claim identifiers (https://github.com/TheThingsIndustries/lorawan-stack/issues/941)
 	go func() {
 		g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
 	}()
