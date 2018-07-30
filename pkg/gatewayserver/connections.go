@@ -129,6 +129,7 @@ func (c *gRPCConnection) Close() error {
 
 type udpConnState struct {
 	connectionData
+	ctx context.Context
 
 	gtw                 atomic.Value
 	lastPullDataStorage atomic.Value

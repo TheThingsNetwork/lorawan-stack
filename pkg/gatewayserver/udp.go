@@ -82,8 +82,20 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 	}
 }
 
+// CustomUDPContextFiller allows for filling the context for the UDP connection.
+var CustomUDPContextFiller func(ctx context.Context, id ttnpb.GatewayIdentifiers) (context.Context, error)
+
 func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnState) error {
 	// TODO: Add frequency plan refresh on a regular basis: https://github.com/TheThingsIndustries/ttn/issues/727
+
+	ctx = g.Component.FillContext(ctx)
+	if filler := CustomUDPContextFiller; filler != nil {
+		var err error
+		ctx, err = filler(ctx, ttnpb.GatewayIdentifiers{EUI: conn.eui})
+		if err != nil {
+			return err
+		}
+	}
 
 	logger := log.FromContext(ctx)
 	logger.Info("Fetching gateway information and frequency plan...")
@@ -93,6 +105,9 @@ func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnSta
 		logger.WithError(err).Error("Could not retrieve gateway information from the Gateway Server")
 		return err
 	}
+	uid := unique.ID(ctx, gtw.GatewayIdentifiers)
+	logger = logger.WithField("gateway_uid", uid)
+	conn.gtw.Store(gtw)
 
 	fpID := gtw.GetFrequencyPlanID()
 	logger = logger.WithField("frequency_plan_id", fpID)
@@ -108,17 +123,16 @@ func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnSta
 	}
 	conn.scheduler = scheduler
 
-	conn.gtw.Store(gtw)
-
 	logger.Info("Gateway information and frequency plan fetched")
 
-	g.setupConnection(unique.ID(ctx, gtw.GatewayIdentifiers), conn)
+	g.setupConnection(uid, conn)
+
+	// TODO: Claim identifiers here (https://github.com/TheThingsIndustries/lorawan-stack/issues/941)
 	go func() {
-		ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
 		g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
-		cancel()
 	}()
 
+	conn.ctx = ctx
 	return nil
 }
 
