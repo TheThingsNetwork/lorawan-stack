@@ -15,6 +15,7 @@
 package component_test
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -48,7 +49,7 @@ var (
 func init() {
 	for _, filepath := range []string{certPem, keyPem} {
 		if _, err := os.Stat(filepath); err != nil {
-			panic(fmt.Sprintf("Could not retrieve information about the %s file - if you haven't generated it, generate it with `make dev-cert`.", filepath))
+			panic(fmt.Sprintf("could not retrieve information about the %s file - if you haven't generated it, generate it with `make dev-cert`.", filepath))
 		}
 	}
 }
@@ -238,5 +239,39 @@ func TestGRPC(t *testing.T) {
 		client.Close()
 
 		c.Close()
+	}
+}
+
+func TestContext(t *testing.T) {
+	a := assertions.New(t)
+
+	config := component.Config{}
+
+	c, err := component.New(test.GetLogger(t), &config)
+	a.So(err, should.BeNil)
+
+	baseCtx := context.Background()
+
+	// No filler
+	{
+		ctx := c.FillContext(baseCtx)
+		a.So(ctx, should.Resemble, baseCtx)
+	}
+
+	// Filler
+	{
+		c.AddContextFiller(func(ctx context.Context) context.Context {
+			ctx = context.WithValue(ctx, "k1", "v1")
+			ctx = context.WithValue(ctx, "k2", "v2")
+			return ctx
+		})
+		ctx := c.FillContext(baseCtx)
+		a.So(ctx, should.Resemble, context.WithValue(
+			context.WithValue(
+				baseCtx,
+				"k1", "v1",
+			),
+			"k2", "v2",
+		))
 	}
 }

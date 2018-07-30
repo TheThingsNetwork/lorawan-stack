@@ -38,4 +38,7 @@ func (c *Component) initRights() {
 	}
 
 	c.rightsFetcher = fetcher
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		return rights.NewContextWithFetcher(ctx, fetcher)
+	})
 }

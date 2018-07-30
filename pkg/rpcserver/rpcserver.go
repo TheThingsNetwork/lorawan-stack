@@ -31,11 +31,12 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
+	rpcfillcontext "go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/sentry"
@@ -130,7 +131,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 
 	streamInterceptors := []grpc.StreamServerInterceptor{
-		fillcontext.StreamServerInterceptor(options.contextFillers...),
+		rpcfillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
 		events.StreamServerInterceptor,
@@ -143,7 +144,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
-		fillcontext.UnaryServerInterceptor(options.contextFillers...),
+		rpcfillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
 		events.UnaryServerInterceptor,

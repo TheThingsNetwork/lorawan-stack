@@ -19,7 +19,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -33,11 +32,7 @@ func (c *Component) initGRPC() {
 
 	c.grpc = rpcserver.New(
 		c.ctx,
-		rpcserver.WithContextFiller(func(ctx context.Context) context.Context {
-			ctx = rights.NewContextWithFetcher(ctx, c.rightsFetcher)
-			// TODO: Fill other globals in call context (data stores, config, ...)
-			return ctx
-		}),
+		rpcserver.WithContextFiller(c.FillContext),
 		rpcserver.WithSentry(c.sentry),
 	)
 }

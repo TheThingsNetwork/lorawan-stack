@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
@@ -60,6 +61,8 @@ type Component struct {
 	loopback *grpc.ClientConn
 
 	tcpListeners map[string]*listener
+
+	fillers []fillcontext.Filler
 
 	FrequencyPlans *frequencyplans.Store
 
@@ -117,6 +120,19 @@ func (c *Component) Logger() log.Stack {
 // Context returns the context of the component
 func (c *Component) Context() context.Context {
 	return c.ctx
+}
+
+// FillContext fills the context
+func (c *Component) FillContext(ctx context.Context) context.Context {
+	for _, filler := range c.fillers {
+		ctx = filler(ctx)
+	}
+	return ctx
+}
+
+// AddContextFiller adds the specified filler
+func (c *Component) AddContextFiller(f fillcontext.Filler) {
+	c.fillers = append(c.fillers, f)
 }
 
 // Start starts the component
