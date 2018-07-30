@@ -15,6 +15,7 @@
 package joinserver_test
 
 import (
+	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/store"
@@ -51,7 +52,7 @@ var (
 func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 	b, err := crypto.EncryptJoinAccept(key, pld)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to encrypt join-accept"))
+		panic(fmt.Sprintf("failed to encrypt join-accept: %s", err))
 	}
 	return b
 }
@@ -120,7 +121,7 @@ func TestHandleJoin(t *testing.T) {
 		JoinRequest  *ttnpb.JoinRequest
 		JoinResponse *ttnpb.JoinResponse
 
-		Error error
+		ValidErr func(error) bool
 	}{
 		{
 			"1.1 new device",
@@ -407,7 +408,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			nil,
-			ErrDevNonceTooSmall,
+			errors.IsInvalidArgument,
 		},
 		{
 			"1.1 address mismatch",
@@ -466,9 +467,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			nil,
-			ErrAddressMismatch.WithAttributes(
-				"component", "Network Server",
-			),
+			errors.IsPermissionDenied,
 		},
 		{
 			"1.0.2 new device",
@@ -900,7 +899,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			nil,
-			ErrDevNonceReused,
+			errors.IsInvalidArgument,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -926,9 +925,8 @@ func TestHandleJoin(t *testing.T) {
 
 			start := time.Now()
 			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
-			if tc.Error != nil {
-				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
-				a.So(errors.From(err).Code(), should.Resemble, errors.From(tc.Error).Code())
+			if tc.ValidErr != nil {
+				a.So(tc.ValidErr(err), should.BeTrue)
 				a.So(resp, should.BeNil)
 				return
 			}
@@ -953,7 +951,7 @@ func TestHandleJoin(t *testing.T) {
 			ed.NextDevNonce = tc.NextNextDevNonce
 			ed.NextJoinNonce = tc.NextNextJoinNonce
 			ed.UsedDevNonces = tc.NextUsedDevNonces
-			if tc.Error == nil {
+			if tc.ValidErr == nil {
 				a.So([]time.Time{start, dev.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
 				ed.Session = &ttnpb.Session{
 					DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
@@ -1003,7 +1001,7 @@ func TestGetAppSKey(t *testing.T) {
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.AppSKeyResponse
 
-		Error error
+		ValidErr func(error) bool
 	}{
 		{
 			"Valid session",
@@ -1081,7 +1079,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrNoSession,
+			errors.IsDataLoss,
 		},
 		{
 			"ID mismatch",
@@ -1106,7 +1104,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch,
+			errors.IsInvalidArgument,
 		},
 		{
 			"ID mismatch no fallback",
@@ -1126,7 +1124,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch,
+			errors.IsInvalidArgument,
 		},
 		{
 			"Address mismatch",
@@ -1141,9 +1139,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrAddressMismatch.WithAttributes(
-				"component", "Application Server",
-			),
+			errors.IsPermissionDenied,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1168,9 +1164,8 @@ func TestGetAppSKey(t *testing.T) {
 			}).ToIncomingContext(test.Context())
 
 			resp, err := js.GetAppSKey(ctx, tc.KeyRequest)
-			if tc.Error != nil {
-				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
-				a.So(errors.From(err).Code(), should.Resemble, errors.From(tc.Error).Code())
+			if tc.ValidErr != nil {
+				a.So(tc.ValidErr(err), should.BeTrue)
 				a.So(resp, should.BeNil)
 				return
 			}
@@ -1215,7 +1210,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.NwkSKeysResponse
 
-		Error error
+		ValidErr func(error) bool
 	}{
 		{
 			"Valid request",
@@ -1325,7 +1320,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrNoSession,
+			errors.IsDataLoss,
 		},
 		{
 			"ID mismatch",
@@ -1350,7 +1345,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch,
+			errors.IsInvalidArgument,
 		},
 		{
 			"ID mismatch no fallback",
@@ -1370,7 +1365,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch,
+			errors.IsInvalidArgument,
 		},
 		{
 			"Address mismatch",
@@ -1385,9 +1380,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrAddressMismatch.WithAttributes(
-				"component", "Network Server",
-			),
+			errors.IsPermissionDenied,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1412,9 +1405,8 @@ func TestGetNwkSKeys(t *testing.T) {
 			}).ToIncomingContext(test.Context())
 
 			resp, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
-			if tc.Error != nil {
-				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
-				a.So(errors.From(err).Code(), should.Resemble, errors.From(tc.Error).Code())
+			if tc.ValidErr != nil {
+				a.So(tc.ValidErr(err), should.BeTrue)
 				a.So(resp, should.BeNil)
 				return
 			}
