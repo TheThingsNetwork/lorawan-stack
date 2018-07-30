@@ -34,6 +34,14 @@ func compatibleVerifier(t *testing.T) func(version ttnpb.PHYVersion, versionName
 			if _, err = b.Version(version); err != nil {
 				t.Fatalf("Band %s does not support intended LoRaWAN Regional Parameters version %s\n", b.ID, versionName)
 			}
+
+			versions := b.Versions()
+			for _, scannedVersion := range versions {
+				if scannedVersion == version {
+					return
+				}
+			}
+			t.Fatalf("A version of the band %s was returned for LoRaWAN Regional Parameters %s, but the version was not returned by Versions", id, version.String())
 		}
 	}
 }
