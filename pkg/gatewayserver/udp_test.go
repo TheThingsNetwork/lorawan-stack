@@ -219,7 +219,7 @@ func TestUDP(t *testing.T) {
 	}
 	defer conn.Close()
 
-	t.Run("PushData", testPushData(registeredGatewayEUI, &ns))
 	t.Run("PullData", testPullData(registeredGatewayEUI, &ns, conn))
+	t.Run("PushData", testPushData(registeredGatewayEUI, &ns))
 	t.Run("Downlink", testDownlink(registeredGatewayID, gs, conn))
 }
