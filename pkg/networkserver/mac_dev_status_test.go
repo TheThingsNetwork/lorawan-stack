@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleDevStatusAns(t *testing.T) {
+	events := test.CollectEvents("ns.mac.device_status")
+	defer events.Expect(t, 1)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleDLChannelAns(t *testing.T) {
+	events := test.CollectEvents("ns.mac.dl_channel.*")
+	defer events.Expect(t, 1)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

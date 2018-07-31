@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleRekeyInd(t *testing.T) {
+	events := test.CollectEvents("ns.mac.rekey_ind")
+	defer events.Expect(t, 2)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

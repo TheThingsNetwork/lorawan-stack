@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleDutyCycleAns(t *testing.T) {
+	events := test.CollectEvents("ns.mac.duty_cycle.accept")
+	defer events.Expect(t, 1)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

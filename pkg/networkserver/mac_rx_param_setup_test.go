@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleRxParamSetupAns(t *testing.T) {
+	events := test.CollectEvents("ns.mac.rx_param.*")
+	defer events.Expect(t, 2)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

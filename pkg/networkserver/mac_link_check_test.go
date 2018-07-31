@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleLinkCheckReq(t *testing.T) {
+	events := test.CollectEvents("ns.mac.link_check")
+	defer events.Expect(t, 3)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

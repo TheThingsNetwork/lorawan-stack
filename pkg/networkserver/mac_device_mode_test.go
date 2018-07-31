@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleDeviceModeInd(t *testing.T) {
+	events := test.CollectEvents("ns.mac.device_mode")
+	defer events.Expect(t, 1)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleRejoinParamSetupAns(t *testing.T) {
+	events := test.CollectEvents("ns.mac.rejoin_param.accept")
+	defer events.Expect(t, 1)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice

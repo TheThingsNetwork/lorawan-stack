@@ -26,6 +26,9 @@ import (
 )
 
 func TestHandleADRParamSetupAns(t *testing.T) {
+	events := test.CollectEvents("ns.mac.adr_param.accept")
+	defer events.Expect(t, 1)
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
