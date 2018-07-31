@@ -66,9 +66,12 @@ func init() {
 }
 
 func contextWithKey() context.Context {
-	return metadata.NewIncomingContext(test.Context(), metadata.MD{
-		"authorization": []string{fmt.Sprintf("Basic %s", Keys[0])},
-	})
+	ctx := test.Context()
+	md := metadata.Pairs("authorization", fmt.Sprintf("Basic %s", Keys[0]))
+	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	return metadata.NewIncomingContext(ctx, md)
 }
 
 func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
@@ -1162,7 +1165,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 						MockServerStream: &test.MockServerStream{
 							MockStream: &test.MockStream{
-								ContextFunc: context.Background,
+								ContextFunc: contextWithKey,
 							},
 						},
 						SendFunc: func(up *ttnpb.ApplicationUp) error {
@@ -1685,7 +1688,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 						MockServerStream: &test.MockServerStream{
 							MockStream: &test.MockStream{
-								ContextFunc: context.Background,
+								ContextFunc: contextWithKey,
 							},
 						},
 						SendFunc: func(up *ttnpb.ApplicationUp) error {
