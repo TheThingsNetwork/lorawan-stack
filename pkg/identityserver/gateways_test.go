@@ -182,11 +182,15 @@ func TestPullConfiguration(t *testing.T) {
 			key, err := is.userService.GenerateGatewayAPIKey(userCtx, apiKeyRequest)
 			a.So(err, should.BeNil)
 
-			authString := fmt.Sprintf("Bearer %s", key.GetKey())
-			gtwCtx := metadata.NewIncomingContext(userCtx, metadata.MD{
-				"id":            []string{unique.ID(userCtx, gtw.GatewayIdentifiers)},
-				"authorization": []string{authString},
+			gtwCtx := test.Context()
+			md := metadata.New(map[string]string{
+				"id":            unique.ID(gtwCtx, gtw.GatewayIdentifiers),
+				"authorization": fmt.Sprintf("Bearer %s", key.GetKey()),
 			})
+			if ctxMd, ok := metadata.FromIncomingContext(gtwCtx); ok {
+				md = metadata.Join(ctxMd, md)
+			}
+			gtwCtx = metadata.NewIncomingContext(gtwCtx, md)
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
