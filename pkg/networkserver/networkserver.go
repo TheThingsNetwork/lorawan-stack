@@ -90,10 +90,10 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			ADRNbTrans:        1,
 			DutyCycle:         ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:           band.DefaultMaxEIRP,
+			Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
 			Rx1DataRateOffset: 0,
 			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
 			Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
-			Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
 			DownlinkDwellTime: band.DwellTime > 0,
 			UplinkDwellTime:   band.DwellTime > 0,
 		},
@@ -182,11 +182,15 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink and error if any.
 // If no downlink could be generated - nil, errNoDownlink is returned.
-func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage) (b []byte, err error) {
+func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confFCnt uint32) (b []byte, err error) {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
+
+	if !ack && confFCnt > 0 {
+		panic("confFCnt must be 0 if ack is false")
+	}
 
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
@@ -219,8 +223,8 @@ func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb
 		}).MACCommand())
 	}
 
-	if dev.MACSettings.GetStatusCountPeriodicity() > 0 && dev.NextStatusAfter == 0 ||
-		dev.MACSettings.GetStatusTimePeriodicity() > 0 && dev.NextStatusAt.Before(time.Now()) {
+	if dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
+		dev.MACSettings.StatusTimePeriodicity > 0 && dev.NextStatusAt.Before(time.Now()) {
 
 		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
 		if dev.MACSettings.StatusTimePeriodicity > 0 {
@@ -314,10 +318,10 @@ func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb
 		}).MACCommand())
 	}
 
-	if len(dev.MACState.PendingRequests) == 0 &&
+	if !ack &&
+		len(dev.MACState.PendingRequests) == 0 &&
 		len(dev.MACState.QueuedResponses) == 0 &&
-		len(dev.QueuedApplicationDownlinks) == 0 &&
-		(up == nil || up.Payload.MType != ttnpb.MType_CONFIRMED_UP) {
+		len(dev.QueuedApplicationDownlinks) == 0 {
 		return nil, errNoDownlink
 	}
 
@@ -367,7 +371,7 @@ func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb
 		FHDR: ttnpb.FHDR{
 			DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
 			FCtrl: ttnpb.FCtrl{
-				Ack: up != nil && up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
+				Ack: ack,
 			},
 			FCnt: dev.Session.NextNFCntDown,
 		},
@@ -389,7 +393,7 @@ func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb
 		}
 	}
 
-	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.EndDevice.LoRaWANVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || dev.Session.NwkSEncKey.Key.IsZero() {
 			return nil, errMissingNwkSEncKey
 		}
@@ -434,6 +438,7 @@ func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb
 		},
 	}).MarshalLoRaWAN()
 	if err != nil {
+		panic(err)
 		return nil, errMarshalPayloadFailed.WithCause(err)
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
@@ -455,7 +460,7 @@ func generateDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb
 	mic, err := crypto.ComputeDownlinkMIC(
 		key,
 		*dev.EndDeviceIdentifiers.DevAddr,
-		pld.FCnt,
+		confFCnt,
 		b,
 	)
 	if err != nil {
@@ -615,7 +620,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return fnv.New64a()
 	}
 	ns.metadataAccumulatorPool.New = func() interface{} {
-		return &metadataAccumulator{newAccumulator()}
+		return newMetadataAccumulator()
 	}
 
 	for _, opt := range opts {
@@ -842,46 +847,56 @@ func (ns *NetworkServer) StopServingGateway(ctx context.Context, id *ttnpb.Gatew
 }
 
 type accumulator struct {
-	accumulation *sync.Map
+	m *sync.Map
 }
 
-func newAccumulator() *accumulator {
-	return &accumulator{
-		accumulation: &sync.Map{},
-	}
+func (acc *accumulator) Add(v interface{}) {
+	acc.m.Store(v, struct{}{})
 }
 
-func (a *accumulator) Add(v interface{}) {
-	a.accumulation.Store(v, struct{}{})
-}
-
-func (a *accumulator) Range(f func(v interface{})) {
-	a.accumulation.Range(func(k, _ interface{}) bool {
+func (acc *accumulator) Range(f func(v interface{})) {
+	acc.m.Range(func(k, _ interface{}) bool {
 		f(k)
 		return true
 	})
 }
 
-func (a *accumulator) Reset() {
-	a.Range(a.accumulation.Delete)
+func (acc *accumulator) Reset() {
+	acc.Range(acc.m.Delete)
+}
+
+func newAccumulator(vs ...interface{}) (acc *accumulator) {
+	acc = &accumulator{
+		m: &sync.Map{},
+	}
+	for _, v := range vs {
+		acc.Add(v)
+	}
+	return
 }
 
 type metadataAccumulator struct {
 	*accumulator
 }
 
-func (a *metadataAccumulator) Accumulated() []*ttnpb.RxMetadata {
-	md := make([]*ttnpb.RxMetadata, 0, accumulationCapacity)
-	a.accumulator.Range(func(k interface{}) {
+func (acc *metadataAccumulator) Accumulated() (md []*ttnpb.RxMetadata) {
+	md = make([]*ttnpb.RxMetadata, 0, accumulationCapacity)
+	acc.accumulator.Range(func(k interface{}) {
 		md = append(md, k.(*ttnpb.RxMetadata))
 	})
-	return md
+	return
 }
 
-func (a *metadataAccumulator) Add(mds ...*ttnpb.RxMetadata) {
+func (acc *metadataAccumulator) Add(mds ...*ttnpb.RxMetadata) {
 	for _, md := range mds {
-		a.accumulator.Add(md)
+		acc.accumulator.Add(md)
 	}
+}
+
+func newMetadataAccumulator(mds ...*ttnpb.RxMetadata) *metadataAccumulator {
+	acc := &metadataAccumulator{newAccumulator()}
+	acc.Add(mds...)
+	return acc
 }
 
 func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*metadataAccumulator, func(), bool) {
@@ -893,15 +908,15 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.Uplin
 	h.Reset()
 	ns.hashPool.Put(h)
 
-	a := ns.metadataAccumulatorPool.Get().(*metadataAccumulator)
-	lv, isDup := ns.metadataAccumulators.LoadOrStore(k, a)
+	acc := ns.metadataAccumulatorPool.Get().(*metadataAccumulator)
+	lv, isDup := ns.metadataAccumulators.LoadOrStore(k, acc)
 	lv.(*metadataAccumulator).Add(msg.RxMetadata...)
 
 	if isDup {
-		ns.metadataAccumulatorPool.Put(a)
+		ns.metadataAccumulatorPool.Put(acc)
 		return nil, nil, true
 	}
-	return a, func() {
+	return acc, func() {
 		ns.metadataAccumulators.Delete(k)
 	}, false
 }
@@ -936,13 +951,12 @@ func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 	return nil
 }
 
-func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
+func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
 	if dev.MACState == nil {
 		return errUnknownMACState
 	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
 
@@ -1063,7 +1077,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 		for _, md := range mds {
 			logger := logger.WithField(
-				"gateway_id", md.GatewayIdentifiers.GatewayID,
+				"gateway_uid", unique.ID(ctx, md.GatewayIdentifiers),
 			)
 
 			cl, err := ns.gsClient(ctx, md.GatewayIdentifiers)
@@ -1084,14 +1098,6 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 			}
 
 			dev.RecentDownlinks = append(dev.RecentDownlinks, msg)
-			if err = dev.Store(
-				"MACState",
-				"QueuedApplicationDownlinks",
-				"RecentDownlinks",
-				"Session",
-			); err != nil {
-				return errDeviceStoreFailed.WithCause(err)
-			}
 			return nil
 		}
 	}
@@ -1314,6 +1320,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return errMissingApplicationID
 	}
 
+	pld := msg.Payload.GetMACPayload()
+	if pld == nil {
+		return errMissingPayload
+	}
+
 	ns.applicationServersMu.RLock()
 	asCl, asOk := ns.applicationServers[uid]
 	ns.applicationServersMu.RUnlock()
@@ -1333,7 +1344,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			return
 		}
 
-		b, err := generateDownlink(ctx, dev, msg)
+		ack := msg.Payload.MType == ttnpb.MType_CONFIRMED_UP
+		var confFCnt uint32
+		if ack {
+			confFCnt = pld.FHDR.FCnt
+		}
+
+		b, err := generateDownlink(ctx, dev.EndDevice, ack, confFCnt)
 		if err != nil && !errors.Resemble(err, errNoDownlink) {
 			logger.WithError(err).Error("Failed to generate downlink in reception slot")
 			return
@@ -1342,15 +1359,20 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			return
 		}
 
-		if err := ns.scheduleDownlink(ctx, dev, msg, acc, b, false); err != nil {
+		if err := ns.scheduleDownlink(ctx, dev.EndDevice, msg, acc, b, false); err != nil {
 			logger.WithError(err).Error("Failed to schedule downlink in reception slot")
+			return
+		}
+
+		if err = dev.Store(
+			"MACState",
+			"QueuedApplicationDownlinks",
+			"RecentDownlinks",
+			"Session",
+		); err != nil {
+			logger.WithError(err).Error("Failed to update device in registry")
 		}
 	})
-
-	pld := msg.Payload.GetMACPayload()
-	if pld == nil {
-		return errMissingPayload
-	}
 
 	if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
 		asUp := &ttnpb.ApplicationUp{
@@ -1622,7 +1644,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 		}
 
-		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
+		if err := ns.scheduleDownlink(ctx, dev.EndDevice, msg, nil, resp.RawPayload, true); err != nil {
 			logger.WithError(err).Debug("Failed to schedule join-accept")
 			return err
 		}
@@ -1630,11 +1652,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		if err = dev.Store(
 			"EndDeviceIdentifiers.DevAddr",
 			"MACState",
+			"RecentDownlinks",
 			"RecentUplinks",
 			"Session",
 			"SessionFallback",
 		); err != nil {
-			logger.WithError(err).Error("Failed to update device")
+			logger.WithError(err).Error("Failed to update device in registry")
 			return err
 		}
 

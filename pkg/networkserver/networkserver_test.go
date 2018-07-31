@@ -41,20 +41,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	ttnshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 var (
-	FNwkSIntKey   = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	SNwkSIntKey   = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	NwkSEncKey    = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
-	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	ApplicationID = "test"
-
 	DuplicateCount = 6
 	DeviceCount    = 100
 	Timeout        = (2 << 10) * test.Delay
@@ -333,7 +324,7 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 		msg.CorrelationIDs = we.msg.CorrelationIDs
 
 		a.So(we.msg, should.Resemble, msg)
-		a.So(we.ctx, ttnshould.HaveParentContext, ctx)
+		a.So(we.ctx, should.HaveParentContext, ctx)
 
 		weCh = we.ch
 
@@ -1252,6 +1243,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(collectionDoneCh)
 
 				select {
 				case err := <-errch:
@@ -1315,9 +1307,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					t.FailNow()
 				}
 
-				if len(dev.QueuedApplicationDownlinks) > 0 ||
-					len(dev.MACState.QueuedResponses) > 0 ||
-					tc.UplinkMessage.Payload.MType == ttnpb.MType_CONFIRMED_UP {
+				_, err = GenerateDownlink(test.Context(), deepcopy.Copy(dev.EndDevice).(*ttnpb.EndDevice), tc.UplinkMessage.Payload.MType == ttnpb.MType_CONFIRMED_UP, 0)
+				if err != nil {
+					a.So(err, should.Equal, ErrNoDownlink)
+				}
+				hasDownlink := err == nil
+
+				if hasDownlink {
 					t.Run("downlink", func(t *testing.T) {
 						a := assertions.New(t)
 
@@ -1326,6 +1322,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							if !a.So(we.msg.RxMetadata, should.HaveSameElementsDeep, md) {
 								metadataLdiff(t, md, we.msg.RxMetadata)
 							}
+
+							close(deduplicationDoneCh)
 
 							msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
 
@@ -1338,7 +1336,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							msg.CorrelationIDs = we.msg.CorrelationIDs
 
 							a.So(we.msg, should.Resemble, msg)
-							a.So(we.ctx, ttnshould.HaveParentContext, ctx)
+							a.So(we.ctx, should.HaveParentContext, ctx)
 
 							we.ch <- time.Now()
 
@@ -1351,6 +1349,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
+					deduplicationDoneCh = make(chan windowEnd, 1)
+					collectionDoneCh = make(chan windowEnd, 1)
+
 					errch := make(chan error, 1)
 					go func() {
 						_, err = ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
@@ -1358,7 +1359,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}()
 
 					if !dev.FCntResets {
+						close(deduplicationDoneCh)
 						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+						close(collectionDoneCh)
 
 						select {
 						case err := <-errch:
@@ -1415,6 +1418,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}
 
 					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+					close(collectionDoneCh)
 
 					select {
 					case err := <-errch:
@@ -1423,6 +1427,42 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for HandleUplink to return")
 					}
+
+					if !hasDownlink {
+						close(deduplicationDoneCh)
+						return
+					}
+
+					t.Run("downlink", func(t *testing.T) {
+						a := assertions.New(t)
+
+						select {
+						case we := <-deduplicationDoneCh:
+							close(deduplicationDoneCh)
+
+							if !a.So(we.msg.RxMetadata, should.HaveSameElementsDeep, md) {
+								metadataLdiff(t, md, we.msg.RxMetadata)
+							}
+
+							msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+
+							msg.RxMetadata = we.msg.RxMetadata
+
+							a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
+							msg.ReceivedAt = we.msg.ReceivedAt
+
+							a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
+							msg.CorrelationIDs = we.msg.CorrelationIDs
+
+							a.So(we.msg, should.Resemble, msg)
+							a.So(we.ctx, should.HaveParentContext, ctx)
+
+							we.ch <- time.Now()
+
+						case <-time.After(Timeout):
+							t.Fatal("Timed out while waiting for deduplication window end request during downlink scheduling")
+						}
+					})
 				})
 			})
 		}
@@ -1775,6 +1815,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				}
 
 				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(deduplicationDoneCh)
 
 				select {
 				case up := <-asSendCh:
@@ -1800,6 +1841,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(collectionDoneCh)
 
 				select {
 				case err := <-errch:
@@ -1887,6 +1929,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
 				})
 
+				deduplicationDoneCh = make(chan windowEnd, 1)
+				collectionDoneCh = make(chan windowEnd, 1)
+
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
@@ -1951,6 +1996,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for HandleUplink to return")
 					}
+
+					close(deduplicationDoneCh)
+					close(collectionDoneCh)
 				})
 			})
 		}

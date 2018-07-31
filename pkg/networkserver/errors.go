@@ -25,7 +25,6 @@ var (
 	errDecryptionFailed          = errors.DefineInvalidArgument("decryption", "decryption failed")
 	errDeviceNotFound            = errors.DefineNotFound("device_not_found", "device not found")
 	errDeviceRegistryInitialize  = errors.DefineInternal("device_registry_initialization", "Device Registry initialization failed")
-	errDeviceStoreFailed         = errors.DefineInternal("device_store", "failed to store device")
 	errDuplicateCIDHandler       = errors.DefineAlreadyExists("duplicate_cid_handler", "a handler for MAC command with CID {cid} is already registered")
 	errDuplicateSubscription     = errors.DefineAlreadyExists("duplicate_subscription", "another subscription already started")
 	errEmptySession              = errors.DefineFailedPrecondition("empty_session", "session in empty")
