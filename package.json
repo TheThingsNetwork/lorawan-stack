@@ -84,7 +84,7 @@
         {
           "extractComments": true,
           "filebase": true,
-          "removePrefix": "pkg.client"
+          "removePrefix": "pkg.webui"
         }
       ],
       [
