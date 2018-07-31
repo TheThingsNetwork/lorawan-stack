@@ -1682,15 +1682,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver:authentication_type": {
-    "translations": {
-      "en": "received `{passed}` authentication type, but expected `{expected}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/gatewayserver:compute_toa_of_downlink": {
     "translations": {
       "en": "could not compute the time on air of a downlink"
@@ -1709,27 +1700,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver:list_gateway_rights": {
-    "translations": {
-      "en": "could not list gateway rights for the passed authentication method"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/gatewayserver:marshal_to_protobuf": {
     "translations": {
       "en": "could not marshal to protobuf"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_credentials_passed": {
-    "translations": {
-      "en": "no credentials passed"
     },
     "description": {
       "package": "pkg/gatewayserver",

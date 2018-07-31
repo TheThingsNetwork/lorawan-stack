@@ -23,8 +23,7 @@ var (
 	errNoIdentityServerFound             = errors.DefineInternal("no_identity_server_found", "no Identity Server found")
 	errNoReadyConnectionToIdentityServer = errors.DefineUnavailable("no_ready_connection_to_is", "no ready connection to the Identity Server")
 
-	errNoCredentialsPassed = errors.DefineUnauthenticated("no_credentials_passed", "no credentials passed")
-	errAPIKeyNeedsRights   = errors.DefinePermissionDenied(
+	errAPIKeyNeedsRights = errors.DefinePermissionDenied(
 		"api_key_needs_rights",
 		"API key needs the following rights for the gateway `{gateway_uid}` to perform this operation: {rights}",
 	)
@@ -35,13 +34,10 @@ var (
 	errUnsupportedTopicFormat       = errors.DefineInvalidArgument("topic_format", "unsupported topic format `{topic}`")
 	errInvalidAPIVersion            = errors.DefineInvalidArgument("api_version", "invalid API version tag `{version}`")
 	errPermissionDeniedForThisTopic = errors.DefinePermissionDenied("topic_rights", "permission denied to subscribe to `{topic}`")
-	errUnexpectedAuthenticationType = errors.DefineInvalidArgument("authentication_type", "received `{passed}` authentication type, but expected `{expected}`")
 
 	errMarshalToProtobuf       = errors.DefineInvalidArgument("marshal_to_protobuf", "could not marshal to protobuf")
 	errUnmarshalFromProtobuf   = errors.DefineInvalidArgument("unmarshal_from_protobuf", "could not unmarshal message from protobuf")
 	errTranslationFromProtobuf = errors.DefineInternal("protocol_translation", "could not translate from the protobuf format to UDP")
-
-	errListGatewayRights = errors.Define("list_gateway_rights", "could not list gateway rights for the passed authentication method")
 
 	errCouldNotRetrieveGatewayInformation     = errors.Define("retrieve_gateway_info", "could not retrieve information about the gateway")
 	errCouldNotRetrieveFrequencyPlanOfGateway = errors.Define("retrieve_gtw_frequency_plan", "could not retrieve the frequency plan `{fp_id}` of the gateway")
