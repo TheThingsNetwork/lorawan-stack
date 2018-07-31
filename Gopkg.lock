@@ -27,7 +27,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9321867e33fccce0aacc3e990f4d995575b25189731474b1308812a5c4cf94f3"
+  digest = "1:e1e6f80a27657f6a267d20e23afdb2b2381bb82dbd04d0b47537766d59a7332e"
   name = "github.com/TheThingsIndustries/mystique"
   packages = [
     "pkg/auth",
@@ -40,7 +40,7 @@
     "pkg/topic",
   ]
   pruneopts = ""
-  revision = "3a9dc1538bf691ff307b0a004ef0866618b44d22"
+  revision = "ea5164a0593db77ad040f1f63e8c8cad6ffe31a5"
 
 [[projects]]
   digest = "1:0748e25390c9439df48b528c01816340065e7611f1060db09ed12bc3afd2ebe8"
