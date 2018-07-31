@@ -37,6 +37,7 @@ import (
 type mqttConnectionHandler struct {
 	gs         *GatewayServer
 	connection *mqttConnection
+	id         ttnpb.GatewayIdentifiers
 }
 
 func (h mqttConnectionHandler) Context() context.Context {
@@ -108,13 +109,26 @@ func (h *mqttConnectionHandler) deliverMQTTStatus(pkt *packet.PublishPacket, _ c
 	return h.gs.handleStatus(h.Context(), status)
 }
 
-func (h *mqttConnectionHandler) Connect(info *auth.Info) error {
-	identifiers, err := unique.ToGatewayID(info.Username)
+// CustomMQTTContextFiller allows for filling the context for the MQTT connection.
+var CustomMQTTContextFiller func(ctx context.Context, id ttnpb.GatewayIdentifiers) (context.Context, error)
+
+func (h *mqttConnectionHandler) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
+	var err error
+	h.id, err = unique.ToGatewayID(info.Username)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	ctx = h.gs.Component.FillContext(ctx)
+	if filler := CustomMQTTContextFiller; filler != nil {
+		ctx, err = filler(ctx, h.id)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	md := rpcmetadata.MD{
-		ID:            identifiers.GetGatewayID(),
+		ID:            h.id.GatewayID,
 		AuthType:      "Bearer",
 		AuthValue:     string(info.Password),
 		AllowInsecure: h.gs.Component.AllowInsecureForCredentials(),
@@ -122,19 +136,20 @@ func (h *mqttConnectionHandler) Connect(info *auth.Info) error {
 
 	is, err := h.gs.getIdentityServer()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	h.connection.gtw, err = is.GetGateway(h.Context(), &identifiers)
+	h.connection.gtw, err = is.GetGateway(ctx, &h.id)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	resp, err := is.ListGatewayRights(h.Context(), &identifiers, grpc.PerRPCCredentials(md))
+	resp, err := is.ListGatewayRights(ctx, &h.id, grpc.PerRPCCredentials(md))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	info.Metadata = resp.GetRights()
 	info.Interface = h
-	return nil
+
+	return ctx, nil
 }
 
 func (h *mqttConnectionHandler) Subscribe(info *auth.Info, requestedTopic string, requestedQoS byte) (acceptedTopic string, acceptedQoS byte, err error) {
@@ -162,13 +177,9 @@ func (h *mqttConnectionHandler) Subscribe(info *auth.Info, requestedTopic string
 	if err != nil {
 		return
 	}
-	identifiers, err := unique.ToGatewayID(info.Username)
-	if err != nil {
-		return "", 0, err
-	}
 
 	if h.connection.scheduler == nil {
-		fp, err := h.gs.getGatewayFrequencyPlan(h.gs.Context(), &identifiers)
+		fp, err := h.gs.getGatewayFrequencyPlan(h.gs.Context(), &h.id)
 		if err != nil {
 			return "", 0, err
 		}
@@ -244,27 +255,24 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 	mqttConn := &mqttConnection{sess: session}
 	handler.connection = mqttConn
 
+	logger := log.FromContext(ctx)
 	if err := session.ReadConnect(); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Could not read CONNECT message, dropping connection")
+		logger.WithError(err).Warn("Could not read CONNECT message, dropping connection")
 		return
 	}
 	defer session.Close()
+	ctx = session.Context()
 
-	uid := session.AuthInfo().Username
-	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
-	gtwIDs, err := unique.ToGatewayID(uid)
-	if err != nil {
-		logger.WithError(err).Warn("Could not extract gateway identifiers")
-		return
-	}
+	logger = logger.WithField("gateway_uid", unique.ID(ctx, handler.id))
 
+	// TODO: Claim identifiers: https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 	logger.Debug("MQTT connection opened")
-	g.signalStartServingGateway(ctx, &gtwIDs)
+	g.signalStartServingGateway(ctx, &handler.id)
 
 	go func() {
 		<-ctx.Done()
 		logger.Debug("MQTT connection closed")
-		g.signalStopServingGateway(g.Context(), &gtwIDs)
+		g.signalStopServingGateway(g.Context(), &handler.id)
 	}()
 
 	readErr := make(chan error)
@@ -287,6 +295,7 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 	}()
 
 	for {
+		var err error
 		select {
 		case err = <-readErr:
 		case pkt, ok := <-control:

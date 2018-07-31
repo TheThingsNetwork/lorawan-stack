@@ -20,6 +20,8 @@ import (
 	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/unique"
+
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/smartystreets/assertions"
@@ -34,6 +36,11 @@ import (
 )
 
 const mqttConnectionTimeout = 3 * time.Second
+
+var (
+	registeredGatewayUID = "registered-gateway"
+	registeredGatewayEUI = types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+)
 
 // TODO: Refactor TestMQTTConnection/TestUDP(/TestLink?)
 func TestMQTTConnection(t *testing.T) {
@@ -50,12 +57,13 @@ func TestMQTTConnection(t *testing.T) {
 	}
 	defer store.Destroy()
 
-	registeredGatewayID := "registered-gateway"
-	registeredGatewayEUI := types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	registeredGatewayIdentifiers := ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID, EUI: &registeredGatewayEUI}
+	gtwID, err := unique.ToGatewayID(registeredGatewayUID)
+	a.So(err, should.BeNil)
+	gtwID.EUI = &registeredGatewayEUI
+
 	is, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
 		{
-			GatewayIdentifiers: registeredGatewayIdentifiers,
+			GatewayIdentifiers: gtwID,
 			FrequencyPlanID:    "EU_863_870",
 			DisableTxDelay:     true,
 		},
@@ -106,7 +114,7 @@ func TestMQTTConnection(t *testing.T) {
 
 	clientOptions := mqtt.NewClientOptions()
 	clientOptions.AddBroker(fmt.Sprintf("tcp://%s", mqttAddress))
-	clientOptions.SetUsername(registeredGatewayID)
+	clientOptions.SetUsername(registeredGatewayUID)
 	clientOptions.SetPassword("test")
 	clientOptions.SetClientID("test-client")
 
@@ -142,7 +150,7 @@ func TestMQTTConnection(t *testing.T) {
 
 			uplinkTopic := topic.Join([]string{
 				gatewayserver.V3TopicPrefix,
-				registeredGatewayID,
+				registeredGatewayUID,
 				gatewayserver.UplinkTopicSuffix,
 			})
 			uplink := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
@@ -186,13 +194,13 @@ func TestMQTTConnection(t *testing.T) {
 			}{
 				{
 					success: false,
-					topic:   registeredGatewayID,
+					topic:   registeredGatewayUID,
 				},
 				{
 					success: true,
 					topic: topic.Join([]string{
 						gatewayserver.V3TopicPrefix,
-						registeredGatewayID,
+						registeredGatewayUID,
 						gatewayserver.DownlinkTopicSuffix,
 					}),
 				},
@@ -200,7 +208,7 @@ func TestMQTTConnection(t *testing.T) {
 					success: false,
 					topic: topic.Join([]string{
 						gatewayserver.V3TopicPrefix,
-						registeredGatewayID,
+						registeredGatewayUID,
 						gatewayserver.UplinkTopicSuffix,
 					}),
 				},
@@ -245,7 +253,7 @@ func TestMQTTConnection(t *testing.T) {
 
 			downlink := ttnpb.NewPopulatedDownlinkMessage(test.Randy, false)
 			downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{
-				GatewayID: registeredGatewayID,
+				GatewayID: gtwID.GatewayID,
 			}
 			downlink.Settings.Frequency = 863000000
 			downlink.Settings.SpreadingFactor = 7
