@@ -164,6 +164,12 @@ const marshal = function (messages) {
     message.id = id
     const r = j + 1
     maxRow = Math.max(maxRow, r)
+    let description = message.description
+    if (typeof description === 'object') {
+      description = Object.keys(description).map(k => message.description[k]).join(', ')
+    } else if (typeof description !== 'string') {
+      description = ''
+    }
 
     // set id
     ws[XLSX.utils.encode_cell({ c: 0, r })] = {
@@ -174,7 +180,7 @@ const marshal = function (messages) {
     // set description
     ws[XLSX.utils.encode_cell({ c: 1, r })] = {
       t: 's',
-      v: message.description,
+      v: description,
     }
 
     // set default message

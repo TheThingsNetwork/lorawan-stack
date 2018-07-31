@@ -47,7 +47,8 @@ const flatten = function (s) {
 
 const localesDir = argv.locales || env.LOCALES_DIR || 'pkg/webui/locales'
 const support = flatten(argv.support || env.SUPPORT_LOCALES || 'en')
-const messagesDir = argv.messages || env.MESSAGES_DIR || '.cache/messages'
+const messagesDir = argv.frontendMessages || env.MESSAGES_FRONTEND || '.cache/messages'
+const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND || 'config/messages.json'
 const defaultLocale = argv.default || env.DEFAULT_LOCALE || 'en'
 const output = flatten(argv.output || env.OUTPUT || 'messages.yml')
 const updates = flatten(argv.updates || env.UPDATES)
@@ -68,13 +69,14 @@ if (argv.help) {
 
 Options:
 
-  --support <locale>   list of supported locales (default: en) [$SUPPORT_LOCALES]
-  --default <locale>   the default locale (that will inherit the default message) (default: en) [$DEFAULT_LOCALE]
-  --locales <dir>      directory where the locales are stored (default: ./locales/) [$LOCALES_DIR]
-  --messages <file>    directory where the messages are extracted to by react-intl (default: .cache/message) [$MESSAGES_DIR]
-  --output <file...>   location of the output files with all messages (default: ./messages.yml) [$OUTPUT]
-  --updates <file...>  location of an updated output file that will be merged into the current output file (updates are applied in order, latter files will overwrite previous ones). [$UPDATES]
-  --help               show this help message
+  --support <locale>         list of supported locales (default: en) [$SUPPORT_LOCALES]
+  --default <locale>         the default locale (that will inherit the default message) (default: en) [$DEFAULT_LOCALE]
+  --locales <dir>            directory where the locales are stored (default: ./locales/) [$LOCALES_DIR]
+  --frontendMessages <file>  directory where the messages are extracted to by react-intl (default: .cache/message) [$MESSAGES_FRONTEND]
+  --backendMessages <file>   file where the backend messages can be found (default: config/messages.json) [$MESSAGES_BACKEND]
+  --output <file...>         location of the output files with all messages (default: ./messages.yml, ) [$OUTPUT]
+  --updates <file...>        location of an updated output file that will be merged into the current output file (updates are applied in order, latter files will overwrite previous ones). [$UPDATES]
+  --help                     show this help message
 `)
 }
 
@@ -192,6 +194,26 @@ const readMessages = async function () {
         [next.id]: next,
       }
     }, {})
+}
+
+/**
+ * Read and parse (and marshal) the backend messages, coming from `make go.translations`
+ *
+ * @returns {object} - The backend messages, keyed by message id.
+ */
+const readBackendMessages = async function () {
+  const backend = JSON.parse(await read(`${path.resolve(backendMessages)}`))
+  return Object.keys(backend).reduce(function (acc, id) {
+    return {
+      ...acc,
+      [id]: {
+        id,
+        defaultMessage: backend[id].translations[defaultLocale],
+        locales: backend[id].translations,
+        description: backend[id].description,
+      },
+    }
+  }, {})
 }
 
 /**
@@ -344,10 +366,18 @@ const writeLocales = async function (locales) {
 
 // main function.
 const main = async function () {
-  const [ locales, messages, updates ] = await Promise.all([ readLocales(), readMessages(), readUpdates() ])
-
+  const [ locales, messages, backend, updates ] = await Promise.all([ readLocales(), readMessages(), readBackendMessages(), readUpdates() ])
   const updated = {}
 
+  // Merge backend messages into messages
+  for (const id of Object.keys(backend)) {
+    const message = backend[id]
+    if (!messages[id]) {
+      messages[id] = message
+    }
+  }
+
+  // Merge updates into messages
   for (const id of Object.keys(updates)) {
     const message = updates[id]
     if (message.force && !messages[id]) {
@@ -355,17 +385,23 @@ const main = async function () {
     }
   }
 
+  // Walk through messages via id
   for (const id of Object.keys(messages)) {
     const message = messages[id]
+
+    // Create new unified translation object with per locale structure
     for (const locale of support) {
       updated[locale] = updated[locale] || {}
 
+      // Get message from updates file
       let msg = get(updates, id, 'locales', locale)
+
+      // If not in there, try to find it in locales
       if (msg === null) {
         msg = get(locales, locale, id) || ''
       }
 
-      // force default message on default locale
+      // Force default message on default locale
       if (locale === defaultLocale) {
         msg = message.defaultMessage
       }
@@ -375,7 +411,7 @@ const main = async function () {
       message.locales[locale] = msg
     }
 
-    // set xx to default locale replaced by x'es
+    // Set xx to default locale replaced by x'es
     const x = xx(updated[defaultLocale][message.id])
     updated.xx = updated.xx || {}
     updated.xx[message.id] = x
