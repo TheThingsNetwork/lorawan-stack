@@ -17,7 +17,14 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACRxParamRequest = events.Define("ns.mac.rx_param.request", "request rx parameter setup") // TODO(#988): publish when requesting
+	evtMACRxParamAccept  = events.Define("ns.mac.rx_param.accept", "device accepted rx parameter setup request")
+	evtMACRxParamReject  = events.Define("ns.mac.rx_param.reject", "device rejected rx parameter setup request")
 )
 
 func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) (err error) {
@@ -29,6 +36,7 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			events.Publish(evtMACRxParamReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return
 		}
 
@@ -38,6 +46,7 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		dev.MACState.Rx2DataRateIndex = req.Rx2DataRateIndex
 		dev.MACState.Rx2Frequency = req.Rx2Frequency
 
+		events.Publish(evtMACRxParamAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

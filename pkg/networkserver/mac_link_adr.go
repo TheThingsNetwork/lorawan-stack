@@ -17,7 +17,14 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACLinkADRRequest = events.Define("ns.mac.adr.request", "request ADR") // TODO(#988): publish when requesting
+	evtMACLinkADRAccept  = events.Define("ns.mac.adr.accept", "device accepted ADR request")
+	evtMACLinkADRReject  = events.Define("ns.mac.adr.reject", "device rejected ADR request")
 )
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns) (err error) {
@@ -29,6 +36,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			events.Publish(evtMACLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return
 		}
 
@@ -44,6 +52,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		dev.MACState.ADRDataRateIndex = req.DataRateIndex
 		dev.MACState.ADRTxPowerIndex = req.TxPowerIndex
 
+		events.Publish(evtMACLinkADRAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

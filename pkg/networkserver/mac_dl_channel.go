@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMacDLChannelAccept = events.Define("ns.mac.dl_channel.accept", "device accepted downlink channel request")
+	evtMacDLChannelReject = events.Define("ns.mac.dl_channel.reject", "device rejected downlink channel request")
 )
 
 func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) (err error) {
@@ -29,6 +35,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		if !pld.ChannelIndexAck && !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			events.Publish(evtMacDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return
 		}
 
@@ -38,6 +45,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		_ = req.ChannelIndex
 		_ = req.Frequency
 
+		events.Publish(evtMacDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

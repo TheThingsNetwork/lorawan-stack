@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACDutyCycleRequest = events.Define("ns.mac.duty_cycle.request", "request duty cycle") // TODO(#988): publish when requesting
+	evtMACDutyCycle        = events.Define("ns.mac.duty_cycle.accept", "device accepted duty cycle request")
 )
 
 func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
@@ -26,6 +32,7 @@ func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 
 		dev.MACState.DutyCycle = req.MaxDutyCycle
 
+		events.Publish(evtMACDutyCycle(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACADRParamRequest = events.Define("ns.mac.adr_param.request", "request ADR parameter setup") // TODO(#988): publish when requesting
+	evtMACADRParamAccept  = events.Define("ns.mac.adr_param.accept", "device accepted ADR parameter setup request")
 )
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
@@ -35,6 +41,7 @@ func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err erro
 			dev.MACState.DesiredMACParameters.ADRAckLimit = dev.MACState.MACParameters.ADRAckLimit
 		}
 
+		events.Publish(evtMACADRParamAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

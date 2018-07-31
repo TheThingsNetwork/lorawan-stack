@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACTxParamRequest = events.Define("ns.mac.tx_param.request", "request transmit parameter setup") // TODO(#988): publish when requesting
+	evtMACTxParamAccept  = events.Define("ns.mac.tx_param.accept", "device accepted transmit parameter setup request")
 )
 
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
@@ -32,6 +38,7 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 			dev.MACState.DesiredMACParameters.MaxEIRP = dev.MACState.MACParameters.MaxEIRP
 		}
 
+		events.Publish(evtMACTxParamAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

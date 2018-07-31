@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACRejoinParamRequest = events.Define("ns.mac.rejoin_param.request", "request rejoin parameter setup") // TODO(#988): publish when requesting
+	evtMACRejoinParamAccept  = events.Define("ns.mac.rejoin_param.accept", "device accepted rejoin parameter setup request")
 )
 
 func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RejoinParamSetupAns) (err error) {
@@ -27,13 +33,15 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetRejoinParamSetupReq()
+		accepted := *req
 
 		// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = req.MaxCountExponent
+		accepted.MaxCountExponent = req.MaxCountExponent
 		if pld.MaxTimeExponentAck {
-			_ = req.MaxTimeExponent
+			accepted.MaxTimeExponent = req.MaxTimeExponent
 		}
 
+		events.Publish(evtMACRejoinParamAccept(ctx, dev.EndDeviceIdentifiers, &accepted))
 	}, dev.MACState.PendingRequests...)
 	return
 }

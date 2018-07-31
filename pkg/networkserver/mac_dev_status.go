@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACDeviceStatusRequest = events.Define("ns.mac.device_status.request", "request device status") // TODO(#988): publish when requesting
+	evtMACDeviceStatus        = events.Define("ns.mac.device_status", "handled device status")
 )
 
 func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns) (err error) {
@@ -30,6 +36,7 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		_ = pld.Battery
 		_ = pld.Margin
 
+		events.Publish(evtMACDeviceStatus(ctx, dev.EndDeviceIdentifiers, pld))
 	}, dev.MACState.PendingRequests...)
 	return
 }

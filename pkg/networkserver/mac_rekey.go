@@ -17,8 +17,11 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+var evtMACRekey = events.Define("ns.mac.rekey_ind", "handled device rekey indication")
 
 func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) error {
 	if !dev.SupportsJoin {
@@ -29,12 +32,16 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return errMissingPayload
 	}
 
+	conf := &ttnpb.MACCommand_RekeyConf{
+		MinorVersion: pld.MinorVersion,
+	}
+
 	dev.SessionFallback = nil
 	dev.MACState.QueuedResponses = append(
 		dev.MACState.QueuedResponses,
-		(&ttnpb.MACCommand_RekeyConf{
-			MinorVersion: pld.MinorVersion,
-		}).MACCommand(),
+		conf.MACCommand(),
 	)
+
+	events.Publish(evtMACRekey(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

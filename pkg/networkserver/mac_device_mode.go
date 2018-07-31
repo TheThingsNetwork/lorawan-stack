@@ -17,20 +17,27 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+var evtMACDeviceMode = events.Define("ns.mac.device_mode", "handled device mode indication")
 
 func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) error {
 	if pld == nil {
 		return errMissingPayload
 	}
 
+	conf := &ttnpb.MACCommand_DeviceModeConf{
+		Class: pld.Class,
+	}
+
 	dev.MACState.DeviceClass = pld.Class
 	dev.MACState.QueuedResponses = append(
 		dev.MACState.QueuedResponses,
-		(&ttnpb.MACCommand_DeviceModeConf{
-			Class: pld.Class,
-		}).MACCommand(),
+		conf.MACCommand(),
 	)
+
+	events.Publish(evtMACDeviceMode(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

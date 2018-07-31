@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACRxTimingRequest = events.Define("ns.mac.rx_timing.request", "request receive window timing setup") // TODO(#988): publish when requesting
+	evtMACRxTimingAccept  = events.Define("ns.mac.rx_timing.accept", "device accepted receive window timing setup request")
 )
 
 func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
@@ -26,6 +32,7 @@ func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err erro
 
 		dev.MACState.Rx1Delay = req.Delay
 
+		events.Publish(evtMACRxTimingAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }

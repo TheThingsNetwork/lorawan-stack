@@ -17,9 +17,12 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+var evtMACReset = events.Define("ns.mac.reset_ind", "handled device reset indication")
 
 func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store) error {
 	if dev.SupportsJoin {
@@ -34,11 +37,15 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return err
 	}
 
+	conf := &ttnpb.MACCommand_ResetConf{
+		MinorVersion: pld.MinorVersion,
+	}
+
 	dev.MACState.QueuedResponses = append(
 		dev.MACState.QueuedResponses,
-		(&ttnpb.MACCommand_ResetConf{
-			MinorVersion: pld.MinorVersion,
-		}).MACCommand(),
+		conf.MACCommand(),
 	)
+
+	events.Publish(evtMACReset(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

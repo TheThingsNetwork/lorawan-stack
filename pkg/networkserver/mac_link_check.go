@@ -17,9 +17,12 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
+
+var evtMACLinkCheck = events.Define("ns.mac.link_check", "handled link check request")
 
 func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
 	floor, ok := demodulationFloor[msg.Settings.SpreadingFactor][msg.Settings.Bandwidth]
@@ -40,12 +43,16 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 		maxSNR = snr
 	}
 
+	ans := &ttnpb.MACCommand_LinkCheckAns{
+		Margin:       uint32(uint8(maxSNR - floor)),
+		GatewayCount: uint32(len(gtws)),
+	}
+
 	dev.MACState.QueuedResponses = append(
 		dev.MACState.QueuedResponses,
-		(&ttnpb.MACCommand_LinkCheckAns{
-			Margin:       uint32(uint8(maxSNR - floor)),
-			GatewayCount: uint32(len(gtws)),
-		}).MACCommand(),
+		ans.MACCommand(),
 	)
+
+	events.Publish(evtMACLinkCheck(ctx, dev.EndDeviceIdentifiers, ans))
 	return nil
 }

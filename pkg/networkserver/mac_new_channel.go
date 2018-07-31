@@ -17,7 +17,14 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtMACNewChannelRequest = events.Define("ns.mac.new_channel.request", "request new channel") // TODO(#988): publish when requesting
+	evtMACNewChannelAccept  = events.Define("ns.mac.new_channel.accept", "device accepted new channel request")
+	evtMACNewChannelReject  = events.Define("ns.mac.new_channel.reject", "device rejected new channel request")
 )
 
 func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (err error) {
@@ -29,6 +36,7 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		if !pld.DataRateAck || !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			events.Publish(evtMACNewChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return
 		}
 
@@ -50,6 +58,7 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		ch.MinDataRateIndex = req.MinDataRateIndex
 		ch.MaxDataRateIndex = req.MaxDataRateIndex
 
+		events.Publish(evtMACNewChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)
 	return
 }
