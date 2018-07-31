@@ -288,7 +288,7 @@ message EndDevice {
   string frequency_plan_id = 6 [(gogoproto.customname) = "FrequencyPlanID"];
 
   // LoRaWAN MAC settings for the device.
-  MACSettings mac_settings = 7 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 7 [(gogoproto.customname) = "MACSettings", (gogoproto.nullable) = false];
 
   // MACState represents the state of device's MAC layer.
   MACState mac_state = 8 [(gogoproto.customname) = "MACState"];

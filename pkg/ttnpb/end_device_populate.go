@@ -90,7 +90,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	}
 	out.BatteryPercentage = r.Float32()
 	out.FrequencyPlanID = "EU_863_870"
-	out.MACSettings = NewPopulatedMACSettings(r, easy)
+	out.MACSettings = *NewPopulatedMACSettings(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
 	out.MACState.MACParameters.Channels = []*MACParameters_Channel{
 		{

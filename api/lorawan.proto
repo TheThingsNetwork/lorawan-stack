@@ -83,6 +83,8 @@ enum PHYVersion {
 }
 
 enum DataRateIndex {
+  option (gogoproto.goproto_enum_prefix) = false;
+
   DATA_RATE_0  = 0;
   DATA_RATE_1  = 1;
   DATA_RATE_2  = 2;
@@ -443,6 +445,7 @@ message MACCommand {
 
 enum AggregatedDutyCycle {
   option (gogoproto.goproto_enum_prefix) = false;
+
   // 100%
   DUTY_CYCLE_1     = 0;
   // 50%
@@ -479,6 +482,7 @@ enum AggregatedDutyCycle {
 
 enum PingSlotPeriod {
   option (gogoproto.goproto_enum_prefix) = false;
+
   // Every second
   PING_EVERY_1S   = 0;
   // Every 2 seconds
@@ -499,6 +503,7 @@ enum PingSlotPeriod {
 
 enum RejoinCountExponent {
   option (gogoproto.goproto_enum_prefix) = false;
+
   REJOIN_COUNT_16     = 0;
   REJOIN_COUNT_32     = 1;
   REJOIN_COUNT_64     = 2;
@@ -518,9 +523,9 @@ enum RejoinCountExponent {
 }
 
 enum RejoinTimeExponent {
-  // For calculations see https://github.com/TheThingsIndustries/lorawan-stack/pull/865#discussion_r201625341
-
   option (gogoproto.goproto_enum_prefix) = false;
+
+  // For calculations see https://github.com/TheThingsIndustries/lorawan-stack/pull/865#discussion_r201625341
   // Every ~17.1 minutes
   REJOIN_TIME_0  = 0;
   // Every ~34.1 minutes
