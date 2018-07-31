@@ -16,8 +16,13 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
+import { defineMessages } from 'react-intl'
 
 import Button from '.'
+
+const m = defineMessages({
+  translate: 'A translated message',
+})
 
 @bind
 class Example extends React.Component {
@@ -122,6 +127,11 @@ storiesOf('Button', module)
       <Button icon="check" disabled />
       <br /><br />
       <Button icon="check" busy />
+    </div>
+  ))
+  .add('Translated', () => (
+    <div>
+      <Button message={m.translate} />
     </div>
   ))
   .add('Toggle', () => (

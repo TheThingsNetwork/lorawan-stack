@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Message from '../message'
 import Icon from '../icon'
 
 import style from './notification.styl'
@@ -44,7 +45,7 @@ const Notification = function ({
 
   return (
     <div className={classname}>
-      <Icon icon={icon} /><span>{message || error || warning || info}</span>
+      <Icon icon={icon} /><span><Message content={message || error || warning || info} /></span>
     </div>
   )
 }

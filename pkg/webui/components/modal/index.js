@@ -16,6 +16,7 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import PropTypes from 'prop-types'
 
+import Message from '../message'
 import Button from '../button'
 import Logo from '../logo'
 
@@ -78,7 +79,6 @@ export default class Modal extends React.PureComponent {
 
     let buttons = <div><Button message={buttonMessage} onClick={this.handleApprove} icon="check" /></div>
 
-
     if (approval) {
       buttons = (
         <div>
@@ -109,8 +109,8 @@ export default class Modal extends React.PureComponent {
         { title
           && <div className={style.titleSection}>
             <div>
-              <h1>{title}</h1>
-              { subtitle && (<span>{subtitle}</span>) }
+              <h1><Message content={title} /></h1>
+              { subtitle && (<Message content={subtitle} />) }
             </div>
             { logo && (<Logo className={style.logo} />)}
           </div>
