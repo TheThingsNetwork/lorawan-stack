@@ -28,46 +28,6 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-// MockContext is a mock context.Context.
-type MockContext struct {
-	DeadlineFunc func() (deadline time.Time, ok bool)
-	DoneFunc     func() <-chan struct{}
-	ErrFunc      func() error
-	ValueFunc    func(interface{}) interface{}
-}
-
-// Deadline calls DeadlineFunc.
-func (ctx *MockContext) Deadline() (deadline time.Time, ok bool) {
-	if ctx.DeadlineFunc == nil {
-		return time.Time{}, false
-	}
-	return ctx.DeadlineFunc()
-}
-
-// Done calls DoneFunc.
-func (ctx *MockContext) Done() <-chan struct{} {
-	if ctx.DoneFunc == nil {
-		return nil
-	}
-	return ctx.DoneFunc()
-}
-
-// Err calls ErrFunc.
-func (ctx *MockContext) Err() error {
-	if ctx.ErrFunc == nil {
-		return nil
-	}
-	return ctx.ErrFunc()
-}
-
-// Value calls ValueFunc.
-func (ctx *MockContext) Value(key interface{}) interface{} {
-	if ctx.ValueFunc == nil {
-		return nil
-	}
-	return ctx.ValueFunc(key)
-}
-
 func TestContextParent(t *testing.T) {
 	for _, tc := range []struct {
 		Name       string
@@ -151,7 +111,7 @@ func TestContextParent(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			for _, parent := range []context.Context{
-				nil, &MockContext{}, context.Background(),
+				nil, context.Background(),
 			} {
 				t.Run(fmt.Sprintf("%T", parent), func(t *testing.T) {
 					a := assertions.New(t)
@@ -180,10 +140,11 @@ func TestContextParent(t *testing.T) {
 }
 
 func TestContextRoot(t *testing.T) {
+	var root = context.Background()
+
 	for _, tc := range []struct {
 		Name    string
 		Context context.Context
-		Root    context.Context
 	}{
 		{
 			Name: "4",
@@ -191,45 +152,44 @@ func TestContextRoot(t *testing.T) {
 				context.WithValue(
 					context.WithValue(
 						context.WithValue(
-							&MockContext{}, "A", nil),
+							root, "A", nil),
 						"B", nil),
 					struct{}{}, nil),
 				struct{}{}, nil),
-			Root: &MockContext{},
 		},
 		{
 			Name: "log.NewContext",
 			Context: log.NewContext(
 				log.NewContext(
-					&MockContext{}, log.Noop),
+					root, log.Noop),
 				log.Noop,
 			),
-			Root: &MockContext{},
 		},
 		{
 			Name: "errorcontext.New",
 			Context: func() (ctx context.Context) {
-				ctx, _ = errorcontext.New(&MockContext{})
+				ctx, _ = errorcontext.New(root)
 				ctx, _ = errorcontext.New(ctx)
 				return
 			}(),
-			Root: &MockContext{},
 		},
 		{
 			Name:    "0",
-			Context: &MockContext{},
-			Root:    &MockContext{},
+			Context: root,
 		},
 		{
 			Name:    "nil",
 			Context: nil,
-			Root:    nil,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			a.So(func() {
-				a.So(ContextRoot(tc.Context), should.Resemble, tc.Root)
+				expected := root
+				if tc.Context == nil {
+					expected = nil
+				}
+				a.So(ContextRoot(tc.Context), should.Equal, expected)
 			}, should.NotPanic)
 		})
 	}
