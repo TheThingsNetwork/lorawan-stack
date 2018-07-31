@@ -17,6 +17,7 @@ package test
 import (
 	"context"
 	"reflect"
+	"testing"
 
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 )
@@ -85,4 +86,23 @@ func ContextRoot(ctx context.Context) context.Context {
 		}
 		ctx = p
 	}
+}
+
+type tKey struct{}
+
+func ContextWithT(ctx context.Context, t *testing.T) context.Context {
+	return context.WithValue(ctx, tKey{}, t)
+}
+
+func TFromContext(ctx context.Context) (*testing.T, bool) {
+	t, ok := ctx.Value(tKey{}).(*testing.T)
+	return t, ok
+}
+
+func MustTFromContext(ctx context.Context) *testing.T {
+	t, ok := TFromContext(ctx)
+	if !ok {
+		panic("*testing.T not present in the context")
+	}
+	return t
 }
