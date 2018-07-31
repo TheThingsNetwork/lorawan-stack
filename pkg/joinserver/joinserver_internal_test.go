@@ -19,6 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -47,4 +48,6 @@ func TestMICCheck(t *testing.T) {
 	}
 	a.So(checkMIC(*k, append(pld, computed[:]...)), should.BeNil)
 	a.So(checkMIC(*k, append(append(pld[1:], pld[0]-1), computed[:]...)), should.NotBeNil)
+
+	a.So(errors.IsInvalidArgument(checkMIC(*k, []byte{})), should.BeTrue)
 }

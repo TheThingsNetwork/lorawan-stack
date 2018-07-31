@@ -901,6 +901,290 @@ func TestHandleJoin(t *testing.T) {
 			nil,
 			errors.IsInvalidArgument,
 		},
+		{
+			"1.0 no payload",
+			&ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+				NextJoinNonce: 0x424242,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+				},
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			0,
+			0x424242,
+			[]uint32{23, 41, 42, 52, 0x2442},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
+			"1.0 not a join request payload",
+			&ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+				NextJoinNonce: 0x424242,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+				},
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			0,
+			0x424242,
+			[]uint32{23, 41, 42, 52, 0x2442},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				Payload: ttnpb.Message{
+					MHDR: ttnpb.MHDR{
+						MType: ttnpb.MType_JOIN_REQUEST,
+					},
+					Payload: &ttnpb.Message_JoinAcceptPayload{},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
+			"1.0 unsupported lorawan version",
+			&ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+				NextJoinNonce: 0x424242,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+				},
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			0,
+			0x424242,
+			[]uint32{23, 41, 42, 52, 0x2442},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				Payload: ttnpb.Message{
+					MHDR: ttnpb.MHDR{
+						MType: ttnpb.MType_JOIN_REQUEST,
+						Major: ttnpb.Major(10),
+					},
+					Payload: &ttnpb.Message_JoinRequestPayload{},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			errors.IsInvalidArgument,
+		},
+		{
+			"1.0 no joineui",
+			&ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+				NextJoinNonce: 0x424242,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+				},
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			0,
+			0x424242,
+			[]uint32{23, 41, 42, 52, 0x2442},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				Payload: ttnpb.Message{
+					MHDR: ttnpb.MHDR{
+						MType: ttnpb.MType_JOIN_REQUEST,
+						Major: ttnpb.Major_LORAWAN_R1,
+					},
+					Payload: &ttnpb.Message_JoinRequestPayload{
+						JoinRequestPayload: &ttnpb.JoinRequestPayload{
+							DevEUI: types.EUI64{0x27, 0x00, 0x00, 0x00, 0x00, 0xab, 0xaa, 0x00},
+						},
+					},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
+			"1.0 raw payload that can't be unmarshalled",
+			&ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+				NextJoinNonce: 0x424242,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+				},
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			0,
+			0x424242,
+			[]uint32{23, 41, 42, 52, 0x2442},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0,
+				RawPayload: []byte{
+					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
+				},
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			errors.IsInvalidArgument,
+		},
+		{
+			"1.0 invalid mtype",
+			&ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+				NextJoinNonce: 0x424242,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+				},
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			0,
+			0x424242,
+			[]uint32{23, 41, 42, 52, 0x2442},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0,
+				Payload: ttnpb.Message{
+					MHDR: ttnpb.MHDR{
+						MType: ttnpb.MType_JOIN_REQUEST,
+					},
+					Payload: &ttnpb.Message_JoinRequestPayload{
+						JoinRequestPayload: &ttnpb.JoinRequestPayload{
+							DevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							JoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+						},
+					},
+				},
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			errors.IsInvalidArgument,
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
@@ -926,7 +1210,9 @@ func TestHandleJoin(t *testing.T) {
 			start := time.Now()
 			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
 			if tc.ValidErr != nil {
-				a.So(tc.ValidErr(err), should.BeTrue)
+				if !a.So(tc.ValidErr(err), should.BeTrue) {
+					t.Fatalf("Received an unexpected error: %s", err)
+				}
 				a.So(resp, should.BeNil)
 				return
 			}
@@ -998,6 +1284,8 @@ func TestGetAppSKey(t *testing.T) {
 
 		Device *ttnpb.EndDevice
 
+		CustomCreateDevice func(*ttnpb.EndDevice) error
+
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.AppSKeyResponse
 
@@ -1020,6 +1308,7 @@ func TestGetAppSKey(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1054,6 +1343,7 @@ func TestGetAppSKey(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1067,6 +1357,17 @@ func TestGetAppSKey(t *testing.T) {
 			nil,
 		},
 		{
+			"No device",
+			nil,
+			func(*ttnpb.EndDevice) error { return nil },
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			errors.IsNotFound,
+		},
+		{
 			"No session",
 			&ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1074,6 +1375,28 @@ func TestGetAppSKey(t *testing.T) {
 				},
 				ApplicationServerAddress: asAddr,
 			},
+			nil,
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
+			"Corrupt session",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: asAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+					},
+				},
+			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1099,6 +1422,7 @@ func TestGetAppSKey(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1119,6 +1443,7 @@ func TestGetAppSKey(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1134,6 +1459,7 @@ func TestGetAppSKey(t *testing.T) {
 				},
 				ApplicationServerAddress: "test",
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1154,7 +1480,12 @@ func TestGetAppSKey(t *testing.T) {
 				},
 			)).(*JoinServer)
 
-			_, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
+			ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			if tc.CustomCreateDevice != nil {
+				err = tc.CustomCreateDevice(ed)
+			} else {
+				_, err = reg.Create(ed)
+			}
 			if !a.So(err, should.BeNil) {
 				return
 			}
@@ -1207,6 +1538,8 @@ func TestGetNwkSKeys(t *testing.T) {
 
 		Device *ttnpb.EndDevice
 
+		CustomCreateDevice func(*ttnpb.EndDevice) error
+
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.NwkSKeysResponse
 
@@ -1237,6 +1570,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1287,6 +1621,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1308,6 +1643,126 @@ func TestGetNwkSKeys(t *testing.T) {
 			nil,
 		},
 		{
+			"No device",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+						NwkSEncKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			func(*ttnpb.EndDevice) error { return nil },
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			errors.IsNotFound,
+		},
+		{
+			"No NwkSEncKey",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			nil,
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
+			"No FNwkSIntKey",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						NwkSEncKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			nil,
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
+			"No SNwkSIntKey",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						NwkSEncKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			nil,
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			errors.IsDataLoss,
+		},
+		{
 			"No session",
 			&ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1315,6 +1770,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				},
 				NetworkServerAddress: nsAddr,
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1340,6 +1796,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1360,6 +1817,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					},
 				},
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1375,6 +1833,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				},
 				NetworkServerAddress: "test",
 			},
+			nil,
 			&ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: "test",
@@ -1395,7 +1854,12 @@ func TestGetNwkSKeys(t *testing.T) {
 				},
 			)).(*JoinServer)
 
-			_, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
+			ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			if tc.CustomCreateDevice != nil {
+				err = tc.CustomCreateDevice(ed)
+			} else {
+				_, err = reg.Create(ed)
+			}
 			if !a.So(err, should.BeNil) {
 				return
 			}
