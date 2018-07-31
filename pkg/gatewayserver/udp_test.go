@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -166,21 +167,26 @@ func testPullData(gatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t 
 	}
 }
 
-func testDownlink(registeredGatewayID string, gs *gatewayserver.GatewayServer, conn net.Conn) func(t *testing.T) {
-	downlink := ttnpb.NewPopulatedDownlinkMessage(test.Randy, false)
-	downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID}
-	downlink.TxMetadata.Timestamp = 3003503000
-	downlink.Settings.Frequency = 868300000
-	downlink.Settings.SpreadingFactor = 7
-	downlink.Settings.Bandwidth = 125000
-	downlink.Settings.CodingRate = "4/5"
-
-	base64payloadRegexp := regexp.MustCompile(regexp.QuoteMeta(base64.StdEncoding.EncodeToString(downlink.RawPayload)))
-
+func testDownlink(gtwUID string, gs *gatewayserver.GatewayServer, conn net.Conn) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
-		_, err := gs.ScheduleDownlink(authorizedCtx, downlink)
+		gtwID, err := unique.ToGatewayID(gtwUID)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		downlink := ttnpb.NewPopulatedDownlinkMessage(test.Randy, false)
+		downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{GatewayID: gtwID.GatewayID}
+		downlink.TxMetadata.Timestamp = 3003503000
+		downlink.Settings.Frequency = 868300000
+		downlink.Settings.SpreadingFactor = 7
+		downlink.Settings.Bandwidth = 125000
+		downlink.Settings.CodingRate = "4/5"
+
+		base64payloadRegexp := regexp.MustCompile(regexp.QuoteMeta(base64.StdEncoding.EncodeToString(downlink.RawPayload)))
+
+		_, err = gs.ScheduleDownlink(authorizedCtx, downlink)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
@@ -212,12 +218,13 @@ func TestUDP(t *testing.T) {
 	}
 	defer store.Destroy()
 
-	registeredGatewayID := "registered-gateway"
-	registeredGatewayEUI := types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	registeredGatewayIdentifiers := ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID, EUI: &registeredGatewayEUI}
+	gtwID, err := unique.ToGatewayID(registeredGatewayUID)
+	a.So(err, should.BeNil)
+	gtwID.EUI = &registeredGatewayEUI
+
 	_, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
 		{
-			GatewayIdentifiers: registeredGatewayIdentifiers,
+			GatewayIdentifiers: gtwID,
 			FrequencyPlanID:    "EU_863_870",
 			DisableTxDelay:     true,
 		},
@@ -265,5 +272,5 @@ func TestUDP(t *testing.T) {
 
 	t.Run("PullData", testPullData(registeredGatewayEUI, &ns, conn))
 	t.Run("PushData", testPushData(registeredGatewayEUI, &ns))
-	t.Run("Downlink", testDownlink(registeredGatewayID, gs, conn))
+	t.Run("Downlink", testDownlink(registeredGatewayUID, gs, conn))
 }
