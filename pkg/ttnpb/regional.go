@@ -14,6 +14,10 @@
 
 package ttnpb
 
+import "time"
+
+const DefaultDwellTime = 400 * time.Millisecond
+
 // Copy the channel parameters to a new struct.
 func (c *FrequencyPlan_Channel) Copy() *FrequencyPlan_Channel {
 	return &FrequencyPlan_Channel{
@@ -52,14 +56,8 @@ func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	if ext.LoraStandardChannel != nil {
 		f.LoraStandardChannel = ext.LoraStandardChannel.Copy()
 	}
-	if ext.UplinkDwellTime != nil {
-		duration := *ext.UplinkDwellTime
-		f.UplinkDwellTime = &duration
-	}
-	if ext.DownlinkDwellTime != nil {
-		duration := *ext.DownlinkDwellTime
-		f.DownlinkDwellTime = &duration
-	}
+	f.UplinkDwellTime = ext.UplinkDwellTime
+	f.DownlinkDwellTime = ext.DownlinkDwellTime
 	if ext.LBT != nil {
 		f.LBT = ext.LBT.Copy()
 	}

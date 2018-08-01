@@ -67,11 +67,11 @@ message FrequencyPlan {
   // TimeOffAir to abide to after transmission.
   TimeOffAir time_off_air = 6 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
 
-  // Override maximum duration of an uplink transmission.
-  google.protobuf.Duration uplink_dwell_time = 7 [(gogoproto.moretags) = "yaml:\"uplink-dwell-time,omitempty\"", (gogoproto.stdduration) = true];
+  // Enable dwell time limitations on uplink transmissions.
+  bool uplink_dwell_time = 7 [(gogoproto.moretags) = "yaml:\"uplink-dwell-time,omitempty\""];
 
-  // Override maximum duration of a downlink transmission.
-  google.protobuf.Duration downlink_dwell_time = 8 [(gogoproto.moretags) = "yaml:\"downlink-dwell-time,omitempty\"", (gogoproto.stdduration) = true];
+  // Enable dwell time limitations on downlink transmissions.
+  bool downlink_dwell_time = 8 [(gogoproto.moretags) = "yaml:\"downlink-dwell-time,omitempty\""];
 
   // Override band settings for the class B ping slot.
   Channel ping_slot = 9 [(gogoproto.moretags) = "yaml:\"ping-slot,omitempty\""];

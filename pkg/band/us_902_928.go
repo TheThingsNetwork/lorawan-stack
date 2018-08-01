@@ -15,8 +15,6 @@
 package band
 
 import (
-	"time"
-
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -130,8 +128,6 @@ func init() {
 			BroadcastChannel: beaconChannelFromFrequencies(usAuBeaconFrequencies),
 			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
-
-		DwellTime: 400 * time.Millisecond,
 
 		regionalParameters1_0:         bandIdentity,
 		regionalParameters1_0_1:       bandIdentity,

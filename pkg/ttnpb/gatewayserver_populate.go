@@ -43,10 +43,8 @@ func NewPopulatedFrequencyPlan(r randyGatewayserver, easy bool) *FrequencyPlan {
 	out.FSKChannel = NewPopulatedFrequencyPlan_Channel(r, easy)
 	out.LBT = NewPopulatedFrequencyPlan_LBTConfiguration(r, easy)
 	out.TimeOffAir = NewPopulatedFrequencyPlan_TimeOffAir(r, easy)
-	if r.Intn(10) != 0 {
-		out.UplinkDwellTime = pbtypes.NewPopulatedStdDuration(r, easy)
-		out.DownlinkDwellTime = pbtypes.NewPopulatedStdDuration(r, easy)
-	}
+	out.UplinkDwellTime = pbtypes.NewPopulatedBoolValue(r, easy).Value
+	out.DownlinkDwellTime = pbtypes.NewPopulatedBoolValue(r, easy).Value
 	out.Rx2 = NewPopulatedFrequencyPlan_Channel(r, easy)
 	out.PingSlot = NewPopulatedFrequencyPlan_Channel(r, easy)
 	out.MaxEIRP = r.Float32()

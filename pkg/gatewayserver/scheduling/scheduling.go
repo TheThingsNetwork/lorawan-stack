@@ -63,10 +63,6 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 	if err != nil {
 		return nil, errCouldNotRetrieveFPBand.WithCause(err)
 	}
-	if scheduler.dwellTime == nil && band.DwellTime > 0 {
-		scheduler.dwellTime = &band.DwellTime
-	}
-
 	for _, subBand := range band.BandDutyCycles {
 		scheduling := &subBandScheduling{
 			dutyCycle:         subBand,
@@ -82,7 +78,7 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 }
 
 type frequencyPlanScheduling struct {
-	dwellTime  *time.Duration
+	dwellTime  bool
 	timeOffAir *ttnpb.FrequencyPlan_TimeOffAir
 
 	subBands []*subBandScheduling
@@ -103,8 +99,8 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 		return errNegativeDuration
 	}
 
-	if f.dwellTime != nil && s.Duration > *f.dwellTime {
-		return errDwellTime.WithAttributes("packet_duration", s.Duration, "dwell_time", *f.dwellTime)
+	if f.dwellTime && s.Duration > ttnpb.DefaultDwellTime {
+		return errDwellTime.WithAttributes("packet_duration", s.Duration, "dwell_time", ttnpb.DefaultDwellTime)
 	}
 
 	subBand, err := f.findSubBand(channel)

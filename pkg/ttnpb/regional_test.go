@@ -85,7 +85,7 @@ lora-std-channel:
   frequency: 904600000
   data-rate:
     index: 4
-uplink-dwell-time: 400ms`
+uplink-dwell-time: true`
 
 	fp := ttnpb.FrequencyPlan{}
 
@@ -102,8 +102,8 @@ uplink-dwell-time: 400ms`
 	a.So(fp.LoraStandardChannel.GetDataRate().Index, should.Equal, 4)
 	a.So(fp.FSKChannel, should.BeNil)
 	a.So(fp.LBT, should.BeNil)
-	a.So(fp.UplinkDwellTime, should.NotBeNil)
-	a.So(*fp.UplinkDwellTime, should.Equal, time.Millisecond*400)
+	a.So(fp.UplinkDwellTime, should.BeTrue)
+	a.So(fp.DownlinkDwellTime, should.BeFalse)
 }
 
 func TestUnmarshalJP(t *testing.T) {
@@ -131,7 +131,8 @@ lbt:
   rssi-target: -80
   rssi-offset: -4
   scan-time: 128
-uplink-dwell-time: 4s
+uplink-dwell-time: true
+downlink-dwell-time: true
 tx-timeoff-air:
   duration: 90ms`
 
@@ -157,8 +158,8 @@ tx-timeoff-air:
 	a.So(fp.TimeOffAir.Duration, should.NotBeNil)
 	a.So(*fp.TimeOffAir.Duration, should.Equal, time.Millisecond*90)
 
-	a.So(fp.UplinkDwellTime, should.NotBeNil)
-	a.So(*fp.UplinkDwellTime, should.Equal, time.Second*4)
+	a.So(fp.UplinkDwellTime, should.BeTrue)
+	a.So(fp.DownlinkDwellTime, should.BeTrue)
 }
 
 func TestUnmarshalKR(t *testing.T) {

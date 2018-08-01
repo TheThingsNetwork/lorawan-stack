@@ -94,8 +94,8 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			Rx1DataRateOffset: 0,
 			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
 			Rx2Frequency:      band.DefaultRx2Parameters.Frequency,
-			DownlinkDwellTime: band.DwellTime > 0,
-			UplinkDwellTime:   band.DwellTime > 0,
+			DownlinkDwellTime: fp.DownlinkDwellTime,
+			UplinkDwellTime:   fp.UplinkDwellTime,
 		},
 	}
 
@@ -146,13 +146,8 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		ch.MaxDataRateIndex = ttnpb.DataRateIndex(fpCh.DataRate.GetIndex())
 	}
 
-	if fp.UplinkDwellTime != nil {
-		dev.MACState.DesiredMACParameters.UplinkDwellTime = true
-	}
-
-	if fp.DownlinkDwellTime != nil {
-		dev.MACState.DesiredMACParameters.DownlinkDwellTime = true
-	}
+	dev.MACState.DesiredMACParameters.UplinkDwellTime = fp.UplinkDwellTime
+	dev.MACState.DesiredMACParameters.DownlinkDwellTime = fp.DownlinkDwellTime
 
 	if fp.Rx2 != nil {
 		dev.MACState.DesiredMACParameters.Rx2Frequency = fp.Rx2.Frequency
