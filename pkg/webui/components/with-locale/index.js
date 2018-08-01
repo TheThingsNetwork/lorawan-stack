@@ -46,7 +46,7 @@ export default class UserLocale extends React.PureComponent {
   promise = null
 
   state = {
-    messages: null,
+    messages: process.predefined.DEFAULT_MESSAGES, // Note: defined by webpack define plugin
     xx: false,
   }
 
@@ -136,6 +136,7 @@ export default class UserLocale extends React.PureComponent {
     const { xx } = this.state
 
     let { messages } = this.state
+
     const lang = user && user.language || env.default_language || defaultLanguage
 
     if (dev && xx) {
@@ -145,7 +146,7 @@ export default class UserLocale extends React.PureComponent {
     const key = `${lang}${messages ? 1 : 0}${xx ? 'xx' : ''}`
     const locale = lang === xx ? 'en' : lang
 
-    return (
+    return messages && (
       <IntlProvider key={key} messages={messages} locale={locale}>
         {children}
       </IntlProvider>
