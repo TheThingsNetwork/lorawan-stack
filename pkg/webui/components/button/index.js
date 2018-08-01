@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+import PropTypes from '../../lib/prop-types'
 import Spinner from '../spinner'
 import Message from '../message'
 import Icon from '../icon'
@@ -69,7 +69,7 @@ const Button = function ({
 }
 
 Button.propTypes = {
-  message: PropTypes.string,
+  message: PropTypes.message,
   onClick: PropTypes.func,
   danger: PropTypes.bool,
   boring: PropTypes.bool,
