@@ -15,7 +15,6 @@
 package test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -26,7 +25,7 @@ import (
 func TestEvents(t *testing.T) {
 	collector := CollectEvents("test.event")
 
-	events.PublishEvent(context.Background(), "test.event", nil, nil)
+	events.PublishEvent(Context(), "test.event", nil, nil)
 
 	collected := collector.Expect(t, 1)
 	assertions.New(t).So(collected, should.HaveLength, 1)
