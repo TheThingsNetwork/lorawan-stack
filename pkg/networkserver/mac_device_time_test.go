@@ -28,13 +28,13 @@ import (
 
 func TestHandleDeviceTimeReq(t *testing.T) {
 	events := test.CollectEvents("ns.mac.device_time")
-	defer events.Expect(t, 1)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "empty queue",
@@ -57,7 +57,8 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "non-empty queue/odd",
@@ -95,7 +96,8 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "non-empty queue/even",
@@ -136,7 +138,8 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -153,6 +156,10 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

@@ -27,12 +27,12 @@ import (
 
 func TestHandleADRParamSetupAns(t *testing.T) {
 	events := test.CollectEvents("ns.mac.adr_param.accept")
-	defer events.Expect(t, 1)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "no request",
@@ -65,6 +65,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -81,6 +82,10 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

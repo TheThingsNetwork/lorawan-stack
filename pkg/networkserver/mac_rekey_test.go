@@ -27,13 +27,13 @@ import (
 
 func TestHandleRekeyInd(t *testing.T) {
 	events := test.CollectEvents("ns.mac.rekey_ind")
-	defer events.Expect(t, 2)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RekeyInd
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "nil payload",
@@ -69,6 +69,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "non-empty queue",
@@ -100,6 +101,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -116,6 +118,10 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

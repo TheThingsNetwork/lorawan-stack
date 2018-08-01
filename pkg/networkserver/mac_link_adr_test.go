@@ -27,13 +27,13 @@ import (
 
 func TestHandleLinkADRAns(t *testing.T) {
 	events := test.CollectEvents("ns.mac.adr.accept")
-	defer events.Expect(t, 3)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_LinkADRAns
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "nil payload",
@@ -83,6 +83,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "2 requests/all ack",
@@ -114,6 +115,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -130,6 +132,10 @@ func TestHandleLinkADRAns(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

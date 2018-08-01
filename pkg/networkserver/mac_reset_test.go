@@ -46,13 +46,13 @@ func TestMain(t *testing.M) {
 
 func TestHandleResetInd(t *testing.T) {
 	events := test.CollectEvents("ns.mac.reset_ind")
-	defer events.Expect(t, 2)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_ResetInd
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "nil payload",
@@ -107,7 +107,8 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "non-empty queue",
@@ -153,7 +154,8 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -170,6 +172,10 @@ func TestHandleResetInd(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

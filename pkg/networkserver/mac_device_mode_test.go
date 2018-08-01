@@ -27,13 +27,13 @@ import (
 
 func TestHandleDeviceModeInd(t *testing.T) {
 	events := test.CollectEvents("ns.mac.device_mode")
-	defer events.Expect(t, 1)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DeviceModeInd
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "nil payload",
@@ -67,6 +67,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_C,
 			},
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "non-empty queue",
@@ -96,6 +97,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_A,
 			},
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -112,6 +114,10 @@ func TestHandleDeviceModeInd(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

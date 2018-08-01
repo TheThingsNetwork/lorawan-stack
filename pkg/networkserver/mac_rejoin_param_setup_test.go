@@ -27,13 +27,13 @@ import (
 
 func TestHandleRejoinParamSetupAns(t *testing.T) {
 	events := test.CollectEvents("ns.mac.rejoin_param.accept")
-	defer events.Expect(t, 1)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RejoinParamSetupAns
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "nil payload",
@@ -78,6 +78,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -94,6 +95,10 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

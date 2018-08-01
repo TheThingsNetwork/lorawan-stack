@@ -27,13 +27,13 @@ import (
 
 func TestHandleRxParamSetupAns(t *testing.T) {
 	events := test.CollectEvents("ns.mac.rx_param.*")
-	defer events.Expect(t, 2)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RxParamSetupAns
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "nil payload",
@@ -89,6 +89,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "data rate ack",
@@ -121,6 +122,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      false,
 			},
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -137,6 +139,10 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

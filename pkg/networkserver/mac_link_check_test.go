@@ -27,13 +27,13 @@ import (
 
 func TestHandleLinkCheckReq(t *testing.T) {
 	events := test.CollectEvents("ns.mac.link_check")
-	defer events.Expect(t, 3)
 
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
 		Error            error
+		ExpectedEvents   int
 	}{
 		{
 			Name: "SF13BW250",
@@ -80,7 +80,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "SF12BW250/1 gateway/non-empty queue",
@@ -120,7 +121,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 		{
 			Name: "SF12BW250/3 gateways/non-empty queue",
@@ -172,7 +174,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
+			Error:          nil,
+			ExpectedEvents: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -189,6 +192,10 @@ func TestHandleLinkCheckReq(t *testing.T) {
 
 			if !a.So(dev, should.Resemble, tc.Expected) {
 				pretty.Ldiff(t, dev, tc.Expected)
+			}
+
+			if tc.ExpectedEvents > 0 {
+				events.Expect(t, tc.ExpectedEvents)
 			}
 		})
 	}
