@@ -33,15 +33,15 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetRejoinParamSetupReq()
-		accepted := *req
+		var acked ttnpb.MACCommand_RejoinParamSetupReq
 
 		// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
-		accepted.MaxCountExponent = req.MaxCountExponent
+		acked.MaxCountExponent = req.MaxCountExponent
 		if pld.MaxTimeExponentAck {
-			accepted.MaxTimeExponent = req.MaxTimeExponent
+			acked.MaxTimeExponent = req.MaxTimeExponent
 		}
 
-		events.Publish(evtMACRejoinParamAccept(ctx, dev.EndDeviceIdentifiers, &accepted))
+		events.Publish(evtMACRejoinParamAccept(ctx, dev.EndDeviceIdentifiers, &acked))
 	}, dev.MACState.PendingRequests...)
 	return
 }
