@@ -17,7 +17,6 @@ package networkserver
 import (
 	"testing"
 
-	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -85,19 +84,15 @@ func TestHandleDevStatusAns(t *testing.T) {
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
 			err := handleDevStatusAns(test.Context(), dev, tc.Payload)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
-			} else {
-				a.So(err, should.BeNil)
-			}
-
-			if !a.So(dev, should.Resemble, tc.Expected) {
-				pretty.Ldiff(t, dev, tc.Expected)
+			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+				tc.Error == nil && !a.So(err, should.BeNil) {
+				t.FailNow()
 			}
 
 			if tc.ExpectedEvents > 0 {
 				events.expect(t, tc.ExpectedEvents)
 			}
+			a.So(dev, should.Resemble, tc.Expected)
 		})
 	}
 }

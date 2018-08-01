@@ -17,7 +17,6 @@ package networkserver
 import (
 	"testing"
 
-	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -75,15 +74,11 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
 			err := handleBeaconTimingReq(test.Context(), dev)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
-			} else {
-				a.So(err, should.BeNil)
+			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+				tc.Error == nil && !a.So(err, should.BeNil) {
+				t.FailNow()
 			}
-
-			if !a.So(dev, should.Resemble, tc.Expected) {
-				pretty.Ldiff(t, dev, tc.Expected)
-			}
+			a.So(dev, should.Resemble, tc.Expected)
 		})
 	}
 }
