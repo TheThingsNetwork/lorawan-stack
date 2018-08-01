@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import { injectIntl } from 'react-intl'
 
 import from from '../../lib/from'
 import { warn } from '../../lib/log'
@@ -75,7 +76,7 @@ const Field = function (props) {
   let _value = props.value
   let _error = props.error
   let _touched = props.touched
-
+  const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
 
   if (form) {
     const {
@@ -118,7 +119,7 @@ const Field = function (props) {
         error={_touched && Boolean(_error)}
         warning={Boolean(warning)}
         type={type}
-        placeholder={placeholder}
+        placeholder={formatMessage(placeholder)}
         {...rest}
       />
       {hasMessages
@@ -183,4 +184,4 @@ const Err = function (props) {
   )
 }
 
-export default Field
+export default injectIntl(Field)
