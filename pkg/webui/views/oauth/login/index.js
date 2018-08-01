@@ -16,15 +16,24 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import Query from 'query-string'
+import { defineMessages } from 'react-intl'
 
 import api from '../../../api'
+import sharedMessages from '../../../lib/shared-messages'
 
 import Button from '../../../components/button'
 import Field from '../../../components/field'
 import Form from '../../../components/form'
 import Logo from '../../../components/logo'
+import Message from '../../../components/message'
 
 import style from './login.styl'
+
+const m = defineMessages({
+  createAccount: 'Create an account',
+  loginToContinue: 'Please login to continue',
+  ttnAccount: 'The Things Network Account',
+})
 
 @withRouter
 @bind
@@ -43,7 +52,7 @@ export default class OAuth extends React.PureComponent {
       window.location = url(this.props.location)
     } catch (error) {
       this.setState({
-        error: error.response.data.message,
+        error: error.response.data,
       })
     } finally {
       setSubmitting(false)
@@ -63,29 +72,29 @@ export default class OAuth extends React.PureComponent {
           <div className={style.left}>
             <div>
               <Logo />
-              <span>Please login to continue</span>
+              <Message content={m.loginToContinue} />
             </div>
           </div>
           <div className={style.right}>
-            <h1>The Things Network Account</h1>
+            <h1><Message content={m.ttnAccount} /></h1>
             <Form
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               error={this.state.error}
             >
               <Field
-                title="Username or Email"
+                title={sharedMessages.userId}
                 name="user_id"
                 type="text"
                 autoFocus
               />
               <Field
-                title="Password"
+                title={sharedMessages.password}
                 name="password"
                 type="password"
               />
-              <Button type="submit" message="Login" />
-              <Button naked message="Create an account" />
+              <Button type="submit" message={sharedMessages.login} />
+              <Button naked message={m.createAccount} />
             </Form>
           </div>
         </div>

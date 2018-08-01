@@ -18,6 +18,7 @@ import { Provider } from 'react-redux'
 
 import Header from '../../../components/header'
 import Init from '../../../components/init'
+import WithLocale from '../../../components/with-locale'
 import Login from '../login'
 import Landing from '../landing'
 import store from '../../../store'
@@ -27,15 +28,17 @@ export default class ConsoleApp extends React.PureComponent {
     return (
       <Provider store={store}>
         <Init>
-          <div>
-            <Header />
-            <BrowserRouter>
-              <Switch>
-                <Route exact path="/console" component={Landing} />
-                <Route path="/console/login" component={Login} />
-              </Switch>
-            </BrowserRouter>
-          </div>
+          <WithLocale>
+            <div>
+              <Header />
+              <BrowserRouter>
+                <Switch>
+                  <Route exact path="/console" component={Landing} />
+                  <Route path="/console/login" component={Login} />
+                </Switch>
+              </BrowserRouter>
+            </div>
+          </WithLocale>
         </Init>
       </Provider>
     )

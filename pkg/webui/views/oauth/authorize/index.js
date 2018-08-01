@@ -15,8 +15,10 @@
 import React, { PureComponent, Fragment } from 'react'
 import Query from 'query-string'
 import { connect } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import api from '../../../api'
+import sharedMessages from '../../../lib/shared-messages'
 
 import Modal from '../../../components/modal'
 import Spinner from '../../../components/spinner'
@@ -26,6 +28,14 @@ import Message from '../../../components/message'
 import { getClient } from '../../../actions/client'
 
 import style from './authorize.styl'
+
+const m = defineMessages({
+  modalTitle: 'Request for Permission',
+  modalSubtitle: '{clientName} is requesting permissions to do the following:',
+  loginInfo: 'You are logged in as {userId}.',
+  redirectInfo: 'You will be redirected to {redirectUri}',
+  authorize: 'Authorize',
+})
 
 @connect(function (state, props) {
   const { client_id, redirect_uri } = Query.parse(props.location.search)
@@ -60,10 +70,12 @@ export default class Authorize extends PureComponent {
       user,
     } = this.props
 
+    const clientName = capitalize(client_id)
+
     const bottomLine = (
       <div>
-        <span className={style.loginInfo}>You are logged in as {user.user_id}. <a href="#" onClick={this.handleLogout}>Logout</a></span>
-        <span className={style.redirectInfo}>You will be redirected to <span>{redirectUri}</span></span>
+        <span><Message className={style.loginInfo} content={m.loginInfo} values={{ userId: user.user_id }} /> <Message content={sharedMessages.logout} component="a" href="#" onClick={this.handleLogout} /></span>
+        <Message content={m.redirectInfo} values={{ redirectUri }} />
       </div>
     )
 
@@ -73,10 +85,10 @@ export default class Authorize extends PureComponent {
 
     return (
       <Modal
-        title="Request for Permission"
-        subtitle={`${capitalize(client_id)} is asking permission to do the following:`}
+        title={m.modalTitle}
+        subtitle={{ ...m.modalSubtitle, values: { clientName }}}
         bottomLine={bottomLine}
-        buttonMessage="Allow"
+        buttonMessage={m.authorize}
         method="POST"
         formName="authorize"
         approval
@@ -86,7 +98,7 @@ export default class Authorize extends PureComponent {
           <div className={style.left}>
             <ul>
               { client.rights.map(right => (
-                <li key={right}><Icon icon="check" className={style.icon} /><Message content={right} /></li>
+                <li key={right}><Icon icon="check" className={style.icon} /><Message content={{ id: `enum:${right}` }} /></li>
               )
               )}
             </ul>
