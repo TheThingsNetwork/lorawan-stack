@@ -134,7 +134,7 @@ func (p *GatewayPrivacySettings) Scan(src interface{}) error {
 
 // Value implements driver.Valuer interface.
 func (p GatewayRadio_TxConfiguration) Value() (driver.Value, error) {
-	b, err := json.Marshal([]uint32{p.MinFrequency, p.MaxFrequency, p.NotchFrequency})
+	b, err := json.Marshal([]uint64{p.MinFrequency, p.MaxFrequency, p.NotchFrequency})
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (p *GatewayRadio_TxConfiguration) Scan(src interface{}) error {
 		return errors.Errorf("Invalid type assertion. Got %T instead of string", src)
 	}
 
-	var values []uint32
+	var values []uint64
 	if err := json.Unmarshal([]byte(str), &values); err != nil {
 		return err
 	}

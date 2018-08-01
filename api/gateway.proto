@@ -129,17 +129,17 @@ enum GatewayAntennaPlacement {
 // Radio defines the configuration of a SX1301 radio.
 message GatewayRadio {
   // frequency is the base frequency of the radio in Hz.
-  uint32 frequency = 1;
+  uint64 frequency = 1;
 
   message TxConfiguration {
     // min_frequency is the minimun frequency for Tx messages.
-    uint32 min_frequency = 1;
+    uint64 min_frequency = 1;
 
     // max_frequency is the maximum frequency for Tx messages.
-    uint32 max_frequency = 2;
+    uint64 max_frequency = 2;
 
     // notch_frequency is the notch frequency for Tx messages.
-    uint32 notch_frequency = 3;
+    uint64 notch_frequency = 3;
   }
 
   // tx_configuration is the configuration for emitting Tx packets in case
