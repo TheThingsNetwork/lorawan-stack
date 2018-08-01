@@ -57,12 +57,12 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Error:   errMACRequestNotFound,
 		},
 		{
-			Name: "both ack",
+			Name: "both ack/no channel",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
-							ChannelIndex: 4,
+							ChannelIndex: 2,
 							Frequency:    42,
 						}).MACCommand(),
 					},
@@ -71,7 +71,62 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							nil,
+							nil,
+							{
+								UplinkFrequency:   0,
+								DownlinkFrequency: 42,
+							},
+						},
+					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_DLChannelAns{
+				FrequencyAck:    true,
+				ChannelIndexAck: true,
+			},
+		},
+		{
+			Name: "both ack/channel exists",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DLChannelReq{
+							ChannelIndex: 2,
+							Frequency:    42,
+						}).MACCommand(),
+					},
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkEnabled: true,
+							},
+							nil,
+							{
+								UplinkFrequency:   41,
+								DownlinkFrequency: 41,
+							},
+						},
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkEnabled: true,
+							},
+							nil,
+							{
+								UplinkFrequency:   41,
+								DownlinkFrequency: 42,
+							},
+						},
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{

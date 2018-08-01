@@ -41,9 +41,16 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 
 		req := cmd.GetDlChannelReq()
 
-		// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = req.ChannelIndex
-		_ = req.Frequency
+		if uint(req.ChannelIndex) >= uint(len(dev.MACState.Channels)) {
+			dev.MACState.MACParameters.Channels = append(dev.MACState.MACParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MACState.MACParameters.Channels))))...)
+		}
+
+		ch := dev.MACState.MACParameters.Channels[req.ChannelIndex]
+		if ch == nil {
+			ch = &ttnpb.MACParameters_Channel{}
+			dev.MACState.MACParameters.Channels[req.ChannelIndex] = ch
+		}
+		ch.DownlinkFrequency = req.Frequency
 
 		events.Publish(evtMacDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 	}, dev.MACState.PendingRequests...)

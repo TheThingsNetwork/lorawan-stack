@@ -1397,7 +1397,7 @@ outer:
 		case ttnpb.CID_LINK_CHECK:
 			err = handleLinkCheckReq(ctx, dev.EndDevice, msg)
 		case ttnpb.CID_LINK_ADR:
-			err = handleLinkADRAns(ctx, dev.EndDevice, cmd.GetLinkADRAns())
+			err = handleLinkADRAns(ctx, dev.EndDevice, cmd.GetLinkADRAns(), ns.Component.FrequencyPlans)
 		case ttnpb.CID_DUTY_CYCLE:
 			err = handleDutyCycleAns(ctx, dev.EndDevice)
 		case ttnpb.CID_RX_PARAM_SETUP:

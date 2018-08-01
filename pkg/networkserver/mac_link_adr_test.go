@@ -17,7 +17,6 @@ package networkserver
 import (
 	"testing"
 
-	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -38,10 +37,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState:        &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState:        &ttnpb.MACState{},
 			},
 			Payload: nil,
 			Error:   errMissingPayload,
@@ -49,10 +50,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState:        &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState:        &ttnpb.MACState{},
 			},
 			Payload: ttnpb.NewPopulatedMACCommand_LinkADRAns(test.Randy, false),
 			Error:   errMACRequestNotFound,
@@ -60,20 +63,60 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "1 request/all ack",
 			Device: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							nil,
+							{UplinkFrequency: 42},
+							{DownlinkFrequency: 23},
+							nil,
+						},
+					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: 4,
+							DataRateIndex: ttnpb.DATA_RATE_4,
 							TxPowerIndex:  42,
+							ChannelMask: []bool{
+								true, true, false, true,
+								false, true, true, true,
+								true, false, true, true,
+								true, true, false, true,
+							},
 						}).MACCommand(),
 					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					MACParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: 4,
+						ADRDataRateIndex: ttnpb.DATA_RATE_4,
 						ADRTxPowerIndex:  42,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: true},
+							{
+								UplinkEnabled:   true,
+								UplinkFrequency: 42,
+							},
+							{
+								UplinkEnabled:     false,
+								DownlinkFrequency: 23,
+							},
+							{UplinkEnabled: true},
+							{UplinkEnabled: false},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: false},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: false},
+							{UplinkEnabled: true},
+						},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
@@ -88,11 +131,19 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "2 requests/all ack",
 			Device: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: 4,
+							DataRateIndex: ttnpb.DATA_RATE_5,
 							TxPowerIndex:  42,
+							ChannelMask: []bool{
+								true, true, true, true,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, true,
+							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
 							DataRateIndex: 5,
@@ -102,10 +153,30 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					MACParameters: ttnpb.MACParameters{
 						ADRDataRateIndex: 5,
-						ADRTxPowerIndex:  43,
+						ADRTxPowerIndex:  42,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: false},
+							{UplinkEnabled: true},
+						},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
@@ -123,20 +194,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleLinkADRAns(test.Context(), dev, tc.Payload)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
-			} else {
-				a.So(err, should.BeNil)
-			}
-
-			if !a.So(dev, should.Resemble, tc.Expected) {
-				pretty.Ldiff(t, dev, tc.Expected)
+			err := handleLinkADRAns(test.Context(), dev, tc.Payload, frequencyPlansStore)
+			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+				tc.Error == nil && !a.So(err, should.BeNil) {
+				t.FailNow()
 			}
 
 			if tc.ExpectedEvents > 0 {
 				events.expect(t, tc.ExpectedEvents)
 			}
+			a.So(dev, should.Resemble, tc.Expected)
 		})
 	}
 }

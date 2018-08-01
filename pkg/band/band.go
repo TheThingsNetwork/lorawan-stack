@@ -74,6 +74,9 @@ type Rx1DataRateFunc func(idx ttnpb.DataRateIndex, offset uint32, dwellTime bool
 // Rx1ChannelFunc computes the Rx1 channel index.
 type Rx1ChannelFunc func(idx uint32) (uint32, error)
 
+// ChannelMaskFunc computes the channels that have to be masked.
+type ChannelMaskFunc func(mask [16]bool, cntl uint8) (map[int]bool, error)
+
 // Rx2Parameters contains downlink datarate index and channel
 type Rx2Parameters struct {
 	DataRateIndex ttnpb.DataRateIndex
@@ -155,6 +158,7 @@ type Band struct {
 	// Rx1Parameters is the default function that determines the settings for a Tx sent during Rx1
 	Rx1Channel  Rx1ChannelFunc
 	Rx1DataRate Rx1DataRateFunc
+	ChanelMask  ChannelMaskFunc
 
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters

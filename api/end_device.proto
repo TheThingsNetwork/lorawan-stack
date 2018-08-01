@@ -104,8 +104,8 @@ message MACParameters {
     // Index of the maximum data rate for uplink.
     DataRateIndex max_data_rate_index = 4;
 
-    // Channel is masked for ADR.
-    bool masked = 5;
+    // Channel can be used by device for uplink.
+    bool uplink_enabled = 5;
   }
 
   // Rx1 channel settings.
