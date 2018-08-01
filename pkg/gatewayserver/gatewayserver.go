@@ -17,7 +17,9 @@ package gatewayserver
 
 import (
 	"context"
+	"fmt"
 	"net"
+	"strings"
 	"sync"
 
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
@@ -84,16 +86,17 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 			create:   component.Listener.TLS,
 		},
 	} {
+		protocol := fmt.Sprintf("MQTT over %s", strings.ToUpper(mqttEndpoint.protocol))
 		if mqttEndpoint.address == "" {
 			continue
 		}
 		componentLis, err := c.ListenTCP(mqttEndpoint.address)
 		if err != nil {
-			return nil, err
+			return nil, errTCPSocket.WithAttributes("protocol", protocol).WithCause(err)
 		}
 		lis, err := mqttEndpoint.create(componentLis)
 		if err != nil {
-			return nil, err
+			return nil, errCreateEndpoint.WithAttributes("protocol", protocol).WithCause(err)
 		}
 		mqttLis := mqttnet.NewListener(lis, mqttEndpoint.protocol)
 		go gs.runMQTTEndpoint(mqttLis)

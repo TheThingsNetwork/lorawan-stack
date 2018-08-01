@@ -1691,6 +1691,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/gatewayserver:create_endpoint": {
+    "translations": {
+      "en": "could not create {protocol} endpoint"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/gatewayserver:gateway_not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"
@@ -1802,6 +1811,15 @@
   "error:pkg/gatewayserver:schedule": {
     "translations": {
       "en": "could not schedule downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver:tcp_socket": {
+    "translations": {
+      "en": "could not open TCP socket for {protocol}"
     },
     "description": {
       "package": "pkg/gatewayserver",

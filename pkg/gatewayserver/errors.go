@@ -17,7 +17,9 @@ package gatewayserver
 import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 var (
-	errUDPSocket = errors.DefineFailedPrecondition("udp_socket", "could not open UDP socket")
+	errUDPSocket      = errors.DefineFailedPrecondition("udp_socket", "could not open UDP socket")
+	errTCPSocket      = errors.DefineFailedPrecondition("tcp_socket", "could not open TCP socket for {protocol}")
+	errCreateEndpoint = errors.DefineFailedPrecondition("create_endpoint", "could not create {protocol} endpoint")
 
 	errNoNetworkServerFound              = errors.DefineInternal("no_network_server_found", "no Network Server found for this message")
 	errNoIdentityServerFound             = errors.DefineInternal("no_identity_server_found", "no Identity Server found")
