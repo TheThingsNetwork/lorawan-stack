@@ -16,6 +16,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
+import Icon from '../icon'
 import ByteInput from './byte'
 
 import style from './input.styl'
@@ -46,6 +47,7 @@ const filter = function (props) {
 @bind
 export default class Input extends React.Component {
   static propTypes = {
+    icon: PropTypes.string,
     value: PropTypes.string,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -73,6 +75,7 @@ export default class Input extends React.Component {
 
   render () {
     const {
+      icon,
       value,
       error,
       warning,
@@ -111,6 +114,7 @@ export default class Input extends React.Component {
 
     return (
       <div className={classname}>
+        {icon && <Icon className={style.icon}icon={icon} />}
         <Component
           key="i"
           className={style.input}

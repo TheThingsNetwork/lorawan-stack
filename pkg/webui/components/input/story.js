@@ -58,6 +58,9 @@ storiesOf('Input', module)
   .add('With Placeholder', () => (
     <Example placeholder="Placeholder..." />
   ))
+  .add('With icon', () => (
+    <Example icon="search" />
+  ))
   .add('Valid', () => (
     <Example valid />
   ))
