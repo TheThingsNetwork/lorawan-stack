@@ -31,6 +31,7 @@ It is generated from these files:
 	go.thethings.network/lorawan-stack/api/networkserver.proto
 	go.thethings.network/lorawan-stack/api/organization.proto
 	go.thethings.network/lorawan-stack/api/payload_formatter.proto
+	go.thethings.network/lorawan-stack/api/regional.proto
 	go.thethings.network/lorawan-stack/api/rights.proto
 	go.thethings.network/lorawan-stack/api/user.proto
 
@@ -66,7 +67,6 @@ It has these top-level messages:
 	GatewayObservations
 	GatewayUp
 	GatewayDown
-	FrequencyPlan
 	GetFrequencyPlanRequest
 	UserIdentifiers
 	ApplicationIdentifiers
@@ -159,6 +159,7 @@ It has these top-level messages:
 	Location
 	Organization
 	OrganizationMember
+	FrequencyPlan
 	User
 */
 package ttnpb

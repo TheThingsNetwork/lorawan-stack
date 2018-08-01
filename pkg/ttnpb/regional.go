@@ -14,22 +14,43 @@
 
 package ttnpb
 
+// Copy the channel parameters to a new struct.
+func (c *FrequencyPlan_Channel) Copy() *FrequencyPlan_Channel {
+	return &FrequencyPlan_Channel{
+		Frequency: c.Frequency,
+		DataRate:  c.DataRate,
+	}
+}
+
+// Copy the time off air parameters to a new struct.
+func (toa *FrequencyPlan_TimeOffAir) Copy() *FrequencyPlan_TimeOffAir {
+	return &FrequencyPlan_TimeOffAir{
+		Duration: toa.Duration,
+		Fraction: toa.Fraction,
+	}
+}
+
+func (lbt *FrequencyPlan_LBTConfiguration) Copy() *FrequencyPlan_LBTConfiguration {
+	return &FrequencyPlan_LBTConfiguration{
+		RSSIOffset: lbt.RSSIOffset,
+		RSSITarget: lbt.RSSITarget,
+		ScanTime:   lbt.ScanTime,
+	}
+}
+
 // Extend a frequency plan from a frequency plan blueprint
 func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	if channels := ext.Channels; channels != nil {
 		f.Channels = make([]*FrequencyPlan_Channel, 0)
 		for _, channel := range channels {
-			f.Channels = append(f.Channels, &FrequencyPlan_Channel{
-				Frequency: channel.Frequency,
-				DataRate:  channel.DataRate,
-			})
+			f.Channels = append(f.Channels, channel.Copy())
 		}
 	}
 	if ext.FSKChannel != nil {
-		f.FSKChannel = &FrequencyPlan_Channel{Frequency: ext.FSKChannel.Frequency, DataRate: ext.FSKChannel.DataRate}
+		f.FSKChannel = ext.FSKChannel.Copy()
 	}
 	if ext.LoraStandardChannel != nil {
-		f.LoraStandardChannel = &FrequencyPlan_Channel{Frequency: ext.LoraStandardChannel.Frequency, DataRate: ext.LoraStandardChannel.DataRate}
+		f.LoraStandardChannel = ext.LoraStandardChannel.Copy()
 	}
 	if ext.UplinkDwellTime != nil {
 		duration := *ext.UplinkDwellTime
@@ -40,29 +61,16 @@ func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 		f.DownlinkDwellTime = &duration
 	}
 	if ext.LBT != nil {
-		f.LBT = &FrequencyPlan_LBTConfiguration{
-			RSSIOffset: ext.LBT.RSSIOffset,
-			RSSITarget: ext.LBT.RSSITarget,
-			ScanTime:   ext.LBT.ScanTime,
-		}
+		f.LBT = ext.LBT.Copy()
 	}
 	if ext.TimeOffAir != nil {
-		f.TimeOffAir = &FrequencyPlan_TimeOffAir{
-			Duration: ext.TimeOffAir.Duration,
-			Fraction: ext.TimeOffAir.Fraction,
-		}
+		f.TimeOffAir = ext.TimeOffAir.Copy()
 	}
 	if ext.PingSlot != nil {
-		f.PingSlot = &FrequencyPlan_Channel{
-			Frequency: ext.PingSlot.Frequency,
-			DataRate:  ext.PingSlot.DataRate,
-		}
+		f.PingSlot = ext.PingSlot.Copy()
 	}
 	if ext.Rx2 != nil {
-		f.Rx2 = &FrequencyPlan_Channel{
-			Frequency: ext.Rx2.Frequency,
-			DataRate:  ext.Rx2.DataRate,
-		}
+		f.Rx2 = ext.Rx2.Copy()
 	}
 	if ext.MaxEIRP != 0.0 {
 		f.MaxEIRP = ext.MaxEIRP

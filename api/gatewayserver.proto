@@ -19,6 +19,7 @@ import "go.thethings.network/lorawan-stack/api/identifiers.proto";
 import "go.thethings.network/lorawan-stack/api/lorawan.proto";
 import "go.thethings.network/lorawan-stack/api/messages.proto";
 import "go.thethings.network/lorawan-stack/api/metadata.proto";
+import "go.thethings.network/lorawan-stack/api/regional.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
@@ -38,68 +39,6 @@ message GatewayUp {
 message GatewayDown {
   // DownlinkMessage for the gateway.
   DownlinkMessage downlink_message = 1;
-}
-
-// FrequencyPlan contains the frequency plan for the gateway.
-message FrequencyPlan {
-  option (gogoproto.populate) = false;
-
-  // BandID of the band to support.
-  string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band-id\""];
-
-  message Channel {
-    // Frequency of the channel.
-    uint64 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
-
-    message ForceDataRate {
-      // Index of the data rate to use.
-      uint32 index = 1 [(gogoproto.moretags) = "yaml:\"index\""];
-    }
-
-    // DataRate that should be used on this channel.
-    ForceDataRate data_rate = 2 [(gogoproto.moretags) = "yaml:\"data-rate,omitempty\""];
-  }
-
-  // Channels to support.
-  repeated Channel channels = 2 [(gogoproto.moretags) = "yaml:\"channels\""];
-
-  Channel lora_standard_channel = 3 [(gogoproto.moretags) = "yaml:\"lora-std-channel,omitempty\""];
-  Channel fsk_channel = 4 [(gogoproto.customname) = "FSKChannel", (gogoproto.moretags) = "yaml:\"fsk-channel,omitempty\""];
-
-  message LBTConfiguration {
-    float rssi_target = 1 [(gogoproto.customname) = "RSSITarget",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
-    // RSSIOffset describes the LBT config-specific RSSI offset.
-    float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset",  (gogoproto.moretags) = "yaml:\"rssi-offset\""];
-    int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time\""];
-  }
-
-  // LBT configuration.
-  LBTConfiguration lbt = 5 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
-
-  message TimeOffAir {
-    // Fraction of the time on air of a Tx emission to account as cooloff after emission.
-    float fraction = 1 [(gogoproto.moretags) = "yaml:\"fraction,omitempty\""];
-    // Cooloff after a Tx emission.
-    google.protobuf.Duration duration = 2 [(gogoproto.moretags) = "yaml:\"duration,omitempty\"", (gogoproto.stdduration) = true];
-  }
-
-  // TimeOffAir to abide to after transmission.
-  TimeOffAir time_off_air = 6 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
-
-  // Override maximum duration of an uplink transmission.
-  google.protobuf.Duration uplink_dwell_time = 7 [(gogoproto.moretags) = "yaml:\"uplink-dwell-time,omitempty\"", (gogoproto.stdduration) = true];
-
-  // Override maximum duration of a downlink transmission.
-  google.protobuf.Duration downlink_dwell_time = 8 [(gogoproto.moretags) = "yaml:\"downlink-dwell-time,omitempty\"", (gogoproto.stdduration) = true];
-
-  // Override band settings for the class B ping slot.
-  Channel ping_slot = 9 [(gogoproto.moretags) = "yaml:\"ping-slot,omitempty\""];
-
-  // Override band settings for Rx2.
-  Channel rx2 = 10 [(gogoproto.customname) = "Rx2", (gogoproto.moretags) = "yaml:\"rx2,omitempty\""];
-
-  // Override MaxEIRP devices should respect (in dBm).
-  float max_eirp = 18 [(gogoproto.customname) = "MaxEIRP", (gogoproto.moretags) = "yaml:\"max-eirp\""];
 }
 
 message GetFrequencyPlanRequest {
