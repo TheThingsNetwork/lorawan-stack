@@ -45,9 +45,14 @@ const Message = function ({
     return <Component {...rest}>{content}</Component>
   }
 
+  let vals = values
+  if (content.values && Object.keys(values).length === 0) {
+    vals = content.values
+  }
+
   if (content.id) {
     return (
-      <FormattedMessage {...content} values={values}>
+      <FormattedMessage {...content} values={vals}>
         {(...children) => <Component {...rest}>{children}</Component>}
       </FormattedMessage>
     )
