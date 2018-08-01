@@ -184,7 +184,6 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // If no downlink could be generated - nil, errNoDownlink is returned.
 func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confFCnt uint32) (b []byte, err error) {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
 
@@ -197,7 +196,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	}
 
 	if dev.Session == nil {
-		logger.Debug("No active session found for device")
 		return nil, errEmptySession
 	}
 
@@ -206,7 +204,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	// TODO: Queue LinkADRReq(https://github.com/TheThingsIndustries/ttn/issues/837)
 
 	if dev.MACState.DesiredMACParameters.DutyCycle != dev.MACState.MACParameters.DutyCycle {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DutyCycleReq{
 			MaxDutyCycle: dev.MACState.DesiredMACParameters.DutyCycle,
 		}).MACCommand())
@@ -215,7 +212,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	if dev.MACState.DesiredMACParameters.Rx2Frequency != dev.MACState.MACParameters.Rx2Frequency ||
 		dev.MACState.DesiredMACParameters.Rx2DataRateIndex != dev.MACState.MACParameters.Rx2DataRateIndex ||
 		dev.MACState.DesiredMACParameters.Rx1DataRateOffset != dev.MACState.MACParameters.Rx1DataRateOffset {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxParamSetupReq{
 			Rx2Frequency:      dev.MACState.DesiredMACParameters.Rx2Frequency,
 			Rx2DataRateIndex:  dev.MACState.DesiredMACParameters.Rx2DataRateIndex,
@@ -225,7 +221,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	if dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
 		dev.MACSettings.StatusTimePeriodicity > 0 && dev.NextStatusAt.Before(time.Now()) {
-
 		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
 		if dev.MACSettings.StatusTimePeriodicity > 0 {
 			dev.NextStatusAt = time.Now().Add(dev.MACSettings.StatusTimePeriodicity)
@@ -266,7 +261,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	}
 
 	if dev.MACState.DesiredMACParameters.Rx1Delay != dev.MACState.MACParameters.Rx1Delay {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxTimingSetupReq{
 			Delay: dev.MACState.DesiredMACParameters.Rx1Delay,
 		}).MACCommand())
@@ -275,7 +269,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	if dev.MACState.DesiredMACParameters.MaxEIRP != dev.MACState.MACParameters.MaxEIRP ||
 		dev.MACState.DesiredMACParameters.DownlinkDwellTime != dev.MACState.MACParameters.DownlinkDwellTime ||
 		dev.MACState.DesiredMACParameters.UplinkDwellTime != dev.MACState.MACParameters.UplinkDwellTime {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_TxParamSetupReq{
 			MaxEIRPIndex:      ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredMACParameters.MaxEIRP),
 			DownlinkDwellTime: dev.MACState.DesiredMACParameters.DownlinkDwellTime,
@@ -285,7 +278,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	if dev.MACState.DesiredMACParameters.ADRAckLimit != dev.MACState.MACParameters.ADRAckLimit ||
 		dev.MACState.DesiredMACParameters.ADRAckDelay != dev.MACState.MACParameters.ADRAckDelay {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_ADRParamSetupReq{
 			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredMACParameters.ADRAckLimit),
 			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredMACParameters.ADRAckDelay),
@@ -295,7 +287,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	// TODO: Queue ForceRejoinReq(https://github.com/TheThingsIndustries/ttn/issues/837)
 
 	if dev.MACState.DesiredMACParameters.RejoinTimePeriodicity != dev.MACState.MACParameters.RejoinTimePeriodicity {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RejoinParamSetupReq{
 			MaxTimeExponent:  dev.MACState.DesiredMACParameters.RejoinTimePeriodicity,
 			MaxCountExponent: dev.MACState.DesiredMACParameters.RejoinCountPeriodicity,
@@ -304,7 +295,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	if dev.MACState.DesiredMACParameters.PingSlotDataRateIndex != dev.MACState.MACParameters.PingSlotDataRateIndex ||
 		dev.MACState.DesiredMACParameters.PingSlotFrequency != dev.MACState.MACParameters.PingSlotFrequency {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_PingSlotChannelReq{
 			Frequency:     dev.MACState.DesiredMACParameters.PingSlotFrequency,
 			DataRateIndex: dev.MACState.DesiredMACParameters.PingSlotDataRateIndex,
@@ -312,7 +302,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	}
 
 	if dev.MACState.DesiredMACParameters.BeaconFrequency != dev.MACState.MACParameters.BeaconFrequency {
-
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_BeaconFreqReq{
 			Frequency: dev.MACState.DesiredMACParameters.BeaconFrequency,
 		}).MACCommand())
@@ -408,11 +397,13 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		pld.FRMPayload = cmdBuf
 		dev.Session.NextNFCntDown++
 	} else {
+		// TODO: Ensure that maxPayloadSize of the data rate is not exceeded.
+		// https://github.com/TheThingsIndustries/lorawan-stack/issues/995
 		pld.FHDR.FOpts = cmdBuf
 	}
 
 	// TODO: Set to true if commands were trimmed.
-	// (https://github.com/TheThingsIndustries/ttn/issues/836)
+	// https://github.com/TheThingsIndustries/ttn/issues/836
 	pld.FHDR.FCtrl.FPending = len(dev.QueuedApplicationDownlinks) > 0
 
 	switch {
@@ -438,7 +429,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		},
 	}).MarshalLoRaWAN()
 	if err != nil {
-		panic(err)
 		return nil, errMarshalPayloadFailed.WithCause(err)
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
@@ -449,7 +439,6 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 			return nil, errMissingFNwkSIntKey
 		}
 		key = *dev.Session.FNwkSIntKey.Key
-
 	} else {
 		if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 			return nil, errMissingSNwkSIntKey
@@ -1344,13 +1333,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			return
 		}
 
-		ack := msg.Payload.MType == ttnpb.MType_CONFIRMED_UP
+		needsAck := msg.Payload.MType == ttnpb.MType_CONFIRMED_UP
 		var confFCnt uint32
-		if ack {
+		if needsAck {
 			confFCnt = pld.FHDR.FCnt
 		}
 
-		b, err := generateDownlink(ctx, dev.EndDevice, ack, confFCnt)
+		b, err := generateDownlink(ctx, dev.EndDevice, needsAck, confFCnt)
 		if err != nil && !errors.Resemble(err, errNoDownlink) {
 			logger.WithError(err).Error("Failed to generate downlink in reception slot")
 			return
