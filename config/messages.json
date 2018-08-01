@@ -2204,15 +2204,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:device_store": {
-    "translations": {
-      "en": "failed to store device"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:duplicate_cid_handler": {
     "translations": {
       "en": "a handler for MAC command with CID {cid} is already registered"
@@ -2373,6 +2364,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:no_downlink": {
+    "translations": {
+      "en": "no downlink to send"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "networkserver.go"
     }
   },
   "error:pkg/networkserver:raw_payload_too_long": {
