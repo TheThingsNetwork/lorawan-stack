@@ -14,7 +14,7 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import PropTypes from 'prop-types'
+import PropTypes from '../../lib/prop-types'
 
 import Message from '../message'
 import Button from '../button'
@@ -25,22 +25,22 @@ import style from './modal.styl'
 @bind
 export default class Modal extends React.PureComponent {
   static propTypes = {
-    title: PropTypes.string,
+    title: PropTypes.message,
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]),
-    message: PropTypes.string,
-    subtitle: PropTypes.string,
+    message: PropTypes.message,
+    subtitle: PropTypes.message,
     bottomLine: PropTypes.oneOfType([
       PropTypes.element,
-      PropTypes.string,
+      PropTypes.message,
     ]),
     approval: PropTypes.bool,
-    buttonMessage: PropTypes.string,
-    cancelButtonMessage: PropTypes.string,
+    buttonMessage: PropTypes.message,
+    cancelButtonMessage: PropTypes.message,
     method: PropTypes.string,
-    buttonName: PropTypes.string,
+    buttonName: PropTypes.message,
   }
 
   handleApprove () {
@@ -63,19 +63,23 @@ export default class Modal extends React.PureComponent {
       subtitle,
       children,
       message,
-      bottomLine,
       logo,
       approval = false,
       formName,
       buttonMessage = this.props.approval ? 'Approve' : 'Ok',
       cancelButtonMessage = 'Cancel',
       onComplete,
+      bottomLine,
       ...rest
     } = this.props
 
     const name = formName ? { name: formName } : {}
     const RootComponent = this.props.method ? 'form' : 'div'
     const messageElement = (<span className={style.message}>{message}</span>)
+    const bottomLineElement = bottomLine === 'object'
+      ? <Message content={bottomLine} />
+      : bottomLine
+
 
     let buttons = <div><Button message={buttonMessage} onClick={this.handleApprove} icon="check" /></div>
 
@@ -120,7 +124,7 @@ export default class Modal extends React.PureComponent {
           {children || messageElement}
         </div>
         <div className={style.controlBar}>
-          <div><span>{ bottomLine }</span></div>
+          <div><span>{ bottomLineElement }</span></div>
           {buttons}
         </div>
       </RootComponent>,
