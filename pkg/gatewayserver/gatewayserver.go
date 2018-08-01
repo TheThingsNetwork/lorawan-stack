@@ -129,12 +129,13 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 		return nil, err
 	}
 
+	uid := unique.ID(ctx, id)
 	gs.connectionsMu.Lock()
-	connection, ok := gs.connections[unique.ID(ctx, id)]
+	connection, ok := gs.connections[uid]
 	gs.connectionsMu.Unlock()
 
 	if !ok {
-		return nil, errGatewayNotConnected.WithAttributes("gateway_id", id.GatewayID)
+		return nil, errGatewayNotConnected.WithAttributes("gateway_uid", uid)
 	}
 
 	observations := connection.getObservations()

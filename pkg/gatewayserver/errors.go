@@ -27,7 +27,7 @@ var (
 		"api_key_needs_rights",
 		"API key needs the following rights for the gateway `{gateway_uid}` to perform this operation: {rights}",
 	)
-	errGatewayNotConnected = errors.DefineNotFound("gateway_not_connected", "gateway `{gateway_id}` not connected")
+	errGatewayNotConnected = errors.DefineNotFound("gateway_not_connected", "gateway `{gateway_uid}` not connected")
 	errNoPULLDATAReceived  = errors.Define("no_pull_data_received", "no PULL_DATA received in the last `{delay}`")
 
 	errNoMetadata                   = errors.DefineInternal("no_metadata", "No metadata present")

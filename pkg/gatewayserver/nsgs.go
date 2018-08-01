@@ -19,6 +19,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -51,6 +52,10 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	}
 	err = connection.send(down)
 	if err != nil {
+		ttnErr, ok := errors.From(err)
+		if ok && errors.IsNotFound(ttnErr) { // Connections don't have enough information on gateways
+			err = ttnErr.WithAttributes("gateway_uid", uid)
+		}
 		return nil, err
 	}
 

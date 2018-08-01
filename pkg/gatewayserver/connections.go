@@ -183,7 +183,7 @@ func (c *udpConnState) pullDataExpired() bool {
 func (c *udpConnState) send(down *ttnpb.DownlinkMessage) error {
 	gtw := c.gateway()
 	if c.pullDataExpired() {
-		return errGatewayNotConnected.WithCause(errNoPULLDATAReceived.WithAttributes("delay", pullDataExpiration.String()))
+		return errGatewayNotConnected.WithCause(errNoPULLDATAReceived.WithAttributes("delay", pullDataExpiration.String())) // UID filled upstream
 	}
 
 	tx, err := udp.TranslateDownstream(down)
