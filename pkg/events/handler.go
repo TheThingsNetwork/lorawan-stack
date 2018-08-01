@@ -14,7 +14,10 @@
 
 package events
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Handler interface for event listeners.
 type Handler interface {
@@ -43,6 +46,26 @@ func (ch Channel) Notify(evt Event) {
 	select {
 	case ch <- evt:
 	default:
+	}
+}
+
+// ReceiveTimeout returns the next event from the channel or returns nil after a timeout.
+func (ch Channel) ReceiveTimeout(timeout time.Duration) Event {
+	select {
+	case evt := <-ch:
+		return evt
+	case <-time.After(timeout):
+		return nil
+	}
+}
+
+// ReceiveContext returns the next event from the channel or returns nil when the context is done.
+func (ch Channel) ReceiveContext(ctx context.Context) Event {
+	select {
+	case evt := <-ch:
+		return evt
+	case <-ctx.Done():
+		return nil
 	}
 }
 

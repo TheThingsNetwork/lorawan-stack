@@ -17,9 +17,13 @@ package events_test
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
 
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func ExampleHandlerFunc() {
@@ -56,6 +60,25 @@ func ExampleChannel() {
 
 	// Note that in-transit events may still be delivered after Unsubscribe returns.
 	// This means that you can't immediately close the channel after unsubscribing.
+}
+
+func TestChannelReceive(t *testing.T) {
+	a := assertions.New(t)
+
+	eventChan := make(events.Channel, 2)
+	eventChan.Notify(events.New(test.Context(), "evt", nil, nil))
+	eventChan.Notify(events.New(test.Context(), "evt", nil, nil))
+	eventChan.Notify(events.New(test.Context(), "overflow", nil, nil))
+
+	ctx, cancel := context.WithCancel(test.Context())
+
+	a.So(eventChan.ReceiveTimeout(time.Millisecond), should.NotBeNil)
+	a.So(eventChan.ReceiveContext(ctx), should.NotBeNil)
+
+	cancel()
+
+	a.So(eventChan.ReceiveTimeout(time.Millisecond), should.BeNil)
+	a.So(eventChan.ReceiveContext(ctx), should.BeNil)
 }
 
 func ExampleContextHandler() {
