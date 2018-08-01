@@ -141,7 +141,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		if ch.MinDataRateIndex > ttnpb.DataRateIndex(fpCh.DataRate.GetIndex()) || ttnpb.DataRateIndex(fpCh.DataRate.GetIndex()) > ch.MaxDataRateIndex {
 			return errInvalidFrequencyPlan
 		}
-		// TODO: This should fixed once https://github.com/TheThingsIndustries/lorawan-stack/issues/927 is resolved.
+		// TODO: This should be fixed once https://github.com/TheThingsIndustries/lorawan-stack/issues/927 is resolved.
 		ch.MinDataRateIndex = ttnpb.DataRateIndex(fpCh.DataRate.GetIndex())
 		ch.MaxDataRateIndex = ttnpb.DataRateIndex(fpCh.DataRate.GetIndex())
 	}
@@ -182,6 +182,12 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink and error if any.
 // If no downlink could be generated - nil, errNoDownlink is returned.
+// generateDownlink does not perform validation of dev.MACState.DesiredMACParameters,
+// hence, it could potentially generate MAC command(s), which are not suported by the
+// regional parameters the device operates in.
+// For example, a sequence of 'NewChannel' MAC commands could be generated for a
+// device operating in a region where a fixed channel plan is defined in case
+// dev.MACState.MACParameters.Channels is not equal to dev.MACState.DesiredMACParameters.Channels.
 func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confFCnt uint32) (b []byte, err error) {
 	if !ack && confFCnt > 0 {
 		panic("confFCnt must be 0 if ack is false")
