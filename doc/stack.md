@@ -81,6 +81,6 @@ The `init` command runs database migrations and creates an admin account, with `
 You can also run it using Docker, or container orchestration solutions. A testing [Docker Compose configuration](../docker-compose.yml) is available in the repository:
 
 ```bash
-$ docker-compose run --entrypoint ttn-lw-identity-server --rm stack init
+$ docker-compose run -e TTN_LW_IDENTITY_SERVER_IS_DATABASE_URI=postgres://root@cockroach:26257/is_development?sslmode=disable --entrypoint ttn-lw-identity-server --rm stack init
 $ docker-compose up
 ```

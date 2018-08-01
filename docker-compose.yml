@@ -1,0 +1,36 @@
+version: '3'
+services:
+  stack:
+    image: thethingsnetwork/lorawan-stack
+    entrypoint: ttn-lw-stack
+    command: start
+    environment:
+      TTN_LW_STACK_IS_DATABASE_URI: postgres://root@cockroach:26257/is_development?sslmode=disable
+      TTN_LW_STACK_REDIS_ADDRESS: redis:6379
+    depends_on:
+      - cockroach
+      - redis
+    ports:
+      - "80:80"
+      - "443:443"
+      - "1882:1882"
+      - "8882:8882"
+      - "1883:1883"
+      - "8883:8883"
+      - "1884:1884"
+      - "8884:8884"
+      - "1885:1885"
+      - "8885:8885"
+      - "1700:1700/udp"
+  cockroach:
+    image: cockroachdb/cockroach:v2.0.3
+    command: start --http-port 26256 --insecure
+    volumes:
+      - /cockroach/cockroach-data
+    ports:
+      - "127.0.0.1:26256:26256" # WebUI
+  redis:
+    image: redis:4.0-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - /data
