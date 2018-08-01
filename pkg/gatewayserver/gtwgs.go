@@ -235,11 +235,13 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		}
 
 		if useLocationFromMetadata {
+			antenna.Location.Source = ttnpb.SOURCE_GPS
 			continue
 		}
 
 		if gwMetadata != nil && len(gwMetadata.GetAntennas()) >= index {
 			antenna.Location = &gwMetadata.GetAntennas()[index].Location
+			antenna.Location.Source = ttnpb.SOURCE_REGISTRY
 		} else {
 			antenna.Location = nil
 		}
