@@ -183,10 +183,6 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // generateDownlink returns the marshaled payload of the downlink and error if any.
 // If no downlink could be generated - nil, errNoDownlink is returned.
 func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confFCnt uint32) (b []byte, err error) {
-	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-	))
-
 	if !ack && confFCnt > 0 {
 		panic("confFCnt must be 0 if ack is false")
 	}

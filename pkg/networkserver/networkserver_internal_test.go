@@ -285,7 +285,7 @@ func TestScheduleDownlink(t *testing.T) {
 									Timestamp:          uint64(time.Unix(0, 124).Add(3 * time.Second).UnixNano()),
 								}))
 
-								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).ClusterAuth())
+								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
 						}, nil
@@ -299,7 +299,7 @@ func TestScheduleDownlink(t *testing.T) {
 									GatewayIdentifiers: gateways[2],
 									Timestamp:          uint64(time.Unix(0, 42).Add(3 * time.Second).UnixNano()),
 								}))
-								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).ClusterAuth())
+								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return ttnpb.Empty, nil
 							},
 						}, nil
@@ -407,7 +407,7 @@ func TestScheduleDownlink(t *testing.T) {
 										GatewayIdentifiers: md.GatewayIdentifiers,
 										Timestamp:          md.Timestamp + uint64(time.Second.Nanoseconds()),
 									}))
-									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).ClusterAuth())
+									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 									return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 								},
 							}, nil
@@ -418,7 +418,7 @@ func TestScheduleDownlink(t *testing.T) {
 							ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 								a.So(ctx, should.HaveParentContext, testCtx)
 								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, md))
-								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).ClusterAuth())
+								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
 						}, nil
@@ -440,7 +440,7 @@ func TestScheduleDownlink(t *testing.T) {
 										GatewayIdentifiers: md.GatewayIdentifiers,
 										Timestamp:          md.Timestamp + uint64(time.Second.Nanoseconds()),
 									}))
-									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).ClusterAuth())
+									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 									return ttnpb.Empty, nil
 								},
 							}, nil
@@ -451,7 +451,7 @@ func TestScheduleDownlink(t *testing.T) {
 							ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 								a.So(ctx, should.HaveParentContext, testCtx)
 								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, md))
-								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).ClusterAuth())
+								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
 						}, nil
