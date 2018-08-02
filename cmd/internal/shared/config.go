@@ -74,7 +74,7 @@ var DefaultEventsConfig = config.Events{
 // DefaultAssetsConfig is the default config for the assets server.
 var DefaultAssetsConfig = assets.Config{
 	Mount:      "/assets",
-	SearchPath: []string{"public", "/var/ttn-lw/assets"},
+	SearchPath: []string{"public", "/srv/ttn-lorawan/public"},
 }
 
 // DefaultServiceBase is the default base config for a service.
