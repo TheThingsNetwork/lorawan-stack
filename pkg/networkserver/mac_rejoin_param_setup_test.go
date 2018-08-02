@@ -57,27 +57,58 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Error:   errMACRequestNotFound,
 		},
 		{
-			Name: "all ack",
+			Name: "ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RejoinParamSetupReq{
-							MaxCountExponent: 42,
-							MaxTimeExponent:  43,
+							MaxCountExponent: ttnpb.REJOIN_COUNT_128,
+							MaxTimeExponent:  ttnpb.REJOIN_TIME_10,
 						}).MACCommand(),
 					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
+					MACParameters: ttnpb.MACParameters{
+						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
+						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+					},
 					PendingRequests: []*ttnpb.MACCommand{},
-					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
 			},
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
 			ExpectedEvents: 1,
+		},
+		{
+			Name: "no ack",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					MACParameters: ttnpb.MACParameters{
+						RejoinTimePeriodicity: ttnpb.REJOIN_TIME_1,
+					},
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_RejoinParamSetupReq{
+							MaxCountExponent: ttnpb.REJOIN_COUNT_1024,
+							MaxTimeExponent:  ttnpb.REJOIN_TIME_11,
+						}).MACCommand(),
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					MACParameters: ttnpb.MACParameters{
+						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_1024,
+						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_1,
+					},
+					PendingRequests: []*ttnpb.MACCommand{},
+				},
+			},
+			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
+				MaxTimeExponentAck: false,
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
