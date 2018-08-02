@@ -23,19 +23,16 @@ storiesOf('Notification', module)
   ))
   .add('Info', () => (
     <Notification
-      info
-      message="This message is good to know"
+      info="This message is good to know"
     />
   ))
   .add('Warning', () => (
     <Notification
-      warning
-      message="This issue should be addressed!"
+      warning="This issue should be addressed!"
     />
   ))
   .add('Error', () => (
     <Notification
-      error
-      message="We got a problem here!"
+      error="We got a problem here!"
     />
   ))

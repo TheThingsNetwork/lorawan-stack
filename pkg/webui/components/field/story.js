@@ -14,10 +14,18 @@
 
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { IntlProvider } from 'react-intl'
 
 import Field from '.'
 
+const IntlDecorator = storyFn => (
+  <IntlProvider key="key" messages={{}} locale="en-US">
+    { storyFn() }
+  </IntlProvider>
+)
+
 storiesOf('Field', module)
+  .addDecorator(IntlDecorator)
   .add('Default', () => (
     <Field
       title="Foo"

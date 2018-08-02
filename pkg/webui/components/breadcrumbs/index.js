@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React, { Fragment } from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+import PropTypes from '../../lib/prop-types'
 import Message from '../message'
 import Icon from '../icon'
 import Breacrumb from './breadcrumb'
@@ -58,7 +58,7 @@ Breadcrumbs.propTypes = {
    * @param {path} The path for a breadcrumb
    */
   entries: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.string.isRequired,
+    title: PropTypes.message.isRequired,
     path: PropTypes.string.isRequired,
     icon: PropTypes.string,
   })),

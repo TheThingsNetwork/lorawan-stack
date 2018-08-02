@@ -14,9 +14,9 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import PropTypes from 'prop-types'
 import { injectIntl } from 'react-intl'
 
+import PropTypes from '../../lib/prop-types'
 import from from '../../lib/from'
 import { warn } from '../../lib/log'
 
@@ -57,7 +57,7 @@ const Field = function (props) {
   const {
     type = 'text',
     name = '',
-    title = null,
+    title,
     placeholder = props.title,
     description = null,
     error,
@@ -127,9 +127,8 @@ const Field = function (props) {
           <Err error={_error} name={title} />
           <Err warning={warning} name={title} />
         </div>
-        : <div className={style.description}>
-          <Message content={description} />
-        </div>}
+        : <Message className={style.description} content={description} />
+      }
     </div>
   )
 }
@@ -145,8 +144,8 @@ Field.propTypes = {
     PropTypes.string.isRequired,
     PropTypes.func.isRequired,
   ]),
-  error: PropTypes.string,
-  warning: PropTypes.string,
+  error: PropTypes.error,
+  warning: PropTypes.message,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,

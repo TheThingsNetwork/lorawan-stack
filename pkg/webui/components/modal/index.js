@@ -16,6 +16,8 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import PropTypes from '../../lib/prop-types'
 
+import sharedMessages from '../../lib/shared-messages'
+
 import Message from '../message'
 import Button from '../button'
 import Logo from '../logo'
@@ -66,8 +68,8 @@ export default class Modal extends React.PureComponent {
       logo,
       approval = false,
       formName,
-      buttonMessage = this.props.approval ? 'Approve' : 'Ok',
-      cancelButtonMessage = 'Cancel',
+      buttonMessage = this.props.approval ? sharedMessages.approve : sharedMessages.ok,
+      cancelButtonMessage = sharedMessages.cancel,
       onComplete,
       bottomLine,
       ...rest
@@ -76,10 +78,7 @@ export default class Modal extends React.PureComponent {
     const name = formName ? { name: formName } : {}
     const RootComponent = this.props.method ? 'form' : 'div'
     const messageElement = (<span className={style.message}>{message}</span>)
-    const bottomLineElement = bottomLine === 'object'
-      ? <Message content={bottomLine} />
-      : bottomLine
-
+    const bottomLineElement = <Message content={bottomLine} />
 
     let buttons = <div><Button message={buttonMessage} onClick={this.handleApprove} icon="check" /></div>
 
@@ -124,7 +123,7 @@ export default class Modal extends React.PureComponent {
           {children || messageElement}
         </div>
         <div className={style.controlBar}>
-          <div><span>{ bottomLineElement }</span></div>
+          <div>{ bottomLineElement }</div>
           {buttons}
         </div>
       </RootComponent>,

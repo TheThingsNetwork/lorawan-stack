@@ -16,8 +16,10 @@ import React from 'react'
 import classnames from 'classnames'
 
 import Message from '../message'
+import ErrorMessage from '../error-message'
 import Icon from '../icon'
 
+import PropTypes from '../../lib/prop-types'
 import style from './notification.styl'
 
 const Notification = function ({
@@ -43,11 +45,22 @@ const Notification = function ({
     icon = 'warning'
   }
 
+  const content = message || error || warning || info
+  const Component = error ? ErrorMessage : Message
+
   return (
     <div className={classname}>
-      <Icon icon={icon} /><span><Message content={message || error || warning || info} /></span>
+      <Icon icon={icon} /><span><Component content={content} /></span>
     </div>
   )
+}
+
+Notification.propTypes = {
+  message: PropTypes.message,
+  error: PropTypes.error,
+  warning: PropTypes.message,
+  info: PropTypes.message,
+  small: PropTypes.bool,
 }
 
 export default Notification

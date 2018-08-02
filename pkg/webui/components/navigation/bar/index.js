@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import NavigationLink from '../link'
 import Message from '../../message'
 import Icon from '../../icon'
+import PropTypes from '../../../lib/prop-types'
 
 import style from './bar.styl'
 
@@ -64,7 +64,7 @@ NavigationBar.propTypes = {
    */
   entries: PropTypes.arrayOf(PropTypes.shape({
     path: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
+    title: PropTypes.message.isRequired,
     icon: PropTypes.string,
     exact: PropTypes.bool,
   })),

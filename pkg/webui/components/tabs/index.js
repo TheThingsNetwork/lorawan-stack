@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+import PropTypes from '../../lib/prop-types'
 import Message from '../message'
 import Icon from '../icon'
 import Tab from './tab'
@@ -64,7 +64,7 @@ Tabs.propTypes = {
   active: PropTypes.number.isRequired,
   /** List of tabs */
   tabs: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.string.isRequired,
+    title: PropTypes.message.isRequired,
     icon: PropTypes.string,
     disabled: PropTypes.bool,
   })),
