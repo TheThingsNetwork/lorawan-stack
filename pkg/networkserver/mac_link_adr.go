@@ -20,7 +20,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -30,7 +29,7 @@ var (
 	evtMACLinkADRReject  = events.Define("ns.mac.adr.reject", "device rejected ADR request")
 )
 
-func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, fps *frequencyplans.Store) (err error) {
+func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (err error) {
 	if pld == nil {
 		return errMissingPayload
 	}
@@ -45,23 +44,34 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return err
 	}
 
-	logger := log.FromContext(ctx)
+	handler := handleMACResponseBlock
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+		handler = handleMACResponse
+	}
 
-	dev.MACState.PendingRequests, err = handleMACResponseBlock(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) {
+	if dev.MACState.LoRaWANVersion != ttnpb.MAC_V1_0_2 && dupCount != 1 {
+		return errInvalidPayload
+	}
+
+	var n uint
+	var req *ttnpb.MACCommand_LinkADRReq
+	dev.MACState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
+		if dev.MACState.LoRaWANVersion == ttnpb.MAC_V1_0_2 && n >= dupCount {
+			return errInvalidPayload
+		}
+		n++
+
 		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
 			events.Publish(evtMACLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
-			return
+			return nil
 		}
 
-		req := cmd.GetLinkADRReq()
-
-		// TODO: Ensure LoRaWAN1.0* compatibility (https://github.com/TheThingsIndustries/ttn/issues/870)
+		req = cmd.GetLinkADRReq()
 
 		if req.NbTrans > 15 || len(req.ChannelMask) != 16 || req.ChannelMaskControl > 7 {
-			logger.Error("Network Server scheduled an invalid LinkADR command, assuming device dropped the request")
-			return
+			panic("Network Server scheduled an invalid LinkADR command")
 		}
 
 		if req.NbTrans > 0 {
@@ -73,30 +83,30 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			mask[i] = v
 		}
 
-		// NOTE: err references the error outside the scope of this function.
 		m, err := band.ChannelMask(mask, uint8(req.ChannelMaskControl))
 		if err != nil {
-			logger.WithError(err).Error("Failed to determine channel mask")
-			return
+			return err
 		}
 
 		for i, masked := range m {
-			if i >= len(dev.MACState.Channels) {
-				dev.MACState.MACParameters.Channels = append(dev.MACState.MACParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+i-len(dev.MACState.MACParameters.Channels))...)
+			if i >= len(dev.MACState.Channels) || dev.MACState.MACParameters.Channels[i] == nil {
+				if !masked {
+					continue
+				}
+				return errCorruptedMACState.WithCause(errUnknownChannel)
 			}
-
-			ch := dev.MACState.MACParameters.Channels[i]
-			if ch == nil {
-				ch = &ttnpb.MACParameters_Channel{}
-				dev.MACState.MACParameters.Channels[i] = ch
-			}
-			ch.UplinkEnabled = masked
+			dev.MACState.MACParameters.Channels[i].UplinkEnabled = masked
 		}
 
-		dev.MACState.ADRDataRateIndex = req.DataRateIndex
-		dev.MACState.ADRTxPowerIndex = req.TxPowerIndex
-
 		events.Publish(evtMACLinkADRAccept(ctx, dev.EndDeviceIdentifiers, req))
+		return nil
+
 	}, dev.MACState.PendingRequests...)
-	return
+	if err != nil {
+		return err
+	}
+
+	dev.MACState.ADRDataRateIndex = req.DataRateIndex
+	dev.MACState.ADRTxPowerIndex = req.TxPowerIndex
+	return nil
 }

@@ -1291,7 +1291,6 @@ func HandleUplinkTest() func(t *testing.T) {
 						}
 					}
 					expected.MACState.PendingApplicationDownlink = nil
-					expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
 					expected.RecentUplinks = append(expected.RecentUplinks, msg)
 					if len(expected.RecentUplinks) > RecentUplinkCount {

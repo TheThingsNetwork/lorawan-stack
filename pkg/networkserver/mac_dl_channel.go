@@ -31,28 +31,24 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		return errMissingPayload
 	}
 
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		if !pld.ChannelIndexAck && !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
 			events.Publish(evtMacDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
-			return
+			return nil
 		}
 
 		req := cmd.GetDlChannelReq()
 
-		if uint(req.ChannelIndex) >= uint(len(dev.MACState.Channels)) {
-			dev.MACState.MACParameters.Channels = append(dev.MACState.MACParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MACState.MACParameters.Channels))))...)
+		if uint(req.ChannelIndex) >= uint(len(dev.MACState.Channels)) || dev.MACState.MACParameters.Channels[req.ChannelIndex] == nil {
+			return errCorruptedMACState.WithCause(errUnknownChannel)
 		}
-
-		ch := dev.MACState.MACParameters.Channels[req.ChannelIndex]
-		if ch == nil {
-			ch = &ttnpb.MACParameters_Channel{}
-			dev.MACState.MACParameters.Channels[req.ChannelIndex] = ch
-		}
-		ch.DownlinkFrequency = req.Frequency
+		dev.MACState.MACParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 
 		events.Publish(evtMacDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
+		return nil
+
 	}, dev.MACState.PendingRequests...)
 	return
 }

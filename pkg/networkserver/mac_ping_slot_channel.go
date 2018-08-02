@@ -25,12 +25,13 @@ func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 		return errMissingPayload
 	}
 
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetPingSlotChannelReq()
 
 		// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 		_ = req.Frequency
 		_ = req.DataRateIndex
+		return nil
 
 	}, dev.MACState.PendingRequests...)
 	return

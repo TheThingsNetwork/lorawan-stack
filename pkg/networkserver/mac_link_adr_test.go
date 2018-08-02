@@ -31,40 +31,53 @@ func TestHandleLinkADRAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_LinkADRAns
+		DupCount         uint
 		Error            error
 		ExpectedEvents   int
 	}{
 		{
-			Name: "nil payload",
+			Name:     "nil payload",
+			DupCount: 1,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
-				MACState:        &ttnpb.MACState{},
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
-				MACState:        &ttnpb.MACState{},
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
 			},
 			Payload: nil,
 			Error:   errMissingPayload,
 		},
 		{
-			Name: "no request",
+			Name:     "no request",
+			DupCount: 1,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
-				MACState:        &ttnpb.MACState{},
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
-				MACState:        &ttnpb.MACState{},
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
 			},
 			Payload: ttnpb.NewPopulatedMACCommand_LinkADRAns(test.Randy, false),
 			Error:   errMACRequestNotFound,
 		},
 		{
-			Name: "1 request/all ack",
+			Name:     "1 request/all ack",
+			DupCount: 1,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					MACParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							nil,
@@ -78,10 +91,10 @@ func TestHandleLinkADRAns(t *testing.T) {
 							DataRateIndex: ttnpb.DATA_RATE_4,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
-								true, true, false, true,
-								false, true, true, true,
-								true, false, true, true,
-								true, true, false, true,
+								false, true, false, false,
+								false, false, false, false,
+								false, false, false, false,
+								false, false, false, false,
 							},
 						}).MACCommand(),
 					},
@@ -90,11 +103,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					MACParameters: ttnpb.MACParameters{
 						ADRDataRateIndex: ttnpb.DATA_RATE_4,
 						ADRTxPowerIndex:  42,
 						Channels: []*ttnpb.MACParameters_Channel{
-							{UplinkEnabled: true},
+							nil,
 							{
 								UplinkEnabled:   true,
 								UplinkFrequency: 42,
@@ -103,19 +117,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 								UplinkEnabled:     false,
 								DownlinkFrequency: 23,
 							},
-							{UplinkEnabled: true},
-							{UplinkEnabled: false},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: false},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: false},
-							{UplinkEnabled: true},
+							nil,
 						},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
@@ -129,25 +131,51 @@ func TestHandleLinkADRAns(t *testing.T) {
 			ExpectedEvents: 1,
 		},
 		{
-			Name: "2 requests/all ack",
+			Name:     "1.1/2 requests/all ack",
+			DupCount: 1,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							nil,
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+						},
+					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
 							DataRateIndex: ttnpb.DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
+								true, true, true, false,
 								true, true, true, true,
 								true, true, true, true,
-								true, true, true, true,
-								true, true, false, true,
+								true, true, false, false,
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: 5,
+							DataRateIndex: ttnpb.DATA_RATE_10,
 							TxPowerIndex:  43,
+							ChannelMask: []bool{
+								false, true, true, false,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, false,
+							},
 						}).MACCommand(),
 					},
 				},
@@ -157,13 +185,13 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					MACParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: 5,
-						ADRTxPowerIndex:  42,
+						ADRDataRateIndex: ttnpb.DATA_RATE_10,
+						ADRTxPowerIndex:  43,
 						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: false},
 							{UplinkEnabled: true},
 							{UplinkEnabled: true},
-							{UplinkEnabled: true},
-							{UplinkEnabled: true},
+							nil,
 							{UplinkEnabled: true},
 							{UplinkEnabled: true},
 							{UplinkEnabled: true},
@@ -175,10 +203,189 @@ func TestHandleLinkADRAns(t *testing.T) {
 							{UplinkEnabled: true},
 							{UplinkEnabled: true},
 							{UplinkEnabled: false},
-							{UplinkEnabled: true},
 						},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
+				},
+			},
+			Payload: &ttnpb.MACCommand_LinkADRAns{
+				ChannelMaskAck:   true,
+				DataRateIndexAck: true,
+				TxPowerIndexAck:  true,
+			},
+		},
+		{
+			Name:     "1.0.2/2 requests/all ack",
+			DupCount: 2,
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_0_2,
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							nil,
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+						},
+					},
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: ttnpb.DATA_RATE_5,
+							TxPowerIndex:  42,
+							ChannelMask: []bool{
+								true, true, true, false,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, false,
+							},
+						}).MACCommand(),
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: ttnpb.DATA_RATE_10,
+							TxPowerIndex:  43,
+							ChannelMask: []bool{
+								false, true, true, false,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, false,
+							},
+						}).MACCommand(),
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_0_2,
+					MACParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_10,
+						ADRTxPowerIndex:  43,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: false},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							nil,
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: false},
+						},
+					},
+					PendingRequests: []*ttnpb.MACCommand{},
+				},
+			},
+			Payload: &ttnpb.MACCommand_LinkADRAns{
+				ChannelMaskAck:   true,
+				DataRateIndexAck: true,
+				TxPowerIndexAck:  true,
+			},
+			ExpectedEvents: 1,
+		},
+		{
+			Name:     "1.0/2 requests/all ack",
+			DupCount: 1,
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+					MACParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							nil,
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+						},
+					},
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: ttnpb.DATA_RATE_5,
+							TxPowerIndex:  42,
+							ChannelMask: []bool{
+								true, true, true, false,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, false,
+							},
+						}).MACCommand(),
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: ttnpb.DATA_RATE_10,
+							TxPowerIndex:  43,
+							ChannelMask: []bool{
+								false, true, true, false,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, false,
+							},
+						}).MACCommand(),
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+					MACParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_5,
+						ADRTxPowerIndex:  42,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							nil,
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: true},
+							{UplinkEnabled: false},
+						},
+					},
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: ttnpb.DATA_RATE_10,
+							TxPowerIndex:  43,
+							ChannelMask: []bool{
+								false, true, true, false,
+								true, true, true, true,
+								true, true, true, true,
+								true, true, false, false,
+							},
+						}).MACCommand(),
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -194,7 +401,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleLinkADRAns(test.Context(), dev, tc.Payload, frequencyPlansStore)
+			err := handleLinkADRAns(test.Context(), dev, tc.Payload, tc.DupCount, frequencyPlansStore)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

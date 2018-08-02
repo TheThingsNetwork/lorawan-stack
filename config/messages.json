@@ -1214,6 +1214,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/band:chmaskcntl_unsupported": {
+    "translations": {
+      "en": "ChMaskCntl `{chmaskcntl}` unsupported"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/band:data_rate_index_too_high": {
     "translations": {
       "en": "data rate index must be lower or equal to {max}"
@@ -2177,6 +2186,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:corrupted_mac_state": {
+    "translations": {
+      "en": "MAC state is corrupted"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:data_rate": {
     "translations": {
       "en": "invalid data rate"
@@ -2382,6 +2400,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "networkserver.go"
+    }
+  },
+  "error:pkg/networkserver:payload": {
+    "translations": {
+      "en": "invalid payload"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
     }
   },
   "error:pkg/networkserver:raw_payload_too_long": {

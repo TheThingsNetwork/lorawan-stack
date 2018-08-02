@@ -27,12 +27,14 @@ var (
 )
 
 func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetDutyCycleReq()
 
 		dev.MACState.DutyCycle = req.MaxDutyCycle
 
 		events.Publish(evtMACDutyCycle(ctx, dev.EndDeviceIdentifiers, req))
+		return nil
+
 	}, dev.MACState.PendingRequests...)
 	return
 }

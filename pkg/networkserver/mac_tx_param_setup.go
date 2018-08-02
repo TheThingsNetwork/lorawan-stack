@@ -27,7 +27,7 @@ var (
 )
 
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()
 
 		dev.MACState.MACParameters.DownlinkDwellTime = req.DownlinkDwellTime
@@ -39,6 +39,8 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 		}
 
 		events.Publish(evtMACTxParamAccept(ctx, dev.EndDeviceIdentifiers, req))
+		return nil
+
 	}, dev.MACState.PendingRequests...)
 	return
 }

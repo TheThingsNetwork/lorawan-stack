@@ -16,18 +16,20 @@ package networkserver
 
 import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
+func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	for i, cmd := range cmds {
 		if cmd.CID != cid {
 			continue
 		}
-		f(cmd)
+		if err := f(cmd); err != nil {
+			return cmds, err
+		}
 		return append(cmds[:i], cmds[i+1:]...), nil
 	}
 	return cmds, errMACRequestNotFound
 }
 
-func handleMACResponseBlock(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
+func handleMACResponseBlock(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	first := -1
 	last := -1
 
@@ -43,7 +45,9 @@ outer:
 		case first < 0:
 			first = i
 		}
-		f(cmd)
+		if err := f(cmd); err != nil {
+			return cmds, err
+		}
 	}
 
 	if first < 0 {

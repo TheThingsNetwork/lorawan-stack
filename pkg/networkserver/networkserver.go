@@ -1375,7 +1375,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			return err
 		}
 	}
-	dev.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
+	dev.MACState.QueuedResponses = dev.MACState.QueuedResponses[:0]
 
 	select {
 	case <-ctx.Done():
@@ -1386,18 +1386,34 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = acc.Accumulated()
 	registerMergeMetadata(ctx, dev.EndDevice, msg)
 
-	dev.MACState.QueuedResponses = dev.MACState.QueuedResponses[:0]
-
 outer:
-	for _, cmd := range cmds {
-		cid := cmd.CID
-		switch cid {
+	for len(cmds) > 0 {
+		cmd, cmds := cmds[0], cmds[1:]
+		switch cmd.CID {
 		case ttnpb.CID_RESET:
 			err = handleResetInd(ctx, dev.EndDevice, cmd.GetResetInd(), ns.Component.FrequencyPlans)
 		case ttnpb.CID_LINK_CHECK:
 			err = handleLinkCheckReq(ctx, dev.EndDevice, msg)
 		case ttnpb.CID_LINK_ADR:
-			err = handleLinkADRAns(ctx, dev.EndDevice, cmd.GetLinkADRAns(), ns.Component.FrequencyPlans)
+			pld := cmd.GetLinkADRAns()
+			i := 0
+			for i = range cmds {
+				switch {
+				case cmds[i].CID != ttnpb.CID_LINK_ADR,
+					dev.EndDevice.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_1) <= 0:
+					break
+
+				case dev.EndDevice.LoRaWANVersion == ttnpb.MAC_V1_0_2 && *cmds[i].GetLinkADRAns() != *pld,
+					dev.EndDevice.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
+					err = errInvalidPayload
+					break
+				}
+			}
+			if err != nil {
+				break
+			}
+			cmds = cmds[i:]
+			err = handleLinkADRAns(ctx, dev.EndDevice, pld, uint(i+1), ns.Component.FrequencyPlans)
 		case ttnpb.CID_DUTY_CYCLE:
 			err = handleDutyCycleAns(ctx, dev.EndDevice)
 		case ttnpb.CID_RX_PARAM_SETUP:
@@ -1431,15 +1447,16 @@ outer:
 		case ttnpb.CID_DEVICE_MODE:
 			err = handleDeviceModeInd(ctx, dev.EndDevice, cmd.GetDeviceModeInd())
 		default:
-			h, ok := ns.macHandlers.Load(cid)
+			h, ok := ns.macHandlers.Load(cmd.CID)
 			if !ok {
-				logger.WithField("cid", cid).Warn("Unknown MAC command received, skipping the rest...")
+				logger.WithField("cid", cmd.CID).Warn("Unknown MAC command received, skipping the rest...")
 				break outer
 			}
 			err = h.(MACHandler)(ctx, dev.EndDevice, cmd.GetRawPayload(), msg)
 		}
 		if err != nil {
-			logger.WithField("cid", cid).WithError(err).Warn("Failed to process MAC command")
+			logger.WithField("cid", cmd.CID).WithError(err).Warn("Failed to process MAC command")
+			break
 		}
 	}
 

@@ -70,16 +70,11 @@ func TestHandleDLChannelAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					PendingRequests: []*ttnpb.MACCommand{},
-					MACParameters: ttnpb.MACParameters{
-						Channels: []*ttnpb.MACParameters_Channel{
-							nil,
-							nil,
-							{
-								UplinkFrequency:   0,
-								DownlinkFrequency: 42,
-							},
-						},
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DLChannelReq{
+							ChannelIndex: 2,
+							Frequency:    42,
+						}).MACCommand(),
 					},
 				},
 			},
@@ -87,6 +82,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
+			Error: errCorruptedMACState.WithCause(errUnknownChannel),
 		},
 		{
 			Name: "both ack/channel exists",
