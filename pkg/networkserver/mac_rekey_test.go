@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleRekeyInd(t *testing.T) {
-	events := test.CollectEvents("ns.mac.rekey_ind")
+	events := collectEvents("ns.mac.rekey_ind")
 
 	for _, tc := range []struct {
 		Name             string
@@ -121,7 +121,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

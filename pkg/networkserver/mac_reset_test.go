@@ -45,7 +45,7 @@ func TestMain(t *testing.M) {
 }
 
 func TestHandleResetInd(t *testing.T) {
-	events := test.CollectEvents("ns.mac.reset_ind")
+	events := collectEvents("ns.mac.reset_ind")
 
 	for _, tc := range []struct {
 		Name             string
@@ -175,7 +175,7 @@ func TestHandleResetInd(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

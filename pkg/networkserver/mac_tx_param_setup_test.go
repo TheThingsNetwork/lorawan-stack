@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleTxParamSetupAns(t *testing.T) {
-	events := test.CollectEvents("ns.mac.tx_param.accept")
+	events := collectEvents("ns.mac.tx_param.accept")
 
 	for _, tc := range []struct {
 		Name             string
@@ -87,7 +87,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

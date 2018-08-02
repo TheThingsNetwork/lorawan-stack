@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleRejoinParamSetupAns(t *testing.T) {
-	events := test.CollectEvents("ns.mac.rejoin_param.accept")
+	events := collectEvents("ns.mac.rejoin_param.accept")
 
 	for _, tc := range []struct {
 		Name             string
@@ -98,7 +98,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

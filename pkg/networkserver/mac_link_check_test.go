@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleLinkCheckReq(t *testing.T) {
-	events := test.CollectEvents("ns.mac.link_check")
+	events := collectEvents("ns.mac.link_check")
 
 	for _, tc := range []struct {
 		Name             string
@@ -195,7 +195,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

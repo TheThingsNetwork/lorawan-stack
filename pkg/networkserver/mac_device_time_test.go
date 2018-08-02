@@ -27,7 +27,7 @@ import (
 )
 
 func TestHandleDeviceTimeReq(t *testing.T) {
-	events := test.CollectEvents("ns.mac.device_time")
+	events := collectEvents("ns.mac.device_time")
 
 	for _, tc := range []struct {
 		Name             string
@@ -159,7 +159,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

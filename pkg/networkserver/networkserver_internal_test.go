@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -38,6 +39,28 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
+
+// TODO(#1008) Move eventCollector to the test package
+type eventCollector events.Channel
+
+func collectEvents(name string) eventCollector {
+	collectedEvents := make(events.Channel, 32)
+	events.Subscribe(name, collectedEvents)
+	return eventCollector(collectedEvents)
+}
+
+// Expect n events, fail the test if not received within reasonable time.
+func (ch eventCollector) expect(t *testing.T, n int) []events.Event {
+	collected := make([]events.Event, 0, n)
+	for i := 0; i < n; i++ {
+		evt := events.Channel(ch).ReceiveTimeout(10 * time.Millisecond * test.Delay)
+		if evt == nil {
+			t.Fatalf("Did not receive expected event %d/%d", i+1, n)
+		}
+		collected = append(collected, evt)
+	}
+	return collected
+}
 
 const (
 	RecentUplinkCount = recentUplinkCount

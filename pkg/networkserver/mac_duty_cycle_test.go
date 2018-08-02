@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleDutyCycleAns(t *testing.T) {
-	events := test.CollectEvents("ns.mac.duty_cycle.accept")
+	events := collectEvents("ns.mac.duty_cycle.accept")
 
 	for _, tc := range []struct {
 		Name             string
@@ -83,7 +83,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

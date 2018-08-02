@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleLinkADRAns(t *testing.T) {
-	events := test.CollectEvents("ns.mac.adr.accept")
+	events := collectEvents("ns.mac.adr.accept")
 
 	for _, tc := range []struct {
 		Name             string
@@ -135,7 +135,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}

@@ -26,7 +26,7 @@ import (
 )
 
 func TestHandleNewChannelAns(t *testing.T) {
-	events := test.CollectEvents("ns.mac.new_channel.*")
+	events := collectEvents("ns.mac.new_channel.*")
 
 	for _, tc := range []struct {
 		Name             string
@@ -114,7 +114,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 			}
 
 			if tc.ExpectedEvents > 0 {
-				events.Expect(t, tc.ExpectedEvents)
+				events.expect(t, tc.ExpectedEvents)
 			}
 		})
 	}
