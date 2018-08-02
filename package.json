@@ -44,6 +44,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "http-proxy-middleware": "^0.18.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
     "js-yaml": "^3.10.0",
     "json": "^9.0.6",
@@ -145,6 +146,9 @@
       "^.+\\.js$": "babel-jest",
       "\\.(css|styl|less|sass)$": "<rootDir>/config/jest/styles.transform.js",
       "\\.(jpg|jpeg|svg|png|woff|woff2|ttf|eot|gif|webp)$": "<rootDir>/config/jest/files.transform.js"
+    },
+    "moduleNameMapper": {
+      "\\.(css|styl|less|sass)$": "identity-obj-proxy"
     }
   },
   "eslintConfig": {
