@@ -49,10 +49,10 @@ export default function () {
         return driver.is.pageSelected(driver.get.pages().length - 1)
       },
       prevNavigationDisabled () {
-        return driver.get.prevNavigation().hasClass('disabled')
+        return driver.get.prevNavigation().hasClass('itemDisabled')
       },
       nextNavigationDisabled () {
-        return driver.get.nextNavigation().hasClass('disabled')
+        return driver.get.nextNavigation().hasClass('itemDisabled')
       },
     },
     get: {
