@@ -25,10 +25,10 @@
     color: $c-icon-fill
 
   &-active, &-active > .link
-    color: $c-active-blue
+    color: $tc-active
 
   &-active
-    $hover-color = lighter($c-active-blue, 2)
+    $hover-color = $tc-active
 
     +pseudo-border(3px, $c-active-blue)
       transform: scaleX(1)

@@ -30,14 +30,11 @@ $button($color)
     margin-right: $cs.s
 
   &:not(.naked)
-    &:hover
-      background: darken($color, 6)
-
-    &:focus
-      background: darken($color, 6)
+    &:hover, &:focus
+      hoverize($color)
 
     &:active
-      background: darken($color, 10)
+      activize($color)
 
   &:disabled
     opacity: .4
@@ -60,6 +57,7 @@ $button($color)
 
   &.busy:not(.naked),
   &.busy:disabled
+    position: relative
     if ($color != transparent)
       background: $c-backdrop
       color: transparent
@@ -67,6 +65,9 @@ $button($color)
       $s = lighter($color, 1)
     else
       $s = lighter($c-active-blue, 1)
+
+    svg
+      center-absolute()
 
     stop
       stop-color: $s
@@ -76,7 +77,7 @@ $button($color)
   display: inline-block
   padding: $cs.s $cs.l
   border-radius: 3px
-  transition: color 150ms, background 150ms, border 200ms
+  transition: color 100ms, background 100ms, border 100ms
   $button($c-active-blue)
 
   &.danger
@@ -99,7 +100,7 @@ $button($color)
     padding-right: $cs.s
 
 .icon
-  line-height: 0.8
+  line-height: .8
 
 @keyframes shake
   0%

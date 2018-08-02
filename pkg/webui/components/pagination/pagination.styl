@@ -25,8 +25,10 @@
   font-weight: 600
   user-select: none
 
-  .link:hover,
-  .link:focus
+  .link:hover
+    background-color: $c-backdrop
+
+  +focus-visible()
     background-color: $c-backdrop
 
   .link:active
@@ -59,9 +61,11 @@
     & + .item-break
       border-left: 0
 
-    .link:hover,
-    .link:focus
+    +focus-visible()
       background-color: lighter($c-active-blue, 1)
+
+    .link:hover
+      background-color: $c-active-blue
 
     .link:active
       background-color: lighter($c-active-blue, .7)
