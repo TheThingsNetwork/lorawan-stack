@@ -26,13 +26,14 @@
   user-select: none
 
   .link:hover
-    background-color: $c-backdrop
+    background-color: hoverize(white)
 
-  +focus-visible()
-    background-color: $c-backdrop
+  .link
+    +focus-visible()
+      background-color: hoverize(white)
 
   .link:active
-    background-color: darker($c-backdrop, .8)
+    background-color: activize(white)
 
   &-navigation-next
     .link
@@ -54,6 +55,9 @@
       border: 1px solid $c-active-blue
       color: white
 
+      +focus-visible()
+        background-color: hoverize($c-active-blue)
+
     & + .item
       a
         border-left: 0
@@ -61,14 +65,8 @@
     & + .item-break
       border-left: 0
 
-    +focus-visible()
-      background-color: lighter($c-active-blue, 1)
-
     .link:hover
       background-color: $c-active-blue
-
-    .link:active
-      background-color: lighter($c-active-blue, .7)
 
   &-break
     color: $c-active-blue

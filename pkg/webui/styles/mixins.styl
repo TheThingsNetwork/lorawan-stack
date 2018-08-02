@@ -66,32 +66,35 @@ pseudo-border-animated($size, $color)
 // COLORS
 // ======
 
+// Darker/lighter is used to step through color shadings in a consistent
+// way (using steps). Consider using an already defined color or defining
+// a new one altogether when applicable. Only use with full integer steps.
 darker($color, $step = 1)
-  darken($color, 5 * $step * $step)
+  darken($color, 5 * $step)
 
 lighter($color, $step = 1)
-  lighten($color, 5 * $step * $step)
+  lighten($color, 5 * $step)
 
 // Hoverize and activize will return shaded values for active and hover state.
 // This will improve consistency for shaded colors.
 hoverize($color)
   if ($color == $c-active-blue)
-    background: $c-active-blue-hover
+    $c-active-blue-hover
   else
-    background: darken($color, 6)
+    darker($color)
 
 activize($color)
   if ($color == $c-active-blue)
-    background: $c-active-blue-active
+    $c-active-blue-active
   else
-    background: darken($color, 10)
+    darker($color, 2)
 
 // For text colors and lines
 tc-hoverize($color)
   if ($color == $tc-active)
-    background: $tc-active-hover
+    $tc-active-hover
   else
-    background: darken($color, 10)
+    darker($color, 2)
 
 
 // POSITIONING
