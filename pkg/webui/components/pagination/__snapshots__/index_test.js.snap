@@ -2,12 +2,13 @@
 
 exports[`Pagination has only a single page should match snapshot 1`] = `
 <ul
-  className=""
+  className="pagination"
 >
   <li
-    className=" disabled"
+    className="item itemNavigationPrev itemDisabled"
   >
     <a
+      className="link"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
@@ -21,16 +22,19 @@ exports[`Pagination has only a single page should match snapshot 1`] = `
     </a>
   </li>
   <PageView
-    activeClassName="selected"
+    activeClassName="itemActive"
     key="0"
     onClick={[Function]}
     page={1}
+    pageClassName="item"
+    pageLinkClassName="link"
     selected={true}
   />
   <li
-    className=" disabled"
+    className="item itemNavigationNext itemDisabled"
   >
     <a
+      className="link"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
@@ -48,12 +52,13 @@ exports[`Pagination has only a single page should match snapshot 1`] = `
 
 exports[`Pagination has several pages should match snapshot 1`] = `
 <ul
-  className=""
+  className="pagination"
 >
   <li
-    className=" disabled"
+    className="item itemNavigationPrev itemDisabled"
   >
     <a
+      className="link"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
@@ -67,30 +72,37 @@ exports[`Pagination has several pages should match snapshot 1`] = `
     </a>
   </li>
   <PageView
-    activeClassName="selected"
+    activeClassName="itemActive"
     key="0"
     onClick={[Function]}
     page={1}
+    pageClassName="item"
+    pageLinkClassName="link"
     selected={true}
   />
   <PageView
-    activeClassName="selected"
+    activeClassName="itemActive"
     key="1"
     onClick={[Function]}
     page={2}
+    pageClassName="item"
+    pageLinkClassName="link"
     selected={false}
   />
   <PageView
-    activeClassName="selected"
+    activeClassName="itemActive"
     key="2"
     onClick={[Function]}
     page={3}
+    pageClassName="item"
+    pageLinkClassName="link"
     selected={false}
   />
   <li
-    className=""
+    className="item itemNavigationNext"
   >
     <a
+      className="link"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
