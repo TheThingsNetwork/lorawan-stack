@@ -42,7 +42,7 @@ The main function of the Gateway Server is to establish a stable connection with
 
 When routing an uplink, the Gateway Server decides which Network Server to send it to based on the `DevAddr` of the device. Join request are similarly routed based on the `DevEUI` of the device.
 
-The Gateway Server exchanges with Network Servers over gRPC - it signals connections of gateways using `StartServingGateway` and `StopServingGateway`, and pushes uplinks using `HandleUplink`. It exposes an endpoint, `ScheduleDownlink`, that the Network Server uses to send downlinks to gateways.
+The Gateway Server exchanges with Network Servers over gRPC. It claims identifiers of gateways using `ClaimIDs` and `UnclaimIDs` in the cluster, and sends uplinks using `HandleUplink`. It exposes an service with `ScheduleDownlink`, that the Network Server uses to send downlinks to gateways.
 
 ## Downlink Scheduling
 

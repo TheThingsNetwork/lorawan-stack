@@ -41,7 +41,7 @@ func (e nsErrors) Error() string {
 }
 
 func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifiers) (ttnpb.FrequencyPlan, error) {
-	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
+	isInfo := g.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, gatewayID)
 	if isInfo == nil {
 		return ttnpb.FrequencyPlan{}, errNoIdentityServerFound
 	}
@@ -58,32 +58,6 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 	}
 
 	return fp, nil
-}
-
-func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
-	errors := nsErrors{}
-	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags) {
-		nsClient := ttnpb.NewGsNsClient(ns.Conn())
-		err := f(nsClient)
-		if err != nil {
-			errors[ns.Name()] = err
-		}
-	}
-
-	if len(errors) == 0 {
-		return nil
-	}
-
-	return errors
-}
-
-func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) {
-	// TODO: cluster.ClaimIDs(ctx, id) https://github.com/TheThingsIndustries/lorawan-stack/issues/941
-}
-
-func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) {
-	// NOTE: ctx may already be canceled.
-	// TODO: cluster.ReleaseIDs(ctx, id) https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 }
 
 func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
@@ -121,7 +95,7 @@ func (g *GatewayServer) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err err
 	logger.Info("Link with gateway opened")
 	defer logger.WithError(err).Debug("Link with gateway closed")
 
-	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
+	isInfo := g.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, id)
 	if isInfo == nil {
 		return errNoIdentityServerFound
 	}
@@ -154,11 +128,11 @@ func (g *GatewayServer) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err err
 
 	g.setupConnection(uid, connectionInfo)
 
-	g.signalStartServingGateway(ctx, id)
+	g.ClaimIDs(ctx, id)
 
 	go func() {
 		<-ctx.Done()
-		g.signalStopServingGateway(ctx, id)
+		g.UnclaimIDs(ctx, id)
 		g.connectionsMu.Lock()
 		if oldConnection := g.connections[uid]; oldConnection == connectionInfo {
 			delete(g.connections, uid)
@@ -244,24 +218,14 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			return
 		}
 		logger = logger.WithField("dev_addr", *uplink.DevAddr)
-		var devAddrBytes []byte
-		devAddrBytes, err = uplink.DevAddr.Marshal()
-		if err != nil {
-			return
-		}
-		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags, devAddrBytes)
+		ns = g.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, &ttnpb.EndDeviceIdentifiers{DevAddr: uplink.DevAddr})
 	case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 		if uplink.DevEUI == nil {
 			err = errNoDevEUI
 			return
 		}
 		logger = logger.WithField("dev_eui", uplink.DevEUI.String())
-		var devEUIBytes []byte
-		devEUIBytes, err = uplink.DevEUI.Marshal()
-		if err != nil {
-			return
-		}
-		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags, devEUIBytes)
+		ns = g.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, &ttnpb.EndDeviceIdentifiers{DevEUI: uplink.DevEUI})
 	}
 
 	if ns == nil {

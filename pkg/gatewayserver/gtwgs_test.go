@@ -152,13 +152,13 @@ func TestLinkGateway(t *testing.T) {
 	}
 
 	gsStart := time.Now()
-	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil {
+	for gs.GetPeer(context.Background(), ttnpb.PeerInfo_IDENTITY_SERVER, nil) == nil {
 		if time.Since(gsStart) > peerConnectionTimeout {
 			t.Fatal("Identity Server was not initialized in time by the Gateway Server - timeout")
 		}
 		time.Sleep(200 * time.Millisecond)
 	}
-	for gs.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, []string{}, nil) == nil {
+	for gs.GetPeer(context.Background(), ttnpb.PeerInfo_NETWORK_SERVER, nil) == nil {
 		if time.Since(gsStart) > peerConnectionTimeout {
 			t.Fatal("Gateway Server could not reach Network Server in time - timeout")
 		}

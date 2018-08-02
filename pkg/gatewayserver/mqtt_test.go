@@ -95,7 +95,7 @@ func TestMQTTConnection(t *testing.T) {
 	}
 
 	gsStart := time.Now()
-	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil || gs.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, []string{}, nil) == nil {
+	for gs.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil) == nil || gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, nil) == nil {
 		if time.Since(gsStart) > nsReceptionTimeout {
 			t.Fatal("Identity Server and Network Server were not initialized in time by the Gateway Server - timeout")
 		}

@@ -126,8 +126,10 @@ func (g *GatewayServer) setupUDPConnection(ctx context.Context, conn *udpConnSta
 
 	g.setupConnection(uid, conn)
 
-	// TODO: Claim identifiers: https://github.com/TheThingsIndustries/lorawan-stack/issues/941
-	go g.signalStartServingGateway(ctx, gtw.GatewayIdentifiers)
+	if err := g.ClaimIDs(ctx, gtw.GatewayIdentifiers); err != nil {
+		logger.WithError(err).Warn("Could not claim identifiers")
+		return err
+	}
 
 	conn.ctx = ctx
 	return nil

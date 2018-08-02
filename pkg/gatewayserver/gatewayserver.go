@@ -146,8 +146,8 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 	return &observations, nil
 }
 
-func (gs *GatewayServer) getIdentityServer() (ttnpb.IsGatewayClient, error) {
-	peer := gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+func (gs *GatewayServer) getIdentityServer(ctx context.Context) (ttnpb.IsGatewayClient, error) {
+	peer := gs.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
 	if peer == nil {
 		return nil, errNoIdentityServerFound
 	}
@@ -160,7 +160,7 @@ func (gs *GatewayServer) getIdentityServer() (ttnpb.IsGatewayClient, error) {
 }
 
 func (gs *GatewayServer) getGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
-	is, err := gs.getIdentityServer()
+	is, err := gs.getIdentityServer(ctx)
 	if err != nil {
 		return nil, err
 	}

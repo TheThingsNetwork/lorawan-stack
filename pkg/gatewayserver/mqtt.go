@@ -127,26 +127,28 @@ func (h *mqttConnectionHandler) Connect(ctx context.Context, info *auth.Info) (c
 		}
 	}
 
+	is, err := h.gs.getIdentityServer(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	h.connection.gtw, err = is.GetGateway(ctx, &h.id)
+	if err != nil {
+		return nil, err
+	}
+
 	md := rpcmetadata.MD{
 		ID:            h.id.GatewayID,
 		AuthType:      "Bearer",
 		AuthValue:     string(info.Password),
 		AllowInsecure: h.gs.Component.AllowInsecureForCredentials(),
 	}
-
-	is, err := h.gs.getIdentityServer()
-	if err != nil {
-		return nil, err
-	}
-	h.connection.gtw, err = is.GetGateway(ctx, &h.id)
-	if err != nil {
-		return nil, err
-	}
 	resp, err := is.ListGatewayRights(ctx, &h.id, grpc.PerRPCCredentials(md))
 	if err != nil {
 		return nil, err
 	}
 	info.Metadata = resp.GetRights()
+
 	info.Interface = h
 
 	return ctx, nil
@@ -260,17 +262,20 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 	}
 	defer session.Close()
 	ctx = session.Context()
-
 	logger = logger.WithField("gateway_uid", unique.ID(ctx, handler.id))
-
-	// TODO: Claim identifiers: https://github.com/TheThingsIndustries/lorawan-stack/issues/941
 	logger.Debug("MQTT connection opened")
-	g.signalStartServingGateway(ctx, handler.id)
+
+	if err := g.ClaimIDs(ctx, handler.id); err != nil {
+		logger.WithError(err).Warn("Could not claim identifiers")
+		return
+	}
 
 	go func() {
 		<-ctx.Done()
 		logger.Debug("MQTT connection closed")
-		g.signalStopServingGateway(g.Context(), handler.id)
+		if err := g.UnclaimIDs(ctx, handler.id); err != nil {
+			logger.WithError(err).Debug("Could not unclaim identifiers")
+		}
 	}()
 
 	readErr := make(chan error)
