@@ -222,14 +222,14 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		}
 	}()
 
-	gwMetadata := conn.gateway()
-	useLocationFromMetadata := gwMetadata != nil && len(gwMetadata.GetAntennas()) == 0
+	registryData := conn.gateway()
+	useLocationFromMetadata := registryData != nil && len(registryData.GetAntennas()) == 0
 
 	for _, antenna := range uplink.RxMetadata {
 		antenna.GatewayIdentifiers = conn.gatewayIdentifiers()
 
 		index := int(antenna.GetAntennaIndex())
-		if !gwMetadata.GetPrivacySettings().LocationPublic {
+		if !registryData.GetPrivacySettings().LocationPublic {
 			antenna.Location = nil
 			continue
 		}
@@ -239,8 +239,8 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			continue
 		}
 
-		if gwMetadata != nil && len(gwMetadata.GetAntennas()) >= index {
-			antenna.Location = &gwMetadata.GetAntennas()[index].Location
+		if registryData != nil && len(registryData.GetAntennas()) >= index {
+			antenna.Location = &registryData.GetAntennas()[index].Location
 			antenna.Location.Source = ttnpb.SOURCE_REGISTRY
 		} else {
 			antenna.Location = nil
