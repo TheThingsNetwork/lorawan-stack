@@ -16,6 +16,7 @@ import React from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { warn } from '../../lib/log'
+import PropTypes from '../../lib/prop-types'
 
 const warned = {}
 const warning = function (message) {
@@ -32,15 +33,15 @@ const Message = function ({
   ...rest
 }) {
 
-  if (content === null) {
-    return content
+  if (!content && content !== 0) {
+    return null
   }
 
   if (React.isValidElement(content)) {
     return content
   }
 
-  if (typeof content === 'string') {
+  if (typeof content === 'string' || typeof content === 'number') {
     warning(content)
     return <Component {...rest}>{content}</Component>
   }
