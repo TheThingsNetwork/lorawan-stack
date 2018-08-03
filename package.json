@@ -128,7 +128,6 @@
     "redux-form": "^7.2.1",
     "redux-logic": "^0.15.0",
     "redux-saga": "^0.16.0",
-    "sockjs-client": "^1.1.4",
     "ulid": "^2.3.0",
     "whatwg-fetch": "^2.0.3"
   },
