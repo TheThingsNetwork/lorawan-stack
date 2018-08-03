@@ -58,6 +58,26 @@ const Message = function ({
       </FormattedMessage>
     )
   }
+
+  return null
+}
+
+Message.propTypes = {
+  /**
+   * The translatable message, should be an object (with `id` or
+   * `defaultMessage` key). Additionally the content can contain a `values` key,
+   * containing values for the message's placeholders. A string will also work,
+   * but output a warning. If a a valid dom/react element is passed it will be
+   * passed through without any modifications.
+   */
+  content: PropTypes.message,
+  /** Values can also be given as a separate property (will have precedence) */
+  values: PropTypes.object,
+  /**
+   * The wrapping element component can also be set explicitly
+   * (defaults to span). This can be useful to avoid unnecessary wrapping.
+   */
+  component: PropTypes.node,
 }
 
 export default Message
