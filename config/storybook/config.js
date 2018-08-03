@@ -18,6 +18,7 @@ import React from 'react'
 import { configure, addDecorator } from '@storybook/react'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
+import { IntlProvider } from 'react-intl'
 import createHistory from 'history/createMemoryHistory'
 
 import '../../pkg/webui/styles/main.styl'
@@ -34,9 +35,11 @@ addDecorator(function (story) {
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
-        <Center>
-          {story()}
-        </Center>
+        <IntlProvider key="key" messages={{}} locale="en-US">
+          <Center>
+            {story()}
+          </Center>
+        </IntlProvider>
       </ConnectedRouter>
     </Provider>
   )

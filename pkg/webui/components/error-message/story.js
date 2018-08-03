@@ -15,7 +15,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
-import { IntlProvider } from 'react-intl'
 
 import ErrorMessage from '.'
 
@@ -33,19 +32,12 @@ const exampleError = {
   }],
 }
 
-const IntlDecorator = storyFn => (
-  <IntlProvider key="key" messages={{}} locale="en-US">
-    { storyFn() }
-  </IntlProvider>
-)
-
 storiesOf('ErrorMessage', module)
   .addDecorator((story, context) => withInfo({
     inline: true,
     header: false,
     propTables: [ ErrorMessage ],
   })(story)(context))
-  .addDecorator(IntlDecorator)
   .add('Default', () =>
     (
       <ErrorMessage content={exampleError} />
