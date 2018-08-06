@@ -31,6 +31,9 @@ WEBPACK_CONFIG ?= $(CONFIG_DIR)/webpack.config.js
 # The config file for DLL builds
 DLL_CONFIG ?= $(CONFIG_DIR)/webpack.dll.js
 
+# Check changes in cache message directory
+BABEL_EXTRACTED_MESSAGES ?= $(shell if [ -d "$(CACHE_DIR)/messages/" ]; then find $(CACHE_DIR)/messages/ -type f -name '*' && find $(CACHE_DIR)/messages/ -type d; fi)
+
 # Pre-build config files for quicker builds
 $(CACHE_DIR)/config/%.js: $(CONFIG_DIR)/%.js
 	@$(log) pre-building config files [babel $<]
@@ -39,6 +42,10 @@ $(CACHE_DIR)/config/%.js: $(CONFIG_DIR)/%.js
 
 # The location of the cached config file
 WEBPACK_CONFIG_BUILT = $(subst $(CONFIG_DIR)/,$(CACHE_DIR)/config/,$(WEBPACK_CONFIG))
+
+## the location of the dll output
+DLL_OUTPUT ?= $(PUBLIC_DIR)/libs.bundle.js
+DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
 
 # Run webpack main bundle (webpack.config.js)
 js.build-main: $(PUBLIC_DIR)/console.html
@@ -52,25 +59,20 @@ js.build: js.build-dll js.build-main
 js.watch: js.build-dll js.build-watch
 
 js.serve: DEV_SERVER_BUILD = true
-js.serve: $(WEBPACK_CONFIG_BUILT)
+js.serve: $(WEBPACK_CONFIG_BUILT) $(DEFAULT_LOCALE_FILE) $(BACKEND_LOCALES_DIR) $(DLL_OUTPUT)
 	@$(log) "Serving via webpack-serve, make sure stack is running for the api proxy to work"
 	@$(JS_ENV) $(WEBPACK_SERVE) $(WEBPACK_CONFIG_BUILT)
 
-js.webpack-main:
-	@$(log) "building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
+js.webpack-main: $(WEBPACK_CONFIG_BUILT) $(DEFAULT_LOCALE_FILE) $(XX_LOCALE_FILE) $(BACKEND_LOCALES_DIR)
+	@$(log) "Building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
 	@$(JS_ENV) $(WEBPACK) --config $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)
 
-$(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html yarn.lock
+$(PUBLIC_DIR)/console.html: $(DLL_OUTPUT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html yarn.lock
 	$(MAKE) js.webpack-main
 
 # build in dev mode
 js.build-dev: NODE_ENV =
 js.build-dev: js.build
-
-## the location of the dll output
-DLL_OUTPUT ?= $(PUBLIC_DIR)/libs.bundle.js
-
-DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
 
 # DLL for faster dev builds
 $(DLL_OUTPUT): $(DLL_CONFIG_BUILT) yarn.lock
@@ -85,18 +87,31 @@ js.webpack-dll:
 js.build-dll: $(DLL_OUTPUT)
 
 $(CACHE_DIR)/make/%.js: .make/js/%.js
-	@$(log) "pre-building translation scrips [babel $<]"
+	@$(log) "Pre-building translation scripts [babel $<]"
 	@mkdir -p $(CACHE_DIR)/make
 	@$(BABEL) $< >| $@
 
-SUPPORT_LOCALES ?= en,ja
-DEFAULT_LOCALE ?= en
-OUTPUT_MESSAGES ?= messages.yml,messages.xlsx
-UPDATES_FILES ?= messages.xlsx
+# Translations
 
-# update translations
-js.translations: $(CACHE_DIR)/make/translations.js $(CACHE_DIR)/make/xls.js $(CACHE_DIR)/make/xx.js
-	@$(log) "gathering translations [translations --output messages.{yml,xlsx]"
-	@$(NODE) $(CACHE_DIR)/make/translations.js --output $(OUTPUT_MESSAGES) --support $(SUPPORT_LOCALES) --updates $(UPDATES_FILES)
+$(CACHE_DIR)/messages:
+	@$(log) "Extracting frontend translation messages via babel"
+	@mkdir -p $(LOCALES_DIR)
+	@$(BABEL) -q $(JS_SRC_DIR) > /dev/null
+
+$(DEFAULT_LOCALE_FILE): $(CACHE_DIR)/make/translations.js $(CACHE_DIR)/make/xx.js $(CACHE_DIR)/messages $(BABEL_EXTRACTED_MESSAGES)
+	@$(log) "Gathering frontend translation messages"
+	@$(NODE) $(CACHE_DIR)/make/translations.js --support $(SUPPORT_LOCALES)
+
+$(XX_LOCALE_FILE): $(DEFAULT_LOCALE_FILE)
+
+.PHONY: js.gather-locales
+js.gather-locales: $(DEFAULT_LOCALE_FILE)
+	@:
+
+$(BACKEND_LOCALES_DIR): $(CACHE_DIR)/make/translations.js $(CACHE_DIR)/make/xx.js $(CACHE_DIR)/messages
+	@$(log) "Gathering backend translation messages"
+	@$(NODE) $(CACHE_DIR)/make/translations.js --support $(SUPPORT_LOCALES) --backend-messages $(CONFIG_DIR)/messages.json --locales $(BACKEND_LOCALES_DIR) --backend-only
+
+js.translations: $(DEFAULT_LOCALE_FILE) js.build-main
 
 # vim: ft=make

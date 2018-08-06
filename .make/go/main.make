@@ -20,9 +20,6 @@ RELEASE_DIR ?= release#
 # default cache dir for intermediate files.
 CACHE_DIR ?= .cache
 
-# File where messages are written to.
-GO_MESSAGES_FILE ?= $(RELEASE_DIR)/errors.json
-
 # the first entry of the go path
 GO_PATH ?= $(shell echo $(GOPATH) | awk -F':' '{ print $$1 }')
 

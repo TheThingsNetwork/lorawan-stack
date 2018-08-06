@@ -36,6 +36,7 @@ ESLINT_FLAGS ?= --no-ignore --color
 BABEL_FLAGS ?= -D --ignore '*.test.js'
 
 SUPPORT_LOCALES ?= en
+DEFAULT_LOCALE ?= en
 
 JS_ENV = \
 	PUBLIC_DIR=$(PUBLIC_DIR) \
@@ -44,13 +45,19 @@ JS_ENV = \
 	VERSION=$(CURRENT_VERSION) \
 	GIT_TAG=$(GIT_TAG) \
 	SUPPORT_LOCALES=$(SUPPORT_LOCALES) \
-	DEV_SERVER_BUILD=$(DEV_SERVER_BUILD)
+	DEV_SERVER_BUILD=$(DEV_SERVER_BUILD) \
+	DEFAULT_LOCALE=$(DEFAULT_LOCALE)
 
 JS_SRC_DIR ?= pkg/webui
 JS_FILES ?= $(ALL_FILES) | $(only_js)
 JS_SRC_FILES ?= $(ALL_FILES) | $(only_js) | $(only_js_src)
 JS_STAGED_FILES = $(STAGED_FILES) | $(only_js)
 JS_TESTS ?= $(JS_FILES) | grep "\_test\.js$$"
+
+LOCALES_DIR ?= $(JS_SRC_DIR)/locales
+BACKEND_LOCALES_DIR ?= $(LOCALES_DIR)/.backend
+DEFAULT_LOCALE_FILE ?= $(LOCALES_DIR)/$(DEFAULT_LOCALE).json
+XX_LOCALE_FILE ?= $(LOCALES_DIR)/xx.json
 
 # Filters
 
@@ -83,6 +90,7 @@ js.init:
 	@$(log) "initializing js"
 	@echo "$(js_init_script)" | node
 
+
 INIT_RULES += js.init
 
 # install dependencies
@@ -91,14 +99,19 @@ js.deps:
 	@$(YARN) install $(YARN_FLAGS)
 
 # clean build files and cache
-js.clean:
+js.clean-public:
 	@$(log) "cleaning js public dir" [rm -rf $(PUBLIC_DIR)]
 	@rm -rf $(PUBLIC_DIR)
-js.clean: js.flush-cache
 
 js.flush-cache:
 	@$(log) "cleaning cache dir" [rm -rf $(CACHE_DIR)]
 	@rm -rf $(CACHE_DIR)
+
+js.clean-locale:
+	@$(log) "cleaning locales dir" [rm -rf $(CACHE_DIR)]
+	@rm -rf $(BACKEND_LOCALES_DIR)
+
+js.clean: js.clean-public js.clean-locale js.flush-cache
 
 # list js files
 js.list:

@@ -18,9 +18,8 @@
 import fs from 'fs'
 import path from 'path'
 import yargs from 'yargs'
+import mkdirp from 'mkdirp'
 import g from 'glob'
-import YAML from 'js-yaml'
-import xlsx from './xls'
 import xx from './xx'
 
 const argv = yargs.argv
@@ -47,11 +46,11 @@ const flatten = function (s) {
 
 const localesDir = argv.locales || env.LOCALES_DIR || 'pkg/webui/locales'
 const support = flatten(argv.support || env.SUPPORT_LOCALES || 'en')
-const messagesDir = argv.frontendMessages || env.MESSAGES_FRONTEND || '.cache/messages'
-const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND || 'config/messages.json'
+const backendOnly = 'backend-only' in argv && argv['backend-only'] !== false || false
+const messagesDir = !backendOnly && (argv.messages || env.MESSAGES || '.cache/messages')
+const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND
 const defaultLocale = argv.default || env.DEFAULT_LOCALE || 'en'
-const output = flatten(argv.output || env.OUTPUT || 'messages.yml')
-const updates = flatten(argv.updates || env.UPDATES)
+const verbose = 'verbose' in argv && argv.verbose !== 'false' || false
 
 if (argv.help) {
   console.log(`Usage: translations [opts]
@@ -62,21 +61,20 @@ if (argv.help) {
 
     1. It gathers all the messages defined in the source files (as output by babel-plugin-react-intl).
     2. It incorporates updates from the updates file.
-    3. It writes the messages to all the files specified by --output
-    4. It writes the updated locales into one file per locale.
+    3. It writes the updated locales into one file per locale.
 
   Supported file types are .json, .yml and .xlsx.
 
 Options:
 
-  --support <locale>         list of supported locales (default: en) [$SUPPORT_LOCALES]
-  --default <locale>         the default locale (that will inherit the default message) (default: en) [$DEFAULT_LOCALE]
-  --locales <dir>            directory where the locales are stored (default: ./locales/) [$LOCALES_DIR]
-  --frontendMessages <file>  directory where the messages are extracted to by react-intl (default: .cache/message) [$MESSAGES_FRONTEND]
-  --backendMessages <file>   file where the backend messages can be found (default: config/messages.json) [$MESSAGES_BACKEND]
-  --output <file...>         location of the output files with all messages (default: ./messages.yml, ) [$OUTPUT]
-  --updates <file...>        location of an updated output file that will be merged into the current output file (updates are applied in order, latter files will overwrite previous ones). [$UPDATES]
-  --help                     show this help message
+  --support <locale>        list of supported locales (default: en) [$SUPPORT_LOCALES]
+  --default <locale>        the default locale (that will inherit the default message) (default: en) [$DEFAULT_LOCALE]
+  --locales <dir>           directory where the locales are stored (default: ./locales/) [$LOCALES_DIR]
+  --backend-messages <file> file where the backend messages are stored (default config/messages.json) [$BACKEND_MESSAGES]
+  --messages <file>         directory where the messages are extracted to by react-intl (default: .cache/message) [$MESSAGES]
+  --backend-only <flag>.    Flag that determines whether only backend messages will be processed
+  --verbose                 verbose output for debugging purposes
+  --help                    show this help message
 `)
 }
 
@@ -106,7 +104,9 @@ const glob = function (pat) {
  */
 const read = function (filename) {
   return new Promise(function (resolve, reject) {
-    console.log(`reading from ${filename}`)
+    if (verbose) {
+      console.log(`reading from ${filename}`)
+    }
     fs.readFile(filename, function (err, res) {
       if (err) {
         return reject(err)
@@ -126,7 +126,9 @@ const read = function (filename) {
  */
 const write = function (filename, content) {
   return new Promise(function (resolve, reject) {
-    console.log('writing', filename)
+    if (verbose) {
+      console.log('writing', filename)
+    }
     fs.writeFile(filename, content, function (err, res) {
       if (err) {
         return reject(err)
@@ -177,6 +179,9 @@ const readLocales = async function () {
  * @returns {object} - The messages, keyed by message id.
  */
 const readMessages = async function () {
+  if (!messagesDir) {
+    return {}
+  }
   const files = await glob(`${path.resolve(messagesDir)}/**/*.json`)
   return files
     .map(f => fs.readFileSync(f, 'utf-8'))
@@ -202,6 +207,9 @@ const readMessages = async function () {
  * @returns {object} - The backend messages, keyed by message id.
  */
 const readBackendMessages = async function () {
+  if (!backendMessages) {
+    return {}
+  }
   const backend = JSON.parse(await read(`${path.resolve(backendMessages)}`))
   return Object.keys(backend).reduce(function (acc, id) {
     return {
@@ -213,35 +221,6 @@ const readBackendMessages = async function () {
         description: backend[id].description,
       },
     }
-  }, {})
-}
-
-/**
- * Read and parse the updates from the updates file (if given) (specified by --updates).
- *
- * @returns {object} - The updates, keyed by message id.
- */
-const readUpdates = async function () {
-  const contents = await updates.reduce(async function (acc, file) {
-    try {
-      const content = await read(file)
-      const m = marshaller(file)
-      return [
-        ...(await acc),
-        m.unmarshal(content),
-      ]
-    } catch (err) {
-      return acc
-    }
-  }, [])
-
-  return contents.reduce(function (acc, updates) {
-    const res = { ...acc, ...updates }
-    for (const id of Object.keys(acc)) {
-      res[id].force = acc[id] && acc[id].force
-    }
-
-    return res
   }, {})
 }
 
@@ -271,86 +250,6 @@ const get = function (object, ...pth) {
 }
 
 /**
- * removes message ids (inline).
- *
- * @param {object} messages - The messages.
- * @returns {object} - The messages but with their id removed.
- */
-const removeID = function (messages) {
-  const res = {}
-  for (const id of Object.keys(messages)) {
-    const { id: _, ...rest } = messages[id]
-    res[id] = rest
-  }
-
-  return res
-}
-
-/**
- * Add message ids based on keys in the map (inline).
- *
- * @param {object} messages - The messages to add the ids to.
- * @returns {object} - The messages with the added ids.
- */
-const addID = function (messages) {
-  const res = {}
-  for (const id of Object.keys(messages)) {
-    res[id] = { ...messages[id]}
-    res[id].id = id
-  }
-
-  return res
-}
-
-
-/**
- * Create a marshaller based on the filename of the source.
- * If the extension matches yaml, returns a YAML marshaller.
- * If the extension matches json, returns a JSON marshaller.
- *
- * @param {string} filename - The filename to match.
- * @returns {object} - An object containing the marshal and unmarshal
- *   functions for the matched file type.
- */
-const marshaller = function (filename) {
-  if (!filename) {
-    throw new Error('Illegal filename')
-  }
-
-  if (filename.endsWith('.json')) {
-    return {
-      unmarshal: buf => addID(JSON.parse(buf.toString())),
-      marshal: o => JSON.stringify(removeID(o), null, 2),
-    }
-  }
-
-  if (filename.endsWith('.yml') || filename.endsWith('.yaml')) {
-    return {
-      unmarshal: buf => addID(YAML.safeLoad(buf.toString())),
-      marshal: o => YAML.safeDump(removeID(o)),
-    }
-  }
-
-  if (filename.endsWith('xlsx')) {
-    return xlsx
-  }
-}
-
-/**
- * Write messages to the message file, determined by --output.
- *
- * @param {object} messages - The messages to write.
- * @returns {Promise<void>} - A promise that resolves when the messages are written.
- */
-const writeMessages = function (messages) {
-  return Promise.all(output.map(function (file) {
-    const m = marshaller(file)
-    const content = m.marshal(messages)
-    return write(file, content)
-  }))
-}
-
-/**
  * Write locales to their corresponding file in the localesDir (specified by --locales).
  *
  * @param {object} locales - The locales to write.
@@ -360,27 +259,20 @@ const writeLocales = async function (locales) {
   return Promise.all(Object.keys(locales).map(async function (key) {
     const locale = locales[key]
     const content = JSON.stringify(locale, null, 2).concat('\n')
+    await mkdirp(localesDir)
     await write(`${localesDir}/${key}.json`, content)
   }))
 }
 
 // main function.
 const main = async function () {
-  const [ locales, messages, backend, updates ] = await Promise.all([ readLocales(), readMessages(), readBackendMessages(), readUpdates() ])
+  const [ locales, messages, backend ] = await Promise.all([ readLocales(), readMessages(), readBackendMessages() ])
   const updated = {}
 
   // Merge backend messages into messages
   for (const id of Object.keys(backend)) {
     const message = backend[id]
     if (!messages[id]) {
-      messages[id] = message
-    }
-  }
-
-  // Merge updates into messages
-  for (const id of Object.keys(updates)) {
-    const message = updates[id]
-    if (message.force && !messages[id]) {
       messages[id] = message
     }
   }
@@ -393,13 +285,8 @@ const main = async function () {
     for (const locale of support) {
       updated[locale] = updated[locale] || {}
 
-      // Get message from updates file
-      let msg = get(updates, id, 'locales', locale)
-
       // If not in there, try to find it in locales
-      if (msg === null) {
-        msg = get(locales, locale, id) || ''
-      }
+      let msg = get(locales, locale, id) || ''
 
       // Force default message on default locale
       if (locale === defaultLocale) {
@@ -417,10 +304,8 @@ const main = async function () {
     updated.xx[message.id] = x
   }
 
-  await Promise.all([
-    writeMessages(messages),
-    writeLocales(updated),
-  ])
+  await writeLocales(updated)
+  console.log('Done.')
 }
 
 main().catch(function (err) {

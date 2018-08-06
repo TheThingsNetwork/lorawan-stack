@@ -97,6 +97,4 @@ assets: js.build
 	@go-bindata-assetfs -pkg assets -ignore libs.bundle.js $(PUBLIC_DIR)
 	@mv bindata_assetfs.go pkg/webui/assets
 
-UPDATES_FILES = $(GO_MESSAGES_FILE),messages.xlsx
-
 translations: messages js.translations
