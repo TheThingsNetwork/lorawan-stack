@@ -258,3 +258,64 @@ var usAuBeaconFrequencies = func() [8]uint32 {
 	}
 	return freqs
 }()
+
+func chMask16Channels(mask [16]bool, cntl uint8) (map[int]bool, error) {
+	chans := make(map[int]bool, 16)
+	switch cntl {
+	case 0:
+		for i := 0; i < 16; i++ {
+			chans[i] = mask[i]
+		}
+	case 6:
+		for i := 0; i < 16; i++ {
+			chans[i] = true
+		}
+	default:
+		return nil, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", cntl)
+	}
+	return chans, nil
+}
+
+func chMask72Channels(mask [16]bool, cntl uint8) (map[int]bool, error) {
+	chans := make(map[int]bool, 72)
+	switch cntl {
+	case 0, 1, 2, 3, 4:
+		for i := 0; i < 72; i++ {
+			chans[i] = (i >= int(cntl)*16 && i < int(cntl+1)*16) && mask[i%16]
+		}
+	case 5:
+		for i := 0; i < 64; i++ {
+			chans[i] = mask[i/8]
+		}
+		for i := 64; i < 72; i++ {
+			chans[i] = mask[i-64]
+		}
+	case 6, 7:
+		for i := 0; i < 64; i++ {
+			chans[i] = cntl == 6
+		}
+		for i := 64; i < 72; i++ {
+			chans[i] = mask[i-64]
+		}
+	default:
+		return nil, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", cntl)
+	}
+	return chans, nil
+}
+
+func chMask96Channels(mask [16]bool, cntl uint8) (map[int]bool, error) {
+	chans := make(map[int]bool, 96)
+	switch cntl {
+	case 0, 1, 2, 3, 4, 5:
+		for i := 0; i < 96; i++ {
+			chans[i] = (i >= int(cntl)*16 && i < int(cntl+1)*16) && mask[i%16]
+		}
+	case 6:
+		for i := 0; i < 96; i++ {
+			chans[i] = true
+		}
+	default:
+		return nil, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", cntl)
+	}
+	return chans, nil
+}

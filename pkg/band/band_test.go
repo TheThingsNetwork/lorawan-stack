@@ -163,3 +163,13 @@ func TestRx1DataRate(t *testing.T) {
 		}
 	}
 }
+
+func TestChannelMasksBands(t *testing.T) {
+	a := assertions.New(t)
+
+	for _, b := range band.All {
+		if !a.So(b.ChannelMask, should.NotBeNil) {
+			t.Fatalf("Band %s should have a ChannelMask function defined", b.ID)
+		}
+	}
+}
