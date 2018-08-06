@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.8
 ARG release_dir=release
 RUN apk --update --no-cache add ca-certificates
 ADD $release_dir/ttn-*-linux-amd64 /bin/
