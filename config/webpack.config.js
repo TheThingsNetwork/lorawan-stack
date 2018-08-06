@@ -20,6 +20,7 @@ import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
+import CleanWebpackPlugin from 'clean-webpack-plugin'
 
 import convert from 'koa-connect'
 import history from 'connect-history-api-fallback'
@@ -195,6 +196,18 @@ export default {
         filename: env({
           development: '[name].css',
           production: '[name].[contenthash].css',
+        }),
+      }),
+      new CleanWebpackPlugin(path.resolve(CONTEXT, PUBLIC_DIR), {
+        root: context,
+        verbose: false,
+        dry: DEV_SERVER_BUILD,
+        exclude: env({
+          production: [],
+          development: [
+            'libs.bundle.js',
+            'libs.bundle.js.map',
+          ],
         }),
       }),
     ],
