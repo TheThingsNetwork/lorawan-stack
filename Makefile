@@ -99,4 +99,4 @@ assets: js.build
 
 UPDATES_FILES = $(GO_MESSAGES_FILE),messages.xlsx
 
-translations: go.translations js.translations
+translations: messages js.translations
