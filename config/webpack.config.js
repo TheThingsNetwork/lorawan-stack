@@ -21,6 +21,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 import CleanWebpackPlugin from 'clean-webpack-plugin'
+import ShellPlugin from 'webpack-shell-plugin'
 
 import convert from 'koa-connect'
 import history from 'connect-history-api-fallback'
@@ -36,6 +37,7 @@ const {
   VERSION = '?.?.?',
   GIT_TAG,
   SUPPORT_LOCALES = 'en',
+  DEFAULT_LOCALE = 'en',
 } = process.env
 
 const DEV_SERVER_BUILD = process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_BUILD === 'true'
@@ -168,6 +170,13 @@ export default {
         NODE_ENV,
         VERSION: VERSION || GIT_TAG || 'unknown',
       }),
+      new webpack.DefinePlugin({
+        'process.predefined.DEFAULT_MESSAGES':
+          JSON.stringify({
+            ...require(`${src}/locales/${DEFAULT_LOCALE}`),
+            ...require(`${src}/locales/.backend/${DEFAULT_LOCALE}`),
+          }),
+      }),
       new HtmlWebpackPlugin({
         chunks: [ 'vendor', 'console' ],
         title: 'console',
@@ -218,10 +227,14 @@ export default {
       }),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
+        /locales/,
         new RegExp(path.resolve(context, PUBLIC_DIR)),
       ]),
       new AddAssetHtmlPlugin({
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
+      }),
+      new ShellPlugin({
+        onBuildExit: [ 'make js.gather-locales' ],
       }),
     ],
   }),
