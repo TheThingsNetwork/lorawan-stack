@@ -68,25 +68,16 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			dev.MACState.ADRNbTrans = req.NbTrans
 		}
 
-		var m map[int]bool
-		if band.ChannelMask == nil {
-			// TODO: This check should probably be removed once all band structs contain ChannelMask field.
-			m = make(map[int]bool, 16)
-			for i, v := range req.ChannelMask {
-				m[i] = v
-			}
-		} else {
-			var mask [16]bool
-			for i, v := range req.ChannelMask {
-				mask[i] = v
-			}
+		var mask [16]bool
+		for i, v := range req.ChannelMask {
+			mask[i] = v
+		}
 
-			// NOTE: err references the error outside the scope of this function.
-			m, err = band.ChannelMask(mask, uint8(req.ChannelMaskControl))
-			if err != nil {
-				logger.WithError(err).Error("Failed to determine channel mask")
-				return
-			}
+		// NOTE: err references the error outside the scope of this function.
+		m, err := band.ChannelMask(mask, uint8(req.ChannelMaskControl))
+		if err != nil {
+			logger.WithError(err).Error("Failed to determine channel mask")
+			return
 		}
 
 		for i, masked := range m {
