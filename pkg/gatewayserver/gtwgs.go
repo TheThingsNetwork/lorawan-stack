@@ -239,8 +239,9 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			continue
 		}
 
-		if registryData != nil && len(registryData.GetAntennas()) >= index {
-			antenna.Location = &registryData.GetAntennas()[index].Location
+		if registryData != nil && index < len(registryData.GetAntennas()) {
+			location := registryData.GetAntennas()[index].Location
+			antenna.Location = &location
 			antenna.Location.Source = ttnpb.SOURCE_REGISTRY
 		} else {
 			antenna.Location = nil
