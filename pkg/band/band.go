@@ -158,7 +158,7 @@ type Band struct {
 	// Rx1Parameters is the default function that determines the settings for a Tx sent during Rx1
 	Rx1Channel  Rx1ChannelFunc
 	Rx1DataRate Rx1DataRateFunc
-	ChanelMask  ChannelMaskFunc
+	ChannelMask ChannelMaskFunc
 
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters

@@ -69,7 +69,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		}
 
 		var m map[int]bool
-		if band.ChanelMask == nil {
+		if band.ChannelMask == nil {
 			// TODO: This check should probably be removed once all band structs contain ChannelMask field.
 			m = make(map[int]bool, 16)
 			for i, v := range req.ChannelMask {
@@ -82,7 +82,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			}
 
 			// NOTE: err references the error outside the scope of this function.
-			m, err = band.ChanelMask(mask, uint8(req.ChannelMaskControl))
+			m, err = band.ChannelMask(mask, uint8(req.ChannelMaskControl))
 			if err != nil {
 				logger.WithError(err).Error("Failed to determine channel mask")
 				return
