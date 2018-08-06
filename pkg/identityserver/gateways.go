@@ -18,7 +18,6 @@ import (
 	"context"
 	"math"
 	"strings"
-	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -27,9 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 const forever = time.Duration(math.MaxInt64)
@@ -48,8 +45,7 @@ var (
 type gatewayService struct {
 	*IdentityServer
 
-	pullConfigMu    sync.RWMutex
-	pullConfigChans map[string]chan []string
+	IdentifiersFilter events.IdentifierFilter
 }
 
 // CreateGateway creates a gateway in the network, sets the user as collaborator
@@ -538,23 +534,10 @@ func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, 
 		return err
 	}
 
-	updateCh := make(chan []string, 1)
-	uid := unique.ID(ctx, gtwIDs)
-	s.pullConfigMu.Lock()
-	if existing, ok := s.pullConfigChans[uid]; ok {
-		close(existing)
-	}
-	s.pullConfigChans[uid] = updateCh
-	s.pullConfigMu.Unlock()
-
-	defer func() {
-		s.pullConfigMu.Lock()
-		if existing, ok := s.pullConfigChans[uid]; ok && existing == updateCh {
-			// If we did not get kicked by another PullConfiguration:
-			delete(s.pullConfigChans, uid)
-		}
-		s.pullConfigMu.Unlock()
-	}()
+	updateCh := make(events.Channel, 1)
+	contextualizedCh := events.ContextHandler(ctx, updateCh)
+	s.IdentifiersFilter.Subscribe(ctx, gtwIDs, contextualizedCh)
+	defer s.IdentifiersFilter.Unsubscribe(ctx, gtwIDs, contextualizedCh)
 
 	t := time.NewTimer(forever)
 	accumulatedFields := map[string]bool{}
@@ -582,53 +565,28 @@ func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, 
 				return err
 			}
 			accumulatedFields = map[string]bool{}
-		case updatedFields, ok := <-updateCh:
+		case evt, ok := <-updateCh:
 			if !ok {
 				return errOtherPullConfigurationStreamOpened
+			}
+			var updatedFields []string
+			switch newData := evt.Data().(type) {
+			case []string:
+				updatedFields = newData
+			case []interface{}:
+				for _, val := range newData {
+					if str, ok := val.(string); ok {
+						updatedFields = append(updatedFields, str)
+					}
+				}
+			}
+			if len(updatedFields) == 0 {
+				continue
 			}
 			for _, updatedField := range updatedFields {
 				accumulatedFields[updatedField] = true
 			}
 			t.Reset(updateDebounce)
 		}
-	}
-}
-
-func (s *gatewayService) Notify(evt events.Event) {
-	ctx := evt.Context()
-
-	gtwIDs := evt.Identifiers().GetGatewayIDs()
-	switch evt.Name() {
-	case "is.gateway.update":
-		s.pullConfigMu.RLock()
-		for _, gtwID := range gtwIDs {
-			uid := unique.ID(ctx, gtwID)
-
-			updateCh, ok := s.pullConfigChans[uid]
-			if !ok {
-				continue
-			}
-
-			var fields []string
-			switch newData := evt.Data().(type) {
-			case []string:
-				fields = newData
-			case []interface{}:
-				for _, val := range newData {
-					if str, ok := val.(string); ok {
-						fields = append(fields, str)
-					}
-				}
-			}
-			if len(fields) == 0 {
-				continue
-			}
-			select {
-			case updateCh <- fields:
-			default:
-				log.FromContext(ctx).WithField("gateway_uid", uid).Error("Gateway update was not properly propagated to the gateway")
-			}
-		}
-		s.pullConfigMu.RUnlock()
 	}
 }

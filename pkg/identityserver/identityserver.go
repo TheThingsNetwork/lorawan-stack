@@ -134,8 +134,8 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	is.userService = &userService{IdentityServer: is}
 	is.applicationService = &applicationService{IdentityServer: is}
 	is.gatewayService = &gatewayService{
-		IdentityServer:  is,
-		pullConfigChans: make(map[string]chan []string),
+		IdentityServer:    is,
+		IdentifiersFilter: events.NewIdentifierFilter(),
 	}
 	is.clientService = &clientService{IdentityServer: is}
 	is.adminService = &adminService{IdentityServer: is}
@@ -192,12 +192,12 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 
 	c.RegisterGRPC(is)
 
-	if err := events.Subscribe("is.gateway.update", is.gatewayService); err != nil {
+	if err := events.Subscribe("is.gateway.update", is.IdentifiersFilter); err != nil {
 		return nil, errors.NewWithCause(err, "Could not subscribe to gateway configuration updates")
 	}
 	go func() {
 		<-c.Context().Done()
-		events.Unsubscribe("is.gateway.update", is.gatewayService)
+		events.Unsubscribe("is.gateway.update", is.IdentifiersFilter)
 	}()
 
 	return is, nil

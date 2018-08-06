@@ -24,6 +24,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -474,20 +475,19 @@ func TestUpdateNotification(t *testing.T) {
 	a := assertions.New(t)
 
 	s := &gatewayService{
-		pullConfigChans: make(map[string]chan []string),
+		IdentifiersFilter: events.NewIdentifierFilter(),
 	}
 	gtwIDs := &ttnpb.GatewayIdentifiers{
 		GatewayID: "hello",
 	}
-	subscription := make(chan []string, 1)
-	s.pullConfigChans[unique.ID(test.Context(), gtwIDs)] = subscription
+	subscription := make(events.Channel, 1)
+	s.IdentifiersFilter.Subscribe(test.Context(), gtwIDs, subscription)
 
 	// Sending []string
 	for _, data := range []interface{}{
 		[]string{"platform"},
-		[]interface{}{"platform"},
 	} {
-		go s.Notify(dummyEvent{
+		go s.IdentifiersFilter.Notify(dummyEvent{
 			t:    t,
 			name: "is.gateway.update",
 			data: data,
@@ -497,7 +497,7 @@ func TestUpdateNotification(t *testing.T) {
 		})
 		select {
 		case updatedFields := <-subscription:
-			a.So(updatedFields, should.Contain, "platform")
+			a.So(updatedFields.Data().([]string), should.Contain, "platform")
 		case <-time.After(newConfigurationTimeout):
 			t.Fatal("No new subscription received")
 		}
