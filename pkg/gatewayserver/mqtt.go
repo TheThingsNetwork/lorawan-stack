@@ -227,10 +227,6 @@ func (h *mqttConnectionHandler) CanWrite(info *auth.Info, topic ...string) bool 
 
 func (g *GatewayServer) runMQTTEndpoint(lis net.Listener) {
 	ctx := g.Context()
-	go func() {
-		<-ctx.Done()
-		lis.Close()
-	}()
 	logger := log.FromContext(ctx)
 	ctx = mqttlog.NewContext(ctx, mqtt.Logger(logger.WithField("namespace", "mqtt")))
 
