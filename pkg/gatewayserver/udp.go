@@ -16,7 +16,6 @@ package gatewayserver
 
 import (
 	"context"
-	"io"
 	"net"
 	"sync"
 	"time"
@@ -50,10 +49,12 @@ func (g *GatewayServer) runUDPEndpoint(ctx context.Context, rawConn *net.UDPConn
 
 	for {
 		packet, err := udpConn.Read()
-		if err != nil && err != io.EOF {
-			logger.WithError(err).Error("Could not read incoming UDP packets")
-		}
 		if err != nil {
+			select {
+			case <-ctx.Done():
+			default:
+				logger.WithError(err).Error("Could not read incoming UDP packets")
+			}
 			return
 		}
 

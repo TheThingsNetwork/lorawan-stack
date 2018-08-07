@@ -45,7 +45,8 @@ func (c *Component) listenWeb() (err error) {
 		}
 		c.logger.WithFields(log.Fields("namespace", "web", "address", c.config.HTTP.Listen)).Info("Listening for HTTP connections")
 		go func() {
-			if err := http.Serve(lis, c); err != nil {
+			err := http.Serve(lis, c)
+			if err != nil && c.ctx.Err() == nil {
 				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
 			}
 		}()
@@ -62,8 +63,9 @@ func (c *Component) listenWeb() (err error) {
 		}
 		c.logger.WithFields(log.Fields("namespace", "web", "address", c.config.HTTP.ListenTLS)).Info("Listening for HTTPS connections")
 		go func() {
-			if err := http.Serve(lis, c); err != nil {
-				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
+			err := http.Serve(lis, c)
+			if err != nil && c.ctx.Err() == nil {
+				c.logger.WithError(err).Errorf("Error serving HTTPS on %s", lis.Addr())
 			}
 		}()
 	}

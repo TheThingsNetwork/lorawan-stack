@@ -232,7 +232,7 @@ func (c *Component) Close() {
 		if err == nil {
 			c.logger.Debugf("Stopped listening on %s", l.lis.Addr())
 		} else {
-			c.logger.Errorf("Error while stopping to listen on %s", l.lis.Addr())
+			c.logger.WithError(err).Errorf("Error while stopping to listen on %s", l.lis.Addr())
 		}
 	}
 

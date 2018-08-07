@@ -233,7 +233,9 @@ func (g *GatewayServer) runMQTTEndpoint(lis net.Listener) {
 	for {
 		conn, err := lis.Accept()
 		if err != nil {
-			logger.WithError(err).Error("Cannot continue accepting MQTT connections")
+			if ctx.Err() == nil {
+				logger.WithError(err).Error("Cannot continue accepting MQTT connections")
+			}
 			return
 		}
 		go g.handleMQTTConnection(ctx, conn)

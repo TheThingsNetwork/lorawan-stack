@@ -67,7 +67,8 @@ func (c *Component) listenGRPC() (err error) {
 		}
 		c.logger.WithFields(log.Fields("namespace", "grpc", "address", c.config.GRPC.Listen)).Info("Listening for TCP gRPC connections")
 		go func() {
-			if err := c.grpc.Serve(lis); err != nil {
+			err := c.grpc.Serve(lis)
+			if err != nil && c.ctx.Err() == nil {
 				c.logger.WithError(err).Errorf("Error serving gRPC on %s", lis.Addr())
 			}
 		}()
@@ -83,7 +84,8 @@ func (c *Component) listenGRPC() (err error) {
 		}
 		c.logger.WithFields(log.Fields("namespace", "grpc", "address", c.config.GRPC.ListenTLS)).Info("Listening for TLS gRPC connections")
 		go func() {
-			if err := c.grpc.Serve(lis); err != nil {
+			err := c.grpc.Serve(lis)
+			if err != nil && c.ctx.Err() == nil {
 				c.logger.WithError(err).Errorf("Error serving gRPC/tls on %s", lis.Addr())
 			}
 		}()

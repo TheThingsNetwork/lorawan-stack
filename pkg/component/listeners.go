@@ -140,7 +140,7 @@ func (c *Component) ListenTCP(address string) (Listener, error) {
 		c.tcpListeners[address] = l
 		go func() {
 			c.logger.WithField("address", l.lis.Addr().String()).Debug("Start serving")
-			if err := l.mux.Serve(); err != nil {
+			if err := l.mux.Serve(); err != nil && c.ctx.Err() == nil {
 				c.logger.WithError(err).Errorf("Error in Listener %s", l.lis.Addr())
 			}
 		}()
