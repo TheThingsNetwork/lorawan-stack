@@ -90,6 +90,11 @@ func (s *server) GetFrequencyPlan(ctx context.Context, id string) (*ttnpb.Freque
 	return &fp, nil
 }
 
+// ClaimDownlink implements io.Server.
+func (s *server) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return nil
+}
+
 func (s *server) Connections() <-chan *io.Connection {
 	return s.connectionsCh
 }

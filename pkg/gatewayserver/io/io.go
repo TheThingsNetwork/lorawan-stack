@@ -32,9 +32,11 @@ const bufferSize = 10
 type Server interface {
 	// Connect connects a gateway by its identifiers to the Gateway Server and returns a Connection
 	// for traffic and control.
-	Connect(ctx context.Context, id ttnpb.GatewayIdentifiers) (*Connection, error)
+	Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by its identifier.
 	GetFrequencyPlan(ctx context.Context, id string) (*ttnpb.FrequencyPlan, error)
+	// ClaimDownlink claims the specified gateway identifiers for downlink.
+	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 }
 
 // Connection is a connection to a gateway managed by a frontend.

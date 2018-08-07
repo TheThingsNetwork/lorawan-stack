@@ -55,8 +55,9 @@ func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	}
 
 	uid := unique.ID(ctx, id)
-	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
-	conn, err := s.server.Connect(log.NewContext(ctx, logger), id)
+	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+	logger := log.FromContext(ctx)
+	conn, err := s.server.Connect(ctx, id)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)
