@@ -60,7 +60,7 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	out.CreatedAt = *v8
 	v9 := pbtypes.NewPopulatedStdTime(r, easy)
 	out.UpdatedAt = *v9
-	out.DisableTxDelay = bool(r.Intn(2) == 0)
+	out.ScheduleDownlinkLate = bool(r.Intn(2) == 0)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return out

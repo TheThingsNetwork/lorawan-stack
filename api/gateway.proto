@@ -77,9 +77,11 @@ message Gateway {
   // This a read-only field.
   google.protobuf.Timestamp updated_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // By default, the Gateway Server only sends downlinks to gateways right before
-  // emission time. You can opt a gateway out by setting this field to `true`.
-  bool disable_tx_delay = 15;
+  // Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet
+  // Forwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the
+  // downlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have
+  // not been transmitted yet.
+  bool schedule_downlink_late = 15;
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
