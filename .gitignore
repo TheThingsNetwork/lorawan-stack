@@ -90,8 +90,7 @@ $RECYCLE.BIN/
 /node_modules
 /public
 /stories
-/messages.xlsx
-/messages.yml
+/pkg/webui/locales/.backend
 
 # Keypair
 cert.pem
