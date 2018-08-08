@@ -23,8 +23,8 @@ echo "deb-src https://deb.nodesource.com/node_8.x xenial main" | sudo tee -a /et
 sudo apt-get update
 sudo apt-get install build-essential nodejs yarn
 
-curl -sS https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz -o go1.8.3.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.8.3.linux-amd64.tar.gz
+curl -sS https://storage.googleapis.com/golang/go1.10.3.linux-amd64.tar.gz -o go1.10.3.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.10.3.linux-amd64.tar.gz
 sudo ln -s /usr/local/go/bin/* /usr/local/bin
 ```
 
