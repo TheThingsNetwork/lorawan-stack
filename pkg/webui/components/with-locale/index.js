@@ -65,6 +65,8 @@ export default class UserLocale extends React.PureComponent {
       window.addEventListener('keydown', this.onKeydown)
       log('Press alt + X to toggle the xx locale')
     }
+
+
   }
 
   check (prev, props) {
@@ -77,7 +79,9 @@ export default class UserLocale extends React.PureComponent {
   }
 
   success (p) {
-    this.setState({ messages: p[0]})
+    const frontendMessages = p[0]
+    const backendMessages = p[1]
+    this.setState({ messages: { ...frontendMessages, ...backendMessages }})
   }
 
   fail (err) {
@@ -100,9 +104,10 @@ export default class UserLocale extends React.PureComponent {
       locale = language
     }
 
-    // load the language file
+    // load the language files
     const promises = [
-      import(/* webpackChunkName: "lang.[request]" */ `../../locales/${language}.json`),
+      import(/* webpackChunkName: "lang.[request]" */ `../../locales/${language}.json`), // Frontend messages
+      import(/* webpackChunkName: "lang.[request]" */ `../../locales/.backend/${language}.json`), // Backend messages
     ]
 
     // load locale polyfill if need be
@@ -140,7 +145,10 @@ export default class UserLocale extends React.PureComponent {
     const lang = user && user.language || env.default_language || defaultLanguage
 
     if (dev && xx) {
-      messages = require('../../locales/xx.json')
+      messages = {
+        ...require('../../locales/xx.json'),
+        ...require('../../locales/.backend/xx.json'),
+      }
     }
 
     const key = `${lang}${messages ? 1 : 0}${xx ? 'xx' : ''}`
