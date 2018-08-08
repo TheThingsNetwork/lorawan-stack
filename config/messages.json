@@ -1457,6 +1457,15 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/frequencyplans:invalid_frequency_plan": {
+    "translations": {
+      "en": "invalid frequency plan"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
   "error:pkg/frequencyplans:read_base_frequency_plan": {
     "translations": {
       "en": "could not read the base `{base_id}` of frequency plan `{id}`"
@@ -1502,9 +1511,9 @@
       "file": "scheduling.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:dwell_time_required": {
+  "error:pkg/gatewayserver/scheduling:exceeded_dwell_time": {
     "translations": {
-      "en": "packet time-on-air duration is greater than this band's dwell time ({packet_duration} \u003e {dwell_time})"
+      "en": "packet exceeded dwell time restrictions"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
@@ -2561,6 +2570,24 @@
     },
     "description": {
       "package": "pkg/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:invalid_frequency_plan_channel": {
+    "translations": {
+      "en": "invalid frequency plan channel `{index}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:no_dwell_time_duration": {
+    "translations": {
+      "en": "no dwell time duration specified"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
       "file": "errors.go"
     }
   },

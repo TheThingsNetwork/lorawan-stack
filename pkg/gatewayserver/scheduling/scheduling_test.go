@@ -60,16 +60,20 @@ func TestInexistantBand(t *testing.T) {
 
 func TestDwellTimeBlocking(t *testing.T) {
 	a := assertions.New(t)
+	dwellTimeDuration := 400 * time.Millisecond
 
 	s, err := scheduling.FrequencyPlanScheduler(test.Context(), ttnpb.FrequencyPlan{
-		BandID:            string(band.EU_863_870),
-		DownlinkDwellTime: true,
+		BandID: string(band.EU_863_870),
+		DwellTime: &ttnpb.FrequencyPlan_DwellTime{
+			Downlinks: true,
+			Duration:  &dwellTimeDuration,
+		},
 	})
 	a.So(err, should.BeNil)
 
 	err = s.ScheduleAt(scheduling.Span{
 		Start:    scheduling.SystemTime(time.Now()),
-		Duration: 3 * ttnpb.DefaultDwellTime,
+		Duration: 3 * dwellTimeDuration,
 	}, 0)
 	a.So(err, should.NotBeNil)
 }

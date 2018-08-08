@@ -28,9 +28,20 @@ message FrequencyPlan {
   // BandID of the band to support.
   string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band-id\""];
 
+  message DwellTime {
+    // Enabled for uplinks.
+    bool uplinks = 1 [(gogoproto.moretags) = "yaml:\"uplinks\""];
+
+    // Enabled for downlinks.
+    bool downlinks = 2 [(gogoproto.moretags) = "yaml:\"downlinks\""];
+
+    // Duration of dwell time.
+    google.protobuf.Duration duration = 3 [(gogoproto.moretags) = "yaml:\"duration,omitempty\"", (gogoproto.stdduration) = true];
+  }
+
   message Channel {
     // Frequency of the channel.
-    uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
+    uint64 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
 
     message ForceDataRate {
       // Index of the data rate to use.
@@ -39,12 +50,15 @@ message FrequencyPlan {
 
     // DataRate that should be used on this channel.
     ForceDataRate data_rate = 2 [(gogoproto.moretags) = "yaml:\"data-rate,omitempty\""];
+
+    // Dwell time configuration.
+    DwellTime dwell_time = 3 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\""];
   }
 
   // Channels to support.
   repeated Channel channels = 2 [(gogoproto.moretags) = "yaml:\"channels\""];
 
-  Channel lora_standard_channel = 3 [(gogoproto.moretags) = "yaml:\"lora-std-channel,omitempty\""];
+  Channel lora_standard_channel = 3 [(gogoproto.moretags) = "yaml:\"lora-standard-channel,omitempty\""];
   Channel fsk_channel = 4 [(gogoproto.customname) = "FSKChannel", (gogoproto.moretags) = "yaml:\"fsk-channel,omitempty\""];
 
   message LBTConfiguration {
@@ -65,20 +79,17 @@ message FrequencyPlan {
   }
 
   // TimeOffAir to abide to after transmission.
-  TimeOffAir time_off_air = 6 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
+  TimeOffAir time_off_air = 6 [(gogoproto.moretags) = "yaml:\"time-off-air,omitempty\""];
 
-  // Enable dwell time limitations on uplink transmissions.
-  bool uplink_dwell_time = 7 [(gogoproto.moretags) = "yaml:\"uplink-dwell-time,omitempty\""];
-
-  // Enable dwell time limitations on downlink transmissions.
-  bool downlink_dwell_time = 8 [(gogoproto.moretags) = "yaml:\"downlink-dwell-time,omitempty\""];
+  // Dwell time configuration.
+  DwellTime dwell_time = 7 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\""];
 
   // Override band settings for the class B ping slot.
-  Channel ping_slot = 9 [(gogoproto.moretags) = "yaml:\"ping-slot,omitempty\""];
+  Channel ping_slot = 8 [(gogoproto.moretags) = "yaml:\"ping-slot,omitempty\""];
 
   // Override band settings for Rx2.
-  Channel rx2 = 10 [(gogoproto.customname) = "Rx2", (gogoproto.moretags) = "yaml:\"rx2,omitempty\""];
+  Channel rx2 = 9 [(gogoproto.customname) = "Rx2", (gogoproto.moretags) = "yaml:\"rx2,omitempty\""];
 
   // Override MaxEIRP devices should respect (in dBm).
-  float max_eirp = 18 [(gogoproto.customname) = "MaxEIRP", (gogoproto.moretags) = "yaml:\"max-eirp\""];
+  float max_eirp = 10 [(gogoproto.customname) = "MaxEIRP", (gogoproto.moretags) = "yaml:\"max-eirp\""];
 }

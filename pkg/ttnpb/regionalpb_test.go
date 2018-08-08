@@ -122,6 +122,108 @@ func BenchmarkFrequencyPlanProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
+func TestFrequencyPlan_DwellTimeProto(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, false)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &FrequencyPlan_DwellTime{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	littlefuzz := make([]byte, len(dAtA))
+	copy(littlefuzz, dAtA)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+	if len(littlefuzz) > 0 {
+		fuzzamount := 100
+		for i := 0; i < fuzzamount; i++ {
+			littlefuzz[popr.Intn(len(littlefuzz))] = byte(popr.Intn(256))
+			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
+		}
+		// shouldn't panic
+		_ = proto.Unmarshal(littlefuzz, msg)
+	}
+}
+
+func TestFrequencyPlan_DwellTimeMarshalTo(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, false)
+	size := p.Size()
+	dAtA := make([]byte, size)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	_, err := p.MarshalTo(dAtA)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &FrequencyPlan_DwellTime{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func BenchmarkFrequencyPlan_DwellTimeProtoMarshal(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	pops := make([]*FrequencyPlan_DwellTime, 10000)
+	for i := 0; i < 10000; i++ {
+		pops[i] = NewPopulatedFrequencyPlan_DwellTime(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		dAtA, err := proto.Marshal(pops[i%10000])
+		if err != nil {
+			panic(err)
+		}
+		total += len(dAtA)
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func BenchmarkFrequencyPlan_DwellTimeProtoUnmarshal(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	datas := make([][]byte, 10000)
+	for i := 0; i < 10000; i++ {
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlan_DwellTime(popr, false))
+		if err != nil {
+			panic(err)
+		}
+		datas[i] = dAtA
+	}
+	msg := &FrequencyPlan_DwellTime{}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += len(datas[i%10000])
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
+			panic(err)
+		}
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
 func TestFrequencyPlan_ChannelProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
@@ -551,6 +653,27 @@ func TestFrequencyPlanJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
+func TestFrequencyPlan_DwellTimeJSON(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, true)
+	marshaler := jsonpb.Marshaler{}
+	jsondata, err := marshaler.MarshalToString(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &FrequencyPlan_DwellTime{}
+	err = jsonpb.UnmarshalString(jsondata, msg)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
+	}
+}
 func TestFrequencyPlan_ChannelJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
@@ -658,6 +781,40 @@ func TestFrequencyPlanProtoCompactText(t *testing.T) {
 	p := NewPopulatedFrequencyPlan(popr, true)
 	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlan{}
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestFrequencyPlan_DwellTimeProtoText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, true)
+	dAtA := proto.MarshalTextString(p)
+	msg := &FrequencyPlan_DwellTime{}
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestFrequencyPlan_DwellTimeProtoCompactText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, true)
+	dAtA := proto.CompactTextString(p)
+	msg := &FrequencyPlan_DwellTime{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -820,6 +977,21 @@ func TestFrequencyPlanVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
+func TestFrequencyPlan_DwellTimeVerboseEqual(t *testing.T) {
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, false)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		panic(err)
+	}
+	msg := &FrequencyPlan_DwellTime{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		panic(err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
+	}
+}
 func TestFrequencyPlan_ChannelVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlan_Channel(popr, false)
@@ -908,6 +1080,42 @@ func BenchmarkFrequencyPlanSize(b *testing.B) {
 	pops := make([]*FrequencyPlan, 1000)
 	for i := 0; i < 1000; i++ {
 		pops[i] = NewPopulatedFrequencyPlan(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += pops[i%1000].Size()
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func TestFrequencyPlan_DwellTimeSize(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedFrequencyPlan_DwellTime(popr, true)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	size := p.Size()
+	if len(dAtA) != size {
+		t.Errorf("seed = %d, size %v != marshalled size %v", seed, size, len(dAtA))
+	}
+	if size2 != size {
+		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
+	}
+	size3 := proto.Size(p)
+	if size3 != size {
+		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
+	}
+}
+
+func BenchmarkFrequencyPlan_DwellTimeSize(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	pops := make([]*FrequencyPlan_DwellTime, 1000)
+	for i := 0; i < 1000; i++ {
+		pops[i] = NewPopulatedFrequencyPlan_DwellTime(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

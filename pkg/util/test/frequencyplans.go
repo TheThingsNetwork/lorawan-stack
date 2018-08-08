@@ -40,7 +40,7 @@ channels:
 - frequency: 868100000
 - frequency: 868300000
 - frequency: 868500000
-lora-std-channel:
+lora-standard-channel:
   frequency: 863000000
   data-rate:
     index: 6

@@ -35,6 +35,7 @@ var (
 	errCouldNotReadList              = errors.Define("read_list", "could not read the list of frequency plans")
 	errCouldNotReadFrequencyPlan     = errors.Define("read_frequency_plan", "could not read the frequency plan `{id}`")
 	errCouldNotReadBaseFrequencyPlan = errors.Define("read_base_frequency_plan", "could not read the base `{base_id}` of frequency plan `{id}`")
+	errInvalidFrequencyPlan          = errors.DefineCorruption("invalid_frequency_plan", "invalid frequency plan")
 )
 
 // FrequencyPlanDescription describes a frequency plan in the YAML format.
@@ -194,7 +195,11 @@ func (s *Store) getByID(id string) (proto ttnpb.FrequencyPlan, err error) {
 		proto = baseProto.Extend(proto)
 	}
 
-	return
+	err = proto.Validate()
+	if err != nil {
+		return proto, errInvalidFrequencyPlan.WithCause(err)
+	}
+	return proto, nil
 }
 
 // GetByID tries to retrieve the frequency plan that has the given ID, and returns an error otherwise.

@@ -34,8 +34,8 @@ var (
 	errTimeOffAir     = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
 	errNoSubBandFound = errors.DefineNotFound("no_sub_band_found", "no sub-band found for frequency {frequency} Hz")
 	errDwellTime      = errors.DefineFailedPrecondition(
-		"dwell_time_required",
-		"packet time-on-air duration is greater than this band's dwell time ({packet_duration} > {dwell_time})",
+		"dwell_time",
+		"packet time-on-air duration {packet_duration} is greater than the dwell time for its frequency plan and channel",
 	)
 	errCouldNotRetrieveFPBand = errors.DefineCorruption("retrieve_fp_band", "could not retrieve the band associated with the frequency plan")
 	errNegativeDuration       = errors.DefineInternal("negative_duration", "duration cannot be negative")
@@ -54,9 +54,9 @@ type Scheduler interface {
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan, and starts a goroutine for cleanup. The scheduler is based on the dwell time, time off air, and the frequency plan's band. Assumption is made that no two duty cycles on a given band overlap.
 func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Scheduler, error) {
 	scheduler := &frequencyPlanScheduling{
-		dwellTime:  fp.DownlinkDwellTime,
-		timeOffAir: fp.TimeOffAir,
-		subBands:   []*subBandScheduling{},
+		respectsDwellTime: fp.RespectsDwellTime,
+		timeOffAir:        fp.TimeOffAir,
+		subBands:          []*subBandScheduling{},
 	}
 
 	band, err := band.GetByID(fp.BandID)
@@ -78,8 +78,8 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 }
 
 type frequencyPlanScheduling struct {
-	dwellTime  bool
-	timeOffAir *ttnpb.FrequencyPlan_TimeOffAir
+	respectsDwellTime func(isDownlink bool, frequency uint64, duration time.Duration) bool
+	timeOffAir        *ttnpb.FrequencyPlan_TimeOffAir
 
 	subBands []*subBandScheduling
 }
@@ -99,8 +99,8 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 		return errNegativeDuration
 	}
 
-	if f.dwellTime && s.Duration > ttnpb.DefaultDwellTime {
-		return errDwellTime.WithAttributes("packet_duration", s.Duration, "dwell_time", ttnpb.DefaultDwellTime)
+	if !f.respectsDwellTime(true, channel, s.Duration) {
+		return errDwellTime.WithAttributes("packet_duration", s.Duration)
 	}
 
 	subBand, err := f.findSubBand(channel)

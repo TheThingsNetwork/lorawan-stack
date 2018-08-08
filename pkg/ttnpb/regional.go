@@ -14,15 +14,82 @@
 
 package ttnpb
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
-const DefaultDwellTime = 400 * time.Millisecond
+// Validate the frequency plan.
+func (f *FrequencyPlan) Validate() error {
+	if f.DwellTime != nil {
+		dt := f.DwellTime
+		if dt.Duration == nil && (dt.Uplinks || dt.Downlinks) {
+			return errNoDwellTimeDuration
+		}
+	}
+	for i, channel := range f.Channels {
+		if channel == nil || channel.DwellTime == nil {
+			continue
+		}
+		if f.DwellTime.GetDuration() == nil && channel.DwellTime.Duration == nil &&
+			(channel.DwellTime.Uplinks || channel.DwellTime.Downlinks) {
+			return errInvalidFrequencyPlanChannel.WithAttributes("index", i).WithCause(errNoDwellTimeDuration)
+		}
+	}
+	return nil
+}
+
+// RespectsDwellTime returns whether the transmission respects the frequency plan's dwell time restrictions.
+func (f *FrequencyPlan) RespectsDwellTime(isDownlink bool, frequency uint64, duration time.Duration) bool {
+	isUplink := !isDownlink
+	channels := append(f.Channels, f.LoraStandardChannel, f.FSKChannel)
+	for _, ch := range channels {
+		if ch == nil || ch.Frequency != frequency {
+			continue
+		}
+		dtConfig := FrequencyPlan_DwellTime{
+			Uplinks:   ch.DwellTime.GetUplinks() || f.DwellTime.GetUplinks(),
+			Downlinks: ch.DwellTime.GetDownlinks() || f.DwellTime.GetDownlinks(),
+		}
+		if isDownlink && !dtConfig.Downlinks || isUplink && !dtConfig.Uplinks {
+			return true
+		}
+		var dtDuration time.Duration
+		switch {
+		case ch.DwellTime.GetDuration() != nil:
+			dtDuration = *ch.DwellTime.Duration
+		case f.DwellTime.GetDuration() != nil:
+			dtDuration = *f.DwellTime.Duration
+		default:
+			panic(fmt.Sprintf("frequency plan has dwell time enabled, but no dwell time duration set for channel %d", frequency))
+		}
+		return duration <= dtDuration
+	}
+	if isDownlink && f.DwellTime.GetDownlinks() || isUplink && f.DwellTime.GetUplinks() {
+		return duration <= *f.DwellTime.Duration
+	}
+	return true
+}
+
+func (dt *FrequencyPlan_DwellTime) Copy() *FrequencyPlan_DwellTime {
+	var duration *time.Duration
+	if dt.Duration != nil {
+		copyDuration := *dt.Duration
+		duration = &copyDuration
+	}
+	return &FrequencyPlan_DwellTime{
+		Uplinks:   dt.Uplinks,
+		Downlinks: dt.Downlinks,
+		Duration:  duration,
+	}
+}
 
 // Copy the channel parameters to a new struct.
 func (c *FrequencyPlan_Channel) Copy() *FrequencyPlan_Channel {
 	return &FrequencyPlan_Channel{
 		Frequency: c.Frequency,
 		DataRate:  c.DataRate,
+		DwellTime: c.DwellTime.Copy(),
 	}
 }
 
@@ -42,7 +109,7 @@ func (lbt *FrequencyPlan_LBTConfiguration) Copy() *FrequencyPlan_LBTConfiguratio
 	}
 }
 
-// Extend a frequency plan from a frequency plan blueprint
+// Extend a frequency plan from a frequency plan blueprint.
 func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	if channels := ext.Channels; channels != nil {
 		f.Channels = make([]*FrequencyPlan_Channel, 0)
@@ -56,8 +123,6 @@ func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	if ext.LoraStandardChannel != nil {
 		f.LoraStandardChannel = ext.LoraStandardChannel.Copy()
 	}
-	f.UplinkDwellTime = ext.UplinkDwellTime
-	f.DownlinkDwellTime = ext.DownlinkDwellTime
 	if ext.LBT != nil {
 		f.LBT = ext.LBT.Copy()
 	}
@@ -72,6 +137,9 @@ func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	}
 	if ext.MaxEIRP != 0.0 {
 		f.MaxEIRP = ext.MaxEIRP
+	}
+	if ext.DwellTime != nil {
+		f.DwellTime = ext.DwellTime.Copy()
 	}
 
 	return f

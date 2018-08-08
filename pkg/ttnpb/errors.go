@@ -128,6 +128,15 @@ var (
 		Code:          8,
 		Type:          removetheseerrors.InvalidArgument,
 	}
+
+	errNoDwellTimeDuration = errors.DefineInvalidArgument(
+		"no_dwell_time_duration",
+		"no dwell time duration specified",
+	)
+	errInvalidFrequencyPlanChannel = errors.Define(
+		"invalid_frequency_plan_channel",
+		"invalid frequency plan channel `{index}`",
+	)
 )
 
 func init() {
