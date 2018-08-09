@@ -77,7 +77,7 @@ type Rx1ChannelFunc func(idx uint32) (uint32, error)
 // Rx2Parameters contains downlink datarate index and channel
 type Rx2Parameters struct {
 	DataRateIndex ttnpb.DataRateIndex
-	Frequency     uint32
+	Frequency     uint64
 }
 
 // ID is the ID of band

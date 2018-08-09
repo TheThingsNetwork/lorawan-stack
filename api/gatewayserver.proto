@@ -49,7 +49,7 @@ message FrequencyPlan {
 
   message Channel {
     // Frequency of the channel.
-    uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
+    uint64 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
 
     message ForceDataRate {
       // Index of the data rate to use.

@@ -93,7 +93,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
 			Rx1DataRateOffset: 0,
 			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
-			Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
+			Rx2Frequency:      band.DefaultRx2Parameters.Frequency,
 			DownlinkDwellTime: band.DwellTime > 0,
 			UplinkDwellTime:   band.DwellTime > 0,
 		},
@@ -135,8 +135,8 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			dev.MACState.DesiredMACParameters.Channels[i] = ch
 		}
 
-		ch.UplinkFrequency = uint64(fpCh.Frequency)
-		ch.DownlinkFrequency = uint64(fpCh.Frequency)
+		ch.UplinkFrequency = fpCh.Frequency
+		ch.DownlinkFrequency = fpCh.Frequency
 
 		if ch.MinDataRateIndex > ttnpb.DataRateIndex(fpCh.DataRate.GetIndex()) || ttnpb.DataRateIndex(fpCh.DataRate.GetIndex()) > ch.MaxDataRateIndex {
 			return errInvalidFrequencyPlan
@@ -155,7 +155,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	}
 
 	if fp.Rx2 != nil {
-		dev.MACState.DesiredMACParameters.Rx2Frequency = uint64(fp.Rx2.Frequency)
+		dev.MACState.DesiredMACParameters.Rx2Frequency = fp.Rx2.Frequency
 		dev.MACState.DesiredMACParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(fp.Rx2.DataRate.Index)
 	}
 
@@ -163,7 +163,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		if fp.PingSlot.DataRate != nil {
 			dev.MACState.DesiredMACParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(fp.PingSlot.DataRate.Index)
 		}
-		dev.MACState.DesiredMACParameters.PingSlotFrequency = uint64(fp.PingSlot.Frequency)
+		dev.MACState.DesiredMACParameters.PingSlotFrequency = fp.PingSlot.Frequency
 	}
 
 	if fp.MaxEIRP > 0 {

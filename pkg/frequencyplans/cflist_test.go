@@ -51,14 +51,14 @@ func TestFrequenciesCFList(t *testing.T) {
 fpChannels:
 	for _, channel := range euFP.Channels {
 		for _, bandChannel := range euBand.UplinkChannels {
-			if bandChannel.Frequency == uint64(channel.Frequency) {
+			if bandChannel.Frequency == channel.Frequency {
 				continue fpChannels
 			}
 		}
 
 		var found bool
 		for _, cfListFrequency := range cfList.Freq {
-			if cfListFrequency*100 == channel.Frequency {
+			if uint64(cfListFrequency)*100 == channel.Frequency {
 				found = true
 			}
 		}
