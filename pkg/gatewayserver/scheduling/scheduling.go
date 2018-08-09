@@ -30,13 +30,10 @@ var (
 		"duty_cycle_full",
 		"duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}",
 	)
-	errOverlap        = errors.DefineResourceExhausted("window_overlap", "window overlap")
-	errTimeOffAir     = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
-	errNoSubBandFound = errors.DefineNotFound("no_sub_band_found", "no sub-band found for frequency {frequency} Hz")
-	errDwellTime      = errors.DefineFailedPrecondition(
-		"dwell_time",
-		"packet time-on-air duration {packet_duration} is greater than the dwell time for its frequency plan and channel",
-	)
+	errOverlap                = errors.DefineResourceExhausted("window_overlap", "window overlap")
+	errTimeOffAir             = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
+	errNoSubBandFound         = errors.DefineNotFound("no_sub_band_found", "no sub-band found for frequency {frequency} Hz")
+	errExceededDwellTime      = errors.DefineFailedPrecondition("exceeded_dwell_time", "packet exceeded dwell time restrictions")
 	errCouldNotRetrieveFPBand = errors.DefineCorruption("retrieve_fp_band", "could not retrieve the band associated with the frequency plan")
 	errNegativeDuration       = errors.DefineInternal("negative_duration", "duration cannot be negative")
 )
@@ -100,7 +97,7 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 	}
 
 	if !f.respectsDwellTime(true, channel, s.Duration) {
-		return errDwellTime.WithAttributes("packet_duration", s.Duration)
+		return errExceededDwellTime.WithAttributes("packet_duration", s.Duration.String())
 	}
 
 	subBand, err := f.findSubBand(channel)

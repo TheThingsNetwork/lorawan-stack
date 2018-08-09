@@ -20,6 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -75,7 +76,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 		Start:    scheduling.SystemTime(time.Now()),
 		Duration: 3 * dwellTimeDuration,
 	}, 0)
-	a.So(err, should.NotBeNil)
+	a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 }
 
 func TestScheduleAnytime(t *testing.T) {
