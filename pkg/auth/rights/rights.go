@@ -55,6 +55,7 @@ func FromContext(ctx context.Context) (Rights, bool) {
 	return Rights{}, false
 }
 
-func newContext(ctx context.Context, rights Rights) context.Context {
+// NewContext returns a derived context with the given rights.
+func NewContext(ctx context.Context, rights Rights) context.Context {
 	return context.WithValue(ctx, rightsKey, rights)
 }

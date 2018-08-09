@@ -64,7 +64,7 @@ func TestRequire(t *testing.T) {
 		RequireOrganization(test.Context(), ttnpb.OrganizationIdentifiers{}, ttnpb.RIGHT_ORGANIZATION_INFO)
 	}, should.Panic)
 
-	fooCtx := newContext(test.Context(), Rights{
+	fooCtx := NewContext(test.Context(), Rights{
 		ApplicationRights: map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{
 			{ApplicationID: "foo"}: {ttnpb.RIGHT_APPLICATION_INFO},
 		},

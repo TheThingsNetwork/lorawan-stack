@@ -42,7 +42,7 @@ func TestContext(t *testing.T) {
 		},
 	}
 
-	ctx := newContext(test.Context(), fooRights)
+	ctx := NewContext(test.Context(), fooRights)
 
 	rights, ok = FromContext(ctx)
 	a.So(ok, should.BeTrue)

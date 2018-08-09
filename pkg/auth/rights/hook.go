@@ -96,7 +96,7 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 				return nil, err
 			}
 		}
-		ctx = newContext(ctx, results)
+		ctx = NewContext(ctx, results)
 		return next(ctx, req)
 	}
 }
