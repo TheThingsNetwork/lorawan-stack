@@ -34,19 +34,19 @@ const Tabs = function ({
         const {
           disabled = false,
           title,
+          name,
           icon = null,
         } = tab
 
         return (
           <Tab
             key={index}
-            index={index}
             tabIndex={index + 1}
-            isActive={active === index}
+            isActive={name === active}
             isDisabled={disabled}
             onClick={function () {
               if (!disabled) {
-                onTabChange(index)
+                onTabChange(name)
               }
             }}
           >
@@ -60,25 +60,19 @@ const Tabs = function ({
 }
 
 Tabs.propTypes = {
-  /** Index of the active tab [0..tabs.length] */
-  active: PropTypes.number.isRequired,
+  /** The name of the active tab */
+  active: PropTypes.string.isRequired,
   /** List of tabs */
   tabs: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.message.isRequired,
     icon: PropTypes.string,
     disabled: PropTypes.bool,
-  })),
+  })).isRequired,
   /**
    * Function to be called when the selected tab changes. Passes
    * index of the tab as an argument.
    */
   onTabChange: PropTypes.func.isRequired,
-}
-
-Tabs.defaultProps = {
-  active: 0,
-  tabs: [],
-  onTabChange: () => 0,
 }
 
 export default Tabs

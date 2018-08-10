@@ -20,11 +20,14 @@ import { withInfo } from '@storybook/addon-info'
 
 import Tabs from '.'
 
-
 @bind
 class Example extends Component {
-  state = {
-    activeTab: 0,
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      activeTab: props.active,
+    }
   }
 
   onTabChange (activeTab) {
@@ -53,34 +56,40 @@ storiesOf('Tabs', module)
     propTablesExclude: [ Example ],
   })(story)(context))
   .add('Default', function () {
-    const tabs = [{ title: 'All' }, { title: 'Starred' }]
+    const tabs = [
+      { title: 'All', name: 'all' },
+      { title: 'Starred', name: 'starred' },
+    ]
 
     return (
-      <Example tabs={tabs} />
+      <Example tabs={tabs} active={tabs[0].name} />
     )
   }).add('Default (disabled)', function () {
 
-    const tabs = [{ title: 'All' }, { title: 'Starred', disabled: true }]
+    const tabs = [
+      { title: 'All', name: 'all' },
+      { title: 'Starred', name: 'starred', disabled: true },
+    ]
 
     return (
-      <Example tabs={tabs} />
+      <Example tabs={tabs} active={tabs[0].name} />
     )
   }).add('With icons', function () {
     const tabs = [
-      { title: 'People', icon: 'organization' },
-      { title: 'Data', icon: 'data' },
+      { title: 'People', name: 'people', icon: 'organization' },
+      { title: 'Data', name: 'data', icon: 'data' },
     ]
 
     return (
-      <Example tabs={tabs} />
+      <Example tabs={tabs} active={tabs[0].name} />
     )
   }).add('With icons (disabled)', function () {
     const tabs = [
-      { title: 'People', icon: 'organization' },
-      { title: 'Data', icon: 'data', disabled: true },
+      { title: 'People', name: 'people', icon: 'organization' },
+      { title: 'Data', name: 'data', icon: 'data', disabled: true },
     ]
 
     return (
-      <Example tabs={tabs} />
+      <Example tabs={tabs} active={tabs[0].name} />
     )
   })

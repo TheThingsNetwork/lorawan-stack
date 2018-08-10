@@ -22,7 +22,7 @@ const Tab = function ({
   className,
   onClick,
   isActive = false,
-  isDisabled,
+  isDisabled = false,
   children,
   ...rest
 }) {
@@ -49,12 +49,6 @@ Tab.propTypes = {
   isActive: PropTypes.bool,
   /** Boolean flag identifying whether the tab is disabled */
   isDisabled: PropTypes.bool,
-}
-
-Tab.defaultProps = {
-  onClick: () => 0,
-  isActive: false,
-  isDisabled: false,
 }
 
 export default Tab

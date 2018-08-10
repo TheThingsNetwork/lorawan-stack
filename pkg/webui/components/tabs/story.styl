@@ -12,9 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  list-style-type: none
-  padding: 0
+.navigation-title
+  color: $tc-subtle-gray
+  font-size: $fs.xl
+  padding: $cs.l $cs.xl
+  white-space: nowrap
 
-  .icon
-    margin-right: $cs.xs
+  &-active
+    color: lighter($c-active-blue, 2)
+    position: relative
+
+    &:after
+      position: absolute
+      bottom: 0
+      left: 0
+      height: 3px
+      display: block
+      width: 100%
+      background: lighter($c-active-blue, 2)
+      content: ''
+
+.icon
+  margin-right: $ls.xxs
