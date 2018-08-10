@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -81,13 +82,13 @@ func TestHook(t *testing.T) {
 				rights, ok := FromContext(ctx)
 				a.So(ok, should.BeTrue)
 				if a.So(rights.ApplicationRights, should.HaveLength, 1) {
-					a.So(rights.ApplicationRights[ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}], should.BeEmpty)
+					a.So(rights.ApplicationRights[unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})], should.BeEmpty)
 				}
 				if a.So(rights.GatewayRights, should.HaveLength, 1) {
-					a.So(rights.GatewayRights[ttnpb.GatewayIdentifiers{GatewayID: "foo"}], should.BeEmpty)
+					a.So(rights.GatewayRights[unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo"})], should.BeEmpty)
 				}
 				if a.So(rights.OrganizationRights, should.HaveLength, 1) {
-					a.So(rights.OrganizationRights[ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}], should.BeEmpty)
+					a.So(rights.OrganizationRights[unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})], should.BeEmpty)
 				}
 			},
 		},
@@ -106,13 +107,13 @@ func TestHook(t *testing.T) {
 				rights, ok := FromContext(ctx)
 				a.So(ok, should.BeTrue)
 				if a.So(rights.ApplicationRights, should.HaveLength, 1) {
-					a.So(rights.IncludesApplicationRights(ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
+					a.So(rights.IncludesApplicationRights(unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}), ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
 				}
 				if a.So(rights.GatewayRights, should.HaveLength, 1) {
-					a.So(rights.IncludesGatewayRights(ttnpb.GatewayIdentifiers{GatewayID: "foo"}, ttnpb.RIGHT_GATEWAY_INFO), should.BeTrue)
+					a.So(rights.IncludesGatewayRights(unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo"}), ttnpb.RIGHT_GATEWAY_INFO), should.BeTrue)
 				}
 				if a.So(rights.OrganizationRights, should.HaveLength, 1) {
-					a.So(rights.IncludesOrganizationRights(ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, ttnpb.RIGHT_ORGANIZATION_INFO), should.BeTrue)
+					a.So(rights.IncludesOrganizationRights(unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}), ttnpb.RIGHT_ORGANIZATION_INFO), should.BeTrue)
 				}
 			},
 		},

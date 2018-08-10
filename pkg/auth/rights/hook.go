@@ -20,6 +20,7 @@ import (
 
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 )
 
@@ -59,39 +60,42 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		}
 		combined := ids.CombinedIdentifiers()
 		results := Rights{
-			ApplicationRights:  make(map[ttnpb.ApplicationIdentifiers][]ttnpb.Right, len(combined.ApplicationIDs)),
-			GatewayRights:      make(map[ttnpb.GatewayIdentifiers][]ttnpb.Right, len(combined.GatewayIDs)),
-			OrganizationRights: make(map[ttnpb.OrganizationIdentifiers][]ttnpb.Right, len(combined.OrganizationIDs)),
+			ApplicationRights:  make(map[string][]ttnpb.Right, len(combined.ApplicationIDs)),
+			GatewayRights:      make(map[string][]ttnpb.Right, len(combined.GatewayIDs)),
+			OrganizationRights: make(map[string][]ttnpb.Right, len(combined.OrganizationIDs)),
 		}
 		for _, id := range combined.ApplicationIDs {
+			uid := unique.ID(ctx, id)
 			rights, err := fetcher.ApplicationRights(ctx, *id)
 			switch {
 			case err == nil:
-				results.ApplicationRights[*id] = rights
+				results.ApplicationRights[uid] = rights
 			case errors.IsPermissionDenied(err):
-				results.ApplicationRights[*id] = nil
+				results.ApplicationRights[uid] = nil
 			default:
 				return nil, err
 			}
 		}
 		for _, id := range combined.GatewayIDs {
+			uid := unique.ID(ctx, id)
 			rights, err := fetcher.GatewayRights(ctx, *id)
 			switch {
 			case err == nil:
-				results.GatewayRights[*id] = rights
+				results.GatewayRights[uid] = rights
 			case errors.IsPermissionDenied(err):
-				results.GatewayRights[*id] = nil
+				results.GatewayRights[uid] = nil
 			default:
 				return nil, err
 			}
 		}
 		for _, id := range combined.OrganizationIDs {
+			uid := unique.ID(ctx, id)
 			rights, err := fetcher.OrganizationRights(ctx, *id)
 			switch {
 			case err == nil:
-				results.OrganizationRights[*id] = rights
+				results.OrganizationRights[uid] = rights
 			case errors.IsPermissionDenied(err):
-				results.OrganizationRights[*id] = nil
+				results.OrganizationRights[uid] = nil
 			default:
 				return nil, err
 			}

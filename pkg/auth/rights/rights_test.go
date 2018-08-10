@@ -20,34 +20,36 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestContext(t *testing.T) {
 	a := assertions.New(t)
 
-	rights, ok := FromContext(test.Context())
+	ctx := test.Context()
+	rights, ok := FromContext(ctx)
 	a.So(ok, should.BeFalse)
 	a.So(rights, should.Resemble, Rights{})
 
 	fooRights := Rights{
-		ApplicationRights: map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{
-			{ApplicationID: "foo-app"}: {ttnpb.RIGHT_APPLICATION_INFO},
+		ApplicationRights: map[string][]ttnpb.Right{
+			unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}): {ttnpb.RIGHT_APPLICATION_INFO},
 		},
-		GatewayRights: map[ttnpb.GatewayIdentifiers][]ttnpb.Right{
-			{GatewayID: "foo-gtw"}: {ttnpb.RIGHT_GATEWAY_INFO},
+		GatewayRights: map[string][]ttnpb.Right{
+			unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"}): {ttnpb.RIGHT_GATEWAY_INFO},
 		},
-		OrganizationRights: map[ttnpb.OrganizationIdentifiers][]ttnpb.Right{
-			{OrganizationID: "foo-org"}: {ttnpb.RIGHT_ORGANIZATION_INFO},
+		OrganizationRights: map[string][]ttnpb.Right{
+			unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"}): {ttnpb.RIGHT_ORGANIZATION_INFO},
 		},
 	}
 
-	ctx := NewContext(test.Context(), fooRights)
+	ctx = NewContext(ctx, fooRights)
 
 	rights, ok = FromContext(ctx)
 	a.So(ok, should.BeTrue)
 	a.So(rights, should.Resemble, fooRights)
-	a.So(rights.IncludesApplicationRights(ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}, ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
-	a.So(rights.IncludesGatewayRights(ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"}, ttnpb.RIGHT_GATEWAY_INFO), should.BeTrue)
-	a.So(rights.IncludesOrganizationRights(ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"}, ttnpb.RIGHT_ORGANIZATION_INFO), should.BeTrue)
+	a.So(rights.IncludesApplicationRights(unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}), ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
+	a.So(rights.IncludesGatewayRights(unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"}), ttnpb.RIGHT_GATEWAY_INFO), should.BeTrue)
+	a.So(rights.IncludesOrganizationRights(unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"}), ttnpb.RIGHT_ORGANIZATION_INFO), should.BeTrue)
 }

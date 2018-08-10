@@ -23,24 +23,24 @@ import (
 
 // Rights for the request.
 type Rights struct {
-	ApplicationRights  map[ttnpb.ApplicationIdentifiers][]ttnpb.Right
-	GatewayRights      map[ttnpb.GatewayIdentifiers][]ttnpb.Right
-	OrganizationRights map[ttnpb.OrganizationIdentifiers][]ttnpb.Right
+	ApplicationRights  map[string][]ttnpb.Right
+	GatewayRights      map[string][]ttnpb.Right
+	OrganizationRights map[string][]ttnpb.Right
 }
 
 // IncludesApplicationRights returns whether the given rights are included for the given application.
-func (r Rights) IncludesApplicationRights(appID ttnpb.ApplicationIdentifiers, rights ...ttnpb.Right) bool {
-	return ttnpb.IncludesRights(r.ApplicationRights[appID], rights...)
+func (r Rights) IncludesApplicationRights(appUID string, rights ...ttnpb.Right) bool {
+	return ttnpb.IncludesRights(r.ApplicationRights[appUID], rights...)
 }
 
 // IncludesGatewayRights returns whether the given rights are included for the given gateway.
-func (r Rights) IncludesGatewayRights(gtwID ttnpb.GatewayIdentifiers, rights ...ttnpb.Right) bool {
-	return ttnpb.IncludesRights(r.GatewayRights[gtwID], rights...)
+func (r Rights) IncludesGatewayRights(gtwUID string, rights ...ttnpb.Right) bool {
+	return ttnpb.IncludesRights(r.GatewayRights[gtwUID], rights...)
 }
 
 // IncludesOrganizationRights returns whether the given rights are included for the given organization.
-func (r Rights) IncludesOrganizationRights(orgID ttnpb.OrganizationIdentifiers, rights ...ttnpb.Right) bool {
-	return ttnpb.IncludesRights(r.OrganizationRights[orgID], rights...)
+func (r Rights) IncludesOrganizationRights(orgUID string, rights ...ttnpb.Right) bool {
+	return ttnpb.IncludesRights(r.OrganizationRights[orgUID], rights...)
 }
 
 type rightsKeyType struct{}

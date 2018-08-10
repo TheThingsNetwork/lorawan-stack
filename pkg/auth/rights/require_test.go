@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -64,15 +65,16 @@ func TestRequire(t *testing.T) {
 		RequireOrganization(test.Context(), ttnpb.OrganizationIdentifiers{}, ttnpb.RIGHT_ORGANIZATION_INFO)
 	}, should.Panic)
 
-	fooCtx := NewContext(test.Context(), Rights{
-		ApplicationRights: map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{
-			{ApplicationID: "foo"}: {ttnpb.RIGHT_APPLICATION_INFO},
+	fooCtx := test.Context()
+	fooCtx = NewContext(fooCtx, Rights{
+		ApplicationRights: map[string][]ttnpb.Right{
+			unique.ID(fooCtx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}): {ttnpb.RIGHT_APPLICATION_INFO},
 		},
-		GatewayRights: map[ttnpb.GatewayIdentifiers][]ttnpb.Right{
-			{GatewayID: "foo"}: {ttnpb.RIGHT_GATEWAY_INFO},
+		GatewayRights: map[string][]ttnpb.Right{
+			unique.ID(fooCtx, ttnpb.GatewayIdentifiers{GatewayID: "foo"}): {ttnpb.RIGHT_GATEWAY_INFO},
 		},
-		OrganizationRights: map[ttnpb.OrganizationIdentifiers][]ttnpb.Right{
-			{OrganizationID: "foo"}: {ttnpb.RIGHT_ORGANIZATION_INFO},
+		OrganizationRights: map[string][]ttnpb.Right{
+			unique.ID(fooCtx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}): {ttnpb.RIGHT_ORGANIZATION_INFO},
 		},
 	})
 

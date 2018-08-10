@@ -40,6 +40,7 @@ var errMissingOrganizationRights = errors.DefinePermissionDenied(
 // RequireApplication checks that context contains the required rights for the
 // given Application ID.
 func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
+	appUID := unique.ID(ctx, appID)
 	rights, ok := FromContext(ctx)
 	if !ok {
 		fetcher, ok := fetcherFromContext(ctx)
@@ -53,10 +54,10 @@ func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers,
 		default:
 			return err
 		}
-		rights.ApplicationRights = map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{appID: appRights}
+		rights.ApplicationRights = map[string][]ttnpb.Right{appUID: appRights}
 	}
-	if !rights.IncludesApplicationRights(appID, required...) {
-		return errMissingApplicationRights.WithAttributes("uid", unique.ID(ctx, appID))
+	if !rights.IncludesApplicationRights(appUID, required...) {
+		return errMissingApplicationRights.WithAttributes("uid", appUID)
 	}
 	return nil
 }
@@ -64,6 +65,7 @@ func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers,
 // RequireGateway checks that context contains the required rights for the
 // given Gateway ID.
 func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+	gtwUID := unique.ID(ctx, gtwID)
 	rights, ok := FromContext(ctx)
 	if !ok {
 		fetcher, ok := fetcherFromContext(ctx)
@@ -77,10 +79,10 @@ func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, require
 		default:
 			return err
 		}
-		rights.GatewayRights = map[ttnpb.GatewayIdentifiers][]ttnpb.Right{gtwID: gtwRights}
+		rights.GatewayRights = map[string][]ttnpb.Right{gtwUID: gtwRights}
 	}
-	if !rights.IncludesGatewayRights(gtwID, required...) {
-		return errMissingGatewayRights.WithAttributes("uid", unique.ID(ctx, gtwID))
+	if !rights.IncludesGatewayRights(gtwUID, required...) {
+		return errMissingGatewayRights.WithAttributes("uid", gtwUID)
 	}
 	return nil
 }
@@ -88,6 +90,7 @@ func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, require
 // RequireOrganization checks that context contains the required rights for the
 // given organization ID.
 func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifiers, required ...ttnpb.Right) error {
+	orgUID := unique.ID(ctx, orgID)
 	rights, ok := FromContext(ctx)
 	if !ok {
 		fetcher, ok := fetcherFromContext(ctx)
@@ -101,10 +104,10 @@ func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifier
 		default:
 			return err
 		}
-		rights.OrganizationRights = map[ttnpb.OrganizationIdentifiers][]ttnpb.Right{orgID: orgRights}
+		rights.OrganizationRights = map[string][]ttnpb.Right{orgUID: orgRights}
 	}
-	if !rights.IncludesOrganizationRights(orgID, required...) {
-		return errMissingOrganizationRights.WithAttributes("uid", unique.ID(ctx, orgID))
+	if !rights.IncludesOrganizationRights(orgUID, required...) {
+		return errMissingOrganizationRights.WithAttributes("uid", orgUID)
 	}
 	return nil
 }
