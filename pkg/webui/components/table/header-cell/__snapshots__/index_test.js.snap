@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HeaderCell is active should match snapshot 1`] = `
+<th
+  className="cell cellSortable"
+>
+  <button
+    className="sortButton sortButtonActive"
+    data-hook="sort-button"
+    onClick={[Function]}
+    type="button"
+  >
+    <Message
+      content="Id"
+    />
+    <SortIcon
+      ascending={false}
+    />
+  </button>
+</th>
+`;
+
+exports[`HeaderCell is not sortable should match snapshot 1`] = `
+<th
+  className="cell"
+>
+  <Message
+    content="Id"
+  />
+</th>
+`;
+
+exports[`HeaderCell is sortable should match snapshot 1`] = `
+<th
+  className="cell cellSortable"
+>
+  <button
+    className="sortButton"
+    data-hook="sort-button"
+    onClick={[Function]}
+    type="button"
+  >
+    <Message
+      content="Id"
+    />
+    <SortIcon />
+  </button>
+</th>
+`;

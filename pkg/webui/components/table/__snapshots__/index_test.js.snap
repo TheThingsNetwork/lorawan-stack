@@ -1,0 +1,135 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table has data the number of rows is equal to the page size should match snapshot 1`] = `
+<div>
+  <table
+    className="table"
+  >
+    <thead>
+      <tr
+        className="headerRow"
+      >
+        <HeaderCell
+          active={false}
+          content="Id"
+          key="0"
+          name="id"
+          onSort={[Function]}
+          order={0}
+          sortable={true}
+        />
+        <HeaderCell
+          active={false}
+          content="Description"
+          key="1"
+          name="desc"
+          onSort={[Function]}
+          order={0}
+        />
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="dataRow"
+        data-hook="data-row"
+        key="0"
+      >
+        <DataCell
+          key="0"
+          small={false}
+        >
+          1
+        </DataCell>
+        <DataCell
+          key="1"
+          small={false}
+        >
+          Description1
+        </DataCell>
+      </tr>
+      <tr
+        className="dataRow"
+        data-hook="data-row"
+        key="1"
+      >
+        <DataCell
+          key="0"
+          small={false}
+        >
+          2
+        </DataCell>
+        <DataCell
+          key="1"
+          small={false}
+        >
+          Description2
+        </DataCell>
+      </tr>
+    </tbody>
+  </table>
+  <Pagination
+    className="pagination"
+    disableInitialCallback={true}
+    forcePage={0}
+    initialPage={0}
+    marginPagesDisplayed={1}
+    onPageChange={[Function]}
+    pageCount={1}
+    pageRangeDisplayed={1}
+  />
+</div>
+`;
+
+exports[`Table has not data should match snapshot 1`] = `
+<div>
+  <table
+    className="table"
+  >
+    <thead>
+      <tr
+        className="headerRow"
+      >
+        <HeaderCell
+          active={false}
+          content="Id"
+          key="0"
+          name="id"
+          onSort={[Function]}
+          order={0}
+        />
+        <HeaderCell
+          active={false}
+          content="Description"
+          key="1"
+          name="desc"
+          onSort={[Function]}
+          order={0}
+        />
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colSpan={2}
+          data-hook="empty-message"
+        >
+          <Message
+            className="emptyMessage"
+            content="No entries"
+          />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <Pagination
+    className="pagination"
+    disableInitialCallback={true}
+    forcePage={0}
+    initialPage={0}
+    marginPagesDisplayed={1}
+    onPageChange={[Function]}
+    pageCount={1}
+    pageRangeDisplayed={1}
+  />
+</div>
+`;
