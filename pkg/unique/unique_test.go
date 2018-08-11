@@ -20,6 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	. "go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -35,6 +36,7 @@ func (c customIdentifiers) CombinedIdentifiers() *ttnpb.CombinedIdentifiers {
 }
 
 func TestValidity(t *testing.T) {
+	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
 	for _, tc := range []ttnpb.Identifiers{
 		nil,
 		(*ttnpb.ApplicationIdentifiers)(nil),
@@ -43,8 +45,22 @@ func TestValidity(t *testing.T) {
 		ttnpb.ClientIdentifiers{},
 		(*ttnpb.EndDeviceIdentifiers)(nil),
 		ttnpb.EndDeviceIdentifiers{},
+		&ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			DevEUI:                 &eui,
+		},
+		ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			DevEUI:                 &eui,
+		},
 		(*ttnpb.GatewayIdentifiers)(nil),
 		ttnpb.GatewayIdentifiers{},
+		&ttnpb.GatewayIdentifiers{
+			EUI: &eui,
+		},
+		ttnpb.GatewayIdentifiers{
+			EUI: &eui,
+		},
 		(*ttnpb.OrganizationIdentifiers)(nil),
 		ttnpb.OrganizationIdentifiers{},
 		(*ttnpb.UserIdentifiers)(nil),
