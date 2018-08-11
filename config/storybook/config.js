@@ -35,13 +35,13 @@ const history = createHistory()
 addDecorator(function (story) {
   return (
     <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <IntlProvider key="key" messages={{}} locale="en-US">
+      <IntlProvider key="key" messages={{}} locale="en-US">
+        <ConnectedRouter history={history}>
           <Center>
             {story()}
           </Center>
-        </IntlProvider>
-      </ConnectedRouter>
+        </ConnectedRouter>
+      </IntlProvider>
     </Provider>
   )
 })
