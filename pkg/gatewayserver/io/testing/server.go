@@ -16,10 +16,13 @@ package testing
 
 import (
 	"context"
+	"fmt"
 	stdio "io"
+	"strings"
 	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
@@ -62,8 +65,20 @@ func (s *server) Close() error {
 	return s.localStore.Destroy()
 }
 
+// FillContext implements io.Server.
+func (s *server) FillContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+	if ids.IsZero() {
+		return nil, ttnpb.GatewayIdentifiers{}, errors.New("the identifiers are zero")
+	}
+	if ids.GatewayID != "" {
+		return ctx, ids, nil
+	}
+	ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+	return ctx, ids, nil
+}
+
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (s *server) Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers, assumedRights ...ttnpb.Right) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}

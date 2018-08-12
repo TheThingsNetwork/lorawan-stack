@@ -30,9 +30,11 @@ const bufferSize = 10
 
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
-	// Connect connects a gateway by its identifiers to the Gateway Server and returns a Connection for traffic and
-	// control.
-	Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*Connection, error)
+	// FillContext fills the given context and identifiers.
+	FillContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
+	// Connect connects a gateway by its identifiers to the Gateway Server with its assumed rights, and returns a
+	// Connection for traffic and control.
+	Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers, assumedRights ...ttnpb.Right) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by its identifier.
 	GetFrequencyPlan(ctx context.Context, id string) (*ttnpb.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
@@ -125,6 +127,7 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 		Start:    scheduling.ConcentratorTime(down.TxMetadata.Timestamp),
 		Duration: duration,
 	}
+
 	if err := c.scheduler.ScheduleAt(span, down.Settings.Frequency); err != nil {
 		return err
 	}

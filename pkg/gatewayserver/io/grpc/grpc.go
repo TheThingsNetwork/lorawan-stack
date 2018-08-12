@@ -53,6 +53,10 @@ func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	if err = rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return
 	}
+	ctx, id, err = s.server.FillContext(ctx, id)
+	if err != nil {
+		return
+	}
 
 	uid := unique.ID(ctx, id)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)

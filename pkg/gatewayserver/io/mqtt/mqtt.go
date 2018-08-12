@@ -193,18 +193,10 @@ type gatewayTopics struct {
 	statusTopic   []string
 }
 
-// CustomContextFiller allows for filling the context.
-var CustomContextFiller func(ctx context.Context, id ttnpb.GatewayIdentifiers) (context.Context, error)
-
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
 	id, err := unique.ToGatewayID(info.Username)
 	if err != nil {
 		return nil, err
-	}
-	if filler := CustomContextFiller; filler != nil {
-		if ctx, err = filler(ctx, id); err != nil {
-			return nil, err
-		}
 	}
 
 	md := metadata.New(map[string]string{
@@ -215,6 +207,11 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		md = metadata.Join(ctxMd, md)
 	}
 	ctx = metadata.NewIncomingContext(ctx, md)
+
+	ctx, id, err = c.server.FillContext(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	uid := unique.ID(ctx, id)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
