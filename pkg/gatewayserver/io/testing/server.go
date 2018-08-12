@@ -17,6 +17,7 @@ package testing
 import (
 	"context"
 	stdio "io"
+	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
@@ -24,13 +25,15 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 type server struct {
-	localStore    test.FrequencyPlansStore
-	store         *frequencyplans.Store
-	connectionsCh chan *io.Connection
+	localStore     test.FrequencyPlansStore
+	store          *frequencyplans.Store
+	connectionsCh  chan *io.Connection
+	downlinkClaims sync.Map
 }
 
 // Server represents a testing io.Server.
@@ -60,11 +63,11 @@ func (s *server) Close() error {
 }
 
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, id ttnpb.GatewayIdentifiers) (*io.Connection, error) {
-	if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+func (s *server) Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-	gtw := &ttnpb.Gateway{GatewayIdentifiers: id}
+	gtw := &ttnpb.Gateway{GatewayIdentifiers: ids}
 	fp, err := s.store.GetByID("EU_863_870")
 	if err != nil {
 		return nil, err
@@ -92,7 +95,20 @@ func (s *server) GetFrequencyPlan(ctx context.Context, id string) (*ttnpb.Freque
 
 // ClaimDownlink implements io.Server.
 func (s *server) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	s.downlinkClaims.Store(unique.ID(ctx, ids), true)
 	return nil
+}
+
+// UnclaimDownlink implements io.Server.
+func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	s.downlinkClaims.Delete(unique.ID(ctx, ids))
+	return nil
+}
+
+// GetFrequencyPlan implements io.Server.
+func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) (bool, error) {
+	_, ok := s.downlinkClaims.Load(unique.ID(ctx, ids))
+	return ok, nil
 }
 
 func (s *server) Connections() <-chan *io.Connection {
