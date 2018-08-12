@@ -178,6 +178,7 @@ func (c *connection) setup(ctx context.Context) error {
 					logger.Debug("Disconnected")
 				}
 				c.session.Close()
+				c.io.Disconnect(err)
 				return
 			}
 		}

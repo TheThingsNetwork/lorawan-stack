@@ -96,6 +96,7 @@ func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 			if !errors.IsCanceled(err) {
 				logger.WithError(err).Warn("Link failed")
 			}
+			conn.Disconnect(err)
 			return err
 		}
 
