@@ -567,7 +567,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -629,7 +630,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -691,7 +693,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -759,7 +762,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -825,7 +829,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -892,7 +897,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -970,7 +976,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -1038,7 +1045,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
 						},
-						DevAddr: &DevAddr,
+						DeviceID: DeviceID,
+						DevAddr:  &DevAddr,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -1507,6 +1515,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 		req := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
+		ed.EndDeviceIdentifiers.ApplicationID = ApplicationID
+		ed.EndDeviceIdentifiers.DeviceID = DeviceID
 		ed.EndDeviceIdentifiers.DevEUI = &req.Payload.GetJoinRequestPayload().DevEUI
 		ed.EndDeviceIdentifiers.JoinEUI = &req.Payload.GetJoinRequestPayload().JoinEUI
 
@@ -1534,6 +1544,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         nil,
@@ -1561,6 +1572,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
@@ -1588,6 +1600,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
@@ -1615,6 +1628,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
@@ -1642,6 +1656,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),

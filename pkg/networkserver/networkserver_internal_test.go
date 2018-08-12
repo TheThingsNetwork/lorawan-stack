@@ -79,6 +79,7 @@ var (
 	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
 	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	DeviceID      = "test"
 	ApplicationID = "test"
 )
 
@@ -185,7 +186,9 @@ func TestScheduleDownlink(t *testing.T) {
 		msg := &ttnpb.DownlinkMessage{
 			RawPayload: testBytes,
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DevAddr: &DevAddr,
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+				DeviceID:               DeviceID,
+				DevAddr:                &DevAddr,
 			},
 			Settings: ttnpb.TxSettings{
 				DataRateIndex:         drIdx,
@@ -205,7 +208,9 @@ func TestScheduleDownlink(t *testing.T) {
 		msg := &ttnpb.DownlinkMessage{
 			RawPayload: testBytes,
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DevAddr: &DevAddr,
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+				DeviceID:               DeviceID,
+				DevAddr:                &DevAddr,
 			},
 			Settings: ttnpb.TxSettings{
 				DataRateIndex:         drIdx,
@@ -239,7 +244,9 @@ func TestScheduleDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
 					MACParameters: ttnpb.MACParameters{
@@ -349,7 +356,9 @@ func TestScheduleDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
 					MACParameters: ttnpb.MACParameters{
