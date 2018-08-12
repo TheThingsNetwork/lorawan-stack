@@ -41,7 +41,7 @@ var (
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	registeredGatewayKey = "test-key"
 
-	timeout = 100 * time.Millisecond
+	timeout = 10 * time.Millisecond
 )
 
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
