@@ -1592,25 +1592,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver/udp:gateway_not_connected": {
-    "translations": {
-      "en": "gateway not connected"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:marshal_packet_to_udp_format": {
-    "translations": {
-      "en": "failed to marshal packet to UDP format"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:marshal_payload_to_lorawan": {
+  "error:pkg/gatewayserver/io/udp/encoding:marshal_payload_to_lorawan": {
     "translations": {
       "en": "failed to marshalling payload to LoRaWAN format"
     },
@@ -1619,16 +1601,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver/udp:no_connection_associated": {
-    "translations": {
-      "en": "no gateway connection associated to this packet"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:no_gateway_eui": {
+  "error:pkg/gatewayserver/io/udp/encoding:no_gateway_eui": {
     "translations": {
       "en": "packet is not long enough to contain the gateway EUI"
     },
