@@ -212,12 +212,6 @@ func TestUDP(t *testing.T) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	store, err := test.NewFrequencyPlansStore()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer store.Destroy()
-
 	gtwID, err := unique.ToGatewayID(registeredGatewayUID)
 	a.So(err, should.BeNil)
 	gtwID.EUI = &registeredGatewayEUI
@@ -239,11 +233,9 @@ func TestUDP(t *testing.T) {
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
 			},
-			FrequencyPlans: config.FrequencyPlans{
-				StoreDirectory: store.Directory(),
-			},
 		},
 	})
+	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 	gs, err := gatewayserver.New(c, gatewayserver.Config{
 		UDPAddress: testUDPAddress,
 	})

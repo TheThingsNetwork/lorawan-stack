@@ -79,12 +79,6 @@ func TestLink(t *testing.T) {
 	ctx = clusterauth.NewContext(ctx, nil)
 	ctx, cancel := context.WithCancel(ctx)
 
-	store, err := test.NewFrequencyPlansStore()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer store.Destroy()
-
 	gtwID, err := unique.ToGatewayID(registeredGatewayUID)
 	a.So(err, should.BeNil)
 
@@ -104,14 +98,12 @@ func TestLink(t *testing.T) {
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
 			},
-			FrequencyPlans: config.FrequencyPlans{
-				StoreDirectory: store.Directory(),
-			},
 			GRPC: config.GRPC{
 				AllowInsecureForCredentials: true,
 			},
 		},
 	})
+	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Gateway Server could not be initialized:", err)
@@ -285,16 +277,9 @@ func TestLink(t *testing.T) {
 func TestGetFrequencyPlan(t *testing.T) {
 	a := assertions.New(t)
 
-	store, err := test.NewFrequencyPlansStore()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer store.Destroy()
-
 	logger := test.GetLogger(t)
-	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
-		FrequencyPlans: config.FrequencyPlans{StoreDirectory: store.Directory()},
-	}})
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		logger.Fatal("Gateway Server could not start")

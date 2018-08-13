@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -32,16 +31,9 @@ import (
 func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 	a := assertions.New(t)
 
-	store, err := test.NewFrequencyPlansStore()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer store.Destroy()
-
 	logger := test.GetLogger(t)
-	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
-		FrequencyPlans: config.FrequencyPlans{StoreDirectory: store.Directory()},
-	}})
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		logger.Fatal("Gateway Server could not start")
