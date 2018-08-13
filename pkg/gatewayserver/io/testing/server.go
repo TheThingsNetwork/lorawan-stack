@@ -17,13 +17,11 @@ package testing
 import (
 	"context"
 	"fmt"
-	stdio "io"
 	"strings"
 	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
@@ -33,7 +31,6 @@ import (
 )
 
 type server struct {
-	localStore     test.FrequencyPlansStore
 	store          *frequencyplans.Store
 	connectionsCh  chan *io.Connection
 	downlinkClaims sync.Map
@@ -41,28 +38,17 @@ type server struct {
 
 // Server represents a testing io.Server.
 type Server interface {
-	stdio.Closer
 	io.Server
 
 	Connections() <-chan *io.Connection
 }
 
-// MustNewServer instantiates a new Server and panics on failure.
-func MustNewServer() Server {
-	localStore, err := test.NewFrequencyPlansStore()
-	if err != nil {
-		panic(err)
-	}
+// NewServer instantiates a new Server.
+func NewServer() Server {
 	return &server{
-		localStore:    localStore,
-		store:         frequencyplans.NewStore(fetch.FromFilesystem(localStore.Directory())),
+		store:         frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		connectionsCh: make(chan *io.Connection, 10),
 	}
-}
-
-// Close cleans up temporary files.
-func (s *server) Close() error {
-	return s.localStore.Destroy()
 }
 
 // FillContext implements io.Server.

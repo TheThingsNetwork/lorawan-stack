@@ -57,9 +57,7 @@ func TestConnection(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
 
-	gs := iotesting.MustNewServer()
-	defer gs.Close()
-
+	gs := iotesting.NewServer()
 	addr, _ := net.ResolveUDPAddr("udp", ":0")
 	lis, err := net.ListenUDP("udp", addr)
 	if !a.So(err, should.BeNil) {
@@ -196,9 +194,7 @@ func TestTraffic(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
 
-	gs := iotesting.MustNewServer()
-	defer gs.Close()
-
+	gs := iotesting.NewServer()
 	addr, _ := net.ResolveUDPAddr("udp", ":0")
 	lis, err := net.ListenUDP("udp", addr)
 	if !a.So(err, should.BeNil) {

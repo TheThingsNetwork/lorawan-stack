@@ -46,9 +46,7 @@ func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
 
-	gs := iotesting.MustNewServer()
-	defer gs.Close()
-
+	gs := iotesting.NewServer()
 	srv := New(gs)
 
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
@@ -122,9 +120,7 @@ func TestTraffic(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 
-	gs := iotesting.MustNewServer()
-	defer gs.Close()
-
+	gs := iotesting.NewServer()
 	srv := New(gs)
 
 	upCh := make(chan *ttnpb.GatewayUp)
