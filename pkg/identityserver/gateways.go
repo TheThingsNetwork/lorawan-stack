@@ -205,9 +205,7 @@ func copyGatewayFields(recipient, origin *ttnpb.Gateway, paths []string) error {
 			recipient.DisableTxDelay = origin.DisableTxDelay
 		default:
 			if !strings.HasPrefix(path, ttnpb.FieldPrefixGatewayAttributes) {
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 			attr := strings.TrimPrefix(path, ttnpb.FieldPrefixGatewayAttributes)
 			if value, ok := origin.Attributes[attr]; ok && len(value) > 0 {

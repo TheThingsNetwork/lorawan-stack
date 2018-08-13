@@ -124,4 +124,6 @@ var (
 	errOtherPullConfigurationStreamOpened = errors.DefineAborted("other_pull_configuration_stream_opened", "another `PullConfiguration` stream opened")
 
 	errWrongGatewayForAPIKey = errors.DefinePermissionDenied("wrong_gateway_for_api_key", "api key has no rights for gateway `{gateway_id}`")
+
+	errPathUpdateMask = errors.DefineInvalidArgument("update_mask", "invalid update_mask: `{path}` is not a valid path")
 )

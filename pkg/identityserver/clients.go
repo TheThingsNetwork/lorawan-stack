@@ -170,9 +170,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 			case ttnpb.FieldPathClientDescription:
 				client.Description = req.Client.Description
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 

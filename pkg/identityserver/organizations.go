@@ -159,9 +159,7 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 			case ttnpb.FieldPathOrganizationEmail:
 				organization.Email = req.Organization.Email
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 

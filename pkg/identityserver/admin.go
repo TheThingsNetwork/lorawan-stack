@@ -81,9 +81,7 @@ func (s *adminService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSett
 			case ttnpb.FieldPathSettingsInvitationTokenTTL:
 				settings.InvitationTokenTTL = req.Settings.InvitationTokenTTL
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 
@@ -264,9 +262,7 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 			case ttnpb.FieldPathUserRequirePasswordUpdate:
 				user.RequirePasswordUpdate = req.User.RequirePasswordUpdate
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 
@@ -619,9 +615,7 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 				}
 				client.Grants = req.Client.Grants
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 

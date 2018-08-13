@@ -229,9 +229,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 
 				user.UserIdentifiers.Email = req.User.UserIdentifiers.Email
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 

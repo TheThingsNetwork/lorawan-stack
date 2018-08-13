@@ -175,9 +175,7 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 			case ttnpb.FieldPathApplicationDescription:
 				application.Description = req.Application.Description
 			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 

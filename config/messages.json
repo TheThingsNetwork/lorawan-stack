@@ -1889,6 +1889,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/identityserver:invalid_update_mask": {
+    "translations": {
+      "en": "invalid update_mask: `{path}` is not a valid path"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver:other_pull_configuration_stream_opened": {
     "translations": {
       "en": "another `PullConfiguration` stream opened"
