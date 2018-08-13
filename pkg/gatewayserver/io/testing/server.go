@@ -66,7 +66,7 @@ func (s *server) Close() error {
 }
 
 // FillContext implements io.Server.
-func (s *server) FillContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
 	if ids.IsZero() {
 		return nil, ttnpb.GatewayIdentifiers{}, errors.New("the identifiers are zero")
 	}

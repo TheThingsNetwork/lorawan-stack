@@ -209,7 +209,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	}
 	ctx = metadata.NewIncomingContext(ctx, md)
 
-	ctx, id, err = c.server.FillContext(ctx, id)
+	ctx, id, err = c.server.FillGatewayContext(ctx, id)
 	if err != nil {
 		return nil, err
 	}

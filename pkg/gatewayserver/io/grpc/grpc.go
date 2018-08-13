@@ -53,7 +53,7 @@ func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	if err = rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return
 	}
-	ctx, id, err = s.server.FillContext(ctx, id)
+	ctx, id, err = s.server.FillGatewayContext(ctx, id)
 	if err != nil {
 		return
 	}

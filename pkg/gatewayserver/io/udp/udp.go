@@ -191,7 +191,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			cs.ioCond.L.Unlock()
 		}()
 		id := ttnpb.GatewayIdentifiers{EUI: &eui}
-		ctx, id, err = s.server.FillContext(ctx, id)
+		ctx, id, err = s.server.FillGatewayContext(ctx, id)
 		if err != nil {
 			return nil, err
 		}

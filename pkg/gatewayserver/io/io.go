@@ -30,8 +30,8 @@ const bufferSize = 10
 
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
-	// FillContext fills the given context and identifiers.
-	FillContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
+	// FillGatewayContext fills the given context and identifiers.
+	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server with its assumed rights, and returns a
 	// Connection for traffic and control.
 	Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers, assumedRights ...ttnpb.Right) (*Connection, error)
