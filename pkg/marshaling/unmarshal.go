@@ -19,6 +19,7 @@ import (
 	"encoding/binary"
 	"encoding/gob"
 	"encoding/json"
+	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -27,7 +28,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/vmihailenco/msgpack"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var (
@@ -77,6 +78,13 @@ type MapUnmarshaler interface {
 	UnmarshalMap(map[string]interface{}) error
 }
 
+var (
+	errFieldKind           = errors.DefineInternal("field_kind", "field value `{field}` is of kind `{kind}`, while `{expected}` was expected")
+	errNilPointerValue     = errors.DefineInternal("nil_pointer_value", "pointer value is nil")
+	errMissingField        = errors.DefineInternal("missing_field", "field `{field}` specified, but does not exist on `{type}` structs")
+	errUnsupportedMapValue = errors.DefineInternal("unsupported_map_value", "unsupported map value of kind `{kind}`")
+)
+
 // UnmarshalMap parses the map-encoded data and stores the result
 // in the value pointed to by v.
 //
@@ -96,7 +104,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 		rv = rv.Elem()
 	}
 	if !rv.IsValid() {
-		return ErrInvalidData.NewWithCause(nil, errors.Errorf("indirected value is nil"))
+		return errNilPointerValue
 	}
 
 	for mk, mv := range m {
@@ -113,7 +121,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 
 			ft := fv.Type()
 			if fv = fv.FieldByName(sk); !fv.IsValid() {
-				return errors.Errorf("field `%s` specified, but does not exist on structs of type `%s`", sk, ft)
+				return errMissingField.WithAttributes("field", sk, "type", ft.String())
 			}
 		}
 
@@ -123,7 +131,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Float32, reflect.Float64, reflect.Bool, reflect.String:
 			if vk != fv.Kind() {
-				return ErrInvalidData.NewWithCause(nil, errors.Errorf("field value `%s` has kind `%s`, when `%s` is expected", mk, fv.Kind(), vk))
+				return errFieldKind.WithAttributes("field", mk, "kind", fv.Kind(), "expected", vk.String())
 			}
 			fv.Set(rmv)
 
@@ -144,11 +152,21 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 			fallthrough
 
 		default:
-			return ErrInvalidData.NewWithCause(nil, errors.Errorf("unmatched map value kind: `%s`", vk))
+			return errUnsupportedMapValue.WithAttributes("kind", vk.String())
 		}
 	}
 	return nil
 }
+
+var (
+	errEmptyByteSlice      = errors.DefineInternal("empty_byte_slice", "empty byte slice specified")
+	errUnsupportedType     = errors.DefineInternal("unsupported_type", "expected `{ev}` or `{pv}` to implement `{type}`")
+	errTypeOverflow        = errors.DefineCorruption("type_overflow", "stored value `{value}` overflows `{type}`")
+	errUnmarshaledDataLeft = errors.DefineCorruption("unmarshaled_data_left", "unmarshaled data left in buffer")
+	errUnmatchedEncoding   = errors.DefineInternal("unmatched_encoding", "unmatched encoding")
+	errUnreadDataLeft      = errors.DefineCorruption("unread_data_left", "unread data left in buffer")
+	errUnsupportedVersion  = errors.DefineInternal("unsupported_version", "unsupported version `{version}`")
+)
 
 // BytesToType decodes []byte value in b into a new value of type typ.
 // BytesToType expects the first byte in b to represent the encoding version
@@ -156,12 +174,12 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 // and attempts to decode accordingly.
 func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 	if len(b) == 0 {
-		return nil, ErrInvalidData.NewWithCause(nil, errors.Errorf("empty byte slice specified"))
+		return nil, errEmptyByteSlice
 	}
 
 	ver := Version(b[0])
 	if ver != DefaultVersion {
-		return nil, errors.Errorf("unsupported version: %d", ver)
+		return nil, errUnsupportedVersion.WithAttributes("version", fmt.Sprintf("0x%X", ver))
 	}
 	b = b[1:]
 
@@ -237,20 +255,20 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		case reflect.Int:
 			v := *(iface.(*int64))
 			if iv.OverflowInt(v) {
-				return nil, errors.Errorf("stored value (%d) overflows %s", v, iv.Type())
+				return nil, errTypeOverflow.WithAttributes("value", v, "type", iv.Type().String())
 			}
 			iv.SetInt(v)
 
 		case reflect.Uint, reflect.Uintptr:
 			v := *(iface.(*uint64))
 			if iv.OverflowUint(v) {
-				return nil, errors.Errorf("stored value (%d) overflows %s", v, iv.Type())
+				return nil, errTypeOverflow.WithAttributes("value", v, "type", iv.Type().String())
 			}
 			iv.SetUint(v)
 		}
 
 		if buf.Len() > 0 {
-			err = errors.New("unread data left in buffer")
+			err = errUnreadDataLeft
 		}
 		return pv.Elem().Interface(), err
 
@@ -264,7 +282,7 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		rv := ev
 		if !ev.Type().Implements(protoMessageType) {
 			if !pv.Type().Implements(protoMessageType) {
-				return nil, errors.Errorf("expected %s or %s to implement %s", ev.Type(), pv.Type(), protoMessageType)
+				return nil, errUnsupportedType.WithAttributes("ev", ev, "pv", pv, "type", protoMessageType)
 			}
 			rv = pv
 		}
@@ -284,7 +302,7 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 
 		b, err := rv.Interface().(msgp.Unmarshaler).UnmarshalMsg(buf.Bytes())
 		if len(b) > 0 {
-			return nil, ErrInvalidData.NewWithCause(nil, errors.New("Unmarshaled data left in buffer"))
+			return nil, errUnmarshaledDataLeft
 		}
 		return pv.Elem().Interface(), err
 
@@ -293,7 +311,7 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		return pv.Elem().Interface(), err
 
 	default:
-		return nil, ErrInvalidData.NewWithCause(nil, errors.Errorf("unmatched encoding"))
+		return nil, errUnmatchedEncoding
 	}
 }
 

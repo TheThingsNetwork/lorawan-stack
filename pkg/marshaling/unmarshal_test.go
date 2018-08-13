@@ -25,7 +25,6 @@ import (
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/marshaling"
 )
 
@@ -139,7 +138,6 @@ func TestUnmarshalMap(t *testing.T) {
 			}
 			err := UnmarshalMap(v.marshaled, rv.Interface())
 			if !a.So(err, should.BeNil) {
-				t.Log(errors.Cause(err))
 				return
 			}
 			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
@@ -161,7 +159,6 @@ func TestUnmarshalByteMap(t *testing.T) {
 			}
 			err := UnmarshalByteMap(v.bytes, rv.Interface())
 			if !a.So(err, should.BeNil) {
-				t.Log(errors.Cause(err))
 				return
 			}
 			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {

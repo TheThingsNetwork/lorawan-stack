@@ -22,7 +22,7 @@ import (
 	"reflect"
 
 	"github.com/gogo/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var (
@@ -118,6 +118,8 @@ func marshalNested(v reflect.Value) (reflect.Value, error) {
 	return v, nil
 }
 
+var errExpectedStruct = errors.DefineCorruption("expected_struct", "expected argument to be a struct, got `{result}` (kind: `{kind}`)")
+
 // marhshal converts the given struct s to a map[string]reflect.Value
 func marshal(v reflect.Value) (m map[string]reflect.Value, err error) {
 	for v.Kind() == reflect.Ptr {
@@ -126,7 +128,7 @@ func marshal(v reflect.Value) (m map[string]reflect.Value, err error) {
 	t := v.Type()
 
 	if t.Kind() != reflect.Struct {
-		return nil, errors.Errorf("Expected argument to be a struct, got %s (kind: %s)", t, t.Kind())
+		return nil, errExpectedStruct.WithAttributes("result", t.String(), "kind", t.Kind().String())
 	}
 
 	m = make(map[string]reflect.Value, t.NumField())
@@ -226,6 +228,8 @@ func binaryEncodable(v reflect.Value) (interface{}, bool) {
 	return nil, false
 }
 
+var errMissingCustomMarshaler = errors.DefineInternal("missing_custom_marshaler", "values of type `{type}` (kind `{kind}`), do not implement custom marshaling")
+
 // ToBytesValue is like ToBytes, but operates on values of type reflect.Value.
 func ToBytesValue(v reflect.Value) (b []byte, err error) {
 	var enc Encoding
@@ -279,7 +283,7 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 		return proto.Marshal(ptr.Interface().(proto.Message))
 
 	case t.Kind() == reflect.Chan, t.Kind() == reflect.Func:
-		return nil, errors.Errorf("Values of type %s (kind %s), which do not implement custom marshaling logic are not supported", t, t.Kind())
+		return nil, errMissingCustomMarshaler.WithAttributes("type", t.String(), "kind", t.Kind().String())
 	}
 
 	enc = GobEncoding

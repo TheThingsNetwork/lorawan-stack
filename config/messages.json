@@ -2177,6 +2177,123 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/marshaling:empty_byte_slice": {
+    "translations": {
+      "en": "empty byte slice specified"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:expected_struct": {
+    "translations": {
+      "en": "expected argument to be a struct, got `{result}` (kind: `{kind}`)"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "marshal.go"
+    }
+  },
+  "error:pkg/marshaling:field_kind": {
+    "translations": {
+      "en": "field value `{field}` is of kind `{kind}`, while `{expected}` was expected"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:missing_custom_marshaler": {
+    "translations": {
+      "en": "values of type `{type}` (kind `{kind}`), do not implement custom marshaling"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "marshal.go"
+    }
+  },
+  "error:pkg/marshaling:missing_field": {
+    "translations": {
+      "en": "field `{field}` specified, but does not exist on `{type}` structs"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:nil_pointer_value": {
+    "translations": {
+      "en": "pointer value is nil"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:type_overflow": {
+    "translations": {
+      "en": "stored value `{value}` overflows `{type}`"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:unmarshaled_data_left": {
+    "translations": {
+      "en": "unmarshaled data left in buffer"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:unmatched_encoding": {
+    "translations": {
+      "en": "unmatched encoding"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:unread_data_left": {
+    "translations": {
+      "en": "unread data left in buffer"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:unsupported_map_value": {
+    "translations": {
+      "en": "unsupported map value of kind `{kind}`"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:unsupported_type": {
+    "translations": {
+      "en": "expected `{ev}` or `{pv}` to implement `{type}`"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
+  "error:pkg/marshaling:unsupported_version": {
+    "translations": {
+      "en": "unsupported version `{version}`"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
+    }
+  },
   "error:pkg/networkserver:channel_index_too_high": {
     "translations": {
       "en": "channel index is too high"

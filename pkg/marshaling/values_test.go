@@ -18,13 +18,14 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/vmihailenco/msgpack"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	. "go.thethings.network/lorawan-stack/pkg/marshaling"
 )
 
@@ -118,10 +119,10 @@ func (m ProtoMarshaler) Marshal() ([]byte, error) {
 
 func (m *ProtoMarshaler) Unmarshal(b []byte) error {
 	if len(b) != 2 {
-		return errors.Errorf("Encoded length must be 2, got %d", len(b))
+		return errors.New(fmt.Sprintf("Encoded length must be 2, got %d", len(b)))
 	}
 	if Encoding(b[1]) != ProtoEncoding {
-		return errors.Errorf("Second byte must be %d, got %d", ProtoEncoding, b[1])
+		return errors.New(fmt.Sprintf("Second byte must be %d, got %d", ProtoEncoding, b[1]))
 	}
 	*m = ProtoMarshaler{
 		a: int(b[0]),
@@ -582,7 +583,7 @@ var structValues = []struct {
 func bigEndianEncoded(v interface{}) []byte {
 	conv, ok := BinaryEncodable(reflect.ValueOf(v))
 	if !ok {
-		panic(errors.Errorf("can't encode value of type %T as binary", v))
+		panic(errors.New(fmt.Sprintf("can't encode value of type %T as binary", v)))
 	}
 
 	if conv == nil {
