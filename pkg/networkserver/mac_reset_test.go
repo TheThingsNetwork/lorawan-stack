@@ -21,7 +21,6 @@ import (
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -32,15 +31,10 @@ import (
 var frequencyPlansStore *frequencyplans.Store
 
 func TestMain(t *testing.M) {
-	testFPS := test.Must(test.NewFrequencyPlansStore()).(test.FrequencyPlansStore)
-
-	frequencyPlansStore = (&config.FrequencyPlans{
-		StoreDirectory: testFPS.Directory(),
-	}).Store()
+	frequencyPlansStore = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 	ret := t.Run()
 
-	test.Must(nil, testFPS.Destroy())
 	os.Exit(ret)
 }
 

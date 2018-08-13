@@ -456,7 +456,7 @@ type windowEnd struct {
 	ch  chan<- time.Time
 }
 
-func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
+func HandleUplinkTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
@@ -464,13 +464,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), conf),
+			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
 				Registry:            reg,
 				JoinServers:         nil,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
 			})).(*NetworkServer)
+		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 		test.Must(nil, ns.Start())
 
 		_, err := reg.Create(&ttnpb.EndDevice{
@@ -1151,7 +1152,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				collectionDoneCh := make(chan windowEnd, 1)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), conf),
+					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
 						Registry:            reg,
 						DeduplicationWindow: 42,
@@ -1168,6 +1169,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						return ch
 					}),
 				)).(*NetworkServer)
+				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 				test.Must(nil, ns.Start())
 
 				asSendCh := make(chan *ttnpb.ApplicationUp)
@@ -1492,7 +1494,7 @@ func (c *MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyR
 	return c.GetNwkSKeysFunc(ctx, req, opts...)
 }
 
-func HandleJoinTest(conf *component.Config) func(t *testing.T) {
+func HandleJoinTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
@@ -1500,13 +1502,14 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), conf),
+			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
 				Registry:            reg,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
 			},
 		)).(*NetworkServer)
+		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 		test.Must(nil, ns.Start())
 
 		_, err := ns.HandleUplink(authorizedCtx, ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
@@ -1714,7 +1717,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				handleJoinCh := make(chan handleJoinRequest, 1)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), conf),
+					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
 						Registry: reg,
 						JoinServers: []ttnpb.NsJsClient{&MockNsJsClient{
@@ -1748,6 +1751,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						return &MockNsGsClient{}, nil
 					}),
 				)).(*NetworkServer)
+				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 
 				test.Must(nil, ns.Start())
 
@@ -2020,7 +2024,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 	}
 }
 
-func HandleRejoinTest(conf *component.Config) func(t *testing.T) {
+func HandleRejoinTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	}
@@ -2029,23 +2033,11 @@ func HandleRejoinTest(conf *component.Config) func(t *testing.T) {
 func TestHandleUplink(t *testing.T) {
 	a := assertions.New(t)
 
-	fpStore, err := test.NewFrequencyPlansStore()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer fpStore.Destroy()
-
 	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
-
-	conf := &component.Config{ServiceBase: config.ServiceBase{
-		FrequencyPlans: config.FrequencyPlans{
-			StoreDirectory: fpStore.Directory(),
-		},
-	}}
 
 	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), conf),
+		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:            reg,
 			JoinServers:         nil,
@@ -2058,7 +2050,7 @@ func TestHandleUplink(t *testing.T) {
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = nil
-	_, err = ns.HandleUplink(authorizedCtx, msg)
+	_, err := ns.HandleUplink(authorizedCtx, msg)
 	a.So(err, should.NotBeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
@@ -2072,7 +2064,7 @@ func TestHandleUplink(t *testing.T) {
 	_, err = ns.HandleUplink(authorizedCtx, msg)
 	a.So(err, should.NotBeNil)
 
-	t.Run("Uplink", HandleUplinkTest(conf))
-	t.Run("Join", HandleJoinTest(conf))
-	t.Run("Rejoin", HandleRejoinTest(conf))
+	t.Run("Uplink", HandleUplinkTest())
+	t.Run("Join", HandleJoinTest())
+	t.Run("Rejoin", HandleRejoinTest())
 }

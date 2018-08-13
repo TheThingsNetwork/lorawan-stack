@@ -26,7 +26,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -511,18 +510,9 @@ func TestScheduleDownlink(t *testing.T) {
 
 			a := assertions.New(t)
 
-			fpStore, err := test.NewFrequencyPlansStore()
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			defer fpStore.Destroy()
-
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t),
-					&component.Config{ServiceBase: config.ServiceBase{
-						FrequencyPlans: config.FrequencyPlans{
-							StoreDirectory: fpStore.Directory(),
-						}}},
+					&component.Config{},
 				),
 				&Config{
 					Registry:            deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New())),
@@ -534,6 +524,7 @@ func TestScheduleDownlink(t *testing.T) {
 				WithDeduplicationDoneFunc(tc.DeduplicationDone),
 			)).(*NetworkServer)
 			test.Must(nil, ns.Start())
+			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 
 			ctx = context.WithValue(ctx, nsKey{}, ns)
 
@@ -541,7 +532,7 @@ func TestScheduleDownlink(t *testing.T) {
 			up := deepcopy.Copy(tc.Uplink).(*ttnpb.UplinkMessage)
 			b := deepcopy.Copy(tc.Bytes).([]byte)
 
-			err = ns.scheduleDownlink(ctx, dev, up, tc.Accumulator, b, tc.IsJoinAccept)
+			err := ns.scheduleDownlink(ctx, dev, up, tc.Accumulator, b, tc.IsJoinAccept)
 			if tc.Error == nil && !a.So(err, should.BeNil) ||
 				tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) {
 				t.FailNow()
