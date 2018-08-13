@@ -14,14 +14,28 @@
 
 package gatewayserver
 
-// MQTTConfig of the Gateway Server.
+import "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+
+// MQTTConfig contains MQTT configuration of the Gateway Server.
 type MQTTConfig struct {
-	Listen    string `name:"listen" description:"Address for the MQTT endpoint to listen on"`
-	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS endpoint to listen on"`
+	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
+}
+
+// UDPConfig defines the UDP configuration of the Gateway Server.
+type UDPConfig struct {
+	udp.Config
+	Listeners []UDPListener `name:"listeners" description:"Listener configuration"`
+}
+
+// UDPListener defines a UDP listener of the Gateway Server.
+type UDPListener struct {
+	Listen                  string `name:"listen" description:"Address for the UDP frontend to listen on"`
+	FallbackFrequencyPlanID string `name:"fallback-frequency-plan-id" description:"Frequency plan ID when the gateway is not registered"`
 }
 
 // Config represents the Gateway Server configuration.
 type Config struct {
-	UDPAddress string     `name:"udp.listen" description:"Address for the UDP endpoint to listen on"`
-	MQTT       MQTTConfig `name:"mqtt"`
+	MQTT MQTTConfig `name:"mqtt"`
+	UDP  UDPConfig  `name:"udp"`
 }
