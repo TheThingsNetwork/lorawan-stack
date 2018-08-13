@@ -30,13 +30,27 @@ func TestAES128(t *testing.T) {
 		0x52, 0x31, 0x0B, 0x53, 0x3A, 0xB7, 0x38, 0x01,
 	}
 
+	a.So(aes.IsZero(), should.BeFalse)
+
 	// JSON
 	{
 		jsonBytes, err := json.Marshal(aes)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
+		a.So(err, should.BeNil)
 		jsonContent := string(jsonBytes)
 		a.So(jsonContent, should.ContainSubstring, "1234AE003AB7380152310B533AB73801")
+		var unmarshaledKey AES128Key
+		a.So(unmarshaledKey.UnmarshalJSON(jsonBytes), should.BeNil)
+		a.So(aes.Equal(unmarshaledKey), should.BeTrue)
+	}
+
+	// Text
+	{
+		textBytes, err := aes.MarshalText()
+		a.So(err, should.BeNil)
+		textContent := string(textBytes)
+		a.So(textContent, should.Equal, "1234AE003AB7380152310B533AB73801")
+		var unmarshaledKey AES128Key
+		a.So(unmarshaledKey.UnmarshalText(textBytes), should.BeNil)
+		a.So(aes.Equal(unmarshaledKey), should.BeTrue)
 	}
 }

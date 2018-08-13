@@ -56,4 +56,13 @@ func TestEUI64(t *testing.T) {
 		jsonContent = string(jsonBytes)
 		a.So(jsonContent, should.ContainSubstring, "2600000000000000/7")
 	}
+
+	// Number unmarshalling
+	{
+		number := eui.MarshalNumber()
+		a.So(number, should.Equal, uint64(2743312668105523778))
+		unmarshaledEui := EUI64{}
+		unmarshaledEui.UnmarshalNumber(number)
+		a.So(unmarshaledEui, should.Equal, eui)
+	}
 }
