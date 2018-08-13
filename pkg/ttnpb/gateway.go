@@ -17,9 +17,10 @@ package ttnpb
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 const (
@@ -111,11 +112,16 @@ func (p GatewayPrivacySettings) Value() (driver.Value, error) {
 	return strings.Join(settings, ","), nil
 }
 
+var errInvalidType = errors.DefineInvalidArgument("type", "got `{result}` instead of `{expected}`")
+
 // Scan implements sql.Scanner interface.
 func (p *GatewayPrivacySettings) Scan(src interface{}) error {
 	str, ok := src.(string)
 	if !ok {
-		return errors.Errorf("Invalid type assertion. Got %T instead of string", src)
+		return errInvalidType.WithAttributes(
+			"expected", "string",
+			"result", fmt.Sprintf("%T", src),
+		)
 	}
 
 	for _, part := range strings.Split(str, ",") {
@@ -146,7 +152,10 @@ func (p GatewayRadio_TxConfiguration) Value() (driver.Value, error) {
 func (p *GatewayRadio_TxConfiguration) Scan(src interface{}) error {
 	str, ok := src.(string)
 	if !ok {
-		return errors.Errorf("Invalid type assertion. Got %T instead of string", src)
+		return errInvalidType.WithAttributes(
+			"expected", "string",
+			"result", fmt.Sprintf("%T", src),
+		)
 	}
 
 	var values []uint64

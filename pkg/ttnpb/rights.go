@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/jsonpb"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var (
@@ -71,11 +71,15 @@ func AllGatewayRights() []Right { return gatewayRights }
 // AllOrganizationRights is the set that contains all the rights that are to organizations.
 func AllOrganizationRights() []Right { return organizationRights }
 
+var errUnknownRight = unexpectedValue(
+	errors.DefineInvalidArgument("unknown_right", "unknown right", valueKey),
+)
+
 // ParseRight parses the string specified into a Right.
 func ParseRight(str string) (Right, error) {
 	val, ok := Right_value[str]
 	if !ok {
-		return Right(0), errors.Errorf("Could not parse right `%s`", str)
+		return Right(0), errUnknownRight(str)
 	}
 	return Right(val), nil
 }

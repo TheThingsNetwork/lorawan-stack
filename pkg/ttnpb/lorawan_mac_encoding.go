@@ -23,13 +23,9 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 )
-
-func newLengthUnequalError(want, got int) error {
-	return errors.Errorf("expected length to equal %d, got %d", want, got)
-}
 
 func boolToByte(b bool) byte {
 	if b {
@@ -269,7 +265,7 @@ func Uint32ToADRAckDelayExponent(v uint32) ADRAckDelayExponent {
 // AppendLoRaWAN appends the marshaled ResetInd payload to the slice.
 func (cmd *MACCommand_ResetInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.MinorVersion > 15 {
-		return nil, errors.Errorf("expected MinorVersion to be less or equal to 15, got %d", cmd.MinorVersion)
+		return nil, errExpectedLowerOrEqual("MinorVersion", 15)(cmd.MinorVersion)
 	}
 	dst = append(dst, byte(cmd.MinorVersion))
 	return dst, nil
@@ -278,7 +274,7 @@ func (cmd *MACCommand_ResetInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the ResetInd payload.
 func (cmd *MACCommand_ResetInd) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("ResetInd", 1)(len(b))
 	}
 	cmd.MinorVersion = uint32(b[0] & 0xf)
 	return nil
@@ -300,7 +296,7 @@ func (pld *MACCommand_ResetInd_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled ResetConf payload to the slice.
 func (cmd *MACCommand_ResetConf) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.MinorVersion > 15 {
-		return nil, errors.Errorf("expected MinorVersion to be less or equal to 15, got %d", cmd.MinorVersion)
+		return nil, errExpectedLowerOrEqual("MinorVersion", 15)(cmd.MinorVersion)
 	}
 	dst = append(dst, byte(cmd.MinorVersion))
 	return dst, nil
@@ -309,7 +305,7 @@ func (cmd *MACCommand_ResetConf) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the ResetConf payload.
 func (cmd *MACCommand_ResetConf) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("ResetConf", 1)(len(b))
 	}
 	cmd.MinorVersion = uint32(b[0] & 0xf)
 	return nil
@@ -328,10 +324,10 @@ func (cmd *MACCommand_ResetConf_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled LinkCheckAns payload to the slice.
 func (cmd *MACCommand_LinkCheckAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Margin > 254 {
-		return nil, errors.Errorf("expected Margin to be less or equal to 254, got %d", cmd.Margin)
+		return nil, errExpectedLowerOrEqual("Margin", 254)(cmd.Margin)
 	}
 	if cmd.GatewayCount > 255 {
-		return nil, errors.Errorf("expected GatewayCount to be less or equal to 255, got %d", cmd.GatewayCount)
+		return nil, errExpectedLowerOrEqual("GatewayCount", 255)(cmd.GatewayCount)
 	}
 	dst = append(dst, byte(cmd.Margin), byte(cmd.GatewayCount))
 	return dst, nil
@@ -340,7 +336,7 @@ func (cmd *MACCommand_LinkCheckAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the LinkCheckAns payload.
 func (cmd *MACCommand_LinkCheckAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 2 {
-		return newLengthUnequalError(2, len(b))
+		return errExpectedLengthEqual("LinkCheckAns", 2)(len(b))
 	}
 	cmd.Margin = uint32(b[0])
 	cmd.GatewayCount = uint32(b[1])
@@ -360,19 +356,19 @@ func (cmd *MACCommand_LinkCheckAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled LinkADRReq payload to the slice.
 func (cmd *MACCommand_LinkADRReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.DataRateIndex > 15 {
-		return nil, errors.Errorf("expected DataRateIndex to be less or equal to 15, got %d", cmd.DataRateIndex)
+		return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(cmd.DataRateIndex)
 	}
 	if cmd.TxPowerIndex > 15 {
-		return nil, errors.Errorf("expected TxPowerIndex to be less or equal to 15, got %d", cmd.TxPowerIndex)
+		return nil, errExpectedLowerOrEqual("TxPowerIndex", 15)(cmd.TxPowerIndex)
 	}
 	if len(cmd.ChannelMask) > 16 {
-		return nil, errors.Errorf("expected ChannelMask to be shorter or equal to 16, got %d", len(cmd.ChannelMask))
+		return nil, errExpectedLowerOrEqual("length of ChannelMask", "16 bits")(len(cmd.ChannelMask))
 	}
 	if cmd.ChannelMaskControl > 7 {
-		return nil, errors.Errorf("expected ChannelMaskControl to be less or equal to 7, got %d", cmd.ChannelMaskControl)
+		return nil, errExpectedLowerOrEqual("ChannelMaskControl", 7)(cmd.ChannelMaskControl)
 	}
 	if cmd.NbTrans > 15 {
-		return nil, errors.Errorf("expected NbTrans to be less or equal to 15, got %d", cmd.NbTrans)
+		return nil, errExpectedLowerOrEqual("NbTrans", 15)(cmd.NbTrans)
 	}
 	dst = append(dst, byte((cmd.DataRateIndex&0xf)<<4)^byte(cmd.TxPowerIndex&0xf))
 	chMask := make([]byte, 2)
@@ -387,7 +383,7 @@ func (cmd *MACCommand_LinkADRReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the LinkADRReq payload.
 func (cmd *MACCommand_LinkADRReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 4 {
-		return newLengthUnequalError(4, len(b))
+		return errExpectedLengthEqual("LinkADRReq", 4)(len(b))
 	}
 	cmd.DataRateIndex = DataRateIndex(b[0] >> 4)
 	cmd.TxPowerIndex = uint32(b[0] & 0xf)
@@ -432,7 +428,7 @@ func (cmd *MACCommand_LinkADRAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the LinkADRAns payload.
 func (cmd *MACCommand_LinkADRAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("LinkADRAns", 1)(len(b))
 	}
 	cmd.ChannelMaskAck = b[0]&1 == 1
 	cmd.DataRateIndexAck = (b[0]>>1)&1 == 1
@@ -453,7 +449,7 @@ func (cmd *MACCommand_LinkADRAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled DutyCycleReq payload to the slice.
 func (cmd *MACCommand_DutyCycleReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.MaxDutyCycle > 15 {
-		return nil, errors.Errorf("expected MaxDutyCycle to be less or equal to 15, got %d", cmd.MaxDutyCycle)
+		return nil, errExpectedLowerOrEqual("MaxDutyCycle", 15)(cmd.MaxDutyCycle)
 	}
 	dst = append(dst, byte(cmd.MaxDutyCycle))
 	return dst, nil
@@ -462,7 +458,7 @@ func (cmd *MACCommand_DutyCycleReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DutyCycleReq payload.
 func (cmd *MACCommand_DutyCycleReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("DutyCycleReq", 1)(len(b))
 	}
 	cmd.MaxDutyCycle = AggregatedDutyCycle(b[0] & 0xf)
 	return nil
@@ -481,14 +477,14 @@ func (cmd *MACCommand_DutyCycleReq_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled RxParamSetupReq payload to the slice.
 func (cmd *MACCommand_RxParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Rx1DataRateOffset > 7 {
-		return nil, errors.Errorf("expected Rx1DROffset to be less or equal to 7, got %d", cmd.Rx1DataRateOffset)
+		return nil, errExpectedLowerOrEqual("Rx1DROffset", 7)(cmd.Rx1DataRateOffset)
 	}
 	if cmd.Rx2DataRateIndex > 15 {
-		return nil, errors.Errorf("expected Rx2DR to be less or equal to 15, got %d", cmd.Rx2DataRateIndex)
+		return nil, errExpectedLowerOrEqual("Rx2DR", 15)(cmd.Rx2DataRateIndex)
 	}
 	dst = append(dst, byte(cmd.Rx2DataRateIndex)|byte(cmd.Rx1DataRateOffset<<4))
 	if cmd.Rx2Frequency < 100000 || cmd.Rx2Frequency > maxUint24*100 {
-		return nil, errors.Errorf("expected Rx2Frequency to be between %d and %d, got %d", 100000, maxUint24*100, cmd.Rx2Frequency)
+		return nil, errExpectedBetween("Rx2Frequency", 100000, maxUint24*100)(cmd.Rx2Frequency)
 	}
 	dst = appendUint64(dst, cmd.Rx2Frequency/100, 3)
 	return dst, nil
@@ -497,7 +493,7 @@ func (cmd *MACCommand_RxParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error)
 // UnmarshalLoRaWAN unmarshals the RxParamSetupReq payload.
 func (cmd *MACCommand_RxParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 4 {
-		return newLengthUnequalError(4, len(b))
+		return errExpectedLengthEqual("RxParamSetupReq", 4)(len(b))
 	}
 	cmd.Rx1DataRateOffset = uint32((b[0] >> 4) & 0x7)
 	cmd.Rx2DataRateIndex = DataRateIndex(b[0] & 0xf)
@@ -534,7 +530,7 @@ func (cmd *MACCommand_RxParamSetupAns) AppendLoRaWAN(dst []byte) ([]byte, error)
 // UnmarshalLoRaWAN unmarshals the RxParamSetupAns payload.
 func (cmd *MACCommand_RxParamSetupAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("RxParamSetupAns", 1)(len(b))
 	}
 	cmd.Rx2FrequencyAck = b[0]&1 == 1
 	cmd.Rx2DataRateIndexAck = (b[0]>>1)&1 == 1
@@ -555,10 +551,10 @@ func (cmd *MACCommand_RxParamSetupAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled DevStatusAns payload to the slice.
 func (cmd *MACCommand_DevStatusAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Battery > math.MaxUint8 {
-		return nil, errors.Errorf("expected Battery to be less or equal to %d, got %d", math.MaxUint8, cmd.Battery)
+		return nil, errExpectedLowerOrEqual("Battery", math.MaxUint8)(math.MaxUint8)
 	}
 	if cmd.Margin < -32 || cmd.Margin > 31 {
-		return nil, errors.Errorf("expected Margin to be between -32 and 31, got %d", cmd.Margin)
+		return nil, errExpectedBetween("Margin", -32, 31)(cmd.Margin)
 	}
 	dst = append(dst, byte(cmd.Battery))
 	if cmd.Margin < 0 {
@@ -572,7 +568,7 @@ func (cmd *MACCommand_DevStatusAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DevStatusAns payload.
 func (cmd *MACCommand_DevStatusAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 2 {
-		return newLengthUnequalError(2, len(b))
+		return errExpectedLengthEqual("DevStatusAns", 2)(len(b))
 	}
 	cmd.Battery = uint32(b[0])
 	margin := int32(b[1] & 0x1f)
@@ -596,22 +592,22 @@ func (cmd *MACCommand_DevStatusAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled NewChannelReq payload to the slice.
 func (cmd *MACCommand_NewChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.ChannelIndex > math.MaxUint8 {
-		return nil, errors.Errorf("expected ChannelIndex to be less or equal to %d, got %d", math.MaxUint8, cmd.ChannelIndex)
+		return nil, errExpectedLowerOrEqual("ChannelIndex", math.MaxUint8)(cmd.ChannelIndex)
 	}
 	dst = append(dst, byte(cmd.ChannelIndex))
 
 	if cmd.Frequency > maxUint24*100 {
-		return nil, errors.Errorf("expected Frequency to be less or equal to %d, got %d", maxUint24*100, cmd.Frequency)
+		return nil, errExpectedLowerOrEqual("Frequency", maxUint24*100)(cmd.Frequency)
 	}
 	dst = appendUint64(dst, cmd.Frequency/100, 3)
 
 	if cmd.MinDataRateIndex > 15 {
-		return nil, errors.Errorf("expected MinDataRateIndex to be less or equal to %d, got %d", 15, cmd.MinDataRateIndex)
+		return nil, errExpectedLowerOrEqual("MinDataRateIndex", 15)(cmd.MinDataRateIndex)
 	}
 	b := byte(cmd.MinDataRateIndex)
 
 	if cmd.MaxDataRateIndex > 15 {
-		return nil, errors.Errorf("expected MaxDataRateIndex to be less or equal to %d, got %d", 15, cmd.MaxDataRateIndex)
+		return nil, errExpectedLowerOrEqual("MaxDataRateIndex", 15)(cmd.MaxDataRateIndex)
 	}
 	b |= byte(cmd.MaxDataRateIndex) << 4
 	dst = append(dst, b)
@@ -621,7 +617,7 @@ func (cmd *MACCommand_NewChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the NewChannelReq payload.
 func (cmd *MACCommand_NewChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 5 {
-		return newLengthUnequalError(5, len(b))
+		return errExpectedLengthEqual("NewChannelReq", 5)(len(b))
 	}
 	cmd.ChannelIndex = uint32(b[0])
 	cmd.Frequency = parseUint64(b[1:4]) * 100
@@ -656,7 +652,7 @@ func (cmd *MACCommand_NewChannelAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the NewChannelAns payload.
 func (cmd *MACCommand_NewChannelAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("NewChannelAns", 1)(len(b))
 	}
 	cmd.FrequencyAck = b[0]&1 == 1
 	cmd.DataRateAck = (b[0]>>1)&1 == 1
@@ -676,12 +672,12 @@ func (cmd *MACCommand_NewChannelAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled DLChannelReq payload to the slice.
 func (cmd *MACCommand_DLChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.ChannelIndex > math.MaxUint8 {
-		return nil, errors.Errorf("expected ChannelIndex to be less or equal to %d, got %d", math.MaxUint8, cmd.ChannelIndex)
+		return nil, errExpectedLowerOrEqual("ChannelIndex", math.MaxUint8)(cmd.ChannelIndex)
 	}
 	dst = append(dst, byte(cmd.ChannelIndex))
 
 	if cmd.Frequency < 100000 || cmd.Frequency > maxUint24*100 {
-		return nil, errors.Errorf("expected Frequency to be between %d and %d, got %d", 100000, maxUint24*100, cmd.Frequency)
+		return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(cmd.Frequency)
 	}
 	dst = appendUint64(dst, cmd.Frequency/100, 3)
 	return dst, nil
@@ -690,7 +686,7 @@ func (cmd *MACCommand_DLChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DLChannelReq payload.
 func (cmd *MACCommand_DLChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 4 {
-		return newLengthUnequalError(4, len(b))
+		return errExpectedLengthEqual("DLChannelReq", 4)(len(b))
 	}
 	cmd.ChannelIndex = uint32(b[0])
 	cmd.Frequency = parseUint64(b[1:4]) * 100
@@ -723,7 +719,7 @@ func (cmd *MACCommand_DLChannelAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DLChannelAns payload.
 func (cmd *MACCommand_DLChannelAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("DLChannelAns", 1)(len(b))
 	}
 	cmd.ChannelIndexAck = b[0]&1 == 1
 	cmd.FrequencyAck = (b[0]>>1)&1 == 1
@@ -743,7 +739,7 @@ func (cmd *MACCommand_DlChannelAns) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled RxTimingSetupReq payload to the slice.
 func (cmd *MACCommand_RxTimingSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Delay > 15 {
-		return nil, errors.Errorf("expected Delay to be less or equal to %d, got %d", 15, cmd.Delay)
+		return nil, errExpectedLowerOrEqual("Delay", 15)(cmd.Delay)
 	}
 	dst = append(dst, byte(cmd.Delay))
 	return dst, nil
@@ -752,7 +748,7 @@ func (cmd *MACCommand_RxTimingSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error
 // UnmarshalLoRaWAN unmarshals the RxTimingSetupReq payload.
 func (cmd *MACCommand_RxTimingSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("RxTimingSetupReq", 1)(len(b))
 	}
 	cmd.Delay = uint32(b[0] & 0xf)
 	return nil
@@ -784,7 +780,7 @@ func (cmd *MACCommand_TxParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error)
 // UnmarshalLoRaWAN unmarshals the TxParamSetupReq payload.
 func (cmd *MACCommand_TxParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("TxParamSetupReq", 1)(len(b))
 	}
 
 	cmd.MaxEIRPIndex = DeviceEIRP(b[0] & 0xf)
@@ -806,7 +802,7 @@ func (cmd *MACCommand_TxParamSetupReq_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled RekeyInd payload to the slice.
 func (cmd *MACCommand_RekeyInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.MinorVersion > 15 {
-		return nil, errors.Errorf("expected MinorVersion to be less or equal to 15, got %d", cmd.MinorVersion)
+		return nil, errExpectedLowerOrEqual("MinorVersion", 15)(cmd.MinorVersion)
 	}
 	dst = append(dst, byte(cmd.MinorVersion))
 	return dst, nil
@@ -815,7 +811,7 @@ func (cmd *MACCommand_RekeyInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the RekeyInd payload.
 func (cmd *MACCommand_RekeyInd) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("RekeyInd", 1)(len(b))
 	}
 	cmd.MinorVersion = uint32(b[0] & 0xf)
 	return nil
@@ -834,7 +830,7 @@ func (cmd *MACCommand_RekeyInd_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled RekeyConf payload to the slice.
 func (cmd *MACCommand_RekeyConf) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.MinorVersion > 15 {
-		return nil, errors.Errorf("expected MinorVersion to be less or equal to 15, got %d", cmd.MinorVersion)
+		return nil, errExpectedLowerOrEqual("MinorVersion", 15)(cmd.MinorVersion)
 	}
 	dst = append(dst, byte(cmd.MinorVersion))
 	return dst, nil
@@ -843,7 +839,7 @@ func (cmd *MACCommand_RekeyConf) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the RekeyConf payload.
 func (cmd *MACCommand_RekeyConf) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("RekeyConf", 1)(len(b))
 	}
 	cmd.MinorVersion = uint32(b[0] & 0xf)
 	return nil
@@ -862,12 +858,12 @@ func (cmd *MACCommand_RekeyConf_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled ADRParamSetupReq payload to the slice.
 func (cmd *MACCommand_ADRParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if 1 > cmd.ADRAckDelayExponent || cmd.ADRAckDelayExponent > 32768 {
-		return nil, errors.Errorf("expected ADRAckDelay to be between 1 and 32768, got %d", cmd.ADRAckDelayExponent)
+		return nil, errExpectedBetween("ADRAckDelay", 1, 32768)(cmd.ADRAckDelayExponent)
 	}
 	b := byte(cmd.ADRAckDelayExponent)
 
 	if 1 > cmd.ADRAckLimitExponent || cmd.ADRAckLimitExponent > 32768 {
-		return nil, errors.Errorf("expected ADRAckLimit to be between 1 and 32768, got %d", cmd.ADRAckLimitExponent)
+		return nil, errExpectedBetween("ADRAckLimit", 1, 32768)(cmd.ADRAckLimitExponent)
 	}
 	b |= byte(cmd.ADRAckLimitExponent) << 4
 
@@ -878,7 +874,7 @@ func (cmd *MACCommand_ADRParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error
 // UnmarshalLoRaWAN unmarshals the ADRParamSetupReq payload.
 func (cmd *MACCommand_ADRParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("ADRParamSetupReq", 1)(len(b))
 	}
 	cmd.ADRAckDelayExponent = ADRAckDelayExponent(b[0] & 0xf)
 	cmd.ADRAckLimitExponent = ADRAckLimitExponent(b[0] >> 4)
@@ -905,7 +901,7 @@ const maxGPSTime int64 = 1<<32 - 1
 func (cmd *MACCommand_DeviceTimeAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	sec := gpstime.ToGPS(cmd.Time)
 	if sec > maxGPSTime {
-		return nil, errors.Errorf("expected GPS time to be less or equal to %d, got %d", maxGPSTime, sec)
+		return nil, errExpectedLowerOrEqual("Time", maxGPSTime)(sec)
 	}
 	dst = appendUint32(dst, uint32(sec), 4)
 	dst = append(dst, byte(time.Duration(cmd.Time.Nanosecond())/fractStep))
@@ -915,7 +911,7 @@ func (cmd *MACCommand_DeviceTimeAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DeviceTimeAns payload.
 func (cmd *MACCommand_DeviceTimeAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 5 {
-		return newLengthUnequalError(5, len(b))
+		return errExpectedLengthEqual("DeviceTimeAns", 5)(len(b))
 	}
 	cmd.Time = gpstime.Parse(int64(parseUint32(b[0:4])))
 	cmd.Time = cmd.Time.Add(time.Duration(b[4]) * fractStep)
@@ -935,25 +931,25 @@ func (cmd *MACCommand_DeviceTimeAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled ForceRejoinReq payload to the slice.
 func (cmd *MACCommand_ForceRejoinReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.PeriodExponent > 7 {
-		return nil, errors.Errorf("expected PeriodExponent to be less or equal to 7, got %d", cmd.PeriodExponent)
+		return nil, errExpectedLowerOrEqual("PeriodExponent", 7)(cmd.PeriodExponent)
 	}
 	// First byte
 	b := byte(cmd.PeriodExponent) << 3
 
 	if cmd.MaxRetries > 7 {
-		return nil, errors.Errorf("expected MaxRetries to be less or equal to 7, got %d", cmd.MaxRetries)
+		return nil, errExpectedLowerOrEqual("MaxRetries", 7)(cmd.MaxRetries)
 	}
 	b |= byte(cmd.MaxRetries)
 	dst = append(dst, b)
 
 	if cmd.RejoinType > 7 {
-		return nil, errors.Errorf("expected RejoinType to be less or equal to 7, got %d", cmd.RejoinType)
+		return nil, errExpectedLowerOrEqual("RejoinType", 7)(cmd.RejoinType)
 	}
 	// Second byte
 	b = byte(cmd.RejoinType) << 4
 
 	if cmd.DataRateIndex > 15 {
-		return nil, errors.Errorf("expected DataRateIndex to be less or equal to 15, got %d", cmd.DataRateIndex)
+		return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(cmd.DataRateIndex)
 	}
 	b |= byte(cmd.DataRateIndex)
 	dst = append(dst, b)
@@ -963,7 +959,7 @@ func (cmd *MACCommand_ForceRejoinReq) AppendLoRaWAN(dst []byte) ([]byte, error) 
 // UnmarshalLoRaWAN unmarshals the ForceRejoinReq payload.
 func (cmd *MACCommand_ForceRejoinReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 2 {
-		return newLengthUnequalError(2, len(b))
+		return errExpectedLengthEqual("ForceRejoinReq", 2)(len(b))
 	}
 	cmd.PeriodExponent = uint32(b[0] >> 3)
 	cmd.MaxRetries = uint32(b[0] & 0x7)
@@ -985,12 +981,12 @@ func (cmd *MACCommand_ForceRejoinReq_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled RejoinParamSetupReq payload to the slice.
 func (cmd *MACCommand_RejoinParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.MaxTimeExponent > 15 {
-		return nil, errors.Errorf("expected MaxTimeExponent to be less or equal to 15, got %d", cmd.MaxTimeExponent)
+		return nil, errExpectedLowerOrEqual("MaxTimeExponent", 15)(cmd.MaxTimeExponent)
 	}
 	b := byte(cmd.MaxTimeExponent) << 4
 
 	if cmd.MaxCountExponent > 15 {
-		return nil, errors.Errorf("expected MaxCountExponent to be less or equal to 15, got %d", cmd.MaxCountExponent)
+		return nil, errExpectedLowerOrEqual("MaxCountExponent", 15)(cmd.MaxCountExponent)
 	}
 	b |= byte(cmd.MaxCountExponent)
 	dst = append(dst, b)
@@ -1000,7 +996,7 @@ func (cmd *MACCommand_RejoinParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, er
 // UnmarshalLoRaWAN unmarshals the RejoinParamSetupReq payload.
 func (cmd *MACCommand_RejoinParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("RejoinParamSetupReq", 1)(len(b))
 	}
 	cmd.MaxTimeExponent = RejoinTimeExponent(uint32(b[0] >> 4))
 	cmd.MaxCountExponent = RejoinCountExponent(uint32(b[0] & 0xf))
@@ -1030,7 +1026,7 @@ func (cmd *MACCommand_RejoinParamSetupAns) AppendLoRaWAN(dst []byte) ([]byte, er
 // UnmarshalLoRaWAN unmarshals the RejoinParamSetupAns payload.
 func (cmd *MACCommand_RejoinParamSetupAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("RejoinParamSetupAns", 1)(len(b))
 	}
 	cmd.MaxTimeExponentAck = b[0]&1 == 1
 	return nil
@@ -1049,7 +1045,7 @@ func (cmd *MACCommand_RejoinParamSetupAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled PingSlotInfoReq payload to the slice.
 func (cmd *MACCommand_PingSlotInfoReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Period > 7 {
-		return nil, errors.Errorf("expected Period to be less or equal to 7, got %d", cmd.Period)
+		return nil, errExpectedLowerOrEqual("Period", 15)(cmd.Period)
 	}
 	dst = append(dst, byte(cmd.Period))
 	return dst, nil
@@ -1058,7 +1054,7 @@ func (cmd *MACCommand_PingSlotInfoReq) AppendLoRaWAN(dst []byte) ([]byte, error)
 // UnmarshalLoRaWAN unmarshals the PingSlotInfoReq payload.
 func (cmd *MACCommand_PingSlotInfoReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("PingSlotInfoReq", 1)(len(b))
 	}
 	cmd.Period = PingSlotPeriod(b[0] & 0x7)
 	return nil
@@ -1077,12 +1073,12 @@ func (cmd *MACCommand_PingSlotInfoReq_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled PingSlotChannelReq payload to the slice.
 func (cmd *MACCommand_PingSlotChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Frequency > maxUint24 {
-		return nil, errors.Errorf("expected Frequency to be less or equal to %d, got %d", maxUint24, cmd.Frequency)
+		return nil, errExpectedLowerOrEqual("Frequency", maxUint24)(cmd.Frequency)
 	}
 	dst = appendUint64(dst, cmd.Frequency, 3)
 
 	if cmd.DataRateIndex > 15 {
-		return nil, errors.Errorf("expected DataRateIndex to be less or equal to 15, got %d", cmd.DataRateIndex)
+		return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(cmd.DataRateIndex)
 	}
 	dst = append(dst, byte(cmd.DataRateIndex))
 	return dst, nil
@@ -1091,7 +1087,7 @@ func (cmd *MACCommand_PingSlotChannelReq) AppendLoRaWAN(dst []byte) ([]byte, err
 // UnmarshalLoRaWAN unmarshals the PingSlotChannelReq payload.
 func (cmd *MACCommand_PingSlotChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 4 {
-		return newLengthUnequalError(4, len(b))
+		return errExpectedLengthEqual("PingSlotChannelReq", 4)(len(b))
 	}
 	cmd.Frequency = parseUint64(b[0:3])
 	cmd.DataRateIndex = DataRateIndex(b[3] & 0xf)
@@ -1124,7 +1120,7 @@ func (cmd *MACCommand_PingSlotChannelAns) AppendLoRaWAN(dst []byte) ([]byte, err
 // UnmarshalLoRaWAN unmarshals the PingSlotChannelAns payload.
 func (cmd *MACCommand_PingSlotChannelAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("PingSlotChannelAns", 1)(len(b))
 	}
 	cmd.FrequencyAck = b[0]&1 == 1
 	cmd.DataRateIndexAck = (b[0]>>1)&1 == 1
@@ -1144,12 +1140,12 @@ func (cmd *MACCommand_PingSlotChannelAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled BeaconTimingAns payload to the slice.
 func (cmd *MACCommand_BeaconTimingAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Delay > math.MaxUint16 {
-		return nil, errors.Errorf("expected Delay to be less or equal to %d, got %d", math.MaxUint16, cmd.Delay)
+		return nil, errExpectedLowerOrEqual("Delay", math.MaxUint16)(cmd.Delay)
 	}
 	dst = appendUint32(dst, cmd.Delay, 2)
 
 	if cmd.ChannelIndex > math.MaxUint8 {
-		return nil, errors.Errorf("expected ChannelIndex to be less or equal to %d, got %d", math.MaxUint8, cmd.ChannelIndex)
+		return nil, errExpectedLowerOrEqual("ChannelIndex", math.MaxUint8)(cmd.ChannelIndex)
 	}
 	dst = append(dst, byte(cmd.ChannelIndex))
 
@@ -1159,7 +1155,7 @@ func (cmd *MACCommand_BeaconTimingAns) AppendLoRaWAN(dst []byte) ([]byte, error)
 // UnmarshalLoRaWAN unmarshals the BeaconTimingAns payload.
 func (cmd *MACCommand_BeaconTimingAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 3 {
-		return newLengthUnequalError(3, len(b))
+		return errExpectedLengthEqual("BeaconTimingAns", 3)(len(b))
 	}
 	cmd.Delay = parseUint32(b[0:2])
 	cmd.ChannelIndex = uint32(b[2])
@@ -1179,7 +1175,7 @@ func (cmd *MACCommand_BeaconTimingAns_) UnmarshalLoRaWAN(b []byte) error {
 // AppendLoRaWAN appends the marshaled BeaconFreqReq payload to the slice.
 func (cmd *MACCommand_BeaconFreqReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if cmd.Frequency > maxUint24 {
-		return nil, errors.Errorf("expected Frequency to be less or equal to %d, got %d", maxUint24, cmd.Frequency)
+		return nil, errExpectedLowerOrEqual("Frequency", maxUint24)(cmd.Frequency)
 	}
 	dst = appendUint64(dst, cmd.Frequency, 3)
 	return dst, nil
@@ -1188,7 +1184,7 @@ func (cmd *MACCommand_BeaconFreqReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the BeaconFreqReq payload.
 func (cmd *MACCommand_BeaconFreqReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 3 {
-		return newLengthUnequalError(3, len(b))
+		return errExpectedLengthEqual("BeaconFreqReq", 3)(len(b))
 	}
 	cmd.Frequency = parseUint64(b[0:3])
 	return nil
@@ -1217,7 +1213,7 @@ func (cmd *MACCommand_BeaconFreqAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the BeaconFreqAns payload.
 func (cmd *MACCommand_BeaconFreqAns) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("BeaconFreqAns", 1)(len(b))
 	}
 	cmd.FrequencyAck = b[0]&1 == 1
 	return nil
@@ -1242,7 +1238,7 @@ func (cmd *MACCommand_DeviceModeInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DeviceModeInd payload.
 func (cmd *MACCommand_DeviceModeInd) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("DeviceModeInd", 1)(len(b))
 	}
 	cmd.Class = Class(b[0])
 	return nil
@@ -1267,7 +1263,7 @@ func (cmd *MACCommand_DeviceModeConf) AppendLoRaWAN(dst []byte) ([]byte, error) 
 // UnmarshalLoRaWAN unmarshals the DeviceModeConf payload.
 func (cmd *MACCommand_DeviceModeConf) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
-		return newLengthUnequalError(1, len(b))
+		return errExpectedLengthEqual("DeviceModeConf", 1)(len(b))
 	}
 	cmd.Class = Class(b[0])
 	return nil
@@ -1319,12 +1315,17 @@ func (cmd *MACCommand) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return defaultMACCommands.Read(bytes.NewReader(b), isUplink, cmd)
 }
 
+var (
+	errDecodingMACCommand    = errors.DefineInvalidArgument("decoding_mac_command", "could not decode MAC command with CID `{cid}`")
+	errUnexpectedPayloadType = errors.DefineInvalidArgument("payload_type", "payload type `{type}` is unexpected")
+)
+
 // Read reads a MACCommand from r into cmd and returns any errors encountered.
 func (spec macCommandSpec) Read(r io.Reader, isUplink bool, cmd *MACCommand) error {
 	b := make([]byte, 1)
 	_, err := r.Read(b)
 	if err != nil {
-		return errors.NewWithCause(err, "failed to read CID")
+		return err
 	}
 
 	ret := MACCommand{
@@ -1386,11 +1387,11 @@ func (spec macCommandSpec) Read(r io.Reader, isUplink bool, cmd *MACCommand) err
 	}:
 		ret.Payload = pld.MACCommand_Payload()
 	default:
-		return errors.Errorf("payload has unexpected type: %T", pld)
+		return errUnexpectedPayloadType.WithAttributes("type", fmt.Sprintf("%T", pld))
 	}
 
 	if err := pld.UnmarshalLoRaWAN(b); err != nil {
-		return errors.NewWithCausef(err, "failed to decode MAC command with CID 0x%X", int32(ret.CID))
+		return errDecodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.CID))).WithCause(err)
 	}
 	*cmd = ret
 	return nil

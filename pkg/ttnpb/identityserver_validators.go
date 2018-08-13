@@ -17,8 +17,13 @@ package ttnpb
 import (
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/validate"
+)
+
+var (
+	errInvalidPathUpdateMask = errors.DefineInvalidArgument("invalid_update_mask", "update path `{path}` is not a valid path")
+	errMissingUpdateMask     = errors.DefineInvalidArgument("missing_update_mask", "missing update mask")
 )
 
 // Validate is used as validator function by the GRPC validator interceptor.
@@ -27,7 +32,7 @@ func (req *UpdateSettingsRequest) Validate() error {
 	paths := mask.GetPaths()
 
 	if len(paths) == 0 {
-		return ErrEmptyUpdateMask.New(nil)
+		return errMissingUpdateMask
 	}
 
 	validations := make([]error, 0)
@@ -49,9 +54,7 @@ func (req *UpdateSettingsRequest) Validate() error {
 			FieldPathSettingsAllowedEmails,
 			FieldPathSettingsInvitationTokenTTL:
 		default:
-			return ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+			return errInvalidPathUpdateMask.WithAttributes("path", path)
 		}
 
 		validations = append(validations, err)
@@ -75,7 +78,7 @@ func (req *UpdateUserRequest) Validate() error {
 	paths := mask.GetPaths()
 
 	if len(paths) == 0 {
-		return ErrEmptyUpdateMask.New(nil)
+		return errMissingUpdateMask
 	}
 
 	validations := make([]error, 0)
@@ -89,9 +92,7 @@ func (req *UpdateUserRequest) Validate() error {
 		case FieldPathUserEmail:
 			err = validate.Field(req.User.UserIdentifiers.Email, validate.Email).DescribeFieldName("Email")
 		default:
-			return ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+			return errInvalidPathUpdateMask.WithAttributes("path", path)
 		}
 
 		validations = append(validations, err)
@@ -148,7 +149,7 @@ func (req *UpdateApplicationRequest) Validate() error {
 	paths := mask.GetPaths()
 
 	if len(paths) == 0 {
-		return ErrEmptyUpdateMask.New(nil)
+		return errMissingUpdateMask
 	}
 
 	validations := make([]error, 0)
@@ -161,9 +162,7 @@ func (req *UpdateApplicationRequest) Validate() error {
 		switch path {
 		case FieldPathApplicationDescription:
 		default:
-			return ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+			return errInvalidPathUpdateMask.WithAttributes("path", path)
 		}
 	}
 
@@ -243,7 +242,7 @@ func (req *UpdateGatewayRequest) Validate() error {
 	paths := mask.GetPaths()
 
 	if len(paths) == 0 {
-		return ErrEmptyUpdateMask.New(nil)
+		return errMissingUpdateMask
 	}
 
 	validations := make([]error, 0)
@@ -278,9 +277,7 @@ func (req *UpdateGatewayRequest) Validate() error {
 			err = req.Gateway.ContactAccountIDs.Validate()
 		default:
 			if !strings.HasPrefix(path, FieldPrefixGatewayAttributes) {
-				return ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
+				return errInvalidPathUpdateMask.WithAttributes("path", path)
 			}
 		}
 		validations = append(validations, err)
@@ -388,7 +385,7 @@ func (req *UpdateClientRequest) Validate() error {
 	paths := mask.GetPaths()
 
 	if len(paths) == 0 {
-		return ErrEmptyUpdateMask.New(nil)
+		return errMissingUpdateMask
 	}
 
 	validations := make([]error, 0)
@@ -407,9 +404,7 @@ func (req *UpdateClientRequest) Validate() error {
 		case FieldPathClientRights:
 			err = validate.Field(req.Client.Rights, validate.MinLength(1), validate.In(validClientRights)).DescribeFieldName("Rights")
 		default:
-			return ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+			return errInvalidPathUpdateMask.WithAttributes("path", path)
 		}
 
 		validations = append(validations, err)
@@ -424,7 +419,7 @@ func (req *UpdateOrganizationRequest) Validate() error {
 	paths := mask.GetPaths()
 
 	if len(paths) == 0 {
-		return ErrEmptyUpdateMask.New(nil)
+		return errMissingUpdateMask
 	}
 
 	validations := make([]error, 0)
@@ -438,9 +433,7 @@ func (req *UpdateOrganizationRequest) Validate() error {
 		case FieldPathOrganizationEmail:
 			err = validate.Field(req.Organization.Email, validate.Email).DescribeFieldName("Email")
 		default:
-			return ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+			return errInvalidPathUpdateMask.WithAttributes("path", path)
 		}
 
 		validations = append(validations, err)

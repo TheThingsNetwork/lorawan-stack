@@ -15,7 +15,8 @@
 package ttnpb
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"fmt"
+
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -42,7 +43,7 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to encode join-request message to LoRaWAN"))
+		panic(fmt.Sprintf("failed to encode join-request message to LoRaWAN: %s", err))
 	}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
 	devEUI := msg.GetJoinRequestPayload().DevEUI

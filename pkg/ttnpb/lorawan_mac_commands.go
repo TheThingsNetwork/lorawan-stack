@@ -15,8 +15,9 @@
 package ttnpb
 
 import (
+	"fmt"
+
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // macCommandDescriptor descibes a MAC command.
@@ -299,7 +300,7 @@ func init() {
 // Validate reports whether cid represents a valid MACCommandIdentifier.
 func (cid MACCommandIdentifier) Validate() error {
 	if cid < 0x00 || cid > 0xff {
-		return errors.Errorf("expected CID to be between 0x00 and 0xFF, got 0x%X", int32(cid))
+		return errExpectedBetween("CID", "0x00", "0xFF")(fmt.Sprintf("0x%X", int32(cid)))
 	}
 	return nil
 }

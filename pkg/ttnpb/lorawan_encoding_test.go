@@ -17,11 +17,13 @@ package ttnpb_test
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -90,7 +92,12 @@ func TestLoRaWANEncodingRandomized(t *testing.T) {
 			a.So(ret, should.Resemble, b)
 
 			msg := reflect.New(reflect.Indirect(reflect.ValueOf(expected)).Type()).Interface().(lorawan.Unmarshaler)
-			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
+			if err := msg.UnmarshalLoRaWAN(b); !a.So(err, should.BeNil) {
+				for i, err := range errors.Stack(err) {
+					t.Log(strings.Repeat("  ", i), err)
+				}
+				t.FailNow()
+			}
 			if !a.So(msg, should.Resemble, expected) {
 				pretty.Ldiff(t, msg, expected)
 			}

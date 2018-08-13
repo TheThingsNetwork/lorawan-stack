@@ -1889,18 +1889,18 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/identityserver:invalid_update_mask": {
+  "error:pkg/identityserver:other_pull_configuration_stream_opened": {
     "translations": {
-      "en": "invalid update_mask: `{path}` is not a valid path"
+      "en": "another `PullConfiguration` stream opened"
     },
     "description": {
       "package": "pkg/identityserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/identityserver:other_pull_configuration_stream_opened": {
+  "error:pkg/identityserver:update_mask": {
     "translations": {
-      "en": "another `PullConfiguration` stream opened"
+      "en": "invalid update_mask: `{path}` is not a valid path"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -2717,13 +2717,202 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/ttnpb:cflist_frequencies": {
+    "translations": {
+      "en": "too many CFList frequencies: expected 15 or less"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "lorawan_encoding.go"
+    }
+  },
+  "error:pkg/ttnpb:decoding": {
+    "translations": {
+      "en": "could not decode `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:decoding_mac_command": {
+    "translations": {
+      "en": "could not decode MAC command with CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "lorawan_mac_encoding.go"
+    }
+  },
+  "error:pkg/ttnpb:encoded_field_length_bound": {
+    "translations": {
+      "en": "`{lorawan_field}` encoded length should between `{min}` and `{max}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:encoded_field_length_equal": {
+    "translations": {
+      "en": "`{lorawan_field}` encoded length should be equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:encoded_field_length_multiple_choices": {
+    "translations": {
+      "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:encoding": {
+    "translations": {
+      "en": "could not encode `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:encrypted_joinacceptpayload_length": {
+    "translations": {
+      "en": "encrypted JoinAcceptPayload should have length of 16 or 32"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "lorawan_encoding.go"
+    }
+  },
+  "error:pkg/ttnpb:expected_uplink_mtype": {
+    "translations": {
+      "en": "MType `{result}` is not an uplink MType"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "message_validators.go"
+    }
+  },
+  "error:pkg/ttnpb:field_bound": {
+    "translations": {
+      "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field_equal": {
+    "translations": {
+      "en": "`{lorawan_field}` should be equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field_length_bound": {
+    "translations": {
+      "en": "`{lorawan_field}` length should between `{min}` and `{max}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field_length_equal": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field_length_with_max": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be lower or equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field_length_with_multiple_choices": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field_with_max": {
+    "translations": {
+      "en": "`{lorawan_field}` should be lower or equal to `{max}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:identifiers": {
+    "translations": {
+      "en": "missing identifiers"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/ttnpb:invalid_frequency_plan_channel": {
     "translations": {
       "en": "invalid frequency plan channel `{index}`"
     },
     "description": {
       "package": "pkg/ttnpb",
+      "file": "regional.go"
+    }
+  },
+  "error:pkg/ttnpb:invalid_update_mask": {
+    "translations": {
+      "en": "update path `{path}` is not a valid path"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "identityserver_validators.go"
+    }
+  },
+  "error:pkg/ttnpb:max_cflist_frequency": {
+    "translations": {
+      "en": "expected CFList frequency to be less or equal to MaxUint24"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "lorawan_encoding.go"
+    }
+  },
+  "error:pkg/ttnpb:missing": {
+    "translations": {
+      "en": "missing `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:missing_update_mask": {
+    "translations": {
+      "en": "missing update mask"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "identityserver_validators.go"
     }
   },
   "error:pkg/ttnpb:no_dwell_time_duration": {
@@ -2732,7 +2921,70 @@
     },
     "description": {
       "package": "pkg/ttnpb",
+      "file": "regional.go"
+    }
+  },
+  "error:pkg/ttnpb:parsing": {
+    "translations": {
+      "en": "could not parse `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:parsing_semantic_version": {
+    "translations": {
+      "en": "could not parse semantic version"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "lorawan.go"
+    }
+  },
+  "error:pkg/ttnpb:payload_type": {
+    "translations": {
+      "en": "payload type `{type}` is unexpected"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "lorawan_mac_encoding.go"
+    }
+  },
+  "error:pkg/ttnpb:raw_payload": {
+    "translations": {
+      "en": "missing raw payload"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "message_validators.go"
+    }
+  },
+  "error:pkg/ttnpb:type": {
+    "translations": {
+      "en": "got `{result}` instead of `{expected}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "gateway.go"
+    }
+  },
+  "error:pkg/ttnpb:unknown": {
+    "translations": {
+      "en": "unknown `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:unknown_right": {
+    "translations": {
+      "en": "unknown right"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "rights.go"
     }
   },
   "error:pkg/types:data_rate": {

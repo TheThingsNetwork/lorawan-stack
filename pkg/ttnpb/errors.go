@@ -16,13 +16,13 @@ package ttnpb
 
 import (
 	"fmt"
-	"math"
 
 	proto "github.com/golang/protobuf/proto"
-	removetheseerrors "go.thethings.network/lorawan-stack/pkg/errors"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 )
+
+const valueKey = "value"
 
 type errorDetails struct {
 	*ErrorDetails
@@ -69,81 +69,93 @@ func init() {
 	}
 }
 
+type valueErr func(interface{}) errors.Error
+
+func unexpectedValue(err interface {
+	WithAttributes(kv ...interface{}) errors.Error
+}) valueErr {
+	return func(value interface{}) errors.Error {
+		return err.WithAttributes(valueKey, value)
+	}
+}
+
 var (
-	// ErrEmptyUpdateMask is returned when the update mask is specified but empty.
-	ErrEmptyUpdateMask = &removetheseerrors.ErrDescriptor{
-		MessageFormat: "update_mask must be non-empty",
-		Code:          1,
-		Type:          removetheseerrors.InvalidArgument,
-	}
+	errMissingIdentifiers = errors.DefineInvalidArgument("identifiers", "missing identifiers")
 
-	// ErrInvalidPathUpdateMask is returned when the update mask includes a wrong field path.
-	ErrInvalidPathUpdateMask = &removetheseerrors.ErrDescriptor{
-		MessageFormat: "Invalid update_mask: `{path}` is not a valid path",
-		Code:          2,
-		Type:          removetheseerrors.InvalidArgument,
-	}
+	fieldBound                   = errors.DefineInvalidArgument("field_bound", "`{lorawan_field}` should be between `{min}` and `{max}`", valueKey)
+	fieldHasMax                  = errors.DefineInvalidArgument("field_with_max", "`{lorawan_field}` should be lower or equal to `{max}`", valueKey)
+	fieldEqual                   = errors.DefineInvalidArgument("field_equal", "`{lorawan_field}` should be equal to `{expected}`", valueKey)
+	fieldLengthBound             = errors.DefineInvalidArgument("field_length_bound", "`{lorawan_field}` length should between `{min}` and `{max}`", valueKey)
+	fieldLengthEqual             = errors.DefineInvalidArgument("field_length_equal", "`{lorawan_field}` length should be equal to `{expected}`", valueKey)
+	fieldLengthHasMax            = errors.DefineInvalidArgument("field_length_with_max", "`{lorawan_field}` length should be lower or equal to `{expected}`", valueKey)
+	fieldLengthTwoChoices        = errors.DefineInvalidArgument("field_length_with_multiple_choices", "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`", valueKey)
+	encodedFieldLengthBound      = errors.DefineInvalidArgument("encoded_field_length_bound", "`{lorawan_field}` encoded length should between `{min}` and `{max}`", valueKey)
+	encodedFieldLengthEqual      = errors.DefineInvalidArgument("encoded_field_length_equal", "`{lorawan_field}` encoded length should be equal to `{expected}`", valueKey)
+	encodedFieldLengthTwoChoices = errors.DefineInvalidArgument("encoded_field_length_multiple_choices", "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`", valueKey)
 
-	// ErrMissingRawPayload represents error ocurring when raw message payload is missing.
-	ErrMissingRawPayload = &removetheseerrors.ErrDescriptor{
-		MessageFormat: "Raw Message payload is missing",
-		Type:          removetheseerrors.InvalidArgument,
-		Code:          3,
-	}
-
-	// ErrWrongPayloadType represents error ocurring when wrong payload type is received.
-	ErrWrongPayloadType = &removetheseerrors.ErrDescriptor{
-		MessageFormat:  "Wrong payload type: `{type}`",
-		Type:           removetheseerrors.InvalidArgument,
-		Code:           4,
-		SafeAttributes: []string{"type"},
-	}
-
-	// ErrFPortTooHigh represents error ocurring when FPort provided is too high.
-	ErrFPortTooHigh = &removetheseerrors.ErrDescriptor{
-		MessageFormat: fmt.Sprintf("FPort must be lower or equal to %d", math.MaxUint8),
-		Type:          removetheseerrors.InvalidArgument,
-		Code:          5,
-	}
-
-	// ErrTxChIdxTooHigh represents error ocurring when TxChIdx provided is too high.
-	ErrTxChIdxTooHigh = &removetheseerrors.ErrDescriptor{
-		MessageFormat: fmt.Sprintf("TxChIdx must be lower or equal to %d", math.MaxUint8),
-		Type:          removetheseerrors.InvalidArgument,
-		Code:          6,
-	}
-
-	// ErrTxDRIdxTooHigh represents error ocurring when TxDRIdx provided is too high.
-	ErrTxDRIdxTooHigh = &removetheseerrors.ErrDescriptor{
-		MessageFormat: fmt.Sprintf("TxDRIdx must be lower or equal to %d", math.MaxUint8),
-		Type:          removetheseerrors.InvalidArgument,
-		Code:          7,
-	}
-
-	// ErrEmptyIdentifiers is returned when the XXXIdentifiers are empty.
-	ErrEmptyIdentifiers = &removetheseerrors.ErrDescriptor{
-		MessageFormat: "Identifiers must not be empty",
-		Code:          8,
-		Type:          removetheseerrors.InvalidArgument,
-	}
-
-	errNoDwellTimeDuration = errors.DefineInvalidArgument(
-		"no_dwell_time_duration",
-		"no dwell time duration specified",
-	)
-	errInvalidFrequencyPlanChannel = errors.Define(
-		"invalid_frequency_plan_channel",
-		"invalid frequency plan channel `{index}`",
-	)
+	encoding = errors.Define("encoding", "could not encode `{lorawan_field}`")
+	decoding = errors.Define("decoding", "could not decode `{lorawan_field}`")
+	missing  = errors.DefineInvalidArgument("missing", "missing `{lorawan_field}`")
+	parsing  = errors.DefineInvalidArgument("parsing", "could not parse `{lorawan_field}`", valueKey)
+	unknown  = errors.DefineInvalidArgument("unknown", "unknown `{lorawan_field}`", valueKey)
 )
 
-func init() {
-	ErrEmptyUpdateMask.Register()
-	ErrInvalidPathUpdateMask.Register()
-	ErrMissingRawPayload.Register()
-	ErrWrongPayloadType.Register()
-	ErrFPortTooHigh.Register()
-	ErrTxChIdxTooHigh.Register()
-	ErrTxDRIdxTooHigh.Register()
-	ErrEmptyIdentifiers.Register()
+func errExpectedBetween(lorawanField string, min, max interface{}) valueErr {
+	return unexpectedValue(fieldBound.WithAttributes("lorawan_field", lorawanField, "min", min, "max", max))
+}
+
+func errExpectedLowerOrEqual(lorawanField string, max interface{}) valueErr {
+	return unexpectedValue(fieldHasMax.WithAttributes("lorawan_field", lorawanField, "max", max))
+}
+
+func errExpectedEqual(lorawanField string, expected interface{}) valueErr {
+	return unexpectedValue(fieldEqual.WithAttributes("lorawan_field", lorawanField, "expected", expected))
+}
+
+func errExpectedLengthEqual(lorawanField string, expected interface{}) valueErr {
+	return unexpectedValue(fieldLengthEqual.WithAttributes("lorawan_field", lorawanField, "expected", expected))
+}
+
+func errExpectedLengthBound(lorawanField string, min, max interface{}) valueErr {
+	return unexpectedValue(fieldLengthBound.WithAttributes("lorawan_field", lorawanField, "min", min, "max", max))
+}
+
+func errExpectedLengthLowerOrEqual(lorawanField string, max interface{}) valueErr {
+	return unexpectedValue(fieldLengthHasMax.WithAttributes("lorawan_field", lorawanField, "max", max))
+}
+
+func errExpectedLengthTwoChoices(lorawanField string, expected1, expected2 interface{}) valueErr {
+	return unexpectedValue(fieldLengthTwoChoices.WithAttributes("lorawan_field", lorawanField, "expected_1", expected1, "expected_2", expected2))
+}
+
+func errExpectedLengthEncodedBound(lorawanField string, min, max interface{}) valueErr {
+	return unexpectedValue(encodedFieldLengthBound.WithAttributes("lorawan_field", lorawanField, "min", min, "max", max))
+}
+
+func errExpectedLengthEncodedEqual(lorawanField string, expected interface{}) valueErr {
+	return unexpectedValue(encodedFieldLengthBound.WithAttributes("lorawan_field", lorawanField, "expected", expected))
+}
+
+func errExpectedLengthEncodedTwoChoices(lorawanField string, expected1, expected2 interface{}) valueErr {
+	return unexpectedValue(encodedFieldLengthTwoChoices.WithAttributes("lorawan_field", lorawanField, "expected_1", expected1, "expected_2", expected2))
+}
+
+func errFailedEncoding(lorawanField string) errors.Error {
+	return encoding.WithAttributes("lorawan_field", lorawanField)
+}
+
+func errFailedDecoding(lorawanField string) errors.Error {
+	return decoding.WithAttributes("lorawan_field", lorawanField)
+}
+
+func errMissing(lorawanField string) errors.Error {
+	return missing.WithAttributes("lorawan_field", lorawanField)
+}
+
+func errUnknown(lorawanField string) valueErr {
+	return unexpectedValue(unknown.WithAttributes("lorawan_field", lorawanField))
+}
+
+func errCouldNotParse(lorawanField string) valueErr {
+	return unexpectedValue(parsing.WithAttributes("lorawan_field", lorawanField))
 }

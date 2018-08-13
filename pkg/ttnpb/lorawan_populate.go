@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -196,7 +195,7 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 
 	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, true)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to compute payload for MIC computation"))
+		panic(fmt.Sprintf("failed to compute payload for MIC computation: %s", err))
 	}
 	var confFCnt uint32
 	if pld.MACPayload.Ack {
@@ -204,7 +203,7 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 	}
 	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, confFCnt, txDrIdx, txChIdx, pld.MACPayload.DevAddr, pld.MACPayload.FCnt, b)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to compute MIC"))
+		panic(fmt.Sprintf("failed to compute MIC: %s", err))
 	}
 	out.MIC = mic[:]
 	out.Payload = pld
@@ -227,11 +226,11 @@ func NewPopulatedMessageDownlink(r randyLorawan, sNwkSIntKey types.AES128Key, co
 	}
 	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, false)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to compute payload for MIC computation"))
+		panic(fmt.Sprintf("failed to compute payload for MIC computation: %s", err))
 	}
 	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, pld.MACPayload.DevAddr, pld.MACPayload.FCnt, b)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to compute MIC"))
+		panic(fmt.Sprintf("failed to compute MIC: %s", err))
 	}
 	out.MIC = mic[:]
 	out.Payload = pld

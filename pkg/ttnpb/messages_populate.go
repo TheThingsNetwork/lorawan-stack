@@ -15,9 +15,9 @@
 package ttnpb
 
 import (
+	"fmt"
 	"math"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -56,7 +56,7 @@ func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey ty
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to encode uplink message to LoRaWAN"))
+		panic(fmt.Sprintf("could not encode raw payload to LoRaWAN: %s", err))
 	}
 	return out
 }
@@ -82,7 +82,7 @@ func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to encode uplink message to LoRaWAN"))
+		panic(fmt.Sprintf("failed to encode uplink message to LoRaWAN: %s", err))
 	}
 	return out
 }
@@ -108,7 +108,7 @@ func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinType) *Upl
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to encode uplink message to LoRaWAN"))
+		panic(fmt.Sprintf("failed to encode uplink message to LoRaWAN: %s", err))
 	}
 	return out
 }
@@ -130,7 +130,7 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause(err, "failed to encode downlink message to LoRaWAN"))
+		panic(fmt.Sprintf("failed to encode downlink message to LoRaWAN: %s", err))
 	}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
 	devAddr := msg.GetMACPayload().DevAddr

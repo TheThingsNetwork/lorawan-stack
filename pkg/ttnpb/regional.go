@@ -17,6 +17,19 @@ package ttnpb
 import (
 	"fmt"
 	"time"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+)
+
+var (
+	errNoDwellTimeDuration = errors.DefineInvalidArgument(
+		"no_dwell_time_duration",
+		"no dwell time duration specified",
+	)
+	errInvalidFrequencyPlanChannel = errors.Define(
+		"invalid_frequency_plan_channel",
+		"invalid frequency plan channel `{index}`",
+	)
 )
 
 // Validate returns an error if the frequency plan is invalid.

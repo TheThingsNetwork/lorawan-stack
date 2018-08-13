@@ -20,7 +20,7 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/gogo/protobuf/jsonpb"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 func init() {
@@ -72,15 +72,19 @@ func init() {
 	}
 }
 
+var errParsingSemanticVersion = unexpectedValue(
+	errors.DefineInvalidArgument("parsing_semantic_version", "could not parse semantic version", valueKey),
+)
+
 // Validate reports whether v represents a valid MACVersion.
 func (v MACVersion) Validate() error {
 	if v < 1 || v >= MACVersion(len(MACVersion_name)) {
-		return errors.Errorf("expected MACVersion to be between %d and %d, got %d", 1, len(MACVersion_name)-1, v)
+		return errExpectedBetween("MACVersion", 1, len(MACVersion_name)-1)(v)
 	}
 
 	_, err := semver.Parse(v.String())
 	if err != nil {
-		return errors.NewWithCause(err, "failed to parse semantic version")
+		return errParsingSemanticVersion(v.String()).WithCause(err)
 	}
 	return nil
 }
@@ -138,7 +142,7 @@ func (v *MACVersion) UnmarshalText(b []byte) error {
 	case MAC_UNKNOWN.String():
 		*v = MAC_UNKNOWN
 	default:
-		return errors.Errorf("Could not parse MACVersion `%s`", string(b))
+		return errCouldNotParse("MACVersion")(string(b))
 	}
 	return nil
 }
@@ -247,7 +251,7 @@ func (v *PHYVersion) UnmarshalText(b []byte) error {
 	case PHY_UNKNOWN.String():
 		*v = PHY_UNKNOWN
 	default:
-		return errors.Errorf("Could not parse PHYVersion `%s`", string(b))
+		return errCouldNotParse("PHYVersion")(string(b))
 	}
 	return nil
 }

@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb_test
+package ttnpb
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -43,8 +42,9 @@ func TestUserIdentifiersValidate(t *testing.T) {
 	a.So(ids.Validate(), should.BeNil)
 
 	ids = UserIdentifiers{}
-	a.So(ids.Validate(), should.NotBeNil)
-	a.So(ErrEmptyIdentifiers.Describes(ids.Validate()), should.BeTrue)
+	err := ids.Validate()
+	a.So(err, should.NotBeNil)
+	a.So(err, should.EqualErrorOrDefinition, errMissingIdentifiers)
 
 	ids = UserIdentifiers{
 		UserID: "foo",
@@ -79,8 +79,9 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	a.So(ids.Validate(), should.BeNil)
 
 	ids = GatewayIdentifiers{}
-	a.So(ids.Validate(), should.NotBeNil)
-	a.So(ErrEmptyIdentifiers.Describes(ids.Validate()), should.BeTrue)
+	err := ids.Validate()
+	a.So(err, should.NotBeNil)
+	a.So(err, should.EqualErrorOrDefinition, errMissingIdentifiers)
 
 	ids = GatewayIdentifiers{
 		GatewayID: "_foo-gtw",

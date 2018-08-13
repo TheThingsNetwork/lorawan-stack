@@ -19,7 +19,7 @@ import "go.thethings.network/lorawan-stack/pkg/validate"
 // Validate is used as validator function by the GRPC validator interceptor.
 func (ids UserIdentifiers) Validate() error {
 	if ids.IsZero() {
-		return ErrEmptyIdentifiers.New(nil)
+		return errMissingIdentifiers
 	}
 
 	return validate.All(
@@ -36,7 +36,7 @@ func (ids ApplicationIdentifiers) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (ids GatewayIdentifiers) Validate() error {
 	if ids.IsZero() {
-		return ErrEmptyIdentifiers.New(nil)
+		return errMissingIdentifiers
 	}
 
 	return validate.All(
@@ -65,13 +65,13 @@ func (ids OrganizationOrUserIdentifiers) Validate() error {
 		return id.Validate()
 	}
 
-	return ErrEmptyIdentifiers.New(nil)
+	return errMissingIdentifiers
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (ids *EndDeviceIdentifiers) Validate() error {
 	if ids == nil || ids.IsZero() {
-		return ErrEmptyIdentifiers.New(nil)
+		return errMissingIdentifiers
 	}
 	return validate.All(
 		validate.Field(ids.GetDeviceID(), validate.NotRequired, validate.ID).DescribeFieldName("Device ID"),

@@ -30,7 +30,7 @@ func TestSettingsValidations(t *testing.T) {
 		req := &UpdateSettingsRequest{}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errMissingUpdateMask)
 
 		// request with an invalid path in the update mask (bad)
 		req = &UpdateSettingsRequest{
@@ -40,7 +40,7 @@ func TestSettingsValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidPathUpdateMask)
 
 		// good request
 		req = &UpdateSettingsRequest{
@@ -97,7 +97,7 @@ func TestUserValidations(t *testing.T) {
 		req := &UpdateUserRequest{}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errMissingUpdateMask)
 
 		// request with an invalid path in the update mask (bad)
 		req = &UpdateUserRequest{
@@ -107,7 +107,7 @@ func TestUserValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidPathUpdateMask)
 
 		// good request
 		req = &UpdateUserRequest{
@@ -247,7 +247,7 @@ func TestApplicationValidations(t *testing.T) {
 		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errMissingUpdateMask)
 
 		// request with an invalid update mask (bad)
 		req = &UpdateApplicationRequest{
@@ -260,7 +260,7 @@ func TestApplicationValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidPathUpdateMask)
 
 		// good request
 		req = &UpdateApplicationRequest{
@@ -410,7 +410,7 @@ func TestGatewayValidations(t *testing.T) {
 		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errMissingUpdateMask)
 
 		// request with an invalid update mask (bad)
 		req = &UpdateGatewayRequest{
@@ -425,7 +425,7 @@ func TestGatewayValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidPathUpdateMask)
 
 		// good request
 		req = &UpdateGatewayRequest{
@@ -568,7 +568,7 @@ func TestClientValidations(t *testing.T) {
 		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errMissingUpdateMask)
 
 		// request with invalid path fields on the update_mask (bad)
 		req = &UpdateClientRequest{
@@ -584,7 +584,7 @@ func TestClientValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidPathUpdateMask)
 
 		// good request
 		req = &UpdateClientRequest{
@@ -638,7 +638,7 @@ func TestOrganizationValidations(t *testing.T) {
 		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errMissingUpdateMask)
 
 		// request with an invalid update mask (bad)
 		req = &UpdateOrganizationRequest{
@@ -652,7 +652,7 @@ func TestOrganizationValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidPathUpdateMask)
 
 		// request with good update mask but invalid email
 		req = &UpdateOrganizationRequest{

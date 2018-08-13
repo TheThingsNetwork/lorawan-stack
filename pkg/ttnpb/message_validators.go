@@ -17,18 +17,17 @@ package ttnpb
 import (
 	"math"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (s TxSettings) Validate() error {
 	if s.GetChannelIndex() > math.MaxUint8 {
-		return ErrTxChIdxTooHigh.New(nil)
+		return errExpectedLowerOrEqual("TxChIdx", math.MaxUint8)(s.GetChannelIndex())
 	}
 
 	if s.GetDataRateIndex() > math.MaxUint8 {
-		return ErrTxDRIdxTooHigh.New(nil)
+		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
 	}
 	return nil
 }
@@ -36,15 +35,15 @@ func (s TxSettings) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (p MACPayload) Validate() error {
 	if p.DevAddr.IsZero() {
-		return common.ErrMissingDevAddr.New(nil)
+		return errMissing("DevAddr")
 	}
 
 	if p.GetFCnt() > math.MaxUint16 {
-		return common.ErrFCntTooHigh.New(nil)
+		return errExpectedLowerOrEqual("FCnt", math.MaxUint16)(p.GetFCnt())
 	}
 
 	if p.FPort > math.MaxUint8 {
-		return ErrFPortTooHigh.New(nil)
+		return errExpectedLowerOrEqual("FPort", math.MaxUint8)(p.FPort)
 	}
 
 	return nil
@@ -53,10 +52,10 @@ func (p MACPayload) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (p JoinRequestPayload) Validate() error {
 	if p.DevEUI.IsZero() {
-		return common.ErrMissingDevEUI.New(nil)
+		return errMissing("DevEUI")
 	}
 	if p.JoinEUI.IsZero() {
-		return common.ErrMissingJoinEUI.New(nil)
+		return errMissing("JoinEUI")
 	}
 
 	return nil
@@ -68,6 +67,11 @@ func (p RejoinRequestPayload) Validate() error {
 	return nil
 }
 
+var (
+	errExpectedUplinkMType = errors.DefineInvalidArgument("expected_uplink_mtype", "MType `{result}` is not an uplink MType")
+	errMissingRawPayload   = errors.DefineInvalidArgument("raw_payload", "missing raw payload")
+)
+
 // Validate is used as validator function by the GRPC validator interceptor.
 func (m UplinkMessage) Validate() error {
 	if err := m.GetSettings().Validate(); err != nil {
@@ -75,7 +79,7 @@ func (m UplinkMessage) Validate() error {
 	}
 
 	if len(m.GetRawPayload()) == 0 {
-		return ErrMissingRawPayload.New(nil)
+		return errMissingRawPayload
 	}
 
 	p := m.GetPayload()
@@ -83,24 +87,22 @@ func (m UplinkMessage) Validate() error {
 	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
 		mp := p.GetMACPayload()
 		if mp == nil {
-			return common.ErrMissingPayload.New(nil)
+			return errMissing("MACPayload")
 		}
 		return mp.Validate()
 	case MType_JOIN_REQUEST:
 		jp := p.GetJoinRequestPayload()
 		if jp == nil {
-			return common.ErrMissingPayload.New(nil)
+			return errMissing("JoinRequestPayload")
 		}
 		return jp.Validate()
 	case MType_REJOIN_REQUEST:
 		rp := p.GetRejoinRequestPayload()
 		if rp == nil {
-			return common.ErrMissingPayload.New(nil)
+			return errMissing("RejoinRequestPayload")
 		}
 		return rp.Validate()
 	default:
-		return ErrWrongPayloadType.New(errors.Attributes{
-			"type": p.GetMType(),
-		})
+		return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
 	}
 }
