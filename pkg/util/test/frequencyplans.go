@@ -15,11 +15,7 @@
 package test
 
 import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
 
 const (
@@ -69,62 +65,9 @@ lbt:
   scan-time: 128`
 )
 
-// FrequencyPlansStore containing several frequency plans in order to use
-// local frequency plans rather than the production ones stored on GitHub.
-type FrequencyPlansStore string
-
-// NewFrequencyPlansStore returns a new frequency plans store.
-func NewFrequencyPlansStore() (FrequencyPlansStore, error) {
-	var store FrequencyPlansStore
-
-	dir, err := ioutil.TempDir("", "frequencyplans")
-	if err != nil {
-		return store, errors.New("Failed to create a new temporary directory for frequency plans").WithCause(err)
-	}
-	store = FrequencyPlansStore(dir)
-
-	defer func() {
-		if err != nil {
-			os.RemoveAll(dir)
-		}
-	}()
-
-	for _, document := range []struct {
-		filename, content string
-	}{
-		{"frequency-plans.yml", frequencyPlansDescription},
-		{"EU_863_870.yml", euFrequencyPlan},
-		{"KR_920_923.yml", krFrequencyPlan},
-	} {
-		f, fileErr := os.Create(filepath.Join(dir, document.filename))
-		if fileErr != nil {
-			err = fileErr
-			break
-		}
-
-		_, err = f.Write([]byte(document.content))
-		if err != nil {
-			break
-		}
-
-		err = f.Close()
-		if err != nil {
-			break
-		}
-	}
-
-	return store, err
-}
-
-// Directory where the frequency plans are stored.
-func (f FrequencyPlansStore) Directory() string {
-	return string(f)
-}
-
-// Destroy the store. This should be called at the end of every lifecycle.
-//
-// If the fetcher is used after Destroy() is called, the fetcher will always
-// return an error.
-func (f FrequencyPlansStore) Destroy() error {
-	return os.RemoveAll(string(f))
-}
+// FrequencyPlansFetcher fetches frequency plans from memory.
+var FrequencyPlansFetcher = fetch.NewMemFetcher(map[string][]byte{
+	"frequency-plans.yml": []byte(frequencyPlansDescription),
+	"EU_863_870.yml":      []byte(euFrequencyPlan),
+	"KR_920_923.yml":      []byte(krFrequencyPlan),
+})

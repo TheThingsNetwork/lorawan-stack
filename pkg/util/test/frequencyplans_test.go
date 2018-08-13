@@ -19,8 +19,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -29,25 +27,11 @@ import (
 )
 
 func ExampleFrequencyPlansStore() {
-	store, err := test.NewFrequencyPlansStore()
+	component, err := component.New(log.Default, &component.Config{})
 	if err != nil {
 		panic(err)
 	}
-
-	defer store.Destroy()
-
-	config := config.ServiceBase{
-		FrequencyPlans: config.FrequencyPlans{
-			StoreDirectory: store.Directory(),
-		},
-	}
-
-	component, err := component.New(log.Default, &component.Config{
-		ServiceBase: config,
-	})
-	if err != nil {
-		panic(err)
-	}
+	component.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 
 	gs, err := gatewayserver.New(component, gatewayserver.Config{})
 	if err != nil {
@@ -60,17 +44,13 @@ func ExampleFrequencyPlansStore() {
 func TestFrequencyPlans(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := test.NewFrequencyPlansStore()
-	a.So(err, should.BeNil)
-
-	a.So(s.Directory(), should.NotEqual, "")
-
-	fp := frequencyplans.NewStore(fetch.FromFilesystem(s.Directory()))
+	fp := frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 	euFP, err := fp.GetByID(test.EUFrequencyPlanID)
 	a.So(err, should.BeNil)
 	a.So(euFP.BandID, should.Equal, "EU_863_870")
+	krFP, err := fp.GetByID(test.KRFrequencyPlanID)
+	a.So(krFP.Channels[0].Frequency, should.Equal, 922100000)
 
-	err = s.Destroy()
 	a.So(err, should.BeNil)
 }
