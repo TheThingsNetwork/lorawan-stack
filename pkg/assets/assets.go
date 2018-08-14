@@ -15,7 +15,9 @@
 package assets
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -156,13 +158,23 @@ func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 		}
 	}
 
+	var err error
+	var buf *bytes.Buffer
+	t, ok := tv.Load().(*template.Template)
+	if !ok {
+		err = errTemplateNotFound.WithAttributes("name", name)
+	} else {
+		buf = &bytes.Buffer{}
+		err = t.Execute(buf, data)
+	}
+
 	return func(c echo.Context) error {
-		t, ok := tv.Load().(*template.Template)
-		if !ok || t == nil {
-			return errTemplateNotFound.WithAttributes("name", name)
+		if err != nil {
+			return err
 		}
 		c.Response().WriteHeader(http.StatusOK)
-		return t.Execute(c.Response().Writer, data)
+		_, err := io.Copy(c.Response().Writer, buf)
+		return err
 	}
 }
 
