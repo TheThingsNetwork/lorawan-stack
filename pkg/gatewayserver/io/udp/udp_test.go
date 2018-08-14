@@ -79,60 +79,60 @@ func TestConnection(t *testing.T) {
 	}
 
 	for i, tc := range []struct {
-		Name            string
-		PacketType      encoding.PacketType
-		Wait            time.Duration
-		Connects        bool
-		HasDownlinkPath bool
-		Disconnects     bool
+		Name              string
+		PacketType        encoding.PacketType
+		Wait              time.Duration
+		Connects          bool
+		LosesDownlinkPath bool
+		Disconnects       bool
 	}{
 		{
-			Name:            "NewConnectionOnPush",
-			PacketType:      encoding.PushData,
-			Wait:            0,
-			Connects:        true,
-			HasDownlinkPath: true,
-			Disconnects:     false,
+			Name:              "NewConnectionOnPush",
+			PacketType:        encoding.PushData,
+			Wait:              0,
+			Connects:          true,
+			LosesDownlinkPath: true,
+			Disconnects:       false,
 		},
 		{
-			Name:            "ExistingConnectionOnPull",
-			PacketType:      encoding.PullData,
-			Wait:            0,
-			Connects:        false,
-			HasDownlinkPath: false,
-			Disconnects:     false,
+			Name:              "ExistingConnectionOnPull",
+			PacketType:        encoding.PullData,
+			Wait:              0,
+			Connects:          false,
+			LosesDownlinkPath: false,
+			Disconnects:       false,
 		},
 		{
-			Name:            "LoseDownlinkPath",
-			PacketType:      encoding.PullData,
-			Wait:            testConfig.DownlinkPathExpires * 150 / 100,
-			Connects:        false,
-			HasDownlinkPath: true,
-			Disconnects:     false,
+			Name:              "LoseDownlinkPath",
+			PacketType:        encoding.PullData,
+			Wait:              testConfig.DownlinkPathExpires * 150 / 100,
+			Connects:          false,
+			LosesDownlinkPath: true,
+			Disconnects:       false,
 		},
 		{
-			Name:            "RecoverDownlinkPathWithoutReconnect",
-			PacketType:      encoding.PullData,
-			Wait:            0,
-			Connects:        false,
-			HasDownlinkPath: false,
-			Disconnects:     false,
+			Name:              "RecoverDownlinkPathWithoutReconnect",
+			PacketType:        encoding.PullData,
+			Wait:              0,
+			Connects:          false,
+			LosesDownlinkPath: false,
+			Disconnects:       false,
 		},
 		{
-			Name:            "LoseConnection",
-			PacketType:      encoding.PullData,
-			Wait:            testConfig.ConnectionExpires * 150 / 100,
-			Connects:        false,
-			HasDownlinkPath: true,
-			Disconnects:     true,
+			Name:              "LoseConnection",
+			PacketType:        encoding.PullData,
+			Wait:              testConfig.ConnectionExpires * 150 / 100,
+			Connects:          false,
+			LosesDownlinkPath: true,
+			Disconnects:       true,
 		},
 		{
-			Name:            "Reconnect",
-			PacketType:      encoding.PullData,
-			Wait:            0,
-			Connects:        true,
-			HasDownlinkPath: false,
-			Disconnects:     false,
+			Name:              "Reconnect",
+			PacketType:        encoding.PullData,
+			Wait:              0,
+			Connects:          true,
+			LosesDownlinkPath: false,
+			Disconnects:       false,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -174,13 +174,11 @@ func TestConnection(t *testing.T) {
 
 			// Assert claim, give some time.
 			<-time.After(timeout)
-			hasClaim, err := gs.HasDownlinkClaim(ctx, conn.Gateway().GatewayIdentifiers)
-			if a.So(err, should.BeNil) {
-				if tc.HasDownlinkPath {
-					a.So(hasClaim, should.BeFalse)
-				} else {
-					a.So(hasClaim, should.BeTrue)
-				}
+			hasClaim := gs.HasDownlinkClaim(ctx, conn.Gateway().GatewayIdentifiers)
+			if tc.LosesDownlinkPath {
+				a.So(hasClaim, should.BeFalse)
+			} else {
+				a.So(hasClaim, should.BeTrue)
 			}
 		})
 	}
@@ -439,7 +437,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				PreferScheduleLate: true,
-				ScheduledLate:      false, // Should be scheduled immediately as it's overruled.
+				ScheduledLate:      false, // Should be scheduled immediately as it's overruled (JIT queue enabled by TxAck).
 				SendTxAck:          true,
 			},
 		} {

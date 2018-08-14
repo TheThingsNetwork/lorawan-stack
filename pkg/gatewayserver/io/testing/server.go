@@ -40,6 +40,7 @@ type server struct {
 type Server interface {
 	io.Server
 
+	HasDownlinkClaim(context.Context, ttnpb.GatewayIdentifiers) bool
 	Connections() <-chan *io.Connection
 }
 
@@ -106,10 +107,9 @@ func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifie
 	return nil
 }
 
-// GetFrequencyPlan implements io.Server.
-func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) (bool, error) {
+func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) bool {
 	_, ok := s.downlinkClaims.Load(unique.ID(ctx, ids))
-	return ok, nil
+	return ok
 }
 
 func (s *server) Connections() <-chan *io.Connection {
