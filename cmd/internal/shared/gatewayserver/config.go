@@ -14,11 +14,22 @@
 
 package shared
 
-import "go.thethings.network/lorawan-stack/pkg/gatewayserver"
+import (
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+)
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
 var DefaultGatewayServerConfig = gatewayserver.Config{
-	UDPAddress: ":1700",
+	UDP: gatewayserver.UDPConfig{
+		Config: udp.DefaultConfig,
+		Listeners: []gatewayserver.UDPListener{
+			{
+				Listen:                  ":1700",
+				FallbackFrequencyPlanID: "",
+			},
+		},
+	},
 	MQTT: gatewayserver.MQTTConfig{
 		Listen:    ":1882",
 		ListenTLS: ":8882",
