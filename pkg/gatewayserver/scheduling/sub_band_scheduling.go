@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -100,6 +101,8 @@ func (s *subBandScheduling) ScheduleAt(w Span, timeOffAir *ttnpb.FrequencyPlan_T
 	return err
 }
 
+var errTimeOffAirRequired = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
+
 func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	windowWithTimeOffAir := packetWindow{window: w, timeOffAir: w.timeOffAir(timeOffAir)}
 
@@ -112,7 +115,7 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 			return errOverlap
 		}
 		if scheduledWindow.withTimeOffAir().Overlaps(windowWithTimeOffAir.withTimeOffAir()) {
-			return errTimeOffAir
+			return errTimeOffAirRequired
 		}
 	}
 

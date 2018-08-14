@@ -28,14 +28,16 @@ import (
 var (
 	errDutyCycleFull = errors.DefineResourceExhausted(
 		"duty_cycle_full",
-		"duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}",
+		"duty cycle between `{min_frequency}` and `{max_frequency}` full, exceeded quota of `{quota}`",
 	)
-	errOverlap                = errors.DefineResourceExhausted("window_overlap", "window overlap")
-	errTimeOffAir             = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
-	errNoSubBandFound         = errors.DefineNotFound("no_sub_band_found", "no sub-band found for frequency {frequency} Hz")
-	errExceededDwellTime      = errors.DefineFailedPrecondition("exceeded_dwell_time", "packet exceeded dwell time restrictions")
-	errCouldNotRetrieveFPBand = errors.DefineCorruption("retrieve_fp_band", "could not retrieve the band associated with the frequency plan")
-	errNegativeDuration       = errors.DefineInternal("negative_duration", "duration cannot be negative")
+	errOverlap                   = errors.DefineResourceExhausted("window_overlap", "window overlap")
+	errExceededDwellTime         = errors.DefineFailedPrecondition("exceeded_dwell_time", "packet exceeded dwell time restrictions")
+	errSubBandNotFound           = errors.DefineNotFound("sub_band_not_found", "no sub-band found for frequency `{frequency}` Hz")
+	errRetrieveFrequencyPlanBand = errors.DefineCorruption(
+		"retrieve_frequency_plan_band",
+		"failed to retrieve the band associated with the frequency plan",
+	)
+	errNegativeDuration = errors.DefineInternal("negative_duration", "duration cannot be negative")
 )
 
 // Scheduler is an abstraction for an entity that manages the packet's timespans.
@@ -58,14 +60,13 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 
 	band, err := band.GetByID(fp.BandID)
 	if err != nil {
-		return nil, errCouldNotRetrieveFPBand.WithCause(err)
+		return nil, errRetrieveFrequencyPlanBand.WithCause(err)
 	}
 	for _, subBand := range band.BandDutyCycles {
 		scheduling := &subBandScheduling{
 			dutyCycle:         subBand,
 			schedulingWindows: []schedulingWindow{},
-
-			mu: sync.Mutex{},
+			mu:                sync.Mutex{},
 		}
 		scheduler.subBands = append(scheduler.subBands, scheduling)
 		go scheduling.bgCleanup(ctx)
@@ -88,7 +89,7 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 		}
 	}
 
-	return nil, errNoSubBandFound.WithAttributes("frequency", channel)
+	return nil, errSubBandNotFound.WithAttributes("frequency", channel)
 }
 
 func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
