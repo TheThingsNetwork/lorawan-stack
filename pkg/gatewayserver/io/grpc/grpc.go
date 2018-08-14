@@ -119,5 +119,9 @@ func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 }
 
 func (s *impl) GetFrequencyPlan(ctx context.Context, req *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
-	return s.server.GetFrequencyPlan(ctx, req.FrequencyPlanID)
+	fp, err := s.server.GetFrequencyPlan(ctx, req.FrequencyPlanID)
+	if err != nil {
+		return nil, err
+	}
+	return &fp, nil
 }
