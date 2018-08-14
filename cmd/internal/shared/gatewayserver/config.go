@@ -21,6 +21,7 @@ import (
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
 var DefaultGatewayServerConfig = gatewayserver.Config{
+	RequireRegisteredGateways: false,
 	UDP: gatewayserver.UDPConfig{
 		Config: udp.DefaultConfig,
 		Listeners: []gatewayserver.UDPListener{

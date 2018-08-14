@@ -36,6 +36,8 @@ type UDPListener struct {
 
 // Config represents the Gateway Server configuration.
 type Config struct {
+	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
+
 	MQTT MQTTConfig `name:"mqtt"`
 	UDP  UDPConfig  `name:"udp"`
 }
