@@ -44,25 +44,16 @@ type srv struct {
 	lis    mqttnet.Listener
 }
 
-func start(ctx context.Context, server io.Server, listener net.Listener, protocol string) {
+// Start starts the MQTT frontend.
+func Start(ctx context.Context, server io.Server, listener net.Listener, protocol string) {
 	ctx = log.NewContextWithField(ctx, "namespace", "io/mqtt")
 	ctx = mqttlog.NewContext(ctx, mqtt.Logger(log.FromContext(ctx)))
-	s := &srv{ctx, server, mqttnet.NewListener(listener, "tcp")}
+	s := &srv{ctx, server, mqttnet.NewListener(listener, protocol)}
 	go s.accept()
 	go func() {
 		<-ctx.Done()
 		s.lis.Close()
 	}()
-}
-
-// Start starts the MQTT frontend.
-func Start(ctx context.Context, server io.Server, listener net.Listener) {
-	start(ctx, server, listener, "tcp")
-}
-
-// StartTLS starts the MQTT frontend using TLS.
-func StartTLS(ctx context.Context, server io.Server, listener net.Listener) {
-	start(ctx, server, listener, "tls")
 }
 
 func (s *srv) accept() {

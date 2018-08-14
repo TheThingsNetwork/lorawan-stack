@@ -24,14 +24,11 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
 	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -43,24 +40,6 @@ var (
 
 	timeout = 10 * time.Millisecond
 )
-
-func newContextWithRightsFetcher(ctx context.Context) context.Context {
-	return rights.NewContextWithFetcher(
-		ctx,
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set []ttnpb.Right, err error) {
-			uid := unique.ID(ctx, ids)
-			if uid != registeredGatewayUID {
-				return
-			}
-			md := rpcmetadata.FromIncomingContext(ctx)
-			if md.AuthType != "Key" || md.AuthValue != registeredGatewayKey {
-				return
-			}
-			set = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK}
-			return
-		}),
-	)
-}
 
 func TestAuthentication(t *testing.T) {
 	a := assertions.New(t)
@@ -75,7 +54,7 @@ func TestAuthentication(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	Start(ctx, gs, lis)
+	Start(ctx, gs, lis, "tcp")
 
 	for _, tc := range []struct {
 		UID string
@@ -107,8 +86,7 @@ func TestAuthentication(t *testing.T) {
 			clientOpts.SetPassword(tc.Key)
 			client := mqtt.NewClient(clientOpts)
 			token := client.Connect()
-			ok := token.WaitTimeout(timeout)
-			if tc.OK {
+			if ok := token.WaitTimeout(timeout); tc.OK {
 				if a.So(ok, should.BeTrue) && a.So(token.Error(), should.BeNil) {
 					client.Disconnect(100)
 				}
@@ -132,7 +110,7 @@ func TestTraffic(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	Start(ctx, gs, lis)
+	Start(ctx, gs, lis, "tcp")
 
 	clientOpts := mqtt.NewClientOptions()
 	clientOpts.AddBroker(fmt.Sprintf("tcp://%v", lis.Addr()))
