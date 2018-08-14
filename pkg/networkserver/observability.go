@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	evtStartApplicationLink = events.Define("ns.application.start_link", "start application link")
+	evtBeginApplicationLink = events.Define("ns.application.begin_link", "begin application link")
 	evtEndApplicationLink   = events.Define("ns.application.end_link", "end application link")
 
 	evtReceiveUp          = events.Define("ns.up.receive", "receive uplink message")

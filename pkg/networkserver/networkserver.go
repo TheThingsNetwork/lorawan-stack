@@ -699,7 +699,7 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 	ctx := stream.Context()
 	uid := unique.ID(ctx, id)
 
-	events.Publish(evtStartApplicationLink(ctx, id, nil))
+	events.Publish(evtBeginApplicationLink(ctx, id, nil))
 	defer events.Publish(evtEndApplicationLink(ctx, id, err))
 
 	ns.applicationServersMu.Lock()
