@@ -65,7 +65,7 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 }
 
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *server) Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io
 	if err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, gtw, scheduler)
+	conn := io.NewConnection(ctx, protocol, gtw, scheduler)
 	select {
 	case s.connectionsCh <- conn:
 	default:

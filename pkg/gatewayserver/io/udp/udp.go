@@ -202,7 +202,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				uid: {ttnpb.RIGHT_GATEWAY_LINK},
 			},
 		})
-		io, err = s.server.Connect(ctx, id)
+		io, err = s.server.Connect(ctx, "udp", id)
 		if err != nil {
 			return nil, err
 		}

@@ -16,7 +16,7 @@ package io
 
 import (
 	"context"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
@@ -32,9 +32,9 @@ const bufferSize = 10
 type Server interface {
 	// FillGatewayContext fills the given context and identifiers.
 	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
-	// Connect connects a gateway by its identifiers to the Gateway Server with its assumed rights, and returns a
-	// Connection for traffic and control.
-	Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*Connection, error)
+	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
+	// control.
+	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by its identifier.
 	GetFrequencyPlan(ctx context.Context, id string) (ttnpb.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
@@ -45,26 +45,33 @@ type Server interface {
 
 // Connection is a connection to a gateway managed by a frontend.
 type Connection struct {
+	// Align for sync/atomic.
+	uplinks,
+	downlinks uint64
+	lastStatusTime,
+	lastUplinkTime,
+	lastDownlinkTime int64
+	lastStatus atomic.Value
+
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
+	protocol  string
 	gateway   *ttnpb.Gateway
 	scheduler scheduling.Scheduler
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
 	statusCh chan *ttnpb.GatewayStatus
-
-	observations   ttnpb.GatewayObservations
-	observationsMu sync.RWMutex
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, gateway *ttnpb.Gateway, scheduler scheduling.Scheduler) *Connection {
+func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway, scheduler scheduling.Scheduler) *Connection {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	return &Connection{
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
+		protocol:  protocol,
 		gateway:   gateway,
 		scheduler: scheduler,
 		upCh:      make(chan *ttnpb.UplinkMessage, bufferSize),
@@ -81,6 +88,9 @@ func (c *Connection) Disconnect(err error) {
 	c.cancelCtx(err)
 }
 
+// Protocol returns the protocol used for the connection, i.e. grpc, mqtt or udp.
+func (c *Connection) Protocol() string { return c.protocol }
+
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
@@ -95,7 +105,8 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	default:
 		return errBufferFull
 	}
-	c.addUplinkObservation(up)
+	atomic.AddUint64(&c.uplinks, 1)
+	atomic.StoreInt64(&c.lastUplinkTime, time.Now().UnixNano())
 	return nil
 }
 
@@ -108,7 +119,8 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 	default:
 		return errBufferFull
 	}
-	c.addStatusObservation(status)
+	c.lastStatus.Store(status)
+	atomic.StoreInt64(&c.lastStatusTime, time.Now().UnixNano())
 	return nil
 }
 
@@ -120,12 +132,10 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 	if err != nil {
 		return errComputeTOA.WithCause(err)
 	}
-
 	span := scheduling.Span{
 		Start:    scheduling.ConcentratorTime(down.TxMetadata.Timestamp),
 		Duration: duration,
 	}
-
 	if err := c.scheduler.ScheduleAt(span, down.Settings.Frequency); err != nil {
 		return err
 	}
@@ -137,8 +147,14 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 	default:
 		return errBufferFull
 	}
-	c.addDownlinkObservation(down)
+	atomic.AddUint64(&c.downlinks, 1)
+	atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
 	return nil
+}
+
+// Status returns the status channel.
+func (c *Connection) Status() <-chan *ttnpb.GatewayStatus {
+	return c.statusCh
 }
 
 // Up returns the upstream channel.
@@ -151,37 +167,28 @@ func (c *Connection) Down() <-chan *ttnpb.DownlinkMessage {
 	return c.downCh
 }
 
-// Status returns the status channel.
-func (c *Connection) Status() <-chan *ttnpb.GatewayStatus {
-	return c.statusCh
+// StatusStats returns the status statistics.
+func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
+	if last, ok = c.lastStatus.Load().(*ttnpb.GatewayStatus); ok {
+		t = time.Unix(0, atomic.LoadInt64(&c.lastStatusTime))
+	}
+	return
 }
 
-// GetObservations returns the gateway observations.
-func (c *Connection) GetObservations() ttnpb.GatewayObservations {
-	c.observationsMu.RLock()
-	observations := c.observations
-	c.observationsMu.RUnlock()
-	return observations
+// UpStats returns the upstream statistics.
+func (c *Connection) UpStats() (total uint64, t time.Time, ok bool) {
+	total = atomic.LoadUint64(&c.uplinks)
+	if ok = total > 0; ok {
+		t = time.Unix(0, atomic.LoadInt64(&c.lastUplinkTime))
+	}
+	return
 }
 
-func (c *Connection) addUplinkObservation(msg *ttnpb.UplinkMessage) {
-	now := time.Now().UTC()
-	c.observationsMu.Lock()
-	c.observations.LastUplinkReceivedAt = &now
-	c.observationsMu.Unlock()
-}
-
-func (c *Connection) addStatusObservation(status *ttnpb.GatewayStatus) {
-	now := time.Now().UTC()
-	c.observationsMu.Lock()
-	c.observations.LastStatus = status
-	c.observations.LastStatusReceivedAt = &now
-	c.observationsMu.Unlock()
-}
-
-func (c *Connection) addDownlinkObservation(msg *ttnpb.DownlinkMessage) {
-	now := time.Now().UTC()
-	c.observationsMu.Lock()
-	c.observations.LastDownlinkReceivedAt = &now
-	c.observationsMu.Unlock()
+// DownStats returns the downstream statistics.
+func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
+	total = atomic.LoadUint64(&c.downlinks)
+	if ok = total > 0; ok {
+		t = time.Unix(0, atomic.LoadInt64(&c.lastDownlinkTime))
+	}
+	return
 }

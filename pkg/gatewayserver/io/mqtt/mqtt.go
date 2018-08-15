@@ -207,7 +207,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	uid := unique.ID(ctx, id)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
-	c.io, err = c.server.Connect(ctx, id)
+	c.io, err = c.server.Connect(ctx, "mqtt", id)
 	if err != nil {
 		return nil, err
 	}
