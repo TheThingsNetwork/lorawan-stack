@@ -119,6 +119,18 @@ func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 }
 
 func (s *impl) GetFrequencyPlan(ctx context.Context, req *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
+	ctx = log.NewContextWithField(ctx, "namespace", "io/grpc")
+
+	id := ttnpb.GatewayIdentifiers{
+		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
+	}
+	if err := validate.ID(id.GetGatewayID()); err != nil {
+		return nil, err
+	}
+	if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+		return nil, err
+	}
+
 	fp, err := s.server.GetFrequencyPlan(ctx, req.FrequencyPlanID)
 	if err != nil {
 		return nil, err
