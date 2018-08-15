@@ -24,14 +24,8 @@ type MQTTConfig struct {
 
 // UDPConfig defines the UDP configuration of the Gateway Server.
 type UDPConfig struct {
-	udp.Config
-	Listeners []UDPListener `name:"listeners" description:"Listener configuration"`
-}
-
-// UDPListener defines a UDP listener of the Gateway Server.
-type UDPListener struct {
-	Listen                  string `name:"listen" description:"Address for the UDP frontend to listen on"`
-	FallbackFrequencyPlanID string `name:"fallback-frequency-plan-id" description:"Frequency plan ID when the gateway is not registered"`
+	udp.Config `name:",squash" yaml:",inline"`
+	Listeners  map[string]string `name:"listeners" description:"Listen addresses with (optional) fallback frequency plan ID for non-registered gateways"`
 }
 
 // Config represents the Gateway Server configuration.

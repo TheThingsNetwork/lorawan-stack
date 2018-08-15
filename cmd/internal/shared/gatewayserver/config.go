@@ -24,11 +24,8 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 	RequireRegisteredGateways: false,
 	UDP: gatewayserver.UDPConfig{
 		Config: udp.DefaultConfig,
-		Listeners: []gatewayserver.UDPListener{
-			{
-				Listen:                  ":1700",
-				FallbackFrequencyPlanID: "",
-			},
+		Listeners: map[string]string{
+			":1700": "",
 		},
 	},
 	MQTT: gatewayserver.MQTTConfig{
