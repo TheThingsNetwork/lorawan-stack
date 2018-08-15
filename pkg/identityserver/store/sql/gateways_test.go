@@ -65,12 +65,12 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 	s := testStore(t, database)
 
 	gateway := &ttnpb.Gateway{
-		GatewayIdentifiers: ids,
-		Description:        "My description",
-		Platform:           "The Things Gateway",
-		DisableTxDelay:     true,
-		Attributes:         map[string]string{},
-		FrequencyPlanID:    "868_3",
+		GatewayIdentifiers:   ids,
+		Description:          "My description",
+		Platform:             "The Things Gateway",
+		ScheduleDownlinkLate: false,
+		Attributes:           map[string]string{},
+		FrequencyPlanID:      "868_3",
 		Radios: []ttnpb.GatewayRadio{
 			{
 				Frequency: 10,

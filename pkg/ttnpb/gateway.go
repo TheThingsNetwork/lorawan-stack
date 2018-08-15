@@ -60,8 +60,8 @@ const (
 	// FieldPathGatewayContactAccountIDs is the field path for the gateway contact account identifiers field.
 	FieldPathGatewayContactAccountIDs = "contact_account_ids"
 
-	// FieldPathGatewayDisableTxDelay is the field path for the gateway disable Tx delay field.
-	FieldPathGatewayDisableTxDelay = "disable_tx_delay"
+	// FieldPathGatewayScheduleDownlinkLate is the field path for the gateway schedule downlink late field.
+	FieldPathGatewayScheduleDownlinkLate = "schedule_downlink_late"
 )
 
 // GetGateway returns the base Gateway itself.

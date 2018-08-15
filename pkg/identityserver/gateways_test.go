@@ -151,7 +151,7 @@ func TestPullConfiguration(t *testing.T) {
 			paths: []string{},
 			afterUpdateReception: func(a *assertions.Assertion, _, received *ttnpb.Gateway) {
 				a.So(received.GetAntennas(), should.HaveLength, 0)
-				a.So(received.GetDisableTxDelay(), should.Equal, false)
+				a.So(received.GetScheduleDownlinkLate(), should.Equal, false)
 				a.So(received.GetPlatform(), should.Equal, "")
 				a.So(received.GetFrequencyPlanID(), should.Equal, "")
 			},
@@ -160,7 +160,7 @@ func TestPullConfiguration(t *testing.T) {
 			name:  "PopulatedFieldPath",
 			paths: []string{"platform"},
 			afterUpdateReception: func(a *assertions.Assertion, sent, received *ttnpb.Gateway) {
-				a.So(received.GetDisableTxDelay(), should.BeFalse)
+				a.So(received.GetScheduleDownlinkLate(), should.BeFalse)
 				a.So(received.GetFrequencyPlanID(), should.Equal, "")
 				a.So(sent.GetPlatform(), should.Equal, received.GetPlatform())
 			},
@@ -223,7 +223,7 @@ func TestPullConfiguration(t *testing.T) {
 			_, err = is.gatewayService.UpdateGateway(userCtx, &ttnpb.UpdateGatewayRequest{
 				Gateway: updatedGtw,
 				UpdateMask: pbtypes.FieldMask{
-					Paths: []string{"antennas", "disable_tx_delay", "platform", "frequency_plan_id"},
+					Paths: []string{"antennas", "schedule_downlink_late", "platform", "frequency_plan_id"},
 				},
 			})
 			a.So(err, should.BeNil)
@@ -278,8 +278,8 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 				},
 			},
 		},
-		Radios:         []ttnpb.GatewayRadio{},
-		DisableTxDelay: true,
+		Radios:               []ttnpb.GatewayRadio{},
+		ScheduleDownlinkLate: true,
 	}
 
 	ctx := newTestCtx(user.UserIdentifiers)

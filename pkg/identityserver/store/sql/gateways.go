@@ -129,7 +129,7 @@ func (s *gatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 					auto_update,
 					platform,
 					cluster_address,
-					disable_tx_delay,
+					schedule_downlink_late,
 					created_at,
 					updated_at)
 			VALUES (
@@ -142,7 +142,7 @@ func (s *gatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 					:auto_update,
 					:platform,
 					:cluster_address,
-					:disable_tx_delay,
+					:schedule_downlink_late,
 					:created_at,
 					:updated_at)
 			RETURNING id`,
@@ -341,7 +341,7 @@ func (s *gatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Ga
 				auto_update = :auto_update,
 				platform = :platform,
 				cluster_address = :cluster_address,
-				disable_tx_delay = :disable_tx_delay,
+				schedule_downlink_late = :schedule_downlink_late,
 				updated_at = :updated_at
 			WHERE id = :id
 			RETURNING gateway_id`,

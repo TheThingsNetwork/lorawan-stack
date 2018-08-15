@@ -85,19 +85,19 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		now := time.Now().UTC()
 
 		err = tx.Gateways.Create(&ttnpb.Gateway{
-			GatewayIdentifiers: req.Gateway.GatewayIdentifiers,
-			Description:        req.Gateway.Description,
-			FrequencyPlanID:    req.Gateway.FrequencyPlanID,
-			PrivacySettings:    req.Gateway.PrivacySettings,
-			AutoUpdate:         req.Gateway.AutoUpdate,
-			Platform:           req.Gateway.Platform,
-			Antennas:           req.Gateway.Antennas,
-			Attributes:         req.Gateway.Attributes,
-			ClusterAddress:     req.Gateway.ClusterAddress,
-			ContactAccountIDs:  req.Gateway.ContactAccountIDs,
-			DisableTxDelay:     req.Gateway.DisableTxDelay,
-			CreatedAt:          now,
-			UpdatedAt:          now,
+			GatewayIdentifiers:   req.Gateway.GatewayIdentifiers,
+			Description:          req.Gateway.Description,
+			FrequencyPlanID:      req.Gateway.FrequencyPlanID,
+			PrivacySettings:      req.Gateway.PrivacySettings,
+			AutoUpdate:           req.Gateway.AutoUpdate,
+			Platform:             req.Gateway.Platform,
+			Antennas:             req.Gateway.Antennas,
+			Attributes:           req.Gateway.Attributes,
+			ClusterAddress:       req.Gateway.ClusterAddress,
+			ContactAccountIDs:    req.Gateway.ContactAccountIDs,
+			ScheduleDownlinkLate: req.Gateway.ScheduleDownlinkLate,
+			CreatedAt:            now,
+			UpdatedAt:            now,
 		})
 		if err != nil {
 			return err
@@ -201,8 +201,8 @@ func copyGatewayFields(recipient, origin *ttnpb.Gateway, paths []string) error {
 			recipient.Platform = origin.Platform
 		case ttnpb.FieldPathGatewayContactAccountIDs:
 			recipient.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: origin.ContactAccountIDs.GetUserID()}}
-		case ttnpb.FieldPathGatewayDisableTxDelay:
-			recipient.DisableTxDelay = origin.DisableTxDelay
+		case ttnpb.FieldPathGatewayScheduleDownlinkLate:
+			recipient.ScheduleDownlinkLate = origin.ScheduleDownlinkLate
 		default:
 			if !strings.HasPrefix(path, ttnpb.FieldPrefixGatewayAttributes) {
 				return errPathUpdateMask.WithAttributes("path", path)

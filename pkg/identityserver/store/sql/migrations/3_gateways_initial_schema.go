@@ -17,19 +17,19 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS gateways (
-			id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			gateway_id          VARCHAR(36) UNIQUE NOT NULL,
-			eui                 BYTEA UNIQUE,
-			description         VARCHAR NOT NULL DEFAULT '',
-			frequency_plan_id   VARCHAR(36) NOT NULL,
-			activated_at        TIMESTAMP DEFAULT NULL,
-			privacy_settings    VARCHAR NOT NULL DEFAULT '',
-			auto_update         BOOL DEFAULT TRUE,
-			platform            VARCHAR NOT NULL DEFAULT '',
-			cluster_address     VARCHAR NOT NULL,
-			disable_tx_delay    BOOL NOT NULL DEFAULT FALSE,
-			created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+			id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			gateway_id               VARCHAR(36) UNIQUE NOT NULL,
+			eui                      BYTEA UNIQUE,
+			description              VARCHAR NOT NULL DEFAULT '',
+			frequency_plan_id        VARCHAR(36) NOT NULL,
+			activated_at             TIMESTAMP DEFAULT NULL,
+			privacy_settings         VARCHAR NOT NULL DEFAULT '',
+			auto_update              BOOL DEFAULT TRUE,
+			platform                 VARCHAR NOT NULL DEFAULT '',
+			cluster_address          VARCHAR NOT NULL,
+			schedule_downlink_late   BOOL NOT NULL DEFAULT FALSE,
+			created_at               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,

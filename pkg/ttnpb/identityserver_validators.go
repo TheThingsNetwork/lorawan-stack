@@ -261,7 +261,7 @@ func (req *UpdateGatewayRequest) Validate() error {
 			FieldPathGatewayAutoUpdate,
 			FieldPathGatewayPlatform,
 			FieldPathGatewayAntennas,
-			FieldPathGatewayDisableTxDelay:
+			FieldPathGatewayScheduleDownlinkLate:
 		case FieldPathGatewayClusterAddress:
 			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address")
 		case FieldPathGatewayFrequencyPlanID:
