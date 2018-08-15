@@ -65,12 +65,12 @@ type gsImplementation struct {
 	*component.Component
 }
 
-// GetGatewayObservations implements ttnpb.GsServer
-func (gs *gsImplementation) GetGatewayObservations(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
+// GetGatewayConnectionStats implements ttnpb.GsServer
+func (gs *gsImplementation) GetGatewayConnectionStats(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-	return &ttnpb.GatewayObservations{}, nil
+	return &ttnpb.GatewayConnectionStats{}, nil
 }
 
 func TestUnaryHook(t *testing.T) {
@@ -138,7 +138,7 @@ func TestUnaryHook(t *testing.T) {
 
 	// Failing calls
 	{
-		_, err = gsClient.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{})
+		_, err = gsClient.GetGatewayConnectionStats(ctx, &ttnpb.GatewayIdentifiers{})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
@@ -154,7 +154,7 @@ func TestUnaryHook(t *testing.T) {
 
 	// Successful calls
 	{
-		_, err = gsClient.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{}, c.WithClusterAuth())
+		_, err = gsClient.GetGatewayConnectionStats(ctx, &ttnpb.GatewayIdentifiers{}, c.WithClusterAuth())
 		a.So(err, should.BeNil)
 		sub, err := asClient.Subscribe(ctx, &ttnpb.ApplicationIdentifiers{}, c.WithClusterAuth())
 		a.So(err, should.BeNil)
