@@ -67,7 +67,7 @@ Changes that affect multiple components can be comma separated.
 
 Good commit messages:
 - `ns: Fix MIC check`
-- `make: Set version from git tag, closes #123`
+- `dev: Set version from git tag, closes #123`
 - `ns,as,gs: Fix TLS check`
 
 Make sure that commits are scoped to something meaningful and could, potentially, be merged individually.
