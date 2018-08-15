@@ -102,11 +102,11 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.upCh <- up:
+		atomic.AddUint64(&c.uplinks, 1)
+		atomic.StoreInt64(&c.lastUplinkTime, time.Now().UnixNano())
 	default:
 		return errBufferFull
 	}
-	atomic.AddUint64(&c.uplinks, 1)
-	atomic.StoreInt64(&c.lastUplinkTime, time.Now().UnixNano())
 	return nil
 }
 
@@ -116,11 +116,11 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.statusCh <- status:
+		c.lastStatus.Store(status)
+		atomic.StoreInt64(&c.lastStatusTime, time.Now().UnixNano())
 	default:
 		return errBufferFull
 	}
-	c.lastStatus.Store(status)
-	atomic.StoreInt64(&c.lastStatusTime, time.Now().UnixNano())
 	return nil
 }
 
@@ -144,11 +144,11 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.downCh <- down:
+		atomic.AddUint64(&c.downlinks, 1)
+		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
 	default:
 		return errBufferFull
 	}
-	atomic.AddUint64(&c.downlinks, 1)
-	atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
 	return nil
 }
 
