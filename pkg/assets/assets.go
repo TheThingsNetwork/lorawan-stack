@@ -23,7 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync/atomic"
+	"sync"
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/assets/templates"
@@ -122,21 +122,30 @@ var errTemplateNotFound = errors.DefineNotFound("template_not_found", "template 
 // AppHandler returns an echo.HandlerFunc that renders an application.
 func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 	var (
-		tv   atomic.Value
-		data = templates.Data{
-			Env: env,
+		logger       = a.logger.WithField("template", name)
+		renderMu     sync.RWMutex
+		renderErr    error
+		renderResult *bytes.Buffer
+		render       = func(t *template.Template, data templates.Data) {
+			res := &bytes.Buffer{}
+			err := t.Execute(res, data)
+			renderMu.Lock()
+			renderResult, renderErr = res, err
+			renderMu.Unlock()
 		}
-		logger = a.logger.WithField("template", name)
 	)
 	if a.fs != nil {
-		data.Root = a.config.Mount
+		data := templates.Data{
+			Root: a.config.Mount,
+			Env:  env,
+		}
 		loadTemplate := func() {
 			t, err := a.loadTemplate(name)
 			if err != nil {
 				logger.WithError(err).Error("Could not load template")
 				return
 			}
-			tv.Store(t)
+			render(t, data)
 			logger.Debug("Loaded template")
 		}
 		loadTemplate()
@@ -152,28 +161,26 @@ func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 	} else {
 		appData, ok := a.config.Apps[name]
 		if ok {
-			data.Root = a.config.CDN
-			data.Data = appData
-			tv.Store(templates.App)
+			render(templates.App, templates.Data{
+				Root: a.config.CDN,
+				Env:  env,
+				Data: appData,
+			})
 		}
-	}
-
-	var err error
-	var buf *bytes.Buffer
-	t, ok := tv.Load().(*template.Template)
-	if !ok {
-		err = errTemplateNotFound.WithAttributes("name", name)
-	} else {
-		buf = &bytes.Buffer{}
-		err = t.Execute(buf, data)
 	}
 
 	return func(c echo.Context) error {
+		renderMu.RLock()
+		res, err := renderResult, renderErr
+		renderMu.RUnlock()
 		if err != nil {
 			return err
 		}
+		if res == nil {
+			return errTemplateNotFound.WithAttributes("name", name)
+		}
 		c.Response().WriteHeader(http.StatusOK)
-		_, err := io.Copy(c.Response().Writer, buf)
+		_, err = io.Copy(c.Response().Writer, res)
 		return err
 	}
 }
