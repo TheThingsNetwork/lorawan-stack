@@ -16,13 +16,13 @@ package component
 
 import (
 	"crypto/subtle"
+	"net"
 	"net/http"
 	"net/http/pprof"
 	"strings"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -33,41 +33,21 @@ func (c *Component) RegisterWeb(s web.Registerer) {
 	c.webSubsystems = append(c.webSubsystems, s)
 }
 
-func (c *Component) listenWeb() (err error) {
-	if c.config.HTTP.Listen != "" {
-		l, err := c.ListenTCP(c.config.HTTP.Listen)
-		if err != nil {
-			return errors.NewWithCause(err, "Could not listen on HTTP port")
-		}
-		lis, err := l.TCP()
-		if err != nil {
-			return errors.NewWithCause(err, "Could not create TCP HTTP listener")
-		}
-		c.logger.WithFields(log.Fields("namespace", "web", "address", c.config.HTTP.Listen)).Info("Listening for HTTP connections")
-		go func() {
-			err := http.Serve(lis, c)
-			if err != nil && c.ctx.Err() == nil {
-				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
-			}
-		}()
-	}
+func (c *Component) serveHTTP(lis net.Listener) error {
+	return http.Serve(lis, c)
+}
 
-	if c.config.HTTP.ListenTLS != "" {
-		l, err := c.ListenTCP(c.config.HTTP.ListenTLS)
-		if err != nil {
-			return errors.NewWithCause(err, "Could not listen on HTTP/tls port")
-		}
-		lis, err := l.TLS()
-		if err != nil {
-			return errors.NewWithCause(err, "Could not create TLS HTTP listener")
-		}
-		c.logger.WithFields(log.Fields("namespace", "web", "address", c.config.HTTP.ListenTLS)).Info("Listening for HTTPS connections")
-		go func() {
-			err := http.Serve(lis, c)
-			if err != nil && c.ctx.Err() == nil {
-				c.logger.WithError(err).Errorf("Error serving HTTPS on %s", lis.Addr())
-			}
-		}()
+func (c *Component) httpListenerConfigs() []endpoint {
+	return []endpoint{
+		{toNativeListener: Listener.TCP, address: c.config.HTTP.Listen, protocol: "HTTP"},
+		{toNativeListener: Listener.TLS, address: c.config.HTTP.ListenTLS, protocol: "HTTPS"},
+	}
+}
+
+func (c *Component) listenWeb() (err error) {
+	err = c.serveOnListeners(c.httpListenerConfigs(), (*Component).serveHTTP, "web")
+	if err != nil {
+		return
 	}
 
 	if c.config.HTTP.PProf.Enable {

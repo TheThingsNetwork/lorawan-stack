@@ -16,12 +16,12 @@ package component
 
 import (
 	"context"
+	"net"
 	"net/http"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/labstack/echo"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -55,43 +55,19 @@ func (c *Component) setupGRPC() (err error) {
 	return nil
 }
 
-func (c *Component) listenGRPC() (err error) {
-	if c.config.GRPC.Listen != "" {
-		l, err := c.ListenTCP(c.config.GRPC.Listen)
-		if err != nil {
-			return errors.New("could not listen on gRPC port").WithCause(err)
-		}
-		lis, err := l.TCP()
-		if err != nil {
-			return errors.New("could not create TCP gRPC listener").WithCause(err)
-		}
-		c.logger.WithFields(log.Fields("namespace", "grpc", "address", c.config.GRPC.Listen)).Info("Listening for TCP gRPC connections")
-		go func() {
-			err := c.grpc.Serve(lis)
-			if err != nil && c.ctx.Err() == nil {
-				c.logger.WithError(err).Errorf("Error serving gRPC on %s", lis.Addr())
-			}
-		}()
-	}
-	if c.config.GRPC.ListenTLS != "" {
-		l, err := c.ListenTCP(c.config.GRPC.ListenTLS)
-		if err != nil {
-			return errors.New("could not listen on gRPC/tls port").WithCause(err)
-		}
-		lis, err := l.TLS()
-		if err != nil {
-			return errors.New("could not create TLS gRPC listener").WithCause(err)
-		}
-		c.logger.WithFields(log.Fields("namespace", "grpc", "address", c.config.GRPC.ListenTLS)).Info("Listening for TLS gRPC connections")
-		go func() {
-			err := c.grpc.Serve(lis)
-			if err != nil && c.ctx.Err() == nil {
-				c.logger.WithError(err).Errorf("Error serving gRPC/tls on %s", lis.Addr())
-			}
-		}()
-	}
+func (c *Component) serveGRPC(lis net.Listener) error {
+	return c.grpc.Serve(lis)
+}
 
-	return nil
+func (c *Component) grpcListenerConfigs() []endpoint {
+	return []endpoint{
+		{toNativeListener: Listener.TCP, address: c.config.GRPC.Listen, protocol: "gRPC"},
+		{toNativeListener: Listener.TLS, address: c.config.GRPC.ListenTLS, protocol: "gRPC/tls"},
+	}
+}
+
+func (c *Component) listenGRPC() (err error) {
+	return c.serveOnListeners(c.grpcListenerConfigs(), (*Component).serveGRPC, "grpc")
 }
 
 // RegisterGRPC registers a gRPC subsystem to the component

@@ -21,9 +21,15 @@ import (
 	"time"
 
 	"github.com/soheilhy/cmux"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/fs"
+	"go.thethings.network/lorawan-stack/pkg/log"
+)
+
+var (
+	errListenEndpoint = errors.Define("listen_endpoint", "could not listen on `{endpoint}` address")
+	errListener       = errors.Define("listener", "could not create `{protocol}` listener")
 )
 
 func (c *Component) tlsConfig() (*tls.Config, error) {
@@ -155,4 +161,43 @@ func (c *Component) ListenUDP(address string) (*net.UDPConn, error) {
 		return nil, err
 	}
 	return net.ListenUDP("udp", udpAddr)
+}
+
+type endpoint struct {
+	toNativeListener func(Listener) (net.Listener, error)
+
+	address, protocol string
+}
+
+func (c *Component) serveOnListeners(endpoints []endpoint, serve func(*Component, net.Listener) error, namespace string) error {
+	for _, endpoint := range endpoints {
+		if endpoint.address == "" {
+			continue
+		}
+		err := c.serveOnListener(endpoint, serve, namespace)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Component) serveOnListener(endpoint endpoint, serve func(*Component, net.Listener) error, namespace string) error {
+	l, err := c.ListenTCP(endpoint.address)
+	if err != nil {
+		return errListenEndpoint.WithAttributes("endpoint", endpoint.address).WithCause(err)
+	}
+	lis, err := endpoint.toNativeListener(l)
+	if err != nil {
+		return errListener.WithAttributes("protocol", endpoint.protocol).WithCause(err)
+	}
+	logger := log.FromContext(c.ctx).WithFields(log.Fields("namespace", namespace, "address", endpoint.address))
+	logger.Infof("Listening for %s connections", endpoint.protocol)
+	go func() {
+		err := serve(c, lis)
+		if err != nil && c.ctx.Err() == nil {
+			logger.WithError(err).Errorf("Error serving %s on %s", endpoint.protocol, lis.Addr())
+		}
+	}()
+	return nil
 }

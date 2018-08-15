@@ -1259,6 +1259,24 @@
       "file": "cluster.go"
     }
   },
+  "error:pkg/component:listen_endpoint": {
+    "translations": {
+      "en": "could not listen on `{endpoint}` address"
+    },
+    "description": {
+      "package": "pkg/component",
+      "file": "listeners.go"
+    }
+  },
+  "error:pkg/component:listener": {
+    "translations": {
+      "en": "could not create `{protocol}` listener"
+    },
+    "description": {
+      "package": "pkg/component",
+      "file": "listeners.go"
+    }
+  },
   "error:pkg/console:extract_path_from_public_url": {
     "translations": {
       "en": "could not extract path from public URL `{url}`"
