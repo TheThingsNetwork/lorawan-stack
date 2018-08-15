@@ -64,7 +64,7 @@ It has these top-level messages:
 	GatewayAntenna
 	GatewayRadio
 	GatewayStatus
-	GatewayObservations
+	GatewayConnectionStats
 	GatewayUp
 	GatewayDown
 	GetFrequencyPlanRequest

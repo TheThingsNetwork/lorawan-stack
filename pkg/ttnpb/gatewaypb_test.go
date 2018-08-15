@@ -634,15 +634,15 @@ func BenchmarkGatewayStatusProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayObservationsProto(t *testing.T) {
+func TestGatewayConnectionStatsProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayObservations(popr, false)
+	p := NewPopulatedGatewayConnectionStats(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -668,10 +668,10 @@ func TestGatewayObservationsProto(t *testing.T) {
 	}
 }
 
-func TestGatewayObservationsMarshalTo(t *testing.T) {
+func TestGatewayConnectionStatsMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayObservations(popr, false)
+	p := NewPopulatedGatewayConnectionStats(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -681,7 +681,7 @@ func TestGatewayObservationsMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -696,12 +696,12 @@ func TestGatewayObservationsMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayObservationsProtoMarshal(b *testing.B) {
+func BenchmarkGatewayConnectionStatsProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayObservations, 10000)
+	pops := make([]*GatewayConnectionStats, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedGatewayObservations(popr, false)
+		pops[i] = NewPopulatedGatewayConnectionStats(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -714,18 +714,18 @@ func BenchmarkGatewayObservationsProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkGatewayObservationsProtoUnmarshal(b *testing.B) {
+func BenchmarkGatewayConnectionStatsProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedGatewayObservations(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedGatewayConnectionStats(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -862,16 +862,16 @@ func TestGatewayStatusJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestGatewayObservationsJSON(t *testing.T) {
+func TestGatewayConnectionStatsJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayObservations(popr, true)
+	p := NewPopulatedGatewayConnectionStats(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -1087,12 +1087,12 @@ func TestGatewayStatusProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestGatewayObservationsProtoText(t *testing.T) {
+func TestGatewayConnectionStatsProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayObservations(popr, true)
+	p := NewPopulatedGatewayConnectionStats(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1104,12 +1104,12 @@ func TestGatewayObservationsProtoText(t *testing.T) {
 	}
 }
 
-func TestGatewayObservationsProtoCompactText(t *testing.T) {
+func TestGatewayConnectionStatsProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayObservations(popr, true)
+	p := NewPopulatedGatewayConnectionStats(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1211,14 +1211,14 @@ func TestGatewayStatusVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestGatewayObservationsVerboseEqual(t *testing.T) {
+func TestGatewayConnectionStatsVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedGatewayObservations(popr, false)
+	p := NewPopulatedGatewayConnectionStats(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &GatewayObservations{}
+	msg := &GatewayConnectionStats{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1442,10 +1442,10 @@ func BenchmarkGatewayStatusSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayObservationsSize(t *testing.T) {
+func TestGatewayConnectionStatsSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayObservations(popr, true)
+	p := NewPopulatedGatewayConnectionStats(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1464,12 +1464,12 @@ func TestGatewayObservationsSize(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayObservationsSize(b *testing.B) {
+func BenchmarkGatewayConnectionStatsSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayObservations, 1000)
+	pops := make([]*GatewayConnectionStats, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedGatewayObservations(popr, false)
+		pops[i] = NewPopulatedGatewayConnectionStats(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
