@@ -52,6 +52,7 @@ export default class Input extends React.Component {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
+    onEnter: PropTypes.func,
     placeholder: PropTypes.string,
     error: PropTypes.bool,
     warning: PropTypes.bool,
@@ -66,6 +67,7 @@ export default class Input extends React.Component {
     onFocus: () => null,
     onBlur: () => null,
     onChange: () => null,
+    onEnter: () => null,
     type: 'text',
   }
 
@@ -123,6 +125,7 @@ export default class Input extends React.Component {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
           placeholder={placeholder}
           disabled={disabled}
           readOnly={readOnly}
@@ -145,6 +148,12 @@ export default class Input extends React.Component {
 
   onChange (evt) {
     this.props.onChange(evt.target.value)
+  }
+
+  onKeyDown (evt) {
+    if (evt.key === 'Enter') {
+      this.props.onEnter(evt.target.value)
+    }
   }
 }
 
