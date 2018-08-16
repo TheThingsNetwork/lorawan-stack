@@ -56,11 +56,10 @@ const NavigationBar = function ({
 NavigationBar.propTypes = {
   /**
    * A list of navigation bar entries.
-   * @param {title} The title to be displayed
-   * @param {icon} The icon name to be displayed next to the title
-   * @param {path} The path for a navigation tab
-   * @param {exact} Boolean flag identifying whether the path should
-   *  be matched exactly
+   * @param {(string|Object)} title - The title to be displayed
+   * @param {string} icon - The icon name to be displayed next to the title
+   * @param {string} path -  The path for a navigation tab
+   * @param {boolean} exact - Flag identifying whether the path should be matched exactly
    */
   entries: PropTypes.arrayOf(PropTypes.shape({
     path: PropTypes.string.isRequired,

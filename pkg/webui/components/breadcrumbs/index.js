@@ -53,9 +53,9 @@ const Breadcrumbs = function ({
 Breadcrumbs.propTypes = {
   /**
    * A list of breadcrumb entries.
-   * @param {title} The title to be displayed
-   * @param {icon} The icon name to be displayed next to the title
-   * @param {path} The path for a breadcrumb
+   * @param {(string|Object)} title - The title to be displayed
+   * @param {string} title - The icon name to be displayed next to the title
+   * @param {string} path - The path for a breadcrumb
    */
   entries: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.message.isRequired,
