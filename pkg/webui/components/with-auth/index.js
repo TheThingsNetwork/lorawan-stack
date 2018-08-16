@@ -18,6 +18,9 @@ import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router'
 import { connect } from 'react-redux'
 
+import Header from '../header'
+import * as user from '../../actions/user'
+
 /**
  * Auth is a component that wraps a tree that requires the user
  * to be authenticated.
@@ -29,6 +32,7 @@ export class Auth extends React.PureComponent {
   static propTypes = {
     user: PropTypes.object,
     fetching: PropTypes.bool,
+    header: PropTypes.bool,
   }
 
   render () {
@@ -36,6 +40,9 @@ export class Auth extends React.PureComponent {
       user,
       fetching,
       children,
+      header = true,
+      handleLogout,
+      handleSearchRequest,
     } = this.props
 
     if (fetching) {
@@ -46,7 +53,20 @@ export class Auth extends React.PureComponent {
       return <Redirect to={`/${window.ENV.console ? 'console' : 'oauth'}/login`} />
     }
 
-    return children
+    const headerElement = (
+      <Header
+        user={user}
+        handleLogout={handleLogout}
+        handleSearchRequest={handleSearchRequest}
+      />
+    )
+
+    return (
+      <React.Fragment>
+        { window.ENV.console && header && headerElement }
+        {children}
+      </React.Fragment>
+    )
   }
 }
 
@@ -57,4 +77,13 @@ const mapStateToProps = function (state) {
   }
 }
 
-export default connect(mapStateToProps)(Auth)
+const mapDispatchToProps = dispatch => ({
+  handleLogout () {
+    dispatch(user.logout())
+  },
+  handleSearchRequest () {
+    return null
+  },
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Auth)
