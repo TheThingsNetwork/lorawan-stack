@@ -16,7 +16,7 @@ import React from 'react'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
-import Header from '../../../components/header'
+import AuthRoute from '../../../lib/auth-route'
 import Init from '../../../components/init'
 import WithLocale from '../../../components/with-locale'
 import Login from '../login'
@@ -29,15 +29,14 @@ export default class ConsoleApp extends React.PureComponent {
       <Provider store={store}>
         <Init>
           <WithLocale>
-            <div>
-              <Header />
-              <BrowserRouter>
+            <BrowserRouter>
+              <React.Fragment>
                 <Switch>
-                  <Route exact path="/console" component={Landing} />
+                  <AuthRoute exact path="/console" component={Landing} />
                   <Route path="/console/login" component={Login} />
                 </Switch>
-              </BrowserRouter>
-            </div>
+              </React.Fragment>
+            </BrowserRouter>
           </WithLocale>
         </Init>
       </Provider>

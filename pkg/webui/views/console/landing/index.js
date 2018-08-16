@@ -14,22 +14,27 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-
-import WithAuth from '../../../components/with-auth'
+import bind from 'autobind-decorator'
 
 const mapStateToProps = state => ({
   user: state.user.user,
 })
 
 @connect(mapStateToProps)
+@bind
 export default class Landing extends React.PureComponent {
+
+  handleSearchRequest () {
+    return null
+  }
+
   render () {
-    const { user = {}} = this.props
+    const {
+      user = {},
+    } = this.props
 
     return (
-      <WithAuth>
-        <div>Welcome, {user.name}</div>
-      </WithAuth>
+      <div>Welcome, {user.name}</div>
     )
   }
 }
