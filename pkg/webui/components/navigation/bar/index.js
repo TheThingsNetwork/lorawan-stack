@@ -16,7 +16,7 @@ import React from 'react'
 import classnames from 'classnames'
 
 import NavigationLink from '../link'
-import Message from '../../message'
+import Message from '../../../lib/components/message'
 import Icon from '../../icon'
 import PropTypes from '../../../lib/prop-types'
 

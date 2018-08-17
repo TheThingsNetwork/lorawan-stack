@@ -25,7 +25,7 @@ import Button from '../../../components/button'
 import Field from '../../../components/field'
 import Form from '../../../components/form'
 import Logo from '../../../components/logo'
-import Message from '../../../components/message'
+import Message from '../../../lib/components/message'
 
 import style from './login.styl'
 

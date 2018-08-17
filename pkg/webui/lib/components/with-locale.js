@@ -21,12 +21,12 @@ import { connect } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 import CancelablePromise from 'cancelable-promise'
 
-import { withEnv } from '../../lib/env'
-import log, { error } from '../../lib/log'
+import log, { error } from '../log'
+import { withEnv } from './env'
 
 const defaultLanguage = 'en'
 const xx = 'xx'
-const dev = '../../lib/dev'
+const dev = '../../dev'
 
 /**
  * WithLocale is a component that fetches the user's preferred language and

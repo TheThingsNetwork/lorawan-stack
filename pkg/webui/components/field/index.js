@@ -23,7 +23,7 @@ import { warn } from '../../lib/log'
 import Icon from '../icon'
 import Input from '../input'
 import Checkbox from '../checkbox'
-import Message from '../message'
+import Message from '../../lib/components/message'
 
 import style from './field.styl'
 

@@ -15,8 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Message from '../message'
-import ErrorMessage from '../error-message'
+import Message from '../../lib/components/message'
+import ErrorMessage from '../../lib/components/error-message'
 import Icon from '../icon'
 
 import PropTypes from '../../lib/prop-types'

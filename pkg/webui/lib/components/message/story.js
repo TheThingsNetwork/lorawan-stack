@@ -41,7 +41,7 @@ const IntlDecorator = storyFn => (
   </IntlProvider>
 )
 
-storiesOf('Message', module)
+storiesOf('Utility Components/Message', module)
   .addDecorator((story, context) => withInfo({
     inline: true,
     header: false,

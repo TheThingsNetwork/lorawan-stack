@@ -23,7 +23,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import Modal from '../../../components/modal'
 import Spinner from '../../../components/spinner'
 import Icon from '../../../components/icon'
-import Message from '../../../components/message'
+import Message from '../../../lib/components/message'
 
 import { getClient } from '../../../actions/client'
 

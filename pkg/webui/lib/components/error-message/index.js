@@ -16,7 +16,7 @@ import React from 'react'
 
 import Message from '../message'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '../../prop-types'
 
 const ErrorMessage = function ({ content, ...rest }) {
 

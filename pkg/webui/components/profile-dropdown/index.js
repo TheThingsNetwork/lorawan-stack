@@ -17,7 +17,7 @@ import bind from 'autobind-decorator'
 import { Link } from 'react-router-dom'
 
 import Icon from '../icon'
-import Message from '../message'
+import Message from '../../lib/components/message'
 import PropTypes from '../../lib/prop-types'
 
 import styles from './profile-dropdown.styl'

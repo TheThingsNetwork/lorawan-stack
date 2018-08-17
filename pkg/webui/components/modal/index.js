@@ -18,7 +18,7 @@ import PropTypes from '../../lib/prop-types'
 
 import sharedMessages from '../../lib/shared-messages'
 
-import Message from '../message'
+import Message from '../../lib/components/message'
 import Button from '../button'
 import Logo from '../logo'
 

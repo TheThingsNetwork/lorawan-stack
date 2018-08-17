@@ -16,7 +16,7 @@ import React from 'react'
 import PropTypes from '../../lib/prop-types'
 
 import Pagination from '../pagination'
-import Message from '../message'
+import Message from '../../lib/components/message'
 import DataCell from './data-cell'
 import HeaderCell from './header-cell'
 

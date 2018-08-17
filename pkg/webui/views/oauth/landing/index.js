@@ -16,7 +16,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import Button from '../../../components/button'
-import WithAuth from '../../../components/with-auth'
+import WithAuth from '../../../lib/components/with-auth'
 import api from '../../../api'
 
 @connect((state, props) => ({

@@ -17,7 +17,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import displayName from 'react-display-name'
 
-import { warn } from './log'
+import { warn } from '../log'
 
 export const withEnv = function (Component) {
   const Base = Component.prototype instanceof React.Component ? React.Component : React.PureComponent

@@ -17,7 +17,7 @@ import classnames from 'classnames'
 
 import PropTypes from '../../lib/prop-types'
 import Spinner from '../spinner'
-import Message from '../message'
+import Message from '../../lib/components/message'
 import Icon from '../icon'
 
 import style from './button.styl'

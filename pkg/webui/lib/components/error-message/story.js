@@ -32,7 +32,7 @@ const exampleError = {
   }],
 }
 
-storiesOf('ErrorMessage', module)
+storiesOf('Utility Components/ErrorMessage', module)
   .addDecorator((story, context) => withInfo({
     inline: true,
     header: false,

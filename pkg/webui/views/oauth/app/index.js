@@ -16,14 +16,14 @@ import React from 'react'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
-import WithLocale from '../../../components/with-locale'
-import { EnvProvider } from '../../../lib/env'
+import WithLocale from '../../../lib/components/with-locale'
+import { EnvProvider } from '../../../lib/components/env'
 
 import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import store from '../../../store'
-import Init from '../../../components/init'
+import Init from '../../../lib/components/init'
 
 const env = window.ENV || {}
 

@@ -15,8 +15,8 @@
 import React from 'react'
 import { FormattedMessage } from 'react-intl'
 
-import { warn } from '../../lib/log'
-import PropTypes from '../../lib/prop-types'
+import { warn } from '../../log'
+import PropTypes from '../../prop-types'
 
 const warned = {}
 const warning = function (message) {
