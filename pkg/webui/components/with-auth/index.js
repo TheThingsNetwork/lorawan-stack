@@ -81,9 +81,6 @@ const mapDispatchToProps = dispatch => ({
   handleLogout () {
     dispatch(user.logout())
   },
-  handleSearchRequest () {
-    return null
-  },
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Auth)

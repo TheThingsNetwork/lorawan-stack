@@ -116,11 +116,11 @@ Header.propTypes = {
   /**
   * A handler for when the user clicks the logout button
   */
-  handleLogout: PropTypes.func.isRequired,
+  handleLogout: PropTypes.func,
   /**
   * A handler for when the user used the search input
   */
-  handleSearchRequest: PropTypes.func.isRequired,
+  handleSearchRequest: PropTypes.func,
 }
 
 export default Header
