@@ -1,7 +1,6 @@
 {
   "Enable": [
     "deadcode",
-    "dupl",
     "gosec",
     "goconst",
     "gofmt",
