@@ -22,6 +22,7 @@ import { IntlProvider } from 'react-intl'
 import createHistory from 'history/createMemoryHistory'
 
 import '../../pkg/webui/styles/main.styl'
+import 'focus-visible/dist/focus-visible'
 import store from '../../pkg/webui/store'
 
 import Center from './center'

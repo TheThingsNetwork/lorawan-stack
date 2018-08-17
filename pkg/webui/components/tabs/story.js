@@ -15,7 +15,6 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import { storiesOf } from '@storybook/react'
-import 'focus-visible/dist/focus-visible'
 import { withInfo } from '@storybook/addon-info'
 
 import Tabs from '.'
