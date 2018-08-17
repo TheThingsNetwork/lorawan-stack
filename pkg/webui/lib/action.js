@@ -29,12 +29,12 @@ const validator = {
  * Creates an object of action creators based on the definition.
  *
  * @param {string} namespace - The namespace of the actions.
- * @param {object} def - The action creator definitions.
- * @param {object} def.key - A definition of an action creator, named by key
- * @param {object} def.key.types - A proptype object describing the type of payload
- * @param {function} def.key.transform - A transformer for the arguments, run before the type check
+ * @param {Object} def - The action creator definitions.
+ * @param {Object} def.key - A definition of an action creator, named by key
+ * @param {Object} def.key.types - A proptype object describing the type of payload
+ * @param {Function} def.key.transform - A transformer for the arguments, run before the type check
  *
- * @returns {object} - An object containing the action creators.
+ * @returns {Object} - An object containing the action creators.
  */
 export default function (namespace, def) {
   if (!namespace) {

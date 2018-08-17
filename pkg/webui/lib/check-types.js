@@ -21,8 +21,8 @@ import secret from 'prop-types/lib/ReactPropTypesSecret'
  * Assert that the values match with the type specs.
  * Throws if a type is wrong.
  *
- * @param {object} specs - Map of name to a PropType
- * @param {object} values - Runtime values that need to be type-checked
+ * @param {Object} specs - Map of name to a PropType
+ * @param {Object} values - Runtime values that need to be type-checked
  * @param {string} location - e.g. "prop", "context", "child context"
  * @param {string} component - Name of the component for error messages.
  */

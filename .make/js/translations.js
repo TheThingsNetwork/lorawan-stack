@@ -122,7 +122,7 @@ const read = function (filename) {
  * @param {string} filename - The file to write to.
  * @param {string} content - The content to write.
  *
- * @returns {Promise<void>} - A promise that resolves when the file has been written.
+ * @returns {Promise<undefined>} - A promise that resolves when the file has been written.
  */
 const write = function (filename, content) {
   return new Promise(function (resolve, reject) {
@@ -144,7 +144,7 @@ const write = function (filename, content) {
  * have an corresponding file in the localesDir will be filled in.
  * Locales that are in the localesDir but not in --support will be omitted.
  *
- * @returns {object} - The locales, keyed by locale name.
+ * @returns {Object} - The locales, keyed by locale name.
  *   For example: `{ en: { ... }, ja: { ... }}`
  */
 const readLocales = async function () {
@@ -176,7 +176,7 @@ const readLocales = async function () {
  * Read and parse messages that were exported by babel-plugin-react-intl, located in
  * messagesDir (specified by --messages).
  *
- * @returns {object} - The messages, keyed by message id.
+ * @returns {Object} - The messages, keyed by message id.
  */
 const readMessages = async function () {
   if (!messagesDir) {
@@ -204,7 +204,7 @@ const readMessages = async function () {
 /**
  * Read and parse (and marshal) the backend messages, coming from `make go.translations`
  *
- * @returns {object} - The backend messages, keyed by message id.
+ * @returns {Object} - The backend messages, keyed by message id.
  */
 const readBackendMessages = async function () {
   if (!backendMessages) {
@@ -227,7 +227,7 @@ const readBackendMessages = async function () {
 /**
  * get a nested key in an object or return null if not found.
  *
- * @param {object} object - The object to find the key in.
+ * @param {Object} object - The object to find the key in.
  * @param {Array<string>} pth - The path to find in the object.
  * @returns {any} - The value of the key at the path, or null if not found.
  */
@@ -252,8 +252,8 @@ const get = function (object, ...pth) {
 /**
  * Write locales to their corresponding file in the localesDir (specified by --locales).
  *
- * @param {object} locales - The locales to write.
- * @returns {Promise<void>} - A promise that resolves when all locales have been written.
+ * @param {Object} locales - The locales to write.
+ * @returns {Promise<undefined>} - A promise that resolves when all locales have been written.
  */
 const writeLocales = async function (locales) {
   return Promise.all(Object.keys(locales).map(async function (key) {

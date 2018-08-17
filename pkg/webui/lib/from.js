@@ -41,10 +41,10 @@
  *     const classname = classnames(style.foo, ...from(styles, props, [ "foo", "bar" ]))
  *
  *
- * @param {object} a - The object to take the values from.
- * @param {object} b - The object that controls which values will be taken.
- * @param {array} only - Filter the keys by name.
- * @returns {array} - An array of values from a for which the key in b had a trueish value.
+ * @param {Object} a - The object to take the values from.
+ * @param {Object} b - The object that controls which values will be taken.
+ * @param {Array} only - Filter the keys by name.
+ * @returns {Array} - An array of values from a for which the key in b had a trueish value.
  */
 export default function (a = {}, b = {}, only) {
   const res = []
