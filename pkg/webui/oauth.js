@@ -16,7 +16,5 @@ import React from 'react'
 import DOM from 'react-dom'
 import OAuthApp from './views/oauth/app'
 
-import './styles/main.styl'
-
 const root = document.getElementById('app')
 DOM.render((<OAuthApp />), root)

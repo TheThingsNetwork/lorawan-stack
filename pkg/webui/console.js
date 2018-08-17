@@ -16,8 +16,6 @@ import React from 'react'
 import DOM from 'react-dom'
 import ConsoleApp from './views/console/app'
 
-import './styles/main.styl'
-
 const root = document.getElementById('app')
 DOM.render((<ConsoleApp />), root)
 

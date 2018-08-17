@@ -14,8 +14,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import 'focus-visible/dist/focus-visible'
 
 import Spinner from '../spinner'
+
+import '../../styles/main.styl'
 
 @connect(state => (
   {
