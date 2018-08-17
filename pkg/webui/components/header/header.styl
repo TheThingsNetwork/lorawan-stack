@@ -14,21 +14,45 @@
 
 .bar
   border-normal('bottom')
+
   height: 120px
+  position: relative
   display: flex
   padding: 0 $ls.s
+  justify-content: space-between
 
 .logo
-  width: 20%
   display: flex
   align-items: center
   justify-content: flex-start
+  flex-grow: 1
 
   svg
     height: 35px
     nudge('up', 3px)
 
-  .nav-list
-    width: 50%
-    background: red
+.nav-list
+  display: flex
+  align-items: stretch
+  justify-content: space-between
+  padding: 0 $cs.l
+  flex-grow: 3
 
+.left
+  display: flex
+  max-width: 60rem
+  flex-grow: 1
+
+.right
+  padding-left: $cs.l
+  display: flex
+  align-items: center
+  justify-content: space-between
+  max-width: 25rem
+  flex-grow: 1
+
+  & > div:first-child
+    max-width: 15rem
+    margin-right: $ls.s
+    border-radius: 60px
+    border-color: $c-divider-dark

@@ -15,18 +15,112 @@
 import React from 'react'
 
 import Logo from '../logo'
+import NavigationBar from '../navigation/bar'
+import ProfileDropdown from '../profile-dropdown'
+import Input from '../input'
+import PropTypes from '../../lib/prop-types'
+import sharedMessages from '../../lib/shared-messages'
 
 import styles from './header.styl'
 
-const Header = function () {
+const defaultNavigationEntries = [
+  {
+    title: sharedMessages.overview,
+    icon: 'overview',
+    path: '/console/overview',
+  },
+  {
+    title: sharedMessages.applications,
+    icon: 'application',
+    path: '/console/overview',
+  },
+  {
+    title: sharedMessages.gateways,
+    icon: 'gateway',
+    path: '/console/gateways',
+  },
+  {
+    title: sharedMessages.organizations,
+    icon: 'organization',
+    path: '/console/organizations',
+  },
+]
+
+const defaultDropdownItems = handleLogout => [
+  {
+    title: sharedMessages.profileSettings,
+    icon: 'settings',
+    link: '/profile-settings',
+  },
+  {
+    title: sharedMessages.logout,
+    icon: 'power_settings_new',
+    action: handleLogout,
+  },
+]
+
+const Header = function ({
+  handleLogout = () => null,
+  dropdownItems = defaultDropdownItems(handleLogout),
+  navigationEntries = defaultNavigationEntries,
+  user,
+  handleSearchRequest = () => null,
+  ...rest
+}) {
 
   return (
-    <nav className={styles.bar}>
-      <div className={styles.logo}><Logo /></div>
-      <ul className={styles.navList} />
-      <div className="right-options" />
-    </nav>
+    <header {...rest} className={styles.bar}>
+      <div className={styles.left}>
+        <div className={styles.logo}><Logo /></div>
+        <NavigationBar className={styles.navList} entries={navigationEntries} />
+      </div>
+      <div className={styles.right}>
+        <Input icon="search" onEnter={handleSearchRequest} />
+        <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} user={user} />
+      </div>
+    </header>
   )
+}
+
+Header.propTypes = {
+  /**
+  * The User object, retrieved from the API
+  */
+  user: PropTypes.object.isRequired,
+  /**
+  * A list of items for the dropdown
+  * @param {(string|Object)} title - The title to be displayed
+  * @param {string} icon - The icon name to be displayed next to the title
+  * @param {string} path - The path for a navigation tab
+  * @param {function} action - Alternatively, the function to be called on click
+  */
+  dropdownItems: PropTypes.arrayOf(PropTypes.shape({
+    title: PropTypes.message.isRequired,
+    icon: PropTypes.string,
+    path: PropTypes.string.isRequired,
+    action: PropTypes.func,
+  })),
+  /**
+   * A list of navigation bar entries.
+   * @param {(string|Object)} title - The title to be displayed
+   * @param {string} icon - The icon name to be displayed next to the title
+   * @param {string} path -  The path for a navigation tab
+   * @param {boolean} exact - Flag identifying whether the path should be matched exactly
+   */
+  navigationEntries: PropTypes.arrayOf(PropTypes.shape({
+    path: PropTypes.string.isRequired,
+    title: PropTypes.message.isRequired,
+    action: PropTypes.func,
+    icon: PropTypes.string,
+  })),
+  /**
+  * A handler for when the user clicks the logout button
+  */
+  handleLogout: PropTypes.func.isRequired,
+  /**
+  * A handler for when the user used the search input
+  */
+  handleSearchRequest: PropTypes.func.isRequired,
 }
 
 export default Header
