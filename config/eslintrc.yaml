@@ -6,6 +6,7 @@ parser: babel-eslint
 
 plugins:
   - flowtype
+  - jsdoc
 
 settings:
   flowtype:
@@ -26,6 +27,13 @@ rules:
     - warn
     - maxSize: 400
 
+  jsdoc/no-undefined-types: error
+  jsdoc/check-param-names: error
+  jsdoc/check-types: error
+  jsdoc/require-param-name: error
+  jsdoc/require-param-type: error
+  jsdoc/require-hyphen-before-param-description: error
+
   # Warn on console occurrences
   no-console:
     - warn
@@ -39,8 +47,4 @@ rules:
         argument: param
         class: constructor
         virtual: abstract
-      preferType:
-        String: string
-        Object: object
-        Function: function
       requireReturn: false

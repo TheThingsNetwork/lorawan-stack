@@ -39,6 +39,7 @@
     "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jest": "^21.17.0",
+    "eslint-plugin-jsdoc": "^3.7.1",
     "eslint-plugin-react": "^7.4.0",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
