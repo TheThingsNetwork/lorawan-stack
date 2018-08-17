@@ -71,7 +71,7 @@ type TypedMapStore interface {
 	Deleter
 }
 
-// TypedMapStore represents a store, which stores data as []byte.
+// ByteMapStore represents a store holding data as []byte.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
 //

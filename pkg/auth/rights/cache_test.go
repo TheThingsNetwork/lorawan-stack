@@ -46,7 +46,7 @@ func TestCache(t *testing.T) {
 
 	mockFetcher.applicationError, mockFetcher.gatewayError, mockFetcher.organizationError = mockErr, mockErr, mockErr
 
-	ctxA := context.WithValue(test.Context(), "ctx", "A")
+	ctxA := context.WithValue(test.Context(), struct{}{}, "A")
 	res := fetchRights(ctxA, "foo", c)
 
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)
@@ -59,7 +59,7 @@ func TestCache(t *testing.T) {
 
 	timeTravel(31 * time.Second) // Error responses should be cached for 1 minute.
 
-	ctxB := context.WithValue(test.Context(), "ctx", "B")
+	ctxB := context.WithValue(test.Context(), struct{}{}, "B")
 	res = fetchRights(ctxB, "foo", c)
 
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)

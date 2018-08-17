@@ -388,7 +388,7 @@ func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 	return err
 }
 
-// Find implements store.ByteSetStore.
+// Put implements store.ByteSetStore.
 func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey

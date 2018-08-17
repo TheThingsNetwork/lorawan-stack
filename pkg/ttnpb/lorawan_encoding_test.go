@@ -106,7 +106,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_JOIN_REQUEST, Major: 0},
-				Payload: &Message_JoinRequestPayload{&JoinRequestPayload{
+				Payload: &Message_JoinRequestPayload{JoinRequestPayload: &JoinRequestPayload{
 					JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevNonce: types.DevNonce{0x42, 0xff},
@@ -132,7 +132,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_JOIN_ACCEPT, Major: 0},
-				Payload: &Message_JoinAcceptPayload{&JoinAcceptPayload{
+				Payload: &Message_JoinAcceptPayload{JoinAcceptPayload: &JoinAcceptPayload{
 					Encrypted: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				}},
 			},
@@ -146,7 +146,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_UNCONFIRMED_UP, Major: 0},
-				Payload: &Message_MACPayload{&MACPayload{
+				Payload: &Message_MACPayload{MACPayload: &MACPayload{
 					FHDR: FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: FCtrl{
@@ -193,7 +193,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_UNCONFIRMED_DOWN, Major: 0},
-				Payload: &Message_MACPayload{&MACPayload{
+				Payload: &Message_MACPayload{MACPayload: &MACPayload{
 					FHDR: FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: FCtrl{
@@ -240,7 +240,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_CONFIRMED_UP, Major: 0},
-				Payload: &Message_MACPayload{&MACPayload{
+				Payload: &Message_MACPayload{MACPayload: &MACPayload{
 					FHDR: FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: FCtrl{
@@ -287,7 +287,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_CONFIRMED_DOWN, Major: 0},
-				Payload: &Message_MACPayload{&MACPayload{
+				Payload: &Message_MACPayload{MACPayload: &MACPayload{
 					FHDR: FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: FCtrl{
@@ -334,7 +334,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_REJOIN_REQUEST, Major: 0},
-				Payload: &Message_RejoinRequestPayload{&RejoinRequestPayload{
+				Payload: &Message_RejoinRequestPayload{RejoinRequestPayload: &RejoinRequestPayload{
 					RejoinType: 0,
 					NetID:      types.NetID{0x42, 0xff, 0xff},
 					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -363,7 +363,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_REJOIN_REQUEST, Major: 0},
-				Payload: &Message_RejoinRequestPayload{&RejoinRequestPayload{
+				Payload: &Message_RejoinRequestPayload{RejoinRequestPayload: &RejoinRequestPayload{
 					RejoinType: 1,
 					JoinEUI:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -392,7 +392,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		{
 			&Message{
 				MHDR: MHDR{MType: MType_REJOIN_REQUEST, Major: 0},
-				Payload: &Message_RejoinRequestPayload{&RejoinRequestPayload{
+				Payload: &Message_RejoinRequestPayload{RejoinRequestPayload: &RejoinRequestPayload{
 					RejoinType: 2,
 					NetID:      types.NetID{0x42, 0xff, 0xff},
 					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},

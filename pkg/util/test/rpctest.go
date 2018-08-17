@@ -130,7 +130,7 @@ func (s *MockServerTransportStream) Method() string {
 	return s.MethodFunc()
 }
 
-// Method calls s.SetTrailerFunc or s.MockServerStream.SetTrailer if s.SetTrailerFunc is nil.
+// SetTrailer calls s.SetTrailerFunc or s.MockServerStream.SetTrailer if s.SetTrailerFunc is nil.
 func (s *MockServerTransportStream) SetTrailer(md metadata.MD) error {
 	if s == nil {
 		return nil

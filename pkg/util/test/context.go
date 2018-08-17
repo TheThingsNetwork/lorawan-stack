@@ -63,7 +63,7 @@ func ContextParent(ctx context.Context) (context.Context, bool) {
 
 // ContextHasParent reports whether parent is one of ctx's parents.
 // ContextHasParent assumes that ctx has a parent iff it's located at field named Context.
-func ContextHasParent(ctx context.Context, parent context.Context) bool {
+func ContextHasParent(ctx, parent context.Context) bool {
 	for {
 		p, ok := ContextParent(ctx)
 		if !ok {
@@ -90,15 +90,18 @@ func ContextRoot(ctx context.Context) context.Context {
 
 type tKey struct{}
 
+// ContextWithT saves the test state in the context.
 func ContextWithT(ctx context.Context, t *testing.T) context.Context {
 	return context.WithValue(ctx, tKey{}, t)
 }
 
+// TFromContext returns the test state from the context.
 func TFromContext(ctx context.Context) (*testing.T, bool) {
 	t, ok := ctx.Value(tKey{}).(*testing.T)
 	return t, ok
 }
 
+// MustTFromContext returns the test state from the context, and panics if it was not saved in the context.
 func MustTFromContext(ctx context.Context) *testing.T {
 	t, ok := TFromContext(ctx)
 	if !ok {

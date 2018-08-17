@@ -35,10 +35,8 @@ func (e errorDetails) PublicAttributes() map[string]interface{} {
 	attributes, err := gogoproto.Map(e.GetAttributes())
 	if err != nil {
 		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in gogoproto.
-	} else {
-		return attributes
 	}
-	return nil
+	return attributes
 }
 func (e errorDetails) CorrelationID() string { return e.GetCorrelationID() }
 

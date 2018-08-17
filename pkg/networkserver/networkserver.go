@@ -1235,6 +1235,7 @@ outer:
 	return nil, errDeviceNotFound
 }
 
+// MACHandler defines the behaviour of a MAC command on a device.
 type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, msg *ttnpb.UplinkMessage) error
 
 func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {

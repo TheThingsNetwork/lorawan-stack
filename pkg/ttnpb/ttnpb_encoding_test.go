@@ -128,7 +128,7 @@ func TestEnumMarshalers(t *testing.T) {
 		t.Run(typ.String(), func(t *testing.T) {
 			for _, v := range vs {
 				a := assertions.New(t)
-				if !a.So(func() { v.String() }, should.NotPanic) {
+				if !a.So(func() { _ = v.String() }, should.NotPanic) {
 					t.FailNow()
 				}
 

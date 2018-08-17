@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func ExampleFrequencyPlansStore() {
+func ExampleFrequencyPlansFetcher() {
 	component, err := component.New(log.Default, &component.Config{})
 	if err != nil {
 		panic(err)

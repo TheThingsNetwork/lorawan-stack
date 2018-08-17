@@ -36,7 +36,7 @@ type NewResultFunc func() interface{}
 // contents: no key will be visited more than once, but if the value for any key
 // is stored or deleted concurrently, Range may reflect any mapping for that key
 // from any point during the Range call.
-
+//
 // If batchSize argument is non-zero, Range will retrieve elements
 // from the underlying store in chunks of (approximately) batchSize elements.
 //

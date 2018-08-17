@@ -104,9 +104,9 @@ func init() {
 
 		// No LoRaWAN 1.0
 		// No LoRaWAN 1.0.1
-		regionalParameters1_0_2_rev_A: bandIdentity,
-		regionalParameters1_0_2_rev_B: bandIdentity,
-		regionalParameters1_1_rev_A:   bandIdentity,
+		regionalParameters1_0_2RevA: bandIdentity,
+		regionalParameters1_0_2RevB: bandIdentity,
+		regionalParameters1_1RevA:   bandIdentity,
 	}
 	All = append(All, kr_920_923)
 }

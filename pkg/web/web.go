@@ -35,8 +35,9 @@ type Registerer interface {
 	RegisterRoutes(s *Server)
 }
 
-type echoGroup = echo.Group
+// RouterGroup is a set of routes.
 type RouterGroup = Group
+type echoGroup = echo.Group
 
 // Server is the server.
 type Server struct {
@@ -45,7 +46,7 @@ type Server struct {
 	server *echo.Echo
 }
 
-// Group is the group.
+// Group is a set of routes.
 type Group struct {
 	*echoGroup
 	prefix string

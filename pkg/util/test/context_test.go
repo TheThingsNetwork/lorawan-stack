@@ -29,6 +29,13 @@ import (
 )
 
 func TestContextParent(t *testing.T) {
+	var cancels []context.CancelFunc
+	defer func() {
+		for _, cancel := range cancels {
+			cancel()
+		}
+	}()
+
 	for _, tc := range []struct {
 		Name       string
 		NewContext func(context.Context) context.Context
@@ -37,7 +44,8 @@ func TestContextParent(t *testing.T) {
 		{
 			Name: "context.WithCancel",
 			NewContext: func(ctx context.Context) context.Context {
-				ctx, _ = context.WithCancel(ctx)
+				ctx, cancel := context.WithCancel(ctx)
+				cancels = append(cancels, cancel)
 				return ctx
 			},
 			OK: true,
@@ -52,7 +60,8 @@ func TestContextParent(t *testing.T) {
 		{
 			Name: "context.WithDeadline",
 			NewContext: func(ctx context.Context) context.Context {
-				ctx, _ = context.WithDeadline(ctx, time.Now().Add(200*Delay))
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(200*Delay))
+				cancels = append(cancels, cancel)
 				return ctx
 			},
 			OK: true,
@@ -60,7 +69,8 @@ func TestContextParent(t *testing.T) {
 		{
 			Name: "context.WithTimeout",
 			NewContext: func(ctx context.Context) context.Context {
-				ctx, _ = context.WithTimeout(ctx, 200*Delay)
+				ctx, cancel := context.WithTimeout(ctx, 200*Delay)
+				cancels = append(cancels, cancel)
 				return ctx
 			},
 			OK: true,
@@ -196,7 +206,8 @@ func TestContextRoot(t *testing.T) {
 }
 
 func TestContextHasParent(t *testing.T) {
-	sharedCtx, _ := context.WithCancel(context.WithValue(Context(), struct{}{}, struct{}{}))
+	sharedCtx, cancel := context.WithCancel(context.WithValue(Context(), struct{}{}, struct{}{}))
+	defer cancel()
 
 	for _, tc := range []struct {
 		Name      string

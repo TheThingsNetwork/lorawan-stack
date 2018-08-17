@@ -46,14 +46,6 @@ func logFieldsForError(err error) (fieldsKV []interface{}) {
 	return
 }
 
-type fielder struct {
-	values map[string]interface{}
-}
-
-func (f fielder) Fields() map[string]interface{} {
-	return f.values
-}
-
 func newLoggerForCall(ctx context.Context, logger log.Interface, fullMethodString string) context.Context {
 	service := path.Dir(fullMethodString)[1:]
 	method := path.Base(fullMethodString)

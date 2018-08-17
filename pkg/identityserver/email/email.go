@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package emails provides a generic interface to send emails.
+// Package email provides a generic interface to send emails.
 package email
 
 import "go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"

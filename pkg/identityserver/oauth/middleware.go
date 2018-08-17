@@ -63,7 +63,7 @@ func (s *Server) RequireLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// RequireLogin is an echo middleware that requires a user to be logged in
+// RedirectToLogin is an echo middleware that requires a user to be logged in
 // by checking the cookie on the request. If no user is logged in, it redirects
 // to the login page.
 func (s *Server) RedirectToLogin(next echo.HandlerFunc) echo.HandlerFunc {

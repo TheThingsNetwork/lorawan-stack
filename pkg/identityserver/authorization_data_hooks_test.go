@@ -158,6 +158,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 	}
 	err = is.store.Organizations.Create(org)
+	a.So(err, should.BeNil)
 	defer func() {
 		is.store.Organizations.Delete(org.OrganizationIdentifiers)
 	}()

@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// Validate the frequency plan.
+// Validate returns an error if the frequency plan is invalid.
 func (f *FrequencyPlan) Validate() error {
 	if f.DwellTime != nil {
 		dt := f.DwellTime
@@ -71,6 +71,7 @@ func (f *FrequencyPlan) RespectsDwellTime(isDownlink bool, frequency uint64, dur
 	return true
 }
 
+// Copy copies the dwell time to a new structure.
 func (dt *FrequencyPlan_DwellTime) Copy() *FrequencyPlan_DwellTime {
 	var duration *time.Duration
 	if dt.Duration != nil {
@@ -84,7 +85,7 @@ func (dt *FrequencyPlan_DwellTime) Copy() *FrequencyPlan_DwellTime {
 	}
 }
 
-// Copy the channel parameters to a new struct.
+// Copy copies the channel parameters to a new struct.
 func (c *FrequencyPlan_Channel) Copy() *FrequencyPlan_Channel {
 	return &FrequencyPlan_Channel{
 		Frequency: c.Frequency,
@@ -93,7 +94,7 @@ func (c *FrequencyPlan_Channel) Copy() *FrequencyPlan_Channel {
 	}
 }
 
-// Copy the time off air parameters to a new struct.
+// Copy copies the time off air parameters to a new struct.
 func (toa *FrequencyPlan_TimeOffAir) Copy() *FrequencyPlan_TimeOffAir {
 	return &FrequencyPlan_TimeOffAir{
 		Duration: toa.Duration,
@@ -101,6 +102,7 @@ func (toa *FrequencyPlan_TimeOffAir) Copy() *FrequencyPlan_TimeOffAir {
 	}
 }
 
+// Copy copies the listen-before-talk configuration.
 func (lbt *FrequencyPlan_LBTConfiguration) Copy() *FrequencyPlan_LBTConfiguration {
 	return &FrequencyPlan_LBTConfiguration{
 		RSSIOffset: lbt.RSSIOffset,
@@ -109,7 +111,7 @@ func (lbt *FrequencyPlan_LBTConfiguration) Copy() *FrequencyPlan_LBTConfiguratio
 	}
 }
 
-// Extend a frequency plan from a frequency plan blueprint.
+// Extend returns a new frequency plan with f's values, overridden by ext.
 func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	if channels := ext.Channels; channels != nil {
 		f.Channels = make([]*FrequencyPlan_Channel, 0)

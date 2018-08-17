@@ -105,7 +105,7 @@ func init() {
 		// No LoRaWAN Regional Parameters 1.0
 		// No LoRaWAN Regional Parameters 1.0.1
 		// No LoRaWAN Regional Parameters 1.0.2
-		regionalParameters1_1_rev_A: bandIdentity,
+		regionalParameters1_1RevA: bandIdentity,
 	}
 	All = append(All, ru_864_870)
 }

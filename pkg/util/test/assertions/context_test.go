@@ -45,7 +45,7 @@ func TestShouldHaveParentContext(t *testing.T) {
 			Test:     should.NotBeEmpty,
 		},
 		{
-			Actual:   context.WithValue(context.Background(), "A", struct{}{}),
+			Actual:   context.WithValue(context.Background(), struct{}{}, struct{}{}),
 			Expected: context.Background(),
 			Test:     should.BeEmpty,
 		},

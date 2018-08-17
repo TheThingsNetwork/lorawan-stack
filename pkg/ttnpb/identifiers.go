@@ -102,29 +102,42 @@ func (ids EndDeviceIdentifiers) IsZero() bool {
 		(ids.JoinEUI == nil || ids.JoinEUI.IsZero())
 }
 
+// Identifiers identifies an object.
 type Identifiers interface {
 	CombinedIdentifiers() *CombinedIdentifiers
 }
 
+// CombinedIdentifiers implements Identifiers.
 func (ids ApplicationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return &CombinedIdentifiers{ApplicationIDs: []*ApplicationIdentifiers{&ids}}
 }
+
+// CombinedIdentifiers implements Identifiers.
 func (ids ClientIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return &CombinedIdentifiers{ClientIDs: []*ClientIdentifiers{&ids}}
 }
+
+// CombinedIdentifiers implements Identifiers.
 func (ids EndDeviceIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return &CombinedIdentifiers{DeviceIDs: []*EndDeviceIdentifiers{&ids}}
 }
+
+// CombinedIdentifiers implements Identifiers.
 func (ids GatewayIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return &CombinedIdentifiers{GatewayIDs: []*GatewayIdentifiers{&ids}}
 }
+
+// CombinedIdentifiers implements Identifiers.
 func (ids OrganizationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return &CombinedIdentifiers{OrganizationIDs: []*OrganizationIdentifiers{&ids}}
 }
+
+// CombinedIdentifiers implements Identifiers.
 func (ids UserIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return &CombinedIdentifiers{UserIDs: []*UserIdentifiers{&ids}}
 }
 
+// CombineIdentifiers merges the identifiers of the multiple entities.
 func CombineIdentifiers(ids ...Identifiers) *CombinedIdentifiers {
 	combined := &CombinedIdentifiers{}
 	for _, id := range ids {
@@ -139,6 +152,7 @@ func CombineIdentifiers(ids ...Identifiers) *CombinedIdentifiers {
 	return combined
 }
 
+// CombinedIdentifiers implements Identifiers.
 func (ids *CombinedIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return ids
 }

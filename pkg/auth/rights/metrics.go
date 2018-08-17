@@ -47,7 +47,7 @@ func init() {
 	metrics.MustRegister(rightsRequests, rightsFetches)
 }
 
-func register(c *metrics.ContextualCounterVec, ctx context.Context, entity string, rights []ttnpb.Right, err error) {
+func register(ctx context.Context, c *metrics.ContextualCounterVec, entity string, rights []ttnpb.Right, err error) {
 	switch {
 	case errors.IsUnauthenticated(err):
 		c.WithLabelValues(ctx, entity, "unauthenticated").Inc()
@@ -63,9 +63,9 @@ func register(c *metrics.ContextualCounterVec, ctx context.Context, entity strin
 }
 
 func registerRightsRequest(ctx context.Context, entity string, rights []ttnpb.Right, err error) {
-	register(rightsRequests, ctx, entity, rights, err)
+	register(ctx, rightsRequests, entity, rights, err)
 }
 
 func registerRightsFetch(ctx context.Context, entity string, rights []ttnpb.Right, err error) {
-	register(rightsFetches, ctx, entity, rights, err)
+	register(ctx, rightsFetches, entity, rights, err)
 }

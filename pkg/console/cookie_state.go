@@ -30,6 +30,7 @@ func init() {
 
 const stateCookieName = "_console_state"
 
+// StateCookie returns the cookie storing the state of the console.
 func (console *Console) StateCookie() *cookie.Cookie {
 	return &cookie.Cookie{
 		Name:     stateCookieName,

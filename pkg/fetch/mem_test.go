@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func ExampleMemFetcher() {
+func ExampleNewMemFetcher() {
 	fetcher := fetch.NewMemFetcher(map[string][]byte{
 		"myFile.yml": []byte("Content"),
 	})
