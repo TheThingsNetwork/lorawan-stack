@@ -1,4 +1,5 @@
 {
+  "components.navigation.side.index.hideSidebar": "Hide Sidebar",
   "lib.shared-messages.access": "Access",
   "lib.shared-messages.applications": "Applications",
   "lib.shared-messages.approve": "Approve",
