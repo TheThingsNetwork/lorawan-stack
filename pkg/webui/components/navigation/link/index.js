@@ -26,6 +26,8 @@ const NavigationLink = function ({
   path,
   exact,
   activeClassName,
+  onClick,
+  ...rest
 }) {
   return (
     <NavLink
@@ -33,6 +35,8 @@ const NavigationLink = function ({
       exact={exact}
       className={classnames(className, style.link)}
       activeClassName={activeClassName}
+      onClick={onClick}
+      {...rest}
     >
       {children}
     </NavLink>

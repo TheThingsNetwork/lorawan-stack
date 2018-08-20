@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SideNavigation is flat should match snapshot 1`] = `
+<nav
+  className="navigation"
+>
+  <div>
+    <div
+      className="header"
+    >
+      <Component
+        className="icon"
+        icon="application"
+      />
+      <Message
+        className="message"
+        content="test-header-title"
+      />
+    </div>
+    <SideNavigationList
+      isMinimized={false}
+      items={
+        Array [
+          Object {
+            "path": "/test-path",
+            "title": "test-title",
+          },
+          Object {
+            "path": "/test-title2",
+            "title": "test-title2",
+          },
+        ]
+      }
+      itemsExpanded={Object {}}
+      onItemExpand={[Function]}
+    />
+  </div>
+  <Button
+    className="navigationButton"
+    data-hook="side-nav-hide-button"
+    icon="keyboard_arrow_left"
+    message={
+      Object {
+        "defaultMessage": "Hide Sidebar",
+        "id": "components.navigation.side.index.hideSidebar",
+      }
+    }
+    naked={true}
+    onClick={[Function]}
+    secondary={true}
+  />
+</nav>
+`;
+
+exports[`SideNavigation is nested should match snapshot 1`] = `
+<nav
+  className="navigation"
+>
+  <div>
+    <div
+      className="header"
+    >
+      <Component
+        className="icon"
+        icon="application"
+      />
+      <Message
+        className="message"
+        content="test-header-title"
+      />
+    </div>
+    <SideNavigationList
+      isMinimized={false}
+      items={
+        Array [
+          Object {
+            "items": Array [
+              Object {
+                "path": "/nested-test-title",
+                "title": "nested-test-title",
+              },
+            ],
+            "nested": true,
+            "title": "test-title",
+          },
+          Object {
+            "items": Array [
+              Object {
+                "path": "/nested-test-title2",
+                "title": "nested-test-title2",
+              },
+              Object {
+                "path": "/nested-test-title3",
+                "title": "nested-test-title3",
+              },
+            ],
+            "nested": true,
+            "title": "test-title2",
+          },
+          Object {
+            "path": "/test-title3",
+            "title": "test-title3",
+          },
+        ]
+      }
+      itemsExpanded={Object {}}
+      onItemExpand={[Function]}
+    />
+  </div>
+  <Button
+    className="navigationButton"
+    data-hook="side-nav-hide-button"
+    icon="keyboard_arrow_left"
+    message={
+      Object {
+        "defaultMessage": "Hide Sidebar",
+        "id": "components.navigation.side.index.hideSidebar",
+      }
+    }
+    naked={true}
+    onClick={[Function]}
+    secondary={true}
+  />
+</nav>
+`;

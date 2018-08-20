@@ -1,0 +1,112 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.item
+  &-minimized
+    .message,
+    .expand-icon
+      display: none
+
+    .icon
+      margin-right: 0
+
+    .link,
+    .button
+      display: inline-block
+      padding: $cs.xs $cs.m
+
+.button
+  reset-button()
+  one-liner()
+  width: 100%
+  display: block
+  text-align: left
+  position: relative
+  padding: $cs.s $cs.s $cs.s $cs.l
+  transition: background-color $ad.m, color $ad.s ease-in
+
+  &:active
+    background-color: lighter($c-active-blue-hover, 10)
+
+  &-active,
+  &:hover
+    color: $c-active-blue
+
+.link
+  one-liner()
+  color: $tc-deep-gray
+  padding: $cs.s $cs.s $cs.s $cs.l
+  display: block
+  position: relative
+
+  &:not(&-active)::before // @stylint ignore
+    content: ''
+    position: absolute
+    z-index: -1
+    top: 0
+    left: 0
+    width: 0
+    height: 100%
+    background-color: $c-backdrop
+    transition: width $ad.s ease-out 0s, background-color $ad.s linear
+
+  &:hover:not(&-active)::before // @stylint ignore
+    width: 100%
+    transition: width $ad.s ease-out $ad.m, background-color $ad.s linear
+
+  &::after
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 3px
+    height: 100%
+    background-color: $c-subtle-fill
+    transform: scaleY(0)
+    transform-origin: center
+    transition: transform $ad.m ease-in-out, background-color $ad.s linear
+
+  &:hover:not(&-active)::after // @stylint ignore
+    transform: scaleY(1)
+
+  &-active
+    background-color: $c-backdrop
+    color: $c-active-blue
+
+    &::before
+      content: ''
+      position: absolute
+      bottom: 0
+      left: 0
+      height: 100%
+      display: block
+      width: 3px
+      background: $c-active-blue
+
+.icon
+  margin-right: $cs.xs
+  vertical-align: middle
+
+.message
+  vertical-align: middle
+
+.expand-icon
+  position: absolute
+  right: $cs.xs
+  top: 50%
+  transform: translateY(-50%)
+  transition: transform $ad.m ease-in
+
+  &-open
+    transform: translateY(-50%) rotate(180deg)

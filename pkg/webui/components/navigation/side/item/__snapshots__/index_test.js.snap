@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
+<li
+  className="item"
+>
+  <CollapsableItem
+    depth={0}
+    icon={null}
+    isActive={false}
+    isExpanded={true}
+    isMinimized={false}
+    items={
+      Array [
+        Object {
+          "path": "/nested-title",
+          "title": "nested-title",
+        },
+        Object {
+          "path": "/nested-title2",
+          "title": "nested-title2",
+        },
+      ]
+    }
+    onExpand={[Function]}
+    title="test-title"
+  />
+</li>
+`;
+
+exports[`SideNavigationItem is flat should match snapshot 1`] = `
+<li
+  className="item"
+>
+  <LinkItem
+    depth={0}
+    exact={true}
+    icon={null}
+    onExpand={[Function]}
+    path="/test-title"
+    title="test-title"
+  />
+</li>
+`;
