@@ -120,10 +120,13 @@ git.commit-msg-empty:
 
 # check if the commit message ends with punctuation
 git.commit-msg-phrase:
-	@grep -q '[.,?]$$' $(ARGS) && $(warn) "Commit messages should not end with punctuation" || true
+	@grep -q '^\(\s*[^#]\s*\)\w.*[.,?]$$' $(ARGS) && $(warn) "Commit messages should not end with punctuation" || true
 
 # check if the commit message begins with a capital letter
 git.commit-msg-casing:
 	@grep -q '.*: [a-z]' $(ARGS) && $(warn) "Commit messages should be full sentences that with a capital letter" || true
+
+git.commit-msg-imperative:
+	@grep -q '.*: [A-Za-z]*\(ed\|ing\)' $(ARGS) && $(warn) "Commit messages should follow imperative tense (no 'Added…' or 'Adding…', but 'Add…')" || true
 
 # vim: ft=make
