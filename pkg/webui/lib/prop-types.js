@@ -36,4 +36,11 @@ PropTypes.error = PropTypes.oneOfType([
   PropTypes.string,
 ])
 
+PropTypes.link = PropTypes.shape({
+  title: PropTypes.message.isRequired,
+  icon: PropTypes.string,
+  path: PropTypes.string.isRequired,
+  exact: PropTypes.bool,
+})
+
 export default PropTypes
