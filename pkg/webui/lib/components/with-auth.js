@@ -15,7 +15,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withRouter, Redirect } from 'react-router'
+import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import Header from '../../components/header'
