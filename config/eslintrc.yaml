@@ -5,12 +5,7 @@ extends:
 parser: babel-eslint
 
 plugins:
-  - flowtype
   - jsdoc
-
-settings:
-  flowtype:
-    onlyFilesWithFlowAnnotation: true
 
 env:
   node: true
