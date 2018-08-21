@@ -11,8 +11,8 @@
     "vet"
   ],
   "Linters": {
-    "gas": {
-      "command": "gas -fmt=csv -exclude=G201,G202"
+    "gosec": {
+      "command": "gosec -fmt=csv -exclude=G201,G202"
     }
   },
   "Exclude": [
