@@ -2,7 +2,7 @@
   "Enable": [
     "deadcode",
     "dupl",
-    "gas",
+    "gosec",
     "goconst",
     "gofmt",
     "golint",
