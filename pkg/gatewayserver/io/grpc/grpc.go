@@ -38,10 +38,9 @@ func New(server io.Server) ttnpb.GtwGsServer {
 
 var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
 
-// Link the gateway to the Gateway Server. The authentication information will
-// be used to determine the gateway ID. If no authentication information is present,
-// this gateway may not be used for downlink.
-func (s *impl) Link(link ttnpb.GtwGs_LinkServer) (err error) {
+// LinkGateway links the gateway to the Gateway Server. The authentication information will be used to determine the
+// gateway ID. If no authentication information is present, this gateway may not be used for downlink.
+func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	ctx := log.NewContextWithField(link.Context(), "namespace", "io/grpc")
 
 	id := ttnpb.GatewayIdentifiers{

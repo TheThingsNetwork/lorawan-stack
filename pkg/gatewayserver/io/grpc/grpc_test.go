@@ -96,7 +96,7 @@ func TestAuthentication(t *testing.T) {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
-				if err := srv.Link(stream); err != nil {
+				if err := srv.LinkGateway(stream); err != nil {
 					if tc.OK && !a.So(errors.IsCanceled(err), should.BeTrue) {
 						t.Fatalf("Unexpected link error: %v", err)
 					}
@@ -147,7 +147,7 @@ func TestTraffic(t *testing.T) {
 	}
 
 	go func() {
-		if err := srv.Link(stream); err != nil {
+		if err := srv.LinkGateway(stream); err != nil {
 			if !a.So(errors.IsCanceled(err), should.BeTrue) {
 				t.FailNow()
 			}
