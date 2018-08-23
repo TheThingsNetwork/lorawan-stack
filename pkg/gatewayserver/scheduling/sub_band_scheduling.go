@@ -21,7 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 )
 
 const (
@@ -94,7 +94,7 @@ func (s *subBandScheduling) RegisterEmission(w packetWindow) {
 }
 
 // Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns errScheduleFull. If another error prevents scheduling, it is returned.
-func (s *subBandScheduling) ScheduleAt(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
+func (s *subBandScheduling) ScheduleAt(w Span, timeOffAir frequencyplans.TimeOffAir) error {
 	s.mu.Lock()
 	err := s.schedule(w, timeOffAir)
 	s.mu.Unlock()
@@ -103,7 +103,7 @@ func (s *subBandScheduling) ScheduleAt(w Span, timeOffAir *ttnpb.FrequencyPlan_T
 
 var errTimeOffAirRequired = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
 
-func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
+func (s *subBandScheduling) schedule(w Span, timeOffAir frequencyplans.TimeOffAir) error {
 	windowWithTimeOffAir := packetWindow{window: w, timeOffAir: w.timeOffAir(timeOffAir)}
 
 	emissionWindows := []Span{w}
@@ -137,7 +137,7 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 }
 
 // ScheduleAnytime requires a scheduling window if there is no time.Time constraint.
-func (s *subBandScheduling) ScheduleAnytime(minimum Timestamp, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
+func (s *subBandScheduling) ScheduleAnytime(minimum Timestamp, d time.Duration, timeOffAir frequencyplans.TimeOffAir) (Span, error) {
 	minimumSpan := Span{Start: minimum, Duration: d}
 	if err := s.ScheduleAt(minimumSpan, timeOffAir); err == nil {
 		return minimumSpan, nil

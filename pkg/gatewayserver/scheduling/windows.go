@@ -17,7 +17,7 @@ package scheduling
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 )
 
 type systemTime time.Time
@@ -151,16 +151,12 @@ func sumWithinInterval(spans []Span, start, end Timestamp) time.Duration {
 	return duration
 }
 
-func (s Span) timeOffAir(timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (timeOffAirSpan Span) {
+func (s Span) timeOffAir(timeOffAir frequencyplans.TimeOffAir) (timeOffAirSpan Span) {
 	timeOffAirSpan = Span{Start: s.End(), Duration: 0}
 
-	if timeOffAir == nil {
-		return
-	}
-
 	timeOffAirSpan.Duration = time.Duration(timeOffAir.Fraction * float32(s.Duration))
-	if timeOffAir.Duration != nil && *timeOffAir.Duration > timeOffAirSpan.Duration {
-		timeOffAirSpan.Duration = *timeOffAir.Duration
+	if timeOffAir.Duration > timeOffAirSpan.Duration {
+		timeOffAirSpan.Duration = timeOffAir.Duration
 	}
 
 	return

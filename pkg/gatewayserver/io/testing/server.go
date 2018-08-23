@@ -87,7 +87,7 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 }
 
 // GetFrequencyPlan implements io.Server.
-func (s *server) GetFrequencyPlan(ctx context.Context, id string) (ttnpb.FrequencyPlan, error) {
+func (s *server) GetFrequencyPlan(ctx context.Context, id string) (frequencyplans.FrequencyPlan, error) {
 	return s.store.GetByID(id)
 }
 

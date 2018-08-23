@@ -27,9 +27,9 @@ import (
 func TestFrequenciesCFList(t *testing.T) {
 	a := assertions.New(t)
 
-	euFP := ttnpb.FrequencyPlan{
+	euFP := frequencyplans.FrequencyPlan{
 		BandID: "EU_863_870",
-		Channels: []*ttnpb.FrequencyPlan_Channel{
+		Channels: []frequencyplans.Channel{
 			{Frequency: 867100000},
 			{Frequency: 867300000},
 			{Frequency: 867500000},
@@ -69,9 +69,9 @@ fpChannels:
 func TestChannelMasksCFList(t *testing.T) {
 	a := assertions.New(t)
 
-	usFP := ttnpb.FrequencyPlan{
+	usFP := frequencyplans.FrequencyPlan{
 		BandID: "US_902_928",
-		Channels: []*ttnpb.FrequencyPlan_Channel{
+		Channels: []frequencyplans.Channel{
 			{Frequency: 903900000},
 			{Frequency: 904100000},
 			{Frequency: 904300000},
@@ -101,9 +101,9 @@ chMaskLoop:
 func TestUnimplementedCFList(t *testing.T) {
 	a := assertions.New(t)
 
-	usFP := ttnpb.FrequencyPlan{
+	usFP := frequencyplans.FrequencyPlan{
 		BandID: "US_902_928",
-		Channels: []*ttnpb.FrequencyPlan_Channel{
+		Channels: []frequencyplans.Channel{
 			{Frequency: 903900000},
 			{Frequency: 904100000},
 			{Frequency: 904300000},

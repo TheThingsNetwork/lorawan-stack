@@ -21,6 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -36,7 +37,7 @@ type Server interface {
 	// control.
 	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by its identifier.
-	GetFrequencyPlan(ctx context.Context, id string) (ttnpb.FrequencyPlan, error)
+	GetFrequencyPlan(ctx context.Context, id string) (frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.

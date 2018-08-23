@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -165,24 +165,21 @@ func TestTimeOffAir(t *testing.T) {
 		Duration: time.Second,
 	}
 
-	comparisons := map[ttnpb.FrequencyPlan_TimeOffAir]time.Duration{
+	comparisons := map[frequencyplans.TimeOffAir]time.Duration{
 		{Fraction: 1}:   time.Second,
 		{Fraction: 2}:   time.Second * 2,
 		{Fraction: 0.1}: time.Millisecond * 100,
 	}
 
 	for compared, result := range comparisons {
-		timeOffAirWindow := s.timeOffAir(&compared)
+		timeOffAirWindow := s.timeOffAir(compared)
 		a.So(timeOffAirWindow.Start.Equal(s.End()), should.BeTrue)
 		a.So(timeOffAirWindow.Duration, should.Equal, result)
 	}
 
 	timeOffAirDurations := []time.Duration{time.Millisecond, time.Second, time.Minute}
 	for _, timeOffAirDuration := range timeOffAirDurations {
-		toa := &ttnpb.FrequencyPlan_TimeOffAir{Duration: &timeOffAirDuration}
+		toa := frequencyplans.TimeOffAir{Duration: timeOffAirDuration}
 		a.So(s.timeOffAir(toa).Duration, should.Equal, timeOffAirDuration)
 	}
-
-	nilTOAWindow := s.timeOffAir(nil)
-	a.So(nilTOAWindow.Duration, should.Equal, time.Duration(0))
 }

@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -47,7 +48,7 @@ func Example() {
 	}
 
 	fmt.Println("Content of the EU frequency plan:")
-	fmt.Println(euFP.String())
+	fmt.Println(euFP)
 }
 
 func TestFailToLoadDescriptions(t *testing.T) {
@@ -57,7 +58,11 @@ func TestFailToLoadDescriptions(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		panic(err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() {
+		if err := os.RemoveAll(dir); err != nil {
+			t.Logf("could not remove %s: %s\n", dir, err)
+		}
+	}()
 
 	// Fill frequency plans store
 	{
@@ -91,7 +96,11 @@ func TestStore(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		panic(err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() {
+		if err := os.RemoveAll(dir); err != nil {
+			t.Logf("could not remove %s: %s\n", dir, err)
+		}
+	}()
 
 	// Fill frequency plans store
 	{
@@ -105,6 +114,11 @@ func TestStore(t *testing.T) {
   description: Japanese plan
   base_freq: 923
   file: JP.yml
+  base: AS_923
+- id: JP_2
+  description: Japanese plan 2
+  base_freq: 923
+  file: JP_2.yml
   base: AS_923
 - id: EU_863_870
   description: European frequency plan (Not saved on disk)
@@ -153,7 +167,25 @@ channels: [{frequency: 923000000}]`),
 
 		err = ioutil.WriteFile(
 			filepath.Join(dir, "JP.yml"),
-			[]byte(`lbt: {rssi-target: 1.1, rssi-offset: 2.2, scan-time: 80}`),
+			[]byte(`
+listen-before-talk: {rssi-target: 1.1, rssi-offset: 2.2, scan-time: 80}
+dwell-time: {uplinks: true, downlinks: true, duration: 400ms}
+`),
+			0755,
+		)
+		if !a.So(err, should.BeNil) {
+			panic(err)
+		}
+
+		err = ioutil.WriteFile(
+			filepath.Join(dir, "JP_2.yml"),
+			[]byte(`
+listen-before-talk: {rssi-target: 1.1, rssi-offset: 2.2, scan-time: 80}
+dwell-time: {uplinks: true, downlinks: true, duration: 400ms}
+channels:
+- frequency: 923000000
+  dwell-time: {downlinks: true, duration: 400ms}
+`),
 			0755,
 		)
 		if !a.So(err, should.BeNil) {
@@ -174,7 +206,7 @@ channels: [{frequency: 923000000}]`),
 		a.So(ids, should.Contain, "JP")
 	}
 
-	assertAS923Content := func(fp ttnpb.FrequencyPlan) {
+	assertAS923Content := func(fp frequencyplans.FrequencyPlan) {
 		a.So(fp.Channels, should.HaveLength, 1)
 		a.So(fp.Channels[0].Frequency, should.Equal, 923000000)
 		a.So(fp.BandID, should.Equal, "AS_923")
@@ -201,6 +233,17 @@ channels: [{frequency: 923000000}]`),
 		a.So(fp.LBT, should.NotBeNil)
 		a.So(fp.LBT.RSSIOffset, should.AlmostEqual, 2.2, 0.00001)
 		a.So(fp.LBT.ScanTime, should.Equal, 80)
+	}
+
+	// JP 2 Frequency plan
+	{
+		fp, err := s.GetByID("JP_2")
+		if !a.So(err, should.BeNil) {
+			panic(err)
+		}
+
+		assertAS923Content(fp)
+		a.So(fp.Channels[0].DwellTime.OnDownlinks(), should.BeTrue)
 	}
 
 	// Unknown frequency plan
@@ -241,7 +284,11 @@ func TestNotInitializedStore(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		panic(err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() {
+		if err := os.RemoveAll(dir); err != nil {
+			t.Logf("could not remove %s: %s\n", dir, err)
+		}
+	}()
 
 	s := frequencyplans.NewStore(fetch.FromFilesystem(dir))
 
@@ -250,4 +297,117 @@ func TestNotInitializedStore(t *testing.T) {
 
 	_, err = s.GetByID("EU")
 	a.So(err, should.NotBeNil)
+}
+
+func TestProtoConversion(t *testing.T) {
+	notchFrequency := uint64(920000000)
+	for i, tc := range []struct {
+		fp       *frequencyplans.FrequencyPlan
+		expected *ttnpb.ConcentratorConfig
+	}{
+		{
+			fp: &frequencyplans.FrequencyPlan{
+				Channels: []frequencyplans.Channel{
+					{Frequency: 922100000, Radio: 0},
+					{Frequency: 922300000, Radio: 0},
+					{
+						Frequency: 922500000,
+						Radio:     0,
+					},
+				},
+				Radios: []frequencyplans.Radio{
+					{
+						Enable:    true,
+						ChipType:  "SX1257",
+						Frequency: 922300000,
+						TxConfiguration: &frequencyplans.RadioTxConfiguration{
+							MinFrequency:   909000000,
+							MaxFrequency:   925000000,
+							NotchFrequency: &notchFrequency,
+						},
+					},
+				},
+			},
+			expected: &ttnpb.ConcentratorConfig{
+				Channels: []*ttnpb.ConcentratorConfig_Channel{
+					{Frequency: 922100000, Radio: 0},
+					{Frequency: 922300000, Radio: 0},
+					{
+						Frequency: 922500000,
+						Radio:     0,
+					},
+				},
+				Radios: []*ttnpb.ConcentratorConfig_Radio{
+					{
+						Enable:    true,
+						ChipType:  "SX1257",
+						Frequency: 922300000,
+						TxConfiguration: &ttnpb.ConcentratorConfig_Radio_TxConfiguration{
+							MinFrequency:   909000000,
+							MaxFrequency:   925000000,
+							NotchFrequency: notchFrequency,
+						},
+					},
+				},
+			},
+		},
+		{
+			fp: &frequencyplans.FrequencyPlan{
+				FSKChannel: &frequencyplans.FSKChannel{
+					Channel: frequencyplans.Channel{
+						Frequency: 901000000,
+						Radio:     1,
+					},
+				},
+				LoRaStandardChannel: &frequencyplans.LoRaStandardChannel{
+					Channel: frequencyplans.Channel{
+						Frequency: 900000000,
+						Radio:     0,
+					},
+				},
+			},
+			expected: &ttnpb.ConcentratorConfig{
+				FSKChannel: &ttnpb.ConcentratorConfig_FSKChannel{
+					ConcentratorConfig_Channel: ttnpb.ConcentratorConfig_Channel{
+						Frequency: 901000000,
+						Radio:     1,
+					},
+				},
+				LoRaStandardChannel: &ttnpb.ConcentratorConfig_LoRaStandardChannel{
+					ConcentratorConfig_Channel: ttnpb.ConcentratorConfig_Channel{
+						Frequency: 900000000,
+						Radio:     0,
+					},
+				},
+			},
+		},
+		{
+			fp: &frequencyplans.FrequencyPlan{
+				LBT: &frequencyplans.LBT{
+					ScanTime: 32,
+				},
+				PingSlot: &frequencyplans.Channel{
+					Frequency: 923000000,
+					Radio:     1,
+				},
+			},
+			expected: &ttnpb.ConcentratorConfig{
+				LBT: &ttnpb.ConcentratorConfig_LBTConfiguration{
+					ScanTime: 32,
+				},
+				PingSlot: &ttnpb.ConcentratorConfig_Channel{
+					Frequency: 923000000,
+					Radio:     1,
+				},
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("Proto%d", i), func(t *testing.T) {
+			result := tc.fp.ToConcentratorConfig()
+			diff := pretty.Diff(result, tc.expected)
+			if len(diff) > 0 {
+				t.Fatalf("unexpected difference when generating the proto:\n%s", diff)
+			}
+		})
+	}
 }

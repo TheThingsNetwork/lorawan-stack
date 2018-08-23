@@ -279,7 +279,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 }
 
 // GetFrequencyPlan gets the specified frequency plan by its identifier.
-func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, id string) (ttnpb.FrequencyPlan, error) {
+func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, id string) (frequencyplans.FrequencyPlan, error) {
 	return gs.FrequencyPlans.GetByID(id)
 }
 

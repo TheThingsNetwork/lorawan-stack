@@ -21,6 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -124,7 +125,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	}
 }
 
-func (s *impl) GetFrequencyPlan(ctx context.Context, req *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
+func (s *impl) GetFrequencyPlan(ctx context.Context, req *ttnpb.GetFrequencyPlanRequest) (*frequencyplans.FrequencyPlan, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "io/grpc")
 
 	id := ttnpb.GatewayIdentifiers{

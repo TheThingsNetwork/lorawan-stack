@@ -22,7 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 )
 
 var (
@@ -51,7 +51,7 @@ type Scheduler interface {
 }
 
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan, and starts a goroutine for cleanup. The scheduler is based on the dwell time, time off air, and the frequency plan's band. Assumption is made that no two duty cycles on a given band overlap.
-func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Scheduler, error) {
+func FrequencyPlanScheduler(ctx context.Context, fp frequencyplans.FrequencyPlan) (Scheduler, error) {
 	scheduler := &frequencyPlanScheduling{
 		respectsDwellTime: fp.RespectsDwellTime,
 		timeOffAir:        fp.TimeOffAir,
@@ -77,7 +77,7 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 
 type frequencyPlanScheduling struct {
 	respectsDwellTime func(isDownlink bool, frequency uint64, duration time.Duration) bool
-	timeOffAir        *ttnpb.FrequencyPlan_TimeOffAir
+	timeOffAir        frequencyplans.TimeOffAir
 
 	subBands []*subBandScheduling
 }
