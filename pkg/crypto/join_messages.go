@@ -155,7 +155,7 @@ func ComputeJoinAcceptMIC(jsIntKey types.AES128Key, joinReqType byte, joinEUI ty
 	if err != nil {
 		return mic, err
 	}
-	_, err = hash.Write(append(append([]byte{joinReqType}, joinEUI[:]...), dn[:]...))
+	_, err = hash.Write(append(append([]byte{joinReqType}, reverse(joinEUI[:])...), reverse(dn[:])...))
 	if err != nil {
 		return mic, err
 	}

@@ -29,11 +29,13 @@ func concat(a, b [8]byte) []byte {
 	copy(c[8:], b[:])
 	return c
 }
+
 func xor(b [8]byte, t uint64) (c [8]byte) {
 	val := binary.BigEndian.Uint64(b[:]) ^ t
 	binary.BigEndian.PutUint64(c[:], val)
 	return
 }
+
 func msb(b [16]byte) (c [8]byte) { copy(c[:], b[:8]); return }
 func lsb(b [16]byte) (c [8]byte) { copy(c[:], b[8:]); return }
 
