@@ -213,8 +213,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	var jn types.JoinNonce
 	nb := make([]byte, 4)
-	binary.LittleEndian.PutUint32(nb, dev.NextJoinNonce)
-	copy(jn[:], nb)
+	binary.BigEndian.PutUint32(nb, dev.NextJoinNonce)
+	copy(jn[:], nb[1:])
 
 	b, err = (&ttnpb.JoinAcceptPayload{
 		NetID:      req.NetID,
@@ -228,7 +228,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errMarshalPayloadFailed.WithCause(err)
 	}
 
-	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
+	dn := binary.BigEndian.Uint16(pld.DevNonce[:])
 	if !dev.DisableJoinNonceCheck {
 		switch req.SelectedMacVersion {
 		case ttnpb.MAC_V1_1:
