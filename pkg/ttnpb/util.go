@@ -16,6 +16,19 @@ package ttnpb
 
 const maxUint24 = 1<<24 - 1
 
+func copyReverse(dst, src []byte) {
+	for i := range src {
+		dst[i] = src[len(src)-1-i]
+	}
+}
+
+func appendReverse(dst []byte, src ...byte) []byte {
+	for i := range src {
+		dst = append(dst, src[len(src)-1-i])
+	}
+	return dst
+}
+
 func parseUint32(b []byte) uint32 {
 	switch len(b) {
 	case 0:
@@ -34,6 +47,7 @@ func parseUint32(b []byte) uint32 {
 		return uint32(b[0]) | uint32(b[1])<<8 | uint32(b[2])<<16 | uint32(b[3])<<24
 	}
 }
+
 func parseUint64(b []byte) uint64 {
 	switch len(b) {
 	case 0:

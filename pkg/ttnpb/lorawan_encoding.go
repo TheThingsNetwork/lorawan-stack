@@ -93,7 +93,7 @@ func (msg *FCtrl) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 
 // AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg FHDR) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
-	dst = append(dst, msg.DevAddr[:]...)
+	dst = appendReverse(dst, msg.DevAddr[:]...)
 	fOptsLen := uint8(len(msg.FOpts))
 	if fOptsLen > 15 {
 		return nil, errExpectedLowerOrEqual("FOptsLen", 15)(fOptsLen)
@@ -116,7 +116,7 @@ func (msg *FHDR) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	if n < 7 || n > 23 {
 		return errExpectedLengthEncodedBound("FHDR", 7, 23)(n)
 	}
-	copy(msg.DevAddr[:], b[0:4])
+	copyReverse(msg.DevAddr[:], b[0:4])
 	if err := msg.FCtrl.UnmarshalLoRaWAN(b[4:5], isUplink); err != nil {
 		return errFailedDecoding("FCtrl").WithCause(err)
 	}
@@ -293,9 +293,9 @@ func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
 
 // AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
-	dst = append(dst, msg.JoinNonce[:]...)
-	dst = append(dst, msg.NetID[:]...)
-	dst = append(dst, msg.DevAddr[:]...)
+	dst = appendReverse(dst, msg.JoinNonce[:]...)
+	dst = appendReverse(dst, msg.NetID[:]...)
+	dst = appendReverse(dst, msg.DevAddr[:]...)
 	dst, err := msg.DLSettings.AppendLoRaWAN(dst)
 	if err != nil {
 		return nil, errFailedEncoding("DLSettings").WithCause(err)
@@ -327,9 +327,9 @@ func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 	if n != 12 && n != 28 {
 		return errExpectedLengthEncodedTwoChoices("JoinAcceptPayload", 12, 28)(n)
 	}
-	copy(msg.JoinNonce[:], b[0:3])
-	copy(msg.NetID[:], b[3:6])
-	copy(msg.DevAddr[:], b[6:10])
+	copyReverse(msg.JoinNonce[:], b[0:3])
+	copyReverse(msg.NetID[:], b[3:6])
+	copyReverse(msg.DevAddr[:], b[6:10])
 	if err := msg.DLSettings.UnmarshalLoRaWAN(b[10:11]); err != nil {
 		return errFailedDecoding("DLSettings").WithCause(err)
 	}
@@ -347,9 +347,9 @@ func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 
 // AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg JoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
-	dst = append(dst, msg.JoinEUI[:]...)
-	dst = append(dst, msg.DevEUI[:]...)
-	dst = append(dst, msg.DevNonce[:]...)
+	dst = appendReverse(dst, msg.JoinEUI[:]...)
+	dst = appendReverse(dst, msg.DevEUI[:]...)
+	dst = appendReverse(dst, msg.DevNonce[:]...)
 	return dst, nil
 }
 
@@ -363,9 +363,9 @@ func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 18 {
 		return errExpectedLengthEncodedEqual("JoinRequestPayload", 18)(len(b))
 	}
-	copy(msg.JoinEUI[:], b[0:8])
-	copy(msg.DevEUI[:], b[8:16])
-	copy(msg.DevNonce[:], b[16:18])
+	copyReverse(msg.JoinEUI[:], b[0:8])
+	copyReverse(msg.DevEUI[:], b[8:16])
+	copyReverse(msg.DevNonce[:], b[16:18])
 	return nil
 }
 
@@ -374,11 +374,11 @@ func (msg RejoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(msg.RejoinType))
 	switch msg.RejoinType {
 	case 0, 2:
-		dst = append(dst, msg.NetID[:]...)
-		dst = append(dst, msg.DevEUI[:]...)
+		dst = appendReverse(dst, msg.NetID[:]...)
+		dst = appendReverse(dst, msg.DevEUI[:]...)
 	case 1:
-		dst = append(dst, msg.JoinEUI[:]...)
-		dst = append(dst, msg.DevEUI[:]...)
+		dst = appendReverse(dst, msg.JoinEUI[:]...)
+		dst = appendReverse(dst, msg.DevEUI[:]...)
 	default:
 		return nil, errUnknown("RejoinType")(msg.RejoinType)
 	}
@@ -411,15 +411,15 @@ func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 		if len(b) != 14 {
 			return errExpectedLengthEqual("RejoinRequestPayload", 14)(len(b))
 		}
-		copy(msg.NetID[:], b[1:4])
-		copy(msg.DevEUI[:], b[4:12])
+		copyReverse(msg.NetID[:], b[1:4])
+		copyReverse(msg.DevEUI[:], b[4:12])
 		msg.RejoinCnt = parseUint32(b[12:14])
 	case 1:
 		if len(b) != 19 {
 			return errExpectedLengthEqual("RejoinRequestPayload", 19)(len(b))
 		}
-		copy(msg.JoinEUI[:], b[1:9])
-		copy(msg.DevEUI[:], b[9:17])
+		copyReverse(msg.JoinEUI[:], b[1:9])
+		copyReverse(msg.DevEUI[:], b[9:17])
 		msg.RejoinCnt = parseUint32(b[17:19])
 	default:
 		return errUnknown("RejoinType")(msg.RejoinType.String())
