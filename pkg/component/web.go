@@ -28,6 +28,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
+const (
+	metricsUsername = "metrics"
+	pprofUsername   = "pprof"
+)
+
 // RegisterWeb registers a web subsystem to the component
 func (c *Component) RegisterWeb(s web.Registerer) {
 	c.webSubsystems = append(c.webSubsystems, s)
@@ -53,7 +58,7 @@ func (c *Component) listenWeb() (err error) {
 	if c.config.HTTP.PProf.Enable {
 		var middleware []echo.MiddlewareFunc
 		if c.config.HTTP.PProf.Password != "" {
-			middleware = append(middleware, c.basicAuth("pprof", c.config.HTTP.PProf.Password))
+			middleware = append(middleware, c.basicAuth(pprofUsername, c.config.HTTP.PProf.Password))
 		}
 		g := c.web.RootGroup("/debug/pprof", middleware...)
 		g.GET("", func(c echo.Context) error { return c.Redirect(http.StatusFound, c.Path()+"/") })
@@ -65,7 +70,7 @@ func (c *Component) listenWeb() (err error) {
 	if c.config.HTTP.Metrics.Enable {
 		var middleware []echo.MiddlewareFunc
 		if c.config.HTTP.Metrics.Password != "" {
-			middleware = append(middleware, c.basicAuth("metrics", c.config.HTTP.Metrics.Password))
+			middleware = append(middleware, c.basicAuth(metricsUsername, c.config.HTTP.Metrics.Password))
 		}
 		g := c.web.RootGroup("/metrics", middleware...)
 		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })

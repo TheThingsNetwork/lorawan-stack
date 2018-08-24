@@ -54,6 +54,18 @@ func init() {
 	}
 }
 
+func TestNew(t *testing.T) {
+	a := assertions.New(t)
+
+	logger := test.GetLogger(t)
+
+	_, err := component.New(logger, &component.Config{})
+	a.So(err, should.BeNil)
+
+	mustNew := func() { component.MustNew(logger, &component.Config{}) }
+	a.So(mustNew, should.NotPanic)
+}
+
 func TestLogger(t *testing.T) {
 	a := assertions.New(t)
 

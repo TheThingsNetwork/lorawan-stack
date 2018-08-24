@@ -43,8 +43,9 @@ type Config struct {
 
 // Component is a base component for The Things Network cluster
 type Component struct {
-	ctx       context.Context
-	cancelCtx context.CancelFunc
+	ctx                context.Context
+	cancelCtx          context.CancelFunc
+	terminationSignals chan os.Signal
 
 	config *Config
 	logger log.Stack
@@ -87,8 +88,9 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 	ctx = log.NewContext(ctx, logger)
 
 	c := &Component{
-		ctx:       ctx,
-		cancelCtx: cancel,
+		ctx:                ctx,
+		cancelCtx:          cancel,
+		terminationSignals: make(chan os.Signal),
 
 		config: config,
 		logger: logger,
@@ -210,12 +212,11 @@ func (c *Component) Run() error {
 		c.logger.Debug("Left cluster")
 	}()
 
-	signals := make(chan os.Signal)
-	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
+	signal.Notify(c.terminationSignals, os.Interrupt, os.Kill, syscall.SIGTERM)
 
 	for {
 		select {
-		case sig := <-signals:
+		case sig := <-c.terminationSignals:
 			fmt.Println()
 			c.logger.WithField("signal", sig).Info("Received signal, exiting...")
 			return nil
