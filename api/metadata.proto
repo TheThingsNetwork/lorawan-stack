@@ -88,9 +88,6 @@ message TxMetadata {
   // Send a CRC in the packet. This should only be used for testing purposes, as downlinks with CRCs are not LoRaWAN compliant.
   bool enable_crc = 4 [(gogoproto.customname) = "EnableCRC"];
 
-  // Invert polarity for this downlink. This field should be true for LoRaWAN downlinks.
-  bool invert_polarity = 5;
-
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case
