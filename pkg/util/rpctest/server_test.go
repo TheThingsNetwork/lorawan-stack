@@ -66,6 +66,8 @@ func TestFooBarExampleServer(t *testing.T) {
 			a.So(err, should.BeNil)
 			err = stream.Send(&rpctest.Foo{Message: "foo"})
 			a.So(err, should.BeNil)
+			err = stream.Send(&rpctest.Foo{Message: "reset"})
+			a.So(err, should.BeNil)
 			bar, err := stream.CloseAndRecv()
 			a.So(err, should.BeNil)
 			a.So(bar.Message, should.Equal, "Thanks for the 1 Foo")

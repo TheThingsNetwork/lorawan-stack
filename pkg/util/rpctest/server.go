@@ -40,7 +40,6 @@ func (s *FooBarExampleServer) ClientStream(stream FooBar_ClientStreamServer) err
 	defer cancel(context.Canceled)
 
 	go func() {
-		defer close(fooCh)
 		for {
 			foo, err := stream.Recv()
 			if err != nil {
@@ -62,10 +61,7 @@ func (s *FooBarExampleServer) ClientStream(stream FooBar_ClientStreamServer) err
 			default:
 				return err
 			}
-		case foo, ok := <-fooCh:
-			if !ok {
-				continue // will select ctx.Done() in next loop
-			}
+		case foo := <-fooCh:
 			if foo.Message == "reset" {
 				received = 0
 			}
@@ -78,7 +74,7 @@ func (s *FooBarExampleServer) ClientStream(stream FooBar_ClientStreamServer) err
 
 // ServerStream RPC example
 func (s *FooBarExampleServer) ServerStream(foo *Foo, stream FooBar_ServerStreamServer) error {
-	for i := 0; i < 10; i++ {
+	for {
 		select {
 		case <-stream.Context().Done():
 			return stream.Context().Err()
@@ -88,7 +84,6 @@ func (s *FooBarExampleServer) ServerStream(foo *Foo, stream FooBar_ServerStreamS
 			}
 		}
 	}
-	return nil
 }
 
 // BidiStream RPC example
@@ -97,7 +92,6 @@ func (s *FooBarExampleServer) BidiStream(stream FooBar_BidiStreamServer) error {
 	ctx, cancel := errorcontext.New(stream.Context())
 
 	go func() {
-		defer close(fooCh)
 		for {
 			foo, err := stream.Recv()
 			if err != nil {
@@ -112,10 +106,7 @@ func (s *FooBarExampleServer) BidiStream(stream FooBar_BidiStreamServer) error {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case foo, ok := <-fooCh:
-			if !ok {
-				continue // will select ctx.Done() in next loop
-			}
+		case foo := <-fooCh:
 			if err := stream.Send(&Bar{Message: foo.Message}); err != nil {
 				return err
 			}
