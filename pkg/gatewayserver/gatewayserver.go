@@ -256,24 +256,11 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				logger.WithError(err).Debug("Dropping message")
 				registerDropUplink(ctx, conn.Gateway(), msg, err)
 			}
-			if err := msg.Payload.UnmarshalLoRaWAN(msg.RawPayload); err != nil {
+			if err := msg.UnmarshalIdentifiers(); err != nil {
 				drop(err)
 				break
 			}
-			var ids ttnpb.EndDeviceIdentifiers
-			if pld := msg.Payload.GetMACPayload(); pld != nil {
-				ids.DevAddr = &pld.DevAddr
-			} else if pld := msg.Payload.GetJoinRequestPayload(); pld != nil {
-				ids.JoinEUI = &pld.JoinEUI
-				ids.DevEUI = &pld.DevEUI
-			} else if pld := msg.Payload.GetRejoinRequestPayload(); pld != nil {
-				ids.JoinEUI = &pld.JoinEUI
-				ids.DevEUI = &pld.DevEUI
-			} else {
-				drop(errInvalidPayload)
-				break
-			}
-			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, msg.EndDeviceIdentifiers)
 			if ns == nil {
 				drop(errNoNetworkServer)
 				break
