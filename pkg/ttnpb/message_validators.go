@@ -78,31 +78,34 @@ func (m UplinkMessage) Validate() error {
 		return err
 	}
 
-	if len(m.GetRawPayload()) == 0 {
-		return errMissingRawPayload
+	if p := m.GetPayload(); p.Payload == nil {
+		if len(m.GetRawPayload()) == 0 {
+			return errMissingRawPayload
+		}
+	} else {
+		switch p.GetMType() {
+		case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+			mp := p.GetMACPayload()
+			if mp == nil {
+				return errMissing("MACPayload")
+			}
+			return mp.Validate()
+		case MType_JOIN_REQUEST:
+			jp := p.GetJoinRequestPayload()
+			if jp == nil {
+				return errMissing("JoinRequestPayload")
+			}
+			return jp.Validate()
+		case MType_REJOIN_REQUEST:
+			rp := p.GetRejoinRequestPayload()
+			if rp == nil {
+				return errMissing("RejoinRequestPayload")
+			}
+			return rp.Validate()
+		default:
+			return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
+		}
 	}
 
-	p := m.GetPayload()
-	switch p.GetMType() {
-	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
-		mp := p.GetMACPayload()
-		if mp == nil {
-			return errMissing("MACPayload")
-		}
-		return mp.Validate()
-	case MType_JOIN_REQUEST:
-		jp := p.GetJoinRequestPayload()
-		if jp == nil {
-			return errMissing("JoinRequestPayload")
-		}
-		return jp.Validate()
-	case MType_REJOIN_REQUEST:
-		rp := p.GetRejoinRequestPayload()
-		if rp == nil {
-			return errMissing("RejoinRequestPayload")
-		}
-		return rp.Validate()
-	default:
-		return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
-	}
+	return nil
 }
