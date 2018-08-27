@@ -17,19 +17,25 @@ package validate
 import (
 	"fmt"
 	"regexp"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
-var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+var (
+	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+	errEmail = errors.DefineInvalidArgument("email", "`{email}` is not a valid email.")
+)
 
 // Email checks whether the input value is a valid email or not.
 func Email(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("Email validator: got %T instead of string", v)
+		return errNotString.WithAttributes("type", fmt.Sprintf("%T", v))
 	}
 
 	if !emailRegex.MatchString(str) {
-		return fmt.Errorf("`%s` is not a valid email", str)
+		return errEmail.WithAttributes("email", str)
 	}
 
 	return nil

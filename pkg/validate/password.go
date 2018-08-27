@@ -15,22 +15,27 @@
 package validate
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
-var passwordRegex = regexp.MustCompile("^.{8,}$")
+var (
+	passwordRegex = regexp.MustCompile("^.{8,}$")
+
+	errPasswordLength = errors.DefineInvalidArgument("password_length", "password must be at least 8 characters long")
+)
 
 // Password checks whether the input value is a string and is at least 8 characters long.
 func Password(v interface{}) error {
 	password, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("Password validator: got %T instead of string", v)
+		return errNotString.WithAttributes("type", fmt.Sprintf("%T", v))
 	}
 
 	if !passwordRegex.MatchString(password) {
-		return errors.New("Password must be at least 8 characters long")
+		return errPasswordLength
 	}
 
 	return nil

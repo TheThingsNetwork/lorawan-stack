@@ -17,6 +17,14 @@ package validate
 import (
 	"fmt"
 	"reflect"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+)
+
+var (
+	errNoSliceOrArray = errors.DefineInvalidArgument("no_slice_or_array", "must be slice or array, is `{type}`")
+	errNotPresent     = errors.DefineInvalidArgument("not_present", "`{value}` is not present in `{allowed_values}`")
+	errNotSubset      = errors.DefineInvalidArgument("not_subset", "`{value}` is not a subset of `{reference}`")
 )
 
 // In checks whether:
@@ -27,7 +35,7 @@ func In(slice interface{}) validateFn { // nolint: golint, returns unexported ty
 		sliceVal := reflect.ValueOf(slice)
 
 		if sliceVal.Kind() != reflect.Slice && sliceVal.Kind() != reflect.Array {
-			return fmt.Errorf("In validator: got %T instead of an slice or array", v)
+			return errNoSliceOrArray.WithAttributes("type", fmt.Sprintf("%T", v))
 		}
 
 		fn := func(v interface{}, slice reflect.Value) error {
@@ -37,7 +45,7 @@ func In(slice interface{}) validateFn { // nolint: golint, returns unexported ty
 			}
 
 			if !found {
-				return fmt.Errorf("Expected `%v` to be in `%v` but not", v, slice)
+				return errNotPresent.WithAttributes("value", fmt.Sprintf("%v", v), "allowed_values", fmt.Sprintf("%v", slice))
 			}
 
 			return nil
@@ -46,7 +54,7 @@ func In(slice interface{}) validateFn { // nolint: golint, returns unexported ty
 		val := reflect.ValueOf(v)
 		if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
 			if val.Len() > sliceVal.Len() {
-				return fmt.Errorf("Expected `%v` (length %d) to be a subset of `%v` (length %d) but not", v, val.Len(), slice, sliceVal.Len())
+				return errNotSubset.WithAttributes("value", fmt.Sprintf("%v", v), "reference", fmt.Sprintf("%v", slice))
 			}
 
 			for i := 0; i < val.Len(); i++ {

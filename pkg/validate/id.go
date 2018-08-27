@@ -17,9 +17,15 @@ package validate
 import (
 	"fmt"
 	"regexp"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
-var idRegex = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){1,35}$")
+var (
+	idRegex = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){1,35}$")
+
+	errID = errors.DefineInvalidArgument("id", "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers, dashes and underscores. It may not start or end with a dash or an underscore.")
+)
 
 // ID checks whether the input value is a valid ID according:
 //		- Length must be between 2 and 36
@@ -29,11 +35,11 @@ var idRegex = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){1,35}$")
 func ID(v interface{}) error {
 	id, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("ID validator: got %T instead of string", v)
+		return errNotString.WithAttributes("type", fmt.Sprintf("%T", v))
 	}
 
 	if !idRegex.MatchString(id) {
-		return fmt.Errorf("`%s` is not a valid ID. Must be at least 2 and at most 36 characters long and may consist of only letters, numbers, dashes and underscores. It may not start or end with a dash or an underscore", id)
+		return errID.WithAttributes("id", id)
 
 	}
 

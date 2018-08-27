@@ -3095,6 +3095,132 @@
       "file": "lorawan.go"
     }
   },
+  "error:pkg/validate:email": {
+    "translations": {
+      "en": "`{email}` is not a valid email."
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "email.go"
+    }
+  },
+  "error:pkg/validate:field": {
+    "translations": {
+      "en": "invalid field `{name}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "validate.go"
+    }
+  },
+  "error:pkg/validate:field_set": {
+    "translations": {
+      "en": "field is set"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "required.go"
+    }
+  },
+  "error:pkg/validate:id": {
+    "translations": {
+      "en": "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers, dashes and underscores. It may not start or end with a dash or an underscore."
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "id.go"
+    }
+  },
+  "error:pkg/validate:min_slice_length": {
+    "translations": {
+      "en": "must be non-empty and have at least a length of value `{expected}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "min_length.go"
+    }
+  },
+  "error:pkg/validate:min_string_length": {
+    "translations": {
+      "en": "must have at least a length of value `{expected}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "min_length.go"
+    }
+  },
+  "error:pkg/validate:nil": {
+    "translations": {
+      "en": "must be non-nil"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "min_length.go"
+    }
+  },
+  "error:pkg/validate:no_slice_or_array": {
+    "translations": {
+      "en": "must be slice or array, is `{type}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "in.go"
+    }
+  },
+  "error:pkg/validate:not_present": {
+    "translations": {
+      "en": "`{value}` is not present in `{allowed_values}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "in.go"
+    }
+  },
+  "error:pkg/validate:not_string": {
+    "translations": {
+      "en": "got `{type}` instead of string"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "validate.go"
+    }
+  },
+  "error:pkg/validate:not_string_or_slice": {
+    "translations": {
+      "en": "must be string or slice, is `{type}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "min_length.go"
+    }
+  },
+  "error:pkg/validate:not_subset": {
+    "translations": {
+      "en": "`{value}` is not a subset of `{reference}`"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "in.go"
+    }
+  },
+  "error:pkg/validate:password_length": {
+    "translations": {
+      "en": "password must be at least 8 characters long"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "password.go"
+    }
+  },
+  "error:pkg/validate:required": {
+    "translations": {
+      "en": "a value is required"
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "validate.go"
+    }
+  },
   "error:pkg/validate:spreading_factor": {
     "translations": {
       "en": "invalid spreading factor"

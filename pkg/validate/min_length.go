@@ -17,6 +17,13 @@ package validate
 import (
 	"fmt"
 	"reflect"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+)
+
+var (
+	errNotStringOrSlice = errors.DefineInvalidArgument("not_string_or_slice", "must be string or slice, is `{type}`")
+	errNil              = errors.DefineInvalidArgument("nil", "must be non-nil")
 )
 
 // MinLength checks whether the input value has a minimum length in the following cases:
@@ -26,35 +33,38 @@ import (
 func MinLength(length int) validateFn { // nolint: golint, returns unexported type on purpose
 	return func(v interface{}) error {
 		if v == nil {
-			return fmt.Errorf("MinLength validator: got %T instead of string or slice", v)
+			return errNil
 		}
 
 		typ := reflect.TypeOf(v)
 
-		if typ.Kind() == reflect.String {
+		switch typ.Kind() {
+		case reflect.String:
 			str, _ := v.(string)
 			return minLengthString(str, length)
-		}
-
-		if typ.Kind() == reflect.Slice {
+		case reflect.Slice:
 			return minLengthSlice(reflect.ValueOf(v), length)
+		default:
+			return errNotStringOrSlice.WithAttributes("type", fmt.Sprintf("%T", v))
 		}
-
-		return fmt.Errorf("MinLength validator: got %T instead of string or slice", v)
 	}
 }
 
+var errMinSliceLength = errors.DefineInvalidArgument("min_slice_length", "must be non-empty and have at least a length of value `{expected}`")
+
 func minLengthSlice(v reflect.Value, length int) error {
 	if v.IsNil() || v.Len() < length {
-		return fmt.Errorf("Must be non-empty and have at least a length of value %d", length)
+		return errMinSliceLength.WithAttributes("length", length)
 	}
 
 	return nil
 }
 
+var errMinStringLength = errors.DefineInvalidArgument("min_string_length", "must have at least a length of value `{expected}`")
+
 func minLengthString(v string, length int) error {
 	if len(v) < length {
-		return fmt.Errorf("Got string of length %d but minimum required is %d", len(v), length)
+		return errMinStringLength.WithAttributes("length", length)
 	}
 
 	return nil

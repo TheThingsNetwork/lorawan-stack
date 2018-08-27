@@ -15,44 +15,51 @@
 // Package validate implements validation functions, usually used RPC message validation.
 package validate
 
+import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+
 type validateFn func(v interface{}) error
 
-// All concatenates all the errors and appends them into an `Errors` type.
-func All(results ...error) error {
-	errors := make(Errors, 0, len(results))
-	for _, result := range results {
-		if result == nil {
-			continue
-		}
-		if e, ok := result.(Errors); ok && len(e) == 0 {
-			continue
-		}
+var (
+	errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{name}`")
+	errNotString    = errors.DefineInvalidArgument("not_string", "got `{type}` instead of string")
+	errRequired     = errors.DefineInvalidArgument("required", "a value is required")
+)
 
-		errors = append(errors, result)
+// All returns an error if one of the passed fields is invalid.
+func All(fields ...error) error {
+	for _, verified := range fields {
+		if verified != nil {
+			return verified
+		}
 	}
-	if len(errors) == 0 {
-		return nil
-	}
-	return errors
+	return nil
 }
 
-// Field execute all the given validation functions on v and returns an `Errors`
-// type containing all the errors of the validating functions.
-func Field(v interface{}, fns ...validateFn) Errors {
-	errors := make(Errors, 0, len(fns))
-	for _, fn := range fns {
-		err := fn(v)
+// ValidationField implements error, and represents whether a field is valid or invalid.
+type ValidationField struct {
+	error
+}
 
-		if err == errZeroValue {
+// Field verifies whether a field is valid, and returns an error if it is invalid.
+func Field(v interface{}, verifiers ...func(interface{}) error) (vf *ValidationField) {
+	for _, verifier := range verifiers {
+		err := verifier(v)
+		switch err {
+		case errZeroValue:
 			return nil
+		case nil:
+			continue
+		default:
+			vf = &ValidationField{error: err}
 		}
+	}
+	return
+}
 
-		if err != nil {
-			errors = append(errors, err)
-		}
+// DescribeFieldName attaches the name of a field to the validation of a field, and returns it in an error format.
+func (vf *ValidationField) DescribeFieldName(name string) error {
+	if vf != nil && vf.error != nil {
+		return errInvalidField.WithAttributes("name", name).WithCause(vf.error)
 	}
-	if len(errors) == 0 {
-		return nil
-	}
-	return errors
+	return nil
 }

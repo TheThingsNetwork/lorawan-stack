@@ -15,14 +15,13 @@
 package validate
 
 import (
-	"errors"
+	stdliberr "errors"
 	"reflect"
 	"time"
 
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
-
-var errZeroValue = errors.New("variable is empty")
 
 // IsZeroer is an interface, which reports whether it represents a zero value.
 type IsZeroer interface {
@@ -183,15 +182,21 @@ func isZero(v interface{}) bool {
 	return isZeroValue(reflect.ValueOf(v))
 }
 
+var errFieldSet = errors.DefineInvalidArgument("field_set", "field is set")
+
 // Empty returns error if v is set.
 // It is meant to be used as the first validator function passed as argument to Field.
 // It uses IsZero, if v implements IsZeroer interface.
 func Empty(v interface{}) error {
 	if !isZero(v) {
-		return errors.New("Field must not be set")
+		return errFieldSet
 	}
 	return nil
 }
+
+// errZeroValue is a flag value indicating a value is not required. If a value is not set,
+// requirements on its value will be ignored.
+var errZeroValue = stdliberr.New("Value not set")
 
 // NotRequired returns an error, used internally in Field, if v is zero.
 // It is meant to be used as the first validator function passed as argument to Field.
@@ -208,7 +213,7 @@ func NotRequired(v interface{}) error {
 // It uses IsZero, if v implements IsZeroer interface.
 func Required(v interface{}) error {
 	if isZero(v) {
-		return errors.New("Field must not be empty")
+		return errRequired
 	}
 	return nil
 }
