@@ -38,18 +38,12 @@ message GatewayDown {
   DownlinkMessage downlink_message = 1;
 }
 
-message GetFrequencyPlanRequest {
-  // ID of the frequency plan to fetch.
-  string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID"];
-}
-
 // The GtwGs service connects a gateway to a Gateway Server.
 service GtwGs {
   // Link the gateway to the Gateway Server.
   rpc LinkGateway(stream GatewayUp) returns (stream GatewayDown);
-  // Get the frequency plan associated with the gateway.
-  // The authentication information will be used to determine the gateway ID.
-  rpc GetFrequencyPlan(GetFrequencyPlanRequest) returns (FrequencyPlan);
+  // GetConcentratorConfig associated to the gateway.
+  rpc GetConcentratorConfig(google.protobuf.Empty) returns (ConcentratorConfig);
 }
 
 // The NsGs service connects a Network Server to a Gateway Server.
