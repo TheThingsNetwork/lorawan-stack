@@ -32,8 +32,6 @@ import (
 )
 
 func TestFooBarExampleServer(t *testing.T) {
-	a := assertions.New(t)
-
 	lis, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		panic(err)
@@ -52,44 +50,52 @@ func TestFooBarExampleServer(t *testing.T) {
 
 	cli := rpctest.NewFooBarClient(cc)
 
-	{
+	t.Run("Unary", func(t *testing.T) {
+		a := assertions.New(t)
+
 		bar, err := cli.Unary(test.Context(), &rpctest.Foo{Message: "foo"})
 		a.So(err, should.BeNil)
 		a.So(bar.Message, should.Equal, "foofoo")
-	}
+	})
 
-	{
-		stream, err := cli.ClientStream(test.Context())
-		a.So(err, should.BeNil)
-		err = stream.Send(&rpctest.Foo{Message: "foo"})
-		a.So(err, should.BeNil)
-		bar, err := stream.CloseAndRecv()
-		a.So(err, should.BeNil)
-		a.So(bar.Message, should.Equal, "Thanks for the 1 Foo")
-	}
+	t.Run("ClientStream", func(t *testing.T) {
+		a := assertions.New(t)
 
-	{
-		ctx, cancel := context.WithCancel(test.Context())
-		stream, err := cli.ClientStream(ctx)
-		a.So(err, should.BeNil)
-		err = stream.Send(&rpctest.Foo{Message: "foo"})
-		a.So(err, should.BeNil)
-		cancel()
-		_, err = stream.CloseAndRecv()
-		a.So(grpc.Code(err), should.Equal, codes.Canceled)
-	}
+		{
+			stream, err := cli.ClientStream(test.Context())
+			a.So(err, should.BeNil)
+			err = stream.Send(&rpctest.Foo{Message: "foo"})
+			a.So(err, should.BeNil)
+			bar, err := stream.CloseAndRecv()
+			a.So(err, should.BeNil)
+			a.So(bar.Message, should.Equal, "Thanks for the 1 Foo")
+		}
 
-	{
-		stream, err := cli.ClientStream(test.Context())
-		a.So(err, should.BeNil)
-		err = stream.Send(&rpctest.Foo{Message: "foo"})
-		a.So(err, should.BeNil)
-		time.Sleep(150 * time.Millisecond)
-		err = stream.RecvMsg(&empty.Empty{})
-		a.So(grpc.Code(err), should.Equal, codes.Unknown)
-	}
+		{
+			ctx, cancel := context.WithCancel(test.Context())
+			stream, err := cli.ClientStream(ctx)
+			a.So(err, should.BeNil)
+			err = stream.Send(&rpctest.Foo{Message: "foo"})
+			a.So(err, should.BeNil)
+			cancel()
+			_, err = stream.CloseAndRecv()
+			a.So(grpc.Code(err), should.Equal, codes.Canceled)
+		}
 
-	{
+		{
+			stream, err := cli.ClientStream(test.Context())
+			a.So(err, should.BeNil)
+			err = stream.Send(&rpctest.Foo{Message: "foo"})
+			a.So(err, should.BeNil)
+			time.Sleep(150 * time.Millisecond)
+			err = stream.RecvMsg(&empty.Empty{})
+			a.So(grpc.Code(err), should.Equal, codes.Unknown)
+		}
+	})
+
+	t.Run("ServerStream", func(t *testing.T) {
+		a := assertions.New(t)
+
 		ctx, cancel := context.WithCancel(test.Context())
 		stream, err := cli.ServerStream(ctx, &rpctest.Foo{Message: "foo"})
 		a.So(err, should.BeNil)
@@ -107,9 +113,11 @@ func TestFooBarExampleServer(t *testing.T) {
 		status, ok := status.FromError(err)
 		a.So(ok, should.BeTrue)
 		a.So(status.Code(), should.Equal, codes.Canceled)
-	}
+	})
 
-	{
+	t.Run("BidiStream", func(t *testing.T) {
+		a := assertions.New(t)
+
 		ctx, cancel := context.WithCancel(test.Context())
 		stream, err := cli.BidiStream(ctx)
 		a.So(err, should.BeNil)
@@ -130,7 +138,7 @@ func TestFooBarExampleServer(t *testing.T) {
 		status, ok := status.FromError(err)
 		a.So(ok, should.BeTrue)
 		a.So(status.Code(), should.Equal, codes.Canceled)
-	}
+	})
 }
 
 func watchClientStream(ctx *errorcontext.ErrorContext, stream rpctest.FooBar_ClientStreamClient) <-chan *rpctest.Bar {
