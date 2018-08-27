@@ -48,6 +48,7 @@ type Connection struct {
 	// Align for sync/atomic.
 	uplinks,
 	downlinks uint64
+	connectTime,
 	lastStatusTime,
 	lastUplinkTime,
 	lastDownlinkTime int64
@@ -69,14 +70,15 @@ type Connection struct {
 func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway, scheduler scheduling.Scheduler) *Connection {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	return &Connection{
-		ctx:       ctx,
-		cancelCtx: cancelCtx,
-		protocol:  protocol,
-		gateway:   gateway,
-		scheduler: scheduler,
-		upCh:      make(chan *ttnpb.UplinkMessage, bufferSize),
-		downCh:    make(chan *ttnpb.DownlinkMessage, bufferSize),
-		statusCh:  make(chan *ttnpb.GatewayStatus, bufferSize),
+		ctx:         ctx,
+		cancelCtx:   cancelCtx,
+		protocol:    protocol,
+		gateway:     gateway,
+		scheduler:   scheduler,
+		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
+		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
+		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
+		connectTime: time.Now().UnixNano(),
 	}
 }
 
@@ -96,7 +98,7 @@ func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
 var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 
-// HandleUp updates the gateway observation and sends the message to the upstream channel.
+// HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	select {
 	case <-c.ctx.Done():
@@ -110,7 +112,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	return nil
 }
 
-// HandleStatus updates the gateway observation and sends the status to the status channel.
+// HandleStatus updates the status stats and sends the status to the status channel.
 func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 	select {
 	case <-c.ctx.Done():
@@ -126,7 +128,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 
 var errComputeTOA = errors.Define("compute_toa", "could not compute the time on air")
 
-// SendDown schedules and sends a downlink message.
+// SendDown schedules and sends a downlink message and updates the downlink stats.
 func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 	duration, err := toa.Compute(down.RawPayload, down.Settings)
 	if err != nil {
@@ -166,6 +168,9 @@ func (c *Connection) Up() <-chan *ttnpb.UplinkMessage {
 func (c *Connection) Down() <-chan *ttnpb.DownlinkMessage {
 	return c.downCh
 }
+
+// ConnectTime returns the time the gateway connected.
+func (c *Connection) ConnectTime() time.Time { return time.Unix(0, c.connectTime) }
 
 // StatusStats returns the status statistics.
 func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
