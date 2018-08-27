@@ -550,6 +550,135 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 	}
 }
 
+func TestUnmarshalIdentifiers(t *testing.T) {
+	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
+	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	joinEUI := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	for i, tc := range []struct {
+		Bytes       []byte
+		Identifiers EndDeviceIdentifiers
+	}{
+		{
+			[]byte{
+				/* MHDR: Join-request */
+				0x00,
+				/* MACPayload */
+				/** JoinEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** DevNonce **/
+				0xff, 0x42,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			EndDeviceIdentifiers{
+				JoinEUI: &joinEUI,
+				DevEUI:  &devEUI,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Confirmed up */
+				0x80,
+				/* MACPayload */
+				/** FHDR **/
+				/*** DevAddr ***/
+				0xff, 0xff, 0xff, 0x42,
+				/*** FCtrl ***/
+				0xb2,
+				/*** FCnt ***/
+				0x42, 0xff,
+				/*** FOpts ***/
+				0xfe, 0xff,
+				/** FPort **/
+				0x42,
+				/** FRMPayload **/
+				0xfe, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			EndDeviceIdentifiers{
+				DevAddr: &devAddr,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Rejoin-request */
+				0xc0,
+				/* MACPayload */
+				/** RejoinType **/
+				0x00,
+				/** NetID **/
+				0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** RejoinCnt **/
+				0x42, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			EndDeviceIdentifiers{
+				DevEUI: &devEUI,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Rejoin-request */
+				0xc0,
+				/* MACPayload */
+				/** RejoinType **/
+				0x01,
+				/** JoinEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** RejoinCnt **/
+				0x42, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			EndDeviceIdentifiers{
+				JoinEUI: &joinEUI,
+				DevEUI:  &devEUI,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Rejoin-request */
+				0xc0,
+				/* MACPayload */
+				/** RejoinType **/
+				0x02,
+				/** NetID **/
+				0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** RejoinCnt **/
+				0x42, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			EndDeviceIdentifiers{
+				DevEUI: &devEUI,
+			},
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			msg := UplinkMessage{
+				RawPayload: tc.Bytes,
+			}
+			err := msg.UnmarshalIdentifiers()
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(msg.EndDeviceIdentifiers, should.Resemble, tc.Identifiers)
+		})
+	}
+}
+
 func TestUnmarshalResilience(t *testing.T) {
 	for i, tc := range [][]byte{
 		// Too little data: FHDR is at least 7 bytes.
@@ -592,6 +721,13 @@ func TestUnmarshalResilience(t *testing.T) {
 			a.So(func() {
 				var msg Message
 				err := msg.UnmarshalLoRaWAN(tc)
+				a.So(err, should.NotBeNil)
+			}, should.NotPanic)
+			a.So(func() {
+				msg := UplinkMessage{
+					RawPayload: tc,
+				}
+				err := msg.UnmarshalIdentifiers()
 				a.So(err, should.NotBeNil)
 			}, should.NotPanic)
 		})

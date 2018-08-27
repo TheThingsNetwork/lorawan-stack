@@ -18,6 +18,7 @@ import (
 	"math"
 
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
@@ -579,4 +580,61 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 		return errUnknown("MType")(msg.MType.String())
 	}
 	return nil
+}
+
+func (msg *UplinkMessage) UnmarshalIdentifiers() error {
+	n := len(msg.RawPayload)
+	if n == 0 {
+		return errMissing("PHYPayload")
+	}
+	if err := msg.Payload.MHDR.UnmarshalLoRaWAN(msg.RawPayload[0:1]); err != nil {
+		return errFailedDecoding("MHDR").WithCause(err)
+	}
+	switch msg.Payload.MHDR.MType {
+	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+		if n < 12 {
+			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
+		}
+		var devAddr types.DevAddr
+		copyReverse(devAddr[:], msg.RawPayload[1:5])
+		msg.EndDeviceIdentifiers.DevAddr = &devAddr
+		return nil
+	case MType_JOIN_REQUEST:
+		if n != 23 {
+			return errExpectedLengthEqual("JoinRequestPHYPayload", 23)(n)
+		}
+		var joinEUI, devEUI types.EUI64
+		copyReverse(joinEUI[:], msg.RawPayload[1:9])
+		copyReverse(devEUI[:], msg.RawPayload[9:17])
+		msg.EndDeviceIdentifiers.JoinEUI = &joinEUI
+		msg.EndDeviceIdentifiers.DevEUI = &devEUI
+		return nil
+	case MType_REJOIN_REQUEST:
+		if n != 19 && n != 24 {
+			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
+		}
+		switch msg.RawPayload[1] {
+		case 0, 2:
+			if n != 19 {
+				return errExpectedLengthEqual("RejoinRequestPHYPayload", 19)(n)
+			}
+			var devEUI types.EUI64
+			copyReverse(devEUI[:], msg.RawPayload[5:13])
+			msg.EndDeviceIdentifiers.DevEUI = &devEUI
+		case 1:
+			if n != 24 {
+				return errExpectedLengthEqual("RejoinRequestPHYPayload", 24)(n)
+			}
+			var joinEUI, devEUI types.EUI64
+			copyReverse(joinEUI[:], msg.RawPayload[2:10])
+			copyReverse(devEUI[:], msg.RawPayload[10:18])
+			msg.EndDeviceIdentifiers.JoinEUI = &joinEUI
+			msg.EndDeviceIdentifiers.DevEUI = &devEUI
+		default:
+			return errUnknown("RejoinType")(msg.RawPayload[1])
+		}
+		return nil
+	default:
+		return errUnknown("MType")(msg.Payload.MType.String())
+	}
 }
