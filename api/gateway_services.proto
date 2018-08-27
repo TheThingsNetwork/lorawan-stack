@@ -1,0 +1,138 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/gateway.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+// The GatewayRegistry service, exposed by the Identity Server,
+// manages the gateway registry.
+service GatewayRegistry {
+  // Create a new gateway. This also sets the current user as first collaborator
+  // with all possible rights. When including organization identifiers, this instead
+  // grants those rights to the given organization.
+  rpc CreateGateway(CreateGatewayRequest) returns (Gateway) {
+    option (google.api.http) = {
+      post: "/gateways"
+      body: "*"
+      additional_bindings {
+        post: "/organizations/{organization_ids.organization_id}/gateways"
+        body: "*"
+      }
+    };
+  };
+
+  // Get the gateway with the given identifiers, selecting the fields given
+  // by the field mask. The method may return more or less fields, depending on
+  // the rights of the caller.
+  rpc GetGateway(GetGatewayRequest) returns (Gateway) {
+    option (google.api.http) = {
+      get: "/gateways/{gateway_ids.gateway_id}"
+    };
+  };
+
+  // List gateways. See request message for details.
+  rpc ListGateways(ListGatewaysRequest) returns (Gateways) {
+    option (google.api.http) = {
+      get: "/gateways"
+      additional_bindings {
+        get: "/users/{collaborator.user_ids.user_id}/gateways"
+      }
+      additional_bindings {
+        get: "/organizations/{collaborator.organization_ids.organization_id}/gateways"
+      }
+    };
+  };
+
+  rpc UpdateGateway(UpdateGatewayRequest) returns (Gateway) {
+    option (google.api.http) = {
+      put: "/gateways/{gateway.ids.gateway_id}"
+      body: "*"
+    };
+  };
+
+  rpc DeleteGateway(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/gateways/{gateway_id}"
+    };
+  };
+}
+
+// The GatewayAccess service, exposed by the Identity Server,
+// manages access to gateways.
+service GatewayAccess {
+  rpc ListGatewayRights(GatewayIdentifiers) returns (Rights) {
+    option (google.api.http) = {
+      get: "/gateways/{gateway_id}/rights"
+    };
+  };
+
+  rpc GenerateGatewayAPIKey(SetGatewayAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      post: "/gateways/{gateway_ids.gateway_id}/api-keys"
+      body: "*"
+    };
+  };
+
+  rpc ListGatewayAPIKeys(GatewayIdentifiers) returns (APIKeys) {
+    option (google.api.http) = {
+      get: "/gateways/{gateway_id}/api-keys"
+    };
+  };
+
+  // Set the rights of an existing gateway API key. To generate an API key,
+  // the GenerateGatewayAPIKey should be used. To delete an API key, set it
+  // without any rights.
+  rpc SetGatewayAPIKey(SetGatewayAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      put: "/gateways/{gateway_ids.gateway_id}/api-keys/{id}"
+      body: "*"
+    };
+  };
+
+  // Set the rights of a collaborator on the gateway. Users or organizations
+  // are considered to be a collaborator if they have at least one right on the
+  // gateway.
+  rpc SetGatewayCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/gateways/{gateway_ids.gateway_id}/collaborators"
+      body: "*"
+    };
+  };
+
+  rpc ListGatewayCollaborators(GatewayIdentifiers) returns (Collaborators) {
+    option (google.api.http) = {
+      get: "/gateways/{gateway_id}/collaborators"
+    };
+  };
+}
+
+message PullGatewayConfigurationRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
+}
+
+service GatewayConfigurator {
+  rpc PullConfiguration(PullGatewayConfigurationRequest) returns (stream Gateway);
+}

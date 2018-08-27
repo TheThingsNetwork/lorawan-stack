@@ -14,10 +14,9 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/application.proto";
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/messages.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/messages.proto";
 import "google/protobuf/empty.proto";
 
 package ttn.lorawan.v3;

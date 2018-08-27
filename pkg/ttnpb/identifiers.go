@@ -21,8 +21,8 @@ import (
 )
 
 func init() {
-	gob.Register(&OrganizationOrUserIdentifiers_UserID{})
-	gob.Register(&OrganizationOrUserIdentifiers_OrganizationID{})
+	gob.Register(&OrganizationOrUserIdentifiers_UserIDs{})
+	gob.Register(&OrganizationOrUserIdentifiers_OrganizationIDs{})
 }
 
 // IsZero returns true if all identifiers have zero-values.

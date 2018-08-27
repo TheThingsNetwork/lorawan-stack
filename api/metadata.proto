@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/identifiers.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -28,44 +28,31 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message RxMetadata {
   // gateway_id is the ID of the gateway that received the message
   GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
   // Index of the antenna that received the message
   uint32 antenna_index = 2;
-
   // Gateway's internal timestamp when the Rx finished (nanoseconds)
   // NOTE: most gateways use microsecond timestamps, so conversion may be needed
   uint64 timestamp = 3;
-
   // Gateway's internal fine timestamp when the Rx finished (nanoseconds), encrypted with an AES key.
-  string encrypted_fine_timestamp = 4;
-
+  string encrypted_fine_timestamp = 4; // TODO: This should be bytes, or we need to document the encoding.
   // Gateway's internal fine timestamp when the Rx finished (nanoseconds), decrypted.
   uint64 fine_timestamp_value = 5;
-
   // Real time
   google.protobuf.Timestamp time = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
   // Received signal strength in dBm
   float rssi = 7 [(gogoproto.customname) = "RSSI"];
-
   // Received channel power in dBm
   float  channel_rssi = 8 [(gogoproto.customname) = "ChannelRSSI"];
-
   // Standard deviation of the RSSI
   float rssi_standard_deviation = 9 [(gogoproto.customname) = "RSSIStandardDeviation"];
-
   // Signal-to-noise-ratio in dB
   float snr = 10 [(gogoproto.customname) = "SNR"];
-
   // Frequency offset (Hz)
   int64 frequency_offset = 11;
-
   // Location of the antenna
   Location location = 12;
-
   // ID of the AES key the fine timestamps were encrypted with
   string aes_key_id = 13 [(gogoproto.customname) = "AESKeyID"];
-
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case
@@ -77,16 +64,17 @@ message RxMetadata {
 message TxMetadata {
   // gateway_id is the ID of the gateway that received the message
   GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
+  // Index of the antenna that should transmit the message
+  uint32 antenna_index = 2;
   // Gateway's internal timestamp when the Tx should start (nanoseconds)
   // NOTE: most gateways use microsecond timestamps, so conversion may be needed
-  uint64 timestamp = 2;
-
+  uint64 timestamp = 3;
   // Real time
-  google.protobuf.Timestamp time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
+  google.protobuf.Timestamp time = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // Send a CRC in the packet. This should only be used for testing purposes, as downlinks with CRCs are not LoRaWAN compliant.
-  bool enable_crc = 4 [(gogoproto.customname) = "EnableCRC"];
+  bool enable_crc = 5 [(gogoproto.customname) = "EnableCRC"]; // TODO: Move to TxSettings
+  // Invert polarity for this downlink. This field should be true for LoRaWAN downlinks.
+  bool invert_polarity = 6; // TODO: Remove; already in TxSettings.polarization_inversion
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
@@ -98,16 +86,12 @@ message TxMetadata {
 message Location {
   // The North–South position (degrees; -90 to +90), where 0 is the equator, North pole is positive, South pole is negative
   float latitude = 1;
-
   // The East-West position (degrees; -180 to +180), where 0 is the Prime Meridian (Greenwich), East is positive , West is negative
   float longitude = 2;
-
   // The altitude (meters), where 0 is the mean sea level
   int32 altitude = 3;
-
   // The accuracy of the location (meters)
   int32 accuracy = 4;
-
   // Source of the location information
   LocationSource source = 5;
 }
@@ -116,22 +100,22 @@ message Location {
 enum LocationSource {
   option (gogoproto.goproto_enum_prefix) = false;
   // The source of the location is not known or not set
-  SOURCE_UNKNOWN               = 0;
+  SOURCE_UNKNOWN = 0;
   // The location is determined by GPS
-  SOURCE_GPS                   = 1;
+  SOURCE_GPS = 1;
   // The location is set in and updated from a registry
-  SOURCE_REGISTRY              = 3;
+  SOURCE_REGISTRY = 3;
   // The location is estimated with IP geolocation
-  SOURCE_IP_GEOLOCATION        = 4;
+  SOURCE_IP_GEOLOCATION = 4;
   // The location is estimated with WiFi RSSI geolocation
   SOURCE_WIFI_RSSI_GEOLOCATION = 5;
   // The location is estimated with BT/BLE RSSI geolocation
-  SOURCE_BT_RSSI_GEOLOCATION   = 6;
+  SOURCE_BT_RSSI_GEOLOCATION = 6;
   // The location is estimated with LoRa RSSI geolocation
   SOURCE_LORA_RSSI_GEOLOCATION = 7;
   // The location is estimated with LoRa TDOA geolocation
   SOURCE_LORA_TDOA_GEOLOCATION = 8;
   // The location is estimated by a combination of geolocation sources
-  SOURCE_COMBINED_GEOLOCATION  = 9;
+  SOURCE_COMBINED_GEOLOCATION = 9;
   // More estimation methods can be added
 }

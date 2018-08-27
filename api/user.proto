@@ -14,11 +14,14 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/client.proto";
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/rights.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/client.proto";
+import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/enums.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
@@ -27,38 +30,84 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // User is the message that defines an user on the network.
 message User {
-  // User identifiers.
   UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // password is the user's password.
-  string password = 2;
+  string name = 4;
+  string description = 5;
+  map<string,string> attributes = 6;
+  repeated ContactInfo contact_info = 7;
 
-  // name is the user's full name.
-  string name = 3;
+  // Primary email address that can be used for logging in.
+  // This address is not public, use contact_info for that.
+  string primary_email_address = 8;
 
-  // validated_at denotes the time the email was validated at.
-  // This is a read-only field.
-  google.protobuf.Timestamp validated_at = 4 [(gogoproto.stdtime) = true];
+  // Only used on create; never returned.
+  string password = 9;
+  google.protobuf.Timestamp password_updated_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  bool require_password_update = 11;
 
-  // admin denotes whether or not the user has administrative rights within the tenancy.
+  // The reviewing state of the user.
   // This field can only be modified by admins.
-  bool admin = 5;
+  State state = 12;
+  // This user is an admin.
+  // This field can only be modified by other admins.
+  bool admin = 13;
+}
 
-  // state denotes the reviewing state of the user by admin.
-  // This field can only be modified by admins.
-  ReviewingState state = 6;
+message Users {
+  repeated User users = 1;
+}
 
-  // created_at denotes when the user was created.
-  // This is a read-only field.
-  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+message GetUserRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
 
-  // updated_at is the last time the user was updated.
-  // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+message CreateUserRequest {
+  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+}
 
-  // The last time the password was updated (read-only field).
-  google.protobuf.Timestamp password_updated_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+message UpdateUserRequest {
+  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
 
-  // Require the user to update its password (modifiable only by admins).
-  bool require_password_update = 10;
+message UpdateUserPasswordRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string new = 2;
+  string old = 3;
+}
+
+message SetUserAPIKeyRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+  repeated Right rights = 3;
+}
+
+message RemoveUserAPIKeyRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+}
+
+message Invitation {
+  string email = 1;
+  string token = 2;
+
+  google.protobuf.Timestamp expires_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message Invitations {
+  repeated Invitation invitations = 1;
+}
+
+message SendInvitationRequest {
+  string email = 1;
+}
+
+message DeleteInvitationRequest {
+  string email = 1;
 }

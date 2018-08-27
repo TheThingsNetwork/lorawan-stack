@@ -27,7 +27,7 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	out.FirmwareVersion = randStringEndDevice(r)
 	out.Photos = []string{randStringEndDevice(r) + ".jpg", randStringEndDevice(r) + ".jpg"}
 	if r.Intn(10) != 0 {
-		out.DefaultFormatters = *NewPopulatedEndDeviceFormatters(r, easy)
+		out.DefaultFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
 	}
 	out.DefaultMACParameters = NewPopulatedMACParameters(r, easy)
 	out.MaxFrequency = uint64(r.Uint32())
@@ -149,7 +149,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(2) == 0 {
 		out.DownlinkMargin *= -1
 	}
-	out.EndDeviceFormatters = *NewPopulatedEndDeviceFormatters(r, easy)
+	out.DefaultFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
 	out.SupportsJoin = r.Intn(2) == 0
 	return out
 }

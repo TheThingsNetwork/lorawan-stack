@@ -21,11 +21,23 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
+// Error details that are communicated over gRPC (and HTTP) APIs.
+// The messages (for translation) are stored as "error:<namespace>:<name>".
 message ErrorDetails {
+  // Namespace of the error (typically the package name in the stack).
   string namespace = 1;
+  // Name of the error.
   string name = 2;
+  // The default (fallback) message format that should be used for the error.
+  // This is also used if the client does not have a translation for the error.
   string message_format = 3;
+  // Attributes that should be filled into the message format. Any extra attributes
+  // can be displayed as error details.
   google.protobuf.Struct attributes = 4;
+  // The correlation ID of the error can be used to correlate the error to stack
+  // traces the network may (or may not) store about recent errors.
   string correlation_id = 5 [(gogoproto.customname) = "CorrelationID"];
+  // The error that caused this error.
+  ErrorDetails cause = 6;
 }
 

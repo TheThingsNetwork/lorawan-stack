@@ -15,7 +15,6 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "google/api/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -24,19 +23,17 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message KeyEnvelope {
   // The (encrypted) key.
   bytes key = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.AES128Key"];
-
   // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.
   string kek_label = 2 [(gogoproto.customname) = "KEKLabel"];
 }
 
 // Root keys for a LoRaWAN device.
+// These are stored on the Join Server.
 message RootKeys {
   // Join Server issued identifier for the root keys.
   string root_key_id = 1 [(gogoproto.customname) = "RootKeyID"];
-
   // The (encrypted) Application Key.
   KeyEnvelope app_key = 2;
-
   // The (encrypted) Network Key.
   KeyEnvelope nwk_key = 3;
 }
@@ -47,17 +44,18 @@ message SessionKeys {
   option (gogoproto.populate) = false;
 
   // Join Server issued identifier for the session keys.
+  // This ID can be used to request the keys from the Join Server in case the are lost.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
-
   // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
+  // This key is stored by the (forwarding) Network Server.
   KeyEnvelope f_nwk_s_int_key = 2;
-
   // The (encrypted) Serving Network Session Integrity Key.
+  // This key is stored by the (serving) Network Server.
   KeyEnvelope s_nwk_s_int_key = 3;
-
   // The (encrypted) Network Session Encryption Key.
+  // This key is stored by the (serving) Network Server.
   KeyEnvelope nwk_s_enc_key = 4;
-
   // The (encrypted) Application Session Key.
+  // This key is stored by the Application Server.
   KeyEnvelope app_s_key = 5;
 }

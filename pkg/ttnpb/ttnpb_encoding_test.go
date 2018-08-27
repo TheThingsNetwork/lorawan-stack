@@ -103,11 +103,11 @@ func TestEnumMarshalers(t *testing.T) {
 	}
 	vals = append(vals, peerInfoRoles)
 
-	var reviewingStates []fmt.Stringer
-	for i := range ReviewingState_name {
-		reviewingStates = append(reviewingStates, ReviewingState(i))
+	var states []fmt.Stringer
+	for i := range State_name {
+		states = append(states, State(i))
 	}
-	vals = append(vals, reviewingStates)
+	vals = append(vals, states)
 
 	var locationSources []fmt.Stringer
 	for i := range LocationSource_name {

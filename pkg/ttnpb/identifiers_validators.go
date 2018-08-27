@@ -57,12 +57,12 @@ func (ids OrganizationIdentifiers) Validate() error {
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (ids OrganizationOrUserIdentifiers) Validate() error {
-	if id := ids.GetUserID(); id != nil {
-		return id.Validate()
+	if ids := ids.GetUserIDs(); ids != nil {
+		return ids.Validate()
 	}
 
-	if id := ids.GetOrganizationID(); id != nil {
-		return id.Validate()
+	if ids := ids.GetOrganizationIDs(); ids != nil {
+		return ids.Validate()
 	}
 
 	return errMissingIdentifiers

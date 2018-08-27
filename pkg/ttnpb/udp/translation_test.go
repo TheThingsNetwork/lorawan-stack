@@ -48,11 +48,11 @@ func TestStatusRaw(t *testing.T) {
 	status := upstream.GatewayStatus
 	a.So(status, should.NotBeNil)
 
-	a.So(status.AntennasLocation, should.NotBeNil)
-	a.So(len(status.AntennasLocation), should.Equal, 1)
-	a.So(status.AntennasLocation[0].Longitude, should.AlmostEqual, 5.29685, 0.0001)
-	a.So(status.AntennasLocation[0].Latitude, should.AlmostEqual, 52.34223, 0.0001)
-	a.So(status.AntennasLocation[0].Altitude, should.AlmostEqual, 66)
+	a.So(status.AntennaLocations, should.NotBeNil)
+	a.So(len(status.AntennaLocations), should.Equal, 1)
+	a.So(status.AntennaLocations[0].Longitude, should.AlmostEqual, 5.29685, 0.0001)
+	a.So(status.AntennaLocations[0].Latitude, should.AlmostEqual, 52.34223, 0.0001)
+	a.So(status.AntennaLocations[0].Altitude, should.AlmostEqual, 66)
 
 	a.So(status.Versions, should.NotBeNil)
 	a.So(status.Metrics, should.NotBeNil)

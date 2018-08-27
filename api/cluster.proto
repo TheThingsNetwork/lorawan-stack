@@ -31,13 +31,14 @@ message PeerInfo {
 
   enum Role {
     NONE = 0;
-    IDENTITY_SERVER = 1;
-    GATEWAY_SERVER = 2;
-    NETWORK_SERVER = 3;
-    APPLICATION_SERVER = 4;
-    JOIN_SERVER = 5;
+    ENTITY_REGISTRY = 1;
+    ACCESS = 2;
+    GATEWAY_SERVER = 3;
+    NETWORK_SERVER = 4;
+    APPLICATION_SERVER = 5;
+    JOIN_SERVER = 6;
   }
 
   // Tags of the peer
-  map <string,string> tags = 4;
+  map<string,string> tags = 4;
 }

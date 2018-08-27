@@ -1,0 +1,121 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/organization.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+// The OrganizationRegistry service, exposed by the Identity Server,
+// manages the organization registry.
+service OrganizationRegistry {
+  // Create a new organization. This also sets the current user as first collaborator
+  // with all possible rights.
+  rpc CreateOrganization(CreateOrganizationRequest) returns (Organization) {
+    option (google.api.http) = {
+      post: "/organizations"
+      body: "*"
+    };
+  };
+
+  // Get the organization with the given identifiers, selecting the fields given
+  // by the field mask. The method may return more or less fields, depending on
+  // the rights of the caller.
+  rpc GetOrganization(GetOrganizationRequest) returns (Organization) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_ids.organization_id}"
+    };
+  };
+
+  // List organizations. See request message for details.
+  rpc ListOrganizations(ListOrganizationsRequest) returns (Organizations) {
+    option (google.api.http) = {
+      get: "/organizations"
+      additional_bindings {
+        get: "/users/{collaborator.user_ids.user_id}/organizations"
+      }
+    };
+  };
+
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (Organization) {
+    option (google.api.http) = {
+      put: "/organizations/{organization.ids.organization_id}"
+      body: "*"
+    };
+  };
+
+  rpc DeleteOrganization(OrganizationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/organizations/{organization_id}"
+    };
+  };
+}
+
+// The OrganizationAccess service, exposed by the Identity Server,
+// manages access to organizations.
+service OrganizationAccess {
+  rpc ListOrganizationRights(OrganizationIdentifiers) returns (Rights) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}/rights"
+    };
+  };
+
+  rpc GenerateOrganizationAPIKey(SetOrganizationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      post: "/organizations/{organization_ids.organization_id}/api-keys"
+      body: "*"
+    };
+  };
+
+  rpc ListOrganizationAPIKeys(OrganizationIdentifiers) returns (APIKeys) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}/api-keys"
+    };
+  };
+
+  // Set the rights of an existing organization API key. To generate an API key,
+  // the GenerateOrganizationAPIKey should be used. To delete an API key, set it
+  // without any rights.
+  rpc SetOrganizationAPIKey(SetOrganizationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      put: "/organizations/{organization_ids.organization_id}/api-keys/{id}"
+      body: "*"
+    };
+  };
+
+  // Set the rights of a collaborator (member) on the organization. Users
+  // are considered to be a collaborator if they have at least one right on the
+  // organization.
+  // Note that only users can collaborate (be member of) an organization.
+  rpc SetOrganizationCollaborator(SetOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/organizations/{organization_ids.organization_id}/collaborators"
+      body: "*"
+    };
+  };
+
+  rpc ListOrganizationCollaborators(OrganizationIdentifiers) returns (Collaborators) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}/collaborators"
+    };
+  };
+}

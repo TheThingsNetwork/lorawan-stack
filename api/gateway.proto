@@ -14,10 +14,13 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/metadata.proto";
+import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/metadata.proto";
+import "lorawan-stack/api/rights.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -27,141 +30,95 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
-  option (gogoproto.populate) = false;
-  // Gateway identifiers.
   GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // description is the description of the gateway.
-  string description = 2;
+  string name = 4;
+  string description = 5;
+  map<string,string> attributes = 6;
+  repeated ContactInfo contact_info = 7;
 
-  // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
-
-  // cluster_address indicates the URI of the Gateway Server cluster to connect to,
-  // in a "<ip>:<port>" format.
-  string cluster_address = 4;
-
-  // antennas contains the information for every antenna of the gateway.
-  repeated GatewayAntenna antennas = 5 [(gogoproto.nullable) = false];
-
-  // radios are the gateway concentrator's radios.
-  repeated GatewayRadio radios = 6 [(gogoproto.nullable) = false];
-
-  // activated_at denotes when the gateway was activated.
-  // This a read-only field.
-  google.protobuf.Timestamp activated_at = 7 [(gogoproto.stdtime) = true];
-
-  // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 8 [(gogoproto.nullable) = false];
-
-  // auto_update indicates whether or not the gateway should be able to
-  // automatically fetch and execute firmware updates.
-  // It is true by default.
+  // The address (host:port) of the Gateway Server to connect to.
+  string cluster_address = 8;
   bool auto_update = 9;
-
-  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS".
-  string platform = 10;
-
-  // attributes is a free form map of attributes.
-  map<string, string> attributes = 11;
-
-  // contact_account is either an Organization ID or User ID that will be
-  // displayed (according the privacy settings) as contact persona for this gateway.
-  OrganizationOrUserIdentifiers contact_account_ids = 12 [(gogoproto.customname) = "ContactAccountIDs"];
-
-  // created_at is the time when the gateway was created.
-  // This a read-only field.
-  google.protobuf.Timestamp created_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // updated_at is the last time the gateway was updated.
-  // This a read-only field.
-  google.protobuf.Timestamp updated_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
+  string update_channel = 10;
+  string frequency_plan_id = 11 [(gogoproto.customname) = "FrequencyPlanID"];
   // Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet
   // Forwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the
   // downlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have
   // not been transmitted yet.
-  bool schedule_downlink_late = 15;
+  bool schedule_downlink_late = 12;
+  repeated GatewayAntenna antennas = 13 [(gogoproto.nullable) = false];
+  // The status of this gateway may be publicly displayed.
+  bool status_public = 14;
+  // The location of this gateway may be publicly displayed.
+  bool location_public = 15;
 }
 
-// GatewayPrivacySettings is the message that defines the different privacy settings
-// of the gateway such as if the owner information or gateway location are public.
-message GatewayPrivacySettings {
-  // status_public denotes whether or not the gateway's status is public or not.
-  bool status_public = 1;
+// TODO: Add things like EndDeviceBrand, EndDeviceModel, EndDeviceVersion, but then for Gateway 👍
 
-  // location_public denotes whether or not the gateway's location is public and
-  // should be attached to messages.
-  bool location_public = 2;
+message Gateways {
+  repeated Gateway gateways = 1;
+}
 
-  // contactable denotes whether the user ID thas has been set as contact person
-  // is private or public.
-  bool contactable = 3;
+message GetGatewayRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message ListGatewaysRequest {
+  // By default we list all gateways the caller has rights on.
+  // Set the user or the organization (not both) to instead list the gateways
+  // where the user or organization is collaborator on.
+
+  OrganizationOrUserIdentifiers collaborator = 1;
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message CreateGatewayRequest {
+  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // By default the account of the caller is set as first collaborator with admin rights.
+  // Set the organization to instead make the organization the first collaborator with admin rights.
+  OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+}
+
+message UpdateGatewayRequest {
+  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message SetGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+  repeated Right rights = 3;
+}
+
+message RemoveGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+}
+
+message SetGatewayCollaboratorRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
 }
 
 // GatewayAntenna is the message that defines a gateway antenna.
 message GatewayAntenna {
   // gain is the antenna gain relative to this gateway, in dBi.
   float gain = 1;
-
   // location is the antenna's location.
   Location location = 2 [(gogoproto.nullable) = false];
-
-  // type denotes the antenna's type.
-  string type = 3;
-
-  // model denotes the antenna's model.
-  string model = 4;
-
-  // placement denotes whether if the antenna is placed indoors or outdoors.
-  GatewayAntennaPlacement placement = 5;
-}
-
-// GatewayAntennaPlacement enum defines whether if the gateway antenna is placed
-// indoors or outdoors.
-enum GatewayAntennaPlacement {
-  option (gogoproto.goproto_enum_prefix) = false;
-  // The antenna is placed indoors.
-  PLACEMENT_INDOOR  = 0;
-
-  // The antenna is placed outdoors.
-  PLACEMENT_OUTDOOR = 1;
-}
-
-// Radio defines the configuration of a SX1301 radio.
-message GatewayRadio {
-  // frequency is the base frequency of the radio in Hz.
-  uint64 frequency = 1;
-
-  message TxConfiguration {
-    // min_frequency is the minimun frequency for Tx messages.
-    uint64 min_frequency = 1;
-
-    // max_frequency is the maximum frequency for Tx messages.
-    uint64 max_frequency = 2;
-
-    // notch_frequency is the notch frequency for Tx messages.
-    uint64 notch_frequency = 3;
-  }
-
-  // tx_configuration is the configuration for emitting Tx packets in case
-  // that Tx messages are enabled for this radio.
-  TxConfiguration tx_configuration = 2;
+  map<string,string> attributes = 3;
 }
 
 message GatewayStatus {
   // Current time of the gateway
   google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
   google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // Gateway Platform
-  // - can be left out to save bandwidth; old value will be kept
-  // - for example: "Kerlink iBTS", "MultiTech Conduit AEP", "The Things Gateway", "..."
-  string platform = 3;
-
   // Versions of gateway subsystems
   // - each field can be left out to save bandwidth; old value will be kept
   // - map keys are written in snake_case
@@ -171,23 +128,17 @@ message GatewayStatus {
   //     fpga: "48"
   //     dsp: "27"
   //     hal: "v2-3.5.0"
-  map<string,string> versions = 4;
-
+  map<string,string> versions = 3;
   // Location of each gateway's antenna
   // - if left out, server uses registry-set location as fallback
-  repeated Location antennas_location = 5;
-
-  // IP addresses of this gateway
-  repeated string ip = 6 [(gogoproto.customname) = "IP"];
-
-  // Round-trip time to the server
-  google.protobuf.Duration rtt = 7 [(gogoproto.customname) = "RTT", (gogoproto.stdduration) = true];
-
+  repeated Location antenna_locations = 4;
+  // IP addresses of this gateway.
+  // Repeated addresses can be used to communicate addresses of multiple interfaces (LAN, Public IP, ...).
+  repeated string ip = 5 [(gogoproto.customname) = "IP"];
   // Metrics
   // - can be used for forwarding gateway metrics such as temperatures or performance metrics
   // - map keys are written in snake_case
-  map<string,float> metrics = 8;
-
+  map<string,float> metrics = 6;
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case
@@ -197,15 +148,11 @@ message GatewayStatus {
 // Connection stats as monitored by the Gateway Server.
 message GatewayConnectionStats {
   google.protobuf.Timestamp connected_at = 1 [(gogoproto.stdtime) = true];
-  string protocol = 2;
-
+  string protocol = 2; // Protocol used to connect (for example, udp, mqtt, grpc)
   google.protobuf.Timestamp last_status_received_at = 3 [(gogoproto.stdtime) = true];
   GatewayStatus last_status = 4;
-
   google.protobuf.Timestamp last_uplink_received_at = 5 [(gogoproto.stdtime) = true];
   uint64 uplink_count = 6;
-
   google.protobuf.Timestamp last_downlink_received_at = 7 [(gogoproto.stdtime) = true];
   uint64 downlink_count = 8;
-
 }

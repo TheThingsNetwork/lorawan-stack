@@ -14,14 +14,11 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/gateway.proto";
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/lorawan.proto";
-import "go.thethings.network/lorawan-stack/api/messages.proto";
-import "go.thethings.network/lorawan-stack/api/metadata.proto";
-import "go.thethings.network/lorawan-stack/api/regional.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "google/protobuf/duration.proto";
+import "lorawan-stack/api/gateway.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/regional.proto";
 import "google/protobuf/empty.proto";
 
 package ttn.lorawan.v3;
@@ -50,7 +47,8 @@ message GetFrequencyPlanRequest {
 service GtwGs {
   // Link the gateway to the Gateway Server.
   rpc LinkGateway(stream GatewayUp) returns (stream GatewayDown);
-  // GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
+  // Get the frequency plan associated with the gateway.
+  // The authentication information will be used to determine the gateway ID.
   rpc GetFrequencyPlan(GetFrequencyPlanRequest) returns (FrequencyPlan);
 }
 
@@ -62,8 +60,8 @@ service NsGs {
   rpc ScheduleDownlink(DownlinkMessage) returns (google.protobuf.Empty);
 }
 
-// Service Gs allows clients to retrieve the status of their gateways
 service Gs {
-  // Get the connection stats of a gateway
+  // Get statistics about the current gateway connection to the Gateway Server.
+  // This is not persisted between reconnects.
   rpc GetGatewayConnectionStats(GatewayIdentifiers) returns (GatewayConnectionStats);
 }

@@ -213,7 +213,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 			loc.Altitude = *stat.Alti
 		}
 		if validLocation(*loc) {
-			status.AntennasLocation = []*ttnpb.Location{loc}
+			status.AntennaLocations = []*ttnpb.Location{loc}
 		}
 	}
 

@@ -1,0 +1,119 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/application.proto";
+import "lorawan-stack/api/client.proto";
+import "lorawan-stack/api/gateway.proto";
+import "lorawan-stack/api/organization.proto";
+import "lorawan-stack/api/user.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+message UserRegistrationSettings {
+  // Require email address to be validated before the user can perform any actions.
+  bool require_email_validation = 1;
+  // Require (one-time) invitation token on user registration.
+  bool require_invitation = 2;
+  // Require admin approval before the user can perform any actions.
+  bool require_admin_approval = 3;
+  // Glob-style patterns of allowed email addresses. Matching addresses do not
+  // require an invitation. Invitations can still be sent to other email addresses.
+  repeated string allowed_email_patterns = 4;
+}
+
+message IdentityServerSettings {
+  google.protobuf.Timestamp updated_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // A list of blacklisted IDs that can't be used as Application, Client, Gateway, Organization or User ID.
+  repeated string blacklisted_ids = 2 [(gogoproto.customname) = "BlacklistedIDs"];
+  UserRegistrationSettings user_registration = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // The TTL (expiration) of email validation tokens.
+  google.protobuf.Duration email_validation_token_ttl = 4 [(gogoproto.customname) = "EmailValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  // The TTL (expiration) of invitation tokens.
+  google.protobuf.Duration invitation_token_ttl = 5 [(gogoproto.customname) = "InvitationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+}
+
+message UpdateSettingsRequest {
+  IdentityServerSettings settings = 1 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+// This message is used for finding entities in the IsAdmin service.
+// This functionality may not be available on deployments where these fields
+// are not indexed.
+message FindEntitiesRequest {
+  // Find entities where the ID contains this substring.
+  string id_contains = 1 [(gogoproto.customname) = "IDContains"];
+  // Find entities where the name contains this substring.
+  string name_contains = 2;
+  // Find entities where the description contains this substring.
+  string description_contains = 3;
+
+  // TODO: add filter for approval state.
+}
+
+// This service is exposed by the Identity Server and is only available for admins.
+service IsAdmin {
+  rpc GetSettings(google.protobuf.Empty) returns (IdentityServerSettings) {
+    option (google.api.http) = {
+      get: "/is/admin/settings"
+    };
+  };
+
+  rpc UpdateSettings(UpdateSettingsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/is/admin/settings"
+      body: "*"
+    };
+  };
+
+  rpc FindApplications(FindEntitiesRequest) returns (Applications) {
+    option (google.api.http) = {
+      get: "/is/admin/applications"
+    };
+  }
+
+  rpc FindClients(FindEntitiesRequest) returns (Clients) {
+    option (google.api.http) = {
+      get: "/is/admin/clients"
+    };
+  }
+
+  rpc FindGateways(FindEntitiesRequest) returns (Gateways) {
+    option (google.api.http) = {
+      get: "/is/admin/gateways"
+    };
+  }
+
+  rpc FindOrganizations(FindEntitiesRequest) returns (Organizations) {
+    option (google.api.http) = {
+      get: "/is/admin/organizations"
+    };
+  }
+
+  rpc FindUsers(FindEntitiesRequest) returns (Users) {
+    option (google.api.http) = {
+      get: "/is/admin/users"
+    };
+  }
+}

@@ -14,68 +14,96 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/auth.proto";
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/rights.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/enums.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// Client is the message that defines a third-party client on the network.
-message Client {
-  // Client identifiers.
-  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // description is the description of the client.
-  string description = 2;
-
-  // secret is the secret used to prove the client identity.
-  // This is a read-only field.
-  string secret = 3;
-
-  // redirect_uri is the OAuth redirect URI of the client.
-  string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
-
-  // state denotes the reviewing state of the client by admin.
-  // This field can only be modified by admins.
-  ReviewingState state = 5;
-
-  // If set, the authorization page will be skipped (modifiable only by admins).
-  bool skip_authorization = 6;
-
-  // grants denotes which OAuth2 flows can the client use to get a token.
-  // This field can only be modified by admins.
-  repeated GrantType grants = 7;
-
-  // Rights denotes what rights the client will have access to.
-  repeated Right rights = 8;
-
-  // creator_ids are the identifiers of the user that created the client.
-  UserIdentifiers creator_ids = 9 [(gogoproto.nullable) = false, (gogoproto.customname) = "CreatorIDs"];
-
-  // created_at denotes when the client was created.
-  // This a read-only field.
-  google.protobuf.Timestamp created_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // updated_at is the last time the client was updated.
-  // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-}
-
-// ReviewingState enum defines all the possible admin reviewing states that a
-// request can be at. For example a third-party client creation request.
-enum ReviewingState {
+// The OAuth2 flows an OAuth client can use to get an access token.
+enum GrantType {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // Denotes that the request is pending to review.
-  STATE_PENDING = 0;
+  // Grant type used to exchange an authorization code for an access token.
+  GRANT_AUTHORIZATION_CODE = 0;
+  // Grant type used to exchange a user ID and password for an access token.
+  GRANT_PASSWORD = 1;
+  // Grant type used to exchange a refresh token for an access token.
+  GRANT_REFRESH_TOKEN = 2;
+}
 
-  // Denotes that the request has been reviewed and approved by an admin.
-  STATE_APPROVED = 1;
+// An OAuth client on the network.
+message Client {
+  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // Denotes that the request has been reviewed and rejected by an admin.
-  STATE_REJECTED = 2;
+  string name = 4;
+  string description = 5;
+  map<string,string> attributes = 6;
+  repeated ContactInfo contact_info = 7;
+
+  // The client secret is only visible to collaborators of the client.
+  string secret = 8;
+  // The allowed redirect URIs against which authorization requests are checked.
+  // If the authorization request does not pass a redirect URI, the first one
+  // from this list is taken.
+  repeated string redirect_uris = 9 [(gogoproto.customname) = "RedirectURIs"];
+  // The reviewing state of the client.
+  // This field can only be modified by admins.
+  State state = 10;
+  // If set, the authorization page will be skipped.
+  // This field can only be modified by admins.
+  bool skip_authorization = 11;
+  // If set, the authorization page will show endorsement.
+  // This field can only be modified by admins.
+  bool endorsed = 12;
+  // OAuth flows that can be used for the client to get a token.
+  // After a client is created, this field can only be modified by admins.
+  repeated GrantType grants = 13;
+  // Rights denotes what rights the client will have access to.
+  // Users that previously authorized this client will have to re-authorize the
+  // client after rights are added to this list.
+  repeated Right rights = 14;
+}
+
+message Clients {
+  repeated Client clients = 1;
+}
+
+message GetClientRequest {
+  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message ListClientsRequest {
+  // By default we list all OAuth clients the caller has rights on.
+  // Set the user or the organization (not both) to instead list the OAuth clients
+  // where the user or organization is collaborator on.
+
+  OrganizationOrUserIdentifiers collaborator = 1;
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message CreateClientRequest {
+  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // By default the account of the caller is set as first collaborator with admin rights.
+  // Set the organization to instead make the organization the first collaborator with admin rights.
+  OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+}
+
+message UpdateClientRequest {
+  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message SetClientCollaboratorRequest {
+  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
 }

@@ -14,15 +14,14 @@
 
 DOCKER ?= docker
 
-PROTOC_GOPATH ?= /go
-PROTOC_STACK_PATH ?= $(PROTOC_GOPATH)/src/go.thethings.network/lorawan-stack
+PROTOC_OUT ?= /out
 
 PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.9
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
-                     --mount type=bind,src=$(PWD)/api,dst=$(PROTOC_STACK_PATH)/api,ro=true \
-                     --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_STACK_PATH)/pkg/ttnpb \
-                     -w $(PROTOC_STACK_PATH)
-PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(PROTOC_GOPATH)/src
+                     --mount type=bind,src=$(PWD)/api,dst=$(PWD)/api,ro=true \
+                     --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_OUT)/go.thethings.network/lorawan-stack/pkg/ttnpb \
+                     -w $(PWD)
+PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(shell dirname $(PWD))
 
 protoc:
 	$(DOCKER) pull $(PROTOC_DOCKER_IMAGE)

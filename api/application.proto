@@ -14,99 +14,78 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/keys.proto";
-import "go.thethings.network/lorawan-stack/api/messages.proto";
-import "go.thethings.network/lorawan-stack/api/metadata.proto";
-import "go.thethings.network/lorawan-stack/api/payload_formatter.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/enums.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/rights.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// Application is the message that defines an application in the network.
+// Application is the message that defines an Application in the network.
+// The persistence of the Application is divided between the Identity Server and the Application Server.
+// SDKs are responsible for combining (if desired) the two.
 message Application {
-  // Application identifiers.
   ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // description is the description of the application.
-  string description = 2;
+  string name = 4;
+  string description = 5;
+  map<string,string> attributes = 6;
+  repeated ContactInfo contact_info = 7;
 
-  // created_at is the time when the application was created.
-  // This is a read-only field.
-  google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // updated_at is the last time the application was updated.
-  // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  PayloadFormatter up_formatter = 5;
-  string up_formatter_parameter = 6;
-  PayloadFormatter down_formatter = 7;
-  string down_formatter_parameter = 8;
+  MessagePayloadFormatters default_formatters = 8;
 }
 
 message Applications {
   repeated Application applications = 1;
 }
 
-// ApplicationUp wraps multiple application-layer uplink types
-message ApplicationUp {
-  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
-
-  oneof up {
-    ApplicationUplink uplink_message = 3;
-    ApplicationJoinAccept join_accept = 4;
-    ApplicationDownlink downlink_ack = 5;
-    ApplicationDownlink downlink_nack = 6;
-    ApplicationDownlink downlink_sent = 7;
-    ApplicationDownlink downlink_queued = 8;
-    // Downlink queue invalidated (LoRaWAN 1.0)
-  }
+message GetApplicationRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
-message ApplicationDownlinks {
-  repeated ApplicationDownlink downlinks = 1;
+message ListApplicationsRequest {
+  // By default we list all applications the caller has rights on.
+  // Set the user or the organization (not both) to instead list the applications
+  // where the user or organization is collaborator on.
+
+  OrganizationOrUserIdentifiers collaborator = 1;
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
-message DownlinkQueueRequest {
-  repeated ApplicationDownlink downlinks = 1;
-  EndDeviceIdentifiers end_device = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message CreateApplicationRequest {
+  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // By default the account of the caller is set as first collaborator with admin rights.
+  // Set the organization to instead make the organization the first collaborator with admin rights.
+  OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
 }
 
-// The NsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Network Server.
-service NsApplicationDownlinkQueue {
-  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
-  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
-  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
-  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
+message UpdateApplicationRequest {
+  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
-// The AsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Application Server.
-service AsApplicationDownlinkQueue {
-  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
-    };
-  };
-  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      put: "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
-    };
-  };
-  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks) {
-    option (google.api.http) = {
-      get: "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
-    };
-  };
-  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
-    };
-  };
+message SetApplicationAPIKeyRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+  repeated Right rights = 3;
+}
+
+message RemoveApplicationAPIKeyRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+}
+
+message SetApplicationCollaboratorRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
 }

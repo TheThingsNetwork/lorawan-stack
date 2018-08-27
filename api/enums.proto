@@ -16,18 +16,22 @@ syntax = "proto3";
 
 package ttn.lorawan.v3;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-enum PayloadFormatter {
-  // No payload formatter to work with raw payload only.
-  FORMATTER_NONE = 0;
-  // Use payload formatter for the end device type from a repository.
-  FORMATTER_REPOSITORY = 1;
-  // gRPC service payload formatter. The parameter is the host:port of the service.
-  FORMATTER_GRPC_SERVICE = 2;
-  // Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.
-  FORMATTER_JAVASCRIPT = 3;
-  // CayenneLPP payload formatter.
-  FORMATTER_CAYENNELPP = 4;
-  // More payload formatters can be added.
+// State enum defines states that an entity can be in.
+enum State {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // Denotes that the entity has been requested and is pending review by an admin.
+  STATE_REQUESTED = 0;
+  // Denotes that the entity has been reviewed and approved by an admin.
+  STATE_APPROVED = 1;
+  // Denotes that the entity has been reviewed and rejected by an admin.
+  STATE_REJECTED = 2;
+  // Denotes that the entity has been flagged and is pending review by an admin.
+  STATE_FLAGGED = 3;
+  // Denotes that the entity has been reviewed and suspended by an admin.
+  STATE_SUSPENDED = 4;
 }

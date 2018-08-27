@@ -1,0 +1,176 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/application.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+// The ApplicationRegistry service, exposed by the Identity Server,
+// manages the application registry.
+service ApplicationRegistry {
+  // Create a new application. This also sets the current user as first collaborator
+  // with all possible rights. When including organization identifiers, this instead
+  // grants those rights to the given organization.
+  rpc CreateApplication(CreateApplicationRequest) returns (Application) {
+    option (google.api.http) = {
+      post: "/applications"
+      body: "*"
+      additional_bindings {
+        post: "/organizations/{organization_ids.organization_id}/applications"
+        body: "*"
+      }
+    };
+  };
+
+  // Get the application with the given identifiers, selecting the fields given
+  // by the field mask. The method may return more or less fields, depending on
+  // the rights of the caller.
+  rpc GetApplication(GetApplicationRequest) returns (Application) {
+    option (google.api.http) = {
+      get: "/applications/{application_ids.application_id}"
+    };
+  };
+
+  // List applications. See request message for details.
+  rpc ListApplications(ListApplicationsRequest) returns (Applications) {
+    option (google.api.http) = {
+      get: "/applications"
+      additional_bindings {
+        get: "/users/{collaborator.user_ids.user_id}/applications"
+      }
+      additional_bindings {
+        get: "/organizations/{collaborator.organization_ids.organization_id}/applications"
+      }
+    };
+  };
+
+  rpc UpdateApplication(UpdateApplicationRequest) returns (Application) {
+    option (google.api.http) = {
+      put: "/applications/{application.ids.application_id}"
+      body: "*"
+    };
+  };
+
+  rpc DeleteApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/applications/{application_id}"
+    };
+  };
+}
+
+// The ApplicationAccess service, exposed by the Identity Server,
+// manages access to applications.
+service ApplicationAccess {
+  rpc ListApplicationRights(ApplicationIdentifiers) returns (Rights) {
+    option (google.api.http) = {
+      get: "/applications/{application_id}/rights"
+    };
+  };
+
+  rpc GenerateApplicationAPIKey(SetApplicationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      post: "/applications/{application_ids.application_id}/api-keys"
+      body: "*"
+    };
+  };
+
+  rpc ListApplicationAPIKeys(ApplicationIdentifiers) returns (APIKeys) {
+    option (google.api.http) = {
+      get: "/applications/{application_id}/api-keys"
+    };
+  };
+
+  // Setting an API key without rights removes it.
+  rpc SetApplicationAPIKey(SetApplicationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      put: "/applications/{application_ids.application_id}/api-keys/{id}"
+      body: "*"
+    };
+  };
+
+  // Setting a collaborator without rights, removes them.
+  rpc SetApplicationCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/applications/{application_ids.application_id}/collaborators"
+      body: "*"
+    };
+  };
+
+  rpc ListApplicationCollaborators(ApplicationIdentifiers) returns (Collaborators) {
+    option (google.api.http) = {
+      get: "/applications/{application_id}/collaborators"
+    };
+  };
+}
+
+message DownlinkQueueRequest {
+  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  repeated ApplicationDownlink downlinks = 2;
+}
+
+// The NsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Network Server.
+// This API is typically used by the Application Server, and is therefore not exposed over HTTP.
+service NsApplicationDownlinkQueue {
+  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
+  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
+}
+
+// The AsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Application Server.
+service AsApplicationDownlinkQueue {
+  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
+    };
+  };
+  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
+    };
+  };
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
+    };
+  };
+  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
+    };
+  };
+}
+
+message SetAsApplicationAPIKeyRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string api_key = 2 [(gogoproto.customname) = "APIKey"];
+}
+
+// The As service connects an application or integration to an Application Server.
+service As {
+  // Set the API key that the Application Server should use to link to the Network Server.
+  rpc SetApplicationAPIKey(SetAsApplicationAPIKeyRequest) returns (google.protobuf.Empty);
+  rpc DeleteApplicationAPIKey(ApplicationIdentifiers) returns (google.protobuf.Empty);
+  rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
+}

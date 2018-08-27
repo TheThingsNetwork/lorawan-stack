@@ -14,11 +14,11 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/auth.proto";
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/rights.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "google/protobuf/empty.proto";
+import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
@@ -26,40 +26,60 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message Organization {
-  // Identifiers of the organization.
   OrganizationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // name is the organization's name.
-  string name = 2;
-
-  // description is an organization's description.
-  string description = 3;
-
-  // url is the URL of the organization website.
-  string url = 4 [(gogoproto.customname) = "URL"];
-
-  // location is the organization's location, e.g. "Amsterdam, Europe".
-  string location = 5;
-
-  // email is a generic contact email address that is shown as contact email.
-  string email = 6;
-
-  // created_at denotes when the user was created.
-  // This is a read-only field.
-  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // updated_at is the last time the user was updated.
-  // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  string name = 4;
+  string description = 5;
+  map<string,string> attributes = 6;
+  repeated ContactInfo contact_info = 7;
 }
 
-message OrganizationMember {
-  // organization_ids are the organization's identifiers.
+message Organizations {
+  repeated Organization organizations = 1;
+}
+
+message GetOrganizationRequest {
   OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
 
-  // user_ids are the user's identifiers.
-  UserIdentifiers user_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message ListOrganizationsRequest {
+  // By default we list all organizations the caller has rights on.
+  // Set the user (not both) to instead list the organizations
+  // where the user or organization is collaborator on.
 
-  // rights is the list of rights the user bears to the organization.
+  // NOTE: It is currently not possible to have organizations collaborating on
+  // other organizations.
+  OrganizationOrUserIdentifiers collaborator = 1;
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message CreateOrganizationRequest {
+  Organization organization = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // By default the account of the caller is set as first collaborator with admin rights.
+  // Set the organization to instead make the organization the first collaborator with admin rights.
+  OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+}
+
+message UpdateOrganizationRequest {
+  Organization organization = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message SetOrganizationAPIKeyRequest {
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
   repeated Right rights = 3;
+}
+
+message RemoveOrganizationAPIKeyRequest {
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string id = 2 [(gogoproto.customname) = "ID"];
+}
+
+message SetOrganizationCollaboratorRequest {
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
 }

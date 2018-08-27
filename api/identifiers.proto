@@ -53,7 +53,6 @@ message EndDeviceIdentifiers {
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   // TTN Application ID.
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
   // LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
   // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
@@ -78,8 +77,8 @@ message OrganizationIdentifiers {
 // used to identify the persona entity.
 message OrganizationOrUserIdentifiers {
   oneof ID {
-    UserIdentifiers user_id = 1 [(gogoproto.customname) = "UserID"];
-    OrganizationIdentifiers organization_id = 2 [(gogoproto.customname) = "OrganizationID"];
+    UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs"];
+    OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
   }
 }
 

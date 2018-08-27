@@ -1,0 +1,105 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/client.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+// The ClientRegistry service, exposed by the Identity Server,
+// manages the client registry.
+service ClientRegistry {
+  // Create a new OAuth client. This also sets the current user as first collaborator
+  // with all possible rights. When including organization identifiers, this instead
+  // grants those rights to the given organization.
+  rpc CreateClient(CreateClientRequest) returns (Client) {
+    option (google.api.http) = {
+      post: "/clients"
+      body: "*"
+      additional_bindings {
+        post: "/organizations/{organization_ids.organization_id}/clients"
+        body: "*"
+      }
+    };
+  };
+
+  // Get the OAuth client with the given identifiers, selecting the fields given
+  // by the field mask. The method may return more or less fields, depending on
+  // the rights of the caller.
+  rpc GetClient(GetClientRequest) returns (Client) {
+    option (google.api.http) = {
+      get: "/clients/{client_ids.client_id}"
+    };
+  };
+
+  // List OAuth clients. See request message for details.
+  rpc ListClients(ListClientsRequest) returns (Clients) {
+    option (google.api.http) = {
+      get: "/clients"
+      additional_bindings {
+        get: "/users/{collaborator.user_ids.user_id}/clients"
+      }
+      additional_bindings {
+        get: "/organizations/{collaborator.organization_ids.organization_id}/clients"
+      }
+    };
+  };
+
+  rpc UpdateClient(UpdateClientRequest) returns (Client) {
+    option (google.api.http) = {
+      put: "/clients/{client.ids.client_id}"
+      body: "*"
+    };
+  };
+
+  rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/clients/{client_id}"
+    };
+  };
+}
+
+// The ClientAccess service, exposed by the Identity Server,
+// manages access to OAuth clients.
+service ClientAccess {
+  rpc ListClientRights(ClientIdentifiers) returns (Rights) {
+    option (google.api.http) = {
+      get: "/clients/{client_id}/rights"
+    };
+  };
+
+  // Set the rights of a collaborator on the OAuth client. Users or organizations
+  // are considered to be a collaborator if they have at least one right on the
+  // OAuth client.
+  rpc SetClientCollaborator(SetClientCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/clients/{client_ids.client_id}/collaborators"
+      body: "*"
+    };
+  };
+
+  rpc ListClientCollaborators(ClientIdentifiers) returns (Collaborators) {
+    option (google.api.http) = {
+      get: "/clients/{client_id}/collaborators"
+    };
+  };
+}

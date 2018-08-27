@@ -14,10 +14,10 @@
 
 syntax = "proto3";
 
-import "go.thethings.network/lorawan-stack/api/identifiers.proto";
-import "go.thethings.network/lorawan-stack/api/keys.proto";
-import "go.thethings.network/lorawan-stack/api/lorawan.proto";
-import "go.thethings.network/lorawan-stack/api/metadata.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/keys.proto";
+import "lorawan-stack/api/lorawan.proto";
+import "lorawan-stack/api/metadata.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -70,25 +70,18 @@ message UplinkMessage {
 
   // Raw uplink bytes (PHYPayload)
   bytes raw_payload = 1;
-
   // LoRaWAN Payload
   Message payload = 2 [(gogoproto.nullable) = false];
-
   // End device identifiers
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
   // LoRaWAN Tx settings used for this transmission
   TxSettings settings = 4 [(gogoproto.nullable) = false];
-
   // Rx metadata from the gateway, one for each antenna that received the message
   repeated RxMetadata rx_metadata = 5;
-
   // Locations from various sources
-  map<string, LocationSource> locations = 6;
-
+  map<string,LocationSource> locations = 6;
   // ReceivedAt represents the time instant when the Gateway Server received the message.
   google.protobuf.Timestamp received_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
   repeated string correlation_ids = 8 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
@@ -134,24 +127,19 @@ message DownlinkMessage {
 
   // Raw downlink bytes (PHYPayload)
   bytes raw_payload = 1;
-
   // LoRaWAN Payload
   Message payload = 2 [(gogoproto.nullable) = false];
-
   // End device identifiers
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
   // LoRaWAN Tx settings used for this transmission
   TxSettings settings = 4 [(gogoproto.nullable) = false];
-
   // Tx metadata for the gateway
   TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
-
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationUplink {
-  // Join Server issued identifier for the session keys.
+  // Join Server issued identifier for the session keys used by this uplink.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   uint32 f_port = 2;
   uint32 f_cnt = 3;
@@ -160,7 +148,7 @@ message ApplicationUplink {
 }
 
 message ApplicationJoinAccept {
-  // Join Server issued identifier for the session keys.
+  // Join Server issued identifier for the session keys negotiated in this join.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   // The (encrypted) Application Session Key.
   KeyEnvelope app_s_key = 2;
@@ -173,5 +161,52 @@ message ApplicationDownlink {
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   bool confirmed = 4;
+
   repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
+}
+
+message ApplicationDownlinks {
+  repeated ApplicationDownlink downlinks = 1;
+}
+
+// ApplicationUp wraps multiple application-layer uplink types.
+message ApplicationUp {
+  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"]; // TODO: This field is also in ApplicationDownlink (duplicate)
+
+  oneof up {
+    ApplicationUplink uplink_message = 3;
+    ApplicationJoinAccept join_accept = 4;
+    ApplicationDownlink downlink_ack = 5;
+    ApplicationDownlink downlink_nack = 6;
+    ApplicationDownlink downlink_sent = 7;
+    ApplicationDownlink downlink_queued = 8;
+    // TODO: Downlink queue invalidated (LoRaWAN 1.0)
+  }
+}
+
+enum PayloadFormatter {
+  // No payload formatter to work with raw payload only.
+  FORMATTER_NONE = 0;
+  // Use payload formatter for the end device type from a repository.
+  FORMATTER_REPOSITORY = 1;
+  // gRPC service payload formatter. The parameter is the host:port of the service.
+  FORMATTER_GRPC_SERVICE = 2;
+  // Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.
+  FORMATTER_JAVASCRIPT = 3;
+  // CayenneLPP payload formatter.
+  FORMATTER_CAYENNELPP = 4;
+  // More payload formatters can be added.
+}
+
+message MessagePayloadFormatters {
+  // Payload formatter for uplink messages, must be set together with its parameter.
+  PayloadFormatter up_formatter = 1;
+  // Parameter for the up_formatter, must be set together.
+  string up_formatter_parameter = 2;
+  // Payload formatter for downlink messages, must be set together with its parameter.
+  PayloadFormatter down_formatter = 3;
+  // Parameter for the down_formatter, must be set together.
+  string down_formatter_parameter = 4;
 }
