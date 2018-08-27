@@ -60,7 +60,7 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 	case 1:
 		out.Modulation = Modulation_LORA
 	}
-	out.Bandwidth = r.Uint32()
+	out.Bandwidth = []uint32{125000, 250000, 500000}[r.Intn(3)]
 	out.SpreadingFactor = uint32(r.Intn(6) + 7)
 	out.BitRate = r.Uint32()
 	out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)

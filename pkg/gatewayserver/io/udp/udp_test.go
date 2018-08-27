@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	encoding "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
@@ -68,10 +67,6 @@ func TestConnection(t *testing.T) {
 
 	connections := &sync.Map{}
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
-	band, err := band.GetByID("EU_863_870")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
 
 	conn, err := net.Dial("udp", lis.LocalAddr().String())
 	if !a.So(err, should.BeNil) {
@@ -142,7 +137,7 @@ func TestConnection(t *testing.T) {
 			var packet encoding.Packet
 			var ackType encoding.PacketType
 			if tc.PacketType == encoding.PushData {
-				packet = generatePushData(eui, band, false, 0)
+				packet = generatePushData(eui, false, 0)
 				ackType = encoding.PushAck
 			} else {
 				packet = generatePullData(eui)
@@ -204,10 +199,6 @@ func TestTraffic(t *testing.T) {
 	connections := &sync.Map{}
 	eui1 := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
 	eui2 := types.EUI64{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}
-	band, err := band.GetByID("EU_863_870")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
 
 	t.Run("Upstream", func(t *testing.T) {
 		udpConn, err := net.Dial("udp", lis.LocalAddr().String())
@@ -247,14 +238,14 @@ func TestTraffic(t *testing.T) {
 			{
 				Name:          "ValidNewConnection",
 				EUI:           eui1,
-				Packet:        generatePushData(eui1, band, true, 100*time.Microsecond),
+				Packet:        generatePushData(eui1, true, 100*time.Microsecond),
 				AckOK:         true,
 				ExpectConnect: true,
 			},
 			{
 				Name:          "ValidExistingConnection",
 				EUI:           eui1,
-				Packet:        generatePushData(eui1, band, false, 200*time.Microsecond, 300*time.Microsecond),
+				Packet:        generatePushData(eui1, false, 200*time.Microsecond, 300*time.Microsecond),
 				AckOK:         true,
 				ExpectConnect: false,
 			},
@@ -468,7 +459,7 @@ func TestTraffic(t *testing.T) {
 
 				// Sync the clock at 0, i.e. approximate time.Now().
 				if tc.SyncClock {
-					packet := generatePushData(eui2, band, false, 0)
+					packet := generatePushData(eui2, false, 0)
 					buf, err = packet.MarshalBinary()
 					if !a.So(err, should.BeNil) {
 						t.FailNow()

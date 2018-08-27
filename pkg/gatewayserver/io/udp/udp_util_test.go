@@ -17,13 +17,13 @@ package udp_test
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"net"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
 	encoding "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
@@ -33,7 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func generatePushData(eui types.EUI64, band band.Band, status bool, timestamps ...time.Duration) encoding.Packet {
+func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration) encoding.Packet {
 	packet := encoding.Packet{
 		GatewayEUI:      &eui,
 		ProtocolVersion: encoding.Version1,
@@ -50,17 +50,21 @@ func generatePushData(eui types.EUI64, band band.Band, status bool, timestamps .
 	}
 	for i, t := range timestamps {
 		up := ttnpb.NewPopulatedUplinkMessage(test.Randy, true)
-		modulation := "LORA"
-		if up.Settings.Modulation == ttnpb.Modulation_FSK {
+		var modulation string
+		var dataRate types.DataRate
+		switch up.Settings.Modulation {
+		case ttnpb.Modulation_LORA:
+			modulation = "LORA"
+			dataRate.LoRa = fmt.Sprintf("SF%dBW%d", up.Settings.SpreadingFactor, up.Settings.Bandwidth/1000)
+		case ttnpb.Modulation_FSK:
 			modulation = "FSK"
+			dataRate.FSK = up.Settings.BitRate
 		}
 		packet.Data.RxPacket[i] = &encoding.RxPacket{
 			Freq: float64(up.Settings.Frequency) / 1000000,
 			Chan: uint8(up.Settings.ChannelIndex),
 			Modu: modulation,
-			DatR: encoding.DataRate{
-				DataRate: band.DataRates[up.Settings.DataRateIndex].Rate,
-			},
+			DatR: encoding.DataRate{DataRate: dataRate},
 			CodR: up.Settings.CodingRate,
 			Size: uint16(len(up.RawPayload)),
 			Data: base64.StdEncoding.EncodeToString(up.RawPayload),
