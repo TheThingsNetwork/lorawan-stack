@@ -1520,9 +1520,153 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/gatewayserver/io/grpc:connect": {
+    "translations": {
+      "en": "failed to connect gateway `{gateway_uid}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:not_authorized": {
+    "translations": {
+      "en": "not authorized"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "mqtt.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:decode_payload": {
+    "translations": {
+      "en": "could not decode binary payload"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:no_gateway_eui": {
+    "translations": {
+      "en": "packet is not long enough to contain the gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:packet_type": {
+    "translations": {
+      "en": "invalid packet type"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "packet.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:parse_bandwidth": {
+    "translations": {
+      "en": "could not parse bandwidth"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:parse_spreading_factor": {
+    "translations": {
+      "en": "could not parse spreading factor"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:unknown_modulation": {
+    "translations": {
+      "en": "unknown modulation `{modulation}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:unmarshal_eui": {
+    "translations": {
+      "en": "failed to unmarshal EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:unmarshal_timestamp": {
+    "translations": {
+      "en": "failed to unmarshal timestamp"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:connection_expired": {
+    "translations": {
+      "en": "connection expired"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:downlink_claim": {
+    "translations": {
+      "en": "failed to claim downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:downlink_path_expired": {
+    "translations": {
+      "en": "downlink path expired"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:no_clock_sync": {
+    "translations": {
+      "en": "no clock sync"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:buffer_full": {
+    "translations": {
+      "en": "buffer is full"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:compute_toa": {
+    "translations": {
+      "en": "could not compute the time on air"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/scheduling:duty_cycle_full": {
     "translations": {
-      "en": "duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}"
+      "en": "duty cycle between `{min_frequency}` and `{max_frequency}` full, exceeded quota of `{quota}`"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
@@ -1547,18 +1691,18 @@
       "file": "scheduling.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:no_sub_band_found": {
+  "error:pkg/gatewayserver/scheduling:retrieve_frequency_plan_band": {
     "translations": {
-      "en": "no sub-band found for frequency {frequency} Hz"
+      "en": "failed to retrieve the band associated with the frequency plan"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
       "file": "scheduling.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:retrieve_fp_band": {
+  "error:pkg/gatewayserver/scheduling:sub_band_not_found": {
     "translations": {
-      "en": "could not retrieve the band associated with the frequency plan"
+      "en": "no sub-band found for frequency `{frequency}` Hz"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
@@ -1571,7 +1715,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
+      "file": "sub_band_scheduling.go"
     }
   },
   "error:pkg/gatewayserver/scheduling:window_overlap": {
@@ -1583,283 +1727,76 @@
       "file": "scheduling.go"
     }
   },
-  "error:pkg/gatewayserver/udp:decoding_payload_from_b64": {
+  "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
-      "en": "could not decode payload from base64"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:marshal_payload_to_lorawan": {
-    "translations": {
-      "en": "failed to marshalling payload to LoRaWAN format"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:no_gateway_eui": {
-    "translations": {
-      "en": "packet is not long enough to contain the gateway EUI"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:parse_bandwidth": {
-    "translations": {
-      "en": "could not parse bandwidth"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:parse_spreading_factor": {
-    "translations": {
-      "en": "could not parse spreading factor"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:unknown_modulation": {
-    "translations": {
-      "en": "unknown modulation `{modulation}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:unmarshal_eui": {
-    "translations": {
-      "en": "failed to unmarshal an EUI"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:unmarshal_payload_to_lorawan": {
-    "translations": {
-      "en": "failed to unmarshal payload from LoRaWAN"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/udp:unmarshal_timestamp": {
-    "translations": {
-      "en": "failed to unmarshal timestamp"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:api_key_needs_rights": {
-    "translations": {
-      "en": "API key needs the following rights for the gateway `{gateway_uid}` to perform this operation: {rights}"
+      "en": "empty identifiers"
     },
     "description": {
       "package": "pkg/gatewayserver",
-      "file": "errors.go"
+      "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:api_version": {
+  "error:pkg/gatewayserver:gateway_not_registered": {
     "translations": {
-      "en": "invalid API version tag `{version}`"
+      "en": "gateway `{gateway_uid}` is not registered"
     },
     "description": {
       "package": "pkg/gatewayserver",
-      "file": "errors.go"
+      "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:compute_toa_of_downlink": {
+  "error:pkg/gatewayserver:identity_server_not_found": {
     "translations": {
-      "en": "could not compute the time on air of a downlink"
+      "en": "Identity Server not found"
     },
     "description": {
       "package": "pkg/gatewayserver",
-      "file": "errors.go"
+      "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:create_endpoint": {
+  "error:pkg/gatewayserver:invalid_payload": {
     "translations": {
-      "en": "could not create {protocol} endpoint"
+      "en": "invalid payload"
     },
     "description": {
       "package": "pkg/gatewayserver",
-      "file": "errors.go"
+      "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:gateway_not_connected": {
+  "error:pkg/gatewayserver:listen_frontend": {
+    "translations": {
+      "en": "failed to start frontend listener `{protocol}` on address `{address}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_fallback_frequency_plan": {
+    "translations": {
+      "en": "gateway `{gateway_uid}` is not registered and no fallback frequency plan defined"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_network_server": {
+    "translations": {
+      "en": "no Network Server found to handle message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"
     },
     "description": {
       "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:marshal_to_protobuf": {
-    "translations": {
-      "en": "could not marshal to protobuf"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_dev_addr_specified": {
-    "translations": {
-      "en": "no DevAddr specified"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_dev_eui_specified": {
-    "translations": {
-      "en": "no DevEUI specified"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_identity_server_found": {
-    "translations": {
-      "en": "no Identity Server found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_metadata": {
-    "translations": {
-      "en": "No metadata present"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_network_server_found": {
-    "translations": {
-      "en": "no Network Server found for this message"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_pull_data_received": {
-    "translations": {
-      "en": "no PULL_DATA received in the last `{delay}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:no_ready_connection_to_is": {
-    "translations": {
-      "en": "no ready connection to the Identity Server"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:protocol_translation": {
-    "translations": {
-      "en": "could not translate from the protobuf format to UDP"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:retrieve_gateway_frequency_plan": {
-    "translations": {
-      "en": "could not retrieve the frequency plan `{frequency_plan_id}` of the gateway"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:retrieve_gateway_info": {
-    "translations": {
-      "en": "could not retrieve information about the gateway"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:schedule": {
-    "translations": {
-      "en": "could not schedule downlink"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:tcp_socket": {
-    "translations": {
-      "en": "could not open TCP socket for {protocol}"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:topic_format": {
-    "translations": {
-      "en": "unsupported topic format `{topic}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:topic_rights": {
-    "translations": {
-      "en": "permission denied to subscribe to `{topic}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:udp_socket": {
-    "translations": {
-      "en": "could not open UDP socket"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver:unmarshal_from_protobuf": {
-    "translations": {
-      "en": "could not unmarshal message from protobuf"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "errors.go"
+      "file": "gatewayserver.go"
     }
   },
   "error:pkg/identityserver:other_pull_configuration_stream_opened": {
@@ -3275,27 +3212,45 @@
       "file": "observability.go"
     }
   },
-  "event:gs.gateway.end_link": {
+  "event:gs.gateway.connect": {
     "translations": {
-      "en": "end gateway link"
+      "en": "gateway connect"
     },
     "description": {
       "package": "pkg/gatewayserver",
       "file": "observability.go"
     }
   },
-  "event:gs.gateway.start_link": {
+  "event:gs.gateway.disconnect": {
     "translations": {
-      "en": "start gateway link"
+      "en": "gateway disconnect"
     },
     "description": {
       "package": "pkg/gatewayserver",
       "file": "observability.go"
     }
   },
-  "event:gs.status.receive": {
+  "event:gs.gateway.status": {
     "translations": {
-      "en": "receive status message"
+      "en": "gateway status"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.up.drop": {
+    "translations": {
+      "en": "drop uplink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.up.forward": {
+    "translations": {
+      "en": "forward uplink message"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -3590,18 +3545,18 @@
       "file": "observability.go"
     }
   },
-  "event:ns.application.end_link": {
+  "event:ns.application.begin_link": {
     "translations": {
-      "en": "end application link"
+      "en": "begin application link"
     },
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
     }
   },
-  "event:ns.application.start_link": {
+  "event:ns.application.end_link": {
     "translations": {
-      "en": "start application link"
+      "en": "end application link"
     },
     "description": {
       "package": "pkg/networkserver",

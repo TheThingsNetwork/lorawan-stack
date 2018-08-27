@@ -22,84 +22,105 @@ import (
 	"strings"
 	"sync"
 
-	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	iogrpc "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/validate"
 	"google.golang.org/grpc"
 )
 
 // GatewayServer implements the Gateway Server component.
 //
-// The Gateway Server exposes the Gs, GtwGs and NsGs services.
+// The Gateway Server exposes the Gs, GtwGs and NsGs services and MQTT and UDP frontends for gateways.
 type GatewayServer struct {
 	*component.Component
+	io.Server
 
 	config Config
 
-	connections   map[string]connection
-	connectionsMu sync.Mutex
+	connections sync.Map
 }
+
+var (
+	errListenFrontend = errors.DefineFailedPrecondition(
+		"listen_frontend",
+		"failed to start frontend listener `{protocol}` on address `{address}`",
+	)
+	errNotConnected = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
+)
 
 // New returns new *GatewayServer.
 func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 	gs = &GatewayServer{
 		Component: c,
-
-		config: conf,
-
-		connections: map[string]connection{},
+		config:    conf,
 	}
 
-	if conf.UDPAddress != "" {
-		var conn *net.UDPConn
-		conn, err = gs.ListenUDP(conf.UDPAddress)
+	ctx, cancel := context.WithCancel(c.Context())
+	defer func() {
 		if err != nil {
-			return nil, errUDPSocket.WithCause(err)
+			cancel()
 		}
-		c.Logger().WithField("address", conf.UDPAddress).Info("Listening for UDP connections")
+	}()
 
-		ctx, cancel := context.WithCancel(c.Context())
-		go gs.runUDPEndpoint(ctx, conn)
-		defer func() {
-			if err != nil {
-				cancel()
-			}
-		}()
+	for addr, fallbackFrequencyPlanID := range conf.UDP.Listeners {
+		var conn *net.UDPConn
+		conn, err = gs.ListenUDP(addr)
+		if err != nil {
+			return nil, errListenFrontend.WithCause(err).WithAttributes(
+				"protocol", "udp",
+				"address", addr,
+			)
+		}
+		lisCtx := ctx
+		if fallbackFrequencyPlanID != "" {
+			lisCtx = frequencyplans.WithFallbackID(ctx, fallbackFrequencyPlanID)
+		}
+		udp.Start(lisCtx, gs, conn, conf.UDP.Config)
 	}
 
-	for _, mqttEndpoint := range []struct {
-		address, protocol string
-		create            func(component.Listener) (net.Listener, error)
+	for _, lis := range []struct {
+		Listen   string
+		Protocol string
+		Net      func(component.Listener) (net.Listener, error)
 	}{
 		{
-			address:  conf.MQTT.Listen,
-			protocol: "tcp",
-			create:   component.Listener.TCP,
+			Listen:   conf.MQTT.Listen,
+			Protocol: "tcp",
+			Net:      component.Listener.TCP,
 		},
 		{
-			address:  conf.MQTT.ListenTLS,
-			protocol: "tls",
-			create:   component.Listener.TLS,
+			Listen:   conf.MQTT.ListenTLS,
+			Protocol: "tls",
+			Net:      component.Listener.TLS,
 		},
 	} {
-		protocol := fmt.Sprintf("MQTT over %s", strings.ToUpper(mqttEndpoint.protocol))
-		if mqttEndpoint.address == "" {
+		if lis.Listen == "" {
 			continue
 		}
-		componentLis, err := c.ListenTCP(mqttEndpoint.address)
-		if err != nil {
-			return nil, errTCPSocket.WithAttributes("protocol", protocol).WithCause(err)
+		var componentLis component.Listener
+		var netLis net.Listener
+		componentLis, err = gs.ListenTCP(lis.Listen)
+		if err == nil {
+			netLis, err = lis.Net(componentLis)
 		}
-		lis, err := mqttEndpoint.create(componentLis)
 		if err != nil {
-			return nil, errCreateEndpoint.WithAttributes("protocol", protocol).WithCause(err)
+			return nil, errListenFrontend.WithCause(err).WithAttributes(
+				"protocol", lis.Protocol,
+				"address", lis.Listen,
+			)
 		}
-		mqttLis := mqttnet.NewListener(lis, mqttEndpoint.protocol)
-		go gs.runMQTTEndpoint(mqttLis)
+		mqtt.Start(ctx, gs, netLis, lis.Protocol)
 	}
 
 	c.RegisterGRPC(gs)
@@ -109,8 +130,8 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 // RegisterServices registers services provided by gs at s.
 func (gs *GatewayServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsServer(s, gs)
-	ttnpb.RegisterGtwGsServer(s, gs)
 	ttnpb.RegisterNsGsServer(s, gs)
+	ttnpb.RegisterGtwGsServer(s, iogrpc.New(gs))
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -121,48 +142,164 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
 
-// GetGatewayObservations returns gateway information as observed by the Gateway Server.
-func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if err := rights.RequireGateway(ctx, *id, ttnpb.RIGHT_GATEWAY_STATUS_READ); err != nil {
+// CustomIdentifiersFiller fills the given identifiers.
+var CustomIdentifiersFiller func(context.Context, ttnpb.GatewayIdentifiers) (ttnpb.GatewayIdentifiers, error)
+
+var errEmptyIdentifiers = errors.Define("empty_identifiers", "empty identifiers")
+
+// FillGatewayContext fills the given context and identifiers.
+func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+	ctx = gs.FillContext(ctx)
+	if filler := CustomIdentifiersFiller; filler != nil {
+		var err error
+		if ids, err = filler(ctx, ids); err != nil {
+			return nil, ttnpb.GatewayIdentifiers{}, err
+		}
+	}
+	if ids.IsZero() {
+		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
+	}
+	if ids.GatewayID == "" {
+		ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+	}
+	return ctx, ids, nil
+}
+
+var (
+	errIdentityServerNotFound = errors.DefineNotFound(
+		"identity_server_not_found",
+		"Identity Server not found",
+	)
+	errGatewayNotRegistered = errors.DefineNotFound(
+		"gateway_not_registered",
+		"gateway `{gateway_uid}` is not registered",
+	)
+	errNoFallbackFrequencyPlan = errors.DefineNotFound(
+		"no_fallback_frequency_plan",
+		"gateway `{gateway_uid}` is not registered and no fallback frequency plan defined",
+	)
+)
+
+// Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
+// control.
+func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 
-	gtwID := id.GetGatewayID()
-	if err := validate.ID(gtwID); err != nil {
+	uid := unique.ID(ctx, ids)
+	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
+
+	is := gs.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
+	if is == nil {
+		return nil, errIdentityServerNotFound
+	}
+	gtw, err := ttnpb.NewIsGatewayClient(is.Conn()).GetGateway(ctx, &ids)
+	if errors.IsNotFound(err) {
+		if gs.config.RequireRegisteredGateways {
+			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
+		}
+		fpID, ok := frequencyplans.FallbackIDFromContext(ctx)
+		if !ok {
+			return nil, errNoFallbackFrequencyPlan.WithAttributes("gateway_uid", uid)
+		}
+		logger.Warn("Connecting unregistered gateway")
+		gtw = &ttnpb.Gateway{
+			GatewayIdentifiers: ids,
+			FrequencyPlanID:    fpID,
+		}
+	} else if err != nil {
 		return nil, err
 	}
 
-	uid := unique.ID(ctx, id)
-	gs.connectionsMu.Lock()
-	connection, ok := gs.connections[uid]
-	gs.connectionsMu.Unlock()
-
-	if !ok {
-		return nil, errGatewayNotConnected.WithAttributes("gateway_uid", uid)
-	}
-
-	observations := connection.getObservations()
-
-	return &observations, nil
-}
-
-func (gs *GatewayServer) getIdentityServer(ctx context.Context) (ttnpb.IsGatewayClient, error) {
-	peer := gs.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
-	if peer == nil {
-		return nil, errNoIdentityServerFound
-	}
-	isConn := peer.Conn()
-	if isConn == nil {
-		return nil, errNoReadyConnectionToIdentityServer
-	}
-
-	return ttnpb.NewIsGatewayClient(isConn), nil
-}
-
-func (gs *GatewayServer) getGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
-	is, err := gs.getIdentityServer(ctx)
+	fp, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanID)
 	if err != nil {
 		return nil, err
 	}
-	return is.GetGateway(ctx, id)
+	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
+	if err != nil {
+		return nil, err
+	}
+
+	conn := io.NewConnection(ctx, protocol, gtw, scheduler)
+	gs.connections.Store(uid, conn)
+	events.Publish(evtGatewayConnect(ctx, ids, nil))
+	logger.Info("Gateway connected")
+	go gs.handleUpstream(conn)
+	return conn, nil
+}
+
+var (
+	errInvalidPayload  = errors.DefineInvalidArgument("invalid_payload", "invalid payload")
+	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
+)
+
+func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
+	ctx := conn.Context()
+	logger := log.FromContext(ctx)
+	defer func() {
+		ids := conn.Gateway().GatewayIdentifiers
+		gs.connections.Delete(unique.ID(ctx, ids))
+		gs.UnclaimDownlink(ctx, ids)
+		events.Publish(evtGatewayDisconnect(ctx, ids, nil))
+		logger.Info("Gateway disconnected")
+	}()
+	for {
+		select {
+		case <-gs.Context().Done():
+			return
+		case <-ctx.Done():
+			return
+		case msg := <-conn.Up():
+			registerReceiveUplink(ctx, conn.Gateway(), msg)
+			drop := func(err error) {
+				logger.WithError(err).Debug("Dropping message")
+				registerDropUplink(ctx, conn.Gateway(), msg, err)
+			}
+			if err := msg.Payload.UnmarshalLoRaWAN(msg.RawPayload); err != nil {
+				drop(err)
+				break
+			}
+			var ids ttnpb.EndDeviceIdentifiers
+			if pld := msg.Payload.GetMACPayload(); pld != nil {
+				ids.DevAddr = &pld.DevAddr
+			} else if pld := msg.Payload.GetJoinRequestPayload(); pld != nil {
+				ids.JoinEUI = &pld.JoinEUI
+				ids.DevEUI = &pld.DevEUI
+			} else if pld := msg.Payload.GetRejoinRequestPayload(); pld != nil {
+				ids.JoinEUI = &pld.JoinEUI
+				ids.DevEUI = &pld.DevEUI
+			} else {
+				drop(errInvalidPayload)
+				break
+			}
+			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+			if ns == nil {
+				drop(errNoNetworkServer)
+				break
+			}
+			if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg); err != nil {
+				drop(err)
+				break
+			}
+			registerForwardUplink(ctx, conn.Gateway(), msg, ns)
+		case status := <-conn.Status():
+			registerReceiveStatus(ctx, conn.Gateway(), status)
+		}
+	}
+}
+
+// GetFrequencyPlan gets the specified frequency plan by its identifier.
+func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, id string) (ttnpb.FrequencyPlan, error) {
+	return gs.FrequencyPlans.GetByID(id)
+}
+
+// ClaimDownlink claims the downlink path for the given gateway.
+func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return gs.ClaimIDs(ctx, ids)
+}
+
+// UnclaimDownlink releases the claim of the downlink path for the given gateway.
+func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return gs.UnclaimIDs(ctx, ids)
 }

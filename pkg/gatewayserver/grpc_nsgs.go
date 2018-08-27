@@ -19,50 +19,37 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
-// ScheduleDownlink on a gateway connected to this Gateway Server.
-//
-// This request requires the GatewayIdentifier to have a GatewayID.
-func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
+// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+// The Gateway Server may refuse if there are any conflicts in the schedule or
+// if a duty cycle prevents the gateway from transmitting.
+func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 
 	id := down.TxMetadata.GatewayIdentifiers
-	if err := validate.ID(id.GetGatewayID()); err != nil {
+	// TODO: Remove validation (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
+	if err := validate.ID(id.GatewayID); err != nil {
 		return nil, err
 	}
 
 	uid := unique.ID(ctx, id)
-	g.connectionsMu.Lock()
-	connection, ok := g.connections[uid]
-	g.connectionsMu.Unlock()
+	val, ok := gs.connections.Load(uid)
 	if !ok {
-		return nil, errGatewayNotConnected.WithAttributes("gateway_uid", uid)
+		return nil, errNotConnected.WithAttributes("gateway_uid", uid)
 	}
-	err := connection.schedule(down)
-	if err != nil {
-		return nil, errCouldNotBeScheduled.WithCause(err)
-	}
-	err = connection.send(down)
-	if err != nil {
-		ttnErr, ok := errors.From(err)
-		if ok && errors.IsNotFound(ttnErr) { // Connections don't have enough information on gateways
-			err = ttnErr.WithAttributes("gateway_uid", uid)
-		}
+	conn := val.(*io.Connection)
+
+	if err := conn.SendDown(down); err != nil {
 		return nil, err
 	}
 
-	connection.addDownlinkObservation()
-
-	msgCtx := events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
-	registerSendDownlink(msgCtx, connection.gateway().GatewayIdentifiers, down)
-
-	return ttnpb.Empty, nil
+	registerSendDownlink(ctx, conn.Gateway(), down)
+	return &types.Empty{}, nil
 }
