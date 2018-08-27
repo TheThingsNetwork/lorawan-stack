@@ -2843,6 +2843,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/ttnpb:field_length_with_min": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be higher or equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/ttnpb:field_length_with_multiple_choices": {
     "translations": {
       "en": "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`"

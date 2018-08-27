@@ -17,6 +17,7 @@ package ttnpb_test
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -545,6 +546,54 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			msg := reflect.New(reflect.Indirect(reflect.ValueOf(tc.Message)).Type()).Interface().(lorawan.Unmarshaler)
 			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
 			a.So(msg, should.Resemble, tc.Message)
+		})
+	}
+}
+
+func TestUnmarshalResilience(t *testing.T) {
+	for i, tc := range [][]byte{
+		// Too little data: FHDR is at least 7 bytes.
+		{
+			byte(MType_UNCONFIRMED_UP)<<5 | byte(Major_LORAWAN_R1),
+			0x01, 0x02,
+		},
+		// Too little data: FHDR is at least 7 bytes.
+		{
+			byte(MType_UNCONFIRMED_DOWN)<<5 | byte(Major_LORAWAN_R1),
+			0x01, 0x02,
+		},
+		// Too little data: no join-request payload.
+		{
+			byte(MType_JOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
+		},
+		// Too little data: too little join-request payload.
+		{
+			byte(MType_JOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		},
+		// Too little data: no rejoin-request type.
+		{
+			byte(MType_REJOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
+		},
+		// Too little data: too little rejoin-request payload.
+		{
+			byte(MType_REJOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
+			0x02,
+		},
+		// Too little data: too little join-accept payload.
+		{
+			byte(MType_JOIN_ACCEPT)<<5 | byte(Major_LORAWAN_R1),
+			0x01, 0x02, 0x03, 0x04,
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(func() {
+				var msg Message
+				err := msg.UnmarshalLoRaWAN(tc)
+				a.So(err, should.NotBeNil)
+			}, should.NotPanic)
 		})
 	}
 }

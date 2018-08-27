@@ -88,6 +88,7 @@ var (
 	fieldLengthBound             = errors.DefineInvalidArgument("field_length_bound", "`{lorawan_field}` length should between `{min}` and `{max}`", valueKey)
 	fieldLengthEqual             = errors.DefineInvalidArgument("field_length_equal", "`{lorawan_field}` length should be equal to `{expected}`", valueKey)
 	fieldLengthHasMax            = errors.DefineInvalidArgument("field_length_with_max", "`{lorawan_field}` length should be lower or equal to `{expected}`", valueKey)
+	fieldLengthHasMin            = errors.DefineInvalidArgument("field_length_with_min", "`{lorawan_field}` length should be higher or equal to `{expected}`", valueKey)
 	fieldLengthTwoChoices        = errors.DefineInvalidArgument("field_length_with_multiple_choices", "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`", valueKey)
 	encodedFieldLengthBound      = errors.DefineInvalidArgument("encoded_field_length_bound", "`{lorawan_field}` encoded length should between `{min}` and `{max}`", valueKey)
 	encodedFieldLengthEqual      = errors.DefineInvalidArgument("encoded_field_length_equal", "`{lorawan_field}` encoded length should be equal to `{expected}`", valueKey)
@@ -122,6 +123,10 @@ func errExpectedLengthBound(lorawanField string, min, max interface{}) valueErr 
 
 func errExpectedLengthLowerOrEqual(lorawanField string, max interface{}) valueErr {
 	return unexpectedValue(fieldLengthHasMax.WithAttributes("lorawan_field", lorawanField, "max", max))
+}
+
+func errExpectedLengthHigherOrEqual(lorawanField string, min interface{}) valueErr {
+	return unexpectedValue(fieldLengthHasMin.WithAttributes("lorawan_field", lorawanField, "min", min))
 }
 
 func errExpectedLengthTwoChoices(lorawanField string, expected1, expected2 interface{}) valueErr {

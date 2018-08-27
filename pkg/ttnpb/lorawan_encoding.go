@@ -151,12 +151,12 @@ func (msg MACPayload) MarshalLoRaWAN(isUplink bool) ([]byte, error) {
 func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	n := uint8(len(b))
 	if n < 7 {
-		return errExpectedLengthEqual("FHDR", 7)(n)
+		return errExpectedLengthHigherOrEqual("FHDR", 7)(n)
 	}
 	fOptsLen := b[4] & 0xf
 	fhdrLen := fOptsLen + 7
 	if n < fhdrLen {
-		return errExpectedLengthEqual("MACPayload", fhdrLen)(n)
+		return errExpectedLengthHigherOrEqual("MACPayload", fhdrLen)(n)
 	}
 	if err := msg.FHDR.UnmarshalLoRaWAN(b[0:fhdrLen], isUplink); err != nil {
 		return errFailedDecoding("FHDR").WithCause(err)
@@ -520,6 +520,9 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 	}
 	switch msg.MHDR.MType {
 	case MType_CONFIRMED_DOWN, MType_UNCONFIRMED_DOWN:
+		if n < 12 {
+			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
+		}
 		pld := &MACPayload{}
 		if err := pld.UnmarshalLoRaWAN(b[1:n-4], false); err != nil {
 			return errFailedDecoding("MACPayload").WithCause(err)
@@ -527,6 +530,9 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 		msg.Payload = &Message_MACPayload{pld}
 		msg.MIC = b[n-4:]
 	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+		if n < 12 {
+			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
+		}
 		pld := &MACPayload{}
 		if err := pld.UnmarshalLoRaWAN(b[1:n-4], true); err != nil {
 			return errFailedDecoding("MACPayload").WithCause(err)
@@ -544,6 +550,9 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 		msg.Payload = &Message_JoinRequestPayload{pld}
 		msg.MIC = b[19:]
 	case MType_REJOIN_REQUEST:
+		if n < 2 {
+			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
+		}
 		var micIdx int
 		if b[1] == 1 {
 			// MHDR(1) + Payload(19)
