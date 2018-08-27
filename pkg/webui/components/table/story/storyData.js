@@ -82,6 +82,10 @@ export default {
     headers,
     rows,
   },
+  loadingExample: {
+    headers,
+    rows,
+  },
   customCellExample: {
     headers: [ ...headers, {
       name: 'options',

@@ -223,6 +223,12 @@ storiesOf('Table', module)
       headers={examples.defaultExample.headers}
       data={examples.defaultExample.rows}
     />
+  )).add('Loading', () => (
+    <Example
+      loading
+      headers={examples.loadingExample.headers}
+      data={examples.loadingExample.rows}
+    />
   )).add('Custom cell', () => (
     <Example
       headers={examples.customCellExample.headers}

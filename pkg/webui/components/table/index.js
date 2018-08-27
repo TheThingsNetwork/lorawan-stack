@@ -16,6 +16,7 @@ import React from 'react'
 import PropTypes from '../../lib/prop-types'
 
 import Pagination from '../pagination'
+import Overlay from '../overlay'
 import Message from '../../lib/components/message'
 import DataCell from './data-cell'
 import HeaderCell from './header-cell'
@@ -29,6 +30,7 @@ const Table = function ({
   headers,
   rows,
   emptyMessage,
+  loading = false,
   page = 0,
   order = orders.DEFAULT,
   small = false,
@@ -39,62 +41,64 @@ const Table = function ({
 
   return (
     <div className={className}>
-      <table className={style.table}>
-        <thead>
-          <tr className={style.headerRow}>
-            {headers.map((header, index) => (
-              <HeaderCell
-                key={index}
-                centered={header.centered}
-                active={orderedBy === header.name}
-                sortable={header.sortable}
-                name={header.name}
-                content={header.displayName}
-                order={order}
-                onSort={onSortByColumn}
-              />
-            )
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {
-            !!rows.length
-              ? rows.map((row, index) => (
-                <tr className={style.dataRow} key={index} data-hook="data-row">
-                  {headers.map(function (header, idx) {
-                    return (
-                      <DataCell
-                        key={idx}
-                        centered={header.centered}
-                        small={small}
-                      >
-                        {row[header.name]}
-                      </DataCell>
-                    )
-                  })}
+      <Overlay visible={loading} loading>
+        <table className={style.table}>
+          <thead>
+            <tr className={style.headerRow}>
+              {headers.map((header, index) => (
+                <HeaderCell
+                  key={index}
+                  centered={header.centered}
+                  active={orderedBy === header.name}
+                  sortable={header.sortable}
+                  name={header.name}
+                  content={header.displayName}
+                  order={order}
+                  onSort={onSortByColumn}
+                />
+              )
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              !!rows.length
+                ? rows.map((row, index) => (
+                  <tr className={style.dataRow} key={index} data-hook="data-row">
+                    {headers.map(function (header, idx) {
+                      return (
+                        <DataCell
+                          key={idx}
+                          centered={header.centered}
+                          small={small}
+                        >
+                          {row[header.name]}
+                        </DataCell>
+                      )
+                    })}
+                  </tr>
+                ))
+                : <tr>
+                  <td colSpan={headers.length} data-hook="empty-message">
+                    <Message
+                      className={style.emptyMessage}
+                      content={emptyMessage}
+                    />
+                  </td>
                 </tr>
-              ))
-              : <tr>
-                <td colSpan={headers.length} data-hook="empty-message">
-                  <Message
-                    className={style.emptyMessage}
-                    content={emptyMessage}
-                  />
-                </td>
-              </tr>
-          }
-        </tbody>
-      </table>
-      <Pagination
-        className={style.pagination}
-        disableInitialCallback
-        pageCount={pageCount || 1}
-        onPageChange={function (page) {
-          onPageChange(page.selected)
-        }}
-        forcePage={page}
-      />
+            }
+          </tbody>
+        </table>
+        <Pagination
+          className={style.pagination}
+          disableInitialCallback
+          pageCount={pageCount || 1}
+          onPageChange={function (page) {
+            onPageChange(page.selected)
+          }}
+          forcePage={page}
+        />
+      </Overlay>
     </div>
   )
 }
@@ -126,6 +130,8 @@ Table.propTypes = {
    * Passes the name of a header cell.
    */
   onSortByColumn: PropTypes.func.isRequired,
+  /** A flag specifying whether the table should covered with the loading overlay */
+  loading: PropTypes.bool,
 }
 
 export default Table
