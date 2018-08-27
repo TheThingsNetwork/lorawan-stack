@@ -11,6 +11,7 @@
   "lib.shared-messages.integrations": "Xxxxxxxxxxxx",
   "lib.shared-messages.login": "Xxxxx",
   "lib.shared-messages.logout": "Xxxxxx",
+  "lib.shared-messages.loading": "Xxxxxxx",
   "lib.shared-messages.ok": "Xx",
   "lib.shared-messages.organizations": "Xxxxxxxxxxxxx",
   "lib.shared-messages.overview": "Xxxxxxxx",

@@ -11,6 +11,7 @@
   "lib.shared-messages.integrations": "Integrations",
   "lib.shared-messages.login": "Login",
   "lib.shared-messages.logout": "Logout",
+  "lib.shared-messages.loading": "Loading",
   "lib.shared-messages.ok": "Ok",
   "lib.shared-messages.organizations": "Organizations",
   "lib.shared-messages.overview": "Overview",

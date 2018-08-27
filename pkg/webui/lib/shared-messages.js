@@ -27,6 +27,7 @@ export default defineMessages({
   integrations: 'Integrations',
   login: 'Login',
   logout: 'Logout',
+  loading: 'Loading',
   ok: 'Ok',
   organizations: 'Organizations',
   overview: 'Overview',
