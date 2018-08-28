@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
@@ -55,8 +56,8 @@ type UpstreamMetadata struct {
 	IP string
 }
 
-// TranslateUpstream message from the UDP format to the protobuf format.
-func TranslateUpstream(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error) {
+// ToGatewayUp converts the UDP message to a gateway upstream message.
+func ToGatewayUp(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error) {
 	up := &ttnpb.GatewayUp{}
 	up.UplinkMessages = make([]*ttnpb.UplinkMessage, 0)
 	for rxIndex, rx := range data.RxPacket {
@@ -69,11 +70,9 @@ func TranslateUpstream(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error)
 		}
 		up.UplinkMessages = append(up.UplinkMessages, &convertedRx)
 	}
-
 	if data.Stat != nil {
 		up.GatewayStatus = convertStatus(*data.Stat, md)
 	}
-
 	return up, nil
 }
 
@@ -81,11 +80,10 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 	return []*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers: gatewayID,
-
-			AntennaIndex: 0,
-			Timestamp:    uint64(rx.Tmst) * 1000,
-			RSSI:         float32(rx.RSSI),
-			SNR:          float32(rx.LSNR),
+			AntennaIndex:       0,
+			Timestamp:          uint64(rx.Tmst) * 1000,
+			RSSI:               float32(rx.RSSI),
+			SNR:                float32(rx.LSNR),
 		},
 	}
 }
@@ -94,16 +92,12 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 	md := make([]*ttnpb.RxMetadata, 0)
 	for _, signal := range rx.RSig {
 		signalMetadata := &ttnpb.RxMetadata{
-			GatewayIdentifiers: gatewayID,
-
-			AntennaIndex: uint32(signal.Ant),
-
-			Timestamp: uint64(rx.Tmst) * 1000,
-
+			GatewayIdentifiers:    gatewayID,
+			AntennaIndex:          uint32(signal.Ant),
+			Timestamp:             uint64(rx.Tmst) * 1000,
 			RSSI:                  float32(signal.RSSIS),
 			ChannelRSSI:           float32(signal.RSSIC),
 			RSSIStandardDeviation: float32(signal.RSSISD),
-
 			SNR:             float32(signal.LSNR),
 			FrequencyOffset: int64(signal.FOff),
 		}
@@ -120,15 +114,15 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 	up := ttnpb.UplinkMessage{}
 	rx := *data.RxPacket[rxIndex]
 	up.Settings = ttnpb.TxSettings{
-		CodingRate: rx.CodR,
-		Frequency:  uint64(rx.Freq * 1000000),
+		CodingRate:   rx.CodR,
+		Frequency:    uint64(rx.Freq * 1000000),
+		ChannelIndex: uint32(rx.Chan),
 	}
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
 	if err != nil {
 		return up, errPayload.WithCause(err)
 	}
-
 	up.RawPayload = rawPayload
 
 	if rx.RSig != nil && len(rx.RSig) > 0 {
@@ -148,7 +142,6 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 	switch rx.Modu {
 	case "LORA":
 		up.Settings.Modulation = ttnpb.Modulation_LORA
-
 		sf, err := rx.DatR.SpreadingFactor()
 		if err != nil {
 			return up, errSpreadingFactor.WithCause(err)
@@ -235,35 +228,108 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	return status
 }
 
-// TranslateDownstream message from the protobuf format to the UDP format.
-func TranslateDownstream(downlink *ttnpb.DownlinkMessage) (TxPacket, error) {
-	tx := TxPacket{}
+// FromGatewayUp converts the upstream message to the UDP format.
+func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat) {
+	rxs = make([]*RxPacket, 0, len(up.UplinkMessages))
 
-	payload := downlink.GetRawPayload()
-	tmst := downlink.TxMetadata.Timestamp / 1000
-	tx = TxPacket{
-		CodR: downlink.Settings.CodingRate,
-		Freq: float64(downlink.Settings.Frequency) / 1000000,
-		Imme: downlink.TxMetadata.Timestamp == 0,
-		IPol: downlink.Settings.PolarizationInversion,
-		Powe: uint8(downlink.Settings.TxPower),
+	for _, msg := range up.UplinkMessages {
+		var modulation string
+		var dataRate types.DataRate
+		switch msg.Settings.Modulation {
+		case ttnpb.Modulation_LORA:
+			modulation = "LORA"
+			dataRate.LoRa = fmt.Sprintf("SF%dBW%d", msg.Settings.SpreadingFactor, msg.Settings.Bandwidth/1000)
+		case ttnpb.Modulation_FSK:
+			modulation = "FSK"
+			dataRate.FSK = msg.Settings.BitRate
+		}
+		rxs = append(rxs, &RxPacket{
+			Freq: float64(msg.Settings.Frequency) / 1000000,
+			Chan: uint8(msg.Settings.ChannelIndex),
+			Modu: modulation,
+			DatR: DataRate{DataRate: dataRate},
+			CodR: msg.Settings.CodingRate,
+			Size: uint16(len(msg.RawPayload)),
+			Data: base64.StdEncoding.EncodeToString(msg.RawPayload),
+			Tmst: uint32(msg.RxMetadata[0].Timestamp / 1000),
+			RSSI: int16(msg.RxMetadata[0].RSSI),
+			LSNR: float64(msg.RxMetadata[0].SNR),
+		})
+	}
+	if up.GatewayStatus != nil {
+		stat = &Stat{
+			Time: ExpandedTime(up.GatewayStatus.Time),
+		}
+	}
+	return
+}
+
+// ToDownlinkMessage converts the UDP format to a downlink message.
+func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
+	msg := &ttnpb.DownlinkMessage{
+		Settings: ttnpb.TxSettings{
+			CodingRate:            tx.CodR,
+			Frequency:             uint64(tx.Freq * 1000000),
+			PolarizationInversion: tx.IPol,
+			TxPower:               int32(tx.Powe),
+		},
+		TxMetadata: ttnpb.TxMetadata{
+			Timestamp: uint64(tx.Tmst * 1000),
+		},
+	}
+	var err error
+	msg.RawPayload, err = base64.RawStdEncoding.DecodeString(strings.TrimRight(tx.Data, "="))
+	if err != nil {
+		return nil, err
+	}
+	switch tx.Modu {
+	case "LORA":
+		msg.Settings.Modulation = ttnpb.Modulation_LORA
+		msg.TxMetadata.EnableCRC = !tx.NCRC
+		if sf, err := tx.DatR.SpreadingFactor(); err != nil {
+			return nil, err
+		} else {
+			msg.Settings.SpreadingFactor = uint32(sf)
+		}
+		if bw, err := tx.DatR.Bandwidth(); err != nil {
+			return nil, err
+		} else {
+			msg.Settings.Bandwidth = bw
+		}
+	case "FSK":
+		msg.Settings.Modulation = ttnpb.Modulation_FSK
+		msg.Settings.BitRate = tx.DatR.FSK
+	}
+	return msg, nil
+}
+
+// FromDownlinkMessage converts to the downlink message to the UDP format.
+func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
+	payload := msg.GetRawPayload()
+	tmst := msg.TxMetadata.Timestamp / 1000
+	tx := &TxPacket{
+		CodR: msg.Settings.CodingRate,
+		Freq: float64(msg.Settings.Frequency) / 1000000,
+		Imme: msg.TxMetadata.Timestamp == 0,
+		IPol: msg.Settings.PolarizationInversion,
+		Powe: uint8(msg.Settings.TxPower),
 		Size: uint16(len(payload)),
 		Tmst: uint32(tmst % math.MaxUint32),
 		Data: base64.StdEncoding.EncodeToString(payload),
 	}
-	gpsTime := CompactTime(downlink.TxMetadata.Time)
+	gpsTime := CompactTime(msg.TxMetadata.Time)
 	tx.Time = &gpsTime
 
-	switch downlink.Settings.Modulation {
+	switch msg.Settings.Modulation {
 	case ttnpb.Modulation_LORA:
 		tx.Modu = "LORA"
-		tx.NCRC = !downlink.TxMetadata.EnableCRC
-		tx.DatR.LoRa = fmt.Sprintf("SF%dBW%d", downlink.Settings.SpreadingFactor, downlink.Settings.Bandwidth/1000)
+		tx.NCRC = !msg.TxMetadata.EnableCRC
+		tx.DatR.LoRa = fmt.Sprintf("SF%dBW%d", msg.Settings.SpreadingFactor, msg.Settings.Bandwidth/1000)
 	case ttnpb.Modulation_FSK:
 		tx.Modu = "FSK"
-		tx.DatR.FSK = downlink.Settings.BitRate
+		tx.DatR.FSK = msg.Settings.BitRate
 	default:
-		return tx, errModulation.WithAttributes("modulation", downlink.Settings.Modulation)
+		return tx, errModulation.WithAttributes("modulation", msg.Settings.Modulation)
 	}
 
 	return tx, nil

@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -30,118 +31,58 @@ import (
 
 var ids = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 
-func TestDownlinks(t *testing.T) {
-	a := assertions.New(t)
-	var err error
-
-	downlink := ttnpb.DownlinkMessage{
-		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: 1886440700000,
-		},
-		Settings: ttnpb.TxSettings{
-			Frequency:             925700000,
-			Modulation:            ttnpb.Modulation_LORA,
-			TxPower:               20,
-			SpreadingFactor:       10,
-			Bandwidth:             500000,
-			PolarizationInversion: true,
-		},
-	}
-	downlink.RawPayload, err = base64.StdEncoding.DecodeString("ffOO")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	tx, err := encoding.TranslateDownstream(&downlink)
-	a.So(err, should.BeNil)
-
-	a.So(tx.DatR.LoRa, should.Equal, "SF10BW500")
-	a.So(tx.Tmst, should.Equal, 1886440700)
-	a.So(tx.NCRC, should.Equal, true)
-	a.So(tx.Data, should.Equal, "ffOO")
-}
-
-func TestDummyDownlink(t *testing.T) {
+func TestStatusRaw(t *testing.T) {
 	a := assertions.New(t)
 
-	downlink := ttnpb.DownlinkMessage{Settings: ttnpb.TxSettings{Modulation: 3939}} // Dummy modulation set
-	_, err := encoding.TranslateDownstream(&downlink)
-	a.So(err, should.NotBeNil)
-}
-
-func TestStatus(t *testing.T) {
-	a := assertions.New(t)
-
-	status := []byte(`{"stat":{"rxfw":0,"hal":"5.1.0","fpga":2,"dsp":31,"lpps":2,"lmnw":3,"lmst":1,"lmok":3,"temp":30,"lati":52.34223,"long":5.29685,"txnb":0,"dwnb":0,"alti":66,"rxok":0,"boot":"2017-06-07 09:40:42 GMT","time":"2017-06-08 09:40:42 GMT","rxnb":0,"ackr":0.0}}`)
+	raw := []byte(`{"stat":{"rxfw":0,"hal":"5.1.0","fpga":2,"dsp":31,"lpps":2,"lmnw":3,"lmst":1,"lmok":3,"temp":30,"lati":52.34223,"long":5.29685,"txnb":0,"dwnb":0,"alti":66,"rxok":0,"boot":"2017-06-07 09:40:42 GMT","time":"2017-06-08 09:40:42 GMT","rxnb":0,"ackr":0.0}}`)
 	var statusData encoding.Data
-	err := json.Unmarshal(status, &statusData)
+	err := json.Unmarshal(raw, &statusData)
 	a.So(err, should.BeNil)
 
-	upstream, err := encoding.TranslateUpstream(statusData, encoding.UpstreamMetadata{
+	upstream, err := encoding.ToGatewayUp(statusData, encoding.UpstreamMetadata{
 		IP: "127.0.0.1",
 		ID: ids,
 	})
 	a.So(err, should.BeNil)
 
-	a.So(upstream.GatewayStatus, should.NotBeNil)
+	status := upstream.GatewayStatus
+	a.So(status, should.NotBeNil)
 
-	a.So(upstream.GatewayStatus.AntennasLocation, should.NotBeNil)
-	a.So(len(upstream.GatewayStatus.AntennasLocation), should.Equal, 1)
-	a.So(upstream.GatewayStatus.AntennasLocation[0].Longitude, should.AlmostEqual, 5.29685, 0.0001)
-	a.So(upstream.GatewayStatus.AntennasLocation[0].Latitude, should.AlmostEqual, 52.34223, 0.0001)
-	a.So(upstream.GatewayStatus.AntennasLocation[0].Altitude, should.AlmostEqual, 66)
+	a.So(status.AntennasLocation, should.NotBeNil)
+	a.So(len(status.AntennasLocation), should.Equal, 1)
+	a.So(status.AntennasLocation[0].Longitude, should.AlmostEqual, 5.29685, 0.0001)
+	a.So(status.AntennasLocation[0].Latitude, should.AlmostEqual, 52.34223, 0.0001)
+	a.So(status.AntennasLocation[0].Altitude, should.AlmostEqual, 66)
 
-	a.So(upstream.GatewayStatus.Versions, should.NotBeNil)
-	a.So(upstream.GatewayStatus.Metrics, should.NotBeNil)
+	a.So(status.Versions, should.NotBeNil)
+	a.So(status.Metrics, should.NotBeNil)
 
-	a.So(upstream.GatewayStatus.Versions["ttn-lw-gateway-server"], should.Equal, version.TTN)
-	a.So(upstream.GatewayStatus.Versions["hal"], should.Equal, "5.1.0")
-	a.So(upstream.GatewayStatus.Versions["fpga"], should.Equal, "2")
-	a.So(upstream.GatewayStatus.Versions["dsp"], should.Equal, "31")
+	a.So(status.Versions["ttn-lw-gateway-server"], should.Equal, version.TTN)
+	a.So(status.Versions["hal"], should.Equal, "5.1.0")
+	a.So(status.Versions["fpga"], should.Equal, "2")
+	a.So(status.Versions["dsp"], should.Equal, "31")
 
-	a.So(upstream.GatewayStatus.Metrics["rxfw"], should.AlmostEqual, 0)
-	a.So(upstream.GatewayStatus.Metrics["txnb"], should.AlmostEqual, 0)
-	a.So(upstream.GatewayStatus.Metrics["dwnb"], should.AlmostEqual, 0)
-	a.So(upstream.GatewayStatus.Metrics["rxok"], should.AlmostEqual, 0)
-	a.So(upstream.GatewayStatus.Metrics["rxnb"], should.AlmostEqual, 0)
-	a.So(upstream.GatewayStatus.Metrics["ackr"], should.AlmostEqual, 0)
-	a.So(upstream.GatewayStatus.Metrics["temp"], should.AlmostEqual, 30)
-	a.So(upstream.GatewayStatus.Metrics["lpps"], should.AlmostEqual, 2)
-	a.So(upstream.GatewayStatus.Metrics["lmnw"], should.AlmostEqual, 3)
-	a.So(upstream.GatewayStatus.Metrics["lmst"], should.AlmostEqual, 1)
-	a.So(upstream.GatewayStatus.Metrics["lmok"], should.AlmostEqual, 3)
+	a.So(status.Metrics["rxfw"], should.AlmostEqual, 0)
+	a.So(status.Metrics["txnb"], should.AlmostEqual, 0)
+	a.So(status.Metrics["dwnb"], should.AlmostEqual, 0)
+	a.So(status.Metrics["rxok"], should.AlmostEqual, 0)
+	a.So(status.Metrics["rxnb"], should.AlmostEqual, 0)
+	a.So(status.Metrics["ackr"], should.AlmostEqual, 0)
+	a.So(status.Metrics["temp"], should.AlmostEqual, 30)
+	a.So(status.Metrics["lpps"], should.AlmostEqual, 2)
+	a.So(status.Metrics["lmnw"], should.AlmostEqual, 3)
+	a.So(status.Metrics["lmst"], should.AlmostEqual, 1)
+	a.So(status.Metrics["lmok"], should.AlmostEqual, 3)
 
-	a.So(upstream.GatewayStatus.BootTime, should.NotBeNil)
-	a.So(upstream.GatewayStatus.Time, should.NotBeNil)
+	a.So(status.BootTime, should.NotBeNil)
+	a.So(status.Time, should.NotBeNil)
 	currentTime := time.Date(2017, 06, 8, 9, 40, 42, 0, time.UTC)
-	a.So(upstream.GatewayStatus.Time, should.Equal, currentTime)
+	a.So(status.Time, should.Equal, currentTime)
 	bootTime := time.Date(2017, 06, 7, 9, 40, 42, 0, time.UTC)
-	a.So(upstream.GatewayStatus.BootTime, should.Equal, bootTime)
+	a.So(status.BootTime, should.Equal, bootTime)
 }
 
-func TestUplink(t *testing.T) {
-	a := assertions.New(t)
-
-	rx := []byte(`{"rxpk":[{"tmst":368384825,"chan":0,"rfch":0,"freq":868.100000,"stat":1,"modu":"LORA","datr":"SF7BW125","codr":"4/5","lsnr":-11,"rssi":-107,"size":108,"data":"Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9"}]}`)
-	var rxData encoding.Data
-	err := json.Unmarshal(rx, &rxData)
-	a.So(err, should.BeNil)
-
-	upstream, err := encoding.TranslateUpstream(rxData, encoding.UpstreamMetadata{ID: ids})
-	a.So(err, should.BeNil)
-
-	a.So(len(upstream.UplinkMessages), should.Equal, 1)
-
-	a.So(upstream.UplinkMessages[0].Settings.CodingRate, should.Equal, "4/5")
-	a.So(upstream.UplinkMessages[0].Settings.SpreadingFactor, should.Equal, 7)
-	a.So(upstream.UplinkMessages[0].Settings.Bandwidth, should.Equal, 125000)
-	a.So(upstream.UplinkMessages[0].Settings.Frequency, should.Equal, uint64(868100000))
-	a.So(upstream.UplinkMessages[0].Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
-
-	a.So(upstream.UplinkMessages[0].RxMetadata[0].Timestamp, should.Equal, uint64(368384825000))
-	a.So(len(upstream.UplinkMessages[0].RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
-}
-
-func TestUplink2(t *testing.T) {
+func TestToGatewayUp(t *testing.T) {
 	a := assertions.New(t)
 
 	p := encoding.Packet{
@@ -157,27 +98,92 @@ func TestUplink2(t *testing.T) {
 					DatR: encoding.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
 					CodR: "4/7",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+					Size: 19,
 					Tmst: 1000,
 				},
 			},
 		},
 		PacketType: encoding.PushData,
 	}
-	p.Data.RxPacket[0].Size = uint16(base64.StdEncoding.DecodedLen(len(p.Data.RxPacket[0].Data)))
 
-	upstream, err := encoding.TranslateUpstream(*p.Data, encoding.UpstreamMetadata{ID: ids})
+	upstream, err := encoding.ToGatewayUp(*p.Data, encoding.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
 
-	a.So(upstream.UplinkMessages[0].Settings.CodingRate, should.Equal, "4/7")
-	a.So(upstream.UplinkMessages[0].Settings.SpreadingFactor, should.Equal, 10)
-	a.So(upstream.UplinkMessages[0].Settings.Bandwidth, should.Equal, 125000)
-	a.So(upstream.UplinkMessages[0].Settings.Frequency, should.Equal, 868000000)
-	a.So(upstream.UplinkMessages[0].Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
-
-	a.So(upstream.UplinkMessages[0].RxMetadata[0].Timestamp, should.Equal, 1000000)
+	msg := upstream.UplinkMessages[0]
+	a.So(msg.Settings.CodingRate, should.Equal, "4/7")
+	a.So(msg.Settings.SpreadingFactor, should.Equal, 10)
+	a.So(msg.Settings.Bandwidth, should.Equal, 125000)
+	a.So(msg.Settings.Frequency, should.Equal, 868000000)
+	a.So(msg.Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
+	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000000)
+	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
 }
 
-func TestMultiAntennaUplink(t *testing.T) {
+func TestToGatewayUpRoundtrip(t *testing.T) {
+	a := assertions.New(t)
+
+	expected := encoding.Packet{
+		ProtocolVersion: encoding.Version1,
+		Token:           [2]byte{0x11, 0x00},
+		Data: &encoding.Data{
+			RxPacket: []*encoding.RxPacket{
+				{
+					Freq: 868.0,
+					Chan: 2,
+					Modu: "LORA",
+					DatR: encoding.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+					CodR: "4/7",
+					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+					Size: 19,
+					Tmst: 1000,
+				},
+			},
+		},
+		PacketType: encoding.PushData,
+	}
+	expectedMd := encoding.UpstreamMetadata{
+		ID: ttnpb.GatewayIdentifiers{
+			EUI: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		},
+		IP: "1.1.1.1",
+	}
+
+	up, err := encoding.ToGatewayUp(*expected.Data, expectedMd)
+	a.So(err, should.BeNil)
+
+	actual := encoding.Packet{
+		ProtocolVersion: encoding.Version1,
+		Token:           [2]byte{0x11, 0x00},
+		Data:            &encoding.Data{},
+	}
+	actual.Data.RxPacket, actual.Data.Stat = encoding.FromGatewayUp(up)
+
+	a.So(pretty.Diff(actual, expected), should.BeEmpty)
+}
+
+func TestToGatewayUpRaw(t *testing.T) {
+	a := assertions.New(t)
+
+	raw := []byte(`{"rxpk":[{"tmst":368384825,"chan":0,"rfch":0,"freq":868.100000,"stat":1,"modu":"LORA","datr":"SF7BW125","codr":"4/5","lsnr":-11,"rssi":-107,"size":108,"data":"Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9"}]}`)
+	var rxData encoding.Data
+	err := json.Unmarshal(raw, &rxData)
+	a.So(err, should.BeNil)
+
+	upstream, err := encoding.ToGatewayUp(rxData, encoding.UpstreamMetadata{ID: ids})
+	a.So(err, should.BeNil)
+
+	a.So(len(upstream.UplinkMessages), should.Equal, 1)
+	msg := upstream.UplinkMessages[0]
+	a.So(msg.Settings.CodingRate, should.Equal, "4/5")
+	a.So(msg.Settings.SpreadingFactor, should.Equal, 7)
+	a.So(msg.Settings.Bandwidth, should.Equal, 125000)
+	a.So(msg.Settings.Frequency, should.Equal, uint64(868100000))
+	a.So(msg.Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
+	a.So(msg.RxMetadata[0].Timestamp, should.Equal, uint64(368384825000))
+	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
+}
+
+func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 	a := assertions.New(t)
 
 	rx := []byte(`{
@@ -225,6 +231,64 @@ func TestMultiAntennaUplink(t *testing.T) {
 	err := json.Unmarshal(rx, &rxData)
 	a.So(err, should.BeNil)
 
-	_, err = encoding.TranslateUpstream(rxData, encoding.UpstreamMetadata{ID: ids})
+	_, err = encoding.ToGatewayUp(rxData, encoding.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
+}
+
+func TestFromDownlinkMessage(t *testing.T) {
+	a := assertions.New(t)
+
+	msg := &ttnpb.DownlinkMessage{
+		TxMetadata: ttnpb.TxMetadata{
+			Timestamp: 1886440700000,
+		},
+		Settings: ttnpb.TxSettings{
+			Frequency:             925700000,
+			Modulation:            ttnpb.Modulation_LORA,
+			TxPower:               20,
+			SpreadingFactor:       10,
+			Bandwidth:             500000,
+			PolarizationInversion: true,
+		},
+		RawPayload: []byte{0x7d, 0xf3, 0x8e},
+	}
+	tx, err := encoding.FromDownlinkMessage(msg)
+	a.So(err, should.BeNil)
+	a.So(tx.DatR.LoRa, should.Equal, "SF10BW500")
+	a.So(tx.Tmst, should.Equal, 1886440700)
+	a.So(tx.NCRC, should.Equal, true)
+	a.So(tx.Data, should.Equal, "ffOO")
+}
+
+func TestDownlinkRoundtrip(t *testing.T) {
+	a := assertions.New(t)
+	expected := &ttnpb.DownlinkMessage{
+		TxMetadata: ttnpb.TxMetadata{
+			Timestamp: 188700000,
+		},
+		Settings: ttnpb.TxSettings{
+			Frequency:             925700000,
+			Modulation:            ttnpb.Modulation_LORA,
+			TxPower:               20,
+			SpreadingFactor:       10,
+			Bandwidth:             500000,
+			PolarizationInversion: true,
+		},
+		RawPayload: []byte{0x7d, 0xf3, 0x8e},
+	}
+	tx, err := encoding.FromDownlinkMessage(expected)
+	a.So(err, should.BeNil)
+
+	actual, err := encoding.ToDownlinkMessage(tx)
+	a.So(err, should.BeNil)
+
+	a.So(pretty.Diff(actual, expected), should.BeEmpty)
+}
+
+func TestFromDownlinkMessageDummy(t *testing.T) {
+	a := assertions.New(t)
+
+	msg := ttnpb.DownlinkMessage{Settings: ttnpb.TxSettings{Modulation: 3939}} // Dummy modulation set
+	_, err := encoding.FromDownlinkMessage(&msg)
+	a.So(err, should.NotBeNil)
 }
