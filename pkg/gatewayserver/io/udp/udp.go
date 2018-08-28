@@ -328,12 +328,9 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				write()
 				break
 			}
-			go func() {
-				d := time.Until(gatewayTime.Add(-s.config.ScheduleLateTime))
-				logger.WithField("duration", d).Debug("Waiting to schedule downlink message late")
-				<-time.After(d)
-				write()
-			}()
+			d := time.Until(gatewayTime.Add(-s.config.ScheduleLateTime))
+			logger.WithField("duration", d).Debug("Waiting to schedule downlink message late")
+			time.AfterFunc(d, write)
 		case <-healthCheck.C:
 			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 			if time.Since(lastSeenPull) > s.config.DownlinkPathExpires {
