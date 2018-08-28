@@ -74,7 +74,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	logger.Info("Connected")
 	defer logger.Info("Disconnected")
 	if err = s.server.ClaimDownlink(ctx, id); err != nil {
-		logger.WithError(err).Warn("Failed to claim downlink")
+		logger.WithError(err).Error("Failed to claim downlink")
 		return
 	}
 

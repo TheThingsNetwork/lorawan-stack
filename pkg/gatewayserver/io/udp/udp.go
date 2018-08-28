@@ -233,9 +233,9 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		atomic.StoreInt64(&state.lastSeenPush, time.Now().UnixNano())
 		if len(packet.Data.RxPacket) > 0 {
 			var timestamp uint32
-			for _, rxMetadata := range packet.Data.RxPacket {
-				if rxMetadata.Tmst > timestamp {
-					timestamp = rxMetadata.Tmst
+			for _, pkt := range packet.Data.RxPacket {
+				if pkt.Tmst > timestamp {
+					timestamp = pkt.Tmst
 				}
 			}
 			state.syncClock(timestamp)
@@ -262,7 +262,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 	case encoding.TxAck:
 		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
-			logger.Info("Received TX acknowledgement, JIT queue supported")
+			logger.Debug("Received TX acknowledgement, JIT queue supported")
 		}
 
 		// TODO: Send event to NS (https://github.com/TheThingsIndustries/lorawan-stack/issues/1017)
@@ -279,7 +279,7 @@ var (
 func (s *srv) handleDown(ctx context.Context, state *state) error {
 	logger := log.FromContext(ctx)
 	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
-		logger.WithError(err).Warn("Failed to claim downlink")
+		logger.WithError(err).Error("Failed to claim downlink")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
 
@@ -310,7 +310,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				},
 			}
 			write := func() {
-				logger.Info("Writing downlink message")
+				logger.Debug("Writing downlink message")
 				if err := s.write(packet); err != nil {
 					logger.WithError(err).Warn("Failed to write downlink message")
 					// TODO: Report to Network Server: https://github.com/TheThingsIndustries/lorawan-stack/issues/1017

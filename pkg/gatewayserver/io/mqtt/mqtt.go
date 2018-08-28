@@ -212,7 +212,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		return nil, err
 	}
 	if err = c.server.ClaimDownlink(ctx, id); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to claim downlink")
+		log.FromContext(ctx).WithError(err).Error("Failed to claim downlink")
 		return nil, err
 	}
 
