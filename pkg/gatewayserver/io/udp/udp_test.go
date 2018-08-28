@@ -42,8 +42,8 @@ var (
 	testConfig = Config{
 		PacketHandlers:      2,
 		PacketBuffer:        10,
-		DownlinkPathExpires: 250 * time.Millisecond,
-		ConnectionExpires:   1 * time.Second,
+		DownlinkPathExpires: 100 * time.Millisecond,
+		ConnectionExpires:   250 * time.Millisecond,
 		ScheduleLateTime:    0,
 	}
 

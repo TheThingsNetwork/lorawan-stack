@@ -173,8 +173,8 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			L: &sync.Mutex{},
 		},
 		startHandleDown: &sync.Once{},
-		lastSeenPull:    time.Now().Unix(),
-		lastSeenPush:    time.Now().Unix(),
+		lastSeenPull:    time.Now().UnixNano(),
+		lastSeenPush:    time.Now().UnixNano(),
 	}
 	val, loaded := s.connections.LoadOrStore(eui, cs)
 	cs = val.(*state)
@@ -225,7 +225,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 
 	switch packet.PacketType {
 	case encoding.PullData:
-		atomic.StoreInt64(&state.lastSeenPull, time.Now().Unix())
+		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
 		logger.WithField("remote_addr", packet.GatewayAddr.String()).Debug("Storing downlink path")
 		state.lastDownlinkPath.Store(downlinkPath{
 			addr:    *packet.GatewayAddr,
@@ -236,7 +236,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		})
 
 	case encoding.PushData:
-		atomic.StoreInt64(&state.lastSeenPush, time.Now().Unix())
+		atomic.StoreInt64(&state.lastSeenPush, time.Now().UnixNano())
 		if len(packet.Data.RxPacket) > 0 {
 			var timestamp uint32
 			for _, rxMetadata := range packet.Data.RxPacket {
@@ -266,7 +266,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		}
 
 	case encoding.TxAck:
-		atomic.StoreInt64(&state.lastSeenPull, time.Now().Unix())
+		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
 			logger.Info("Received TX acknowledgement, JIT queue supported")
 		}
@@ -341,7 +341,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				write()
 			}()
 		case <-healthCheck.C:
-			lastSeenPull := time.Unix(atomic.LoadInt64(&state.lastSeenPull), 0)
+			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 			if time.Since(lastSeenPull) > s.config.DownlinkPathExpires {
 				logger.Warn("Downlink path expired")
 				s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
@@ -388,9 +388,9 @@ func (s *srv) gc() {
 		case <-ticker.C:
 			s.connections.Range(func(k, v interface{}) bool {
 				state := v.(*state)
-				lastSeenPull := time.Unix(atomic.LoadInt64(&state.lastSeenPull), 0)
+				lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 				if time.Since(lastSeenPull) > s.config.ConnectionExpires {
-					lastSeenPush := time.Unix(atomic.LoadInt64(&state.lastSeenPush), 0)
+					lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
 					if time.Since(lastSeenPush) > s.config.ConnectionExpires {
 						logger.WithField("gateway_eui", k.(types.EUI64)).Warn("Connection expired")
 						s.connections.Delete(k)
@@ -409,7 +409,7 @@ type downlinkPath struct {
 }
 
 type state struct {
-	// Align for sync/atomic
+	// Align for sync/atomic, time are Unix ns
 	timeOffset    int64
 	lastSeenPull  int64
 	lastSeenPush  int64
