@@ -107,7 +107,7 @@ func (c *connection) setup(ctx context.Context) error {
 				return
 			}
 			if pkt != nil {
-				logger.Debugf("Write %s packet", packet.Name[pkt.PacketType()])
+				logger.Debugf("Scheduling %s packet", packet.Name[pkt.PacketType()])
 				controlCh <- pkt
 			}
 		}
@@ -166,7 +166,7 @@ func (c *connection) setup(ctx context.Context) error {
 				if err != stdio.EOF {
 					logger.WithError(err).Error("Send failed, closing session")
 				} else {
-					logger.Debug("Disconnected")
+					logger.Info("Disconnected")
 				}
 				c.session.Close()
 				c.io.Disconnect(err)
