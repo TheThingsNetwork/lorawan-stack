@@ -51,7 +51,7 @@ var (
 	unregisteredGatewayID  = "eui-bbff000000000000"
 	unregisteredGatewayEUI = types.EUI64{0xBB, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
-	timeout = 100 * time.Millisecond
+	timeout = 10 * time.Millisecond
 )
 
 func TestGatewayServer(t *testing.T) {
@@ -87,10 +87,10 @@ func TestGatewayServer(t *testing.T) {
 			Config: udp.Config{
 				PacketHandlers:      2,
 				PacketBuffer:        10,
-				DownlinkPathExpires: 200 * time.Millisecond,
-				ConnectionExpires:   500 * time.Millisecond,
+				DownlinkPathExpires: 100 * time.Millisecond,
+				ConnectionExpires:   250 * time.Millisecond,
 				ScheduleLateTime:    0,
-				AddrChangeBlock:     500 * time.Millisecond,
+				AddrChangeBlock:     250 * time.Millisecond,
 			},
 			Listeners: map[string]string{
 				":1700": test.EUFrequencyPlanID,
@@ -422,7 +422,7 @@ func TestGatewayServer(t *testing.T) {
 				case err := <-errCh:
 					return err
 				case <-ctx.Done():
-					time.Sleep(config.UDP.ConnectionExpires + timeout) // Ensure that connection expires.
+					time.Sleep(config.UDP.ConnectionExpires * 150 / 100) // Ensure that connection expires.
 					return ctx.Err()
 				}
 			},
