@@ -117,7 +117,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, version, script)
-		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputRange)
+		a.So(err, should.HaveSameErrorDefinitionAs, errOutputRange)
 	}
 
 	// Return invalid type.
@@ -128,7 +128,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, version, script)
-		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
+		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 
 	// Return nothing.
@@ -139,7 +139,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, version, script)
-		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
+		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 
 	// Return an object.
@@ -152,7 +152,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, version, script)
-		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
+		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 }
 

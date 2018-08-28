@@ -37,16 +37,16 @@ func New() messageprocessors.PayloadEncodeDecoder {
 }
 
 var (
-	errInvalidInput   = errors.DefineInvalidArgument("input", "invalid input")
-	errInvalidOutput  = errors.Define("output", "invalid output")
-	errMissingPayload = errors.DefineInvalidArgument("missing_payload", "missing payload")
+	errInput     = errors.DefineInvalidArgument("input", "invalid input")
+	errOutput    = errors.Define("output", "invalid output")
+	errNoPayload = errors.DefineInvalidArgument("no_payload", "missing payload")
 )
 
 // Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
 func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, errMissingPayload
+		return nil, errNoPayload
 	}
 
 	decoded := payload.DecodedPayload
@@ -56,7 +56,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
-		return nil, errInvalidInput.WithCause(err)
+		return nil, errInput.WithCause(err)
 	}
 
 	encoder := lpp.NewEncoder()
@@ -80,18 +80,18 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, errMissingPayload
+		return nil, errNoPayload
 	}
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(payload.FRMPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {
-		return nil, errInvalidOutput.WithCause(err)
+		return nil, errOutput.WithCause(err)
 	}
 
 	s, err := gogoproto.Struct(m)
 	if err != nil {
-		return nil, errInvalidOutput.WithCause(err)
+		return nil, errOutput.WithCause(err)
 	}
 
 	payload.DecodedPayload = s
