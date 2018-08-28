@@ -1538,18 +1538,36 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp/encoding:decode_payload": {
+  "error:pkg/gatewayserver/io/udp/encoding:bandwidth": {
     "translations": {
-      "en": "could not decode binary payload"
+      "en": "failed to parse bandwidth"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp/encoding",
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp/encoding:no_gateway_eui": {
+  "error:pkg/gatewayserver/io/udp/encoding:eui": {
     "translations": {
-      "en": "packet is not long enough to contain the gateway EUI"
+      "en": "failed to parse EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:modulation": {
+    "translations": {
+      "en": "invalid modulation `{modulation}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp/encoding",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp/encoding:no_eui": {
+    "translations": {
+      "en": "packet is not long enough to contain the EUI"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp/encoding",
@@ -1565,45 +1583,27 @@
       "file": "packet.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp/encoding:parse_bandwidth": {
+  "error:pkg/gatewayserver/io/udp/encoding:payload": {
     "translations": {
-      "en": "could not parse bandwidth"
+      "en": "failed to parse binary payload"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp/encoding",
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp/encoding:parse_spreading_factor": {
+  "error:pkg/gatewayserver/io/udp/encoding:spreading_factor": {
     "translations": {
-      "en": "could not parse spreading factor"
+      "en": "failed to parse spreading factor"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp/encoding",
       "file": "errors.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp/encoding:unknown_modulation": {
+  "error:pkg/gatewayserver/io/udp/encoding:timestamp": {
     "translations": {
-      "en": "unknown modulation `{modulation}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:unmarshal_eui": {
-    "translations": {
-      "en": "failed to unmarshal EUI"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:unmarshal_timestamp": {
-    "translations": {
-      "en": "failed to unmarshal timestamp"
+      "en": "failed to parse timestamp"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp/encoding",
@@ -3230,9 +3230,9 @@
       "file": "observability.go"
     }
   },
-  "event:gs.gateway.status": {
+  "event:gs.status.receive": {
     "translations": {
-      "en": "gateway status"
+      "en": "receive gateway status"
     },
     "description": {
       "package": "pkg/gatewayserver",

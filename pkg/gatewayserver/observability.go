@@ -28,7 +28,8 @@ import (
 var (
 	evtGatewayConnect    = events.Define("gs.gateway.connect", "gateway connect")
 	evtGatewayDisconnect = events.Define("gs.gateway.disconnect", "gateway disconnect")
-	evtGatewayStatus     = events.Define("gs.gateway.status", "gateway status")
+
+	evtReceiveStatus = events.Define("gs.status.receive", "receive gateway status")
 
 	evtReceiveUp = events.Define("gs.up.receive", "receive uplink message")
 	evtDropUp    = events.Define("gs.up.drop", "drop uplink message")
@@ -119,7 +120,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus) {
-	events.Publish(evtGatewayStatus(ctx, gtw.GatewayIdentifiers, nil))
+	events.Publish(evtReceiveStatus(ctx, gtw.GatewayIdentifiers, nil))
 	gsMetrics.statusReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
