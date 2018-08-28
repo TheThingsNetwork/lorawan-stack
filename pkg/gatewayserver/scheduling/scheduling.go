@@ -31,7 +31,7 @@ var (
 		"duty cycle between `{min_frequency}` and `{max_frequency}` full, exceeded quota of `{quota}`",
 	)
 	errOverlap                   = errors.DefineResourceExhausted("window_overlap", "window overlap")
-	errExceededDwellTime         = errors.DefineFailedPrecondition("exceeded_dwell_time", "packet exceeded dwell time restrictions")
+	errDwellTime                 = errors.DefineFailedPrecondition("dwell_time", "packet exceeded dwell time restrictions")
 	errSubBandNotFound           = errors.DefineNotFound("sub_band_not_found", "no sub-band found for frequency `{frequency}` Hz")
 	errRetrieveFrequencyPlanBand = errors.DefineCorruption(
 		"retrieve_frequency_plan_band",
@@ -98,7 +98,7 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 	}
 
 	if !f.respectsDwellTime(true, channel, s.Duration) {
-		return errExceededDwellTime.WithAttributes("packet_duration", s.Duration.String())
+		return errDwellTime.WithAttributes("packet_duration", s.Duration.String())
 	}
 
 	subBand, err := f.findSubBand(channel)

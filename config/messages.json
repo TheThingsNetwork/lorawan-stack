@@ -1673,7 +1673,7 @@
       "file": "scheduling.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:exceeded_dwell_time": {
+  "error:pkg/gatewayserver/scheduling:dwell_time": {
     "translations": {
       "en": "packet exceeded dwell time restrictions"
     },
