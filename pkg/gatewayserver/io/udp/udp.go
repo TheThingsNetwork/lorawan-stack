@@ -75,7 +75,7 @@ type srv struct {
 
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
-	ctx = log.NewContextWithField(ctx, "namespace", "io/udp")
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/udp")
 	var firewall Firewall
 	if config.AddrChangeBlock > 0 {
 		firewall = NewMemoryFirewall(ctx, config.AddrChangeBlock)

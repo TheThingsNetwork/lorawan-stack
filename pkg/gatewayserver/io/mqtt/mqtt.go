@@ -46,7 +46,7 @@ type srv struct {
 
 // Start starts the MQTT frontend.
 func Start(ctx context.Context, server io.Server, listener net.Listener, protocol string) {
-	ctx = log.NewContextWithField(ctx, "namespace", "io/mqtt")
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/mqtt")
 	ctx = mqttlog.NewContext(ctx, mqtt.Logger(log.FromContext(ctx)))
 	s := &srv{ctx, server, mqttnet.NewListener(listener, protocol)}
 	go s.accept()

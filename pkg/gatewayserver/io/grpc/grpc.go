@@ -41,7 +41,7 @@ var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_u
 // LinkGateway links the gateway to the Gateway Server. The authentication information will be used to determine the
 // gateway ID. If no authentication information is present, this gateway may not be used for downlink.
 func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
-	ctx := log.NewContextWithField(link.Context(), "namespace", "io/grpc")
+	ctx := log.NewContextWithField(link.Context(), "namespace", "gatewayserver/io/grpc")
 
 	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
@@ -66,6 +66,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)
 	}
 	logger.Info("Connected")
+	defer logger.Info("Disconnected")
 	if err = s.server.ClaimDownlink(ctx, id); err != nil {
 		logger.WithError(err).Warn("Failed to claim downlink")
 		return
