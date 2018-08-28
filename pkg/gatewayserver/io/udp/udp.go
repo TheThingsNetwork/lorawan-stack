@@ -169,9 +169,7 @@ func (s *srv) handlePackets() {
 
 func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 	cs := &state{
-		ioCond: sync.Cond{
-			L: &sync.Mutex{},
-		},
+		ioWait:          make(chan struct{}),
 		startHandleDown: &sync.Once{},
 		lastSeenPull:    time.Now().UnixNano(),
 		lastSeenPush:    time.Now().UnixNano(),
@@ -185,10 +183,8 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			if err != nil {
 				s.connections.Delete(eui)
 			}
-			cs.ioCond.L.Lock()
 			cs.io, cs.ioErr = io, err
-			cs.ioCond.Broadcast()
-			cs.ioCond.L.Unlock()
+			close(cs.ioWait)
 		}()
 		id := ttnpb.GatewayIdentifiers{EUI: &eui}
 		ctx, id, err = s.server.FillGatewayContext(ctx, id)
@@ -207,14 +203,9 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			return nil, err
 		}
 	} else {
-		cs.ioCond.L.Lock()
-		for cs.io == nil && cs.ioErr == nil {
-			cs.ioCond.Wait()
-		}
-		err := cs.ioErr
-		cs.ioCond.L.Unlock()
-		if err != nil {
-			return nil, err
+		<-cs.ioWait
+		if cs.ioErr != nil {
+			return nil, cs.ioErr
 		}
 	}
 	return cs, nil
@@ -416,7 +407,7 @@ type state struct {
 	receivedTxAck uint32
 	pullRespToken uint32
 
-	ioCond sync.Cond
+	ioWait chan struct{}
 	io     *io.Connection
 	ioErr  error
 
