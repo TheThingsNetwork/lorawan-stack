@@ -383,9 +383,13 @@ func (s *srv) gc() {
 				if time.Since(lastSeenPull) > s.config.ConnectionExpires {
 					lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
 					if time.Since(lastSeenPush) > s.config.ConnectionExpires {
-						logger.WithField("gateway_eui", k.(types.EUI64)).Warn("Connection expired")
-						s.connections.Delete(k)
-						state.io.Disconnect(errConnectionExpired)
+						select {
+						case <-state.ioWait:
+							logger.WithField("gateway_eui", k.(types.EUI64)).Warn("Connection expired")
+							s.connections.Delete(k)
+							state.io.Disconnect(errConnectionExpired)
+						default:
+						}
 					}
 				}
 				return true
