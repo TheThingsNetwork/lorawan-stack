@@ -17,6 +17,8 @@ package grpc
 import (
 	"context"
 
+	"google.golang.org/grpc/peer"
+
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
@@ -57,9 +59,13 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 		return
 	}
 
+	if peer, ok := peer.FromContext(ctx); ok {
+		ctx = log.NewContextWithField(ctx, "remote_addr", peer.Addr.String())
+	}
 	uid := unique.ID(ctx, id)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
+
 	conn, err := s.server.Connect(ctx, "grpc", id)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
