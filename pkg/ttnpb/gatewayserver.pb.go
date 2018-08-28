@@ -283,9 +283,7 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for GtwGs service
 
 type GtwGsClient interface {
-	// LinkGateway links the gateway to the Gateway Server. The authentication information
-	// will be used to determine the gateway ID. If no authentication information
-	// is present, this gateway may not be used for downlink.
+	// Link the gateway to the Gateway Server.
 	LinkGateway(ctx context.Context, opts ...grpc.CallOption) (GtwGs_LinkGatewayClient, error)
 	// GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
 	GetFrequencyPlan(ctx context.Context, in *GetFrequencyPlanRequest, opts ...grpc.CallOption) (*FrequencyPlan, error)
@@ -342,9 +340,7 @@ func (c *gtwGsClient) GetFrequencyPlan(ctx context.Context, in *GetFrequencyPlan
 // Server API for GtwGs service
 
 type GtwGsServer interface {
-	// LinkGateway links the gateway to the Gateway Server. The authentication information
-	// will be used to determine the gateway ID. If no authentication information
-	// is present, this gateway may not be used for downlink.
+	// Link the gateway to the Gateway Server.
 	LinkGateway(GtwGs_LinkGatewayServer) error
 	// GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
 	GetFrequencyPlan(context.Context, *GetFrequencyPlanRequest) (*FrequencyPlan, error)
