@@ -108,9 +108,12 @@ func (s *srv) read() {
 			return
 		}
 
+		packetBuf := make([]byte, n)
+		copy(packetBuf, buf[:])
+
 		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
 		packet := encoding.Packet{GatewayAddr: addr}
-		if err = packet.UnmarshalBinary(buf[0:n]); err != nil {
+		if err = packet.UnmarshalBinary(packetBuf); err != nil {
 			log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal packet")
 			continue
 		}
