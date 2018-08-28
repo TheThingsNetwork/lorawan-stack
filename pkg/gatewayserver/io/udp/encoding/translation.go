@@ -126,7 +126,7 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
 	if err != nil {
-		return up, errDecodePayload.WithCause(err)
+		return up, errPayload.WithCause(err)
 	}
 
 	up.RawPayload = rawPayload
@@ -151,17 +151,17 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 
 		sf, err := rx.DatR.SpreadingFactor()
 		if err != nil {
-			return up, errParseSpreadingFactor.WithCause(err)
+			return up, errSpreadingFactor.WithCause(err)
 		}
 		up.Settings.SpreadingFactor = uint32(sf)
 		if up.Settings.Bandwidth, err = rx.DatR.Bandwidth(); err != nil {
-			return up, errParseBandwidth.WithCause(err)
+			return up, errBandwidth.WithCause(err)
 		}
 	case "FSK":
 		up.Settings.Modulation = ttnpb.Modulation_FSK
 		up.Settings.BitRate = rx.DatR.FSK
 	default:
-		return up, errUnknownModulation.WithAttributes("modulation", rx.Modu)
+		return up, errModulation.WithAttributes("modulation", rx.Modu)
 	}
 
 	return up, nil
@@ -263,7 +263,7 @@ func TranslateDownstream(downlink *ttnpb.DownlinkMessage) (TxPacket, error) {
 		tx.Modu = "FSK"
 		tx.DatR.FSK = downlink.Settings.BitRate
 	default:
-		return tx, errUnknownModulation.WithAttributes("modulation", downlink.Settings.Modulation)
+		return tx, errModulation.WithAttributes("modulation", downlink.Settings.Modulation)
 	}
 
 	return tx, nil

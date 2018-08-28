@@ -17,11 +17,11 @@ package encoding
 import "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 var (
-	errNoGatewayEUI         = errors.DefineInvalidArgument("no_gateway_eui", "packet is not long enough to contain the gateway EUI")
-	errDecodePayload        = errors.DefineInvalidArgument("decode_payload", "could not decode binary payload")
-	errParseBandwidth       = errors.DefineInvalidArgument("parse_bandwidth", "could not parse bandwidth")
-	errParseSpreadingFactor = errors.DefineInvalidArgument("parse_spreading_factor", "could not parse spreading factor")
-	errUnmarshalEUI         = errors.DefineInvalidArgument("unmarshal_eui", "failed to unmarshal EUI")
-	errUnmarshalTimestamp   = errors.DefineInvalidArgument("unmarshal_timestamp", "failed to unmarshal timestamp")
-	errUnknownModulation    = errors.DefineInvalidArgument("unknown_modulation", "unknown modulation `{modulation}`")
+	errNoEUI           = errors.DefineInvalidArgument("no_eui", "packet is not long enough to contain the EUI")
+	errPayload         = errors.DefineInvalidArgument("payload", "failed to parse binary payload")
+	errBandwidth       = errors.DefineInvalidArgument("bandwidth", "failed to parse bandwidth")
+	errSpreadingFactor = errors.DefineInvalidArgument("spreading_factor", "failed to parse spreading factor")
+	errEUI             = errors.DefineInvalidArgument("eui", "failed to parse EUI")
+	errTimestamp       = errors.DefineInvalidArgument("timestamp", "failed to parse timestamp")
+	errModulation      = errors.DefineInvalidArgument("modulation", "invalid modulation `{modulation}`")
 )
