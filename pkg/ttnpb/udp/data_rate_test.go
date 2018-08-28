@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package encoding_test
+package udp_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -26,7 +26,7 @@ import (
 func TestDataRate(t *testing.T) {
 	a := assertions.New(t)
 
-	table := map[string]encoding.DataRate{
+	table := map[string]udp.DataRate{
 		`"SF7BW125"`: {DataRate: types.DataRate{LoRa: "SF7BW125"}},
 		`50000`:      {DataRate: types.DataRate{FSK: 50000}},
 	}
@@ -36,13 +36,13 @@ func TestDataRate(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(string(enc), should.Equal, s)
 
-		var dec encoding.DataRate
+		var dec udp.DataRate
 		err = dec.UnmarshalJSON(enc)
 		a.So(err, should.BeNil)
 		a.So(dec, should.Resemble, dr)
 	}
 
-	var dr encoding.DataRate
+	var dr udp.DataRate
 	err := dr.UnmarshalJSON([]byte{})
 	a.So(err, should.NotBeNil)
 }

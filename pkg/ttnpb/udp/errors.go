@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package encoding
+package udp
 
-import "go.thethings.network/lorawan-stack/pkg/errorsv3"
+import (
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+)
 
 var (
 	errNoEUI           = errors.DefineInvalidArgument("no_eui", "packet is not long enough to contain the EUI")

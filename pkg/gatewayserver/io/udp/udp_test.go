@@ -26,9 +26,9 @@ import (
 	"github.com/smartystreets/assertions"
 	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
-	encoding "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -502,11 +502,11 @@ func TestTraffic(t *testing.T) {
 
 				// Assert packet type, content and time of arrival.
 				a.So(response.PacketType, should.Equal, encoding.PullResp)
-				expected, err := encoding.TranslateDownstream(tc.Message)
+				expected, err := encoding.FromDownlinkMessage(tc.Message)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				a.So(*response.Data.TxPacket, should.Resemble, expected)
+				a.So(response.Data.TxPacket, should.Resemble, expected)
 				a.So(actualTime, should.HappenOnOrBetween, expectedTime, expectedTime.Add(timeout))
 
 				// Send TxAck.

@@ -24,9 +24,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
@@ -240,7 +240,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			}
 			state.syncClock(timestamp)
 		}
-		msg, err := encoding.TranslateUpstream(*packet.Data, encoding.UpstreamMetadata{
+		msg, err := encoding.ToGatewayUp(*packet.Data, encoding.UpstreamMetadata{
 			ID: state.io.Gateway().GatewayIdentifiers,
 			IP: packet.GatewayAddr.IP.String(),
 		})
@@ -292,7 +292,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		case <-state.io.Context().Done():
 			return state.io.Context().Err()
 		case down := <-state.io.Down():
-			tx, err := encoding.TranslateDownstream(down)
+			tx, err := encoding.FromDownlinkMessage(down)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to marshal downlink message")
 				// TODO: Report to Network Server: https://github.com/TheThingsIndustries/lorawan-stack/issues/1017
@@ -306,7 +306,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				PacketType:      encoding.PullResp,
 				Token:           state.nextToken(),
 				Data: &encoding.Data{
-					TxPacket: &tx,
+					TxPacket: tx,
 				},
 			}
 			write := func() {

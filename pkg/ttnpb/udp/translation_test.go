@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package encoding_test
+package udp_test
 
 import (
 	"encoding/base64"
@@ -22,8 +22,8 @@ import (
 
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/version"
@@ -35,11 +35,11 @@ func TestStatusRaw(t *testing.T) {
 	a := assertions.New(t)
 
 	raw := []byte(`{"stat":{"rxfw":0,"hal":"5.1.0","fpga":2,"dsp":31,"lpps":2,"lmnw":3,"lmst":1,"lmok":3,"temp":30,"lati":52.34223,"long":5.29685,"txnb":0,"dwnb":0,"alti":66,"rxok":0,"boot":"2017-06-07 09:40:42 GMT","time":"2017-06-08 09:40:42 GMT","rxnb":0,"ackr":0.0}}`)
-	var statusData encoding.Data
+	var statusData udp.Data
 	err := json.Unmarshal(raw, &statusData)
 	a.So(err, should.BeNil)
 
-	upstream, err := encoding.ToGatewayUp(statusData, encoding.UpstreamMetadata{
+	upstream, err := udp.ToGatewayUp(statusData, udp.UpstreamMetadata{
 		IP: "127.0.0.1",
 		ID: ids,
 	})
@@ -85,17 +85,17 @@ func TestStatusRaw(t *testing.T) {
 func TestToGatewayUp(t *testing.T) {
 	a := assertions.New(t)
 
-	p := encoding.Packet{
+	p := udp.Packet{
 		GatewayEUI:      &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-		ProtocolVersion: encoding.Version1,
+		ProtocolVersion: udp.Version1,
 		Token:           [2]byte{0x11, 0x00},
-		Data: &encoding.Data{
-			RxPacket: []*encoding.RxPacket{
+		Data: &udp.Data{
+			RxPacket: []*udp.RxPacket{
 				{
 					Freq: 868.0,
 					Chan: 2,
 					Modu: "LORA",
-					DatR: encoding.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+					DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
 					CodR: "4/7",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
@@ -103,10 +103,10 @@ func TestToGatewayUp(t *testing.T) {
 				},
 			},
 		},
-		PacketType: encoding.PushData,
+		PacketType: udp.PushData,
 	}
 
-	upstream, err := encoding.ToGatewayUp(*p.Data, encoding.UpstreamMetadata{ID: ids})
+	upstream, err := udp.ToGatewayUp(*p.Data, udp.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
 
 	msg := upstream.UplinkMessages[0]
@@ -122,16 +122,16 @@ func TestToGatewayUp(t *testing.T) {
 func TestToGatewayUpRoundtrip(t *testing.T) {
 	a := assertions.New(t)
 
-	expected := encoding.Packet{
-		ProtocolVersion: encoding.Version1,
+	expected := udp.Packet{
+		ProtocolVersion: udp.Version1,
 		Token:           [2]byte{0x11, 0x00},
-		Data: &encoding.Data{
-			RxPacket: []*encoding.RxPacket{
+		Data: &udp.Data{
+			RxPacket: []*udp.RxPacket{
 				{
 					Freq: 868.0,
 					Chan: 2,
 					Modu: "LORA",
-					DatR: encoding.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+					DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
 					CodR: "4/7",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
@@ -139,24 +139,24 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 				},
 			},
 		},
-		PacketType: encoding.PushData,
+		PacketType: udp.PushData,
 	}
-	expectedMd := encoding.UpstreamMetadata{
+	expectedMd := udp.UpstreamMetadata{
 		ID: ttnpb.GatewayIdentifiers{
 			EUI: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		},
 		IP: "1.1.1.1",
 	}
 
-	up, err := encoding.ToGatewayUp(*expected.Data, expectedMd)
+	up, err := udp.ToGatewayUp(*expected.Data, expectedMd)
 	a.So(err, should.BeNil)
 
-	actual := encoding.Packet{
-		ProtocolVersion: encoding.Version1,
+	actual := udp.Packet{
+		ProtocolVersion: udp.Version1,
 		Token:           [2]byte{0x11, 0x00},
-		Data:            &encoding.Data{},
+		Data:            &udp.Data{},
 	}
-	actual.Data.RxPacket, actual.Data.Stat = encoding.FromGatewayUp(up)
+	actual.Data.RxPacket, actual.Data.Stat = udp.FromGatewayUp(up)
 
 	a.So(pretty.Diff(actual, expected), should.BeEmpty)
 }
@@ -165,11 +165,11 @@ func TestToGatewayUpRaw(t *testing.T) {
 	a := assertions.New(t)
 
 	raw := []byte(`{"rxpk":[{"tmst":368384825,"chan":0,"rfch":0,"freq":868.100000,"stat":1,"modu":"LORA","datr":"SF7BW125","codr":"4/5","lsnr":-11,"rssi":-107,"size":108,"data":"Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9"}]}`)
-	var rxData encoding.Data
+	var rxData udp.Data
 	err := json.Unmarshal(raw, &rxData)
 	a.So(err, should.BeNil)
 
-	upstream, err := encoding.ToGatewayUp(rxData, encoding.UpstreamMetadata{ID: ids})
+	upstream, err := udp.ToGatewayUp(rxData, udp.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
 
 	a.So(len(upstream.UplinkMessages), should.Equal, 1)
@@ -227,11 +227,11 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 			}]
 		}]
 	}`)
-	var rxData encoding.Data
+	var rxData udp.Data
 	err := json.Unmarshal(rx, &rxData)
 	a.So(err, should.BeNil)
 
-	_, err = encoding.ToGatewayUp(rxData, encoding.UpstreamMetadata{ID: ids})
+	_, err = udp.ToGatewayUp(rxData, udp.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
 }
 
@@ -252,7 +252,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 		},
 		RawPayload: []byte{0x7d, 0xf3, 0x8e},
 	}
-	tx, err := encoding.FromDownlinkMessage(msg)
+	tx, err := udp.FromDownlinkMessage(msg)
 	a.So(err, should.BeNil)
 	a.So(tx.DatR.LoRa, should.Equal, "SF10BW500")
 	a.So(tx.Tmst, should.Equal, 1886440700)
@@ -276,10 +276,10 @@ func TestDownlinkRoundtrip(t *testing.T) {
 		},
 		RawPayload: []byte{0x7d, 0xf3, 0x8e},
 	}
-	tx, err := encoding.FromDownlinkMessage(expected)
+	tx, err := udp.FromDownlinkMessage(expected)
 	a.So(err, should.BeNil)
 
-	actual, err := encoding.ToDownlinkMessage(tx)
+	actual, err := udp.ToDownlinkMessage(tx)
 	a.So(err, should.BeNil)
 
 	a.So(pretty.Diff(actual, expected), should.BeEmpty)
@@ -289,6 +289,6 @@ func TestFromDownlinkMessageDummy(t *testing.T) {
 	a := assertions.New(t)
 
 	msg := ttnpb.DownlinkMessage{Settings: ttnpb.TxSettings{Modulation: 3939}} // Dummy modulation set
-	_, err := encoding.FromDownlinkMessage(&msg)
+	_, err := udp.FromDownlinkMessage(&msg)
 	a.So(err, should.NotBeNil)
 }

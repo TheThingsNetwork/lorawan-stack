@@ -22,7 +22,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
-	encoding "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
+	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"

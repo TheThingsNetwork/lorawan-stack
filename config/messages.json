@@ -1538,78 +1538,6 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp/encoding:bandwidth": {
-    "translations": {
-      "en": "failed to parse bandwidth"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:eui": {
-    "translations": {
-      "en": "failed to parse EUI"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:modulation": {
-    "translations": {
-      "en": "invalid modulation `{modulation}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:no_eui": {
-    "translations": {
-      "en": "packet is not long enough to contain the EUI"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:packet_type": {
-    "translations": {
-      "en": "invalid packet type"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "packet.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:payload": {
-    "translations": {
-      "en": "failed to parse binary payload"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:spreading_factor": {
-    "translations": {
-      "en": "failed to parse spreading factor"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp/encoding:timestamp": {
-    "translations": {
-      "en": "failed to parse timestamp"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp/encoding",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/gatewayserver/io/udp:connection_expired": {
     "translations": {
       "en": "connection expired"
@@ -2624,6 +2552,78 @@
     },
     "description": {
       "package": "pkg/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:bandwidth": {
+    "translations": {
+      "en": "failed to parse bandwidth"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:eui": {
+    "translations": {
+      "en": "failed to parse EUI"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:modulation": {
+    "translations": {
+      "en": "invalid modulation `{modulation}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:no_eui": {
+    "translations": {
+      "en": "packet is not long enough to contain the EUI"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:packet_type": {
+    "translations": {
+      "en": "invalid packet type"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "packet.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:payload": {
+    "translations": {
+      "en": "failed to parse binary payload"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:spreading_factor": {
+    "translations": {
+      "en": "failed to parse spreading factor"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:timestamp": {
+    "translations": {
+      "en": "failed to parse timestamp"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
       "file": "errors.go"
     }
   },

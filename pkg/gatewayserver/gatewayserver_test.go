@@ -16,10 +16,8 @@ package gatewayserver_test
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -27,14 +25,13 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -61,10 +58,6 @@ func TestGatewayServer(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	ns, nsAddr := startMockNS(ctx)
 
-	band, err := band.GetByID("EU_863_870")
-	if err != nil {
-		panic(err)
-	}
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -288,35 +281,7 @@ func TestGatewayServer(t *testing.T) {
 								PacketType:      encoding.PushData,
 								Data:            &encoding.Data{},
 							}
-							for _, msg := range up.UplinkMessages {
-								var modulation string
-								var dataRate types.DataRate
-								switch msg.Settings.Modulation {
-								case ttnpb.Modulation_LORA:
-									modulation = "LORA"
-									dataRate.LoRa = fmt.Sprintf("SF%dBW%d", msg.Settings.SpreadingFactor, msg.Settings.Bandwidth/1000)
-								case ttnpb.Modulation_FSK:
-									modulation = "FSK"
-									dataRate.FSK = msg.Settings.BitRate
-								}
-								packet.Data.RxPacket = append(packet.Data.RxPacket, &encoding.RxPacket{
-									Freq: float64(msg.Settings.Frequency) / 1000000,
-									Chan: uint8(msg.Settings.ChannelIndex),
-									Modu: modulation,
-									DatR: encoding.DataRate{DataRate: dataRate},
-									CodR: msg.Settings.CodingRate,
-									Size: uint16(len(msg.RawPayload)),
-									Data: base64.StdEncoding.EncodeToString(msg.RawPayload),
-									Tmst: uint32(msg.RxMetadata[0].Timestamp / 1000),
-									RSSI: int16(msg.RxMetadata[0].RSSI),
-									LSNR: float64(msg.RxMetadata[0].SNR),
-								})
-							}
-							if up.GatewayStatus != nil {
-								packet.Data.Stat = &encoding.Stat{
-									Time: encoding.ExpandedTime(up.GatewayStatus.Time),
-								}
-							}
+							packet.Data.RxPacket, packet.Data.Stat = encoding.FromGatewayUp(up)
 							writeBuf, err := packet.MarshalBinary()
 							if err != nil {
 								errCh <- err
@@ -380,40 +345,13 @@ func TestGatewayServer(t *testing.T) {
 						}
 						switch packet.PacketType {
 						case encoding.PullResp:
-							msg := ttnpb.DownlinkMessage{
-								Settings: ttnpb.TxSettings{
-									CodingRate:            packet.Data.TxPacket.CodR,
-									Frequency:             uint64(packet.Data.TxPacket.Freq * 1000000),
-									PolarizationInversion: packet.Data.TxPacket.IPol,
-									TxPower:               int32(packet.Data.TxPacket.Powe),
-								},
-								TxMetadata: ttnpb.TxMetadata{
-									Timestamp: uint64(packet.Data.TxPacket.Tmst * 1000),
-								},
-							}
-							msg.RawPayload, _ = base64.RawStdEncoding.DecodeString(strings.TrimRight(packet.Data.TxPacket.Data, "="))
-							switch packet.Data.TxPacket.Modu {
-							case "LORA":
-								msg.Settings.Modulation = ttnpb.Modulation_LORA
-								msg.TxMetadata.EnableCRC = !packet.Data.TxPacket.NCRC
-								for i := len(band.DataRates) - 1; i >= 0; i-- {
-									dr := band.DataRates[i].Rate
-									if dr == packet.Data.TxPacket.DatR.DataRate {
-										if sf, _ := dr.SpreadingFactor(); err == nil {
-											msg.Settings.SpreadingFactor = uint32(sf)
-										}
-										if bw, _ := dr.Bandwidth(); err == nil {
-											msg.Settings.Bandwidth = bw
-										}
-										break
-									}
-								}
-							case "FSK":
-								msg.Settings.Modulation = ttnpb.Modulation_FSK
-								msg.Settings.BitRate = packet.Data.TxPacket.DatR.FSK
+							msg, err := encoding.ToDownlinkMessage(packet.Data.TxPacket)
+							if err != nil {
+								errCh <- err
+								return
 							}
 							downCh <- &ttnpb.GatewayDown{
-								DownlinkMessage: &msg,
+								DownlinkMessage: msg,
 							}
 						}
 					}

@@ -20,7 +20,7 @@ import (
 	"sync"
 	"time"
 
-	encoding "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp/encoding"
+	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 )
 
 // Firewall filters packets by tracking addresses and time.
