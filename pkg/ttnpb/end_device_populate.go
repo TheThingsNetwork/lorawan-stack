@@ -21,10 +21,7 @@ import (
 
 func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
 	out := &EndDeviceVersion{}
-	out.BrandID = randStringEndDevice(r)
-	out.ModelID = randStringEndDevice(r)
-	out.HardwareVersion = randStringEndDevice(r)
-	out.FirmwareVersion = randStringEndDevice(r)
+	out.EndDeviceVersionIdentifiers = *NewPopulatedEndDeviceVersionIdentifiers(r, easy)
 	out.Photos = []string{randStringEndDevice(r) + ".jpg", randStringEndDevice(r) + ".jpg"}
 	if r.Intn(10) != 0 {
 		out.DefaultFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
@@ -35,8 +32,6 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	out.FCntResets = bool(r.Intn(2) == 0)
 	out.Supports32BitFCnt = bool(r.Intn(2) == 0)
 	out.DisableJoinNonceCheck = bool(r.Intn(2) == 0)
-	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
-	out.LoRaWANPHYVersion = PHYVersion([]int32{1, 2, 3, 4, 5, 6}[r.Intn(6)])
 	return out
 }
 
@@ -124,7 +119,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	}
 	out.NetworkServerAddress = randStringEndDevice(r)
 	out.ApplicationServerAddress = randStringEndDevice(r)
-	out.EndDeviceVersion = *NewPopulatedEndDeviceVersion(r, easy)
+	out.EndDeviceVersionIdentifiers = *NewPopulatedEndDeviceVersionIdentifiers(r, easy)
 	if r.Intn(10) != 0 {
 		out.RecentUplinks = make([]*UplinkMessage, r.Intn(5))
 		for i := range out.RecentUplinks {
@@ -149,7 +144,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(2) == 0 {
 		out.DownlinkMargin *= -1
 	}
-	out.DefaultFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
+	out.MessagePayloadFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
 	out.SupportsJoin = r.Intn(2) == 0
 	return out
 }

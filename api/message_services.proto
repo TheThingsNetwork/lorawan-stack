@@ -23,15 +23,13 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ProcessUplinkMessageRequest {
-  // TODO: @johanstokking see if we still need this. Shouldn't the parameter be enough?
-  EndDeviceVersion device_version = 1 [(gogoproto.nullable) = false];
+  EndDeviceVersionIdentifiers end_device_version_identifiers = 1 [(gogoproto.nullable) = false];
   UplinkMessage message = 2 [(gogoproto.nullable) = false];
   string parameter = 3;
 }
 
 message ProcessDownlinkMessageRequest {
-  // TODO: @johanstokking see if we still need this. Shouldn't the parameter be enough?
-  EndDeviceVersion device_version = 1 [(gogoproto.nullable) = false];
+  EndDeviceVersionIdentifiers end_device_version_identifiers = 1 [(gogoproto.nullable) = false];
   DownlinkMessage message = 2 [(gogoproto.nullable) = false];
   string parameter = 3;
 }

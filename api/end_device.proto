@@ -123,10 +123,8 @@ message EndDeviceModel {
   string name = 3;
 }
 
-// EndDeviceVersion is used as a template for creating end devices.
-message EndDeviceVersion {
-  option (gogoproto.populate) = false;
-
+// EndDeviceVersionIdentifiers identify an end device version.
+message EndDeviceVersionIdentifiers {
   string brand_id = 1 [(gogoproto.customname) = "BrandID"];
   string model_id = 2 [(gogoproto.customname) = "ModelID"];
   // LoRaWAN MAC version.
@@ -135,22 +133,31 @@ message EndDeviceVersion {
   PHYVersion lorawan_phy_version = 4 [(gogoproto.customname) = "LoRaWANPHYVersion"];
   string hardware_version = 5;
   string firmware_version = 6;
+}
+
+// EndDeviceVersion is used as a template for creating end devices.
+message EndDeviceVersion {
+  option (gogoproto.populate) = false;
+
+  // Version identifiers.
+  EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
   // Photos contains file names of device photos.
-  repeated string photos = 7;
+  repeated string photos = 2;
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 8 [(gogoproto.nullable) = false];
+  MessagePayloadFormatters default_formatters = 3 [(gogoproto.nullable) = false];
   // Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd).
-  MACParameters default_mac_parameters = 9 [(gogoproto.customname) = "DefaultMACParameters"];
+  MACParameters default_mac_parameters = 4 [(gogoproto.customname) = "DefaultMACParameters"];
   // Minimum frequency the device is capable of using (in Hz).
-  uint64 min_frequency = 10;
+  uint64 min_frequency = 5;
   // Maximum frequency the device is capable of using (in Hz).
-  uint64 max_frequency = 11;
+  uint64 max_frequency = 6;
   // Indicator that the device may reset the frame counters (not LoRaWAN compliant).
-  bool f_cnt_resets = 12; // TODO: rename to ResetsFCnt.
+  bool f_cnt_resets = 7; // TODO: rename to ResetsFCnt.
   // Indicator that the device uses 32-bit frame counters.
-  bool supports_32_bit_f_cnt = 13 [(gogoproto.customname) = "Supports32BitFCnt"];
+  bool supports_32_bit_f_cnt = 8 [(gogoproto.customname) = "Supports32BitFCnt"];
   // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
-  bool disable_join_nonce_check = 14; // TODO: rename to ResetsNonces.
+  bool disable_join_nonce_check = 9; // TODO: rename to ResetsNonces.
 }
 
 message MACSettings {
@@ -209,9 +216,8 @@ message MACState {
 message EndDevice {
   option (gogoproto.populate) = false;
 
-  // TODO: Remove from EndDevice.
-  EndDeviceVersion version = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  EndDeviceIdentifiers ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceVersionIdentifiers version_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   RootKeys root_keys = 3;
   // The address (host:port) of the Network Server associated with this device.
   string network_server_address = 4 [(gogoproto.customname) = "NetworkServerAddress"];
