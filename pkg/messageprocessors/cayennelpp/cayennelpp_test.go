@@ -32,11 +32,13 @@ func TestEncode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
-	model := &ttnpb.EndDeviceVersion{
-		BrandID:         "The Things Products",
-		ModelID:         "The Things Uno",
-		HardwareVersion: "1.0",
-		FirmwareVersion: "1.0.0",
+	version := &ttnpb.EndDeviceVersionIdentifiers{
+		BrandID:           "The Things Products",
+		ModelID:           "The Things Uno",
+		HardwareVersion:   "1.0",
+		FirmwareVersion:   "1.0.0",
+		LoRaWANVersion:    ttnpb.MAC_V1_1,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 	}
 
 	// Happy flow.
@@ -59,7 +61,7 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		output, err := host.Encode(ctx, message, model, "")
+		output, err := host.Encode(ctx, message, version, "")
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{2, 236, 69})
 	}
@@ -107,7 +109,7 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		output, err := host.Encode(ctx, message, model, "")
+		output, err := host.Encode(ctx, message, version, "")
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.BeEmpty)
 	}
@@ -119,11 +121,13 @@ func TestDecode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
-	model := &ttnpb.EndDeviceVersion{
-		BrandID:         "The Things Products",
-		ModelID:         "The Things Uno",
-		HardwareVersion: "1.0",
-		FirmwareVersion: "1.0.0",
+	version := &ttnpb.EndDeviceVersionIdentifiers{
+		BrandID:           "The Things Products",
+		ModelID:           "The Things Uno",
+		HardwareVersion:   "1.0",
+		FirmwareVersion:   "1.0.0",
+		LoRaWANVersion:    ttnpb.MAC_V1_1,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 	}
 
 	message := &ttnpb.UplinkMessage{
@@ -149,7 +153,7 @@ func TestDecode(t *testing.T) {
 		},
 	}
 
-	output, err := host.Decode(ctx, message, model, "")
+	output, err := host.Decode(ctx, message, version, "")
 	a.So(err, should.BeNil)
 	m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
 	a.So(err, should.BeNil)

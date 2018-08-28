@@ -31,11 +31,13 @@ func TestEncode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
-	version := &ttnpb.EndDeviceVersion{
-		BrandID:         "The Things Products",
-		ModelID:         "The Things Uno",
-		HardwareVersion: "1.0",
-		FirmwareVersion: "1.0.0",
+	version := &ttnpb.EndDeviceVersionIdentifiers{
+		BrandID:           "The Things Products",
+		ModelID:           "The Things Uno",
+		HardwareVersion:   "1.0",
+		FirmwareVersion:   "1.0.0",
+		LoRaWANVersion:    ttnpb.MAC_V1_1,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 	}
 
 	message := &ttnpb.DownlinkMessage{
@@ -162,11 +164,13 @@ func TestDecode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
-	version := &ttnpb.EndDeviceVersion{
-		BrandID:         "The Things Products",
-		ModelID:         "The Things Uno",
-		HardwareVersion: "1.0",
-		FirmwareVersion: "1.0.0",
+	version := &ttnpb.EndDeviceVersionIdentifiers{
+		BrandID:           "The Things Products",
+		ModelID:           "The Things Uno",
+		HardwareVersion:   "1.0",
+		FirmwareVersion:   "1.0.0",
+		LoRaWANVersion:    ttnpb.MAC_V1_1,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 	}
 
 	message := &ttnpb.UplinkMessage{

@@ -39,12 +39,14 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
-func (h *host) createEnvironment(model *ttnpb.EndDeviceVersion) map[string]interface{} {
+func (h *host) createEnvironment(version *ttnpb.EndDeviceVersionIdentifiers) map[string]interface{} {
 	env := make(map[string]interface{})
-	env["brand"] = model.BrandID
-	env["model"] = model.ModelID
-	env["hardware_version"] = model.HardwareVersion
-	env["firmware_version"] = model.FirmwareVersion
+	env["brand"] = version.BrandID
+	env["model"] = version.ModelID
+	env["hardware_version"] = version.HardwareVersion
+	env["firmware_version"] = version.FirmwareVersion
+	env["lorawan_version"], _ = ttnpb.MACVersion_name[int32(version.LoRaWANVersion)]
+	env["lorawan_phy_version"], _ = ttnpb.PHYVersion_name[int32(version.LoRaWANPHYVersion)]
 	return env
 }
 
@@ -57,7 +59,7 @@ var (
 )
 
 // Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
+func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, errNoPayload
@@ -73,7 +75,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 		return nil, errInput.WithCause(err)
 	}
 
-	env := h.createEnvironment(model)
+	env := h.createEnvironment(version)
 	env["application_id"] = msg.ApplicationID
 	env["device_id"] = msg.DeviceID
 	env["dev_eui"] = msg.DevEUI
@@ -137,13 +139,13 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 }
 
 // Decode decodes the message's MAC payload FRMPayload to DecodedPayload using script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
+func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, errNoPayload
 	}
 
-	env := h.createEnvironment(model)
+	env := h.createEnvironment(version)
 	env["application_id"] = msg.ApplicationID
 	env["device_id"] = msg.DeviceID
 	env["dev_eui"] = msg.DevEUI

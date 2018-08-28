@@ -43,7 +43,7 @@ var (
 )
 
 // Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
+func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, errNoPayload
@@ -77,7 +77,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 }
 
 // Decode decodes the message's MAC payload FRMPayload to DecodedPayload using script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
+func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, errNoPayload
