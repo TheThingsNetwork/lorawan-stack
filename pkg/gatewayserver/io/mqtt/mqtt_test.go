@@ -38,7 +38,7 @@ var (
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	registeredGatewayKey = "test-key"
 
-	timeout = 10 * time.Millisecond
+	timeout = 10 * test.Delay
 )
 
 func TestAuthentication(t *testing.T) {
@@ -88,7 +88,7 @@ func TestAuthentication(t *testing.T) {
 			token := client.Connect()
 			if ok := token.WaitTimeout(timeout); tc.OK {
 				if a.So(ok, should.BeTrue) && a.So(token.Error(), should.BeNil) {
-					client.Disconnect(100)
+					client.Disconnect(uint(timeout / time.Millisecond))
 				}
 			} else {
 				a.So(ok, should.BeFalse)

@@ -48,7 +48,7 @@ var (
 	unregisteredGatewayID  = "eui-bbff000000000000"
 	unregisteredGatewayEUI = types.EUI64{0xBB, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
-	timeout = 10 * time.Millisecond
+	timeout = 10 * test.Delay
 )
 
 func TestGatewayServer(t *testing.T) {
@@ -608,7 +608,7 @@ func TestGatewayServer(t *testing.T) {
 						}
 
 						// Wait for gateway status to be processed; no event available here.
-						time.Sleep(50 * time.Millisecond)
+						time.Sleep(timeout)
 
 						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &id)
 						if !a.So(err, should.BeNil) {
@@ -712,6 +712,9 @@ func TestGatewayServer(t *testing.T) {
 
 			cancel()
 			wg.Wait()
+
+			// Wait for disconnection to be processed.
+			time.Sleep(timeout)
 
 			// After canceling the context and awaiting the link, the connection should be gone.
 			t.Run("Disconnected", func(t *testing.T) {

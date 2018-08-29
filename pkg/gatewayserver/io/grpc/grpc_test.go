@@ -39,7 +39,7 @@ var (
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	registeredGatewayKey = "test-key"
 
-	timeout = 10 * time.Millisecond
+	timeout = 10 * test.Delay
 )
 
 func TestAuthentication(t *testing.T) {
