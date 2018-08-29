@@ -4,12 +4,12 @@
   name = "github.com/getsentry/raven-go"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/gogo/protobuf"
+  version = "1.1.1"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/golang/protobuf"
+  version = "1.1.0"
 
 [[constraint]]
   branch = "master"
@@ -45,7 +45,7 @@
 
 [[constraint]]
   name = "google.golang.org/grpc"
-  version = "1.13.0"
+  version = "1.14.0"
 
 [[override]]
   branch = "master"
