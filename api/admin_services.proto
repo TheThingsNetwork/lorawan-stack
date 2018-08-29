@@ -37,9 +37,9 @@ message UserRegistrationSettings {
   bool require_invitation = 2;
   // Require admin approval before the user can perform any actions.
   bool require_admin_approval = 3;
-  // Glob-style patterns of allowed email addresses. Matching addresses do not
+  // Glob-style patterns of email addresses to allow. Matching addresses do not
   // require an invitation. Invitations can still be sent to other email addresses.
-  repeated string allowed_email_patterns = 4;
+  repeated string allow_email_patterns = 4;
 }
 
 message IdentityServerSettings {
