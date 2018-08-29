@@ -46,8 +46,8 @@ func TestRegistry(t *testing.T) {
 			"str":    {Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
 			"number": {Kind: &pbtypes.Value_NumberValue{NumberValue: 42}},
 			"list": {Kind: &pbtypes.Value_ListValue{ListValue: &pbtypes.ListValue{Values: []*pbtypes.Value{
-				{&pbtypes.Value_BoolValue{BoolValue: true}},
-				{&pbtypes.Value_StringValue{StringValue: "bar"}},
+				{Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
+				{Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
 			}}}},
 			"struct": {Kind: &pbtypes.Value_StructValue{StructValue: &pbtypes.Struct{Fields: map[string]*pbtypes.Value{
 				"bool": {Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
