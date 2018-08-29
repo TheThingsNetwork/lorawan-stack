@@ -12,11 +12,11 @@ import (
 	"io"
 	"net/http"
 
+	"context"
 	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -42,7 +42,7 @@ func request_IsAdmin_UpdateSettings_0(ctx context.Context, marshaler runtime.Mar
 	var protoReq UpdateSettingsRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -55,7 +55,7 @@ func request_IsAdmin_CreateUser_0(ctx context.Context, marshaler runtime.Marshal
 	var protoReq CreateUserRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -120,7 +120,7 @@ func request_IsAdmin_UpdateUser_0(ctx context.Context, marshaler runtime.Marshal
 	var protoReq UpdateUserRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -221,7 +221,7 @@ func request_IsAdmin_SendInvitation_0(ctx context.Context, marshaler runtime.Mar
 	var protoReq SendInvitationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -314,7 +314,7 @@ func request_IsAdmin_UpdateClient_0(ctx context.Context, marshaler runtime.Marsh
 	var protoReq UpdateClientRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -372,7 +372,7 @@ func request_IsUser_CreateUser_0(ctx context.Context, marshaler runtime.Marshale
 	var protoReq CreateUserRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -394,7 +394,7 @@ func request_IsUser_UpdateUser_0(ctx context.Context, marshaler runtime.Marshale
 	var protoReq UpdateUserRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -407,7 +407,7 @@ func request_IsUser_UpdateUserPassword_0(ctx context.Context, marshaler runtime.
 	var protoReq UpdateUserPasswordRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -429,7 +429,7 @@ func request_IsUser_GenerateUserAPIKey_0(ctx context.Context, marshaler runtime.
 	var protoReq GenerateUserAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -451,7 +451,7 @@ func request_IsUser_UpdateUserAPIKey_0(ctx context.Context, marshaler runtime.Ma
 	var protoReq UpdateUserAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -509,7 +509,7 @@ func request_IsUser_ValidateUserEmail_0(ctx context.Context, marshaler runtime.M
 	var protoReq ValidateUserEmailRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -571,7 +571,7 @@ func request_IsApplication_CreateApplication_0(ctx context.Context, marshaler ru
 	var protoReq CreateApplicationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Application); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Application); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -592,7 +592,7 @@ func request_IsApplication_CreateApplication_1(ctx context.Context, marshaler ru
 	var protoReq CreateApplicationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Application); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Application); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -706,7 +706,7 @@ func request_IsApplication_UpdateApplication_0(ctx context.Context, marshaler ru
 	var protoReq UpdateApplicationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -764,7 +764,7 @@ func request_IsApplication_GenerateApplicationAPIKey_0(ctx context.Context, mars
 	var protoReq GenerateApplicationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -822,7 +822,7 @@ func request_IsApplication_UpdateApplicationAPIKey_0(ctx context.Context, marsha
 	var protoReq UpdateApplicationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -910,7 +910,7 @@ func request_IsApplication_SetApplicationCollaborator_0(ctx context.Context, mar
 	var protoReq ApplicationCollaborator
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -999,7 +999,7 @@ func request_IsGateway_CreateGateway_0(ctx context.Context, marshaler runtime.Ma
 	var protoReq CreateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Gateway); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Gateway); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1020,7 +1020,7 @@ func request_IsGateway_CreateGateway_1(ctx context.Context, marshaler runtime.Ma
 	var protoReq CreateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Gateway); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Gateway); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1142,7 +1142,7 @@ func request_IsGateway_UpdateGateway_0(ctx context.Context, marshaler runtime.Ma
 	var protoReq UpdateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1208,7 +1208,7 @@ func request_IsGateway_GenerateGatewayAPIKey_0(ctx context.Context, marshaler ru
 	var protoReq GenerateGatewayAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1274,7 +1274,7 @@ func request_IsGateway_UpdateGatewayAPIKey_0(ctx context.Context, marshaler runt
 	var protoReq UpdateGatewayAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1362,7 +1362,7 @@ func request_IsGateway_SetGatewayCollaborator_0(ctx context.Context, marshaler r
 	var protoReq GatewayCollaborator
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1463,7 +1463,7 @@ func request_IsClient_CreateClient_0(ctx context.Context, marshaler runtime.Mars
 	var protoReq CreateClientRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1512,7 +1512,7 @@ func request_IsClient_UpdateClient_0(ctx context.Context, marshaler runtime.Mars
 	var protoReq UpdateClientRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1570,7 +1570,7 @@ func request_IsOrganization_CreateOrganization_0(ctx context.Context, marshaler 
 	var protoReq CreateOrganizationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1619,7 +1619,7 @@ func request_IsOrganization_UpdateOrganization_0(ctx context.Context, marshaler 
 	var protoReq UpdateOrganizationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1677,7 +1677,7 @@ func request_IsOrganization_GenerateOrganizationAPIKey_0(ctx context.Context, ma
 	var protoReq GenerateOrganizationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1735,7 +1735,7 @@ func request_IsOrganization_UpdateOrganizationAPIKey_0(ctx context.Context, mars
 	var protoReq UpdateOrganizationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1823,7 +1823,7 @@ func request_IsOrganization_SetOrganizationMember_0(ctx context.Context, marshal
 	var protoReq OrganizationMember
 	var metadata runtime.ServerMetadata
 
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 

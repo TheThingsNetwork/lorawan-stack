@@ -16,6 +16,7 @@
 package joinserver
 
 import (
+	"context"
 	"encoding/binary"
 	"math"
 	"time"
@@ -31,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
