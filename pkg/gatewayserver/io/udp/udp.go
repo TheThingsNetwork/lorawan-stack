@@ -225,9 +225,11 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			addr:    *packet.GatewayAddr,
 			version: packet.ProtocolVersion,
 		})
+		state.startHandleDownMu.RLock()
 		state.startHandleDown.Do(func() {
 			go s.handleDown(ctx, state)
 		})
+		state.startHandleDownMu.RUnlock()
 
 	case encoding.PushData:
 		atomic.StoreInt64(&state.lastSeenPush, time.Now().UnixNano())
@@ -337,7 +339,9 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				logger.Warn("Downlink path expired")
 				s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
 				state.lastDownlinkPath.Store(downlinkPath{})
+				state.startHandleDownMu.Lock()
 				state.startHandleDown = &sync.Once{}
+				state.startHandleDownMu.Unlock()
 				return errDownlinkPathExpired
 			}
 		}
@@ -415,8 +419,9 @@ type state struct {
 	io     *io.Connection
 	ioErr  error
 
-	lastDownlinkPath atomic.Value // downlinkPath
-	startHandleDown  *sync.Once
+	lastDownlinkPath  atomic.Value // downlinkPath
+	startHandleDown   *sync.Once
+	startHandleDownMu sync.RWMutex
 }
 
 func (s *state) nextToken() [2]byte {
