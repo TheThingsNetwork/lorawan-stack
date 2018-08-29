@@ -21,10 +21,8 @@ import (
 
 var au_915_928 Band
 
-const (
-	// AU_915_928 is the ID of the Australian band
-	AU_915_928 ID = "AU_915_928"
-)
+// AU_915_928 is the ID of the Australian band
+const AU_915_928 = "AU_915_928"
 
 func init() {
 	uplinkChannels := make([]Channel, 0)
@@ -137,5 +135,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, au_915_928)
+	All[AU_915_928] = au_915_928
 }

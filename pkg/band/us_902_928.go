@@ -21,10 +21,8 @@ import (
 
 var us_902_928 Band
 
-const (
-	// US_902_928 is the ID of the US frequency plan
-	US_902_928 ID = "US_902_928"
-)
+// US_902_928 is the ID of the US frequency plan
+const US_902_928 = "US_902_928"
 
 func init() {
 	uplinkChannels := make([]Channel, 0)
@@ -135,5 +133,5 @@ func init() {
 		regionalParameters1_0_2RevB: disableCFList1_0_2,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, us_902_928)
+	All[US_902_928] = us_902_928
 }

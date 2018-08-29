@@ -21,10 +21,8 @@ import (
 
 var cn_779_787 Band
 
-const (
-	// CN_779_787 is the ID of the Chinese 779-787Mhz band
-	CN_779_787 ID = "CN_779_787"
-)
+// CN_779_787 is the ID of the Chinese 779-787Mhz band
+const CN_779_787 = "CN_779_787"
 
 func init() {
 	defaultChannels := []Channel{
@@ -116,5 +114,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, cn_779_787)
+	All[CN_779_787] = cn_779_787
 }

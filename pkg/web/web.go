@@ -16,7 +16,6 @@ package web
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -35,31 +34,15 @@ type Registerer interface {
 	RegisterRoutes(s *Server)
 }
 
-// RouterGroup is a set of routes.
-type RouterGroup = Group
-type echoGroup = echo.Group
-
 // Server is the server.
 type Server struct {
-	*RouterGroup
+	*rootGroup
 	config config.HTTP
 	server *echo.Echo
 }
 
-// Group is a set of routes.
-type Group struct {
-	*echoGroup
-	prefix string
-}
-
-func newGroup(parentGroup *echo.Group, parentPrefix, prefix string, middleware ...echo.MiddlewareFunc) *Group {
-	t := strings.TrimSuffix(prefix, "/")
-	p := strings.TrimSuffix(parentPrefix, "/")
-
-	return &Group{
-		echoGroup: parentGroup.Group(t, middleware...),
-		prefix:    p + "/" + strings.TrimPrefix(t, "/"),
-	}
+type rootGroup struct {
+	*echo.Group
 }
 
 // New builds a new server.
@@ -103,9 +86,8 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 	)
 
 	return &Server{
-		RouterGroup: &Group{
-			echoGroup: group,
-			prefix:    "",
+		rootGroup: &rootGroup{
+			Group: group,
 		},
 		config: config,
 		server: server,
@@ -128,36 +110,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Group creates a sub group.
-func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *Group {
-	return newGroup(s.RouterGroup.echoGroup, s.RouterGroup.prefix, prefix, middleware...)
+func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
+	t := strings.TrimSuffix(prefix, "/")
+	return s.server.Group(t, middleware...)
 }
 
 // RootGroup creates a new Echo router group with prefix and optional group-level middleware on the root Server.
-func (s *Server) RootGroup(prefix string, middleware ...echo.MiddlewareFunc) *Group {
+func (s *Server) RootGroup(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
 	t := strings.TrimSuffix(prefix, "/")
-
-	return &Group{
-		echoGroup: s.server.Group(t, middleware...),
-		prefix:    strings.TrimPrefix(t, "/"),
-	}
+	return s.server.Group(t, middleware...)
 }
 
 // Static adds the http.FileSystem under the defined prefix.
-func (g *Group) Static(prefix string, fs http.FileSystem, middleware ...echo.MiddlewareFunc) {
-	fileServer := http.StripPrefix(fmt.Sprintf("%s%s", g.prefix, prefix), http.FileServer(fs))
-	path := path.Join(prefix, "*")
+func (s *Server) Static(prefix string, fs http.FileSystem, middleware ...echo.MiddlewareFunc) {
+	t := strings.TrimSuffix(prefix, "/")
+	path := path.Join(t, "*")
+	fileServer := http.StripPrefix(t, http.FileServer(fs))
 	handler := func(c echo.Context) error {
 		fileServer.ServeHTTP(c.Response().Writer, c.Request())
 		return nil
 	}
-
-	g.GET(path, handler, middleware...)
-	g.HEAD(path, handler, middleware...)
-}
-
-// Group creates a sub group.
-func (g *Group) Group(prefix string, middleware ...echo.MiddlewareFunc) *Group {
-	return newGroup(g.echoGroup, g.prefix, prefix, middleware...)
+	s.GET(path, handler, middleware...)
+	s.HEAD(path, handler, middleware...)
 }
 
 // Routes returns the defined routes.

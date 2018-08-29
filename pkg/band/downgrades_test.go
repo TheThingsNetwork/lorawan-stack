@@ -49,7 +49,7 @@ func compatibleVerifier(t *testing.T) func(version ttnpb.PHYVersion, versionName
 func TestBands(t *testing.T) {
 	verifyCompatibility := compatibleVerifier(t)
 
-	bands := []band.ID{band.EU_863_870, band.US_902_928, band.CN_779_787, band.EU_433}
+	bands := []string{band.EU_863_870, band.US_902_928, band.CN_779_787, band.EU_433}
 	verifyCompatibility(ttnpb.PHY_V1_0, "1.0", bands...)
 
 	bands = append(bands, band.AU_915_928, band.CN_470_510)

@@ -21,10 +21,8 @@ import (
 
 var eu_433 Band
 
-const (
-	// EU_433 is the ID of the European 433Mhz band
-	EU_433 string = "EU_433"
-)
+// EU_433 is the ID of the European 433Mhz band
+const EU_433 = "EU_433"
 
 func init() {
 	defaultChannels := []Channel{
@@ -113,5 +111,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, eu_433)
+	All[EU_433] = eu_433
 }

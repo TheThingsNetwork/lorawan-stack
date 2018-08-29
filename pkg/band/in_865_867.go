@@ -21,10 +21,8 @@ import (
 
 var in_865_867 Band
 
-const (
-	// IN_865_867 is the ID of the Indian frequency plan
-	IN_865_867 ID = "IN_865_867"
-)
+// IN_865_867 is the ID of the Indian frequency plan
+const IN_865_867 = "IN_865_867"
 
 func init() {
 	defaultChannels := []Channel{
@@ -118,5 +116,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, in_865_867)
+	All[IN_865_867] = in_865_867
 }

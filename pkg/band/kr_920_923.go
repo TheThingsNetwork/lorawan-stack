@@ -21,10 +21,8 @@ import (
 
 var kr_920_923 Band
 
-const (
-	// KR_920_923 is the ID of the Korean frequency plan
-	KR_920_923 ID = "KR_920_923"
-)
+// KR_920_923 is the ID of the Korean frequency plan
+const KR_920_923 = "KR_920_923"
 
 func init() {
 	defaultChannels := []Channel{
@@ -108,5 +106,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, kr_920_923)
+	All[KR_920_923] = kr_920_923
 }

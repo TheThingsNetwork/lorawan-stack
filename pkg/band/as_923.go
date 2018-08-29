@@ -21,10 +21,8 @@ import (
 
 var as_923 Band
 
-const (
-	// AS_923 is the ID of the Asian 923Mhz band
-	AS_923 ID = "AS_923"
-)
+// AS_923 is the ID of the Asian 923Mhz band
+const AS_923 = "AS_923"
 
 func init() {
 	defaultChannels := []Channel{
@@ -121,5 +119,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, as_923)
+	All[AS_923] = as_923
 }

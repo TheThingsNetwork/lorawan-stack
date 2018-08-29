@@ -21,10 +21,8 @@ import (
 
 var eu_863_870 Band
 
-const (
-	// EU_863_870 is the ID of the European 863-870Mhz band
-	EU_863_870 ID = "EU_863_870"
-)
+// EU_863_870 is the ID of the European 863-870Mhz band
+const EU_863_870 = "EU_863_870"
 
 func init() {
 	defaultChannels := []Channel{
@@ -137,5 +135,5 @@ func init() {
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, eu_863_870)
+	All[EU_863_870] = eu_863_870
 }

@@ -80,10 +80,7 @@ type Rx2Parameters struct {
 	Frequency     uint64
 }
 
-// ID is the ID of band
-type ID = string
-
-type versionSwap = func(b Band) Band
+type versionSwap func(b Band) Band
 
 func bandIdentity(b Band) Band {
 	return b
@@ -113,7 +110,7 @@ type Beacon struct {
 
 // Band contains a band's properties
 type Band struct {
-	ID ID
+	ID string
 
 	Beacon Beacon
 
@@ -187,14 +184,12 @@ func (d DutyCycle) MaxEmissionDuring(period time.Duration) time.Duration {
 }
 
 // All contains all the bands available
-var All = make([]Band, 0)
+var All = make(map[string]Band)
 
 // GetByID returns the band if it was found, and returns an error otherwise
-func GetByID(id ID) (Band, error) {
-	for _, band := range All {
-		if band.ID == id {
-			return band, nil
-		}
+func GetByID(id string) (Band, error) {
+	if band, ok := All[id]; ok {
+		return band, nil
 	}
 	return Band{}, errBandNotFound.WithAttributes("band_id", id)
 }

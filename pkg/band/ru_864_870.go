@@ -21,10 +21,8 @@ import (
 
 var ru_864_870 Band
 
-const (
-	// RU_864_870 is the ID of the Russian frequency plan
-	RU_864_870 ID = "RU_864_870"
-)
+// RU_864_870 is the ID of the Russian frequency plan
+const RU_864_870 = "RU_864_870"
 
 func init() {
 	defaultChannels := []Channel{
@@ -107,5 +105,5 @@ func init() {
 		// No LoRaWAN Regional Parameters 1.0.2
 		regionalParameters1_1RevA: bandIdentity,
 	}
-	All = append(All, ru_864_870)
+	All[RU_864_870] = ru_864_870
 }

@@ -21,10 +21,8 @@ import (
 
 var cn_470_510 Band
 
-const (
-	// CN_470_510 is the ID of the Chinese 470-510Mhz band
-	CN_470_510 ID = "CN_470_510"
-)
+// CN_470_510 is the ID of the Chinese 470-510Mhz band
+const CN_470_510 = "CN_470_510"
 
 func init() {
 	uplinkChannels := make([]Channel, 0)
@@ -121,7 +119,7 @@ func init() {
 		regionalParameters1_0_2RevB: disableCFList1_0_2,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
-	All = append(All, cn_470_510)
+	All[CN_470_510] = cn_470_510
 }
 
 var cn470BeaconFrequencies = func() [8]uint32 {

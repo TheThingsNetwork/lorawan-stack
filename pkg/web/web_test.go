@@ -53,19 +53,16 @@ func TestGroup(t *testing.T) {
 
 	{
 		grp := s.Group("/")
-		a.So(grp.prefix, should.Equal, "/")
 		grp.GET("/baz", handler)
 		a.So(s, ShouldHaveRoute, "GET", "/baz")
 	}
 
 	{
 		grp := s.Group("/group")
-		a.So(grp.prefix, should.Equal, "/group")
 		grp.GET("/g", handler)
 		a.So(s, ShouldHaveRoute, "GET", "/group/g")
 
 		ggrp := grp.Group("/quu")
-		a.So(ggrp.prefix, should.Equal, "/group/quu")
 		ggrp.GET("/q", handler)
 		a.So(s, ShouldHaveRoute, "GET", "/group/quu/q")
 	}
