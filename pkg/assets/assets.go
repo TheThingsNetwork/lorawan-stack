@@ -17,7 +17,6 @@ package assets
 import (
 	"bytes"
 	"html/template"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -125,12 +124,12 @@ func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 		logger       = a.logger.WithField("template", name)
 		renderMu     sync.RWMutex
 		renderErr    error
-		renderResult *bytes.Buffer
+		renderResult []byte
 		render       = func(t *template.Template, data templates.Data) {
 			res := &bytes.Buffer{}
 			err := t.Execute(res, data)
 			renderMu.Lock()
-			renderResult, renderErr = res, err
+			renderResult, renderErr = res.Bytes(), err
 			renderMu.Unlock()
 		}
 	)
@@ -180,7 +179,7 @@ func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 			return errTemplateNotFound.WithAttributes("name", name)
 		}
 		c.Response().WriteHeader(http.StatusOK)
-		_, err = io.Copy(c.Response().Writer, res)
+		c.Response().Writer.Write(res)
 		return err
 	}
 }
