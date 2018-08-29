@@ -14,48 +14,62 @@
 
 package topics
 
+// Version is the version of a message.
+type Version string
+
 const (
-	topicVersion  = "v3"
 	topicUplink   = "up"
 	topicDownlink = "down"
 	topicStatus   = "status"
 )
 
+var (
+	// V3 represents a v3-compatible message.
+	V3 Version = "v3"
+	// V2 represents a v2-compatible message.
+	V2 Version = "v2"
+)
+
+func isMessage(topicPath []string, message string) bool {
+	if len(topicPath) > 0 && Version(topicPath[0]) == V3 {
+		topicPath = topicPath[1:]
+	}
+	return len(topicPath) >= 2 && topicPath[1] == message
+}
+
+func makeTopicPath(uid, message string, v Version) []string {
+	if v == V2 {
+		return []string{uid, message}
+	}
+	return []string{string(v), uid, message}
+}
+
 // Uplink returns the uplink topic path.
-func Uplink(uid string) []string {
-	return []string{topicVersion, uid, topicUplink}
+func Uplink(uid string, v Version) []string {
+	return makeTopicPath(uid, topicUplink, v)
 }
 
 // IsUplink returns whether the topic is an uplink topic.
 func IsUplink(topicPath []string) bool {
-	if len(topicPath) != 3 {
-		return false
-	}
-	return topicPath[0] == topicVersion && topicPath[2] == topicUplink
+	return isMessage(topicPath, topicUplink)
 }
 
 // Downlink returns the downlink topic path.
-func Downlink(uid string) []string {
-	return []string{topicVersion, uid, topicDownlink}
+func Downlink(uid string, v Version) []string {
+	return makeTopicPath(uid, topicDownlink, v)
 }
 
 // IsDownlink returns whether the topic is a downlink topic.
 func IsDownlink(topicPath []string) bool {
-	if len(topicPath) != 3 {
-		return false
-	}
-	return topicPath[0] == topicVersion && topicPath[2] == topicDownlink
+	return isMessage(topicPath, topicDownlink)
 }
 
 // Status returns the status topic path.
-func Status(uid string) []string {
-	return []string{topicVersion, uid, topicStatus}
+func Status(uid string, v Version) []string {
+	return makeTopicPath(uid, topicStatus, v)
 }
 
 // IsStatus returns whether the topic is a status topic.
 func IsStatus(topicPath []string) bool {
-	if len(topicPath) != 3 {
-		return false
-	}
-	return topicPath[0] == topicVersion && topicPath[2] == topicStatus
+	return isMessage(topicPath, topicStatus)
 }

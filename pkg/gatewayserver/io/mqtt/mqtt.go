@@ -132,7 +132,7 @@ func (c *connection) setup(ctx context.Context) error {
 					continue
 				}
 				logger.Info("Publishing downlink message")
-				topicParts := topics.Downlink(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers))
+				topicParts := topics.Downlink(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers), topics.V3)
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
@@ -217,9 +217,9 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	}
 
 	info.Metadata = gatewayTopics{
-		downlinkTopic: topics.Downlink(uid),
-		uplinkTopic:   topics.Uplink(uid),
-		statusTopic:   topics.Status(uid),
+		downlinkTopic: topics.Downlink(uid, topics.V3),
+		uplinkTopic:   topics.Uplink(uid, topics.V3),
+		statusTopic:   topics.Status(uid, topics.V3),
 	}
 	info.Interface = c
 	return c.io.Context(), nil

@@ -26,13 +26,15 @@ import (
 func TestTopics(t *testing.T) {
 	for _, tc := range []struct {
 		UID      string
-		Func     func(string) []string
+		Version  Version
+		Func     func(string, Version) []string
 		Expected []string
 		Is       func([]string) bool
 		IsNot    []func([]string) bool
 	}{
 		{
 			UID:      "test",
+			Version:  V3,
 			Func:     Uplink,
 			Expected: []string{"v3", "test", "up"},
 			Is:       IsUplink,
@@ -40,6 +42,7 @@ func TestTopics(t *testing.T) {
 		},
 		{
 			UID:      "test",
+			Version:  V3,
 			Func:     Downlink,
 			Expected: []string{"v3", "test", "down"},
 			Is:       IsDownlink,
@@ -47,15 +50,40 @@ func TestTopics(t *testing.T) {
 		},
 		{
 			UID:      "test",
+			Version:  V3,
 			Func:     Status,
 			Expected: []string{"v3", "test", "status"},
+			Is:       IsStatus,
+			IsNot:    []func([]string) bool{IsDownlink, IsUplink},
+		},
+		{
+			UID:      "test",
+			Version:  V2,
+			Func:     Uplink,
+			Expected: []string{"test", "up"},
+			Is:       IsUplink,
+			IsNot:    []func([]string) bool{IsDownlink, IsStatus},
+		},
+		{
+			UID:      "test",
+			Version:  V2,
+			Func:     Downlink,
+			Expected: []string{"test", "down"},
+			Is:       IsDownlink,
+			IsNot:    []func([]string) bool{IsUplink, IsStatus},
+		},
+		{
+			UID:      "test",
+			Version:  V2,
+			Func:     Status,
+			Expected: []string{"test", "status"},
 			Is:       IsStatus,
 			IsNot:    []func([]string) bool{IsDownlink, IsUplink},
 		},
 	} {
 		t.Run(topic.Join(tc.Expected), func(t *testing.T) {
 			a := assertions.New(t)
-			actual := tc.Func(tc.UID)
+			actual := tc.Func(tc.UID, tc.Version)
 			a.So(actual, should.Resemble, tc.Expected)
 			a.So(tc.Is(actual), should.BeTrue)
 			for _, isNot := range tc.IsNot {
