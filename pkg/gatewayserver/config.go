@@ -24,7 +24,7 @@ type MQTTConfig struct {
 
 // UDPConfig defines the UDP configuration of the Gateway Server.
 type UDPConfig struct {
-	udp.Config `name:",squash" yaml:",inline"`
+	udp.Config `name:",squash"`
 	Listeners  map[string]string `name:"listeners" description:"Listen addresses with (optional) fallback frequency plan ID for non-registered gateways"`
 }
 
