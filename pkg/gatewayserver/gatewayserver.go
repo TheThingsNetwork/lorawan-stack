@@ -189,6 +189,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 
 	uid := unique.ID(ctx, ids)
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_conn:%s", events.NewCorrelationID()))
 
 	is := gs.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
 	if is == nil {
@@ -251,6 +252,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		case <-ctx.Done():
 			return
 		case msg := <-conn.Up():
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
 			registerReceiveUplink(ctx, conn.Gateway(), msg)
 			drop := func(err error) {
 				logger.WithError(err).Debug("Dropping message")
@@ -271,6 +273,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			}
 			registerForwardUplink(ctx, conn.Gateway(), msg, ns)
 		case status := <-conn.Status():
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("status:%s", events.NewCorrelationID()))
 			registerReceiveStatus(ctx, conn.Gateway(), status)
 		}
 	}
