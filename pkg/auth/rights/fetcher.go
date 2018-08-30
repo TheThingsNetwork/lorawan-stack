@@ -25,9 +25,9 @@ import (
 
 // Fetcher interface for rights fetching.
 type Fetcher interface {
-	ApplicationRights(context.Context, ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error)
-	GatewayRights(context.Context, ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error)
-	OrganizationRights(context.Context, ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error)
+	ApplicationRights(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error)
+	GatewayRights(context.Context, ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error)
+	OrganizationRights(context.Context, ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error)
 }
 
 // FetcherFunc is a function that implements the Fetcher interface.
@@ -35,28 +35,29 @@ type Fetcher interface {
 // A FetcherFunc that returns all Application rights for any Application,
 // would look like this:
 //
-//    fetcher := rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
-//    	return ttnpb.AllApplicationRights(), nil
+//    fetcher := rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+//    	rights := ttnpb.AllApplicationRights // Instead this usually comes from an identity server or a database.
+//    	return &rights, nil
 //    })
 //
-type FetcherFunc func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error)
+type FetcherFunc func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error)
 
 // ApplicationRights implements the Fetcher interface.
-func (f FetcherFunc) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
+func (f FetcherFunc) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := f(ctx, ids)
 	registerRightsFetch(ctx, "application", rights, err)
 	return rights, err
 }
 
 // GatewayRights implements the Fetcher interface.
-func (f FetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
+func (f FetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := f(ctx, ids)
 	registerRightsFetch(ctx, "gateway", rights, err)
 	return rights, err
 }
 
 // OrganizationRights implements the Fetcher interface.
-func (f FetcherFunc) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
+func (f FetcherFunc) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := f(ctx, ids)
 	registerRightsFetch(ctx, "organization", rights, err)
 	return rights, err
@@ -102,7 +103,7 @@ func (f identityServerFetcher) forwardAuth(ctx context.Context) (context.Context
 	return md.ToOutgoingContext(ctx), md, nil
 }
 
-func (f identityServerFetcher) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
+func (f identityServerFetcher) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn
@@ -111,15 +112,15 @@ func (f identityServerFetcher) ApplicationRights(ctx context.Context, appID ttnp
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewIsApplicationClient(cc).ListApplicationRights(ctx, &appID, grpc.PerRPCCredentials(md))
-	registerRightsFetch(ctx, "application", rights.GetRights(), err)
+	rights, err := ttnpb.NewApplicationAccessClient(cc).ListApplicationRights(ctx, &appID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "application", rights, err)
 	if err != nil {
 		return nil, err
 	}
-	return rights.Rights, nil
+	return rights, nil
 }
 
-func (f identityServerFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
+func (f identityServerFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn
@@ -128,15 +129,15 @@ func (f identityServerFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewIsGatewayClient(cc).ListGatewayRights(ctx, &gtwID, grpc.PerRPCCredentials(md))
-	registerRightsFetch(ctx, "gateway", rights.GetRights(), err)
+	rights, err := ttnpb.NewGatewayAccessClient(cc).ListGatewayRights(ctx, &gtwID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "gateway", rights, err)
 	if err != nil {
 		return nil, err
 	}
-	return rights.Rights, nil
+	return rights, nil
 }
 
-func (f identityServerFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
+func (f identityServerFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn
@@ -145,10 +146,10 @@ func (f identityServerFetcher) OrganizationRights(ctx context.Context, orgID ttn
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewIsOrganizationClient(cc).ListOrganizationRights(ctx, &orgID, grpc.PerRPCCredentials(md))
-	registerRightsFetch(ctx, "organization", rights.GetRights(), err)
+	rights, err := ttnpb.NewOrganizationAccessClient(cc).ListOrganizationRights(ctx, &orgID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "organization", rights, err)
 	if err != nil {
 		return nil, err
 	}
-	return rights.Rights, nil
+	return rights, nil
 }

@@ -51,8 +51,8 @@ func init() {
 func newContext(md *rpcmetadata.MD, s grpc.ServerTransportStream, rs ...ttnpb.Right) context.Context {
 	ctx := rights.NewContextWithFetcher(
 		test.Context(),
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
-			return rs, nil
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+			return &ttnpb.Rights{rs}, nil
 		}),
 	)
 	if s != nil {

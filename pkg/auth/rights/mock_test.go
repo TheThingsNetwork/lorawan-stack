@@ -48,23 +48,23 @@ type mockFetcher struct {
 	organizationIDs ttnpb.OrganizationIdentifiers
 
 	// Response vars
-	applicationRights  []ttnpb.Right
+	applicationRights  *ttnpb.Rights
 	applicationError   error
-	gatewayRights      []ttnpb.Right
+	gatewayRights      *ttnpb.Rights
 	gatewayError       error
-	organizationRights []ttnpb.Right
+	organizationRights *ttnpb.Rights
 	organizationError  error
 }
 
-func (f *mockFetcher) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
+func (f *mockFetcher) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	f.applicationCtx, f.applicationIDs = ctx, ids
 	return f.applicationRights, f.applicationError
 }
-func (f *mockFetcher) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
+func (f *mockFetcher) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	f.gatewayCtx, f.gatewayIDs = ctx, ids
 	return f.gatewayRights, f.gatewayError
 }
-func (f *mockFetcher) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
+func (f *mockFetcher) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	f.organizationCtx, f.organizationIDs = ctx, ids
 	return f.organizationRights, f.organizationError
 }

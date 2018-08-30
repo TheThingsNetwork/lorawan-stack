@@ -30,11 +30,11 @@ import (
 )
 
 func fetchRights(ctx context.Context, id string, f Fetcher) (res struct {
-	AppRights []ttnpb.Right
+	AppRights *ttnpb.Rights
 	AppErr    error
-	GtwRights []ttnpb.Right
+	GtwRights *ttnpb.Rights
 	GtwErr    error
-	OrgRights []ttnpb.Right
+	OrgRights *ttnpb.Rights
 	OrgErr    error
 }) {
 	var wg sync.WaitGroup
@@ -56,42 +56,42 @@ func fetchRights(ctx context.Context, id string, f Fetcher) (res struct {
 }
 
 type mockIdentityServer struct {
-	ttnpb.IsApplicationServer
-	ttnpb.IsGatewayServer
-	ttnpb.IsOrganizationServer
+	ttnpb.ApplicationAccessServer
+	ttnpb.GatewayAccessServer
+	ttnpb.OrganizationAccessServer
 	mockFetcher
 }
 
 func (is *mockIdentityServer) Server() *grpc.Server {
 	srv := grpc.NewServer()
-	ttnpb.RegisterIsApplicationServer(srv, is)
-	ttnpb.RegisterIsGatewayServer(srv, is)
-	ttnpb.RegisterIsOrganizationServer(srv, is)
+	ttnpb.RegisterApplicationAccessServer(srv, is)
+	ttnpb.RegisterGatewayAccessServer(srv, is)
+	ttnpb.RegisterOrganizationAccessServer(srv, is)
 	return srv
 }
 
-func (is *mockIdentityServer) ListApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ListApplicationRightsResponse, error) {
+func (is *mockIdentityServer) ListApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	is.applicationCtx, is.applicationIDs = ctx, *ids
 	if is.applicationError != nil {
 		return nil, is.applicationError
 	}
-	return &ttnpb.ListApplicationRightsResponse{Rights: is.applicationRights}, nil
+	return is.applicationRights, nil
 }
 
-func (is *mockIdentityServer) ListGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayRightsResponse, error) {
+func (is *mockIdentityServer) ListGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	is.gatewayCtx, is.gatewayIDs = ctx, *ids
 	if is.gatewayError != nil {
 		return nil, is.gatewayError
 	}
-	return &ttnpb.ListGatewayRightsResponse{Rights: is.gatewayRights}, nil
+	return is.gatewayRights, nil
 }
 
-func (is *mockIdentityServer) ListOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationRightsResponse, error) {
+func (is *mockIdentityServer) ListOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	is.organizationCtx, is.organizationIDs = ctx, *ids
 	if is.organizationError != nil {
 		return nil, is.organizationError
 	}
-	return &ttnpb.ListOrganizationRightsResponse{Rights: is.organizationRights}, nil
+	return is.organizationRights, nil
 }
 
 func TestFetcherFunc(t *testing.T) {
@@ -101,11 +101,11 @@ func TestFetcherFunc(t *testing.T) {
 		mu     sync.Mutex
 		ctx    []context.Context
 		ids    []ttnpb.Identifiers
-		rights []ttnpb.Right
+		rights *ttnpb.Rights
 		err    error
 	}
 	fetcher.err = errors.New("test err")
-	f := FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+	f := FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
 		fetcher.mu.Lock()
 		defer fetcher.mu.Unlock()
 		fetcher.ctx = append(fetcher.ctx, ctx)
@@ -131,9 +131,9 @@ func TestIdentityServerFetcher(t *testing.T) {
 
 	is := &mockIdentityServer{
 		mockFetcher: mockFetcher{
-			applicationRights:  []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
-			gatewayRights:      []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
-			organizationRights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_INFO},
+			applicationRights:  ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
+			gatewayRights:      ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
+			organizationRights: ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
 		},
 	}
 	srv := is.Server()

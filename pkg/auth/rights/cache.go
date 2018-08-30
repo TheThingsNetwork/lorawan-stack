@@ -45,7 +45,7 @@ func newRes() *cachedRes {
 type cachedRes struct {
 	waitChan chan struct{}
 	time     time.Time
-	rights   []ttnpb.Right
+	rights   *ttnpb.Rights
 	err      error
 }
 
@@ -65,7 +65,7 @@ func (c *cachedRes) valid(successTTL, errorTTL time.Duration) bool {
 	return now.Sub(c.time) <= successTTL
 }
 
-func (c *cachedRes) set(rights []ttnpb.Right, err error) {
+func (c *cachedRes) set(rights *ttnpb.Rights, err error) {
 	c.rights, c.err = rights, err
 	if err == nil || (!errors.IsCanceled(err) && !errors.IsDeadlineExceeded(err)) {
 		c.time = now() // we only have a real result if the request wasn't canceled or timed out.
@@ -130,7 +130,7 @@ func (f *inMemoryCache) maybeCleanup() {
 	f.lastCleanup = now()
 }
 
-func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (rights []ttnpb.Right, err error) {
+func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "application", rights, err) }()
 	req := newReq(ctx, appID)
 	f.mu.Lock()
@@ -146,7 +146,7 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.Appli
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (rights []ttnpb.Right, err error) {
+func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "gateway", rights, err) }()
 	req := newReq(ctx, gtwID)
 	f.mu.Lock()
@@ -162,7 +162,7 @@ func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayId
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (rights []ttnpb.Right, err error) {
+func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "organization", rights, err) }()
 	req := newReq(ctx, orgID)
 	f.mu.Lock()

@@ -47,7 +47,7 @@ func init() {
 	metrics.MustRegister(rightsRequests, rightsFetches)
 }
 
-func register(ctx context.Context, c *metrics.ContextualCounterVec, entity string, rights []ttnpb.Right, err error) {
+func register(ctx context.Context, c *metrics.ContextualCounterVec, entity string, rights *ttnpb.Rights, err error) {
 	switch {
 	case errors.IsUnauthenticated(err):
 		c.WithLabelValues(ctx, entity, "unauthenticated").Inc()
@@ -55,17 +55,17 @@ func register(ctx context.Context, c *metrics.ContextualCounterVec, entity strin
 		c.WithLabelValues(ctx, entity, "permission_denied").Inc()
 	case err != nil:
 		c.WithLabelValues(ctx, entity, "error").Inc()
-	case len(rights) == 0:
+	case rights == nil || len(rights.Rights) == 0:
 		c.WithLabelValues(ctx, entity, "zero").Inc()
 	default:
 		c.WithLabelValues(ctx, entity, "ok").Inc()
 	}
 }
 
-func registerRightsRequest(ctx context.Context, entity string, rights []ttnpb.Right, err error) {
+func registerRightsRequest(ctx context.Context, entity string, rights *ttnpb.Rights, err error) {
 	register(ctx, rightsRequests, entity, rights, err)
 }
 
-func registerRightsFetch(ctx context.Context, entity string, rights []ttnpb.Right, err error) {
+func registerRightsFetch(ctx context.Context, entity string, rights *ttnpb.Rights, err error) {
 	register(ctx, rightsFetches, entity, rights, err)
 }

@@ -33,14 +33,14 @@ func TestContext(t *testing.T) {
 	a.So(rights, should.Resemble, Rights{})
 
 	fooRights := Rights{
-		ApplicationRights: map[string][]ttnpb.Right{
-			unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}): {ttnpb.RIGHT_APPLICATION_INFO},
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
 		},
-		GatewayRights: map[string][]ttnpb.Right{
-			unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"}): {ttnpb.RIGHT_GATEWAY_INFO},
+		GatewayRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"}): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
 		},
-		OrganizationRights: map[string][]ttnpb.Right{
-			unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"}): {ttnpb.RIGHT_ORGANIZATION_INFO},
+		OrganizationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"}): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
 		},
 	}
 

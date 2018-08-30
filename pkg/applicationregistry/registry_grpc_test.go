@@ -38,14 +38,14 @@ var _ ttnpb.AsApplicationRegistryServer = &RegistryRPC{}
 var (
 	ctxWithoutRights = rights.NewContextWithFetcher(
 		test.Context(),
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
-			return []ttnpb.Right{}, nil
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+			return nil, nil
 		}),
 	)
 	ctxWithRights = rights.NewContextWithFetcher(
 		test.Context(),
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
-			return []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC}, nil
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+			return ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC), nil
 		}),
 	)
 )

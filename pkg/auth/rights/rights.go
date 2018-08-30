@@ -23,24 +23,24 @@ import (
 
 // Rights for the request.
 type Rights struct {
-	ApplicationRights  map[string][]ttnpb.Right
-	GatewayRights      map[string][]ttnpb.Right
-	OrganizationRights map[string][]ttnpb.Right
+	ApplicationRights  map[string]*ttnpb.Rights
+	GatewayRights      map[string]*ttnpb.Rights
+	OrganizationRights map[string]*ttnpb.Rights
 }
 
 // IncludesApplicationRights returns whether the given rights are included for the given application.
 func (r Rights) IncludesApplicationRights(appUID string, rights ...ttnpb.Right) bool {
-	return ttnpb.IncludesRights(r.ApplicationRights[appUID], rights...)
+	return r.ApplicationRights[appUID].IncludesAll(rights...)
 }
 
 // IncludesGatewayRights returns whether the given rights are included for the given gateway.
 func (r Rights) IncludesGatewayRights(gtwUID string, rights ...ttnpb.Right) bool {
-	return ttnpb.IncludesRights(r.GatewayRights[gtwUID], rights...)
+	return r.GatewayRights[gtwUID].IncludesAll(rights...)
 }
 
 // IncludesOrganizationRights returns whether the given rights are included for the given organization.
 func (r Rights) IncludesOrganizationRights(orgUID string, rights ...ttnpb.Right) bool {
-	return ttnpb.IncludesRights(r.OrganizationRights[orgUID], rights...)
+	return r.OrganizationRights[orgUID].IncludesAll(rights...)
 }
 
 type rightsKeyType struct{}

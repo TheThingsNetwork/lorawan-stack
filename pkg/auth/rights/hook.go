@@ -60,9 +60,9 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		}
 		combined := ids.CombinedIdentifiers()
 		results := Rights{
-			ApplicationRights:  make(map[string][]ttnpb.Right, len(combined.ApplicationIDs)),
-			GatewayRights:      make(map[string][]ttnpb.Right, len(combined.GatewayIDs)),
-			OrganizationRights: make(map[string][]ttnpb.Right, len(combined.OrganizationIDs)),
+			ApplicationRights:  make(map[string]*ttnpb.Rights, len(combined.ApplicationIDs)),
+			GatewayRights:      make(map[string]*ttnpb.Rights, len(combined.GatewayIDs)),
+			OrganizationRights: make(map[string]*ttnpb.Rights, len(combined.OrganizationIDs)),
 		}
 		for _, id := range combined.ApplicationIDs {
 			uid := unique.ID(ctx, id)

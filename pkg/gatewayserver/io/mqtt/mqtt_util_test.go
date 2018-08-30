@@ -26,7 +26,7 @@ import (
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
 	return rights.NewContextWithFetcher(
 		ctx,
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set []ttnpb.Right, err error) {
+		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set *ttnpb.Rights, err error) {
 			uid := unique.ID(ctx, ids)
 			if uid != registeredGatewayUID {
 				return
@@ -35,7 +35,7 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 			if md.AuthType != "Key" || md.AuthValue != registeredGatewayKey {
 				return
 			}
-			set = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK}
+			set = ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK)
 			return
 		}),
 	)

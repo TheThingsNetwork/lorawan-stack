@@ -82,21 +82,21 @@ func TestHook(t *testing.T) {
 				rights, ok := FromContext(ctx)
 				a.So(ok, should.BeTrue)
 				if a.So(rights.ApplicationRights, should.HaveLength, 1) {
-					a.So(rights.ApplicationRights[unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})], should.BeEmpty)
+					a.So(rights.ApplicationRights[unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})], should.BeNil)
 				}
 				if a.So(rights.GatewayRights, should.HaveLength, 1) {
-					a.So(rights.GatewayRights[unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo"})], should.BeEmpty)
+					a.So(rights.GatewayRights[unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo"})], should.BeNil)
 				}
 				if a.So(rights.OrganizationRights, should.HaveLength, 1) {
-					a.So(rights.OrganizationRights[unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})], should.BeEmpty)
+					a.So(rights.OrganizationRights[unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})], should.BeNil)
 				}
 			},
 		},
 		"AllInfoRights": {
 			Fetcher: &mockFetcher{
-				applicationRights:  []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
-				gatewayRights:      []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
-				organizationRights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_INFO},
+				applicationRights:  ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
+				gatewayRights:      ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
+				organizationRights: ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
 			},
 			Req: &ttnpb.CombinedIdentifiers{
 				ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},

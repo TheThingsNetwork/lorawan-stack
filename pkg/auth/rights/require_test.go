@@ -67,14 +67,14 @@ func TestRequire(t *testing.T) {
 
 	fooCtx := test.Context()
 	fooCtx = NewContext(fooCtx, Rights{
-		ApplicationRights: map[string][]ttnpb.Right{
-			unique.ID(fooCtx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}): {ttnpb.RIGHT_APPLICATION_INFO},
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(fooCtx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
 		},
-		GatewayRights: map[string][]ttnpb.Right{
-			unique.ID(fooCtx, ttnpb.GatewayIdentifiers{GatewayID: "foo"}): {ttnpb.RIGHT_GATEWAY_INFO},
+		GatewayRights: map[string]*ttnpb.Rights{
+			unique.ID(fooCtx, ttnpb.GatewayIdentifiers{GatewayID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
 		},
-		OrganizationRights: map[string][]ttnpb.Right{
-			unique.ID(fooCtx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}): {ttnpb.RIGHT_ORGANIZATION_INFO},
+		OrganizationRights: map[string]*ttnpb.Rights{
+			unique.ID(fooCtx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
 		},
 	})
 

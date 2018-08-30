@@ -54,7 +54,7 @@ func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers,
 		default:
 			return err
 		}
-		rights.ApplicationRights = map[string][]ttnpb.Right{appUID: appRights}
+		rights.ApplicationRights = map[string]*ttnpb.Rights{appUID: appRights}
 	}
 	if !rights.IncludesApplicationRights(appUID, required...) {
 		return errMissingApplicationRights.WithAttributes("uid", appUID)
@@ -79,7 +79,7 @@ func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, require
 		default:
 			return err
 		}
-		rights.GatewayRights = map[string][]ttnpb.Right{gtwUID: gtwRights}
+		rights.GatewayRights = map[string]*ttnpb.Rights{gtwUID: gtwRights}
 	}
 	if !rights.IncludesGatewayRights(gtwUID, required...) {
 		return errMissingGatewayRights.WithAttributes("uid", gtwUID)
@@ -104,7 +104,7 @@ func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifier
 		default:
 			return err
 		}
-		rights.OrganizationRights = map[string][]ttnpb.Right{orgUID: orgRights}
+		rights.OrganizationRights = map[string]*ttnpb.Rights{orgUID: orgRights}
 	}
 	if !rights.IncludesOrganizationRights(orgUID, required...) {
 		return errMissingOrganizationRights.WithAttributes("uid", orgUID)
