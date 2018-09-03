@@ -90,7 +90,7 @@ const CollapsableItem = ({
         onExpand(false)
       }}
     >
-      <Icon icon={icon} className={style.icon} />
+      {icon && <Icon icon={icon} className={style.icon} />}
       <Message content={title} className={style.message} />
       <Icon
         icon="keyboard_arrow_down"
@@ -127,7 +127,7 @@ const LinkItem = ({
     }}
     data-hook="side-nav-item-link"
   >
-    <Icon icon={icon} className={style.icon} style={{ paddingLeft: `${depth * 1}rem` }} />
+    {icon && <Icon icon={icon} className={style.icon} />}
     <Message content={title} className={style.message} />
   </NavigationLink>
 )
