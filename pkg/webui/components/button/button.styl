@@ -30,7 +30,10 @@ $button($color)
     margin-right: $cs.s
 
   &:not(.naked)
-    &:hover, &:focus
+    &:hover
+      background-color: hoverize($color)
+
+    +focus-visible()
       background-color: hoverize($color)
 
     &:active
@@ -51,9 +54,10 @@ $button($color)
     &:not(.busy)
       color: $color
 
-    &:focus:not(.busy):not(:active)
-      color: darken($color, 8)
-      border: 1px solid $color
+    &:not(.busy):not(:active)
+      +focus-visible()
+        color: darken($color, 8)
+        border: 1px solid $color
 
   &.busy:not(.naked),
   &.busy:disabled
