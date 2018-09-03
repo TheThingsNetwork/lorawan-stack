@@ -73,15 +73,17 @@
   margin-bottom: - $cs.xs
 
 .message
-  display: flex
+  display: block
   font-size: .9rem
 
   height: 0
   box-sizing: border-box
   overflow: hidden
   opacity: 0
-
   transition: opacity $ad.m
+
+  span
+    display: inline-block
 
   .name
     font-weight: bold
@@ -94,6 +96,7 @@
   .icon
     font-size: 1.15rem
     margin-right: $cs.xxs
+    vertical-align: text-top
     flex-grow: 0
     flex-shrink: 0
 
