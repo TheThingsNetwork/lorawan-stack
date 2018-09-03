@@ -138,6 +138,23 @@ message DownlinkMessage {
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
+message TxAcknowledgment {
+  repeated string correlation_ids = 1 [(gogoproto.customname) = "CorrelationIDs"];
+
+  enum Result {
+    SUCCESS = 0;
+    UNKNOWN_ERROR = 1;
+    TOO_LATE = 2;
+    TOO_EARLY = 3;
+    COLLISION_PACKET = 4;
+    COLLISION_BEACON = 5;
+    TX_FREQ = 6;
+    TX_POWER = 7;
+    GPS_UNLOCKED = 8;
+  }
+  Result result = 2;
+}
+
 message ApplicationUplink {
   // Join Server issued identifier for the session keys used by this uplink.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];

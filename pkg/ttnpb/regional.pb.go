@@ -10,10 +10,7 @@ import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/gogo/protobuf/types"
 
-import time "time"
-
 import encoding_binary "encoding/binary"
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
 import strings "strings"
 import reflect "reflect"
@@ -25,7 +22,6 @@ var _ = proto.Marshal
 var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -33,41 +29,28 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-// FrequencyPlan contains the defined frequency plan.
-// This entity is stored in the frequency plan repository.
-type FrequencyPlan struct {
-	// BandID of the band to support.
-	BandID              string                   `protobuf:"bytes,1,opt,name=band_id,json=bandId,proto3" json:"band_id,omitempty" yaml:"band-id"`
-	Channels            []*FrequencyPlan_Channel `protobuf:"bytes,2,rep,name=channels" json:"channels,omitempty" yaml:"channels"`
-	LoraStandardChannel *FrequencyPlan_Channel   `protobuf:"bytes,3,opt,name=lora_standard_channel,json=loraStandardChannel" json:"lora_standard_channel,omitempty" yaml:"lora-standard-channel,omitempty"`
-	FSKChannel          *FrequencyPlan_Channel   `protobuf:"bytes,4,opt,name=fsk_channel,json=fskChannel" json:"fsk_channel,omitempty" yaml:"fsk-channel,omitempty"`
-	// LBT configuration.
-	LBT *FrequencyPlan_LBTConfiguration `protobuf:"bytes,5,opt,name=lbt" json:"lbt,omitempty" yaml:"lbt,omitempty"`
-	// TimeOffAir to abide to after transmission.
-	TimeOffAir *FrequencyPlan_TimeOffAir `protobuf:"bytes,6,opt,name=time_off_air,json=timeOffAir" json:"time_off_air,omitempty" yaml:"time-off-air,omitempty"`
-	// Dwell time configuration.
-	DwellTime *FrequencyPlan_DwellTime `protobuf:"bytes,7,opt,name=dwell_time,json=dwellTime" json:"dwell_time,omitempty" yaml:"dwell-time,omitempty"`
-	// Override band settings for the class B ping slot.
-	PingSlot *FrequencyPlan_Channel `protobuf:"bytes,8,opt,name=ping_slot,json=pingSlot" json:"ping_slot,omitempty" yaml:"ping-slot,omitempty"`
-	// Override band settings for Rx2.
-	Rx2 *FrequencyPlan_Channel `protobuf:"bytes,9,opt,name=rx2" json:"rx2,omitempty" yaml:"rx2,omitempty"`
-	// Override MaxEIRP devices should respect (in dBm).
-	MaxEIRP              float32  `protobuf:"fixed32,10,opt,name=max_eirp,json=maxEirp,proto3" json:"max_eirp,omitempty" yaml:"max-eirp"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type ConcentratorConfig struct {
+	Channels             []*ConcentratorConfig_Channel           `protobuf:"bytes,1,rep,name=channels" json:"channels,omitempty"`
+	LoRaStandardChannel  *ConcentratorConfig_LoRaStandardChannel `protobuf:"bytes,2,opt,name=lora_standard_channel,json=loraStandardChannel" json:"lora_standard_channel,omitempty"`
+	FSKChannel           *ConcentratorConfig_FSKChannel          `protobuf:"bytes,3,opt,name=fsk_channel,json=fskChannel" json:"fsk_channel,omitempty"`
+	LBT                  *ConcentratorConfig_LBTConfiguration    `protobuf:"bytes,4,opt,name=lbt" json:"lbt,omitempty"`
+	PingSlot             *ConcentratorConfig_Channel             `protobuf:"bytes,5,opt,name=ping_slot,json=pingSlot" json:"ping_slot,omitempty"`
+	Radios               []*ConcentratorConfig_Radio             `protobuf:"bytes,6,rep,name=radios" json:"radios,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
+	XXX_sizecache        int32                                   `json:"-"`
 }
 
-func (m *FrequencyPlan) Reset()      { *m = FrequencyPlan{} }
-func (*FrequencyPlan) ProtoMessage() {}
-func (*FrequencyPlan) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_22ed6f2a6c0cd55b, []int{0}
+func (m *ConcentratorConfig) Reset()      { *m = ConcentratorConfig{} }
+func (*ConcentratorConfig) ProtoMessage() {}
+func (*ConcentratorConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0}
 }
-func (m *FrequencyPlan) XXX_Unmarshal(b []byte) error {
+func (m *ConcentratorConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *FrequencyPlan) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ConcentratorConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_FrequencyPlan.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ConcentratorConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -77,110 +60,78 @@ func (m *FrequencyPlan) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (dst *FrequencyPlan) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FrequencyPlan.Merge(dst, src)
+func (dst *ConcentratorConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig.Merge(dst, src)
 }
-func (m *FrequencyPlan) XXX_Size() int {
+func (m *ConcentratorConfig) XXX_Size() int {
 	return m.Size()
 }
-func (m *FrequencyPlan) XXX_DiscardUnknown() {
-	xxx_messageInfo_FrequencyPlan.DiscardUnknown(m)
+func (m *ConcentratorConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FrequencyPlan proto.InternalMessageInfo
+var xxx_messageInfo_ConcentratorConfig proto.InternalMessageInfo
 
-func (m *FrequencyPlan) GetBandID() string {
-	if m != nil {
-		return m.BandID
-	}
-	return ""
-}
-
-func (m *FrequencyPlan) GetChannels() []*FrequencyPlan_Channel {
+func (m *ConcentratorConfig) GetChannels() []*ConcentratorConfig_Channel {
 	if m != nil {
 		return m.Channels
 	}
 	return nil
 }
 
-func (m *FrequencyPlan) GetLoraStandardChannel() *FrequencyPlan_Channel {
+func (m *ConcentratorConfig) GetLoRaStandardChannel() *ConcentratorConfig_LoRaStandardChannel {
 	if m != nil {
-		return m.LoraStandardChannel
+		return m.LoRaStandardChannel
 	}
 	return nil
 }
 
-func (m *FrequencyPlan) GetFSKChannel() *FrequencyPlan_Channel {
+func (m *ConcentratorConfig) GetFSKChannel() *ConcentratorConfig_FSKChannel {
 	if m != nil {
 		return m.FSKChannel
 	}
 	return nil
 }
 
-func (m *FrequencyPlan) GetLBT() *FrequencyPlan_LBTConfiguration {
+func (m *ConcentratorConfig) GetLBT() *ConcentratorConfig_LBTConfiguration {
 	if m != nil {
 		return m.LBT
 	}
 	return nil
 }
 
-func (m *FrequencyPlan) GetTimeOffAir() *FrequencyPlan_TimeOffAir {
-	if m != nil {
-		return m.TimeOffAir
-	}
-	return nil
-}
-
-func (m *FrequencyPlan) GetDwellTime() *FrequencyPlan_DwellTime {
-	if m != nil {
-		return m.DwellTime
-	}
-	return nil
-}
-
-func (m *FrequencyPlan) GetPingSlot() *FrequencyPlan_Channel {
+func (m *ConcentratorConfig) GetPingSlot() *ConcentratorConfig_Channel {
 	if m != nil {
 		return m.PingSlot
 	}
 	return nil
 }
 
-func (m *FrequencyPlan) GetRx2() *FrequencyPlan_Channel {
+func (m *ConcentratorConfig) GetRadios() []*ConcentratorConfig_Radio {
 	if m != nil {
-		return m.Rx2
+		return m.Radios
 	}
 	return nil
 }
 
-func (m *FrequencyPlan) GetMaxEIRP() float32 {
-	if m != nil {
-		return m.MaxEIRP
-	}
-	return 0
+type ConcentratorConfig_Channel struct {
+	Frequency            uint64   `protobuf:"varint,1,opt,name=frequency,proto3" json:"frequency,omitempty"`
+	Radio                uint32   `protobuf:"varint,2,opt,name=radio,proto3" json:"radio,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-type FrequencyPlan_DwellTime struct {
-	// Enabled for uplinks.
-	Uplinks bool `protobuf:"varint,1,opt,name=uplinks,proto3" json:"uplinks,omitempty" yaml:"uplinks"`
-	// Enabled for downlinks.
-	Downlinks bool `protobuf:"varint,2,opt,name=downlinks,proto3" json:"downlinks,omitempty" yaml:"downlinks"`
-	// Duration of dwell time.
-	Duration             *time.Duration `protobuf:"bytes,3,opt,name=duration,stdduration" json:"duration,omitempty" yaml:"duration,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+func (m *ConcentratorConfig_Channel) Reset()      { *m = ConcentratorConfig_Channel{} }
+func (*ConcentratorConfig_Channel) ProtoMessage() {}
+func (*ConcentratorConfig_Channel) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 0}
 }
-
-func (m *FrequencyPlan_DwellTime) Reset()      { *m = FrequencyPlan_DwellTime{} }
-func (*FrequencyPlan_DwellTime) ProtoMessage() {}
-func (*FrequencyPlan_DwellTime) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_22ed6f2a6c0cd55b, []int{0, 0}
-}
-func (m *FrequencyPlan_DwellTime) XXX_Unmarshal(b []byte) error {
+func (m *ConcentratorConfig_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *FrequencyPlan_DwellTime) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ConcentratorConfig_Channel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_FrequencyPlan_DwellTime.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ConcentratorConfig_Channel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -190,165 +141,54 @@ func (m *FrequencyPlan_DwellTime) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (dst *FrequencyPlan_DwellTime) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FrequencyPlan_DwellTime.Merge(dst, src)
+func (dst *ConcentratorConfig_Channel) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig_Channel.Merge(dst, src)
 }
-func (m *FrequencyPlan_DwellTime) XXX_Size() int {
+func (m *ConcentratorConfig_Channel) XXX_Size() int {
 	return m.Size()
 }
-func (m *FrequencyPlan_DwellTime) XXX_DiscardUnknown() {
-	xxx_messageInfo_FrequencyPlan_DwellTime.DiscardUnknown(m)
+func (m *ConcentratorConfig_Channel) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig_Channel.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FrequencyPlan_DwellTime proto.InternalMessageInfo
+var xxx_messageInfo_ConcentratorConfig_Channel proto.InternalMessageInfo
 
-func (m *FrequencyPlan_DwellTime) GetUplinks() bool {
-	if m != nil {
-		return m.Uplinks
-	}
-	return false
-}
-
-func (m *FrequencyPlan_DwellTime) GetDownlinks() bool {
-	if m != nil {
-		return m.Downlinks
-	}
-	return false
-}
-
-func (m *FrequencyPlan_DwellTime) GetDuration() *time.Duration {
-	if m != nil {
-		return m.Duration
-	}
-	return nil
-}
-
-type FrequencyPlan_Channel struct {
-	Frequency            uint64                               `protobuf:"varint,1,opt,name=frequency,proto3" json:"frequency,omitempty" yaml:"frequency"`
-	DataRate             *FrequencyPlan_Channel_ForceDataRate `protobuf:"bytes,2,opt,name=data_rate,json=dataRate" json:"data_rate,omitempty" yaml:"data-rate,omitempty"`
-	DwellTime            *FrequencyPlan_DwellTime             `protobuf:"bytes,3,opt,name=dwell_time,json=dwellTime" json:"dwell_time,omitempty" yaml:"dwell-time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                             `json:"-"`
-	XXX_sizecache        int32                                `json:"-"`
-}
-
-func (m *FrequencyPlan_Channel) Reset()      { *m = FrequencyPlan_Channel{} }
-func (*FrequencyPlan_Channel) ProtoMessage() {}
-func (*FrequencyPlan_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_22ed6f2a6c0cd55b, []int{0, 1}
-}
-func (m *FrequencyPlan_Channel) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *FrequencyPlan_Channel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_FrequencyPlan_Channel.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *FrequencyPlan_Channel) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FrequencyPlan_Channel.Merge(dst, src)
-}
-func (m *FrequencyPlan_Channel) XXX_Size() int {
-	return m.Size()
-}
-func (m *FrequencyPlan_Channel) XXX_DiscardUnknown() {
-	xxx_messageInfo_FrequencyPlan_Channel.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FrequencyPlan_Channel proto.InternalMessageInfo
-
-func (m *FrequencyPlan_Channel) GetFrequency() uint64 {
+func (m *ConcentratorConfig_Channel) GetFrequency() uint64 {
 	if m != nil {
 		return m.Frequency
 	}
 	return 0
 }
 
-func (m *FrequencyPlan_Channel) GetDataRate() *FrequencyPlan_Channel_ForceDataRate {
+func (m *ConcentratorConfig_Channel) GetRadio() uint32 {
 	if m != nil {
-		return m.DataRate
-	}
-	return nil
-}
-
-func (m *FrequencyPlan_Channel) GetDwellTime() *FrequencyPlan_DwellTime {
-	if m != nil {
-		return m.DwellTime
-	}
-	return nil
-}
-
-type FrequencyPlan_Channel_ForceDataRate struct {
-	Index                uint32   `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty" yaml:"index"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *FrequencyPlan_Channel_ForceDataRate) Reset()      { *m = FrequencyPlan_Channel_ForceDataRate{} }
-func (*FrequencyPlan_Channel_ForceDataRate) ProtoMessage() {}
-func (*FrequencyPlan_Channel_ForceDataRate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_22ed6f2a6c0cd55b, []int{0, 1, 0}
-}
-func (m *FrequencyPlan_Channel_ForceDataRate) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *FrequencyPlan_Channel_ForceDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_FrequencyPlan_Channel_ForceDataRate.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *FrequencyPlan_Channel_ForceDataRate) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FrequencyPlan_Channel_ForceDataRate.Merge(dst, src)
-}
-func (m *FrequencyPlan_Channel_ForceDataRate) XXX_Size() int {
-	return m.Size()
-}
-func (m *FrequencyPlan_Channel_ForceDataRate) XXX_DiscardUnknown() {
-	xxx_messageInfo_FrequencyPlan_Channel_ForceDataRate.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FrequencyPlan_Channel_ForceDataRate proto.InternalMessageInfo
-
-func (m *FrequencyPlan_Channel_ForceDataRate) GetIndex() uint32 {
-	if m != nil {
-		return m.Index
+		return m.Radio
 	}
 	return 0
 }
 
-type FrequencyPlan_LBTConfiguration struct {
-	RSSITarget float32 `protobuf:"fixed32,1,opt,name=rssi_target,json=rssiTarget,proto3" json:"rssi_target,omitempty" yaml:"rssi-target"`
-	// RSSIOffset describes the LBT config-specific RSSI offset.
-	RSSIOffset           float32  `protobuf:"fixed32,2,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty" yaml:"rssi-offset"`
-	ScanTime             int32    `protobuf:"varint,3,opt,name=scan_time,json=scanTime,proto3" json:"scan_time,omitempty" yaml:"scan-time"`
+type ConcentratorConfig_LoRaStandardChannel struct {
+	ConcentratorConfig_Channel `protobuf:"bytes,1,opt,name=channel,embedded=channel" json:"channel"`
+	// Bandwidth in Hz.
+	Bandwidth            uint32   `protobuf:"varint,2,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
+	SpreadingFactor      uint32   `protobuf:"varint,3,opt,name=spreading_factor,json=spreadingFactor,proto3" json:"spreading_factor,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *FrequencyPlan_LBTConfiguration) Reset()      { *m = FrequencyPlan_LBTConfiguration{} }
-func (*FrequencyPlan_LBTConfiguration) ProtoMessage() {}
-func (*FrequencyPlan_LBTConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_22ed6f2a6c0cd55b, []int{0, 2}
+func (m *ConcentratorConfig_LoRaStandardChannel) Reset() {
+	*m = ConcentratorConfig_LoRaStandardChannel{}
 }
-func (m *FrequencyPlan_LBTConfiguration) XXX_Unmarshal(b []byte) error {
+func (*ConcentratorConfig_LoRaStandardChannel) ProtoMessage() {}
+func (*ConcentratorConfig_LoRaStandardChannel) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 1}
+}
+func (m *ConcentratorConfig_LoRaStandardChannel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *FrequencyPlan_LBTConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ConcentratorConfig_LoRaStandardChannel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_FrequencyPlan_LBTConfiguration.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ConcentratorConfig_LoRaStandardChannel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -358,59 +198,170 @@ func (m *FrequencyPlan_LBTConfiguration) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (dst *FrequencyPlan_LBTConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FrequencyPlan_LBTConfiguration.Merge(dst, src)
+func (dst *ConcentratorConfig_LoRaStandardChannel) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig_LoRaStandardChannel.Merge(dst, src)
 }
-func (m *FrequencyPlan_LBTConfiguration) XXX_Size() int {
+func (m *ConcentratorConfig_LoRaStandardChannel) XXX_Size() int {
 	return m.Size()
 }
-func (m *FrequencyPlan_LBTConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_FrequencyPlan_LBTConfiguration.DiscardUnknown(m)
+func (m *ConcentratorConfig_LoRaStandardChannel) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig_LoRaStandardChannel.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FrequencyPlan_LBTConfiguration proto.InternalMessageInfo
+var xxx_messageInfo_ConcentratorConfig_LoRaStandardChannel proto.InternalMessageInfo
 
-func (m *FrequencyPlan_LBTConfiguration) GetRSSITarget() float32 {
+func (m *ConcentratorConfig_LoRaStandardChannel) GetBandwidth() uint32 {
+	if m != nil {
+		return m.Bandwidth
+	}
+	return 0
+}
+
+func (m *ConcentratorConfig_LoRaStandardChannel) GetSpreadingFactor() uint32 {
+	if m != nil {
+		return m.SpreadingFactor
+	}
+	return 0
+}
+
+type ConcentratorConfig_FSKChannel struct {
+	ConcentratorConfig_Channel `protobuf:"bytes,1,opt,name=channel,embedded=channel" json:"channel"`
+	// Bandwidth in Hz.
+	Bandwidth            uint32   `protobuf:"varint,2,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
+	BitRate              uint32   `protobuf:"varint,3,opt,name=bit_rate,json=bitRate,proto3" json:"bit_rate,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ConcentratorConfig_FSKChannel) Reset()      { *m = ConcentratorConfig_FSKChannel{} }
+func (*ConcentratorConfig_FSKChannel) ProtoMessage() {}
+func (*ConcentratorConfig_FSKChannel) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 2}
+}
+func (m *ConcentratorConfig_FSKChannel) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ConcentratorConfig_FSKChannel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ConcentratorConfig_FSKChannel.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ConcentratorConfig_FSKChannel) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig_FSKChannel.Merge(dst, src)
+}
+func (m *ConcentratorConfig_FSKChannel) XXX_Size() int {
+	return m.Size()
+}
+func (m *ConcentratorConfig_FSKChannel) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig_FSKChannel.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ConcentratorConfig_FSKChannel proto.InternalMessageInfo
+
+func (m *ConcentratorConfig_FSKChannel) GetBandwidth() uint32 {
+	if m != nil {
+		return m.Bandwidth
+	}
+	return 0
+}
+
+func (m *ConcentratorConfig_FSKChannel) GetBitRate() uint32 {
+	if m != nil {
+		return m.BitRate
+	}
+	return 0
+}
+
+type ConcentratorConfig_LBTConfiguration struct {
+	RSSITarget float32 `protobuf:"fixed32,1,opt,name=rssi_target,json=rssiTarget,proto3" json:"rssi_target,omitempty"`
+	// RSSIOffset describes the LBT config-specific RSSI offset.
+	RSSIOffset           float32  `protobuf:"fixed32,2,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty"`
+	ScanTime             int32    `protobuf:"varint,3,opt,name=scan_time,json=scanTime,proto3" json:"scan_time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ConcentratorConfig_LBTConfiguration) Reset()      { *m = ConcentratorConfig_LBTConfiguration{} }
+func (*ConcentratorConfig_LBTConfiguration) ProtoMessage() {}
+func (*ConcentratorConfig_LBTConfiguration) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 3}
+}
+func (m *ConcentratorConfig_LBTConfiguration) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ConcentratorConfig_LBTConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ConcentratorConfig_LBTConfiguration.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ConcentratorConfig_LBTConfiguration) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig_LBTConfiguration.Merge(dst, src)
+}
+func (m *ConcentratorConfig_LBTConfiguration) XXX_Size() int {
+	return m.Size()
+}
+func (m *ConcentratorConfig_LBTConfiguration) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig_LBTConfiguration.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ConcentratorConfig_LBTConfiguration proto.InternalMessageInfo
+
+func (m *ConcentratorConfig_LBTConfiguration) GetRSSITarget() float32 {
 	if m != nil {
 		return m.RSSITarget
 	}
 	return 0
 }
 
-func (m *FrequencyPlan_LBTConfiguration) GetRSSIOffset() float32 {
+func (m *ConcentratorConfig_LBTConfiguration) GetRSSIOffset() float32 {
 	if m != nil {
 		return m.RSSIOffset
 	}
 	return 0
 }
 
-func (m *FrequencyPlan_LBTConfiguration) GetScanTime() int32 {
+func (m *ConcentratorConfig_LBTConfiguration) GetScanTime() int32 {
 	if m != nil {
 		return m.ScanTime
 	}
 	return 0
 }
 
-type FrequencyPlan_TimeOffAir struct {
-	// Fraction of the time on air of a Tx emission to account as cooloff after emission.
-	Fraction float32 `protobuf:"fixed32,1,opt,name=fraction,proto3" json:"fraction,omitempty" yaml:"fraction,omitempty"`
-	// Cooloff after a Tx emission.
-	Duration             *time.Duration `protobuf:"bytes,2,opt,name=duration,stdduration" json:"duration,omitempty" yaml:"duration,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+type ConcentratorConfig_Radio struct {
+	Enable               bool                                      `protobuf:"varint,1,opt,name=enable,proto3" json:"enable,omitempty"`
+	ChipType             string                                    `protobuf:"bytes,2,opt,name=chip_type,json=chipType,proto3" json:"chip_type,omitempty"`
+	Frequency            uint64                                    `protobuf:"varint,3,opt,name=frequency,proto3" json:"frequency,omitempty"`
+	RSSIOffset           float32                                   `protobuf:"fixed32,4,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty"`
+	TxConfiguration      *ConcentratorConfig_Radio_TxConfiguration `protobuf:"bytes,5,opt,name=tx_configuration,json=txConfiguration" json:"tx_configuration,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                  `json:"-"`
+	XXX_sizecache        int32                                     `json:"-"`
 }
 
-func (m *FrequencyPlan_TimeOffAir) Reset()      { *m = FrequencyPlan_TimeOffAir{} }
-func (*FrequencyPlan_TimeOffAir) ProtoMessage() {}
-func (*FrequencyPlan_TimeOffAir) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_22ed6f2a6c0cd55b, []int{0, 3}
+func (m *ConcentratorConfig_Radio) Reset()      { *m = ConcentratorConfig_Radio{} }
+func (*ConcentratorConfig_Radio) ProtoMessage() {}
+func (*ConcentratorConfig_Radio) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 4}
 }
-func (m *FrequencyPlan_TimeOffAir) XXX_Unmarshal(b []byte) error {
+func (m *ConcentratorConfig_Radio) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *FrequencyPlan_TimeOffAir) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ConcentratorConfig_Radio) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_FrequencyPlan_TimeOffAir.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ConcentratorConfig_Radio.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -420,54 +371,140 @@ func (m *FrequencyPlan_TimeOffAir) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (dst *FrequencyPlan_TimeOffAir) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FrequencyPlan_TimeOffAir.Merge(dst, src)
+func (dst *ConcentratorConfig_Radio) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig_Radio.Merge(dst, src)
 }
-func (m *FrequencyPlan_TimeOffAir) XXX_Size() int {
+func (m *ConcentratorConfig_Radio) XXX_Size() int {
 	return m.Size()
 }
-func (m *FrequencyPlan_TimeOffAir) XXX_DiscardUnknown() {
-	xxx_messageInfo_FrequencyPlan_TimeOffAir.DiscardUnknown(m)
+func (m *ConcentratorConfig_Radio) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig_Radio.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FrequencyPlan_TimeOffAir proto.InternalMessageInfo
+var xxx_messageInfo_ConcentratorConfig_Radio proto.InternalMessageInfo
 
-func (m *FrequencyPlan_TimeOffAir) GetFraction() float32 {
+func (m *ConcentratorConfig_Radio) GetEnable() bool {
 	if m != nil {
-		return m.Fraction
+		return m.Enable
+	}
+	return false
+}
+
+func (m *ConcentratorConfig_Radio) GetChipType() string {
+	if m != nil {
+		return m.ChipType
+	}
+	return ""
+}
+
+func (m *ConcentratorConfig_Radio) GetFrequency() uint64 {
+	if m != nil {
+		return m.Frequency
 	}
 	return 0
 }
 
-func (m *FrequencyPlan_TimeOffAir) GetDuration() *time.Duration {
+func (m *ConcentratorConfig_Radio) GetRSSIOffset() float32 {
 	if m != nil {
-		return m.Duration
+		return m.RSSIOffset
+	}
+	return 0
+}
+
+func (m *ConcentratorConfig_Radio) GetTxConfiguration() *ConcentratorConfig_Radio_TxConfiguration {
+	if m != nil {
+		return m.TxConfiguration
 	}
 	return nil
 }
 
-func init() {
-	proto.RegisterType((*FrequencyPlan)(nil), "ttn.lorawan.v3.FrequencyPlan")
-	golang_proto.RegisterType((*FrequencyPlan)(nil), "ttn.lorawan.v3.FrequencyPlan")
-	proto.RegisterType((*FrequencyPlan_DwellTime)(nil), "ttn.lorawan.v3.FrequencyPlan.DwellTime")
-	golang_proto.RegisterType((*FrequencyPlan_DwellTime)(nil), "ttn.lorawan.v3.FrequencyPlan.DwellTime")
-	proto.RegisterType((*FrequencyPlan_Channel)(nil), "ttn.lorawan.v3.FrequencyPlan.Channel")
-	golang_proto.RegisterType((*FrequencyPlan_Channel)(nil), "ttn.lorawan.v3.FrequencyPlan.Channel")
-	proto.RegisterType((*FrequencyPlan_Channel_ForceDataRate)(nil), "ttn.lorawan.v3.FrequencyPlan.Channel.ForceDataRate")
-	golang_proto.RegisterType((*FrequencyPlan_Channel_ForceDataRate)(nil), "ttn.lorawan.v3.FrequencyPlan.Channel.ForceDataRate")
-	proto.RegisterType((*FrequencyPlan_LBTConfiguration)(nil), "ttn.lorawan.v3.FrequencyPlan.LBTConfiguration")
-	golang_proto.RegisterType((*FrequencyPlan_LBTConfiguration)(nil), "ttn.lorawan.v3.FrequencyPlan.LBTConfiguration")
-	proto.RegisterType((*FrequencyPlan_TimeOffAir)(nil), "ttn.lorawan.v3.FrequencyPlan.TimeOffAir")
-	golang_proto.RegisterType((*FrequencyPlan_TimeOffAir)(nil), "ttn.lorawan.v3.FrequencyPlan.TimeOffAir")
+type ConcentratorConfig_Radio_TxConfiguration struct {
+	MinFrequency         uint64   `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	MaxFrequency         uint64   `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+	NotchFrequency       uint64   `protobuf:"varint,3,opt,name=notch_frequency,json=notchFrequency,proto3" json:"notch_frequency,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
-func (this *FrequencyPlan) Equal(that interface{}) bool {
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) Reset() {
+	*m = ConcentratorConfig_Radio_TxConfiguration{}
+}
+func (*ConcentratorConfig_Radio_TxConfiguration) ProtoMessage() {}
+func (*ConcentratorConfig_Radio_TxConfiguration) Descriptor() ([]byte, []int) {
+	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 4, 0}
+}
+func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ConcentratorConfig_Radio_TxConfiguration) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration.Merge(dst, src)
+}
+func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_Size() int {
+	return m.Size()
+}
+func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration proto.InternalMessageInfo
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) GetMinFrequency() uint64 {
+	if m != nil {
+		return m.MinFrequency
+	}
+	return 0
+}
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) GetMaxFrequency() uint64 {
+	if m != nil {
+		return m.MaxFrequency
+	}
+	return 0
+}
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) GetNotchFrequency() uint64 {
+	if m != nil {
+		return m.NotchFrequency
+	}
+	return 0
+}
+
+func init() {
+	proto.RegisterType((*ConcentratorConfig)(nil), "ttn.lorawan.v3.ConcentratorConfig")
+	golang_proto.RegisterType((*ConcentratorConfig)(nil), "ttn.lorawan.v3.ConcentratorConfig")
+	proto.RegisterType((*ConcentratorConfig_Channel)(nil), "ttn.lorawan.v3.ConcentratorConfig.Channel")
+	golang_proto.RegisterType((*ConcentratorConfig_Channel)(nil), "ttn.lorawan.v3.ConcentratorConfig.Channel")
+	proto.RegisterType((*ConcentratorConfig_LoRaStandardChannel)(nil), "ttn.lorawan.v3.ConcentratorConfig.LoRaStandardChannel")
+	golang_proto.RegisterType((*ConcentratorConfig_LoRaStandardChannel)(nil), "ttn.lorawan.v3.ConcentratorConfig.LoRaStandardChannel")
+	proto.RegisterType((*ConcentratorConfig_FSKChannel)(nil), "ttn.lorawan.v3.ConcentratorConfig.FSKChannel")
+	golang_proto.RegisterType((*ConcentratorConfig_FSKChannel)(nil), "ttn.lorawan.v3.ConcentratorConfig.FSKChannel")
+	proto.RegisterType((*ConcentratorConfig_LBTConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.LBTConfiguration")
+	golang_proto.RegisterType((*ConcentratorConfig_LBTConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.LBTConfiguration")
+	proto.RegisterType((*ConcentratorConfig_Radio)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio")
+	golang_proto.RegisterType((*ConcentratorConfig_Radio)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio")
+	proto.RegisterType((*ConcentratorConfig_Radio_TxConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio.TxConfiguration")
+	golang_proto.RegisterType((*ConcentratorConfig_Radio_TxConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio.TxConfiguration")
+}
+func (this *ConcentratorConfig) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*FrequencyPlan)
+	that1, ok := that.(*ConcentratorConfig)
 	if !ok {
-		that2, ok := that.(FrequencyPlan)
+		that2, ok := that.(ConcentratorConfig)
 		if ok {
 			that1 = &that2
 		} else {
@@ -477,9 +514,6 @@ func (this *FrequencyPlan) Equal(that interface{}) bool {
 	if that1 == nil {
 		return this == nil
 	} else if this == nil {
-		return false
-	}
-	if this.BandID != that1.BandID {
 		return false
 	}
 	if len(this.Channels) != len(that1.Channels) {
@@ -490,7 +524,7 @@ func (this *FrequencyPlan) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if !this.LoraStandardChannel.Equal(that1.LoraStandardChannel) {
+	if !this.LoRaStandardChannel.Equal(that1.LoRaStandardChannel) {
 		return false
 	}
 	if !this.FSKChannel.Equal(that1.FSKChannel) {
@@ -499,67 +533,27 @@ func (this *FrequencyPlan) Equal(that interface{}) bool {
 	if !this.LBT.Equal(that1.LBT) {
 		return false
 	}
-	if !this.TimeOffAir.Equal(that1.TimeOffAir) {
-		return false
-	}
-	if !this.DwellTime.Equal(that1.DwellTime) {
-		return false
-	}
 	if !this.PingSlot.Equal(that1.PingSlot) {
 		return false
 	}
-	if !this.Rx2.Equal(that1.Rx2) {
+	if len(this.Radios) != len(that1.Radios) {
 		return false
 	}
-	if this.MaxEIRP != that1.MaxEIRP {
-		return false
+	for i := range this.Radios {
+		if !this.Radios[i].Equal(that1.Radios[i]) {
+			return false
+		}
 	}
 	return true
 }
-func (this *FrequencyPlan_DwellTime) Equal(that interface{}) bool {
+func (this *ConcentratorConfig_Channel) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*FrequencyPlan_DwellTime)
+	that1, ok := that.(*ConcentratorConfig_Channel)
 	if !ok {
-		that2, ok := that.(FrequencyPlan_DwellTime)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.Uplinks != that1.Uplinks {
-		return false
-	}
-	if this.Downlinks != that1.Downlinks {
-		return false
-	}
-	if this.Duration != nil && that1.Duration != nil {
-		if *this.Duration != *that1.Duration {
-			return false
-		}
-	} else if this.Duration != nil {
-		return false
-	} else if that1.Duration != nil {
-		return false
-	}
-	return true
-}
-func (this *FrequencyPlan_Channel) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*FrequencyPlan_Channel)
-	if !ok {
-		that2, ok := that.(FrequencyPlan_Channel)
+		that2, ok := that.(ConcentratorConfig_Channel)
 		if ok {
 			that1 = &that2
 		} else {
@@ -574,22 +568,19 @@ func (this *FrequencyPlan_Channel) Equal(that interface{}) bool {
 	if this.Frequency != that1.Frequency {
 		return false
 	}
-	if !this.DataRate.Equal(that1.DataRate) {
-		return false
-	}
-	if !this.DwellTime.Equal(that1.DwellTime) {
+	if this.Radio != that1.Radio {
 		return false
 	}
 	return true
 }
-func (this *FrequencyPlan_Channel_ForceDataRate) Equal(that interface{}) bool {
+func (this *ConcentratorConfig_LoRaStandardChannel) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*FrequencyPlan_Channel_ForceDataRate)
+	that1, ok := that.(*ConcentratorConfig_LoRaStandardChannel)
 	if !ok {
-		that2, ok := that.(FrequencyPlan_Channel_ForceDataRate)
+		that2, ok := that.(ConcentratorConfig_LoRaStandardChannel)
 		if ok {
 			that1 = &that2
 		} else {
@@ -601,19 +592,55 @@ func (this *FrequencyPlan_Channel_ForceDataRate) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.Index != that1.Index {
+	if !this.ConcentratorConfig_Channel.Equal(&that1.ConcentratorConfig_Channel) {
+		return false
+	}
+	if this.Bandwidth != that1.Bandwidth {
+		return false
+	}
+	if this.SpreadingFactor != that1.SpreadingFactor {
 		return false
 	}
 	return true
 }
-func (this *FrequencyPlan_LBTConfiguration) Equal(that interface{}) bool {
+func (this *ConcentratorConfig_FSKChannel) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*FrequencyPlan_LBTConfiguration)
+	that1, ok := that.(*ConcentratorConfig_FSKChannel)
 	if !ok {
-		that2, ok := that.(FrequencyPlan_LBTConfiguration)
+		that2, ok := that.(ConcentratorConfig_FSKChannel)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ConcentratorConfig_Channel.Equal(&that1.ConcentratorConfig_Channel) {
+		return false
+	}
+	if this.Bandwidth != that1.Bandwidth {
+		return false
+	}
+	if this.BitRate != that1.BitRate {
+		return false
+	}
+	return true
+}
+func (this *ConcentratorConfig_LBTConfiguration) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ConcentratorConfig_LBTConfiguration)
+	if !ok {
+		that2, ok := that.(ConcentratorConfig_LBTConfiguration)
 		if ok {
 			that1 = &that2
 		} else {
@@ -636,14 +663,14 @@ func (this *FrequencyPlan_LBTConfiguration) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *FrequencyPlan_TimeOffAir) Equal(that interface{}) bool {
+func (this *ConcentratorConfig_Radio) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*FrequencyPlan_TimeOffAir)
+	that1, ok := that.(*ConcentratorConfig_Radio)
 	if !ok {
-		that2, ok := that.(FrequencyPlan_TimeOffAir)
+		that2, ok := that.(ConcentratorConfig_Radio)
 		if ok {
 			that1 = &that2
 		} else {
@@ -655,21 +682,54 @@ func (this *FrequencyPlan_TimeOffAir) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.Fraction != that1.Fraction {
+	if this.Enable != that1.Enable {
 		return false
 	}
-	if this.Duration != nil && that1.Duration != nil {
-		if *this.Duration != *that1.Duration {
-			return false
-		}
-	} else if this.Duration != nil {
+	if this.ChipType != that1.ChipType {
 		return false
-	} else if that1.Duration != nil {
+	}
+	if this.Frequency != that1.Frequency {
+		return false
+	}
+	if this.RSSIOffset != that1.RSSIOffset {
+		return false
+	}
+	if !this.TxConfiguration.Equal(that1.TxConfiguration) {
 		return false
 	}
 	return true
 }
-func (m *FrequencyPlan) Marshal() (dAtA []byte, err error) {
+func (this *ConcentratorConfig_Radio_TxConfiguration) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ConcentratorConfig_Radio_TxConfiguration)
+	if !ok {
+		that2, ok := that.(ConcentratorConfig_Radio_TxConfiguration)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.MinFrequency != that1.MinFrequency {
+		return false
+	}
+	if this.MaxFrequency != that1.MaxFrequency {
+		return false
+	}
+	if this.NotchFrequency != that1.NotchFrequency {
+		return false
+	}
+	return true
+}
+func (m *ConcentratorConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -679,20 +739,14 @@ func (m *FrequencyPlan) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *FrequencyPlan) MarshalTo(dAtA []byte) (int, error) {
+func (m *ConcentratorConfig) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.BandID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(len(m.BandID)))
-		i += copy(dAtA[i:], m.BandID)
-	}
 	if len(m.Channels) > 0 {
 		for _, msg := range m.Channels {
-			dAtA[i] = 0x12
+			dAtA[i] = 0xa
 			i++
 			i = encodeVarintRegional(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
@@ -702,18 +756,18 @@ func (m *FrequencyPlan) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if m.LoraStandardChannel != nil {
-		dAtA[i] = 0x1a
+	if m.LoRaStandardChannel != nil {
+		dAtA[i] = 0x12
 		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.LoraStandardChannel.Size()))
-		n1, err := m.LoraStandardChannel.MarshalTo(dAtA[i:])
+		i = encodeVarintRegional(dAtA, i, uint64(m.LoRaStandardChannel.Size()))
+		n1, err := m.LoRaStandardChannel.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n1
 	}
 	if m.FSKChannel != nil {
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintRegional(dAtA, i, uint64(m.FSKChannel.Size()))
 		n2, err := m.FSKChannel.MarshalTo(dAtA[i:])
@@ -723,7 +777,7 @@ func (m *FrequencyPlan) MarshalTo(dAtA []byte) (int, error) {
 		i += n2
 	}
 	if m.LBT != nil {
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintRegional(dAtA, i, uint64(m.LBT.Size()))
 		n3, err := m.LBT.MarshalTo(dAtA[i:])
@@ -732,56 +786,32 @@ func (m *FrequencyPlan) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n3
 	}
-	if m.TimeOffAir != nil {
-		dAtA[i] = 0x32
+	if m.PingSlot != nil {
+		dAtA[i] = 0x2a
 		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.TimeOffAir.Size()))
-		n4, err := m.TimeOffAir.MarshalTo(dAtA[i:])
+		i = encodeVarintRegional(dAtA, i, uint64(m.PingSlot.Size()))
+		n4, err := m.PingSlot.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n4
 	}
-	if m.DwellTime != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.DwellTime.Size()))
-		n5, err := m.DwellTime.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.Radios) > 0 {
+		for _, msg := range m.Radios {
+			dAtA[i] = 0x32
+			i++
+			i = encodeVarintRegional(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
 		}
-		i += n5
-	}
-	if m.PingSlot != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.PingSlot.Size()))
-		n6, err := m.PingSlot.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if m.Rx2 != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.Rx2.Size()))
-		n7, err := m.Rx2.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.MaxEIRP != 0 {
-		dAtA[i] = 0x55
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.MaxEIRP))
-		i += 4
 	}
 	return i, nil
 }
 
-func (m *FrequencyPlan_DwellTime) Marshal() (dAtA []byte, err error) {
+func (m *ConcentratorConfig_Channel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -791,55 +821,7 @@ func (m *FrequencyPlan_DwellTime) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *FrequencyPlan_DwellTime) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Uplinks {
-		dAtA[i] = 0x8
-		i++
-		if m.Uplinks {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Downlinks {
-		dAtA[i] = 0x10
-		i++
-		if m.Downlinks {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Duration != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.Duration)))
-		n8, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.Duration, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	return i, nil
-}
-
-func (m *FrequencyPlan_Channel) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *FrequencyPlan_Channel) MarshalTo(dAtA []byte) (int, error) {
+func (m *ConcentratorConfig_Channel) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -849,30 +831,15 @@ func (m *FrequencyPlan_Channel) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintRegional(dAtA, i, m.Frequency)
 	}
-	if m.DataRate != nil {
-		dAtA[i] = 0x12
+	if m.Radio != 0 {
+		dAtA[i] = 0x10
 		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.DataRate.Size()))
-		n9, err := m.DataRate.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n9
-	}
-	if m.DwellTime != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.DwellTime.Size()))
-		n10, err := m.DwellTime.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n10
+		i = encodeVarintRegional(dAtA, i, uint64(m.Radio))
 	}
 	return i, nil
 }
 
-func (m *FrequencyPlan_Channel_ForceDataRate) Marshal() (dAtA []byte, err error) {
+func (m *ConcentratorConfig_LoRaStandardChannel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -882,20 +849,33 @@ func (m *FrequencyPlan_Channel_ForceDataRate) Marshal() (dAtA []byte, err error)
 	return dAtA[:n], nil
 }
 
-func (m *FrequencyPlan_Channel_ForceDataRate) MarshalTo(dAtA []byte) (int, error) {
+func (m *ConcentratorConfig_LoRaStandardChannel) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Index != 0 {
-		dAtA[i] = 0x8
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintRegional(dAtA, i, uint64(m.ConcentratorConfig_Channel.Size()))
+	n5, err := m.ConcentratorConfig_Channel.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n5
+	if m.Bandwidth != 0 {
+		dAtA[i] = 0x10
 		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.Index))
+		i = encodeVarintRegional(dAtA, i, uint64(m.Bandwidth))
+	}
+	if m.SpreadingFactor != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintRegional(dAtA, i, uint64(m.SpreadingFactor))
 	}
 	return i, nil
 }
 
-func (m *FrequencyPlan_LBTConfiguration) Marshal() (dAtA []byte, err error) {
+func (m *ConcentratorConfig_FSKChannel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -905,7 +885,43 @@ func (m *FrequencyPlan_LBTConfiguration) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *FrequencyPlan_LBTConfiguration) MarshalTo(dAtA []byte) (int, error) {
+func (m *ConcentratorConfig_FSKChannel) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintRegional(dAtA, i, uint64(m.ConcentratorConfig_Channel.Size()))
+	n6, err := m.ConcentratorConfig_Channel.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n6
+	if m.Bandwidth != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintRegional(dAtA, i, uint64(m.Bandwidth))
+	}
+	if m.BitRate != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintRegional(dAtA, i, uint64(m.BitRate))
+	}
+	return i, nil
+}
+
+func (m *ConcentratorConfig_LBTConfiguration) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ConcentratorConfig_LBTConfiguration) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -930,7 +946,7 @@ func (m *FrequencyPlan_LBTConfiguration) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *FrequencyPlan_TimeOffAir) Marshal() (dAtA []byte, err error) {
+func (m *ConcentratorConfig_Radio) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -940,26 +956,80 @@ func (m *FrequencyPlan_TimeOffAir) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *FrequencyPlan_TimeOffAir) MarshalTo(dAtA []byte) (int, error) {
+func (m *ConcentratorConfig_Radio) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Fraction != 0 {
-		dAtA[i] = 0xd
+	if m.Enable {
+		dAtA[i] = 0x8
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Fraction))
-		i += 4
+		if m.Enable {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
 	}
-	if m.Duration != nil {
+	if len(m.ChipType) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintRegional(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.Duration)))
-		n11, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.Duration, dAtA[i:])
+		i = encodeVarintRegional(dAtA, i, uint64(len(m.ChipType)))
+		i += copy(dAtA[i:], m.ChipType)
+	}
+	if m.Frequency != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintRegional(dAtA, i, m.Frequency)
+	}
+	if m.RSSIOffset != 0 {
+		dAtA[i] = 0x25
+		i++
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
+		i += 4
+	}
+	if m.TxConfiguration != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintRegional(dAtA, i, uint64(m.TxConfiguration.Size()))
+		n7, err := m.TxConfiguration.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n11
+		i += n7
+	}
+	return i, nil
+}
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.MinFrequency != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintRegional(dAtA, i, m.MinFrequency)
+	}
+	if m.MaxFrequency != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintRegional(dAtA, i, m.MaxFrequency)
+	}
+	if m.NotchFrequency != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintRegional(dAtA, i, m.NotchFrequency)
 	}
 	return i, nil
 }
@@ -973,82 +1043,72 @@ func encodeVarintRegional(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func NewPopulatedFrequencyPlan(r randyRegional, easy bool) *FrequencyPlan {
-	this := &FrequencyPlan{}
-	this.BandID = randStringRegional(r)
+func NewPopulatedConcentratorConfig(r randyRegional, easy bool) *ConcentratorConfig {
+	this := &ConcentratorConfig{}
 	if r.Intn(10) != 0 {
 		v1 := r.Intn(5)
-		this.Channels = make([]*FrequencyPlan_Channel, v1)
+		this.Channels = make([]*ConcentratorConfig_Channel, v1)
 		for i := 0; i < v1; i++ {
-			this.Channels[i] = NewPopulatedFrequencyPlan_Channel(r, easy)
+			this.Channels[i] = NewPopulatedConcentratorConfig_Channel(r, easy)
 		}
 	}
 	if r.Intn(10) != 0 {
-		this.LoraStandardChannel = NewPopulatedFrequencyPlan_Channel(r, easy)
+		this.LoRaStandardChannel = NewPopulatedConcentratorConfig_LoRaStandardChannel(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		this.FSKChannel = NewPopulatedFrequencyPlan_Channel(r, easy)
+		this.FSKChannel = NewPopulatedConcentratorConfig_FSKChannel(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		this.LBT = NewPopulatedFrequencyPlan_LBTConfiguration(r, easy)
+		this.LBT = NewPopulatedConcentratorConfig_LBTConfiguration(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		this.TimeOffAir = NewPopulatedFrequencyPlan_TimeOffAir(r, easy)
+		this.PingSlot = NewPopulatedConcentratorConfig_Channel(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		this.DwellTime = NewPopulatedFrequencyPlan_DwellTime(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		this.PingSlot = NewPopulatedFrequencyPlan_Channel(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		this.Rx2 = NewPopulatedFrequencyPlan_Channel(r, easy)
-	}
-	this.MaxEIRP = r.Float32()
-	if r.Intn(2) == 0 {
-		this.MaxEIRP *= -1
+		v2 := r.Intn(5)
+		this.Radios = make([]*ConcentratorConfig_Radio, v2)
+		for i := 0; i < v2; i++ {
+			this.Radios[i] = NewPopulatedConcentratorConfig_Radio(r, easy)
+		}
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
 }
 
-func NewPopulatedFrequencyPlan_DwellTime(r randyRegional, easy bool) *FrequencyPlan_DwellTime {
-	this := &FrequencyPlan_DwellTime{}
-	this.Uplinks = bool(r.Intn(2) == 0)
-	this.Downlinks = bool(r.Intn(2) == 0)
-	if r.Intn(10) != 0 {
-		this.Duration = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedFrequencyPlan_Channel(r randyRegional, easy bool) *FrequencyPlan_Channel {
-	this := &FrequencyPlan_Channel{}
+func NewPopulatedConcentratorConfig_Channel(r randyRegional, easy bool) *ConcentratorConfig_Channel {
+	this := &ConcentratorConfig_Channel{}
 	this.Frequency = uint64(r.Uint32())
-	if r.Intn(10) != 0 {
-		this.DataRate = NewPopulatedFrequencyPlan_Channel_ForceDataRate(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		this.DwellTime = NewPopulatedFrequencyPlan_DwellTime(r, easy)
-	}
+	this.Radio = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
 }
 
-func NewPopulatedFrequencyPlan_Channel_ForceDataRate(r randyRegional, easy bool) *FrequencyPlan_Channel_ForceDataRate {
-	this := &FrequencyPlan_Channel_ForceDataRate{}
-	this.Index = r.Uint32()
+func NewPopulatedConcentratorConfig_LoRaStandardChannel(r randyRegional, easy bool) *ConcentratorConfig_LoRaStandardChannel {
+	this := &ConcentratorConfig_LoRaStandardChannel{}
+	v3 := NewPopulatedConcentratorConfig_Channel(r, easy)
+	this.ConcentratorConfig_Channel = *v3
+	this.Bandwidth = r.Uint32()
+	this.SpreadingFactor = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
 }
 
-func NewPopulatedFrequencyPlan_LBTConfiguration(r randyRegional, easy bool) *FrequencyPlan_LBTConfiguration {
-	this := &FrequencyPlan_LBTConfiguration{}
+func NewPopulatedConcentratorConfig_FSKChannel(r randyRegional, easy bool) *ConcentratorConfig_FSKChannel {
+	this := &ConcentratorConfig_FSKChannel{}
+	v4 := NewPopulatedConcentratorConfig_Channel(r, easy)
+	this.ConcentratorConfig_Channel = *v4
+	this.Bandwidth = r.Uint32()
+	this.BitRate = r.Uint32()
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedConcentratorConfig_LBTConfiguration(r randyRegional, easy bool) *ConcentratorConfig_LBTConfiguration {
+	this := &ConcentratorConfig_LBTConfiguration{}
 	this.RSSITarget = r.Float32()
 	if r.Intn(2) == 0 {
 		this.RSSITarget *= -1
@@ -1066,15 +1126,28 @@ func NewPopulatedFrequencyPlan_LBTConfiguration(r randyRegional, easy bool) *Fre
 	return this
 }
 
-func NewPopulatedFrequencyPlan_TimeOffAir(r randyRegional, easy bool) *FrequencyPlan_TimeOffAir {
-	this := &FrequencyPlan_TimeOffAir{}
-	this.Fraction = r.Float32()
+func NewPopulatedConcentratorConfig_Radio(r randyRegional, easy bool) *ConcentratorConfig_Radio {
+	this := &ConcentratorConfig_Radio{}
+	this.Enable = bool(r.Intn(2) == 0)
+	this.ChipType = randStringRegional(r)
+	this.Frequency = uint64(r.Uint32())
+	this.RSSIOffset = r.Float32()
 	if r.Intn(2) == 0 {
-		this.Fraction *= -1
+		this.RSSIOffset *= -1
 	}
 	if r.Intn(10) != 0 {
-		this.Duration = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+		this.TxConfiguration = NewPopulatedConcentratorConfig_Radio_TxConfiguration(r, easy)
 	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedConcentratorConfig_Radio_TxConfiguration(r randyRegional, easy bool) *ConcentratorConfig_Radio_TxConfiguration {
+	this := &ConcentratorConfig_Radio_TxConfiguration{}
+	this.MinFrequency = uint64(r.Uint32())
+	this.MaxFrequency = uint64(r.Uint32())
+	this.NotchFrequency = uint64(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1099,9 +1172,9 @@ func randUTF8RuneRegional(r randyRegional) rune {
 	return rune(ru + 61)
 }
 func randStringRegional(r randyRegional) string {
-	v2 := r.Intn(100)
-	tmps := make([]rune, v2)
-	for i := 0; i < v2; i++ {
+	v5 := r.Intn(100)
+	tmps := make([]rune, v5)
+	for i := 0; i < v5; i++ {
 		tmps[i] = randUTF8RuneRegional(r)
 	}
 	return string(tmps)
@@ -1123,11 +1196,11 @@ func randFieldRegional(dAtA []byte, r randyRegional, fieldNumber int, wire int) 
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateRegional(dAtA, uint64(key))
-		v3 := r.Int63()
+		v6 := r.Int63()
 		if r.Intn(2) == 0 {
-			v3 *= -1
+			v6 *= -1
 		}
-		dAtA = encodeVarintPopulateRegional(dAtA, uint64(v3))
+		dAtA = encodeVarintPopulateRegional(dAtA, uint64(v6))
 	case 1:
 		dAtA = encodeVarintPopulateRegional(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1152,21 +1225,17 @@ func encodeVarintPopulateRegional(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *FrequencyPlan) Size() (n int) {
+func (m *ConcentratorConfig) Size() (n int) {
 	var l int
 	_ = l
-	l = len(m.BandID)
-	if l > 0 {
-		n += 1 + l + sovRegional(uint64(l))
-	}
 	if len(m.Channels) > 0 {
 		for _, e := range m.Channels {
 			l = e.Size()
 			n += 1 + l + sovRegional(uint64(l))
 		}
 	}
-	if m.LoraStandardChannel != nil {
-		l = m.LoraStandardChannel.Size()
+	if m.LoRaStandardChannel != nil {
+		l = m.LoRaStandardChannel.Size()
 		n += 1 + l + sovRegional(uint64(l))
 	}
 	if m.FSKChannel != nil {
@@ -1177,71 +1246,60 @@ func (m *FrequencyPlan) Size() (n int) {
 		l = m.LBT.Size()
 		n += 1 + l + sovRegional(uint64(l))
 	}
-	if m.TimeOffAir != nil {
-		l = m.TimeOffAir.Size()
-		n += 1 + l + sovRegional(uint64(l))
-	}
-	if m.DwellTime != nil {
-		l = m.DwellTime.Size()
-		n += 1 + l + sovRegional(uint64(l))
-	}
 	if m.PingSlot != nil {
 		l = m.PingSlot.Size()
 		n += 1 + l + sovRegional(uint64(l))
 	}
-	if m.Rx2 != nil {
-		l = m.Rx2.Size()
-		n += 1 + l + sovRegional(uint64(l))
-	}
-	if m.MaxEIRP != 0 {
-		n += 5
-	}
-	return n
-}
-
-func (m *FrequencyPlan_DwellTime) Size() (n int) {
-	var l int
-	_ = l
-	if m.Uplinks {
-		n += 2
-	}
-	if m.Downlinks {
-		n += 2
-	}
-	if m.Duration != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.Duration)
-		n += 1 + l + sovRegional(uint64(l))
+	if len(m.Radios) > 0 {
+		for _, e := range m.Radios {
+			l = e.Size()
+			n += 1 + l + sovRegional(uint64(l))
+		}
 	}
 	return n
 }
 
-func (m *FrequencyPlan_Channel) Size() (n int) {
+func (m *ConcentratorConfig_Channel) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
 		n += 1 + sovRegional(m.Frequency)
 	}
-	if m.DataRate != nil {
-		l = m.DataRate.Size()
-		n += 1 + l + sovRegional(uint64(l))
-	}
-	if m.DwellTime != nil {
-		l = m.DwellTime.Size()
-		n += 1 + l + sovRegional(uint64(l))
+	if m.Radio != 0 {
+		n += 1 + sovRegional(uint64(m.Radio))
 	}
 	return n
 }
 
-func (m *FrequencyPlan_Channel_ForceDataRate) Size() (n int) {
+func (m *ConcentratorConfig_LoRaStandardChannel) Size() (n int) {
 	var l int
 	_ = l
-	if m.Index != 0 {
-		n += 1 + sovRegional(uint64(m.Index))
+	l = m.ConcentratorConfig_Channel.Size()
+	n += 1 + l + sovRegional(uint64(l))
+	if m.Bandwidth != 0 {
+		n += 1 + sovRegional(uint64(m.Bandwidth))
+	}
+	if m.SpreadingFactor != 0 {
+		n += 1 + sovRegional(uint64(m.SpreadingFactor))
 	}
 	return n
 }
 
-func (m *FrequencyPlan_LBTConfiguration) Size() (n int) {
+func (m *ConcentratorConfig_FSKChannel) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ConcentratorConfig_Channel.Size()
+	n += 1 + l + sovRegional(uint64(l))
+	if m.Bandwidth != 0 {
+		n += 1 + sovRegional(uint64(m.Bandwidth))
+	}
+	if m.BitRate != 0 {
+		n += 1 + sovRegional(uint64(m.BitRate))
+	}
+	return n
+}
+
+func (m *ConcentratorConfig_LBTConfiguration) Size() (n int) {
 	var l int
 	_ = l
 	if m.RSSITarget != 0 {
@@ -1256,15 +1314,40 @@ func (m *FrequencyPlan_LBTConfiguration) Size() (n int) {
 	return n
 }
 
-func (m *FrequencyPlan_TimeOffAir) Size() (n int) {
+func (m *ConcentratorConfig_Radio) Size() (n int) {
 	var l int
 	_ = l
-	if m.Fraction != 0 {
+	if m.Enable {
+		n += 2
+	}
+	l = len(m.ChipType)
+	if l > 0 {
+		n += 1 + l + sovRegional(uint64(l))
+	}
+	if m.Frequency != 0 {
+		n += 1 + sovRegional(m.Frequency)
+	}
+	if m.RSSIOffset != 0 {
 		n += 5
 	}
-	if m.Duration != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.Duration)
+	if m.TxConfiguration != nil {
+		l = m.TxConfiguration.Size()
 		n += 1 + l + sovRegional(uint64(l))
+	}
+	return n
+}
+
+func (m *ConcentratorConfig_Radio_TxConfiguration) Size() (n int) {
+	var l int
+	_ = l
+	if m.MinFrequency != 0 {
+		n += 1 + sovRegional(m.MinFrequency)
+	}
+	if m.MaxFrequency != 0 {
+		n += 1 + sovRegional(m.MaxFrequency)
+	}
+	if m.NotchFrequency != 0 {
+		n += 1 + sovRegional(m.NotchFrequency)
 	}
 	return n
 }
@@ -1282,64 +1365,61 @@ func sovRegional(x uint64) (n int) {
 func sozRegional(x uint64) (n int) {
 	return sovRegional((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (this *FrequencyPlan) String() string {
+func (this *ConcentratorConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FrequencyPlan{`,
-		`BandID:` + fmt.Sprintf("%v", this.BandID) + `,`,
-		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "FrequencyPlan_Channel", "FrequencyPlan_Channel", 1) + `,`,
-		`LoraStandardChannel:` + strings.Replace(fmt.Sprintf("%v", this.LoraStandardChannel), "FrequencyPlan_Channel", "FrequencyPlan_Channel", 1) + `,`,
-		`FSKChannel:` + strings.Replace(fmt.Sprintf("%v", this.FSKChannel), "FrequencyPlan_Channel", "FrequencyPlan_Channel", 1) + `,`,
-		`LBT:` + strings.Replace(fmt.Sprintf("%v", this.LBT), "FrequencyPlan_LBTConfiguration", "FrequencyPlan_LBTConfiguration", 1) + `,`,
-		`TimeOffAir:` + strings.Replace(fmt.Sprintf("%v", this.TimeOffAir), "FrequencyPlan_TimeOffAir", "FrequencyPlan_TimeOffAir", 1) + `,`,
-		`DwellTime:` + strings.Replace(fmt.Sprintf("%v", this.DwellTime), "FrequencyPlan_DwellTime", "FrequencyPlan_DwellTime", 1) + `,`,
-		`PingSlot:` + strings.Replace(fmt.Sprintf("%v", this.PingSlot), "FrequencyPlan_Channel", "FrequencyPlan_Channel", 1) + `,`,
-		`Rx2:` + strings.Replace(fmt.Sprintf("%v", this.Rx2), "FrequencyPlan_Channel", "FrequencyPlan_Channel", 1) + `,`,
-		`MaxEIRP:` + fmt.Sprintf("%v", this.MaxEIRP) + `,`,
+	s := strings.Join([]string{`&ConcentratorConfig{`,
+		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1) + `,`,
+		`LoRaStandardChannel:` + strings.Replace(fmt.Sprintf("%v", this.LoRaStandardChannel), "ConcentratorConfig_LoRaStandardChannel", "ConcentratorConfig_LoRaStandardChannel", 1) + `,`,
+		`FSKChannel:` + strings.Replace(fmt.Sprintf("%v", this.FSKChannel), "ConcentratorConfig_FSKChannel", "ConcentratorConfig_FSKChannel", 1) + `,`,
+		`LBT:` + strings.Replace(fmt.Sprintf("%v", this.LBT), "ConcentratorConfig_LBTConfiguration", "ConcentratorConfig_LBTConfiguration", 1) + `,`,
+		`PingSlot:` + strings.Replace(fmt.Sprintf("%v", this.PingSlot), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1) + `,`,
+		`Radios:` + strings.Replace(fmt.Sprintf("%v", this.Radios), "ConcentratorConfig_Radio", "ConcentratorConfig_Radio", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *FrequencyPlan_DwellTime) String() string {
+func (this *ConcentratorConfig_Channel) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FrequencyPlan_DwellTime{`,
-		`Uplinks:` + fmt.Sprintf("%v", this.Uplinks) + `,`,
-		`Downlinks:` + fmt.Sprintf("%v", this.Downlinks) + `,`,
-		`Duration:` + strings.Replace(fmt.Sprintf("%v", this.Duration), "Duration", "types.Duration", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *FrequencyPlan_Channel) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&FrequencyPlan_Channel{`,
+	s := strings.Join([]string{`&ConcentratorConfig_Channel{`,
 		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
-		`DataRate:` + strings.Replace(fmt.Sprintf("%v", this.DataRate), "FrequencyPlan_Channel_ForceDataRate", "FrequencyPlan_Channel_ForceDataRate", 1) + `,`,
-		`DwellTime:` + strings.Replace(fmt.Sprintf("%v", this.DwellTime), "FrequencyPlan_DwellTime", "FrequencyPlan_DwellTime", 1) + `,`,
+		`Radio:` + fmt.Sprintf("%v", this.Radio) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *FrequencyPlan_Channel_ForceDataRate) String() string {
+func (this *ConcentratorConfig_LoRaStandardChannel) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FrequencyPlan_Channel_ForceDataRate{`,
-		`Index:` + fmt.Sprintf("%v", this.Index) + `,`,
+	s := strings.Join([]string{`&ConcentratorConfig_LoRaStandardChannel{`,
+		`ConcentratorConfig_Channel:` + strings.Replace(strings.Replace(this.ConcentratorConfig_Channel.String(), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1), `&`, ``, 1) + `,`,
+		`Bandwidth:` + fmt.Sprintf("%v", this.Bandwidth) + `,`,
+		`SpreadingFactor:` + fmt.Sprintf("%v", this.SpreadingFactor) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *FrequencyPlan_LBTConfiguration) String() string {
+func (this *ConcentratorConfig_FSKChannel) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FrequencyPlan_LBTConfiguration{`,
+	s := strings.Join([]string{`&ConcentratorConfig_FSKChannel{`,
+		`ConcentratorConfig_Channel:` + strings.Replace(strings.Replace(this.ConcentratorConfig_Channel.String(), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1), `&`, ``, 1) + `,`,
+		`Bandwidth:` + fmt.Sprintf("%v", this.Bandwidth) + `,`,
+		`BitRate:` + fmt.Sprintf("%v", this.BitRate) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ConcentratorConfig_LBTConfiguration) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ConcentratorConfig_LBTConfiguration{`,
 		`RSSITarget:` + fmt.Sprintf("%v", this.RSSITarget) + `,`,
 		`RSSIOffset:` + fmt.Sprintf("%v", this.RSSIOffset) + `,`,
 		`ScanTime:` + fmt.Sprintf("%v", this.ScanTime) + `,`,
@@ -1347,13 +1427,28 @@ func (this *FrequencyPlan_LBTConfiguration) String() string {
 	}, "")
 	return s
 }
-func (this *FrequencyPlan_TimeOffAir) String() string {
+func (this *ConcentratorConfig_Radio) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FrequencyPlan_TimeOffAir{`,
-		`Fraction:` + fmt.Sprintf("%v", this.Fraction) + `,`,
-		`Duration:` + strings.Replace(fmt.Sprintf("%v", this.Duration), "Duration", "types.Duration", 1) + `,`,
+	s := strings.Join([]string{`&ConcentratorConfig_Radio{`,
+		`Enable:` + fmt.Sprintf("%v", this.Enable) + `,`,
+		`ChipType:` + fmt.Sprintf("%v", this.ChipType) + `,`,
+		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
+		`RSSIOffset:` + fmt.Sprintf("%v", this.RSSIOffset) + `,`,
+		`TxConfiguration:` + strings.Replace(fmt.Sprintf("%v", this.TxConfiguration), "ConcentratorConfig_Radio_TxConfiguration", "ConcentratorConfig_Radio_TxConfiguration", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ConcentratorConfig_Radio_TxConfiguration) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ConcentratorConfig_Radio_TxConfiguration{`,
+		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
+		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
+		`NotchFrequency:` + fmt.Sprintf("%v", this.NotchFrequency) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1366,7 +1461,7 @@ func valueToStringRegional(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
+func (m *ConcentratorConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1389,42 +1484,13 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: FrequencyPlan: wiretype end group for non-group")
+			return fmt.Errorf("proto: ConcentratorConfig: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: FrequencyPlan: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ConcentratorConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BandID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.BandID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Channels", wireType)
 			}
@@ -1450,14 +1516,14 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Channels = append(m.Channels, &FrequencyPlan_Channel{})
+			m.Channels = append(m.Channels, &ConcentratorConfig_Channel{})
 			if err := m.Channels[len(m.Channels)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LoraStandardChannel", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaStandardChannel", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1481,14 +1547,14 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.LoraStandardChannel == nil {
-				m.LoraStandardChannel = &FrequencyPlan_Channel{}
+			if m.LoRaStandardChannel == nil {
+				m.LoRaStandardChannel = &ConcentratorConfig_LoRaStandardChannel{}
 			}
-			if err := m.LoraStandardChannel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.LoRaStandardChannel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FSKChannel", wireType)
 			}
@@ -1515,13 +1581,13 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.FSKChannel == nil {
-				m.FSKChannel = &FrequencyPlan_Channel{}
+				m.FSKChannel = &ConcentratorConfig_FSKChannel{}
 			}
 			if err := m.FSKChannel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LBT", wireType)
 			}
@@ -1548,79 +1614,13 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.LBT == nil {
-				m.LBT = &FrequencyPlan_LBTConfiguration{}
+				m.LBT = &ConcentratorConfig_LBTConfiguration{}
 			}
 			if err := m.LBT.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimeOffAir", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TimeOffAir == nil {
-				m.TimeOffAir = &FrequencyPlan_TimeOffAir{}
-			}
-			if err := m.TimeOffAir.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DwellTime", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DwellTime == nil {
-				m.DwellTime = &FrequencyPlan_DwellTime{}
-			}
-			if err := m.DwellTime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PingSlot", wireType)
 			}
@@ -1647,15 +1647,15 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PingSlot == nil {
-				m.PingSlot = &FrequencyPlan_Channel{}
+				m.PingSlot = &ConcentratorConfig_Channel{}
 			}
 			if err := m.PingSlot.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
+		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rx2", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Radios", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1679,144 +1679,8 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Rx2 == nil {
-				m.Rx2 = &FrequencyPlan_Channel{}
-			}
-			if err := m.Rx2.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxEIRP", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
-			iNdEx += 4
-			m.MaxEIRP = math.Float32frombits(v)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegional(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRegional
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *FrequencyPlan_DwellTime) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegional
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DwellTime: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DwellTime: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uplinks", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Uplinks = bool(v != 0)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Downlinks", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Downlinks = bool(v != 0)
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Duration == nil {
-				m.Duration = new(time.Duration)
-			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.Duration, dAtA[iNdEx:postIndex]); err != nil {
+			m.Radios = append(m.Radios, &ConcentratorConfig_Radio{})
+			if err := m.Radios[len(m.Radios)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1841,7 +1705,7 @@ func (m *FrequencyPlan_DwellTime) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *FrequencyPlan_Channel) Unmarshal(dAtA []byte) error {
+func (m *ConcentratorConfig_Channel) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1890,10 +1754,10 @@ func (m *FrequencyPlan_Channel) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataRate", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Radio", wireType)
 			}
-			var msglen int
+			m.Radio = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowRegional
@@ -1903,58 +1767,11 @@ func (m *FrequencyPlan_Channel) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				m.Radio |= (uint32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DataRate == nil {
-				m.DataRate = &FrequencyPlan_Channel_ForceDataRate{}
-			}
-			if err := m.DataRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DwellTime", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DwellTime == nil {
-				m.DwellTime = &FrequencyPlan_DwellTime{}
-			}
-			if err := m.DwellTime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegional(dAtA[iNdEx:])
@@ -1976,7 +1793,7 @@ func (m *FrequencyPlan_Channel) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *FrequencyPlan_Channel_ForceDataRate) Unmarshal(dAtA []byte) error {
+func (m *ConcentratorConfig_LoRaStandardChannel) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1999,17 +1816,17 @@ func (m *FrequencyPlan_Channel_ForceDataRate) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ForceDataRate: wiretype end group for non-group")
+			return fmt.Errorf("proto: LoRaStandardChannel: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ForceDataRate: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: LoRaStandardChannel: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConcentratorConfig_Channel", wireType)
 			}
-			m.Index = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowRegional
@@ -2019,7 +1836,56 @@ func (m *FrequencyPlan_Channel_ForceDataRate) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Index |= (uint32(b) & 0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRegional
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ConcentratorConfig_Channel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Bandwidth", wireType)
+			}
+			m.Bandwidth = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Bandwidth |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SpreadingFactor", wireType)
+			}
+			m.SpreadingFactor = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SpreadingFactor |= (uint32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2045,7 +1911,125 @@ func (m *FrequencyPlan_Channel_ForceDataRate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *FrequencyPlan_LBTConfiguration) Unmarshal(dAtA []byte) error {
+func (m *ConcentratorConfig_FSKChannel) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRegional
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FSKChannel: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FSKChannel: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConcentratorConfig_Channel", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRegional
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ConcentratorConfig_Channel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Bandwidth", wireType)
+			}
+			m.Bandwidth = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Bandwidth |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BitRate", wireType)
+			}
+			m.BitRate = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BitRate |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRegional(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRegional
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ConcentratorConfig_LBTConfiguration) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2136,7 +2120,7 @@ func (m *FrequencyPlan_LBTConfiguration) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
+func (m *ConcentratorConfig_Radio) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2159,15 +2143,83 @@ func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: TimeOffAir: wiretype end group for non-group")
+			return fmt.Errorf("proto: Radio: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TimeOffAir: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Radio: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Enable", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Enable = bool(v != 0)
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ChipType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRegional
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ChipType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Frequency", wireType)
+			}
+			m.Frequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Frequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
 			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Fraction", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RSSIOffset", wireType)
 			}
 			var v uint32
 			if (iNdEx + 4) > l {
@@ -2175,10 +2227,10 @@ func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.Fraction = math.Float32frombits(v)
-		case 2:
+			m.RSSIOffset = math.Float32frombits(v)
+		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TxConfiguration", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2202,13 +2254,120 @@ func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Duration == nil {
-				m.Duration = new(time.Duration)
+			if m.TxConfiguration == nil {
+				m.TxConfiguration = &ConcentratorConfig_Radio_TxConfiguration{}
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.Duration, dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.TxConfiguration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRegional(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRegional
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ConcentratorConfig_Radio_TxConfiguration) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRegional
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TxConfiguration: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TxConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
+			}
+			m.MinFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
+			}
+			m.MaxFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NotchFrequency", wireType)
+			}
+			m.NotchFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NotchFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegional(dAtA[iNdEx:])
@@ -2336,76 +2495,63 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_22ed6f2a6c0cd55b)
+	proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_9f058c0d9001276c)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_22ed6f2a6c0cd55b)
+	golang_proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_9f058c0d9001276c)
 }
 
-var fileDescriptor_regional_22ed6f2a6c0cd55b = []byte{
-	// 1018 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x96, 0x3b, 0x6c, 0xdb, 0x46,
-	0x18, 0xc7, 0x79, 0x52, 0x6c, 0x49, 0xe7, 0xd8, 0x35, 0x98, 0x14, 0x50, 0xd4, 0xe4, 0xe8, 0x12,
-	0x6d, 0x6a, 0x14, 0x26, 0x85, 0xca, 0x28, 0x8a, 0x76, 0x2b, 0x63, 0x1b, 0x30, 0x9a, 0x22, 0x01,
-	0x6d, 0x14, 0x41, 0x17, 0xe1, 0x24, 0x3e, 0x7c, 0x10, 0xc5, 0x63, 0x8f, 0xe7, 0x58, 0xde, 0xb2,
-	0x14, 0xc8, 0xd8, 0x31, 0x63, 0xdb, 0x29, 0x63, 0xc6, 0x8c, 0xd9, 0x9a, 0x31, 0x45, 0x97, 0x4c,
-	0x6c, 0x44, 0x2d, 0x41, 0xa7, 0x80, 0x53, 0xc6, 0xe2, 0x8e, 0xa4, 0x1e, 0x46, 0x61, 0xc4, 0x40,
-	0xb3, 0xf1, 0xee, 0xfb, 0xeb, 0xf7, 0xbf, 0xef, 0x71, 0x07, 0xc1, 0x8d, 0x80, 0x32, 0x7c, 0x82,
-	0x43, 0x23, 0xe6, 0xb8, 0x3f, 0x68, 0xe3, 0x88, 0xb4, 0x99, 0xeb, 0x13, 0x1a, 0xe2, 0xc0, 0x8c,
-	0x18, 0xe5, 0x54, 0x5d, 0xe3, 0x3c, 0x34, 0x0b, 0x95, 0x79, 0x7f, 0xbb, 0x65, 0xf8, 0x84, 0x1f,
-	0x1d, 0xf7, 0xcc, 0x3e, 0x1d, 0xb6, 0x7d, 0xea, 0xd3, 0xb6, 0x94, 0xf5, 0x8e, 0x3d, 0xb9, 0x92,
-	0x0b, 0xf9, 0x95, 0xff, 0xbc, 0x85, 0x7c, 0x4a, 0xfd, 0xc0, 0x9d, 0xa9, 0x9c, 0x63, 0x86, 0x39,
-	0xa1, 0x61, 0x1e, 0xd7, 0xff, 0x59, 0x83, 0xab, 0x7b, 0xcc, 0xfd, 0xe9, 0xd8, 0x0d, 0xfb, 0xa7,
-	0x77, 0x03, 0x1c, 0xaa, 0x5f, 0xc2, 0x5a, 0x0f, 0x87, 0x4e, 0x97, 0x38, 0x4d, 0xb0, 0x01, 0x36,
-	0x1b, 0xd6, 0xf5, 0x34, 0xd1, 0x96, 0x2d, 0x1c, 0x3a, 0xfb, 0x3b, 0x59, 0xa2, 0xad, 0x9d, 0xe2,
-	0x61, 0xf0, 0x8d, 0x2e, 0x24, 0x06, 0x71, 0x74, 0x7b, 0x59, 0x7c, 0xed, 0x3b, 0xea, 0x0f, 0xb0,
-	0xde, 0x3f, 0xc2, 0x61, 0xe8, 0x06, 0x71, 0xb3, 0xb2, 0x51, 0xdd, 0x5c, 0xe9, 0x7c, 0x6a, 0x2e,
-	0x1e, 0xdd, 0x5c, 0xf0, 0x31, 0x6f, 0xe5, 0x6a, 0xeb, 0x4a, 0x96, 0x68, 0x1f, 0xe4, 0xd0, 0x12,
-	0xa0, 0xdb, 0x53, 0x96, 0xfa, 0x33, 0x80, 0x1f, 0x0a, 0x46, 0x37, 0xe6, 0x38, 0x74, 0x30, 0x73,
-	0xba, 0x45, 0xa8, 0x59, 0xdd, 0x00, 0xef, 0xee, 0xf2, 0x79, 0x96, 0x68, 0x37, 0x73, 0x17, 0xa1,
-	0x35, 0x4a, 0x9a, 0x51, 0xd0, 0xb6, 0xe8, 0x90, 0x70, 0x77, 0x18, 0xf1, 0x53, 0xdd, 0xbe, 0x22,
-	0x14, 0x07, 0x85, 0xa0, 0x00, 0xa8, 0xf7, 0xe1, 0x8a, 0x17, 0x0f, 0xa6, 0xe6, 0x97, 0x2e, 0x62,
-	0x6e, 0xa6, 0x89, 0x06, 0xf7, 0x0e, 0xbe, 0x2b, 0xd6, 0x59, 0xa2, 0x5d, 0xcf, 0x8f, 0xe2, 0xc5,
-	0x83, 0xff, 0x3a, 0x00, 0xf4, 0xe2, 0x41, 0xe9, 0x8b, 0x61, 0x35, 0xe8, 0xf1, 0xe6, 0x92, 0xf4,
-	0x33, 0xcf, 0xf7, 0xbb, 0x6d, 0x1d, 0xde, 0xa2, 0xa1, 0x47, 0xfc, 0xa2, 0xc7, 0x96, 0x96, 0x26,
-	0x5a, 0xf5, 0xb6, 0x75, 0x98, 0x25, 0xda, 0xd5, 0x22, 0xf9, 0x1e, 0x9f, 0x77, 0x12, 0x6c, 0x75,
-	0x08, 0x2f, 0x73, 0x32, 0x74, 0xbb, 0xd4, 0xf3, 0xba, 0x98, 0xb0, 0xe6, 0xb2, 0xf4, 0xda, 0x3c,
-	0xdf, 0xeb, 0x90, 0x0c, 0xdd, 0x3b, 0x9e, 0xf7, 0x2d, 0x61, 0xd6, 0xc7, 0x59, 0xa2, 0xdd, 0xc8,
-	0xf1, 0x82, 0x63, 0x50, 0xcf, 0x33, 0x30, 0x61, 0x0b, 0x19, 0xf1, 0xa9, 0x5c, 0xf5, 0x21, 0x74,
-	0x4e, 0xdc, 0x20, 0xe8, 0x8a, 0xbd, 0x66, 0x4d, 0x9a, 0x7d, 0x76, 0xbe, 0xd9, 0x8e, 0xd0, 0x0b,
-	0x47, 0x4b, 0xcb, 0x12, 0xed, 0xa3, 0xdc, 0x4b, 0x42, 0x0c, 0x01, 0x99, 0x77, 0x6a, 0x38, 0xa5,
-	0x56, 0xed, 0xc1, 0x46, 0x44, 0x42, 0xbf, 0x1b, 0x07, 0x94, 0x37, 0xeb, 0x17, 0x69, 0x18, 0xca,
-	0x12, 0xad, 0x95, 0xbb, 0x08, 0x82, 0x21, 0x08, 0xf3, 0x26, 0x75, 0xb1, 0x7b, 0x10, 0x50, 0xae,
-	0xde, 0x83, 0x55, 0x36, 0xea, 0x34, 0x1b, 0x17, 0xa1, 0xcb, 0xae, 0xd8, 0xa3, 0xce, 0xac, 0x2b,
-	0x6c, 0xd4, 0x59, 0xe8, 0x0a, 0x1b, 0x75, 0xd4, 0xaf, 0x61, 0x7d, 0x88, 0x47, 0x5d, 0x97, 0xb0,
-	0xa8, 0x09, 0x37, 0xc0, 0x66, 0xc5, 0x42, 0x69, 0xa2, 0xd5, 0xbe, 0xc7, 0xa3, 0xdd, 0x7d, 0xfb,
-	0xee, 0xec, 0xd2, 0x0c, 0xf1, 0xc8, 0x10, 0x22, 0xdd, 0xae, 0x0d, 0xf1, 0x68, 0x97, 0xb0, 0xa8,
-	0xf5, 0x07, 0x80, 0x8d, 0x69, 0xc9, 0xd4, 0x2d, 0x58, 0x3b, 0x8e, 0x02, 0x12, 0x0e, 0x62, 0x79,
-	0xa1, 0xeb, 0x96, 0x3a, 0xbb, 0xc6, 0x45, 0x40, 0xb7, 0x4b, 0x89, 0xda, 0x81, 0x0d, 0x87, 0x9e,
-	0x84, 0xb9, 0xbe, 0x22, 0xf5, 0x57, 0xb3, 0x44, 0x5b, 0x2f, 0x6a, 0x5e, 0x86, 0x44, 0xa1, 0xcb,
-	0x6f, 0xf5, 0x1e, 0xac, 0x97, 0xcf, 0x4a, 0x71, 0x2b, 0xaf, 0x99, 0xf9, 0xbb, 0x63, 0x96, 0xef,
-	0x8e, 0xb9, 0x53, 0xce, 0xa4, 0x98, 0x96, 0x6b, 0x05, 0xad, 0xd8, 0x9b, 0xcb, 0xfd, 0xd1, 0xdf,
-	0x1a, 0xb0, 0xa7, 0xb4, 0xd6, 0x9f, 0x15, 0x58, 0x2b, 0x6f, 0x42, 0x07, 0x36, 0xbc, 0xb2, 0x9e,
-	0x32, 0x93, 0x4b, 0xf3, 0x27, 0x9b, 0x86, 0x74, 0x7b, 0x26, 0x53, 0x23, 0xd8, 0x70, 0x30, 0xc7,
-	0x5d, 0x86, 0xb9, 0x2b, 0xb3, 0x59, 0xe9, 0x6c, 0xbf, 0x53, 0x93, 0xcc, 0x3d, 0xca, 0xfa, 0xee,
-	0x0e, 0xe6, 0xd8, 0xc6, 0xdc, 0x9d, 0x1f, 0x08, 0xc1, 0x33, 0x04, 0x6f, 0x61, 0x20, 0x9c, 0x42,
-	0x79, 0x66, 0xba, 0xab, 0xef, 0x6d, 0xba, 0x5b, 0x5f, 0xc1, 0xd5, 0x85, 0x33, 0xaa, 0x37, 0xe1,
-	0x12, 0x09, 0x1d, 0x77, 0x24, 0x6b, 0xb3, 0x6a, 0xad, 0x67, 0x89, 0x76, 0x39, 0x67, 0xc9, 0x6d,
-	0xdd, 0xce, 0xc3, 0xad, 0xbf, 0x00, 0x5c, 0x3f, 0xfb, 0x52, 0xa8, 0xbb, 0x70, 0x85, 0xc5, 0x31,
-	0xe9, 0x72, 0xcc, 0x7c, 0x97, 0x4b, 0x44, 0xc5, 0xfa, 0x44, 0xbc, 0x5b, 0xf6, 0xc1, 0xc1, 0xfe,
-	0xa1, 0xdc, 0xcd, 0x12, 0x4d, 0x2d, 0xe6, 0x35, 0x8e, 0x89, 0x91, 0x4b, 0x75, 0x1b, 0x8a, 0x55,
-	0xae, 0x98, 0x62, 0xa8, 0xe7, 0xc5, 0x2e, 0x97, 0x15, 0x9f, 0xc3, 0xdc, 0x91, 0xbb, 0x67, 0x30,
-	0xb9, 0xb4, 0xc0, 0xe4, 0x0a, 0xf5, 0x0b, 0xd8, 0x88, 0xfb, 0x38, 0x9c, 0xd5, 0x70, 0x69, 0xbe,
-	0xd5, 0x22, 0x24, 0x2b, 0xa3, 0xdb, 0x75, 0xf1, 0x2d, 0xcb, 0xf1, 0x1b, 0x80, 0x70, 0xf6, 0x26,
-	0x89, 0xdb, 0xe3, 0x31, 0xdc, 0x97, 0x23, 0x99, 0x27, 0x73, 0x63, 0x36, 0x77, 0x65, 0x64, 0xa1,
-	0x83, 0xe5, 0xe6, 0xc2, 0x34, 0x57, 0xfe, 0xcf, 0x69, 0xb6, 0x7e, 0x07, 0xcf, 0xc7, 0x08, 0xbc,
-	0x18, 0x23, 0xf0, 0x72, 0x8c, 0x94, 0x57, 0x63, 0xa4, 0xbc, 0x1e, 0x23, 0xe5, 0xcd, 0x18, 0x29,
-	0x6f, 0xc7, 0x08, 0x3c, 0x48, 0x11, 0x78, 0x98, 0x22, 0xe5, 0x71, 0x8a, 0xc0, 0x93, 0x14, 0x29,
-	0x4f, 0x53, 0xa4, 0x3c, 0x4b, 0x91, 0xf2, 0x3c, 0x45, 0xe0, 0x45, 0x8a, 0xc0, 0xcb, 0x14, 0x29,
-	0xaf, 0x52, 0x04, 0x5e, 0xa7, 0x48, 0x79, 0x93, 0x22, 0xf0, 0x36, 0x45, 0xca, 0x83, 0x09, 0x52,
-	0x1e, 0x4e, 0x10, 0xf8, 0x65, 0x82, 0x94, 0x47, 0x13, 0x04, 0x7e, 0x9d, 0x20, 0xe5, 0xf1, 0x04,
-	0x29, 0x4f, 0x26, 0x08, 0x3c, 0x9d, 0x20, 0xf0, 0x6c, 0x82, 0xc0, 0x8f, 0x5b, 0x3e, 0x35, 0xf9,
-	0x91, 0xcb, 0x8f, 0x48, 0xe8, 0xc7, 0x66, 0xe8, 0xf2, 0x13, 0xca, 0x06, 0xed, 0xc5, 0x7f, 0x1e,
-	0xd1, 0xc0, 0x6f, 0x73, 0x1e, 0x46, 0xbd, 0xde, 0xb2, 0x4c, 0x72, 0xfb, 0xdf, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x48, 0xf1, 0xbc, 0x87, 0x9b, 0x08, 0x00, 0x00,
+var fileDescriptor_regional_9f058c0d9001276c = []byte{
+	// 810 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0x3d, 0x8c, 0x1b, 0x45,
+	0x14, 0x9e, 0x39, 0xdf, 0x8f, 0x6f, 0xcc, 0xfd, 0x68, 0xc3, 0x8f, 0x59, 0xd0, 0xf8, 0x04, 0x05,
+	0x07, 0xe2, 0xd6, 0x52, 0x4e, 0x42, 0x34, 0x48, 0xc8, 0x27, 0x19, 0x21, 0xa2, 0x20, 0x8d, 0x5d,
+	0x51, 0xb0, 0x9a, 0x5d, 0xcf, 0xae, 0x47, 0x5e, 0xcf, 0x2c, 0xbb, 0x63, 0xce, 0xd7, 0x45, 0x82,
+	0x22, 0x25, 0x14, 0x48, 0x94, 0x88, 0x2a, 0x15, 0x8a, 0x44, 0x93, 0x32, 0xe5, 0x95, 0x57, 0xa6,
+	0xb2, 0xe2, 0xd9, 0x26, 0x65, 0x3a, 0x52, 0xa2, 0x9d, 0x5d, 0xff, 0x12, 0x09, 0xa7, 0x49, 0x37,
+	0xef, 0x9b, 0xef, 0x7b, 0xef, 0x9b, 0xf7, 0x9e, 0xbd, 0xe8, 0x24, 0x92, 0x09, 0xbd, 0xa4, 0xe2,
+	0x2c, 0x55, 0xd4, 0x1f, 0x34, 0x69, 0xcc, 0x9b, 0x09, 0x0b, 0xb9, 0x14, 0x34, 0x72, 0xe2, 0x44,
+	0x2a, 0x69, 0x1d, 0x2a, 0x25, 0x9c, 0x92, 0xe5, 0xfc, 0x78, 0x6e, 0x9f, 0x85, 0x5c, 0xf5, 0x47,
+	0x9e, 0xe3, 0xcb, 0x61, 0x33, 0x94, 0xa1, 0x6c, 0x1a, 0x9a, 0x37, 0x0a, 0x4c, 0x64, 0x02, 0x73,
+	0x2a, 0xe4, 0x36, 0x0e, 0xa5, 0x0c, 0x23, 0xb6, 0x60, 0xf5, 0x46, 0x09, 0x55, 0x5c, 0x8a, 0xe2,
+	0xfe, 0x83, 0xbf, 0x6b, 0xc8, 0xba, 0x90, 0xc2, 0x67, 0x42, 0x25, 0x54, 0xc9, 0xe4, 0x42, 0x8a,
+	0x80, 0x87, 0x56, 0x1b, 0x55, 0xfd, 0x3e, 0x15, 0x82, 0x45, 0x69, 0x1d, 0x9e, 0x54, 0x4e, 0x6b,
+	0xb7, 0x3f, 0x71, 0x56, 0x8d, 0x38, 0xff, 0x55, 0x39, 0x17, 0x85, 0x84, 0xcc, 0xb5, 0xd6, 0x4f,
+	0x10, 0xbd, 0x95, 0x6b, 0xdc, 0x54, 0x51, 0xd1, 0xa3, 0x49, 0xcf, 0x2d, 0xaf, 0xea, 0x5b, 0x27,
+	0xf0, 0xb4, 0x76, 0xfb, 0xb3, 0x0d, 0xb2, 0xde, 0x91, 0x84, 0x76, 0x4a, 0x79, 0x59, 0xa1, 0xf5,
+	0x8e, 0x9e, 0x34, 0x6e, 0xbd, 0xe4, 0x82, 0xdc, 0xca, 0x73, 0xad, 0x81, 0xd6, 0xf7, 0xa8, 0x16,
+	0xa4, 0x83, 0x79, 0xe9, 0x8a, 0x29, 0x7d, 0xb6, 0x41, 0xe9, 0x76, 0xe7, 0x9b, 0x59, 0xc5, 0x43,
+	0x3d, 0x69, 0xa0, 0x45, 0x4c, 0x50, 0x90, 0x0e, 0x66, 0xf9, 0xef, 0xa2, 0x4a, 0xe4, 0xa9, 0xfa,
+	0xb6, 0xc9, 0x7b, 0xbe, 0xc9, 0x93, 0x5a, 0xdd, 0xe2, 0x54, 0x0e, 0xa3, 0xb5, 0xa7, 0x27, 0x8d,
+	0xca, 0x9d, 0x56, 0x97, 0xe4, 0x89, 0xac, 0xaf, 0xd0, 0x7e, 0xcc, 0x45, 0xe8, 0xa6, 0x91, 0x54,
+	0xf5, 0x1d, 0x93, 0xf5, 0x95, 0xda, 0x9f, 0x8b, 0x3b, 0x91, 0x54, 0xd6, 0x97, 0x68, 0x37, 0xa1,
+	0x3d, 0x2e, 0xd3, 0xfa, 0xae, 0x19, 0xe2, 0xe9, 0x06, 0x59, 0x48, 0x2e, 0x20, 0xa5, 0xce, 0xfe,
+	0x02, 0xed, 0xcd, 0x5e, 0xf9, 0x3e, 0xda, 0x0f, 0x12, 0xf6, 0xc3, 0x88, 0x09, 0xff, 0xaa, 0x0e,
+	0x4f, 0xe0, 0xe9, 0x36, 0x59, 0x00, 0xd6, 0x9b, 0x68, 0xc7, 0x48, 0xcc, 0x60, 0x0f, 0x48, 0x11,
+	0xd8, 0x7f, 0x41, 0xf4, 0xb2, 0x31, 0x59, 0x77, 0xd1, 0xde, 0x6c, 0x1a, 0xf0, 0x55, 0xdf, 0xd7,
+	0xaa, 0x5e, 0x4f, 0x1a, 0xe0, 0x66, 0xd2, 0x80, 0x64, 0x96, 0x24, 0xf7, 0xe6, 0x51, 0xd1, 0xbb,
+	0xe4, 0x3d, 0xd5, 0x2f, 0x1d, 0x2c, 0x00, 0xeb, 0x63, 0x74, 0x9c, 0xc6, 0x09, 0xa3, 0xbd, 0xbc,
+	0xa9, 0x01, 0xf5, 0x95, 0x4c, 0xcc, 0x12, 0x1c, 0x90, 0xa3, 0x39, 0xde, 0x36, 0xb0, 0xfd, 0x1b,
+	0x44, 0x4b, 0x53, 0x7e, 0xcd, 0x3e, 0xdf, 0x45, 0x55, 0x8f, 0x2b, 0x37, 0xa1, 0x8a, 0x95, 0xfe,
+	0xf6, 0x3c, 0xae, 0x08, 0x55, 0xcc, 0xfe, 0x15, 0xa2, 0xe3, 0xf5, 0xad, 0xb1, 0x9a, 0xa8, 0x96,
+	0xa4, 0x29, 0x77, 0x15, 0x4d, 0x42, 0xa6, 0x8c, 0xc3, 0xad, 0x62, 0x51, 0x49, 0xa7, 0xf3, 0x75,
+	0xd7, 0xa0, 0x04, 0xe5, 0x94, 0xe2, 0x3c, 0x17, 0xc8, 0x20, 0x48, 0x99, 0x32, 0x06, 0x96, 0x04,
+	0xdf, 0x1a, 0xb4, 0x10, 0x14, 0x67, 0xeb, 0x3d, 0xb4, 0x9f, 0xfa, 0x54, 0xb8, 0x8a, 0x0f, 0x0b,
+	0x4b, 0x3b, 0xa4, 0x9a, 0x03, 0x5d, 0x3e, 0x64, 0xf6, 0x3f, 0x5b, 0x68, 0xc7, 0x6c, 0x8b, 0xf5,
+	0x36, 0xda, 0x65, 0x82, 0x7a, 0x11, 0x33, 0x1e, 0xaa, 0xa4, 0x8c, 0x72, 0xb9, 0xdf, 0xe7, 0xb1,
+	0xab, 0xae, 0x62, 0x66, 0xaa, 0xed, 0xe7, 0xff, 0x0d, 0x3c, 0xee, 0x5e, 0xc5, 0x6c, 0x75, 0x9f,
+	0x2a, 0xeb, 0xfb, 0xb4, 0x66, 0x75, 0xfb, 0x7f, 0xad, 0xfa, 0xe8, 0x58, 0x8d, 0x5d, 0x7f, 0xb9,
+	0x41, 0xe5, 0x6f, 0xe7, 0xf3, 0x4d, 0xb7, 0xde, 0xe9, 0x8e, 0x57, 0x1a, 0x4c, 0x8e, 0xd4, 0x2a,
+	0x60, 0xff, 0x0c, 0xd1, 0xd1, 0x1a, 0xc9, 0xfa, 0x10, 0x1d, 0x0c, 0xb9, 0x70, 0xd7, 0x7f, 0x1b,
+	0x6f, 0x0c, 0xb9, 0x68, 0xcf, 0x9f, 0x93, 0x93, 0xe8, 0x78, 0x89, 0xb4, 0x55, 0x92, 0xe8, 0x78,
+	0x41, 0xfa, 0x08, 0x1d, 0x09, 0xa9, 0xfc, 0xbe, 0xbb, 0xde, 0x97, 0x43, 0x03, 0xcf, 0x89, 0xad,
+	0x3f, 0xe1, 0xf5, 0x14, 0xc3, 0x9b, 0x29, 0x86, 0x4f, 0xa6, 0x18, 0x3c, 0x9d, 0x62, 0xf0, 0x6c,
+	0x8a, 0xc1, 0xf3, 0x29, 0x06, 0x2f, 0xa6, 0x18, 0xde, 0xd3, 0x18, 0xde, 0xd7, 0x18, 0x3c, 0xd0,
+	0x18, 0x3e, 0xd4, 0x18, 0x3c, 0xd2, 0x18, 0x3c, 0xd6, 0x18, 0x5c, 0x6b, 0x0c, 0x6f, 0x34, 0x86,
+	0x4f, 0x34, 0x06, 0x4f, 0x35, 0x86, 0xcf, 0x34, 0x06, 0xcf, 0x35, 0x86, 0x2f, 0x34, 0x06, 0xf7,
+	0x32, 0x0c, 0xee, 0x67, 0x18, 0xfe, 0x92, 0x61, 0xf0, 0x7b, 0x86, 0xe1, 0x1f, 0x19, 0x06, 0x0f,
+	0x32, 0x0c, 0x1e, 0x66, 0x18, 0x3e, 0xca, 0x30, 0x7c, 0x9c, 0x61, 0xf8, 0xdd, 0xa7, 0xa1, 0x74,
+	0x54, 0x9f, 0xa9, 0x3e, 0x17, 0x61, 0xea, 0x08, 0xa6, 0x2e, 0x65, 0x32, 0x68, 0xae, 0x7e, 0xc2,
+	0xe2, 0x41, 0xd8, 0x54, 0x4a, 0xc4, 0x9e, 0xb7, 0x6b, 0xbe, 0x30, 0xe7, 0xff, 0x06, 0x00, 0x00,
+	0xff, 0xff, 0xe0, 0xa9, 0x3c, 0xb1, 0xe4, 0x06, 0x00, 0x00,
 }

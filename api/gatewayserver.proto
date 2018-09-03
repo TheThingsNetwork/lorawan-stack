@@ -30,6 +30,7 @@ message GatewayUp {
   // UplinkMessages received by the gateway.
   repeated UplinkMessage uplink_messages = 1;
   GatewayStatus gateway_status = 2;
+  TxAcknowledgment tx_acknowledgment = 3;
 }
 
 // GatewayDown contains downlink messages for the gateway.
