@@ -283,24 +283,24 @@ func TestApplicationValidations(t *testing.T) {
 		// empty list of rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name:   "foo",
-			Rights: []Right{},
+			Name:                   "foo",
+			Rights:                 []Right{},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with gateway rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_GATEWAY_DELETE},
+			Name:                   "foo",
+			Rights:                 []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &GenerateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_APPLICATION_INFO},
+			Name:                   "foo",
+			Rights:                 []Right{RIGHT_APPLICATION_INFO},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -313,23 +313,23 @@ func TestApplicationValidations(t *testing.T) {
 		// request which tries to clear the rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name: "Foo-key",
+			Name:                   "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with gateway rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_GATEWAY_DELETE},
+			Name:                   "foo",
+			Rights:                 []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_APPLICATION_DELETE},
+			Name:                   "foo",
+			Rights:                 []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -342,7 +342,7 @@ func TestApplicationValidations(t *testing.T) {
 		// good request
 		req = &RemoveApplicationAPIKeyRequest{
 			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
-			Name: "foo",
+			Name:                   "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -356,7 +356,7 @@ func TestApplicationValidations(t *testing.T) {
 		req = &ApplicationCollaborator{
 			ApplicationIdentifiers:        ApplicationIdentifiers{ApplicationID: "foo-app"},
 			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
-			Rights: []Right{RIGHT_GATEWAY_DELETE},
+			Rights:                        []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
@@ -521,7 +521,7 @@ func TestGatewayValidations(t *testing.T) {
 		req = &GatewayCollaborator{
 			GatewayIdentifiers:            GatewayIdentifiers{GatewayID: "foo-gtw"},
 			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
-			Rights: []Right{RIGHT_APPLICATION_DELETE},
+			Rights:                        []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
@@ -611,8 +611,8 @@ func TestOrganizationValidations(t *testing.T) {
 		req := &CreateOrganizationRequest{
 			Organization: Organization{
 				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-				Email: "bar",
-				Name:  "baz",
+				Email:                   "bar",
+				Name:                    "baz",
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
@@ -621,8 +621,8 @@ func TestOrganizationValidations(t *testing.T) {
 		req = &CreateOrganizationRequest{
 			Organization: Organization{
 				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-				Email: "bar@bar.com",
-				Name:  "baz",
+				Email:                   "bar@bar.com",
+				Name:                    "baz",
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -633,7 +633,7 @@ func TestOrganizationValidations(t *testing.T) {
 		req := &UpdateOrganizationRequest{
 			Organization: Organization{
 				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-				Name: "baz",
+				Name:                    "baz",
 			},
 		}
 		err := req.Validate()
@@ -644,7 +644,7 @@ func TestOrganizationValidations(t *testing.T) {
 		req = &UpdateOrganizationRequest{
 			Organization: Organization{
 				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-				Name: "baz",
+				Name:                    "baz",
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"descriptio"},
@@ -687,24 +687,24 @@ func TestOrganizationValidations(t *testing.T) {
 		// empty list of rights (bad)
 		req = &GenerateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name:   "foo",
-			Rights: []Right{},
+			Name:                    "foo",
+			Rights:                  []Right{},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// rights for application (bad)
 		req = &GenerateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_APPLICATION_INFO},
+			Name:                    "foo",
+			Rights:                  []Right{RIGHT_APPLICATION_INFO},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &GenerateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_ORGANIZATION_DELETE},
+			Name:                    "foo",
+			Rights:                  []Right{RIGHT_ORGANIZATION_DELETE},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -717,23 +717,23 @@ func TestOrganizationValidations(t *testing.T) {
 		// request which tries to clear the rights (bad)
 		req = &UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name: "Foo-key",
+			Name:                    "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with application rights (bad)
 		req = &UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_APPLICATION_DELETE},
+			Name:                    "foo",
+			Rights:                  []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name:   "foo",
-			Rights: []Right{RIGHT_ORGANIZATION_INFO},
+			Name:                    "foo",
+			Rights:                  []Right{RIGHT_ORGANIZATION_INFO},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -746,7 +746,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// good request
 		req = &RemoveOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
-			Name: "foo",
+			Name:                    "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}

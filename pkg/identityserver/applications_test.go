@@ -81,8 +81,8 @@ func TestApplication(t *testing.T) {
 	// Generate a new API key.
 	key, err := is.applicationService.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
-		Name:   "foo",
-		Rights: ttnpb.AllApplicationRights(),
+		Name:                   "foo",
+		Rights:                 ttnpb.AllApplicationRights(),
 	})
 	a.So(err, should.BeNil)
 	a.So(key.Key, should.NotBeEmpty)
@@ -93,16 +93,16 @@ func TestApplication(t *testing.T) {
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
 	_, err = is.applicationService.UpdateApplicationAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
-		Name:   key.Name,
-		Rights: key.Rights,
+		Name:                   key.Name,
+		Rights:                 key.Rights,
 	})
 	a.So(err, should.BeNil)
 
 	// Can't generate another API key with the same name.
 	_, err = is.applicationService.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
-		Name:   key.Name,
-		Rights: []ttnpb.Right{ttnpb.Right(1)},
+		Name:                   key.Name,
+		Rights:                 []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
 	a.So(err, should.DescribeError, store.ErrAPIKeyNameConflict)
@@ -116,7 +116,7 @@ func TestApplication(t *testing.T) {
 
 	_, err = is.applicationService.RemoveApplicationAPIKey(ctx, &ttnpb.RemoveApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
-		Name: key.Name,
+		Name:                   key.Name,
 	})
 	a.So(err, should.BeNil)
 
@@ -191,7 +191,7 @@ func TestApplication(t *testing.T) {
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifiers:        app.ApplicationIdentifiers,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
-		Rights: ttnpb.DifferenceRights(ttnpb.AllApplicationRights(), []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO}),
+		Rights:                        ttnpb.DifferenceRights(ttnpb.AllApplicationRights(), []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO}),
 	})
 	a.So(err, should.NotBeNil)
 

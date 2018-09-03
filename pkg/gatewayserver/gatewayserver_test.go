@@ -61,7 +61,7 @@ func TestGatewayServer(t *testing.T) {
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen: ":9184",
+				Listen:                      ":9184",
 				AllowInsecureForCredentials: true,
 			},
 			Cluster: config.Cluster{

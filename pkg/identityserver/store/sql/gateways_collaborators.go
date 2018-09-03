@@ -313,7 +313,7 @@ func (s *gatewayStore) listCollaborators(q db.QueryContext, gtwID uuid.UUID, rig
 
 			byUser[collaborator.AccountID.String()] = &ttnpb.GatewayCollaborator{
 				OrganizationOrUserIdentifiers: identifier,
-				Rights: []ttnpb.Right{collaborator.Right},
+				Rights:                        []ttnpb.Right{collaborator.Right},
 			}
 			continue
 		}

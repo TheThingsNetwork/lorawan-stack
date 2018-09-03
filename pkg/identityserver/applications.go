@@ -92,7 +92,7 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 		return tx.Applications.SetCollaborator(ttnpb.ApplicationCollaborator{
 			ApplicationIdentifiers:        req.Application.ApplicationIdentifiers,
 			OrganizationOrUserIdentifiers: id,
-			Rights: ttnpb.AllApplicationRights(),
+			Rights:                        ttnpb.AllApplicationRights(),
 		})
 	})
 

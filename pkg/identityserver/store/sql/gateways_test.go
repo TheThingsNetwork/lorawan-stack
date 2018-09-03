@@ -115,7 +115,7 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 	collaborator := ttnpb.GatewayCollaborator{
 		GatewayIdentifiers:            gateway.GatewayIdentifiers,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
-		Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
+		Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
 	}
 
 	collaborators, err := s.Gateways.ListCollaborators(gateway.GatewayIdentifiers)

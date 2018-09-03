@@ -82,8 +82,8 @@ func TestOrganization(t *testing.T) {
 	// Generate a new API key.
 	key, err := is.organizationService.GenerateOrganizationAPIKey(ctx, &ttnpb.GenerateOrganizationAPIKeyRequest{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
-		Name:   "foo",
-		Rights: ttnpb.AllOrganizationRights(),
+		Name:                    "foo",
+		Rights:                  ttnpb.AllOrganizationRights(),
 	})
 	a.So(err, should.BeNil)
 	a.So(key.Key, should.NotBeEmpty)
@@ -94,16 +94,16 @@ func TestOrganization(t *testing.T) {
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
 	_, err = is.organizationService.UpdateOrganizationAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
-		Name:   key.Name,
-		Rights: key.Rights,
+		Name:                    key.Name,
+		Rights:                  key.Rights,
 	})
 	a.So(err, should.BeNil)
 
 	// Can't generate another API key with the same name.
 	_, err = is.organizationService.GenerateOrganizationAPIKey(ctx, &ttnpb.GenerateOrganizationAPIKeyRequest{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
-		Name:   key.Name,
-		Rights: []ttnpb.Right{ttnpb.Right(1)},
+		Name:                    key.Name,
+		Rights:                  []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
 	a.So(store.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
@@ -117,7 +117,7 @@ func TestOrganization(t *testing.T) {
 
 	_, err = is.organizationService.RemoveOrganizationAPIKey(ctx, &ttnpb.RemoveOrganizationAPIKeyRequest{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
-		Name: key.Name,
+		Name:                    key.Name,
 	})
 	a.So(err, should.BeNil)
 

@@ -64,13 +64,13 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 
 		err = tx.Organizations.Create(&ttnpb.Organization{
 			OrganizationIdentifiers: req.Organization.OrganizationIdentifiers,
-			Name:        req.Organization.Name,
-			Description: req.Organization.Description,
-			URL:         req.Organization.URL,
-			Location:    req.Organization.Location,
-			Email:       req.Organization.Email,
-			CreatedAt:   now,
-			UpdatedAt:   now,
+			Name:                    req.Organization.Name,
+			Description:             req.Organization.Description,
+			URL:                     req.Organization.URL,
+			Location:                req.Organization.Location,
+			Email:                   req.Organization.Email,
+			CreatedAt:               now,
+			UpdatedAt:               now,
 		})
 		if err != nil {
 			return err

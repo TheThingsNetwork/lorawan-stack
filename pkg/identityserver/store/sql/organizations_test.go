@@ -31,8 +31,8 @@ func TestOrganizations(t *testing.T) {
 	userID := alice.UserIdentifiers
 	org := &ttnpb.Organization{
 		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "thethingsnetwork"},
-		Name:  "The Things Network",
-		Email: "foo@bar.org",
+		Name:                    "The Things Network",
+		Email:                   "foo@bar.org",
 	}
 
 	specializer := func(base ttnpb.Organization) store.Organization {
@@ -132,7 +132,7 @@ func TestOrganizations(t *testing.T) {
 		collaborator := ttnpb.ApplicationCollaborator{
 			ApplicationIdentifiers:        application.ApplicationIdentifiers,
 			OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_OrganizationID{OrganizationID: &org.OrganizationIdentifiers}},
-			Rights: ttnpb.AllApplicationRights(),
+			Rights:                        ttnpb.AllApplicationRights(),
 		}
 		err = s.Applications.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
@@ -179,7 +179,7 @@ func TestOrganizations(t *testing.T) {
 		collaborator := ttnpb.GatewayCollaborator{
 			GatewayIdentifiers:            gateway.GatewayIdentifiers,
 			OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_OrganizationID{OrganizationID: &org.OrganizationIdentifiers}},
-			Rights: ttnpb.AllGatewayRights(),
+			Rights:                        ttnpb.AllGatewayRights(),
 		}
 		err = s.Gateways.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)

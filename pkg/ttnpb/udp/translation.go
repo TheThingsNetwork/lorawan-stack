@@ -98,8 +98,8 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 			RSSI:                  float32(signal.RSSIS),
 			ChannelRSSI:           float32(signal.RSSIC),
 			RSSIStandardDeviation: float32(signal.RSSISD),
-			SNR:             float32(signal.LSNR),
-			FrequencyOffset: int64(signal.FOff),
+			SNR:                   float32(signal.LSNR),
+			FrequencyOffset:       int64(signal.FOff),
 		}
 		if signal.ETime != "" {
 			signalMetadata.AESKeyID = strconv.Itoa(int(rx.Aesk))

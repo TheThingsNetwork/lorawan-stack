@@ -59,7 +59,7 @@ func TestApplications(t *testing.T) {
 	collaborator := ttnpb.ApplicationCollaborator{
 		ApplicationIdentifiers:        application.ApplicationIdentifiers,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
-		Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 	}
 
 	collaborators, err := s.Applications.ListCollaborators(application.ApplicationIdentifiers)
@@ -113,7 +113,7 @@ func TestApplications(t *testing.T) {
 	collaborator2 := ttnpb.ApplicationCollaborator{
 		ApplicationIdentifiers:        application.ApplicationIdentifiers,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &bob.UserIdentifiers}},
-		Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 	}
 	err = s.Applications.SetCollaborator(collaborator2)
 	a.So(err, should.BeNil)

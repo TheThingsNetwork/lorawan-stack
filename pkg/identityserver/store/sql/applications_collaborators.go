@@ -299,7 +299,7 @@ func (s *applicationStore) listCollaborators(q db.QueryContext, appID uuid.UUID,
 
 			byUser[collaborator.AccountID.String()] = &ttnpb.ApplicationCollaborator{
 				OrganizationOrUserIdentifiers: identifier,
-				Rights: []ttnpb.Right{collaborator.Right},
+				Rights:                        []ttnpb.Right{collaborator.Right},
 			}
 			continue
 		}
