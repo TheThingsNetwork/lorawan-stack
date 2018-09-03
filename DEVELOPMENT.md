@@ -13,18 +13,17 @@ brew install go node yarn
 On Ubuntu (or Ubuntu [using the Windows Subsystem for Linux](https://www.microsoft.com/nl-NL/store/p/ubuntu/9nblggh4msv6?rtc=1)):
 
 ```sh
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 
-curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
+curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
 echo "deb https://deb.nodesource.com/node_8.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 echo "deb-src https://deb.nodesource.com/node_8.x xenial main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
 
 sudo apt-get update
 sudo apt-get install build-essential nodejs yarn
 
-curl -sS https://storage.googleapis.com/golang/go1.10.3.linux-amd64.tar.gz -o go1.10.3.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.10.3.linux-amd64.tar.gz
+curl -sSL https://dl.google.com/go/go1.11.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
 sudo ln -s /usr/local/go/bin/* /usr/local/bin
 ```
 

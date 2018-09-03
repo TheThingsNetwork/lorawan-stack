@@ -27,7 +27,7 @@ GO_MISSPELL= misspell
 GO_UNCONVERT= unconvert
 GO_METALINTER = gometalinter
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
-GO_MINIMUM_VERSION = 1.10
+GO_MINIMUM_VERSION = 1.11
 GO_VERSION := $(shell go version | cut -d' ' -f3 | cut -c 3-6)
 
 # Get the minor Go version
