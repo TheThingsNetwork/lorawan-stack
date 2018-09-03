@@ -20,61 +20,43 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// UserIdentifiers is the message that is used to identify an user.
 message UserIdentifiers {
-  // The unique and immutable user's ID.
   // This ID shares namespace with organization's IDs.
   string user_id = 1 [(gogoproto.customname) = "UserID"];
-  // Unique and mutable user's email address.
   string email = 2;
 }
 
-// ApplicationIdentifiers is the message that is used to identify an application.
 message ApplicationIdentifiers {
   option (gogoproto.populate) = false;
-  // TTN Application ID.
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
 }
 
-// GatewayIdentifiers is the message that is used to identify a gateway.
 message GatewayIdentifiers {
   option (gogoproto.populate) = false;
-  // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
-  // Gateway's unique and immutable EUI.
   bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
 }
 
-// End device identifiers are carried with uplink and downlink messages.
-// Unknown fields are left empty.
 message EndDeviceIdentifiers {
   option (gogoproto.populate) = false;
-  // TTN Device ID.
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
-  // TTN Application ID.
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // LoRaWAN DevEUI.
+  // The LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
-  // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
+  // The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
   bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
-  // LoRaWAN DevAddr.
+  // The LoRaWAN DevAddr.
   bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
 }
 
-// ClientIdentifiers is the message that is used to identify a client.
 message ClientIdentifiers {
-  // TTN Client ID.
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
 }
 
-// OrganizationIdentifiers is the message that is used to identify an organization.
 message OrganizationIdentifiers {
-  // TTN Organization ID.
   string organization_id = 1 [(gogoproto.customname) = "OrganizationID"];
 }
 
-// OrganizationOrUserIdentifiers is the message used in collaborationship messages
-// used to identify the persona entity.
 message OrganizationOrUserIdentifiers {
   oneof ID {
     UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs"];
@@ -82,7 +64,7 @@ message OrganizationOrUserIdentifiers {
   }
 }
 
-// CombinedIdentifiers combines the identifiers of multiple entities.
+// Combine the identifiers of multiple entities.
 // The main purpose of this message is its use in events.
 message CombinedIdentifiers {
   repeated ApplicationIdentifiers application_ids = 1 [(gogoproto.customname) = "ApplicationIDs"];

@@ -106,8 +106,10 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 			FrequencyOffset:       int64(signal.FOff),
 		}
 		if signal.ETime != "" {
-			signalMetadata.AESKeyID = strconv.Itoa(int(rx.Aesk))
-			signalMetadata.EncryptedFineTimestamp = signal.ETime
+			if etime, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(signal.ETime, "=")); err == nil {
+				signalMetadata.EncryptedFineTimestampKeyID = strconv.Itoa(int(rx.Aesk))
+				signalMetadata.EncryptedFineTimestamp = etime
+			}
 		}
 		md = append(md, signalMetadata)
 	}

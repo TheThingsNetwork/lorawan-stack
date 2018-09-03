@@ -31,24 +31,15 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-// Join-request
 type JoinRequest struct {
-	// Raw uplink bytes (PHYPayload)
-	RawPayload []byte `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	// LoRaWAN Payload
-	Payload Message `protobuf:"bytes,2,opt,name=payload" json:"payload"`
-	// End device identifiers
-	// - this includes the DevAddr assigned by the Network Server
+	RawPayload           []byte  `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
+	Payload              Message `protobuf:"bytes,2,opt,name=payload" json:"payload"`
 	EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device,json=endDevice,embedded=end_device" json:"end_device"`
-	// MAC version selected by the Network Server
-	SelectedMacVersion MACVersion `protobuf:"varint,4,opt,name=selected_mac_version,json=selectedMacVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"selected_mac_version,omitempty"`
-	// NetID of the accepting Network Server
-	NetID go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id"`
-	// Downlink Settings
-	DownlinkSettings DLSettings `protobuf:"bytes,6,opt,name=downlink_settings,json=downlinkSettings" json:"downlink_settings"`
-	// Rx Delay in seconds
-	RxDelay uint32 `protobuf:"varint,7,opt,name=rx_delay,json=rxDelay,proto3" json:"rx_delay,omitempty"`
-	// Optional CFList
+	SelectedMacVersion   MACVersion                                         `protobuf:"varint,4,opt,name=selected_mac_version,json=selectedMacVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"selected_mac_version,omitempty"`
+	NetID                go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id"`
+	DownlinkSettings     DLSettings                                         `protobuf:"bytes,6,opt,name=downlink_settings,json=downlinkSettings" json:"downlink_settings"`
+	RxDelay              uint32                                             `protobuf:"varint,7,opt,name=rx_delay,json=rxDelay,proto3" json:"rx_delay,omitempty"`
+	// Optional CFList.
 	CFList               *CFList  `protobuf:"bytes,8,opt,name=cf_list,json=cfList" json:"cf_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -57,7 +48,7 @@ type JoinRequest struct {
 func (m *JoinRequest) Reset()      { *m = JoinRequest{} }
 func (*JoinRequest) ProtoMessage() {}
 func (*JoinRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_join_cdb74691bfc4c920, []int{0}
+	return fileDescriptor_join_2d88e226874934b9, []int{0}
 }
 func (m *JoinRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -128,13 +119,9 @@ func (m *JoinRequest) GetCFList() *CFList {
 	return nil
 }
 
-// Answer to the Join-request
 type JoinResponse struct {
-	// Raw uplink bytes (PHYPayload)
-	RawPayload []byte `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	// The session keys
-	SessionKeys `protobuf:"bytes,2,opt,name=session_keys,json=sessionKeys,embedded=session_keys" json:"session_keys"`
-	// Lifetime of the session
+	RawPayload           []byte `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
+	SessionKeys          `protobuf:"bytes,2,opt,name=session_keys,json=sessionKeys,embedded=session_keys" json:"session_keys"`
 	Lifetime             *types.Duration `protobuf:"bytes,3,opt,name=lifetime" json:"lifetime,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -143,7 +130,7 @@ type JoinResponse struct {
 func (m *JoinResponse) Reset()      { *m = JoinResponse{} }
 func (*JoinResponse) ProtoMessage() {}
 func (*JoinResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_join_cdb74691bfc4c920, []int{1}
+	return fileDescriptor_join_2d88e226874934b9, []int{1}
 }
 func (m *JoinResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1098,12 +1085,12 @@ var (
 	ErrIntOverflowJoin   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_cdb74691bfc4c920) }
+func init() { proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_2d88e226874934b9) }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_cdb74691bfc4c920)
+	golang_proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_2d88e226874934b9)
 }
 
-var fileDescriptor_join_cdb74691bfc4c920 = []byte{
+var fileDescriptor_join_2d88e226874934b9 = []byte{
 	// 664 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x3d, 0x4c, 0x1b, 0x49,
 	0x14, 0xc7, 0x67, 0xee, 0x8c, 0x6d, 0xc6, 0x1c, 0xe2, 0x56, 0xa7, 0x3b, 0xc3, 0x9d, 0xde, 0x5a,

@@ -68,19 +68,13 @@ message UplinkMessage {
   //   - Lat: rx_metadata.location.latitude
   //   - Lon: rx_metadata.location.longitude
 
-  // Raw uplink bytes (PHYPayload)
   bytes raw_payload = 1;
-  // LoRaWAN Payload
   Message payload = 2 [(gogoproto.nullable) = false];
-  // End device identifiers
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // LoRaWAN Tx settings used for this transmission
   TxSettings settings = 4 [(gogoproto.nullable) = false];
-  // Rx metadata from the gateway, one for each antenna that received the message
   repeated RxMetadata rx_metadata = 5;
-  // Locations from various sources
   map<string,LocationSource> locations = 6;
-  // ReceivedAt represents the time instant when the Gateway Server received the message.
+  // Server time when the Gateway Server received the message.
   google.protobuf.Timestamp received_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   repeated string correlation_ids = 8 [(gogoproto.customname) = "CorrelationIDs"];
 }
@@ -125,15 +119,10 @@ message DownlinkMessage {
   //  - GWInfo:
   //   - ID: tx_metadata.gateway_id
 
-  // Raw downlink bytes (PHYPayload)
   bytes raw_payload = 1;
-  // LoRaWAN Payload
   Message payload = 2 [(gogoproto.nullable) = false];
-  // End device identifiers
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // LoRaWAN Tx settings used for this transmission
   TxSettings settings = 4 [(gogoproto.nullable) = false];
-  // Tx metadata for the gateway
   TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
@@ -186,7 +175,6 @@ message ApplicationDownlinks {
   repeated ApplicationDownlink downlinks = 1;
 }
 
-// ApplicationUp wraps multiple application-layer uplink types.
 message ApplicationUp {
   EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 

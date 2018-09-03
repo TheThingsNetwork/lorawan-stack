@@ -25,33 +25,33 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message Message {
   option (gogoproto.populate) = false;
 
-  MHDR  m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  bytes mic   = 2 [(gogoproto.customname) = "MIC"];
+  MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  bytes mic = 2 [(gogoproto.customname) = "MIC"];
 
   // Payload represents either MACPayload, RejoinRequestPayload, JoinRequestPayload or JoinAcceptPayload
-  // - MACPayload length is in range [7:M] bytes, where M is region specific(see LoRaWAN spec).
+  // - MACPayload length is in range [7:M] bytes, where M is PHY specific.
   // - JoinRequestPayload length is 18 bytes.
   // - JoinAcceptPayload length is either 12 or 28 bytes.
   // - RejoinRequestPayload length is 14 for Type 0 and 2, 19 for Type 1.
   oneof Payload {
-    MACPayload           mac_payload             = 3 [(gogoproto.customname) = "MACPayload"];
-    JoinRequestPayload   join_request_payload    = 4;
-    JoinAcceptPayload    join_accept_payload     = 5;
-    RejoinRequestPayload rejoin_request_payload  = 6;
+    MACPayload mac_payload = 3 [(gogoproto.customname) = "MACPayload"];
+    JoinRequestPayload join_request_payload = 4;
+    JoinAcceptPayload join_accept_payload = 5;
+    RejoinRequestPayload rejoin_request_payload = 6;
   }
 
-  reserved 7; // reserved for proprietary payload
+  reserved 7; // Reserved for proprietary payload.
 }
 
 enum MType {
-  JOIN_REQUEST      = 0;
-  JOIN_ACCEPT       = 1;
-  UNCONFIRMED_UP    = 2;
-  UNCONFIRMED_DOWN  = 3;
-  CONFIRMED_UP      = 4;
-  CONFIRMED_DOWN    = 5;
-  REJOIN_REQUEST    = 6;
-  PROPRIETARY       = 7;
+  JOIN_REQUEST = 0;
+  JOIN_ACCEPT = 1;
+  UNCONFIRMED_UP = 2;
+  UNCONFIRMED_DOWN = 3;
+  CONFIRMED_UP = 4;
+  CONFIRMED_DOWN = 5;
+  REJOIN_REQUEST = 6;
+  PROPRIETARY = 7;
 }
 
 enum Major {
@@ -85,16 +85,16 @@ enum PHYVersion {
 enum DataRateIndex {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  DATA_RATE_0  = 0;
-  DATA_RATE_1  = 1;
-  DATA_RATE_2  = 2;
-  DATA_RATE_3  = 3;
-  DATA_RATE_4  = 4;
-  DATA_RATE_5  = 5;
-  DATA_RATE_6  = 6;
-  DATA_RATE_7  = 7;
-  DATA_RATE_8  = 8;
-  DATA_RATE_9  = 9;
+  DATA_RATE_0 = 0;
+  DATA_RATE_1 = 1;
+  DATA_RATE_2 = 2;
+  DATA_RATE_3 = 3;
+  DATA_RATE_4 = 4;
+  DATA_RATE_5 = 5;
+  DATA_RATE_6 = 6;
+  DATA_RATE_7 = 7;
+  DATA_RATE_8 = 8;
+  DATA_RATE_9 = 9;
   DATA_RATE_10 = 10;
   DATA_RATE_11 = 11;
   DATA_RATE_12 = 12;
@@ -104,70 +104,70 @@ enum DataRateIndex {
 }
 
 message MHDR {
-  MType m_type  = 1;
-  Major major   = 2;
+  MType m_type = 1;
+  Major major = 2;
 }
 
 message MACPayload {
   option (gogoproto.populate) = false;
 
-  FHDR  f_hdr                            = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_port                          = 2;
-  bytes frm_payload                      = 3 [(gogoproto.customname) = "FRMPayload"];
+  FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 f_port = 2;
+  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 4;
 }
 
 message FHDR {
   option (gogoproto.populate) = false;
 
-  bytes dev_addr  = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
-  FCtrl f_ctrl    = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_cnt    = 3;
-  bytes f_opts    = 4;
+  bytes dev_addr = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
+  FCtrl f_ctrl = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 f_cnt = 3;
+  bytes f_opts = 4;
 }
 
 message FCtrl {
-  bool    adr         = 1 [(gogoproto.customname) = "ADR"];
-  bool    adr_ack_req = 2 [(gogoproto.customname) = "ADRAckReq"]; // only on uplink
-  bool    ack         = 3;
-  bool    f_pending   = 4; // only on downlink
-  bool    class_b     = 5; // only on uplink
+  bool adr = 1 [(gogoproto.customname) = "ADR"];
+  bool adr_ack_req = 2 [(gogoproto.customname) = "ADRAckReq"]; // Only on uplink.
+  bool ack = 3;
+  bool f_pending = 4; // Only on downlink.
+  bool class_b = 5; // Only on uplink.
 }
 
 message JoinRequestPayload {
   option (gogoproto.populate) = false;
 
-  bytes join_eui  = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
-  bytes dev_eui   = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
   bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevNonce"];
 }
 
 enum RejoinType {
-  CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters
-  SESSION = 1; // Equivalent to the initial JoinRequest
-  KEYS    = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters
+  CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.
+  SESSION = 1; // Equivalent to the initial JoinRequest.
+  KEYS = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.
 }
 
 message RejoinRequestPayload {
   option (gogoproto.populate) = false;
 
-  RejoinType  rejoin_type = 1;
-  bytes       net_id      = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
-  bytes       join_eui    = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
-  bytes       dev_eui     = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
-  uint32      rejoin_cnt  = 5; // contains RJCount0 or RJCount1 depending on rejoin_type
+  RejoinType rejoin_type = 1;
+  bytes net_id = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
+  bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  bytes dev_eui = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  uint32 rejoin_cnt = 5; // Contains RJCount0 or RJCount1 depending on rejoin_type.
 }
 
 message JoinAcceptPayload {
   option (gogoproto.populate) = false;
 
-  bytes       encrypted   = 1;
-  bytes       join_nonce  = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.JoinNonce"];
-  bytes       net_id      = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
-  bytes       dev_addr    = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
-  DLSettings  dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32      rx_delay    = 6;
-  CFList      cf_list     = 7 [(gogoproto.customname) = "CFList"];
+  bytes encrypted = 1;
+  bytes join_nonce = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.JoinNonce"];
+  bytes net_id = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
+  bytes dev_addr = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
+  DLSettings dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 rx_delay = 6;
+  CFList cf_list = 7 [(gogoproto.customname) = "CFList"];
 }
 
 message DLSettings {
@@ -175,8 +175,8 @@ message DLSettings {
 
   uint32 rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset"];
   DataRateIndex rx2_dr = 2 [(gogoproto.customname) = "Rx2DR"];
-  // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater
-  bool opt_neg         = 3 [(gogoproto.customname) = "OptNeg"];
+  // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater.
+  bool opt_neg = 3 [(gogoproto.customname) = "OptNeg"];
 }
 
 enum CFListType {
@@ -199,7 +199,7 @@ message CFList {
 
 enum Modulation {
   LORA = 0;
-  FSK  = 1;
+  FSK = 1;
 }
 
 enum Class {
@@ -215,24 +215,21 @@ message TxSettings {
   option (gogoproto.populate) = false;
 
   Modulation modulation = 1;
-  // LoRaWAN data rate index
+  // LoRaWAN data rate index.
   DataRateIndex data_rate_index = 2;
-  // Bandwidth in Hz (derived from data_rate_index)
+  // LoRa bandwidth in Hz.
   uint32 bandwidth = 3;
-  // LoRa spreading factor (derived from data_rate_index)
+  // LoRa spreading factor.
   uint32 spreading_factor = 4;
-  // FSK bit rate (derived from data_rate_index)
+  // FSK bit rate.
   uint32 bit_rate = 5;
-  // LoRa coding rate
+  // LoRa coding rate.
   string coding_rate = 6;
-  // Frequency in Hz
+  // Frequency in Hz.
   uint64 frequency = 7;
-  // Transmission power in dBm
-  // - not set on uplink messages
+  // Transmission power in dBm. Only on downlink.
   int32 tx_power = 8;
-  // LoRa polarization inversion
-  // - gateway to end device: true
-  // - end device to gateway: false
+  // LoRa polarization inversion; false for uplink, true for downlink.
   bool polarization_inversion = 9;
   // Index of the channel that received the message.
   uint32 channel_index = 10;
@@ -240,6 +237,7 @@ message TxSettings {
 
 enum MACCommandIdentifier {
   option (gogoproto.goproto_enum_prefix) = false;
+
   CID_RFU_0 = 0;
   CID_RESET = 1;
   CID_LINK_CHECK = 2;
@@ -264,40 +262,40 @@ enum MACCommandIdentifier {
 }
 
 message MACCommand {
-  MACCommandIdentifier  cid                     = 1 [(gogoproto.customname) = "CID"];
+  MACCommandIdentifier cid = 1 [(gogoproto.customname) = "CID"];
 
   oneof payload {
-    bytes                 raw_payload             = 2;
-    ResetInd              reset_ind               = 3;
-    ResetConf             reset_conf              = 4;
-    LinkCheckAns          link_check_ans          = 5;
-    LinkADRReq            link_adr_req            = 6 [(gogoproto.customname) = "LinkADRReq"];
-    LinkADRAns            link_adr_ans            = 7 [(gogoproto.customname) = "LinkADRAns"];
-    DutyCycleReq          duty_cycle_req          = 8;
-    RxParamSetupReq       rx_param_setup_req      = 9;
-    RxParamSetupAns       rx_param_setup_ans      = 10;
-    DevStatusAns          dev_status_ans          = 11;
-    NewChannelReq         new_channel_req         = 12;
-    NewChannelAns         new_channel_ans         = 13;
-    DLChannelReq          dl_channel_req          = 14;
-    DLChannelAns          dl_channel_ans          = 15;
-    RxTimingSetupReq      rx_timing_setup_req     = 16;
-    TxParamSetupReq       tx_param_setup_req      = 17;
-    RekeyInd              rekey_ind               = 18;
-    RekeyConf             rekey_conf              = 19;
-    ADRParamSetupReq      adr_param_setup_req     = 20 [(gogoproto.customname) = "ADRParamSetupReq"];
-    DeviceTimeAns         device_time_ans         = 21;
-    ForceRejoinReq        force_rejoin_req        = 22;
-    RejoinParamSetupReq   rejoin_param_setup_req  = 23;
-    RejoinParamSetupAns   rejoin_param_setup_ans  = 24;
-    PingSlotInfoReq       ping_slot_info_req      = 25;
-    PingSlotChannelReq    ping_slot_channel_req   = 26;
-    PingSlotChannelAns    ping_slot_channel_ans   = 27;
-    BeaconTimingAns       beacon_timing_ans       = 28;
-    BeaconFreqReq         beacon_freq_req         = 29;
-    BeaconFreqAns         beacon_freq_ans         = 30;
-    DeviceModeInd         device_mode_ind         = 31;
-    DeviceModeConf        device_mode_conf        = 32;
+    bytes raw_payload = 2;
+    ResetInd reset_ind = 3;
+    ResetConf reset_conf = 4;
+    LinkCheckAns link_check_ans = 5;
+    LinkADRReq link_adr_req = 6 [(gogoproto.customname) = "LinkADRReq"];
+    LinkADRAns link_adr_ans = 7 [(gogoproto.customname) = "LinkADRAns"];
+    DutyCycleReq duty_cycle_req = 8;
+    RxParamSetupReq rx_param_setup_req = 9;
+    RxParamSetupAns rx_param_setup_ans = 10;
+    DevStatusAns dev_status_ans = 11;
+    NewChannelReq new_channel_req = 12;
+    NewChannelAns new_channel_ans = 13;
+    DLChannelReq dl_channel_req = 14;
+    DLChannelAns dl_channel_ans = 15;
+    RxTimingSetupReq rx_timing_setup_req = 16;
+    TxParamSetupReq tx_param_setup_req = 17;
+    RekeyInd rekey_ind = 18;
+    RekeyConf rekey_conf = 19;
+    ADRParamSetupReq adr_param_setup_req = 20 [(gogoproto.customname) = "ADRParamSetupReq"];
+    DeviceTimeAns device_time_ans = 21;
+    ForceRejoinReq force_rejoin_req = 22;
+    RejoinParamSetupReq rejoin_param_setup_req = 23;
+    RejoinParamSetupAns rejoin_param_setup_ans = 24;
+    PingSlotInfoReq ping_slot_info_req = 25;
+    PingSlotChannelReq ping_slot_channel_req = 26;
+    PingSlotChannelAns ping_slot_channel_ans = 27;
+    BeaconTimingAns beacon_timing_ans = 28;
+    BeaconFreqReq beacon_freq_req = 29;
+    BeaconFreqAns beacon_freq_ans = 30;
+    DeviceModeInd device_mode_ind = 31;
+    DeviceModeConf device_mode_conf = 32;
   }
 
   message ResetInd {
@@ -307,7 +305,7 @@ message MACCommand {
     uint32 minor_version = 1;
   }
   message LinkCheckAns {
-    // Margin indicates the link margin in dB of the received LinkCheckReq, relative to the demodulation floor.
+    // Indicates the link margin in dB of the received LinkCheckReq, relative to the demodulation floor.
     uint32 margin = 1;
     uint32 gateway_count = 2;
   }
@@ -315,7 +313,7 @@ message MACCommand {
     DataRateIndex data_rate_index = 1;
     uint32 tx_power_index = 2;
     repeated bool channel_mask = 3;
-    reserved 4; // for RFU 7th bit of Redundancy
+    reserved 4; // For RFU 7th bit of Redundancy.
     uint32 channel_mask_control = 5;
     uint32 nb_trans = 6;
   }
@@ -338,12 +336,12 @@ message MACCommand {
     bool rx2_frequency_ack = 3;
   }
   message DevStatusAns {
-    // Battery indicates the device battery status.
+    // Indicates the device battery status.
     // 0 indicates that the device is connected to an external power source.
     // 1..254 indicates a battery level.
     // 255 indicates that the device was not able to measure the battery level.
     uint32 battery = 1;
-    // Margin indicates the demodulation SNR in dB in the range [-32, +31].
+    // Indicates the demodulation SNR in dB in the range [-32, +31].
     int32 margin = 2;
   }
   message NewChannelReq {
@@ -368,7 +366,7 @@ message MACCommand {
     uint32 delay = 1;
   }
   message TxParamSetupReq {
-    // MaxEIRPIndex indicates the maximum EIRP value in dBm, indexed by the following table:
+    // Indicates the maximum EIRP value in dBm, indexed by the following vector:
     // [ 8 10 12 13 14 16 18 20 21 24 26 27 29 30 33 36 ]
     DeviceEIRP max_eirp_index = 1 [(gogoproto.customname) = "MaxEIRPIndex"];
     bool uplink_dwell_time = 2;
@@ -381,9 +379,9 @@ message MACCommand {
     uint32 minor_version = 1;
   }
   message ADRParamSetupReq {
-    // ADRAckLimitExponent is the exponent e that configures the ADR_ACK_LIMIT = 2^e messages
+    // Exponent e that configures the ADR_ACK_LIMIT = 2^e messages.
     ADRAckLimitExponent adr_ack_limit_exponent = 1 [(gogoproto.customname) = "ADRAckLimitExponent"];
-    // ADRAckDelayExponent is the exponent e that configures the ADR_ACK_DELAY = 2^e messages
+    // Exponent e that configures the ADR_ACK_DELAY = 2^e messages.
     ADRAckDelayExponent adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent"];
   }
   message DeviceTimeAns {
@@ -393,13 +391,13 @@ message MACCommand {
     uint32 rejoin_type = 1;
     DataRateIndex data_rate_index = 2;
     uint32 max_retries = 3;
-    // PeriodExponent is the exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds
+    // Exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds.
     uint32 period_exponent = 4;
   }
   message RejoinParamSetupReq {
-    // MaxCountExponent is the exponent e that configures the rejoin counter = 2^(e+4) messages
+    // Exponent e that configures the rejoin counter = 2^(e+4) messages.
     RejoinCountExponent max_count_exponent = 1;
-    // MaxTimeExponent is the exponent e that configures the rejoin timer = 2^(e+10) seconds
+    // Exponent e that configures the rejoin timer = 2^(e+10) seconds.
     RejoinTimeExponent max_time_exponent = 2;
   }
   message RejoinParamSetupAns {
@@ -437,77 +435,77 @@ message MACCommand {
 enum AggregatedDutyCycle {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // 100%
-  DUTY_CYCLE_1     = 0;
-  // 50%
-  DUTY_CYCLE_2     = 1;
-  // 25%
-  DUTY_CYCLE_4     = 2;
-  // 12.5%
-  DUTY_CYCLE_8     = 3;
-  // 6.25%
-  DUTY_CYCLE_16    = 4;
-  // 3.125%
-  DUTY_CYCLE_32    = 5;
-  // 1.5625%
-  DUTY_CYCLE_64    = 6;
-  // Roughly 0.781%
-  DUTY_CYCLE_128   = 7;
-  // Roughly 0.390%
-  DUTY_CYCLE_256   = 8;
-  // Roughly 0.195%
-  DUTY_CYCLE_512   = 9;
-  // Roughly 0.098%
-  DUTY_CYCLE_1024  = 10;
-  // Roughly 0.049%
-  DUTY_CYCLE_2048  = 11;
-  // Roughly 0.024%
-  DUTY_CYCLE_4096  = 12;
-  // Roughly 0.012%
-  DUTY_CYCLE_8192  = 13;
-  // Roughly 0.006%
+  // 100%.
+  DUTY_CYCLE_1 = 0;
+  // 50%.
+  DUTY_CYCLE_2 = 1;
+  // 25%.
+  DUTY_CYCLE_4 = 2;
+  // 12.5%.
+  DUTY_CYCLE_8 = 3;
+  // 6.25%.
+  DUTY_CYCLE_16 = 4;
+  // 3.125%.
+  DUTY_CYCLE_32 = 5;
+  // 1.5625%.
+  DUTY_CYCLE_64 = 6;
+  // Roughly 0.781%.
+  DUTY_CYCLE_128 = 7;
+  // Roughly 0.390%.
+  DUTY_CYCLE_256 = 8;
+  // Roughly 0.195%.
+  DUTY_CYCLE_512 = 9;
+  // Roughly 0.098%.
+  DUTY_CYCLE_1024 = 10;
+  // Roughly 0.049%.
+  DUTY_CYCLE_2048 = 11;
+  // Roughly 0.024%.
+  DUTY_CYCLE_4096 = 12;
+  // Roughly 0.012%.
+  DUTY_CYCLE_8192 = 13;
+  // Roughly 0.006%.
   DUTY_CYCLE_16384 = 14;
-  // Roughly 0.003%
+  // Roughly 0.003%.
   DUTY_CYCLE_32768 = 15;
 }
 
 enum PingSlotPeriod {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // Every second
-  PING_EVERY_1S   = 0;
-  // Every 2 seconds
-  PING_EVERY_2S   = 1;
-  // Every 4 seconds
-  PING_EVERY_4S   = 2;
-  // Every 8 seconds
-  PING_EVERY_8S   = 3;
-  // Every 16 seconds
-  PING_EVERY_16S  = 4;
-  // Every 32 seconds
-  PING_EVERY_32S  = 5;
-  // Every 64 seconds
-  PING_EVERY_64S  = 6;
-  // Every 128 seconds
+  // Every second.
+  PING_EVERY_1S = 0;
+  // Every 2 seconds.
+  PING_EVERY_2S = 1;
+  // Every 4 seconds.
+  PING_EVERY_4S = 2;
+  // Every 8 seconds.
+  PING_EVERY_8S = 3;
+  // Every 16 seconds.
+  PING_EVERY_16S = 4;
+  // Every 32 seconds.
+  PING_EVERY_32S = 5;
+  // Every 64 seconds.
+  PING_EVERY_64S = 6;
+  // Every 128 seconds.
   PING_EVERY_128S = 7;
 }
 
 enum RejoinCountExponent {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  REJOIN_COUNT_16     = 0;
-  REJOIN_COUNT_32     = 1;
-  REJOIN_COUNT_64     = 2;
-  REJOIN_COUNT_128    = 3;
-  REJOIN_COUNT_256    = 4;
-  REJOIN_COUNT_512    = 5;
-  REJOIN_COUNT_1024   = 6;
-  REJOIN_COUNT_2048   = 7;
-  REJOIN_COUNT_4096   = 8;
-  REJOIN_COUNT_8192   = 9;
-  REJOIN_COUNT_16384  = 10;
-  REJOIN_COUNT_32768  = 11;
-  REJOIN_COUNT_65536  = 12;
+  REJOIN_COUNT_16 = 0;
+  REJOIN_COUNT_32 = 1;
+  REJOIN_COUNT_64 = 2;
+  REJOIN_COUNT_128 = 3;
+  REJOIN_COUNT_256 = 4;
+  REJOIN_COUNT_512 = 5;
+  REJOIN_COUNT_1024 = 6;
+  REJOIN_COUNT_2048 = 7;
+  REJOIN_COUNT_4096 = 8;
+  REJOIN_COUNT_8192 = 9;
+  REJOIN_COUNT_16384 = 10;
+  REJOIN_COUNT_32768 = 11;
+  REJOIN_COUNT_65536 = 12;
   REJOIN_COUNT_131072 = 13;
   REJOIN_COUNT_262144 = 14;
   REJOIN_COUNT_524288 = 15;
@@ -516,44 +514,43 @@ enum RejoinCountExponent {
 enum RejoinTimeExponent {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // For calculations see https://github.com/TheThingsIndustries/lorawan-stack/pull/865#discussion_r201625341
-  // Every ~17.1 minutes
-  REJOIN_TIME_0  = 0;
-  // Every ~34.1 minutes
-  REJOIN_TIME_1  = 1;
-  // Every ~1.1 hours
-  REJOIN_TIME_2  = 2;
-  // Every ~2.3 hours
-  REJOIN_TIME_3  = 3;
-  // Every ~4.6 hours
-  REJOIN_TIME_4  = 4;
-  // Every ~9.1 hours
-  REJOIN_TIME_5  = 5;
-  // Every ~18.2 hours
-  REJOIN_TIME_6  = 6;
-  // Every ~1.5 days
-  REJOIN_TIME_7  = 7;
-  // Every ~3.0 days
-  REJOIN_TIME_8  = 8;
-  // Every ~6.1 days
-  REJOIN_TIME_9  = 9;
-  // Every ~12.1 days
+  // Every ~17.1 minutes.
+  REJOIN_TIME_0 = 0;
+  // Every ~34.1 minutes.
+  REJOIN_TIME_1 = 1;
+  // Every ~1.1 hours.
+  REJOIN_TIME_2 = 2;
+  // Every ~2.3 hours.
+  REJOIN_TIME_3 = 3;
+  // Every ~4.6 hours.
+  REJOIN_TIME_4 = 4;
+  // Every ~9.1 hours.
+  REJOIN_TIME_5 = 5;
+  // Every ~18.2 hours.
+  REJOIN_TIME_6 = 6;
+  // Every ~1.5 days.
+  REJOIN_TIME_7 = 7;
+  // Every ~3.0 days.
+  REJOIN_TIME_8 = 8;
+  // Every ~6.1 days.
+  REJOIN_TIME_9 = 9;
+  // Every ~12.1 days.
   REJOIN_TIME_10 = 10;
-  // Every ~3.5 weeks
+  // Every ~3.5 weeks.
   REJOIN_TIME_11 = 11;
-  // Every ~1.6 months
+  // Every ~1.6 months.
   REJOIN_TIME_12 = 12;
-  // Every ~3.2 months
+  // Every ~3.2 months.
   REJOIN_TIME_13 = 13;
-  // Every ~6.4 months
+  // Every ~6.4 months.
   REJOIN_TIME_14 = 14;
-  // Every ~1.1 year
+  // Every ~1.1 year.
   REJOIN_TIME_15 = 15;
 }
 
-// DeviceEIRP indicates the device's EIRP value levels.
 enum DeviceEIRP {
   option (gogoproto.goproto_enum_prefix) = false;
+
   DEVICE_EIRP_8  = 0;
   DEVICE_EIRP_10 = 1;
   DEVICE_EIRP_12 = 2;
@@ -574,40 +571,42 @@ enum DeviceEIRP {
 
 enum ADRAckLimitExponent {
   option (gogoproto.goproto_enum_prefix) = false;
-  ADR_ACK_LIMIT_1     = 0;
-  ADR_ACK_LIMIT_2     = 1;
-  ADR_ACK_LIMIT_4     = 2;
-  ADR_ACK_LIMIT_8     = 3;
-  ADR_ACK_LIMIT_16    = 4;
-  ADR_ACK_LIMIT_32    = 5;
-  ADR_ACK_LIMIT_64    = 6;
-  ADR_ACK_LIMIT_128   = 7;
-  ADR_ACK_LIMIT_256   = 8;
-  ADR_ACK_LIMIT_512   = 9;
-  ADR_ACK_LIMIT_1024  = 10;
-  ADR_ACK_LIMIT_2048  = 11;
-  ADR_ACK_LIMIT_4096  = 12;
-  ADR_ACK_LIMIT_8192  = 13;
+
+  ADR_ACK_LIMIT_1 = 0;
+  ADR_ACK_LIMIT_2 = 1;
+  ADR_ACK_LIMIT_4 = 2;
+  ADR_ACK_LIMIT_8 = 3;
+  ADR_ACK_LIMIT_16 = 4;
+  ADR_ACK_LIMIT_32 = 5;
+  ADR_ACK_LIMIT_64 = 6;
+  ADR_ACK_LIMIT_128 = 7;
+  ADR_ACK_LIMIT_256 = 8;
+  ADR_ACK_LIMIT_512 = 9;
+  ADR_ACK_LIMIT_1024 = 10;
+  ADR_ACK_LIMIT_2048 = 11;
+  ADR_ACK_LIMIT_4096 = 12;
+  ADR_ACK_LIMIT_8192 = 13;
   ADR_ACK_LIMIT_16384 = 14;
   ADR_ACK_LIMIT_32768 = 15;
 }
 
 enum ADRAckDelayExponent {
   option (gogoproto.goproto_enum_prefix) = false;
-  ADR_ACK_DELAY_1     = 0;
-  ADR_ACK_DELAY_2     = 1;
-  ADR_ACK_DELAY_4     = 2;
-  ADR_ACK_DELAY_8     = 3;
-  ADR_ACK_DELAY_16    = 4;
-  ADR_ACK_DELAY_32    = 5;
-  ADR_ACK_DELAY_64    = 6;
-  ADR_ACK_DELAY_128   = 7;
-  ADR_ACK_DELAY_256   = 8;
-  ADR_ACK_DELAY_512   = 9;
-  ADR_ACK_DELAY_1024  = 10;
-  ADR_ACK_DELAY_2048  = 11;
-  ADR_ACK_DELAY_4096  = 12;
-  ADR_ACK_DELAY_8192  = 13;
+
+  ADR_ACK_DELAY_1 = 0;
+  ADR_ACK_DELAY_2 = 1;
+  ADR_ACK_DELAY_4 = 2;
+  ADR_ACK_DELAY_8 = 3;
+  ADR_ACK_DELAY_16 = 4;
+  ADR_ACK_DELAY_32 = 5;
+  ADR_ACK_DELAY_64 = 6;
+  ADR_ACK_DELAY_128 = 7;
+  ADR_ACK_DELAY_256 = 8;
+  ADR_ACK_DELAY_512 = 9;
+  ADR_ACK_DELAY_1024 = 10;
+  ADR_ACK_DELAY_2048 = 11;
+  ADR_ACK_DELAY_4096 = 12;
+  ADR_ACK_DELAY_8192 = 13;
   ADR_ACK_DELAY_16384 = 14;
   ADR_ACK_DELAY_32768 = 15;
 }

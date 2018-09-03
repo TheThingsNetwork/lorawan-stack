@@ -28,12 +28,9 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-// UserIdentifiers is the message that is used to identify an user.
 type UserIdentifiers struct {
-	// The unique and immutable user's ID.
 	// This ID shares namespace with organization's IDs.
-	UserID string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	// Unique and mutable user's email address.
+	UserID               string   `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email                string   `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -42,7 +39,7 @@ type UserIdentifiers struct {
 func (m *UserIdentifiers) Reset()      { *m = UserIdentifiers{} }
 func (*UserIdentifiers) ProtoMessage() {}
 func (*UserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{0}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{0}
 }
 func (m *UserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -85,9 +82,7 @@ func (m *UserIdentifiers) GetEmail() string {
 	return ""
 }
 
-// ApplicationIdentifiers is the message that is used to identify an application.
 type ApplicationIdentifiers struct {
-	// TTN Application ID.
 	ApplicationID        string   `protobuf:"bytes,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -96,7 +91,7 @@ type ApplicationIdentifiers struct {
 func (m *ApplicationIdentifiers) Reset()      { *m = ApplicationIdentifiers{} }
 func (*ApplicationIdentifiers) ProtoMessage() {}
 func (*ApplicationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{1}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{1}
 }
 func (m *ApplicationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -132,11 +127,8 @@ func (m *ApplicationIdentifiers) GetApplicationID() string {
 	return ""
 }
 
-// GatewayIdentifiers is the message that is used to identify a gateway.
 type GatewayIdentifiers struct {
-	// TTN Gateway ID.
-	GatewayID string `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,proto3" json:"gateway_id,omitempty"`
-	// Gateway's unique and immutable EUI.
+	GatewayID            string                                              `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,proto3" json:"gateway_id,omitempty"`
 	EUI                  *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=eui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"eui,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                            `json:"-"`
 	XXX_sizecache        int32                                               `json:"-"`
@@ -145,7 +137,7 @@ type GatewayIdentifiers struct {
 func (m *GatewayIdentifiers) Reset()      { *m = GatewayIdentifiers{} }
 func (*GatewayIdentifiers) ProtoMessage() {}
 func (*GatewayIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{2}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{2}
 }
 func (m *GatewayIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -181,18 +173,14 @@ func (m *GatewayIdentifiers) GetGatewayID() string {
 	return ""
 }
 
-// End device identifiers are carried with uplink and downlink messages.
-// Unknown fields are left empty.
 type EndDeviceIdentifiers struct {
-	// TTN Device ID.
-	DeviceID string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	// TTN Application ID.
+	DeviceID               string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
 	ApplicationIdentifiers `protobuf:"bytes,2,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	// LoRaWAN DevEUI.
+	// The LoRaWAN DevEUI.
 	DevEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"dev_eui,omitempty"`
-	// LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
+	// The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
 	JoinEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,5,opt,name=join_eui,json=joinEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"join_eui,omitempty"`
-	// LoRaWAN DevAddr.
+	// The LoRaWAN DevAddr.
 	DevAddr              *go_thethings_network_lorawan_stack_pkg_types.DevAddr `protobuf:"bytes,6,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevAddr" json:"dev_addr,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                              `json:"-"`
 	XXX_sizecache        int32                                                 `json:"-"`
@@ -201,7 +189,7 @@ type EndDeviceIdentifiers struct {
 func (m *EndDeviceIdentifiers) Reset()      { *m = EndDeviceIdentifiers{} }
 func (*EndDeviceIdentifiers) ProtoMessage() {}
 func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{3}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{3}
 }
 func (m *EndDeviceIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -237,9 +225,7 @@ func (m *EndDeviceIdentifiers) GetDeviceID() string {
 	return ""
 }
 
-// ClientIdentifiers is the message that is used to identify a client.
 type ClientIdentifiers struct {
-	// TTN Client ID.
 	ClientID             string   `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -248,7 +234,7 @@ type ClientIdentifiers struct {
 func (m *ClientIdentifiers) Reset()      { *m = ClientIdentifiers{} }
 func (*ClientIdentifiers) ProtoMessage() {}
 func (*ClientIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{4}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{4}
 }
 func (m *ClientIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -284,9 +270,7 @@ func (m *ClientIdentifiers) GetClientID() string {
 	return ""
 }
 
-// OrganizationIdentifiers is the message that is used to identify an organization.
 type OrganizationIdentifiers struct {
-	// TTN Organization ID.
 	OrganizationID       string   `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -295,7 +279,7 @@ type OrganizationIdentifiers struct {
 func (m *OrganizationIdentifiers) Reset()      { *m = OrganizationIdentifiers{} }
 func (*OrganizationIdentifiers) ProtoMessage() {}
 func (*OrganizationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{5}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{5}
 }
 func (m *OrganizationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -331,8 +315,6 @@ func (m *OrganizationIdentifiers) GetOrganizationID() string {
 	return ""
 }
 
-// OrganizationOrUserIdentifiers is the message used in collaborationship messages
-// used to identify the persona entity.
 type OrganizationOrUserIdentifiers struct {
 	// Types that are valid to be assigned to ID:
 	//	*OrganizationOrUserIdentifiers_UserIDs
@@ -345,7 +327,7 @@ type OrganizationOrUserIdentifiers struct {
 func (m *OrganizationOrUserIdentifiers) Reset()      { *m = OrganizationOrUserIdentifiers{} }
 func (*OrganizationOrUserIdentifiers) ProtoMessage() {}
 func (*OrganizationOrUserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{6}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{6}
 }
 func (m *OrganizationOrUserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -486,7 +468,7 @@ func _OrganizationOrUserIdentifiers_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// CombinedIdentifiers combines the identifiers of multiple entities.
+// Combine the identifiers of multiple entities.
 // The main purpose of this message is its use in events.
 type CombinedIdentifiers struct {
 	ApplicationIDs       []*ApplicationIdentifiers  `protobuf:"bytes,1,rep,name=application_ids,json=applicationIds" json:"application_ids,omitempty"`
@@ -502,7 +484,7 @@ type CombinedIdentifiers struct {
 func (m *CombinedIdentifiers) Reset()      { *m = CombinedIdentifiers{} }
 func (*CombinedIdentifiers) ProtoMessage() {}
 func (*CombinedIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2402c50e3de368c6, []int{7}
+	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{7}
 }
 func (m *CombinedIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2836,13 +2818,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_2402c50e3de368c6)
+	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_9a974388f1bf56d8)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_2402c50e3de368c6)
+	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_9a974388f1bf56d8)
 }
 
-var fileDescriptor_identifiers_2402c50e3de368c6 = []byte{
+var fileDescriptor_identifiers_9a974388f1bf56d8 = []byte{
 	// 847 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0x4d, 0x88, 0xdb, 0x46,
 	0x14, 0xc7, 0x67, 0x62, 0xaf, 0x3f, 0x9e, 0xb3, 0x76, 0xa3, 0x84, 0xd6, 0x14, 0x3a, 0x4a, 0x9d,
