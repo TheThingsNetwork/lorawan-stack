@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/struct.proto";
@@ -48,6 +49,7 @@ message RxMetadata {
   int64 frequency_offset = 11;
   Location location = 12;
   string encrypted_fine_timestamp_key_id = 13 [(gogoproto.customname) = "EncryptedFineTimestampKeyID"];
+  GatewayDownlinkPathConstraint downlink_path_constraint = 14;
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

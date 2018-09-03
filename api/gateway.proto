@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/metadata.proto";
 import "lorawan-stack/api/rights.proto";
@@ -57,6 +58,7 @@ message Gateway {
   // Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
   // duty cycle only in controlled research and development environments.
   bool enforce_duty_cycle = 16;
+  GatewayDownlinkPathConstraint downlink_path_constraint = 17;
 }
 
 // TODO: Add things like EndDeviceBrand, EndDeviceModel, EndDeviceVersion, but then for Gateway 👍
