@@ -16,7 +16,7 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
   >
     kschiffer
   </span>
-  <Component
+  <Icon
     icon="arrow_drop_down"
   />
   <Dropdown
@@ -54,7 +54,7 @@ exports[`Profile Dropdown is in initial state should match snapshot 1`] = `
   >
     kschiffer
   </span>
-  <Component
+  <Icon
     icon="arrow_drop_down"
   />
 </div>

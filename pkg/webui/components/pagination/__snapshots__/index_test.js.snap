@@ -14,7 +14,7 @@ exports[`Pagination has only a single page should match snapshot 1`] = `
       role="button"
       tabIndex="0"
     >
-      <Component
+      <Icon
         aria-label="Go to the previous page"
         icon="navigate_before"
         small={true}
@@ -40,7 +40,7 @@ exports[`Pagination has only a single page should match snapshot 1`] = `
       role="button"
       tabIndex="0"
     >
-      <Component
+      <Icon
         aria-label="Go to the next page"
         icon="navigate_next"
         small={true}
@@ -64,7 +64,7 @@ exports[`Pagination has several pages should match snapshot 1`] = `
       role="button"
       tabIndex="0"
     >
-      <Component
+      <Icon
         aria-label="Go to the previous page"
         icon="navigate_before"
         small={true}
@@ -108,7 +108,7 @@ exports[`Pagination has several pages should match snapshot 1`] = `
       role="button"
       tabIndex="0"
     >
-      <Component
+      <Icon
         aria-label="Go to the next page"
         icon="navigate_next"
         small={true}

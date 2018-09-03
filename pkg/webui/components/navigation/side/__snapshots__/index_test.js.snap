@@ -8,7 +8,7 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
     <div
       className="header"
     >
-      <Component
+      <Icon
         className="icon"
         icon="application"
       />
@@ -60,7 +60,7 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
     <div
       className="header"
     >
-      <Component
+      <Icon
         className="icon"
         icon="application"
       />
