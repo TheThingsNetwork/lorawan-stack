@@ -61,10 +61,6 @@ message TxMetadata {
   uint32 antenna_index = 2;
   uint64 timestamp = 3;
   google.protobuf.Timestamp time = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  // Send a CRC in the packet. This should only be used for testing purposes, as downlinks with CRCs are not LoRaWAN compliant.
-  bool enable_crc = 5 [(gogoproto.customname) = "EnableCRC"]; // TODO: Move to TxSettings
-  // Invert polarity for this downlink. This field should be true for LoRaWAN downlinks.
-  bool invert_polarity = 6; // TODO: Remove; already in TxSettings.polarization_inversion
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API

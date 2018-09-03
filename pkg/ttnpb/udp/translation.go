@@ -291,7 +291,7 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 	switch tx.Modu {
 	case lora:
 		msg.Settings.Modulation = ttnpb.Modulation_LORA
-		msg.TxMetadata.EnableCRC = !tx.NCRC
+		msg.Settings.EnableCRC = !tx.NCRC
 		sf, err := tx.DatR.SpreadingFactor()
 		if err != nil {
 			return nil, err
@@ -330,7 +330,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	switch msg.Settings.Modulation {
 	case ttnpb.Modulation_LORA:
 		tx.Modu = "LORA"
-		tx.NCRC = !msg.TxMetadata.EnableCRC
+		tx.NCRC = !msg.Settings.EnableCRC
 		tx.DatR.LoRa = fmt.Sprintf("SF%dBW%d", msg.Settings.SpreadingFactor, msg.Settings.Bandwidth/1000)
 	case ttnpb.Modulation_FSK:
 		tx.Modu = "FSK"
