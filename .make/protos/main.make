@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+GOGO_REPO=github.com/gogo/protobuf
+GRPC_GATEWAY_REPO=github.com/grpc-ecosystem/grpc-gateway
 
 DOCKER ?= docker
 
-PROTOC_DOCKER_IMAGE ?= protocontainer:lorawan-stack
-PROTOC_DOCKER_ARGS = run --user `id -u` --rm -v $(PWD):$(PWD) -w $(PWD)
-PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(GO_PATH)/src
+PROTOC_VERSION ?= 3.0.8
+PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:$(PROTOC_VERSION)
+PROTOC_DOCKER_ARGS = run --user `id -u` --rm -v$(GO_PATH):$(GO_PATH) -w$(PWD)
+PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I/usr/include
+PROTOC += -I$(PWD)/vendor -I$(GO_PATH)/src -I$(PWD)/vendor/$(GRPC_GATEWAY_REPO)/third_party/googleapis
 
 protoc:
-	$(DOCKER) build -f .make/protos/Dockerfile -t $(PROTOC_DOCKER_IMAGE) .
+	$(DOCKER) pull $(PROTOC_DOCKER_IMAGE)
+
+PROTO_DIR=$(PWD)/api
 
 include .make/protos/go.make
 

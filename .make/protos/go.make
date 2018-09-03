@@ -14,14 +14,14 @@
 
 # Go
 GO_PROTO_TYPES := any duration empty field_mask struct timestamp wrappers
-GO_PROTO_TYPE_CONVERSIONS := $(subst $(SPACE),$(COMMA),$(foreach type,$(GO_PROTO_TYPES),Mgoogle/protobuf/$(type).proto=github.com/gogo/protobuf/types))
+GO_PROTO_TYPE_CONVERSIONS = $(subst $(SPACE),$(COMMA),$(foreach type,$(GO_PROTO_TYPES),Mgoogle/protobuf/$(type).proto=$(GOGO_REPO)/types))
 GO_PROTOC_FLAGS ?= \
 	--gogottn_out=plugins=grpc,$(GO_PROTO_TYPE_CONVERSIONS):$(GO_PATH)/src \
 	--grpc-gateway_out=$(GO_PROTO_TYPE_CONVERSIONS):$(GO_PATH)/src
 
-go.protos: $(wildcard api/*.proto) protoc
-	$(PROTOC) $(GO_PROTOC_FLAGS) $(PWD)/api/*.proto
-	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh api
+go.protos: $(wildcard $(PROTO_DIR)/*.proto)
+	$(PROTOC) $(GO_PROTOC_FLAGS) $(PROTO_DIR)/*.proto
+	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh $(PROTO_DIR)
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' -or -name '*pb.gw.go' | grep -v 'vendor'`
 	unconvert -apply ./pkg/ttnpb/... ./pkg/util/rpctest/...
 	gofmt -w -s $(PWD)/pkg/ttnpb
