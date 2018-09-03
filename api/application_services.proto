@@ -161,16 +161,3 @@ service AsApplicationDownlinkQueue {
     };
   };
 }
-
-message SetAsApplicationAPIKeyRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string api_key = 2 [(gogoproto.customname) = "APIKey"];
-}
-
-// The As service connects an application or integration to an Application Server.
-service As {
-  // Set the API key that the Application Server should use to link to the Network Server.
-  rpc SetApplicationAPIKey(SetAsApplicationAPIKeyRequest) returns (google.protobuf.Empty);
-  rpc DeleteApplicationAPIKey(ApplicationIdentifiers) returns (google.protobuf.Empty);
-  rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
-}
