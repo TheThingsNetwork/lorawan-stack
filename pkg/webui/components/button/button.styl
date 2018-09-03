@@ -13,14 +13,23 @@
 // limitations under the License.
 
 $button($color)
+  reset-button()
   one-liner()
+  text-align: center
   background: $color
-  border-radius: $br.m
-  border: 0
+  border-radius: $br.s
+  padding: 0 $cs.s
+  height: 2.3rem
   outline: 0
   font-weight: 600
   cursor: pointer
   color: white
+
+  &.large
+    height: auto
+    padding: $cs.m
+    border-radius: $br.m
+    min-width: 6rem
 
   &:not(.busy) span:last-child
     vertical-align: middle
@@ -79,8 +88,6 @@ $button($color)
 .button
   font: inherit
   display: inline-block
-  padding: $cs.s $cs.l
-  border-radius: 3px
   transition: color $ad.s, background $ad.s, border $ad.s
   $button($c-active-blue)
 
@@ -91,17 +98,27 @@ $button($color)
     $button($c-subtle-fill)
 
   &.error
-    animation: shake .08s 4 linear
+    animation: shake .15s 4 linear
 
   &.withIcon
-    padding-left: $cs.m
+    padding-left: $cs.xs
 
     span:first-child
-      margin-right: $cs.xs
+      margin-right: $cs.xxs
+
+    &.large
+      padding-left: $cs.s
+
+      span:first-child
+        margin-right: $cs.xs
 
   &.onlyIcon
-    padding-left: $cs.s
-    padding-right: $cs.s
+    padding-left: $cs.xs
+    padding-right: $cs.xs
+
+    &.large
+      padding-left: $cs.s
+      padding-right: $cs.s
 
 .icon
   line-height: .8

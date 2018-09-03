@@ -29,6 +29,7 @@ const Button = function ({
   naked,
   icon,
   busy,
+  large,
   className,
   onClick,
   error,
@@ -43,6 +44,7 @@ const Button = function ({
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.error]: error && !busy,
+    [style.large]: large,
   })
 
   const handleClick = function (evt) {

@@ -23,20 +23,23 @@ import Button from '.'
 class Example extends React.Component {
   state = {
     busy: false,
+    error: false,
   }
 
   render () {
     const {
       busy,
       disabled,
+      error,
     } = this.state
 
     return (
       <div>
-        <Button busy={busy} onClick={action('click')} message="A Test Button" disabled={disabled} />
+        <Button busy={busy} onClick={action('click')} message="A Test Button" disabled={disabled} error={error} />
         <br /><br />
         <button onClick={this.disable}>{disabled ? 'enable' : 'disable'}</button> &nbsp;
-        <button onClick={this.toggle}>work</button>
+        <button onClick={this.toggle}>work</button> &nbsp;
+        <button onClick={this.error}>error shake</button>
       </div>
     )
   }
@@ -52,6 +55,17 @@ class Example extends React.Component {
       disabled: !state.disabled,
     }))
   }
+
+  error () {
+    this.setState({
+      error: true,
+    })
+    setTimeout(function () {
+      this.setState({
+        error: false,
+      })
+    }.bind(this), 1200)
+  }
 }
 
 storiesOf('Button', module)
@@ -62,6 +76,12 @@ storiesOf('Button', module)
       <Button message="Default" disabled />
       <br /><br />
       <Button message="Default" busy />
+      <br /><br />
+      <Button message="Default" large />
+      <br /><br />
+      <Button message="Default" large disabled />
+      <br /><br />
+      <Button message="Default" large busy />
     </div>
   ))
   .add('Danger', () => (
@@ -89,6 +109,12 @@ storiesOf('Button', module)
       <Button icon="check" message="With Icon" disabled />
       <br /><br />
       <Button icon="check" message="With Icon" busy />
+      <br /><br />
+      <Button icon="check" message="With Icon" large />
+      <br /><br />
+      <Button icon="check" message="With Icon" large disabled />
+      <br /><br />
+      <Button icon="check" message="With Icon" large busy />
     </div>
   ))
   .add('Naked', () => (
