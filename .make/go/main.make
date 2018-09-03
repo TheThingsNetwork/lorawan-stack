@@ -17,14 +17,8 @@
 # default release dir
 RELEASE_DIR ?= release#
 
-# default cache dir for intermediate files.
-CACHE_DIR ?= .cache
-
 # the first entry of the go path
 GO_PATH ?= $(shell echo $(GOPATH) | awk -F':' '{ print $$1 }')
-
-# the name of you go package (eg. github.com/foo/bar)
-GO_PKG ?= $(shell echo $(PWD) | sed s:$(GO_PATH)/src/::)
 
 # programs
 GO = go
@@ -96,15 +90,6 @@ GO_PACKAGES = $(GO) list -v ./...
 # local go packages as absolute paths
 GO_PACKAGES_ABSOLUTE = $(GO) list -v -f '{{.Dir}}' ./...
 
-# external go packages (in vendor)
-EXTERNAL_PACKAGES = find ./vendor -name "*.go" | $(to_packages) | $(only_vendor)
-
-# staged local packages
-STAGED_PACKAGES = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | xargs $(GO) list -v 2>/dev/null
-
-# staged local packages as absolute paths
-STAGED_PACKAGES_ABSOLUTE = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | xargs $(GO) list -v -f '{{.Dir}}' 2>/dev/null
-
 # packages for testing
 TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 
@@ -135,14 +120,6 @@ go.deps:
 go.clean:
 	@$(log) "Cleaning release dir" [rm -rf $(RELEASE_DIR)]
 	@rm -rf $(RELEASE_DIR)
-
-# list all go files
-go.list:
-	@$(GO_FILES) | sort
-
-# list all staged go files
-go.list-staged: GO_FILES = $(STAGED_FILES) | $(only_go)
-go.list-staged: go.list
 
 # init initializes go
 go.init: go.min-version

@@ -32,44 +32,14 @@ go.unconvert:
 	@$(log) "Unconverting `$(GO_PACKAGES) | $(count)` go packages"
 	@[[ -z "`$(GO_PACKAGES) | xargs $(GO_UNCONVERT) -safe -apply | tee -a /dev/stderr`" ]]
 
-# fmt staged packages
-go.fmt-staged: GO_PACKAGES_ABSOLUTE = $(STAGED_PACKAGES_ABSOLUTE)
-go.fmt-staged: go.fmt
-
-# lint staged packages
-go.lint-staged: GO_PACKAGES = $(STAGED_PACKAGES)
-go.lint-staged: go.lint
-
-# fix misspellings in all staged packages
-go.misspell-staged: GO_PACKAGES_ABSOLUTE = $(STAGED_PACKAGES_ABSOLUTE)
-go.misspell-staged: go.misspell
-
-# unconvert all staged packages
-go.unconvert-staged: GO_PACKAGES = $(STAGED_PACKAGES)
-go.unconvert-staged: go.unconvert
-
 # lint changed packages in travis
 go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) | $(to_packages)
 go.lint-travis: go.lint
-
-# check if you have vendored packages in vendor
-VENDOR_FILE = $(GO_VENDOR_FILE)
-go.check-vendors: DOUBLY_VENDORED=$(shell cat $(VENDOR_FILE) | grep -n '^[\t ]*name = .*/vendor/' | awk '{ print $$1 $$3 }' | sed 's/["]//g')
-go.check-vendors:
-	@test $(VENDOR_FILE) != "/dev/null" && $(log) "Checking $(VENDOR_FILE) for bad packages" || true
-	@if test $$(echo $(DOUBLY_VENDORED) | wc -w) -gt 0; then $(err) "Doubly vendored packages in $(VENDOR_FILE):" && echo $(DOUBLY_VENDORED) | xargs -n1 echo "       " | sed 's/:/  /' && exit 1; fi
-
-# check if you have vendored packages in vendor (if it is staged)
-go.check-vendors-staged: VENDOR_FILE=$(shell $(STAGED_FILES) | grep -q $(GO_VENDOR_FILE) || echo /dev/null)
-go.check-vendors-staged: go.check-vendors
 
 go.depfmt:
 	@go run $(MAKE_DIR)/go/depfmt.go
 
 # run all quality on all files
-go.quality: go.fmt go.misspell go.unconvert go.lint go.check-vendors go.depfmt
-
-# run all quality on staged files
-go.quality-staged: go.fmt-staged go.misspell-staged go.unconvert-staged go.lint-staged go.check-vendors-staged go.depfmt
+go.quality: go.fmt go.misspell go.unconvert go.lint go.depfmt
 
 # vim: ft=make
