@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 
 import style from './icon.styl'
 
@@ -30,13 +31,13 @@ const hardcoded = {
   organization: 'people',
 }
 
-export default function ({
+const Icon = function ({
   icon = '',
   className,
-  nudgeUp,
-  nudgeDown,
-  small,
-  large,
+  nudgeUp = false,
+  nudgeDown = false,
+  small = false,
+  large = false,
   ...rest
 }) {
 
@@ -57,3 +58,17 @@ export default function ({
   )
 }
 
+Icon.propTypes = {
+  /** Which icon to display, using google material icon set */
+  icon: PropTypes.string.isRequired,
+  /** Nudges the icon up by one pixel using position: relative */
+  nudgeUp: PropTypes.bool,
+  /** Nudges the icon down by one pixel using position: relative */
+  nudgeDown: PropTypes.bool,
+  /** Renders a smaller icon */
+  small: PropTypes.bool,
+  /** Renders a bigger icon */
+  large: PropTypes.bool,
+}
+
+export default Icon
