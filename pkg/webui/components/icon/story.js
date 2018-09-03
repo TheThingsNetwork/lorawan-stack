@@ -14,7 +14,9 @@
 
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { withInfo } from '@storybook/addon-info'
 
+import style from './story.styl'
 import Icon from '.'
 
 const icons = [
@@ -35,15 +37,43 @@ const icons = [
   'organization',
 ]
 
+const doc = `Icons can be used using \`display: {flex|inline-block}\`.
+\`inline-block\` is used by default. To use \`flex\` instead, overwrite the
+display value of the wrapping \`<span />\`in your local scoped css. The
+positioning will differ slightly, so the nudge props can be used to fine-tune
+the appearance.`
+
 storiesOf('Icon', module)
+  .addDecorator((story, context) => withInfo({
+    inline: true,
+    header: false,
+    propTables: [ Icon ],
+    text: doc,
+  })(story)(context))
   .add('Icons', () => icons.map(function (icon) {
     return (
-      <div key={icon}>
+      <div className={style.wrapper} key={icon}>
         <Icon
           icon={icon}
-          style={{ marginRight: '1rem' }}
         />
         {icon}
       </div>
     )
   }))
+  .add('Usage', () => (
+    <div className={style.wrapper}>
+      <div className={style.block}>
+        <Icon
+          icon="devices"
+        />
+        <span>{'display: inline-block'}</span>
+      </div>
+      <br />
+      <div className={style.flex}>
+        <Icon
+          icon="devices"
+        />
+        <span>{'display: flex'}</span>
+      </div>
+    </div>
+  ))
