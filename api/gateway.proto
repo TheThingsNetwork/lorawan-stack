@@ -44,16 +44,19 @@ message Gateway {
   bool auto_update = 9;
   string update_channel = 10;
   string frequency_plan_id = 11 [(gogoproto.customname) = "FrequencyPlanID"];
+  repeated GatewayAntenna antennas = 12 [(gogoproto.nullable) = false];
+  // The status of this gateway may be publicly displayed.
+  bool status_public = 13;
+  // The location of this gateway may be publicly displayed.
+  bool location_public = 14;
   // Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet
   // Forwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the
   // downlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have
   // not been transmitted yet.
-  bool schedule_downlink_late = 12;
-  repeated GatewayAntenna antennas = 13 [(gogoproto.nullable) = false];
-  // The status of this gateway may be publicly displayed.
-  bool status_public = 14;
-  // The location of this gateway may be publicly displayed.
-  bool location_public = 15;
+  bool schedule_downlink_late = 15;
+  // Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
+  // duty cycle only in controlled research and development environments.
+  bool enforce_duty_cycle = 16;
 }
 
 // TODO: Add things like EndDeviceBrand, EndDeviceModel, EndDeviceVersion, but then for Gateway 👍
