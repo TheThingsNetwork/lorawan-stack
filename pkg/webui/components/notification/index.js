@@ -50,7 +50,7 @@ const Notification = function ({
 
   return (
     <div className={classname}>
-      <Icon icon={icon} /><span><Component content={content} /></span>
+      <Icon nudgeUp icon={icon} /><Component content={content} />
     </div>
   )
 }
