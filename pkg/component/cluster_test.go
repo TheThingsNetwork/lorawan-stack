@@ -65,7 +65,8 @@ func TestPeers(t *testing.T) {
 		ttnpb.PeerInfo_APPLICATION_SERVER,
 		ttnpb.PeerInfo_GATEWAY_SERVER,
 		ttnpb.PeerInfo_JOIN_SERVER,
-		ttnpb.PeerInfo_IDENTITY_SERVER,
+		ttnpb.PeerInfo_ACCESS,
+		ttnpb.PeerInfo_ENTITY_REGISTRY,
 	}
 
 	var peer cluster.Peer

@@ -79,13 +79,13 @@ func fetcherFromContext(ctx context.Context) (Fetcher, bool) {
 	return nil, false
 }
 
-// NewIdentityServerFetcher returns a new rights fetcher that fetches from the Identity Server returned by getConn.
+// NewAccessFetcher returns a new rights fetcher that fetches from the Access role returned by getConn.
 // The allowInsecure argument indicates whether it's allowed to send credentials over connections without TLS.
-func NewIdentityServerFetcher(getConn func(ctx context.Context) *grpc.ClientConn, allowInsecure bool) Fetcher {
-	return &identityServerFetcher{getConn: getConn, allowInsecure: allowInsecure}
+func NewAccessFetcher(getConn func(ctx context.Context) *grpc.ClientConn, allowInsecure bool) Fetcher {
+	return &accessFetcher{getConn: getConn, allowInsecure: allowInsecure}
 }
 
-type identityServerFetcher struct {
+type accessFetcher struct {
 	getConn       func(ctx context.Context) *grpc.ClientConn
 	allowInsecure bool
 }
@@ -94,7 +94,7 @@ var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "no aut
 
 var errNoISConn = errors.DefineUnavailable("no_identity_server_conn", "no connection to Identity Server")
 
-func (f identityServerFetcher) forwardAuth(ctx context.Context) (context.Context, rpcmetadata.MD, error) {
+func (f accessFetcher) forwardAuth(ctx context.Context) (context.Context, rpcmetadata.MD, error) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 	if md.AuthType == "" || md.AuthValue == "" {
 		return ctx, md, errUnauthenticated
@@ -103,7 +103,7 @@ func (f identityServerFetcher) forwardAuth(ctx context.Context) (context.Context
 	return md.ToOutgoingContext(ctx), md, nil
 }
 
-func (f identityServerFetcher) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+func (f accessFetcher) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn
@@ -120,7 +120,7 @@ func (f identityServerFetcher) ApplicationRights(ctx context.Context, appID ttnp
 	return rights, nil
 }
 
-func (f identityServerFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func (f accessFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn
@@ -137,7 +137,7 @@ func (f identityServerFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.Ga
 	return rights, nil
 }
 
-func (f identityServerFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
+func (f accessFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn

@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
@@ -46,7 +47,14 @@ type asImplementation struct {
 	up chan *ttnpb.ApplicationUp
 }
 
-// Subscribe implements ttnpb.AsServer
+func (as *asImplementation) SetApplicationAPIKey(context.Context, *ttnpb.SetAsApplicationAPIKeyRequest) (*types.Empty, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (as *asImplementation) DeleteApplicationAPIKey(context.Context, *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
 	if err := clusterauth.Authorized(stream.Context()); err != nil {
 		return err

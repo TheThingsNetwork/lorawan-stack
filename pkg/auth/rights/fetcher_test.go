@@ -126,7 +126,7 @@ func TestFetcherFunc(t *testing.T) {
 	})
 }
 
-func TestIdentityServerFetcher(t *testing.T) {
+func TestAccessFetcher(t *testing.T) {
 	a := assertions.New(t)
 
 	is := &mockIdentityServer{
@@ -149,7 +149,7 @@ func TestIdentityServerFetcher(t *testing.T) {
 	}
 
 	// Identity Server not available, return Unavailable error.
-	unavailableFetcher := NewIdentityServerFetcher(func(context.Context) *grpc.ClientConn {
+	unavailableFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return nil
 	}, false)
 	unavailableRes := fetchRights(test.Context(), "foo", unavailableFetcher)
@@ -157,7 +157,7 @@ func TestIdentityServerFetcher(t *testing.T) {
 	a.So(errors.IsUnavailable(unavailableRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnavailable(unavailableRes.OrgErr), should.BeTrue)
 
-	onlySecureFetcher := NewIdentityServerFetcher(func(context.Context) *grpc.ClientConn {
+	onlySecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
 	}, false)
 
@@ -177,7 +177,7 @@ func TestIdentityServerFetcher(t *testing.T) {
 	a.So(errors.IsUnauthenticated(authRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(authRes.OrgErr), should.BeTrue)
 
-	alsoInsecureFetcher := NewIdentityServerFetcher(func(context.Context) *grpc.ClientConn {
+	alsoInsecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
 	}, true)
 
@@ -189,5 +189,4 @@ func TestIdentityServerFetcher(t *testing.T) {
 	a.So(authRes.AppRights, should.Resemble, is.mockFetcher.applicationRights)
 	a.So(authRes.GtwRights, should.Resemble, is.mockFetcher.gatewayRights)
 	a.So(authRes.OrgRights, should.Resemble, is.mockFetcher.organizationRights)
-
 }

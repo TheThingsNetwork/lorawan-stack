@@ -23,8 +23,8 @@ import (
 )
 
 func (c *Component) initRights() {
-	fetcher := rights.NewIdentityServerFetcher(func(ctx context.Context) *grpc.ClientConn {
-		peer := c.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
+	fetcher := rights.NewAccessFetcher(func(ctx context.Context) *grpc.ClientConn {
+		peer := c.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, nil)
 		if peer == nil {
 			return nil
 		}
