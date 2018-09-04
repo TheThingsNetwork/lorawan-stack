@@ -30,13 +30,13 @@ func TestPeer(t *testing.T) {
 
 	p := &peer{
 		name:   "name",
-		roles:  []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_IDENTITY_SERVER},
+		roles:  []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_ACCESS},
 		target: "target",
 		conn:   conn,
 	}
 
 	a.So(p.HasRole(ttnpb.PeerInfo_APPLICATION_SERVER), should.BeFalse)
-	a.So(p.HasRole(ttnpb.PeerInfo_IDENTITY_SERVER), should.BeTrue)
+	a.So(p.HasRole(ttnpb.PeerInfo_ACCESS), should.BeTrue)
 
 	a.So(p.Conn(), should.Equal, conn)
 }

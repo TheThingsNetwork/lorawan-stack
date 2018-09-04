@@ -122,17 +122,27 @@ func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.
 
 	c.peers[c.self.name] = c.self
 
-	tryAddPeer := func(name string, target string, role ttnpb.PeerInfo_Role) {
-		if !c.self.HasRole(role) && target != "" {
-			c.peers[name] = &peer{
-				name:   name,
-				target: target,
-				roles:  []ttnpb.PeerInfo_Role{role},
+	tryAddPeer := func(name string, target string, roles ...ttnpb.PeerInfo_Role) {
+		if target == "" {
+			return
+		}
+		var filteredRoles []ttnpb.PeerInfo_Role
+		for _, role := range roles {
+			if !c.self.HasRole(role) {
+				filteredRoles = append(filteredRoles, role)
 			}
+		}
+		if len(filteredRoles) == 0 {
+			return
+		}
+		c.peers[name] = &peer{
+			name:   name,
+			target: target,
+			roles:  filteredRoles,
 		}
 	}
 
-	tryAddPeer("is", config.Cluster.IdentityServer, ttnpb.PeerInfo_IDENTITY_SERVER)
+	tryAddPeer("is", config.Cluster.IdentityServer, ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY)
 	tryAddPeer("gs", config.Cluster.GatewayServer, ttnpb.PeerInfo_GATEWAY_SERVER)
 	tryAddPeer("ns", config.Cluster.NetworkServer, ttnpb.PeerInfo_NETWORK_SERVER)
 	tryAddPeer("as", config.Cluster.ApplicationServer, ttnpb.PeerInfo_APPLICATION_SERVER)

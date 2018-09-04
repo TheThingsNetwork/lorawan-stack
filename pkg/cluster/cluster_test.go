@@ -74,19 +74,21 @@ func TestCluster(t *testing.T) {
 
 	grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
 
-	// The IS should be there within reasonable time.
-	var is Peer
+	// The Identity Server playing the ACCESS role should be there within reasonable time.
+	var ac Peer
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
-		is = c.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
-		if is != nil {
+		ac = c.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, nil)
+		if ac != nil {
 			break
 		}
 	}
-	if !a.So(is, should.NotBeNil) {
+	if !a.So(ac, should.NotBeNil) {
 		t.FailNow()
 	}
 
+	er := c.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
+	a.So(er, should.NotBeNil)
 	gs := c.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, nil)
 	a.So(gs, should.NotBeNil)
 	ns := c.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, nil)
@@ -98,7 +100,8 @@ func TestCluster(t *testing.T) {
 
 	a.So(c.Leave(), should.BeNil)
 
-	a.So(is.Conn().GetState(), should.Equal, connectivity.Shutdown)
+	a.So(ac.Conn().GetState(), should.Equal, connectivity.Shutdown)
+	a.So(er.Conn().GetState(), should.Equal, connectivity.Shutdown)
 	a.So(gs.Conn().GetState(), should.Equal, connectivity.Shutdown)
 	a.So(ns.Conn().GetState(), should.Equal, connectivity.Shutdown)
 	a.So(as.Conn().GetState(), should.Equal, connectivity.Shutdown)
