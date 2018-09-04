@@ -326,7 +326,13 @@ func TestProtoConversion(t *testing.T) {
 							NotchFrequency: &notchFrequency,
 						},
 					},
+					{
+						Enable:    false,
+						ChipType:  "SX1257",
+						Frequency: 923000000,
+					},
 				},
+				ClockSource: 1,
 			},
 			expected: &ttnpb.ConcentratorConfig{
 				Channels: []*ttnpb.ConcentratorConfig_Channel{
@@ -337,18 +343,24 @@ func TestProtoConversion(t *testing.T) {
 						Radio:     0,
 					},
 				},
-				Radios: []*ttnpb.ConcentratorConfig_Radio{
+				Radios: []*ttnpb.GatewayRadio{
 					{
 						Enable:    true,
 						ChipType:  "SX1257",
 						Frequency: 922300000,
-						TxConfiguration: &ttnpb.ConcentratorConfig_Radio_TxConfiguration{
+						TxConfiguration: &ttnpb.GatewayRadio_TxConfiguration{
 							MinFrequency:   909000000,
 							MaxFrequency:   925000000,
 							NotchFrequency: notchFrequency,
 						},
 					},
+					{
+						Enable:    false,
+						ChipType:  "SX1257",
+						Frequency: 923000000,
+					},
 				},
+				ClockSource: 1,
 			},
 		},
 		{

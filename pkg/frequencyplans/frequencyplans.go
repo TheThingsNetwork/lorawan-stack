@@ -215,11 +215,10 @@ func (txc *RadioTxConfiguration) Copy() *RadioTxConfiguration {
 
 // Radio contains the configuration of a radio on a gateway.
 type Radio struct {
-	Enable     bool    `yaml:"enable"`
-	ChipType   string  `yaml:"chip-type,omitempty"`
-	Frequency  uint64  `yaml:"frequency,omitempty"`
-	RSSIOffset float32 `yaml:"rssi-offset,omitempty"`
-
+	Enable          bool                  `yaml:"enable"`
+	ChipType        string                `yaml:"chip-type,omitempty"`
+	Frequency       uint64                `yaml:"frequency,omitempty"`
+	RSSIOffset      float32               `yaml:"rssi-offset,omitempty"`
 	TxConfiguration *RadioTxConfiguration `yaml:"tx,omitempty"`
 }
 
@@ -233,15 +232,15 @@ func (r Radio) Copy() Radio {
 }
 
 // ToConcentratorConfig returns the radio configuration in the protobuf format.
-func (r Radio) ToConcentratorConfig() *ttnpb.ConcentratorConfig_Radio {
-	ccr := &ttnpb.ConcentratorConfig_Radio{
+func (r Radio) ToConcentratorConfig() *ttnpb.GatewayRadio {
+	ccr := &ttnpb.GatewayRadio{
 		Enable:     r.Enable,
 		Frequency:  r.Frequency,
 		ChipType:   r.ChipType,
 		RSSIOffset: r.RSSIOffset,
 	}
 	if tx := r.TxConfiguration; tx != nil {
-		ccr.TxConfiguration = &ttnpb.ConcentratorConfig_Radio_TxConfiguration{
+		ccr.TxConfiguration = &ttnpb.GatewayRadio_TxConfiguration{
 			MinFrequency: tx.MinFrequency,
 			MaxFrequency: tx.MaxFrequency,
 		}
@@ -264,7 +263,8 @@ type FrequencyPlan struct {
 	DwellTime  DwellTime  `yaml:"dwell-time,omitempty"`
 	LBT        *LBT       `yaml:"listen-before-talk,omitempty"`
 
-	Radios []Radio `yaml:"radios,omitempty"`
+	Radios      []Radio `yaml:"radios,omitempty"`
+	ClockSource uint8   `yaml:"clock-source,omitempty"`
 
 	// PingSlot allows override of default band settings for the class B ping slot.
 	PingSlot *Channel `yaml:"ping-slot,omitempty"`
@@ -300,6 +300,7 @@ func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 		for _, radio := range radios {
 			fp.Radios = append(fp.Radios, radio.Copy())
 		}
+		fp.ClockSource = ext.ClockSource
 	}
 	if ext.PingSlot != nil {
 		fp.PingSlot = ext.PingSlot.Copy()
@@ -401,6 +402,7 @@ func (fp *FrequencyPlan) ToConcentratorConfig() *ttnpb.ConcentratorConfig {
 	for _, radio := range fp.Radios {
 		cc.Radios = append(cc.Radios, radio.ToConcentratorConfig())
 	}
+	cc.ClockSource = uint32(fp.ClockSource)
 	return cc
 }
 
