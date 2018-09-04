@@ -123,7 +123,7 @@ message EndDeviceModel {
   string name = 3;
 }
 
-// EndDeviceVersionIdentifiers identify an end device version.
+// Identifies an end device model with version information.
 message EndDeviceVersionIdentifiers {
   string brand_id = 1 [(gogoproto.customname) = "BrandID"];
   string model_id = 2 [(gogoproto.customname) = "ModelID"];
@@ -135,7 +135,7 @@ message EndDeviceVersionIdentifiers {
   string firmware_version = 6;
 }
 
-// EndDeviceVersion is used as a template for creating end devices.
+// Template for creating end devices.
 message EndDeviceVersion {
   option (gogoproto.populate) = false;
 

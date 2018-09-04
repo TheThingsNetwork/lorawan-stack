@@ -56,7 +56,7 @@ type Session struct {
 func (m *Session) Reset()      { *m = Session{} }
 func (*Session) ProtoMessage() {}
 func (*Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{0}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{0}
 }
 func (m *Session) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -168,7 +168,7 @@ type MACParameters struct {
 func (m *MACParameters) Reset()      { *m = MACParameters{} }
 func (*MACParameters) ProtoMessage() {}
 func (*MACParameters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{1}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{1}
 }
 func (m *MACParameters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -348,7 +348,7 @@ type MACParameters_Channel struct {
 func (m *MACParameters_Channel) Reset()      { *m = MACParameters_Channel{} }
 func (*MACParameters_Channel) ProtoMessage() {}
 func (*MACParameters_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{1, 0}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{1, 0}
 }
 func (m *MACParameters_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -425,7 +425,7 @@ type EndDeviceBrand struct {
 func (m *EndDeviceBrand) Reset()      { *m = EndDeviceBrand{} }
 func (*EndDeviceBrand) ProtoMessage() {}
 func (*EndDeviceBrand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{2}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{2}
 }
 func (m *EndDeviceBrand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -493,7 +493,7 @@ type EndDeviceModel struct {
 func (m *EndDeviceModel) Reset()      { *m = EndDeviceModel{} }
 func (*EndDeviceModel) ProtoMessage() {}
 func (*EndDeviceModel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{3}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{3}
 }
 func (m *EndDeviceModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -543,7 +543,7 @@ func (m *EndDeviceModel) GetName() string {
 	return ""
 }
 
-// EndDeviceVersionIdentifiers identify an end device version.
+// Identifies an end device model with version information.
 type EndDeviceVersionIdentifiers struct {
 	BrandID string `protobuf:"bytes,1,opt,name=brand_id,json=brandId,proto3" json:"brand_id,omitempty"`
 	ModelID string `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
@@ -560,7 +560,7 @@ type EndDeviceVersionIdentifiers struct {
 func (m *EndDeviceVersionIdentifiers) Reset()      { *m = EndDeviceVersionIdentifiers{} }
 func (*EndDeviceVersionIdentifiers) ProtoMessage() {}
 func (*EndDeviceVersionIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{4}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{4}
 }
 func (m *EndDeviceVersionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -631,7 +631,7 @@ func (m *EndDeviceVersionIdentifiers) GetFirmwareVersion() string {
 	return ""
 }
 
-// EndDeviceVersion is used as a template for creating end devices.
+// Template for creating end devices.
 type EndDeviceVersion struct {
 	// Version identifiers.
 	EndDeviceVersionIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
@@ -658,7 +658,7 @@ type EndDeviceVersion struct {
 func (m *EndDeviceVersion) Reset()      { *m = EndDeviceVersion{} }
 func (*EndDeviceVersion) ProtoMessage() {}
 func (*EndDeviceVersion) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{5}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{5}
 }
 func (m *EndDeviceVersion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -764,7 +764,7 @@ type MACSettings struct {
 func (m *MACSettings) Reset()      { *m = MACSettings{} }
 func (*MACSettings) ProtoMessage() {}
 func (*MACSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{6}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{6}
 }
 func (m *MACSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -869,7 +869,7 @@ type MACState struct {
 func (m *MACState) Reset()      { *m = MACState{} }
 func (*MACState) ProtoMessage() {}
 func (*MACState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{7}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{7}
 }
 func (m *MACState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1017,7 +1017,7 @@ type EndDevice struct {
 func (m *EndDevice) Reset()      { *m = EndDevice{} }
 func (*EndDevice) ProtoMessage() {}
 func (*EndDevice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{8}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{8}
 }
 func (m *EndDevice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1244,7 +1244,7 @@ type EndDevices struct {
 func (m *EndDevices) Reset()      { *m = EndDevices{} }
 func (*EndDevices) ProtoMessage() {}
 func (*EndDevices) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{9}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{9}
 }
 func (m *EndDevices) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1291,7 +1291,7 @@ type SetDeviceRequest struct {
 func (m *SetDeviceRequest) Reset()      { *m = SetDeviceRequest{} }
 func (*SetDeviceRequest) ProtoMessage() {}
 func (*SetDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_399e53d708dd69eb, []int{10}
+	return fileDescriptor_end_device_ee3c8ff8609c1f53, []int{10}
 }
 func (m *SetDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -7107,13 +7107,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_399e53d708dd69eb)
+	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_ee3c8ff8609c1f53)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_399e53d708dd69eb)
+	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_ee3c8ff8609c1f53)
 }
 
-var fileDescriptor_end_device_399e53d708dd69eb = []byte{
+var fileDescriptor_end_device_ee3c8ff8609c1f53 = []byte{
 	// 2756 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x59, 0x3d, 0x70, 0x1b, 0x47,
 	0xb2, 0xc6, 0x82, 0x10, 0x09, 0x0c, 0x08, 0x02, 0x18, 0x92, 0xd2, 0x8a, 0xd2, 0x5b, 0xf0, 0x51,

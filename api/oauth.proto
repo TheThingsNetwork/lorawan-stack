@@ -1,0 +1,54 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
+import "google/protobuf/timestamp.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+message OAuthClientAuthorization {
+  ClientIdentifiers client_ids = 1 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  repeated Right rights = 3;
+  google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message OAuthAuthorizationCode {
+  ClientIdentifiers client_ids = 1 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  repeated Right rights = 3;
+  string code = 4;
+  string redirect_uri = 5 [(gogoproto.customname) = "RedirectURI"];
+  string state = 6;
+  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message OAuthAccessToken {
+  ClientIdentifiers client_ids = 1 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  repeated Right rights = 3;
+  string id = 4 [(gogoproto.customname) = "ID"];
+  string access_token = 5;
+  string refresh_token = 6;
+  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
