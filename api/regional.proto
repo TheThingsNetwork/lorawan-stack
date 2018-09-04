@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "lorawan-stack/api/gateway.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 
@@ -53,18 +54,6 @@ message ConcentratorConfig {
 
   Channel ping_slot = 5;
 
-  message Radio {
-    bool enable = 1;
-    string chip_type = 2;
-    uint64 frequency = 3;
-    float rssi_offset = 4 [(gogoproto.customname) = "RSSIOffset"];
-
-    message TxConfiguration {
-      uint64 min_frequency = 1;
-      uint64 max_frequency = 2;
-      uint64 notch_frequency = 3;
-    }
-    TxConfiguration tx_configuration = 5;
-  }
-  repeated Radio radios = 6;
+  repeated GatewayRadio radios = 6;
+  uint32 clock_source = 7;
 }

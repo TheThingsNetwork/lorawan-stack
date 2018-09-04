@@ -35,7 +35,8 @@ type ConcentratorConfig struct {
 	FSKChannel           *ConcentratorConfig_FSKChannel          `protobuf:"bytes,3,opt,name=fsk_channel,json=fskChannel" json:"fsk_channel,omitempty"`
 	LBT                  *ConcentratorConfig_LBTConfiguration    `protobuf:"bytes,4,opt,name=lbt" json:"lbt,omitempty"`
 	PingSlot             *ConcentratorConfig_Channel             `protobuf:"bytes,5,opt,name=ping_slot,json=pingSlot" json:"ping_slot,omitempty"`
-	Radios               []*ConcentratorConfig_Radio             `protobuf:"bytes,6,rep,name=radios" json:"radios,omitempty"`
+	Radios               []*GatewayRadio                         `protobuf:"bytes,6,rep,name=radios" json:"radios,omitempty"`
+	ClockSource          uint32                                  `protobuf:"varint,7,opt,name=clock_source,json=clockSource,proto3" json:"clock_source,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
 	XXX_sizecache        int32                                   `json:"-"`
 }
@@ -43,7 +44,7 @@ type ConcentratorConfig struct {
 func (m *ConcentratorConfig) Reset()      { *m = ConcentratorConfig{} }
 func (*ConcentratorConfig) ProtoMessage() {}
 func (*ConcentratorConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0}
+	return fileDescriptor_regional_bf9b75fe2c5af46a, []int{0}
 }
 func (m *ConcentratorConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -107,11 +108,18 @@ func (m *ConcentratorConfig) GetPingSlot() *ConcentratorConfig_Channel {
 	return nil
 }
 
-func (m *ConcentratorConfig) GetRadios() []*ConcentratorConfig_Radio {
+func (m *ConcentratorConfig) GetRadios() []*GatewayRadio {
 	if m != nil {
 		return m.Radios
 	}
 	return nil
+}
+
+func (m *ConcentratorConfig) GetClockSource() uint32 {
+	if m != nil {
+		return m.ClockSource
+	}
+	return 0
 }
 
 type ConcentratorConfig_Channel struct {
@@ -124,7 +132,7 @@ type ConcentratorConfig_Channel struct {
 func (m *ConcentratorConfig_Channel) Reset()      { *m = ConcentratorConfig_Channel{} }
 func (*ConcentratorConfig_Channel) ProtoMessage() {}
 func (*ConcentratorConfig_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 0}
+	return fileDescriptor_regional_bf9b75fe2c5af46a, []int{0, 0}
 }
 func (m *ConcentratorConfig_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -181,7 +189,7 @@ func (m *ConcentratorConfig_LoRaStandardChannel) Reset() {
 }
 func (*ConcentratorConfig_LoRaStandardChannel) ProtoMessage() {}
 func (*ConcentratorConfig_LoRaStandardChannel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 1}
+	return fileDescriptor_regional_bf9b75fe2c5af46a, []int{0, 1}
 }
 func (m *ConcentratorConfig_LoRaStandardChannel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -236,7 +244,7 @@ type ConcentratorConfig_FSKChannel struct {
 func (m *ConcentratorConfig_FSKChannel) Reset()      { *m = ConcentratorConfig_FSKChannel{} }
 func (*ConcentratorConfig_FSKChannel) ProtoMessage() {}
 func (*ConcentratorConfig_FSKChannel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 2}
+	return fileDescriptor_regional_bf9b75fe2c5af46a, []int{0, 2}
 }
 func (m *ConcentratorConfig_FSKChannel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -291,7 +299,7 @@ type ConcentratorConfig_LBTConfiguration struct {
 func (m *ConcentratorConfig_LBTConfiguration) Reset()      { *m = ConcentratorConfig_LBTConfiguration{} }
 func (*ConcentratorConfig_LBTConfiguration) ProtoMessage() {}
 func (*ConcentratorConfig_LBTConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 3}
+	return fileDescriptor_regional_bf9b75fe2c5af46a, []int{0, 3}
 }
 func (m *ConcentratorConfig_LBTConfiguration) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -341,146 +349,6 @@ func (m *ConcentratorConfig_LBTConfiguration) GetScanTime() int32 {
 	return 0
 }
 
-type ConcentratorConfig_Radio struct {
-	Enable               bool                                      `protobuf:"varint,1,opt,name=enable,proto3" json:"enable,omitempty"`
-	ChipType             string                                    `protobuf:"bytes,2,opt,name=chip_type,json=chipType,proto3" json:"chip_type,omitempty"`
-	Frequency            uint64                                    `protobuf:"varint,3,opt,name=frequency,proto3" json:"frequency,omitempty"`
-	RSSIOffset           float32                                   `protobuf:"fixed32,4,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty"`
-	TxConfiguration      *ConcentratorConfig_Radio_TxConfiguration `protobuf:"bytes,5,opt,name=tx_configuration,json=txConfiguration" json:"tx_configuration,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                  `json:"-"`
-	XXX_sizecache        int32                                     `json:"-"`
-}
-
-func (m *ConcentratorConfig_Radio) Reset()      { *m = ConcentratorConfig_Radio{} }
-func (*ConcentratorConfig_Radio) ProtoMessage() {}
-func (*ConcentratorConfig_Radio) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 4}
-}
-func (m *ConcentratorConfig_Radio) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ConcentratorConfig_Radio) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ConcentratorConfig_Radio.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *ConcentratorConfig_Radio) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConcentratorConfig_Radio.Merge(dst, src)
-}
-func (m *ConcentratorConfig_Radio) XXX_Size() int {
-	return m.Size()
-}
-func (m *ConcentratorConfig_Radio) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConcentratorConfig_Radio.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ConcentratorConfig_Radio proto.InternalMessageInfo
-
-func (m *ConcentratorConfig_Radio) GetEnable() bool {
-	if m != nil {
-		return m.Enable
-	}
-	return false
-}
-
-func (m *ConcentratorConfig_Radio) GetChipType() string {
-	if m != nil {
-		return m.ChipType
-	}
-	return ""
-}
-
-func (m *ConcentratorConfig_Radio) GetFrequency() uint64 {
-	if m != nil {
-		return m.Frequency
-	}
-	return 0
-}
-
-func (m *ConcentratorConfig_Radio) GetRSSIOffset() float32 {
-	if m != nil {
-		return m.RSSIOffset
-	}
-	return 0
-}
-
-func (m *ConcentratorConfig_Radio) GetTxConfiguration() *ConcentratorConfig_Radio_TxConfiguration {
-	if m != nil {
-		return m.TxConfiguration
-	}
-	return nil
-}
-
-type ConcentratorConfig_Radio_TxConfiguration struct {
-	MinFrequency         uint64   `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
-	MaxFrequency         uint64   `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
-	NotchFrequency       uint64   `protobuf:"varint,3,opt,name=notch_frequency,json=notchFrequency,proto3" json:"notch_frequency,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) Reset() {
-	*m = ConcentratorConfig_Radio_TxConfiguration{}
-}
-func (*ConcentratorConfig_Radio_TxConfiguration) ProtoMessage() {}
-func (*ConcentratorConfig_Radio_TxConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_9f058c0d9001276c, []int{0, 4, 0}
-}
-func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *ConcentratorConfig_Radio_TxConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration.Merge(dst, src)
-}
-func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_Size() int {
-	return m.Size()
-}
-func (m *ConcentratorConfig_Radio_TxConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ConcentratorConfig_Radio_TxConfiguration proto.InternalMessageInfo
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) GetMinFrequency() uint64 {
-	if m != nil {
-		return m.MinFrequency
-	}
-	return 0
-}
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) GetMaxFrequency() uint64 {
-	if m != nil {
-		return m.MaxFrequency
-	}
-	return 0
-}
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) GetNotchFrequency() uint64 {
-	if m != nil {
-		return m.NotchFrequency
-	}
-	return 0
-}
-
 func init() {
 	proto.RegisterType((*ConcentratorConfig)(nil), "ttn.lorawan.v3.ConcentratorConfig")
 	golang_proto.RegisterType((*ConcentratorConfig)(nil), "ttn.lorawan.v3.ConcentratorConfig")
@@ -492,10 +360,6 @@ func init() {
 	golang_proto.RegisterType((*ConcentratorConfig_FSKChannel)(nil), "ttn.lorawan.v3.ConcentratorConfig.FSKChannel")
 	proto.RegisterType((*ConcentratorConfig_LBTConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.LBTConfiguration")
 	golang_proto.RegisterType((*ConcentratorConfig_LBTConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.LBTConfiguration")
-	proto.RegisterType((*ConcentratorConfig_Radio)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio")
-	golang_proto.RegisterType((*ConcentratorConfig_Radio)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio")
-	proto.RegisterType((*ConcentratorConfig_Radio_TxConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio.TxConfiguration")
-	golang_proto.RegisterType((*ConcentratorConfig_Radio_TxConfiguration)(nil), "ttn.lorawan.v3.ConcentratorConfig.Radio.TxConfiguration")
 }
 func (this *ConcentratorConfig) Equal(that interface{}) bool {
 	if that == nil {
@@ -543,6 +407,9 @@ func (this *ConcentratorConfig) Equal(that interface{}) bool {
 		if !this.Radios[i].Equal(that1.Radios[i]) {
 			return false
 		}
+	}
+	if this.ClockSource != that1.ClockSource {
+		return false
 	}
 	return true
 }
@@ -663,72 +530,6 @@ func (this *ConcentratorConfig_LBTConfiguration) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ConcentratorConfig_Radio) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*ConcentratorConfig_Radio)
-	if !ok {
-		that2, ok := that.(ConcentratorConfig_Radio)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.Enable != that1.Enable {
-		return false
-	}
-	if this.ChipType != that1.ChipType {
-		return false
-	}
-	if this.Frequency != that1.Frequency {
-		return false
-	}
-	if this.RSSIOffset != that1.RSSIOffset {
-		return false
-	}
-	if !this.TxConfiguration.Equal(that1.TxConfiguration) {
-		return false
-	}
-	return true
-}
-func (this *ConcentratorConfig_Radio_TxConfiguration) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*ConcentratorConfig_Radio_TxConfiguration)
-	if !ok {
-		that2, ok := that.(ConcentratorConfig_Radio_TxConfiguration)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.MinFrequency != that1.MinFrequency {
-		return false
-	}
-	if this.MaxFrequency != that1.MaxFrequency {
-		return false
-	}
-	if this.NotchFrequency != that1.NotchFrequency {
-		return false
-	}
-	return true
-}
 func (m *ConcentratorConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -807,6 +608,11 @@ func (m *ConcentratorConfig) MarshalTo(dAtA []byte) (int, error) {
 			}
 			i += n
 		}
+	}
+	if m.ClockSource != 0 {
+		dAtA[i] = 0x38
+		i++
+		i = encodeVarintRegional(dAtA, i, uint64(m.ClockSource))
 	}
 	return i, nil
 }
@@ -946,94 +752,6 @@ func (m *ConcentratorConfig_LBTConfiguration) MarshalTo(dAtA []byte) (int, error
 	return i, nil
 }
 
-func (m *ConcentratorConfig_Radio) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ConcentratorConfig_Radio) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Enable {
-		dAtA[i] = 0x8
-		i++
-		if m.Enable {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if len(m.ChipType) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(len(m.ChipType)))
-		i += copy(dAtA[i:], m.ChipType)
-	}
-	if m.Frequency != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
-	}
-	if m.RSSIOffset != 0 {
-		dAtA[i] = 0x25
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
-		i += 4
-	}
-	if m.TxConfiguration != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.TxConfiguration.Size()))
-		n7, err := m.TxConfiguration.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	return i, nil
-}
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.MinFrequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintRegional(dAtA, i, m.MinFrequency)
-	}
-	if m.MaxFrequency != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintRegional(dAtA, i, m.MaxFrequency)
-	}
-	if m.NotchFrequency != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintRegional(dAtA, i, m.NotchFrequency)
-	}
-	return i, nil
-}
-
 func encodeVarintRegional(dAtA []byte, offset int, v uint64) int {
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -1066,11 +784,12 @@ func NewPopulatedConcentratorConfig(r randyRegional, easy bool) *ConcentratorCon
 	}
 	if r.Intn(10) != 0 {
 		v2 := r.Intn(5)
-		this.Radios = make([]*ConcentratorConfig_Radio, v2)
+		this.Radios = make([]*GatewayRadio, v2)
 		for i := 0; i < v2; i++ {
-			this.Radios[i] = NewPopulatedConcentratorConfig_Radio(r, easy)
+			this.Radios[i] = NewPopulatedGatewayRadio(r, easy)
 		}
 	}
+	this.ClockSource = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1121,33 +840,6 @@ func NewPopulatedConcentratorConfig_LBTConfiguration(r randyRegional, easy bool)
 	if r.Intn(2) == 0 {
 		this.ScanTime *= -1
 	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedConcentratorConfig_Radio(r randyRegional, easy bool) *ConcentratorConfig_Radio {
-	this := &ConcentratorConfig_Radio{}
-	this.Enable = bool(r.Intn(2) == 0)
-	this.ChipType = randStringRegional(r)
-	this.Frequency = uint64(r.Uint32())
-	this.RSSIOffset = r.Float32()
-	if r.Intn(2) == 0 {
-		this.RSSIOffset *= -1
-	}
-	if r.Intn(10) != 0 {
-		this.TxConfiguration = NewPopulatedConcentratorConfig_Radio_TxConfiguration(r, easy)
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedConcentratorConfig_Radio_TxConfiguration(r randyRegional, easy bool) *ConcentratorConfig_Radio_TxConfiguration {
-	this := &ConcentratorConfig_Radio_TxConfiguration{}
-	this.MinFrequency = uint64(r.Uint32())
-	this.MaxFrequency = uint64(r.Uint32())
-	this.NotchFrequency = uint64(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1256,6 +948,9 @@ func (m *ConcentratorConfig) Size() (n int) {
 			n += 1 + l + sovRegional(uint64(l))
 		}
 	}
+	if m.ClockSource != 0 {
+		n += 1 + sovRegional(uint64(m.ClockSource))
+	}
 	return n
 }
 
@@ -1314,44 +1009,6 @@ func (m *ConcentratorConfig_LBTConfiguration) Size() (n int) {
 	return n
 }
 
-func (m *ConcentratorConfig_Radio) Size() (n int) {
-	var l int
-	_ = l
-	if m.Enable {
-		n += 2
-	}
-	l = len(m.ChipType)
-	if l > 0 {
-		n += 1 + l + sovRegional(uint64(l))
-	}
-	if m.Frequency != 0 {
-		n += 1 + sovRegional(m.Frequency)
-	}
-	if m.RSSIOffset != 0 {
-		n += 5
-	}
-	if m.TxConfiguration != nil {
-		l = m.TxConfiguration.Size()
-		n += 1 + l + sovRegional(uint64(l))
-	}
-	return n
-}
-
-func (m *ConcentratorConfig_Radio_TxConfiguration) Size() (n int) {
-	var l int
-	_ = l
-	if m.MinFrequency != 0 {
-		n += 1 + sovRegional(m.MinFrequency)
-	}
-	if m.MaxFrequency != 0 {
-		n += 1 + sovRegional(m.MaxFrequency)
-	}
-	if m.NotchFrequency != 0 {
-		n += 1 + sovRegional(m.NotchFrequency)
-	}
-	return n
-}
-
 func sovRegional(x uint64) (n int) {
 	for {
 		n++
@@ -1375,7 +1032,8 @@ func (this *ConcentratorConfig) String() string {
 		`FSKChannel:` + strings.Replace(fmt.Sprintf("%v", this.FSKChannel), "ConcentratorConfig_FSKChannel", "ConcentratorConfig_FSKChannel", 1) + `,`,
 		`LBT:` + strings.Replace(fmt.Sprintf("%v", this.LBT), "ConcentratorConfig_LBTConfiguration", "ConcentratorConfig_LBTConfiguration", 1) + `,`,
 		`PingSlot:` + strings.Replace(fmt.Sprintf("%v", this.PingSlot), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1) + `,`,
-		`Radios:` + strings.Replace(fmt.Sprintf("%v", this.Radios), "ConcentratorConfig_Radio", "ConcentratorConfig_Radio", 1) + `,`,
+		`Radios:` + strings.Replace(fmt.Sprintf("%v", this.Radios), "GatewayRadio", "GatewayRadio", 1) + `,`,
+		`ClockSource:` + fmt.Sprintf("%v", this.ClockSource) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1423,32 +1081,6 @@ func (this *ConcentratorConfig_LBTConfiguration) String() string {
 		`RSSITarget:` + fmt.Sprintf("%v", this.RSSITarget) + `,`,
 		`RSSIOffset:` + fmt.Sprintf("%v", this.RSSIOffset) + `,`,
 		`ScanTime:` + fmt.Sprintf("%v", this.ScanTime) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ConcentratorConfig_Radio) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ConcentratorConfig_Radio{`,
-		`Enable:` + fmt.Sprintf("%v", this.Enable) + `,`,
-		`ChipType:` + fmt.Sprintf("%v", this.ChipType) + `,`,
-		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
-		`RSSIOffset:` + fmt.Sprintf("%v", this.RSSIOffset) + `,`,
-		`TxConfiguration:` + strings.Replace(fmt.Sprintf("%v", this.TxConfiguration), "ConcentratorConfig_Radio_TxConfiguration", "ConcentratorConfig_Radio_TxConfiguration", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ConcentratorConfig_Radio_TxConfiguration) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ConcentratorConfig_Radio_TxConfiguration{`,
-		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
-		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
-		`NotchFrequency:` + fmt.Sprintf("%v", this.NotchFrequency) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1679,11 +1311,30 @@ func (m *ConcentratorConfig) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Radios = append(m.Radios, &ConcentratorConfig_Radio{})
+			m.Radios = append(m.Radios, &GatewayRadio{})
 			if err := m.Radios[len(m.Radios)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClockSource", wireType)
+			}
+			m.ClockSource = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegional
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ClockSource |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegional(dAtA[iNdEx:])
@@ -2120,275 +1771,6 @@ func (m *ConcentratorConfig_LBTConfiguration) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ConcentratorConfig_Radio) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegional
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Radio: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Radio: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Enable", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Enable = bool(v != 0)
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ChipType", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ChipType = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Frequency", wireType)
-			}
-			m.Frequency = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Frequency |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RSSIOffset", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
-			iNdEx += 4
-			m.RSSIOffset = math.Float32frombits(v)
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TxConfiguration", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegional
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TxConfiguration == nil {
-				m.TxConfiguration = &ConcentratorConfig_Radio_TxConfiguration{}
-			}
-			if err := m.TxConfiguration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegional(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRegional
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ConcentratorConfig_Radio_TxConfiguration) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegional
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TxConfiguration: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TxConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
-			}
-			m.MinFrequency = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MinFrequency |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
-			}
-			m.MaxFrequency = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxFrequency |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NotchFrequency", wireType)
-			}
-			m.NotchFrequency = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegional
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.NotchFrequency |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegional(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRegional
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func skipRegional(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2495,63 +1877,57 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_9f058c0d9001276c)
+	proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_bf9b75fe2c5af46a)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_9f058c0d9001276c)
+	golang_proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_bf9b75fe2c5af46a)
 }
 
-var fileDescriptor_regional_9f058c0d9001276c = []byte{
-	// 810 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0x3d, 0x8c, 0x1b, 0x45,
-	0x14, 0x9e, 0x39, 0xdf, 0x8f, 0x6f, 0xcc, 0xfd, 0x68, 0xc3, 0x8f, 0x59, 0xd0, 0xf8, 0x04, 0x05,
-	0x07, 0xe2, 0xd6, 0x52, 0x4e, 0x42, 0x34, 0x48, 0xc8, 0x27, 0x19, 0x21, 0xa2, 0x20, 0x8d, 0x5d,
-	0x51, 0xb0, 0x9a, 0x5d, 0xcf, 0xae, 0x47, 0x5e, 0xcf, 0x2c, 0xbb, 0x63, 0xce, 0xd7, 0x45, 0x82,
-	0x22, 0x25, 0x14, 0x48, 0x94, 0x88, 0x2a, 0x15, 0x8a, 0x44, 0x93, 0x32, 0xe5, 0x95, 0x57, 0xa6,
-	0xb2, 0xe2, 0xd9, 0x26, 0x65, 0x3a, 0x52, 0xa2, 0x9d, 0x5d, 0xff, 0x12, 0x09, 0xa7, 0x49, 0x37,
-	0xef, 0x9b, 0xef, 0x7b, 0xef, 0x9b, 0xf7, 0x9e, 0xbd, 0xe8, 0x24, 0x92, 0x09, 0xbd, 0xa4, 0xe2,
-	0x2c, 0x55, 0xd4, 0x1f, 0x34, 0x69, 0xcc, 0x9b, 0x09, 0x0b, 0xb9, 0x14, 0x34, 0x72, 0xe2, 0x44,
-	0x2a, 0x69, 0x1d, 0x2a, 0x25, 0x9c, 0x92, 0xe5, 0xfc, 0x78, 0x6e, 0x9f, 0x85, 0x5c, 0xf5, 0x47,
-	0x9e, 0xe3, 0xcb, 0x61, 0x33, 0x94, 0xa1, 0x6c, 0x1a, 0x9a, 0x37, 0x0a, 0x4c, 0x64, 0x02, 0x73,
-	0x2a, 0xe4, 0x36, 0x0e, 0xa5, 0x0c, 0x23, 0xb6, 0x60, 0xf5, 0x46, 0x09, 0x55, 0x5c, 0x8a, 0xe2,
-	0xfe, 0x83, 0xbf, 0x6b, 0xc8, 0xba, 0x90, 0xc2, 0x67, 0x42, 0x25, 0x54, 0xc9, 0xe4, 0x42, 0x8a,
-	0x80, 0x87, 0x56, 0x1b, 0x55, 0xfd, 0x3e, 0x15, 0x82, 0x45, 0x69, 0x1d, 0x9e, 0x54, 0x4e, 0x6b,
-	0xb7, 0x3f, 0x71, 0x56, 0x8d, 0x38, 0xff, 0x55, 0x39, 0x17, 0x85, 0x84, 0xcc, 0xb5, 0xd6, 0x4f,
-	0x10, 0xbd, 0x95, 0x6b, 0xdc, 0x54, 0x51, 0xd1, 0xa3, 0x49, 0xcf, 0x2d, 0xaf, 0xea, 0x5b, 0x27,
-	0xf0, 0xb4, 0x76, 0xfb, 0xb3, 0x0d, 0xb2, 0xde, 0x91, 0x84, 0x76, 0x4a, 0x79, 0x59, 0xa1, 0xf5,
-	0x8e, 0x9e, 0x34, 0x6e, 0xbd, 0xe4, 0x82, 0xdc, 0xca, 0x73, 0xad, 0x81, 0xd6, 0xf7, 0xa8, 0x16,
-	0xa4, 0x83, 0x79, 0xe9, 0x8a, 0x29, 0x7d, 0xb6, 0x41, 0xe9, 0x76, 0xe7, 0x9b, 0x59, 0xc5, 0x43,
-	0x3d, 0x69, 0xa0, 0x45, 0x4c, 0x50, 0x90, 0x0e, 0x66, 0xf9, 0xef, 0xa2, 0x4a, 0xe4, 0xa9, 0xfa,
-	0xb6, 0xc9, 0x7b, 0xbe, 0xc9, 0x93, 0x5a, 0xdd, 0xe2, 0x54, 0x0e, 0xa3, 0xb5, 0xa7, 0x27, 0x8d,
-	0xca, 0x9d, 0x56, 0x97, 0xe4, 0x89, 0xac, 0xaf, 0xd0, 0x7e, 0xcc, 0x45, 0xe8, 0xa6, 0x91, 0x54,
-	0xf5, 0x1d, 0x93, 0xf5, 0x95, 0xda, 0x9f, 0x8b, 0x3b, 0x91, 0x54, 0xd6, 0x97, 0x68, 0x37, 0xa1,
-	0x3d, 0x2e, 0xd3, 0xfa, 0xae, 0x19, 0xe2, 0xe9, 0x06, 0x59, 0x48, 0x2e, 0x20, 0xa5, 0xce, 0xfe,
-	0x02, 0xed, 0xcd, 0x5e, 0xf9, 0x3e, 0xda, 0x0f, 0x12, 0xf6, 0xc3, 0x88, 0x09, 0xff, 0xaa, 0x0e,
-	0x4f, 0xe0, 0xe9, 0x36, 0x59, 0x00, 0xd6, 0x9b, 0x68, 0xc7, 0x48, 0xcc, 0x60, 0x0f, 0x48, 0x11,
-	0xd8, 0x7f, 0x41, 0xf4, 0xb2, 0x31, 0x59, 0x77, 0xd1, 0xde, 0x6c, 0x1a, 0xf0, 0x55, 0xdf, 0xd7,
-	0xaa, 0x5e, 0x4f, 0x1a, 0xe0, 0x66, 0xd2, 0x80, 0x64, 0x96, 0x24, 0xf7, 0xe6, 0x51, 0xd1, 0xbb,
-	0xe4, 0x3d, 0xd5, 0x2f, 0x1d, 0x2c, 0x00, 0xeb, 0x63, 0x74, 0x9c, 0xc6, 0x09, 0xa3, 0xbd, 0xbc,
-	0xa9, 0x01, 0xf5, 0x95, 0x4c, 0xcc, 0x12, 0x1c, 0x90, 0xa3, 0x39, 0xde, 0x36, 0xb0, 0xfd, 0x1b,
-	0x44, 0x4b, 0x53, 0x7e, 0xcd, 0x3e, 0xdf, 0x45, 0x55, 0x8f, 0x2b, 0x37, 0xa1, 0x8a, 0x95, 0xfe,
-	0xf6, 0x3c, 0xae, 0x08, 0x55, 0xcc, 0xfe, 0x15, 0xa2, 0xe3, 0xf5, 0xad, 0xb1, 0x9a, 0xa8, 0x96,
-	0xa4, 0x29, 0x77, 0x15, 0x4d, 0x42, 0xa6, 0x8c, 0xc3, 0xad, 0x62, 0x51, 0x49, 0xa7, 0xf3, 0x75,
-	0xd7, 0xa0, 0x04, 0xe5, 0x94, 0xe2, 0x3c, 0x17, 0xc8, 0x20, 0x48, 0x99, 0x32, 0x06, 0x96, 0x04,
-	0xdf, 0x1a, 0xb4, 0x10, 0x14, 0x67, 0xeb, 0x3d, 0xb4, 0x9f, 0xfa, 0x54, 0xb8, 0x8a, 0x0f, 0x0b,
-	0x4b, 0x3b, 0xa4, 0x9a, 0x03, 0x5d, 0x3e, 0x64, 0xf6, 0x3f, 0x5b, 0x68, 0xc7, 0x6c, 0x8b, 0xf5,
-	0x36, 0xda, 0x65, 0x82, 0x7a, 0x11, 0x33, 0x1e, 0xaa, 0xa4, 0x8c, 0x72, 0xb9, 0xdf, 0xe7, 0xb1,
-	0xab, 0xae, 0x62, 0x66, 0xaa, 0xed, 0xe7, 0xff, 0x0d, 0x3c, 0xee, 0x5e, 0xc5, 0x6c, 0x75, 0x9f,
-	0x2a, 0xeb, 0xfb, 0xb4, 0x66, 0x75, 0xfb, 0x7f, 0xad, 0xfa, 0xe8, 0x58, 0x8d, 0x5d, 0x7f, 0xb9,
-	0x41, 0xe5, 0x6f, 0xe7, 0xf3, 0x4d, 0xb7, 0xde, 0xe9, 0x8e, 0x57, 0x1a, 0x4c, 0x8e, 0xd4, 0x2a,
-	0x60, 0xff, 0x0c, 0xd1, 0xd1, 0x1a, 0xc9, 0xfa, 0x10, 0x1d, 0x0c, 0xb9, 0x70, 0xd7, 0x7f, 0x1b,
-	0x6f, 0x0c, 0xb9, 0x68, 0xcf, 0x9f, 0x93, 0x93, 0xe8, 0x78, 0x89, 0xb4, 0x55, 0x92, 0xe8, 0x78,
-	0x41, 0xfa, 0x08, 0x1d, 0x09, 0xa9, 0xfc, 0xbe, 0xbb, 0xde, 0x97, 0x43, 0x03, 0xcf, 0x89, 0xad,
-	0x3f, 0xe1, 0xf5, 0x14, 0xc3, 0x9b, 0x29, 0x86, 0x4f, 0xa6, 0x18, 0x3c, 0x9d, 0x62, 0xf0, 0x6c,
-	0x8a, 0xc1, 0xf3, 0x29, 0x06, 0x2f, 0xa6, 0x18, 0xde, 0xd3, 0x18, 0xde, 0xd7, 0x18, 0x3c, 0xd0,
-	0x18, 0x3e, 0xd4, 0x18, 0x3c, 0xd2, 0x18, 0x3c, 0xd6, 0x18, 0x5c, 0x6b, 0x0c, 0x6f, 0x34, 0x86,
-	0x4f, 0x34, 0x06, 0x4f, 0x35, 0x86, 0xcf, 0x34, 0x06, 0xcf, 0x35, 0x86, 0x2f, 0x34, 0x06, 0xf7,
-	0x32, 0x0c, 0xee, 0x67, 0x18, 0xfe, 0x92, 0x61, 0xf0, 0x7b, 0x86, 0xe1, 0x1f, 0x19, 0x06, 0x0f,
-	0x32, 0x0c, 0x1e, 0x66, 0x18, 0x3e, 0xca, 0x30, 0x7c, 0x9c, 0x61, 0xf8, 0xdd, 0xa7, 0xa1, 0x74,
-	0x54, 0x9f, 0xa9, 0x3e, 0x17, 0x61, 0xea, 0x08, 0xa6, 0x2e, 0x65, 0x32, 0x68, 0xae, 0x7e, 0xc2,
-	0xe2, 0x41, 0xd8, 0x54, 0x4a, 0xc4, 0x9e, 0xb7, 0x6b, 0xbe, 0x30, 0xe7, 0xff, 0x06, 0x00, 0x00,
-	0xff, 0xff, 0xe0, 0xa9, 0x3c, 0xb1, 0xe4, 0x06, 0x00, 0x00,
+var fileDescriptor_regional_bf9b75fe2c5af46a = []byte{
+	// 717 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0x3f, 0x4c, 0x33, 0x37,
+	0x14, 0xb7, 0x09, 0x90, 0xe0, 0x14, 0x8a, 0x8e, 0x56, 0x4d, 0x53, 0xe4, 0xa4, 0x9d, 0xd2, 0xaa,
+	0x5c, 0x24, 0xa8, 0xba, 0x75, 0x09, 0x12, 0xa8, 0x2a, 0xa2, 0x92, 0x93, 0xa9, 0x43, 0x23, 0xdf,
+	0xc5, 0x77, 0x39, 0xe5, 0xb0, 0x53, 0x9f, 0xd3, 0x88, 0x0d, 0xa9, 0x0b, 0x63, 0x3b, 0x54, 0xea,
+	0x58, 0x7d, 0x13, 0xd3, 0x27, 0x46, 0x46, 0x46, 0xc6, 0x8c, 0x4c, 0x11, 0xf1, 0x2d, 0x8c, 0x8c,
+	0x8c, 0x9f, 0xce, 0x77, 0x49, 0xf8, 0x37, 0xc0, 0xf2, 0x6d, 0xef, 0xfd, 0xfc, 0x7e, 0xbf, 0xf7,
+	0xb3, 0xdf, 0x93, 0x51, 0x35, 0x14, 0x92, 0x0e, 0x29, 0xdf, 0x8a, 0x14, 0x75, 0x7b, 0x75, 0xda,
+	0x0f, 0xea, 0x92, 0xf9, 0x81, 0xe0, 0x34, 0xb4, 0xfb, 0x52, 0x28, 0x61, 0xad, 0x29, 0xc5, 0xed,
+	0xac, 0xca, 0xfe, 0x73, 0xa7, 0x5c, 0x79, 0xce, 0xf0, 0xa9, 0x62, 0x43, 0x7a, 0x9c, 0x12, 0xca,
+	0x5b, 0x7e, 0xa0, 0xba, 0x03, 0xc7, 0x76, 0xc5, 0x51, 0xdd, 0x17, 0xbe, 0xa8, 0x1b, 0xd8, 0x19,
+	0x78, 0x26, 0x33, 0x89, 0x89, 0xb2, 0x72, 0xec, 0x0b, 0xe1, 0x87, 0x6c, 0x5e, 0xd5, 0x19, 0x48,
+	0xaa, 0x02, 0xc1, 0xd3, 0xf3, 0x6f, 0x46, 0x05, 0x64, 0xed, 0x0a, 0xee, 0x32, 0xae, 0x24, 0x55,
+	0x42, 0xee, 0x0a, 0xee, 0x05, 0xbe, 0xb5, 0x87, 0x0a, 0x6e, 0x97, 0x72, 0xce, 0xc2, 0xa8, 0x04,
+	0xab, 0xb9, 0x5a, 0x71, 0xfb, 0x3b, 0xfb, 0xb1, 0x53, 0xfb, 0x39, 0xcb, 0xde, 0x4d, 0x29, 0x64,
+	0xc6, 0xb5, 0xfe, 0x82, 0xe8, 0xf3, 0x84, 0xd3, 0x8e, 0x14, 0xe5, 0x1d, 0x2a, 0x3b, 0xed, 0xec,
+	0xa8, 0xb4, 0x50, 0x85, 0xb5, 0xe2, 0xf6, 0x8f, 0xaf, 0x50, 0x3d, 0x10, 0x84, 0x36, 0x33, 0x7a,
+	0xd6, 0xa1, 0xf1, 0x85, 0x1e, 0x57, 0x36, 0x5e, 0x38, 0x20, 0x1b, 0x89, 0xd6, 0x13, 0xd0, 0xfa,
+	0x1d, 0x15, 0xbd, 0xa8, 0x37, 0x6b, 0x9d, 0x33, 0xad, 0xb7, 0x5e, 0xd1, 0x7a, 0xaf, 0xf9, 0xcb,
+	0xb4, 0xe3, 0x9a, 0x1e, 0x57, 0xd0, 0x3c, 0x27, 0xc8, 0x8b, 0x7a, 0x53, 0xfd, 0x43, 0x94, 0x0b,
+	0x1d, 0x55, 0x5a, 0x34, 0xba, 0x3b, 0xaf, 0xb9, 0x52, 0xa3, 0x95, 0x46, 0xd9, 0x30, 0x1a, 0x79,
+	0x3d, 0xae, 0xe4, 0x0e, 0x1a, 0x2d, 0x92, 0x08, 0x59, 0xfb, 0x68, 0xa5, 0x1f, 0x70, 0xbf, 0x1d,
+	0x85, 0x42, 0x95, 0x96, 0x8c, 0xea, 0x9b, 0x9e, 0x3f, 0x21, 0x37, 0x43, 0xa1, 0xac, 0x1f, 0xd0,
+	0xb2, 0xa4, 0x9d, 0x40, 0x44, 0xa5, 0x65, 0x33, 0xc4, 0xcd, 0xa7, 0x2a, 0xfb, 0xe9, 0x6e, 0x91,
+	0xa4, 0x88, 0x64, 0xb5, 0xd6, 0xd7, 0xe8, 0x13, 0x37, 0x14, 0x6e, 0xaf, 0x1d, 0x89, 0x81, 0x74,
+	0x59, 0x29, 0x5f, 0x85, 0xb5, 0x55, 0x52, 0x34, 0x58, 0xd3, 0x40, 0xe5, 0x9f, 0x50, 0x7e, 0x7a,
+	0xf9, 0x4d, 0xb4, 0xe2, 0x49, 0xf6, 0xc7, 0x80, 0x71, 0xf7, 0xb8, 0x04, 0xab, 0xb0, 0xb6, 0x48,
+	0xe6, 0x80, 0xf5, 0x19, 0x5a, 0x32, 0xaa, 0x66, 0xde, 0xab, 0x24, 0x4d, 0xca, 0xef, 0x21, 0x7a,
+	0x69, 0x7a, 0xd6, 0x21, 0xca, 0x4f, 0x87, 0x04, 0xdf, 0x7a, 0xed, 0x46, 0xe1, 0x6a, 0x5c, 0x01,
+	0xa3, 0x71, 0x05, 0x92, 0xa9, 0x48, 0xe2, 0xcd, 0xa1, 0xbc, 0x33, 0x0c, 0x3a, 0xaa, 0x9b, 0x39,
+	0x98, 0x03, 0xd6, 0xb7, 0x68, 0x3d, 0xea, 0x4b, 0x46, 0x3b, 0xc9, 0x5b, 0x7b, 0xd4, 0x55, 0x42,
+	0x9a, 0xdd, 0x58, 0x25, 0x9f, 0xce, 0xf0, 0x3d, 0x03, 0x97, 0xff, 0x85, 0xe8, 0xc1, 0xf0, 0x3f,
+	0xb2, 0xcf, 0x2f, 0x51, 0xc1, 0x09, 0x54, 0x5b, 0x52, 0xc5, 0x32, 0x7f, 0x79, 0x27, 0x50, 0x84,
+	0x2a, 0x56, 0xfe, 0x07, 0xa2, 0xf5, 0xa7, 0xcb, 0x64, 0xd5, 0x51, 0x51, 0x46, 0x51, 0xd0, 0x56,
+	0x54, 0xfa, 0x4c, 0x19, 0x87, 0x0b, 0xe9, 0xfe, 0x92, 0x66, 0xf3, 0xe7, 0x96, 0x41, 0x09, 0x4a,
+	0x4a, 0xd2, 0x78, 0x46, 0x10, 0x9e, 0x17, 0x31, 0x65, 0x0c, 0x3c, 0x20, 0xfc, 0x6a, 0xd0, 0x94,
+	0x90, 0xc6, 0xd6, 0x57, 0x68, 0x25, 0x72, 0x29, 0x6f, 0xab, 0xe0, 0x28, 0xb5, 0xb4, 0x44, 0x0a,
+	0x09, 0xd0, 0x0a, 0x8e, 0x58, 0xe3, 0x1d, 0xbc, 0x9a, 0x60, 0x38, 0x9a, 0x60, 0x78, 0x3d, 0xc1,
+	0xe0, 0x66, 0x82, 0xc1, 0xed, 0x04, 0x83, 0xbb, 0x09, 0x06, 0xf7, 0x13, 0x0c, 0x4f, 0x34, 0x86,
+	0xa7, 0x1a, 0x83, 0x33, 0x8d, 0xe1, 0xb9, 0xc6, 0xe0, 0x42, 0x63, 0x70, 0xa9, 0x31, 0xb8, 0xd2,
+	0x18, 0x8e, 0x34, 0x86, 0xd7, 0x1a, 0x83, 0x1b, 0x8d, 0xe1, 0xad, 0xc6, 0xe0, 0x4e, 0x63, 0x78,
+	0xaf, 0x31, 0x38, 0x89, 0x31, 0x38, 0x8d, 0x31, 0xfc, 0x3b, 0xc6, 0xe0, 0xbf, 0x18, 0xc3, 0xff,
+	0x63, 0x0c, 0xce, 0x62, 0x0c, 0xce, 0x63, 0x0c, 0x2f, 0x62, 0x0c, 0x2f, 0x63, 0x0c, 0x7f, 0xfb,
+	0xde, 0x17, 0xb6, 0xea, 0x32, 0xd5, 0x0d, 0xb8, 0x1f, 0xd9, 0x9c, 0xa9, 0xa1, 0x90, 0xbd, 0xfa,
+	0xe3, 0xef, 0xb4, 0xdf, 0xf3, 0xeb, 0x4a, 0xf1, 0xbe, 0xe3, 0x2c, 0x9b, 0xef, 0x6f, 0xe7, 0x43,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x5d, 0xc2, 0x12, 0xe0, 0xa2, 0x05, 0x00, 0x00,
 }
