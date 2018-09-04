@@ -936,7 +936,7 @@ func (m *Application) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Description)
 	}
 	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
+		for k, _ := range m.Attributes {
 			dAtA[i] = 0x32
 			i++
 			v := m.Attributes[k]
@@ -1313,8 +1313,8 @@ func NewPopulatedApplication(r randyApplication, easy bool) *Application {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringApplication(r)
-	this.Description = randStringApplication(r)
+	this.Name = string(randStringApplication(r))
+	this.Description = string(randStringApplication(r))
 	if r.Intn(10) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -1401,7 +1401,7 @@ func NewPopulatedCreateApplicationAPIKeyRequest(r randyApplication, easy bool) *
 	this := &CreateApplicationAPIKeyRequest{}
 	v13 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v13
-	this.Name = randStringApplication(r)
+	this.Name = string(randStringApplication(r))
 	v14 := r.Intn(10)
 	this.Rights = make([]Right, v14)
 	for i := 0; i < v14; i++ {
@@ -1427,7 +1427,7 @@ func NewPopulatedRemoveApplicationAPIKeyRequest(r randyApplication, easy bool) *
 	this := &RemoveApplicationAPIKeyRequest{}
 	v17 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v17
-	this.ID = randStringApplication(r)
+	this.ID = string(randStringApplication(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1510,7 +1510,7 @@ func randFieldApplication(dAtA []byte, r randyApplication, fieldNumber int, wire
 }
 func encodeVarintPopulateApplication(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1672,14 +1672,14 @@ func sovApplication(x uint64) (n int) {
 	return n
 }
 func sozApplication(x uint64) (n int) {
-	return sovApplication((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplication(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Application) String() string {
 	if this == nil {
 		return "nil"
 	}
 	keysForAttributes := make([]string, 0, len(this.Attributes))
-	for k := range this.Attributes {
+	for k, _ := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)

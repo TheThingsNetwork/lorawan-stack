@@ -28,19 +28,21 @@ message JoinRequest {
   option (gogoproto.populate) = false;
 
   bytes raw_payload = 1;
-  Message payload = 2 [(gogoproto.nullable) = false];
-  EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Message payload = 2;
+  EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   MACVersion selected_mac_version = 4;
   bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
   DLSettings downlink_settings = 6 [(gogoproto.nullable) = false];
-  uint32 rx_delay = 7;
+  uint32 rx_delay = 7; // TODO: Make enum.
   // Optional CFList.
   CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
   reserved 9; // Reserved for CFListType.
+  repeated string correlation_ids = 10 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message JoinResponse {
   bytes raw_payload = 1;
   SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   google.protobuf.Duration lifetime = 3;
+  repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
 }

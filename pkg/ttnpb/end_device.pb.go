@@ -19,6 +19,7 @@ import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
 import strings "strings"
 import reflect "reflect"
+import github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 
 import io "io"
 
@@ -42,12 +43,13 @@ type Session struct {
 	SessionKeys `protobuf:"bytes,3,opt,name=keys,embedded=keys" json:"keys"`
 	// Next FCntUp to expect. Network Server only. Application Server assumes the Network Server checked it.
 	NextFCntUp uint32 `protobuf:"varint,4,opt,name=next_f_cnt_up,json=nextFCntUp,proto3" json:"next_f_cnt_up,omitempty"`
-	// Next NFcntDown to be used. Network Server only.
+	// Next NFCntDown to be used. Network Server only.
 	NextNFCntDown uint32 `protobuf:"varint,5,opt,name=next_n_f_cnt_down,json=nextNFCntDown,proto3" json:"next_n_f_cnt_down,omitempty"`
 	// Next AFCntDown to be used. Application Server only.
 	NextAFCntDown uint32 `protobuf:"varint,6,opt,name=next_a_f_cnt_down,json=nextAFCntDown,proto3" json:"next_a_f_cnt_down,omitempty"`
-	// Last FCntDown of the last confirmed message.
-	LastConfFCntDown     uint32    `protobuf:"varint,7,opt,name=last_conf_f_cnt_down,json=lastConfFCntDown,proto3" json:"last_conf_f_cnt_down,omitempty"`
+	// Last FCntDown of the last confirmed message. Network Server only.
+	LastConfFCntDown uint32 `protobuf:"varint,7,opt,name=last_conf_f_cnt_down,json=lastConfFCntDown,proto3" json:"last_conf_f_cnt_down,omitempty"`
+	// Time when the session started. Network Server only.
 	StartedAt            time.Time `protobuf:"bytes,8,opt,name=started_at,json=startedAt,stdtime" json:"started_at"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -56,7 +58,7 @@ type Session struct {
 func (m *Session) Reset()      { *m = Session{} }
 func (*Session) ProtoMessage() {}
 func (*Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{0}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{0}
 }
 func (m *Session) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -123,7 +125,7 @@ func (m *Session) GetStartedAt() time.Time {
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
 // This is used internally by the Network Server and is read only.
 type MACParameters struct {
-	// Maximum EIRP power (in dBm).
+	// Maximum EIRP (dBm).
 	MaxEIRP float32 `protobuf:"fixed32,1,opt,name=max_eirp,json=maxEirp,proto3" json:"max_eirp,omitempty"`
 	// Uplink dwell time is set (400ms).
 	UplinkDwellTime bool `protobuf:"varint,2,opt,name=uplink_dwell_time,json=uplinkDwellTime,proto3" json:"uplink_dwell_time,omitempty"`
@@ -139,13 +141,13 @@ type MACParameters struct {
 	ADRAckLimit uint32 `protobuf:"varint,7,opt,name=adr_ack_limit,json=adrAckLimit,proto3" json:"adr_ack_limit,omitempty"`
 	// ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
 	ADRAckDelay uint32 `protobuf:"varint,8,opt,name=adr_ack_delay,json=adrAckDelay,proto3" json:"adr_ack_delay,omitempty"`
-	// Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
+	// Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
 	Rx1Delay uint32 `protobuf:"varint,9,opt,name=rx1_delay,json=rx1Delay,proto3" json:"rx1_delay,omitempty"`
 	// Data rate offset for Rx1.
 	Rx1DataRateOffset uint32 `protobuf:"varint,10,opt,name=rx1_data_rate_offset,json=rx1DataRateOffset,proto3" json:"rx1_data_rate_offset,omitempty"`
 	// Data rate index for Rx2.
 	Rx2DataRateIndex DataRateIndex `protobuf:"varint,11,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"rx2_data_rate_index,omitempty"`
-	// Frequency for Rx2 (in Hz).
+	// Frequency for Rx2 (Hz).
 	Rx2Frequency uint64 `protobuf:"varint,12,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
 	// Time within which a rejoin-request must be sent.
 	RejoinTimePeriodicity RejoinTimeExponent `protobuf:"varint,13,opt,name=rejoin_time_periodicity,json=rejoinTimePeriodicity,proto3,enum=ttn.lorawan.v3.RejoinTimeExponent" json:"rejoin_time_periodicity,omitempty"`
@@ -155,11 +157,11 @@ type MACParameters struct {
 	DutyCycle AggregatedDutyCycle `protobuf:"varint,15,opt,name=duty_cycle,json=dutyCycle,proto3,enum=ttn.lorawan.v3.AggregatedDutyCycle" json:"duty_cycle,omitempty"`
 	// Configured uplink channels and optionally Rx1 frequency.
 	Channels []*MACParameters_Channel `protobuf:"bytes,16,rep,name=channels" json:"channels,omitempty"`
-	// Frequency of the class B ping slot (in Hz).
+	// Frequency of the class B ping slot (Hz).
 	PingSlotFrequency uint64 `protobuf:"varint,17,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
 	// Data rate index of the class B ping slot.
 	PingSlotDataRateIndex DataRateIndex `protobuf:"varint,18,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"ping_slot_data_rate_index,omitempty"`
-	// Frequency of the class B beacon (in Hz).
+	// Frequency of the class B beacon (Hz).
 	BeaconFrequency      uint64   `protobuf:"varint,19,opt,name=beacon_frequency,json=beaconFrequency,proto3" json:"beacon_frequency,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -168,7 +170,7 @@ type MACParameters struct {
 func (m *MACParameters) Reset()      { *m = MACParameters{} }
 func (*MACParameters) ProtoMessage() {}
 func (*MACParameters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{1}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{1}
 }
 func (m *MACParameters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -331,16 +333,16 @@ func (m *MACParameters) GetBeaconFrequency() uint64 {
 }
 
 type MACParameters_Channel struct {
-	// Uplink frequency of the channel (in Hz).
+	// Uplink frequency of the channel (Hz).
 	UplinkFrequency uint64 `protobuf:"varint,1,opt,name=uplink_frequency,json=uplinkFrequency,proto3" json:"uplink_frequency,omitempty"`
-	// Downlink frequency of the channel (in Hz).
+	// Downlink frequency of the channel (Hz).
 	DownlinkFrequency uint64 `protobuf:"varint,2,opt,name=downlink_frequency,json=downlinkFrequency,proto3" json:"downlink_frequency,omitempty"`
 	// Index of the minimum data rate for uplink.
 	MinDataRateIndex DataRateIndex `protobuf:"varint,3,opt,name=min_data_rate_index,json=minDataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"min_data_rate_index,omitempty"`
 	// Index of the maximum data rate for uplink.
 	MaxDataRateIndex DataRateIndex `protobuf:"varint,4,opt,name=max_data_rate_index,json=maxDataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"max_data_rate_index,omitempty"`
-	// Channel can be used by device for uplink.
-	UplinkEnabled        bool     `protobuf:"varint,5,opt,name=uplink_enabled,json=uplinkEnabled,proto3" json:"uplink_enabled,omitempty"`
+	// Channel is masked for ADR.
+	Masked               bool     `protobuf:"varint,5,opt,name=masked,proto3" json:"masked,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -348,7 +350,7 @@ type MACParameters_Channel struct {
 func (m *MACParameters_Channel) Reset()      { *m = MACParameters_Channel{} }
 func (*MACParameters_Channel) ProtoMessage() {}
 func (*MACParameters_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{1, 0}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{1, 0}
 }
 func (m *MACParameters_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -405,9 +407,9 @@ func (m *MACParameters_Channel) GetMaxDataRateIndex() DataRateIndex {
 	return DATA_RATE_0
 }
 
-func (m *MACParameters_Channel) GetUplinkEnabled() bool {
+func (m *MACParameters_Channel) GetMasked() bool {
 	if m != nil {
-		return m.UplinkEnabled
+		return m.Masked
 	}
 	return false
 }
@@ -425,7 +427,7 @@ type EndDeviceBrand struct {
 func (m *EndDeviceBrand) Reset()      { *m = EndDeviceBrand{} }
 func (*EndDeviceBrand) ProtoMessage() {}
 func (*EndDeviceBrand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{2}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{2}
 }
 func (m *EndDeviceBrand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -493,7 +495,7 @@ type EndDeviceModel struct {
 func (m *EndDeviceModel) Reset()      { *m = EndDeviceModel{} }
 func (*EndDeviceModel) ProtoMessage() {}
 func (*EndDeviceModel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{3}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{3}
 }
 func (m *EndDeviceModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -545,22 +547,18 @@ func (m *EndDeviceModel) GetName() string {
 
 // Identifies an end device model with version information.
 type EndDeviceVersionIdentifiers struct {
-	BrandID string `protobuf:"bytes,1,opt,name=brand_id,json=brandId,proto3" json:"brand_id,omitempty"`
-	ModelID string `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
-	// LoRaWAN MAC version.
-	LoRaWANVersion MACVersion `protobuf:"varint,3,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
-	// LoRaWAN PHY version.
-	LoRaWANPHYVersion    PHYVersion `protobuf:"varint,4,opt,name=lorawan_phy_version,json=lorawanPhyVersion,proto3,enum=ttn.lorawan.v3.PHYVersion" json:"lorawan_phy_version,omitempty"`
-	HardwareVersion      string     `protobuf:"bytes,5,opt,name=hardware_version,json=hardwareVersion,proto3" json:"hardware_version,omitempty"`
-	FirmwareVersion      string     `protobuf:"bytes,6,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	BrandID              string   `protobuf:"bytes,1,opt,name=brand_id,json=brandId,proto3" json:"brand_id,omitempty"`
+	ModelID              string   `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	HardwareVersion      string   `protobuf:"bytes,3,opt,name=hardware_version,json=hardwareVersion,proto3" json:"hardware_version,omitempty"`
+	FirmwareVersion      string   `protobuf:"bytes,4,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *EndDeviceVersionIdentifiers) Reset()      { *m = EndDeviceVersionIdentifiers{} }
 func (*EndDeviceVersionIdentifiers) ProtoMessage() {}
 func (*EndDeviceVersionIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{4}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{4}
 }
 func (m *EndDeviceVersionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -603,20 +601,6 @@ func (m *EndDeviceVersionIdentifiers) GetModelID() string {
 	return ""
 }
 
-func (m *EndDeviceVersionIdentifiers) GetLoRaWANVersion() MACVersion {
-	if m != nil {
-		return m.LoRaWANVersion
-	}
-	return MAC_UNKNOWN
-}
-
-func (m *EndDeviceVersionIdentifiers) GetLoRaWANPHYVersion() PHYVersion {
-	if m != nil {
-		return m.LoRaWANPHYVersion
-	}
-	return PHY_UNKNOWN
-}
-
 func (m *EndDeviceVersionIdentifiers) GetHardwareVersion() string {
 	if m != nil {
 		return m.HardwareVersion
@@ -635,30 +619,38 @@ func (m *EndDeviceVersionIdentifiers) GetFirmwareVersion() string {
 type EndDeviceVersion struct {
 	// Version identifiers.
 	EndDeviceVersionIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	// LoRaWAN MAC version.
+	LoRaWANVersion MACVersion `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
+	// LoRaWAN PHY version.
+	LoRaWANPHYVersion PHYVersion `protobuf:"varint,3,opt,name=lorawan_phy_version,json=lorawanPhyVersion,proto3,enum=ttn.lorawan.v3.PHYVersion" json:"lorawan_phy_version,omitempty"`
+	// ID of the frequency plan used by this device.
+	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
 	// Photos contains file names of device photos.
-	Photos []string `protobuf:"bytes,2,rep,name=photos" json:"photos,omitempty"`
-	// Default formatters defining the payload formats for this end device.
-	DefaultFormatters MessagePayloadFormatters `protobuf:"bytes,3,opt,name=default_formatters,json=defaultFormatters" json:"default_formatters"`
+	Photos []string `protobuf:"bytes,5,rep,name=photos" json:"photos,omitempty"`
 	// Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd).
-	DefaultMACParameters *MACParameters `protobuf:"bytes,4,opt,name=default_mac_parameters,json=defaultMacParameters" json:"default_mac_parameters,omitempty"`
-	// Minimum frequency the device is capable of using (in Hz).
-	MinFrequency uint64 `protobuf:"varint,5,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
-	// Maximum frequency the device is capable of using (in Hz).
-	MaxFrequency uint64 `protobuf:"varint,6,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
-	// Indicator that the device may reset the frame counters (not LoRaWAN compliant).
-	FCntResets bool `protobuf:"varint,7,opt,name=f_cnt_resets,json=fCntResets,proto3" json:"f_cnt_resets,omitempty"`
-	// Indicator that the device uses 32-bit frame counters.
-	Supports32BitFCnt bool `protobuf:"varint,8,opt,name=supports_32_bit_f_cnt,json=supports32BitFCnt,proto3" json:"supports_32_bit_f_cnt,omitempty"`
-	// DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
-	DisableJoinNonceCheck bool     `protobuf:"varint,9,opt,name=disable_join_nonce_check,json=disableJoinNonceCheck,proto3" json:"disable_join_nonce_check,omitempty"`
-	XXX_NoUnkeyedLiteral  struct{} `json:"-"`
-	XXX_sizecache         int32    `json:"-"`
+	DefaultMACParameters *MACParameters `protobuf:"bytes,6,opt,name=default_mac_parameters,json=defaultMacParameters" json:"default_mac_parameters,omitempty"`
+	// Minimum frequency the device is capable of using (Hz).
+	MinFrequency uint64 `protobuf:"varint,7,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	// Maximum frequency the device is capable of using (Hz).
+	MaxFrequency uint64 `protobuf:"varint,8,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+	// Whether the device resets the frame counters (not LoRaWAN compliant).
+	ResetsFCnt bool `protobuf:"varint,9,opt,name=resets_f_cnt,json=resetsFCnt,proto3" json:"resets_f_cnt,omitempty"`
+	// Whether the device uses 32-bit frame counters.
+	Uses32BitFCnt bool `protobuf:"varint,10,opt,name=uses_32_bit_f_cnt,json=uses32BitFCnt,proto3" json:"uses_32_bit_f_cnt,omitempty"`
+	// The device supports join (it's OTAA).
+	SupportsJoin bool `protobuf:"varint,11,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
+	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
+	ResetsJoinNonces bool `protobuf:"varint,12,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
+	// Default formatters defining the payload formats for this end device.
+	DefaultFormatters    MessagePayloadFormatters `protobuf:"bytes,13,opt,name=default_formatters,json=defaultFormatters" json:"default_formatters"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
 }
 
 func (m *EndDeviceVersion) Reset()      { *m = EndDeviceVersion{} }
 func (*EndDeviceVersion) ProtoMessage() {}
 func (*EndDeviceVersion) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{5}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{5}
 }
 func (m *EndDeviceVersion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -687,18 +679,32 @@ func (m *EndDeviceVersion) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EndDeviceVersion proto.InternalMessageInfo
 
+func (m *EndDeviceVersion) GetLoRaWANVersion() MACVersion {
+	if m != nil {
+		return m.LoRaWANVersion
+	}
+	return MAC_UNKNOWN
+}
+
+func (m *EndDeviceVersion) GetLoRaWANPHYVersion() PHYVersion {
+	if m != nil {
+		return m.LoRaWANPHYVersion
+	}
+	return PHY_UNKNOWN
+}
+
+func (m *EndDeviceVersion) GetFrequencyPlanID() string {
+	if m != nil {
+		return m.FrequencyPlanID
+	}
+	return ""
+}
+
 func (m *EndDeviceVersion) GetPhotos() []string {
 	if m != nil {
 		return m.Photos
 	}
 	return nil
-}
-
-func (m *EndDeviceVersion) GetDefaultFormatters() MessagePayloadFormatters {
-	if m != nil {
-		return m.DefaultFormatters
-	}
-	return MessagePayloadFormatters{}
 }
 
 func (m *EndDeviceVersion) GetDefaultMACParameters() *MACParameters {
@@ -722,37 +728,50 @@ func (m *EndDeviceVersion) GetMaxFrequency() uint64 {
 	return 0
 }
 
-func (m *EndDeviceVersion) GetFCntResets() bool {
+func (m *EndDeviceVersion) GetResetsFCnt() bool {
 	if m != nil {
-		return m.FCntResets
+		return m.ResetsFCnt
 	}
 	return false
 }
 
-func (m *EndDeviceVersion) GetSupports32BitFCnt() bool {
+func (m *EndDeviceVersion) GetUses32BitFCnt() bool {
 	if m != nil {
-		return m.Supports32BitFCnt
+		return m.Uses32BitFCnt
 	}
 	return false
 }
 
-func (m *EndDeviceVersion) GetDisableJoinNonceCheck() bool {
+func (m *EndDeviceVersion) GetSupportsJoin() bool {
 	if m != nil {
-		return m.DisableJoinNonceCheck
+		return m.SupportsJoin
 	}
 	return false
+}
+
+func (m *EndDeviceVersion) GetResetsJoinNonces() bool {
+	if m != nil {
+		return m.ResetsJoinNonces
+	}
+	return false
+}
+
+func (m *EndDeviceVersion) GetDefaultFormatters() MessagePayloadFormatters {
+	if m != nil {
+		return m.DefaultFormatters
+	}
+	return MessagePayloadFormatters{}
 }
 
 type MACSettings struct {
-	// Whether to disable ADR or not.
-	DisableADR bool `protobuf:"varint,1,opt,name=disable_adr,json=disableAdr,proto3" json:"disable_adr,omitempty"`
+	UseADR bool `protobuf:"varint,1,opt,name=use_adr,json=useAdr,proto3" json:"use_adr,omitempty"`
 	// The ADR margin tells the network server how much margin it should add in ADR requests.
 	// A bigger margin is less efficient, but gives a better chance of successful reception.
 	ADRMargin uint32 `protobuf:"varint,2,opt,name=adr_margin,json=adrMargin,proto3" json:"adr_margin,omitempty"`
 	// Deadline for the device to respond to requests from the Network Server.
-	ClassBTimeout time.Time `protobuf:"bytes,3,opt,name=class_b_timeout,json=classBTimeout,stdtime" json:"class_b_timeout"`
+	ClassBTimeout time.Duration `protobuf:"bytes,3,opt,name=class_b_timeout,json=classBTimeout,stdduration" json:"class_b_timeout"`
 	// Deadline for the device to respond to requests from the Network Server.
-	ClassCTimeout time.Time `protobuf:"bytes,4,opt,name=class_c_timeout,json=classCTimeout,stdtime" json:"class_c_timeout"`
+	ClassCTimeout time.Duration `protobuf:"bytes,4,opt,name=class_c_timeout,json=classCTimeout,stdduration" json:"class_c_timeout"`
 	// The interval after which a DevStatusReq MACCommand shall be sent.
 	StatusTimePeriodicity time.Duration `protobuf:"bytes,5,opt,name=status_time_periodicity,json=statusTimePeriodicity,stdduration" json:"status_time_periodicity"`
 	// Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
@@ -764,7 +783,7 @@ type MACSettings struct {
 func (m *MACSettings) Reset()      { *m = MACSettings{} }
 func (*MACSettings) ProtoMessage() {}
 func (*MACSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{6}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{6}
 }
 func (m *MACSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -793,9 +812,9 @@ func (m *MACSettings) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MACSettings proto.InternalMessageInfo
 
-func (m *MACSettings) GetDisableADR() bool {
+func (m *MACSettings) GetUseADR() bool {
 	if m != nil {
-		return m.DisableADR
+		return m.UseADR
 	}
 	return false
 }
@@ -807,18 +826,18 @@ func (m *MACSettings) GetADRMargin() uint32 {
 	return 0
 }
 
-func (m *MACSettings) GetClassBTimeout() time.Time {
+func (m *MACSettings) GetClassBTimeout() time.Duration {
 	if m != nil {
 		return m.ClassBTimeout
 	}
-	return time.Time{}
+	return 0
 }
 
-func (m *MACSettings) GetClassCTimeout() time.Time {
+func (m *MACSettings) GetClassCTimeout() time.Duration {
 	if m != nil {
 		return m.ClassCTimeout
 	}
-	return time.Time{}
+	return 0
 }
 
 func (m *MACSettings) GetStatusTimePeriodicity() time.Duration {
@@ -840,9 +859,9 @@ func (m *MACSettings) GetStatusCountPeriodicity() uint64 {
 // This is used internally by the Network Server and is read only.
 type MACState struct {
 	// Current LoRaWAN MAC parameters.
-	MACParameters `protobuf:"bytes,1,opt,name=current_parameters,json=currentParameters,embedded=current_parameters" json:"current_parameters"`
+	CurrentParameters MACParameters `protobuf:"bytes,1,opt,name=current_parameters,json=currentParameters" json:"current_parameters"`
 	// Desired LoRaWAN MAC parameters.
-	DesiredMACParameters MACParameters `protobuf:"bytes,2,opt,name=desired_parameters,json=desiredParameters" json:"desired_parameters"`
+	DesiredParameters MACParameters `protobuf:"bytes,2,opt,name=desired_parameters,json=desiredParameters" json:"desired_parameters"`
 	// Currently active LoRaWAN device class
 	// - Device class is A by default
 	// - If device sets ClassB bit in uplink, this will be set to B
@@ -869,7 +888,7 @@ type MACState struct {
 func (m *MACState) Reset()      { *m = MACState{} }
 func (*MACState) ProtoMessage() {}
 func (*MACState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{7}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{7}
 }
 func (m *MACState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -898,9 +917,16 @@ func (m *MACState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MACState proto.InternalMessageInfo
 
-func (m *MACState) GetDesiredMACParameters() MACParameters {
+func (m *MACState) GetCurrentParameters() MACParameters {
 	if m != nil {
-		return m.DesiredMACParameters
+		return m.CurrentParameters
+	}
+	return MACParameters{}
+}
+
+func (m *MACState) GetDesiredParameters() MACParameters {
+	if m != nil {
+		return m.DesiredParameters
 	}
 	return MACParameters{}
 }
@@ -958,68 +984,115 @@ func (m *MACState) GetPendingRequests() []*MACCommand {
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
 type EndDevice struct {
-	EndDeviceIdentifiers        `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=version_ids,json=versionIds,embedded=version_ids" json:"version_ids"`
-	RootKeys                    *RootKeys `protobuf:"bytes,3,opt,name=root_keys,json=rootKeys" json:"root_keys,omitempty"`
-	// The address (host:port) of the Network Server associated with this device.
-	NetworkServerAddress string `protobuf:"bytes,4,opt,name=network_server_address,json=networkServerAddress,proto3" json:"network_server_address,omitempty"`
-	// The address (host:port) of the Application Server associated with this device.
-	ApplicationServerAddress string `protobuf:"bytes,5,opt,name=application_server_address,json=applicationServerAddress,proto3" json:"application_server_address,omitempty"`
-	FrequencyPlanID          string `protobuf:"bytes,6,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	// Settings for how the Network Server handles MAC for this device.
-	MACSettings MACSettings `protobuf:"bytes,7,opt,name=mac_settings,json=macSettings" json:"mac_settings"`
-	// MAC states of the device.
-	MACState *MACState `protobuf:"bytes,8,opt,name=mac_state,json=macState" json:"mac_state,omitempty"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	CreatedAt            time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
+	UpdatedAt            time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	// Friendly name of the device. Stored in Application Server.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// Description of the device. Stored in Application Server.
+	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// Attributes of the device. Stored in Application Server.
+	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Version Identifiers. Stored in Application Server.
+	VersionIds *EndDeviceVersionIdentifiers `protobuf:"bytes,7,opt,name=version_ids,json=versionIds" json:"version_ids,omitempty"`
+	// TODO: Service Profile Identifier
+	ServiceProfileID string `protobuf:"bytes,8,opt,name=service_profile_id,json=serviceProfileId,proto3" json:"service_profile_id,omitempty"`
+	// LoRaWAN MAC version. Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	LoRaWANVersion MACVersion `protobuf:"varint,9,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
+	// LoRaWAN PHY version. Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	LoRaWANPHYVersion PHYVersion `protobuf:"varint,10,opt,name=lorawan_phy_version,json=lorawanPhyVersion,proto3,enum=ttn.lorawan.v3.PHYVersion" json:"lorawan_phy_version,omitempty"`
+	// ID of the frequency plan used by this device.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	FrequencyPlanID string `protobuf:"bytes,11,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
+	// Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	DefaultMACParameters *MACParameters `protobuf:"bytes,12,opt,name=default_mac_parameters,json=defaultMacParameters" json:"default_mac_parameters,omitempty"`
+	// Minimum frequency the device is capable of using (Hz). Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	MinFrequency uint64 `protobuf:"varint,13,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	// Maximum frequency the device is capable of using (Hz). Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	MaxFrequency uint64 `protobuf:"varint,14,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+	// Whether the device resets the frame counters (not LoRaWAN compliant). Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	ResetsFCnt bool `protobuf:"varint,15,opt,name=resets_f_cnt,json=resetsFCnt,proto3" json:"resets_f_cnt,omitempty"`
+	// Whether the device uses 32-bit frame counters. Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	Uses32BitFCnt bool `protobuf:"varint,16,opt,name=uses_32_bit_f_cnt,json=uses32BitFCnt,proto3" json:"uses_32_bit_f_cnt,omitempty"`
 	// The device supports join (it's OTAA).
-	SupportsJoin bool `protobuf:"varint,9,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
-	// Current session.
-	Session *Session `protobuf:"bytes,10,opt,name=session" json:"session,omitempty"`
-	// Fallback session (stored until RekeyInd is received).
-	SessionFallback *Session `protobuf:"bytes,11,opt,name=session_fallback,json=sessionFallback" json:"session_fallback,omitempty"`
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	SupportsJoin bool `protobuf:"varint,17,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
+	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Network Server.
+	// Copied on creation from template identified by version_ids, if any or from Join Server service profile, if any.
+	ResetsJoinNonces bool `protobuf:"varint,18,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
+	// Device root keys stored by the Join Server.
+	RootKeys *RootKeys `protobuf:"bytes,19,opt,name=root_keys,json=rootKeys" json:"root_keys,omitempty"`
+	// The address (host:port) of the Network Server associated with this device.
+	NetworkServerAddress string `protobuf:"bytes,20,opt,name=network_server_address,json=networkServerAddress,proto3" json:"network_server_address,omitempty"`
+	// The address (host:port) of the Application Server associated with this device.
+	ApplicationServerAddress string `protobuf:"bytes,21,opt,name=application_server_address,json=applicationServerAddress,proto3" json:"application_server_address,omitempty"`
+	// Settings for how the Network Server handles MAC for this device.
+	MACSettings *MACSettings `protobuf:"bytes,22,opt,name=mac_settings,json=macSettings" json:"mac_settings,omitempty"`
+	// MAC state of the device. Stored in Network Server.
+	MACState *MACState `protobuf:"bytes,23,opt,name=mac_state,json=macState" json:"mac_state,omitempty"`
+	// Current session. Stored in Network Server.
+	Session *Session `protobuf:"bytes,24,opt,name=session" json:"session,omitempty"`
+	// Fallback session (stored in Network Server until RekeyInd is received).
+	SessionFallback *Session `protobuf:"bytes,25,opt,name=session_fallback,json=sessionFallback" json:"session_fallback,omitempty"`
 	// Next DevNonce to be expected (in case of LoRaWAN 1.1).
-	NextDevNonce uint32 `protobuf:"varint,12,opt,name=next_dev_nonce,json=nextDevNonce,proto3" json:"next_dev_nonce,omitempty"`
+	// Stored in Join Server.
+	NextDevNonce uint32 `protobuf:"varint,26,opt,name=next_dev_nonce,json=nextDevNonce,proto3" json:"next_dev_nonce,omitempty"`
 	// Used DevNonces (in case of LoRaWAN 1.0).
-	UsedDevNonces []uint32 `protobuf:"varint,13,rep,packed,name=used_dev_nonces,json=usedDevNonces" json:"used_dev_nonces,omitempty"`
+	// Stored in Join Server.
+	UsedDevNonces []uint32 `protobuf:"varint,27,rep,packed,name=used_dev_nonces,json=usedDevNonces" json:"used_dev_nonces,omitempty"`
 	// Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1).
-	NextJoinNonce uint32 `protobuf:"varint,14,opt,name=next_join_nonce,json=nextJoinNonce,proto3" json:"next_join_nonce,omitempty"`
+	// Stored in Join Server.
+	NextJoinNonce uint32 `protobuf:"varint,28,opt,name=next_join_nonce,json=nextJoinNonce,proto3" json:"next_join_nonce,omitempty"`
 	// Used JoinNonces/AppNonce (in case of LoRaWAN 1.0).
-	UsedJoinNonces []uint32 `protobuf:"varint,15,rep,packed,name=used_join_nonces,json=usedJoinNonces" json:"used_join_nonces,omitempty"`
+	// Stored in Join Server.
+	UsedJoinNonces []uint32 `protobuf:"varint,29,rep,packed,name=used_join_nonces,json=usedJoinNonces" json:"used_join_nonces,omitempty"`
 	// Next Rejoin counter (type 0/2) to expect.
-	NextRJCount0 uint32 `protobuf:"varint,16,opt,name=next_rj_count_0,json=nextRjCount0,proto3" json:"next_rj_count_0,omitempty"`
+	// Stored in Join Server.
+	NextRJCount0 uint32 `protobuf:"varint,30,opt,name=next_rj_count_0,json=nextRjCount0,proto3" json:"next_rj_count_0,omitempty"`
 	// Next Rejoin counter (type 1) to expect.
-	NextRJCount1 uint32 `protobuf:"varint,17,opt,name=next_rj_count_1,json=nextRjCount1,proto3" json:"next_rj_count_1,omitempty"`
-	// Location of the device.
-	Location *Location `protobuf:"bytes,18,opt,name=location" json:"location,omitempty"`
-	// Time when a new DevStatusReq MAC command shall be scheduled.
-	NextStatusAt time.Time `protobuf:"bytes,19,opt,name=next_status_at,json=nextStatusAt,stdtime" json:"next_status_at"`
-	// Number of messages, after which a new DevStatusReq MAC command shall be scheduled.
-	NextStatusAfter uint64 `protobuf:"varint,20,opt,name=next_status_after,json=nextStatusAfter,proto3" json:"next_status_after,omitempty"`
-	// Battery percentage of the device, see also status_updated_at.
-	BatteryPercentage float32 `protobuf:"fixed32,21,opt,name=battery_percentage,json=batteryPercentage,proto3" json:"battery_percentage,omitempty"`
-	// Demodulation signal-to-noise ratio(in dB), see also status_updated_at.
-	DownlinkMargin int32 `protobuf:"varint,22,opt,name=downlink_margin,json=downlinkMargin,proto3" json:"downlink_margin,omitempty"`
-	// Recent uplink messages sorted by time. The number of messages stored may depend on configuration.
-	RecentUplinks []*UplinkMessage `protobuf:"bytes,23,rep,name=recent_uplinks,json=recentUplinks" json:"recent_uplinks,omitempty"`
-	// Recent downlink messages sorted by time. The number of messages stored may depend on configuration.
-	RecentDownlinks []*DownlinkMessage `protobuf:"bytes,24,rep,name=recent_downlinks,json=recentDownlinks" json:"recent_downlinks,omitempty"`
-	// Queued Application downlink messages.
-	QueuedApplicationDownlinks []*ApplicationDownlink `protobuf:"bytes,25,rep,name=queued_application_downlinks,json=queuedApplicationDownlinks" json:"queued_application_downlinks,omitempty"`
-	// Formatters defining the payload formats.
-	MessagePayloadFormatters `protobuf:"bytes,26,opt,name=formatters,embedded=formatters" json:"formatters"`
-	// Device Attributes, field names are written in snake_case.
-	Attributes *types.Struct `protobuf:"bytes,27,opt,name=attributes" json:"attributes,omitempty"`
-	// Time when the device status was received last updated(e.g. via DevStatus MAC command).
-	StatusUpdatedAt      *time.Time `protobuf:"bytes,28,opt,name=status_updated_at,json=statusUpdatedAt,stdtime" json:"status_updated_at,omitempty"`
-	CreatedAt            time.Time  `protobuf:"bytes,97,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt            time.Time  `protobuf:"bytes,98,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	// Stored in Join Server.
+	NextRJCount1 uint32 `protobuf:"varint,31,opt,name=next_rj_count_1,json=nextRjCount1,proto3" json:"next_rj_count_1,omitempty"`
+	// Number of messages, after which a new DevStatus MAC command shall be scheduled.
+	// Stored in Network Server.
+	NextStatusAfter uint64 `protobuf:"varint,32,opt,name=next_status_after,json=nextStatusAfter,proto3" json:"next_status_after,omitempty"`
+	// Time when the device status was last received via the DevStatus MAC command.
+	// Stored in Network Server.
+	LastStatusReceivedAt *time.Time `protobuf:"bytes,33,opt,name=last_status_received_at,json=lastStatusReceivedAt,stdtime" json:"last_status_received_at,omitempty"`
+	// Battery percentage of the device, received via the DevStatus MAC command at status_received_at.
+	// Stored in Network Server.
+	BatteryPercentage float32 `protobuf:"fixed32,34,opt,name=battery_percentage,json=batteryPercentage,proto3" json:"battery_percentage,omitempty"`
+	// Demodulation signal-to-noise ratio (dB), received via the DevStatus MAC command at status_received_at.
+	// Stored in Network Server.
+	DownlinkMargin int32 `protobuf:"varint,35,opt,name=downlink_margin,json=downlinkMargin,proto3" json:"downlink_margin,omitempty"`
+	// Recent uplink messages sorted by time. Stored in Network Server.
+	// The number of messages stored may depend on configuration.
+	RecentUplinks []*UplinkMessage `protobuf:"bytes,36,rep,name=recent_uplinks,json=recentUplinks" json:"recent_uplinks,omitempty"`
+	// Recent downlink messages sorted by time. Stored in Network Server.
+	// The number of messages stored may depend on configuration.
+	RecentDownlinks []*DownlinkMessage `protobuf:"bytes,37,rep,name=recent_downlinks,json=recentDownlinks" json:"recent_downlinks,omitempty"`
+	// Queued Application downlink messages. Stored in Application Server,
+	// which sets them on the Network Server.
+	QueuedApplicationDownlinks []*ApplicationDownlink `protobuf:"bytes,38,rep,name=queued_application_downlinks,json=queuedApplicationDownlinks" json:"queued_application_downlinks,omitempty"`
+	// The payload formatters for this end device. Stored in Application Server.
+	// Copied on creation from template identified by version_ids.
+	Formatters MessagePayloadFormatters `protobuf:"bytes,39,opt,name=formatters" json:"formatters"`
+	// Location of the device. Stored in Application Server.
+	Locations            map[string]*Location `protobuf:"bytes,40,rep,name=locations" json:"locations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
 func (m *EndDevice) Reset()      { *m = EndDevice{} }
 func (*EndDevice) ProtoMessage() {}
 func (*EndDevice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{8}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{8}
 }
 func (m *EndDevice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1048,6 +1121,125 @@ func (m *EndDevice) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EndDevice proto.InternalMessageInfo
 
+func (m *EndDevice) GetCreatedAt() time.Time {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return time.Time{}
+}
+
+func (m *EndDevice) GetUpdatedAt() time.Time {
+	if m != nil {
+		return m.UpdatedAt
+	}
+	return time.Time{}
+}
+
+func (m *EndDevice) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *EndDevice) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *EndDevice) GetAttributes() map[string]string {
+	if m != nil {
+		return m.Attributes
+	}
+	return nil
+}
+
+func (m *EndDevice) GetVersionIds() *EndDeviceVersionIdentifiers {
+	if m != nil {
+		return m.VersionIds
+	}
+	return nil
+}
+
+func (m *EndDevice) GetServiceProfileID() string {
+	if m != nil {
+		return m.ServiceProfileID
+	}
+	return ""
+}
+
+func (m *EndDevice) GetLoRaWANVersion() MACVersion {
+	if m != nil {
+		return m.LoRaWANVersion
+	}
+	return MAC_UNKNOWN
+}
+
+func (m *EndDevice) GetLoRaWANPHYVersion() PHYVersion {
+	if m != nil {
+		return m.LoRaWANPHYVersion
+	}
+	return PHY_UNKNOWN
+}
+
+func (m *EndDevice) GetFrequencyPlanID() string {
+	if m != nil {
+		return m.FrequencyPlanID
+	}
+	return ""
+}
+
+func (m *EndDevice) GetDefaultMACParameters() *MACParameters {
+	if m != nil {
+		return m.DefaultMACParameters
+	}
+	return nil
+}
+
+func (m *EndDevice) GetMinFrequency() uint64 {
+	if m != nil {
+		return m.MinFrequency
+	}
+	return 0
+}
+
+func (m *EndDevice) GetMaxFrequency() uint64 {
+	if m != nil {
+		return m.MaxFrequency
+	}
+	return 0
+}
+
+func (m *EndDevice) GetResetsFCnt() bool {
+	if m != nil {
+		return m.ResetsFCnt
+	}
+	return false
+}
+
+func (m *EndDevice) GetUses32BitFCnt() bool {
+	if m != nil {
+		return m.Uses32BitFCnt
+	}
+	return false
+}
+
+func (m *EndDevice) GetSupportsJoin() bool {
+	if m != nil {
+		return m.SupportsJoin
+	}
+	return false
+}
+
+func (m *EndDevice) GetResetsJoinNonces() bool {
+	if m != nil {
+		return m.ResetsJoinNonces
+	}
+	return false
+}
+
 func (m *EndDevice) GetRootKeys() *RootKeys {
 	if m != nil {
 		return m.RootKeys
@@ -1069,18 +1261,11 @@ func (m *EndDevice) GetApplicationServerAddress() string {
 	return ""
 }
 
-func (m *EndDevice) GetFrequencyPlanID() string {
-	if m != nil {
-		return m.FrequencyPlanID
-	}
-	return ""
-}
-
-func (m *EndDevice) GetMACSettings() MACSettings {
+func (m *EndDevice) GetMACSettings() *MACSettings {
 	if m != nil {
 		return m.MACSettings
 	}
-	return MACSettings{}
+	return nil
 }
 
 func (m *EndDevice) GetMACState() *MACState {
@@ -1088,13 +1273,6 @@ func (m *EndDevice) GetMACState() *MACState {
 		return m.MACState
 	}
 	return nil
-}
-
-func (m *EndDevice) GetSupportsJoin() bool {
-	if m != nil {
-		return m.SupportsJoin
-	}
-	return false
 }
 
 func (m *EndDevice) GetSession() *Session {
@@ -1153,25 +1331,18 @@ func (m *EndDevice) GetNextRJCount1() uint32 {
 	return 0
 }
 
-func (m *EndDevice) GetLocation() *Location {
-	if m != nil {
-		return m.Location
-	}
-	return nil
-}
-
-func (m *EndDevice) GetNextStatusAt() time.Time {
-	if m != nil {
-		return m.NextStatusAt
-	}
-	return time.Time{}
-}
-
 func (m *EndDevice) GetNextStatusAfter() uint64 {
 	if m != nil {
 		return m.NextStatusAfter
 	}
 	return 0
+}
+
+func (m *EndDevice) GetLastStatusReceivedAt() *time.Time {
+	if m != nil {
+		return m.LastStatusReceivedAt
+	}
+	return nil
 }
 
 func (m *EndDevice) GetBatteryPercentage() float32 {
@@ -1209,32 +1380,18 @@ func (m *EndDevice) GetQueuedApplicationDownlinks() []*ApplicationDownlink {
 	return nil
 }
 
-func (m *EndDevice) GetAttributes() *types.Struct {
+func (m *EndDevice) GetFormatters() MessagePayloadFormatters {
 	if m != nil {
-		return m.Attributes
+		return m.Formatters
+	}
+	return MessagePayloadFormatters{}
+}
+
+func (m *EndDevice) GetLocations() map[string]*Location {
+	if m != nil {
+		return m.Locations
 	}
 	return nil
-}
-
-func (m *EndDevice) GetStatusUpdatedAt() *time.Time {
-	if m != nil {
-		return m.StatusUpdatedAt
-	}
-	return nil
-}
-
-func (m *EndDevice) GetCreatedAt() time.Time {
-	if m != nil {
-		return m.CreatedAt
-	}
-	return time.Time{}
-}
-
-func (m *EndDevice) GetUpdatedAt() time.Time {
-	if m != nil {
-		return m.UpdatedAt
-	}
-	return time.Time{}
 }
 
 type EndDevices struct {
@@ -1246,7 +1403,7 @@ type EndDevices struct {
 func (m *EndDevices) Reset()      { *m = EndDevices{} }
 func (*EndDevices) ProtoMessage() {}
 func (*EndDevices) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{9}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{9}
 }
 func (m *EndDevices) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1282,18 +1439,109 @@ func (m *EndDevices) GetEndDevices() []*EndDevice {
 	return nil
 }
 
-// TODO: Should the SetDeviceRequest be split up into NS/AS/JS messages?
+type GetEndDeviceRequest struct {
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,embedded=end_device_ids" json:"end_device_ids"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *GetEndDeviceRequest) Reset()      { *m = GetEndDeviceRequest{} }
+func (*GetEndDeviceRequest) ProtoMessage() {}
+func (*GetEndDeviceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_end_device_b404642f60074a6c, []int{10}
+}
+func (m *GetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetEndDeviceRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *GetEndDeviceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetEndDeviceRequest.Merge(dst, src)
+}
+func (m *GetEndDeviceRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetEndDeviceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetEndDeviceRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetEndDeviceRequest proto.InternalMessageInfo
+
+func (m *GetEndDeviceRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+type ListEndDevicesRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
+	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	XXX_NoUnkeyedLiteral   struct{}        `json:"-"`
+	XXX_sizecache          int32           `json:"-"`
+}
+
+func (m *ListEndDevicesRequest) Reset()      { *m = ListEndDevicesRequest{} }
+func (*ListEndDevicesRequest) ProtoMessage() {}
+func (*ListEndDevicesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_end_device_b404642f60074a6c, []int{11}
+}
+func (m *ListEndDevicesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListEndDevicesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListEndDevicesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ListEndDevicesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListEndDevicesRequest.Merge(dst, src)
+}
+func (m *ListEndDevicesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListEndDevicesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListEndDevicesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListEndDevicesRequest proto.InternalMessageInfo
+
+func (m *ListEndDevicesRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
 type SetDeviceRequest struct {
-	Device               EndDevice        `protobuf:"bytes,1,opt,name=device" json:"device"`
-	FieldMask            *types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	Device               EndDevice       `protobuf:"bytes,1,opt,name=device" json:"device"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *SetDeviceRequest) Reset()      { *m = SetDeviceRequest{} }
 func (*SetDeviceRequest) ProtoMessage() {}
 func (*SetDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_6feaace214a25c75, []int{10}
+	return fileDescriptor_end_device_b404642f60074a6c, []int{12}
 }
 func (m *SetDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1329,11 +1577,11 @@ func (m *SetDeviceRequest) GetDevice() EndDevice {
 	return EndDevice{}
 }
 
-func (m *SetDeviceRequest) GetFieldMask() *types.FieldMask {
+func (m *SetDeviceRequest) GetFieldMask() types.FieldMask {
 	if m != nil {
 		return m.FieldMask
 	}
-	return nil
+	return types.FieldMask{}
 }
 
 func init() {
@@ -1357,8 +1605,16 @@ func init() {
 	golang_proto.RegisterType((*MACState)(nil), "ttn.lorawan.v3.MACState")
 	proto.RegisterType((*EndDevice)(nil), "ttn.lorawan.v3.EndDevice")
 	golang_proto.RegisterType((*EndDevice)(nil), "ttn.lorawan.v3.EndDevice")
+	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.EndDevice.AttributesEntry")
+	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.EndDevice.AttributesEntry")
+	proto.RegisterMapType((map[string]*Location)(nil), "ttn.lorawan.v3.EndDevice.LocationsEntry")
+	golang_proto.RegisterMapType((map[string]*Location)(nil), "ttn.lorawan.v3.EndDevice.LocationsEntry")
 	proto.RegisterType((*EndDevices)(nil), "ttn.lorawan.v3.EndDevices")
 	golang_proto.RegisterType((*EndDevices)(nil), "ttn.lorawan.v3.EndDevices")
+	proto.RegisterType((*GetEndDeviceRequest)(nil), "ttn.lorawan.v3.GetEndDeviceRequest")
+	golang_proto.RegisterType((*GetEndDeviceRequest)(nil), "ttn.lorawan.v3.GetEndDeviceRequest")
+	proto.RegisterType((*ListEndDevicesRequest)(nil), "ttn.lorawan.v3.ListEndDevicesRequest")
+	golang_proto.RegisterType((*ListEndDevicesRequest)(nil), "ttn.lorawan.v3.ListEndDevicesRequest")
 	proto.RegisterType((*SetDeviceRequest)(nil), "ttn.lorawan.v3.SetDeviceRequest")
 	golang_proto.RegisterType((*SetDeviceRequest)(nil), "ttn.lorawan.v3.SetDeviceRequest")
 }
@@ -1518,7 +1774,7 @@ func (this *MACParameters_Channel) Equal(that interface{}) bool {
 	if this.MaxDataRateIndex != that1.MaxDataRateIndex {
 		return false
 	}
-	if this.UplinkEnabled != that1.UplinkEnabled {
+	if this.Masked != that1.Masked {
 		return false
 	}
 	return true
@@ -1616,12 +1872,6 @@ func (this *EndDeviceVersionIdentifiers) Equal(that interface{}) bool {
 	if this.ModelID != that1.ModelID {
 		return false
 	}
-	if this.LoRaWANVersion != that1.LoRaWANVersion {
-		return false
-	}
-	if this.LoRaWANPHYVersion != that1.LoRaWANPHYVersion {
-		return false
-	}
 	if this.HardwareVersion != that1.HardwareVersion {
 		return false
 	}
@@ -1652,6 +1902,15 @@ func (this *EndDeviceVersion) Equal(that interface{}) bool {
 	if !this.EndDeviceVersionIdentifiers.Equal(&that1.EndDeviceVersionIdentifiers) {
 		return false
 	}
+	if this.LoRaWANVersion != that1.LoRaWANVersion {
+		return false
+	}
+	if this.LoRaWANPHYVersion != that1.LoRaWANPHYVersion {
+		return false
+	}
+	if this.FrequencyPlanID != that1.FrequencyPlanID {
+		return false
+	}
 	if len(this.Photos) != len(that1.Photos) {
 		return false
 	}
@@ -1659,9 +1918,6 @@ func (this *EndDeviceVersion) Equal(that interface{}) bool {
 		if this.Photos[i] != that1.Photos[i] {
 			return false
 		}
-	}
-	if !this.DefaultFormatters.Equal(&that1.DefaultFormatters) {
-		return false
 	}
 	if !this.DefaultMACParameters.Equal(that1.DefaultMACParameters) {
 		return false
@@ -1672,13 +1928,19 @@ func (this *EndDeviceVersion) Equal(that interface{}) bool {
 	if this.MaxFrequency != that1.MaxFrequency {
 		return false
 	}
-	if this.FCntResets != that1.FCntResets {
+	if this.ResetsFCnt != that1.ResetsFCnt {
 		return false
 	}
-	if this.Supports32BitFCnt != that1.Supports32BitFCnt {
+	if this.Uses32BitFCnt != that1.Uses32BitFCnt {
 		return false
 	}
-	if this.DisableJoinNonceCheck != that1.DisableJoinNonceCheck {
+	if this.SupportsJoin != that1.SupportsJoin {
+		return false
+	}
+	if this.ResetsJoinNonces != that1.ResetsJoinNonces {
+		return false
+	}
+	if !this.DefaultFormatters.Equal(&that1.DefaultFormatters) {
 		return false
 	}
 	return true
@@ -1702,16 +1964,16 @@ func (this *MACSettings) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.DisableADR != that1.DisableADR {
+	if this.UseADR != that1.UseADR {
 		return false
 	}
 	if this.ADRMargin != that1.ADRMargin {
 		return false
 	}
-	if !this.ClassBTimeout.Equal(that1.ClassBTimeout) {
+	if this.ClassBTimeout != that1.ClassBTimeout {
 		return false
 	}
-	if !this.ClassCTimeout.Equal(that1.ClassCTimeout) {
+	if this.ClassCTimeout != that1.ClassCTimeout {
 		return false
 	}
 	if this.StatusTimePeriodicity != that1.StatusTimePeriodicity {
@@ -1741,10 +2003,10 @@ func (this *MACState) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.MACParameters.Equal(&that1.MACParameters) {
+	if !this.CurrentParameters.Equal(&that1.CurrentParameters) {
 		return false
 	}
-	if !this.DesiredMACParameters.Equal(&that1.DesiredMACParameters) {
+	if !this.DesiredParameters.Equal(&that1.DesiredParameters) {
 		return false
 	}
 	if this.DeviceClass != that1.DeviceClass {
@@ -1806,7 +2068,60 @@ func (this *EndDevice) Equal(that interface{}) bool {
 	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
 		return false
 	}
-	if !this.EndDeviceVersionIdentifiers.Equal(&that1.EndDeviceVersionIdentifiers) {
+	if !this.CreatedAt.Equal(that1.CreatedAt) {
+		return false
+	}
+	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if this.Description != that1.Description {
+		return false
+	}
+	if len(this.Attributes) != len(that1.Attributes) {
+		return false
+	}
+	for i := range this.Attributes {
+		if this.Attributes[i] != that1.Attributes[i] {
+			return false
+		}
+	}
+	if !this.VersionIds.Equal(that1.VersionIds) {
+		return false
+	}
+	if this.ServiceProfileID != that1.ServiceProfileID {
+		return false
+	}
+	if this.LoRaWANVersion != that1.LoRaWANVersion {
+		return false
+	}
+	if this.LoRaWANPHYVersion != that1.LoRaWANPHYVersion {
+		return false
+	}
+	if this.FrequencyPlanID != that1.FrequencyPlanID {
+		return false
+	}
+	if !this.DefaultMACParameters.Equal(that1.DefaultMACParameters) {
+		return false
+	}
+	if this.MinFrequency != that1.MinFrequency {
+		return false
+	}
+	if this.MaxFrequency != that1.MaxFrequency {
+		return false
+	}
+	if this.ResetsFCnt != that1.ResetsFCnt {
+		return false
+	}
+	if this.Uses32BitFCnt != that1.Uses32BitFCnt {
+		return false
+	}
+	if this.SupportsJoin != that1.SupportsJoin {
+		return false
+	}
+	if this.ResetsJoinNonces != that1.ResetsJoinNonces {
 		return false
 	}
 	if !this.RootKeys.Equal(that1.RootKeys) {
@@ -1818,16 +2133,10 @@ func (this *EndDevice) Equal(that interface{}) bool {
 	if this.ApplicationServerAddress != that1.ApplicationServerAddress {
 		return false
 	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
-		return false
-	}
-	if !this.MACSettings.Equal(&that1.MACSettings) {
+	if !this.MACSettings.Equal(that1.MACSettings) {
 		return false
 	}
 	if !this.MACState.Equal(that1.MACState) {
-		return false
-	}
-	if this.SupportsJoin != that1.SupportsJoin {
 		return false
 	}
 	if !this.Session.Equal(that1.Session) {
@@ -1864,13 +2173,14 @@ func (this *EndDevice) Equal(that interface{}) bool {
 	if this.NextRJCount1 != that1.NextRJCount1 {
 		return false
 	}
-	if !this.Location.Equal(that1.Location) {
-		return false
-	}
-	if !this.NextStatusAt.Equal(that1.NextStatusAt) {
-		return false
-	}
 	if this.NextStatusAfter != that1.NextStatusAfter {
+		return false
+	}
+	if that1.LastStatusReceivedAt == nil {
+		if this.LastStatusReceivedAt != nil {
+			return false
+		}
+	} else if !this.LastStatusReceivedAt.Equal(*that1.LastStatusReceivedAt) {
 		return false
 	}
 	if this.BatteryPercentage != that1.BatteryPercentage {
@@ -1903,24 +2213,16 @@ func (this *EndDevice) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if !this.MessagePayloadFormatters.Equal(&that1.MessagePayloadFormatters) {
+	if !this.Formatters.Equal(&that1.Formatters) {
 		return false
 	}
-	if !this.Attributes.Equal(that1.Attributes) {
+	if len(this.Locations) != len(that1.Locations) {
 		return false
 	}
-	if that1.StatusUpdatedAt == nil {
-		if this.StatusUpdatedAt != nil {
+	for i := range this.Locations {
+		if !this.Locations[i].Equal(that1.Locations[i]) {
 			return false
 		}
-	} else if !this.StatusUpdatedAt.Equal(*that1.StatusUpdatedAt) {
-		return false
-	}
-	if !this.CreatedAt.Equal(that1.CreatedAt) {
-		return false
-	}
-	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
-		return false
 	}
 	return true
 }
@@ -1953,6 +2255,60 @@ func (this *EndDevices) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *GetEndDeviceRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*GetEndDeviceRequest)
+	if !ok {
+		that2, ok := that.(GetEndDeviceRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
+func (this *ListEndDevicesRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ListEndDevicesRequest)
+	if !ok {
+		that2, ok := that.(ListEndDevicesRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationIdentifiers.Equal(&that1.ApplicationIdentifiers) {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
 func (this *SetDeviceRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1975,7 +2331,7 @@ func (this *SetDeviceRequest) Equal(that interface{}) bool {
 	if !this.Device.Equal(&that1.Device) {
 		return false
 	}
-	if !this.FieldMask.Equal(that1.FieldMask) {
+	if !this.FieldMask.Equal(&that1.FieldMask) {
 		return false
 	}
 	return true
@@ -2060,7 +2416,7 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 	if m.MaxEIRP != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.MaxEIRP))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.MaxEIRP))))
 		i += 4
 	}
 	if m.UplinkDwellTime {
@@ -2126,7 +2482,7 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 	if m.Rx2Frequency != 0 {
 		dAtA[i] = 0x60
 		i++
-		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2Frequency))
 	}
 	if m.RejoinTimePeriodicity != 0 {
 		dAtA[i] = 0x68
@@ -2162,7 +2518,7 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		dAtA[i] = 0x1
 		i++
-		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotFrequency))
 	}
 	if m.PingSlotDataRateIndex != 0 {
 		dAtA[i] = 0x90
@@ -2176,7 +2532,7 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		dAtA[i] = 0x1
 		i++
-		i = encodeVarintEndDevice(dAtA, i, m.BeaconFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.BeaconFrequency))
 	}
 	return i, nil
 }
@@ -2199,12 +2555,12 @@ func (m *MACParameters_Channel) MarshalTo(dAtA []byte) (int, error) {
 	if m.UplinkFrequency != 0 {
 		dAtA[i] = 0x8
 		i++
-		i = encodeVarintEndDevice(dAtA, i, m.UplinkFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.UplinkFrequency))
 	}
 	if m.DownlinkFrequency != 0 {
 		dAtA[i] = 0x10
 		i++
-		i = encodeVarintEndDevice(dAtA, i, m.DownlinkFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkFrequency))
 	}
 	if m.MinDataRateIndex != 0 {
 		dAtA[i] = 0x18
@@ -2216,10 +2572,10 @@ func (m *MACParameters_Channel) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDataRateIndex))
 	}
-	if m.UplinkEnabled {
+	if m.Masked {
 		dAtA[i] = 0x28
 		i++
-		if m.UplinkEnabled {
+		if m.Masked {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -2343,24 +2699,14 @@ func (m *EndDeviceVersionIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ModelID)))
 		i += copy(dAtA[i:], m.ModelID)
 	}
-	if m.LoRaWANVersion != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
-	}
-	if m.LoRaWANPHYVersion != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
-	}
 	if len(m.HardwareVersion) > 0 {
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.HardwareVersion)))
 		i += copy(dAtA[i:], m.HardwareVersion)
 	}
 	if len(m.FirmwareVersion) > 0 {
-		dAtA[i] = 0x32
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FirmwareVersion)))
 		i += copy(dAtA[i:], m.FirmwareVersion)
@@ -2391,9 +2737,25 @@ func (m *EndDeviceVersion) MarshalTo(dAtA []byte) (int, error) {
 		return 0, err
 	}
 	i += n4
+	if m.LoRaWANVersion != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
+	}
+	if m.LoRaWANPHYVersion != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
+	}
+	if len(m.FrequencyPlanID) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i += copy(dAtA[i:], m.FrequencyPlanID)
+	}
 	if len(m.Photos) > 0 {
 		for _, s := range m.Photos {
-			dAtA[i] = 0x12
+			dAtA[i] = 0x2a
 			i++
 			l = len(s)
 			for l >= 1<<7 {
@@ -2406,64 +2768,74 @@ func (m *EndDeviceVersion) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], s)
 		}
 	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultFormatters.Size()))
-	n5, err := m.DefaultFormatters.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
 	if m.DefaultMACParameters != nil {
-		dAtA[i] = 0x22
+		dAtA[i] = 0x32
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultMACParameters.Size()))
-		n6, err := m.DefaultMACParameters.MarshalTo(dAtA[i:])
+		n5, err := m.DefaultMACParameters.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i += n5
 	}
 	if m.MinFrequency != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
-	}
-	if m.MaxFrequency != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
-	}
-	if m.FCntResets {
 		dAtA[i] = 0x38
 		i++
-		if m.FCntResets {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinFrequency))
 	}
-	if m.Supports32BitFCnt {
+	if m.MaxFrequency != 0 {
 		dAtA[i] = 0x40
 		i++
-		if m.Supports32BitFCnt {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxFrequency))
 	}
-	if m.DisableJoinNonceCheck {
+	if m.ResetsFCnt {
 		dAtA[i] = 0x48
 		i++
-		if m.DisableJoinNonceCheck {
+		if m.ResetsFCnt {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
 		i++
 	}
+	if m.Uses32BitFCnt {
+		dAtA[i] = 0x50
+		i++
+		if m.Uses32BitFCnt {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.SupportsJoin {
+		dAtA[i] = 0x58
+		i++
+		if m.SupportsJoin {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.ResetsJoinNonces {
+		dAtA[i] = 0x60
+		i++
+		if m.ResetsJoinNonces {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	dAtA[i] = 0x6a
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultFormatters.Size()))
+	n6, err := m.DefaultFormatters.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n6
 	return i, nil
 }
 
@@ -2482,10 +2854,10 @@ func (m *MACSettings) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.DisableADR {
+	if m.UseADR {
 		dAtA[i] = 0x8
 		i++
-		if m.DisableADR {
+		if m.UseADR {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -2499,16 +2871,16 @@ func (m *MACSettings) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x1a
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ClassBTimeout)))
-	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ClassBTimeout, dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassBTimeout)))
+	n7, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ClassBTimeout, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n7
 	dAtA[i] = 0x22
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ClassCTimeout)))
-	n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ClassCTimeout, dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassCTimeout)))
+	n8, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ClassCTimeout, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -2524,7 +2896,7 @@ func (m *MACSettings) MarshalTo(dAtA []byte) (int, error) {
 	if m.StatusCountPeriodicity != 0 {
 		dAtA[i] = 0x30
 		i++
-		i = encodeVarintEndDevice(dAtA, i, m.StatusCountPeriodicity)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.StatusCountPeriodicity))
 	}
 	return i, nil
 }
@@ -2546,16 +2918,16 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.MACParameters.Size()))
-	n10, err := m.MACParameters.MarshalTo(dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.CurrentParameters.Size()))
+	n10, err := m.CurrentParameters.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n10
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredMACParameters.Size()))
-	n11, err := m.DesiredMACParameters.MarshalTo(dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredParameters.Size()))
+	n11, err := m.DesiredParameters.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -2647,60 +3019,127 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	i += n14
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceVersionIdentifiers.Size()))
-	n15, err := m.EndDeviceVersionIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
+	n15, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n15
-	if m.RootKeys != nil {
-		dAtA[i] = 0x1a
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
+	n16, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n16
+	if len(m.Name) > 0 {
+		dAtA[i] = 0x22
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.RootKeys.Size()))
-		n16, err := m.RootKeys.MarshalTo(dAtA[i:])
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
+	}
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.Attributes) > 0 {
+		for k, _ := range m.Attributes {
+			dAtA[i] = 0x32
+			i++
+			v := m.Attributes[k]
+			mapSize := 1 + len(k) + sovEndDevice(uint64(len(k))) + 1 + len(v) + sovEndDevice(uint64(len(v)))
+			i = encodeVarintEndDevice(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
+			i += copy(dAtA[i:], k)
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(v)))
+			i += copy(dAtA[i:], v)
+		}
+	}
+	if m.VersionIds != nil {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.VersionIds.Size()))
+		n17, err := m.VersionIds.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n16
+		i += n17
 	}
-	if len(m.NetworkServerAddress) > 0 {
-		dAtA[i] = 0x22
+	if len(m.ServiceProfileID) > 0 {
+		dAtA[i] = 0x42
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.NetworkServerAddress)))
-		i += copy(dAtA[i:], m.NetworkServerAddress)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ServiceProfileID)))
+		i += copy(dAtA[i:], m.ServiceProfileID)
 	}
-	if len(m.ApplicationServerAddress) > 0 {
-		dAtA[i] = 0x2a
+	if m.LoRaWANVersion != 0 {
+		dAtA[i] = 0x48
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerAddress)))
-		i += copy(dAtA[i:], m.ApplicationServerAddress)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
+	}
+	if m.LoRaWANPHYVersion != 0 {
+		dAtA[i] = 0x50
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
 	}
 	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x32
+		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
 		i += copy(dAtA[i:], m.FrequencyPlanID)
 	}
-	dAtA[i] = 0x3a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.MACSettings.Size()))
-	n17, err := m.MACSettings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n17
-	if m.MACState != nil {
-		dAtA[i] = 0x42
+	if m.DefaultMACParameters != nil {
+		dAtA[i] = 0x62
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACState.Size()))
-		n18, err := m.MACState.MarshalTo(dAtA[i:])
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultMACParameters.Size()))
+		n18, err := m.DefaultMACParameters.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n18
 	}
+	if m.MinFrequency != 0 {
+		dAtA[i] = 0x68
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinFrequency))
+	}
+	if m.MaxFrequency != 0 {
+		dAtA[i] = 0x70
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxFrequency))
+	}
+	if m.ResetsFCnt {
+		dAtA[i] = 0x78
+		i++
+		if m.ResetsFCnt {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.Uses32BitFCnt {
+		dAtA[i] = 0x80
+		i++
+		dAtA[i] = 0x1
+		i++
+		if m.Uses32BitFCnt {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
 	if m.SupportsJoin {
-		dAtA[i] = 0x48
+		dAtA[i] = 0x88
+		i++
+		dAtA[i] = 0x1
 		i++
 		if m.SupportsJoin {
 			dAtA[i] = 1
@@ -2709,133 +3148,199 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
-	if m.Session != nil {
-		dAtA[i] = 0x52
+	if m.ResetsJoinNonces {
+		dAtA[i] = 0x90
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Session.Size()))
-		n19, err := m.Session.MarshalTo(dAtA[i:])
+		dAtA[i] = 0x1
+		i++
+		if m.ResetsJoinNonces {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.RootKeys != nil {
+		dAtA[i] = 0x9a
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RootKeys.Size()))
+		n19, err := m.RootKeys.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n19
 	}
-	if m.SessionFallback != nil {
-		dAtA[i] = 0x5a
+	if len(m.NetworkServerAddress) > 0 {
+		dAtA[i] = 0xa2
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.SessionFallback.Size()))
-		n20, err := m.SessionFallback.MarshalTo(dAtA[i:])
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.NetworkServerAddress)))
+		i += copy(dAtA[i:], m.NetworkServerAddress)
+	}
+	if len(m.ApplicationServerAddress) > 0 {
+		dAtA[i] = 0xaa
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerAddress)))
+		i += copy(dAtA[i:], m.ApplicationServerAddress)
+	}
+	if m.MACSettings != nil {
+		dAtA[i] = 0xb2
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACSettings.Size()))
+		n20, err := m.MACSettings.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n20
 	}
+	if m.MACState != nil {
+		dAtA[i] = 0xba
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACState.Size()))
+		n21, err := m.MACState.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n21
+	}
+	if m.Session != nil {
+		dAtA[i] = 0xc2
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Session.Size()))
+		n22, err := m.Session.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n22
+	}
+	if m.SessionFallback != nil {
+		dAtA[i] = 0xca
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.SessionFallback.Size()))
+		n23, err := m.SessionFallback.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n23
+	}
 	if m.NextDevNonce != 0 {
-		dAtA[i] = 0x60
+		dAtA[i] = 0xd0
+		i++
+		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextDevNonce))
 	}
 	if len(m.UsedDevNonces) > 0 {
-		dAtA22 := make([]byte, len(m.UsedDevNonces)*10)
-		var j21 int
+		dAtA25 := make([]byte, len(m.UsedDevNonces)*10)
+		var j24 int
 		for _, num := range m.UsedDevNonces {
 			for num >= 1<<7 {
-				dAtA22[j21] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA25[j24] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j21++
+				j24++
 			}
-			dAtA22[j21] = uint8(num)
-			j21++
+			dAtA25[j24] = uint8(num)
+			j24++
 		}
-		dAtA[i] = 0x6a
+		dAtA[i] = 0xda
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(j21))
-		i += copy(dAtA[i:], dAtA22[:j21])
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(j24))
+		i += copy(dAtA[i:], dAtA25[:j24])
 	}
 	if m.NextJoinNonce != 0 {
-		dAtA[i] = 0x70
+		dAtA[i] = 0xe0
+		i++
+		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextJoinNonce))
 	}
 	if len(m.UsedJoinNonces) > 0 {
-		dAtA24 := make([]byte, len(m.UsedJoinNonces)*10)
-		var j23 int
+		dAtA27 := make([]byte, len(m.UsedJoinNonces)*10)
+		var j26 int
 		for _, num := range m.UsedJoinNonces {
 			for num >= 1<<7 {
-				dAtA24[j23] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA27[j26] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j23++
+				j26++
 			}
-			dAtA24[j23] = uint8(num)
-			j23++
+			dAtA27[j26] = uint8(num)
+			j26++
 		}
-		dAtA[i] = 0x7a
+		dAtA[i] = 0xea
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(j23))
-		i += copy(dAtA[i:], dAtA24[:j23])
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(j26))
+		i += copy(dAtA[i:], dAtA27[:j26])
 	}
 	if m.NextRJCount0 != 0 {
-		dAtA[i] = 0x80
+		dAtA[i] = 0xf0
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextRJCount0))
 	}
 	if m.NextRJCount1 != 0 {
-		dAtA[i] = 0x88
+		dAtA[i] = 0xf8
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextRJCount1))
 	}
-	if m.Location != nil {
-		dAtA[i] = 0x92
+	if m.NextStatusAfter != 0 {
+		dAtA[i] = 0x80
 		i++
-		dAtA[i] = 0x1
+		dAtA[i] = 0x2
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Location.Size()))
-		n25, err := m.Location.MarshalTo(dAtA[i:])
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextStatusAfter))
+	}
+	if m.LastStatusReceivedAt != nil {
+		dAtA[i] = 0x8a
+		i++
+		dAtA[i] = 0x2
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)))
+		n28, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n25
-	}
-	dAtA[i] = 0x9a
-	i++
-	dAtA[i] = 0x1
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.NextStatusAt)))
-	n26, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.NextStatusAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n26
-	if m.NextStatusAfter != 0 {
-		dAtA[i] = 0xa0
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.NextStatusAfter)
+		i += n28
 	}
 	if m.BatteryPercentage != 0 {
-		dAtA[i] = 0xad
+		dAtA[i] = 0x95
 		i++
-		dAtA[i] = 0x1
+		dAtA[i] = 0x2
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.BatteryPercentage))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.BatteryPercentage))))
 		i += 4
 	}
 	if m.DownlinkMargin != 0 {
-		dAtA[i] = 0xb0
+		dAtA[i] = 0x98
 		i++
-		dAtA[i] = 0x1
+		dAtA[i] = 0x2
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkMargin))
 	}
 	if len(m.RecentUplinks) > 0 {
 		for _, msg := range m.RecentUplinks {
-			dAtA[i] = 0xba
+			dAtA[i] = 0xa2
 			i++
-			dAtA[i] = 0x1
+			dAtA[i] = 0x2
 			i++
 			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
@@ -2847,9 +3352,9 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	}
 	if len(m.RecentDownlinks) > 0 {
 		for _, msg := range m.RecentDownlinks {
-			dAtA[i] = 0xc2
+			dAtA[i] = 0xaa
 			i++
-			dAtA[i] = 0x1
+			dAtA[i] = 0x2
 			i++
 			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
@@ -2861,9 +3366,9 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	}
 	if len(m.QueuedApplicationDownlinks) > 0 {
 		for _, msg := range m.QueuedApplicationDownlinks {
-			dAtA[i] = 0xca
+			dAtA[i] = 0xb2
 			i++
-			dAtA[i] = 0x1
+			dAtA[i] = 0x2
 			i++
 			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
@@ -2873,60 +3378,46 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	dAtA[i] = 0xd2
+	dAtA[i] = 0xba
 	i++
-	dAtA[i] = 0x1
+	dAtA[i] = 0x2
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.MessagePayloadFormatters.Size()))
-	n27, err := m.MessagePayloadFormatters.MarshalTo(dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.Formatters.Size()))
+	n29, err := m.Formatters.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n27
-	if m.Attributes != nil {
-		dAtA[i] = 0xda
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Attributes.Size()))
-		n28, err := m.Attributes.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	i += n29
+	if len(m.Locations) > 0 {
+		for k, _ := range m.Locations {
+			dAtA[i] = 0xc2
+			i++
+			dAtA[i] = 0x2
+			i++
+			v := m.Locations[k]
+			msgSize := 0
+			if v != nil {
+				msgSize = v.Size()
+				msgSize += 1 + sovEndDevice(uint64(msgSize))
+			}
+			mapSize := 1 + len(k) + sovEndDevice(uint64(len(k))) + msgSize
+			i = encodeVarintEndDevice(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
+			i += copy(dAtA[i:], k)
+			if v != nil {
+				dAtA[i] = 0x12
+				i++
+				i = encodeVarintEndDevice(dAtA, i, uint64(v.Size()))
+				n30, err := v.MarshalTo(dAtA[i:])
+				if err != nil {
+					return 0, err
+				}
+				i += n30
+			}
 		}
-		i += n28
 	}
-	if m.StatusUpdatedAt != nil {
-		dAtA[i] = 0xe2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.StatusUpdatedAt)))
-		n29, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StatusUpdatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n29
-	}
-	dAtA[i] = 0x8a
-	i++
-	dAtA[i] = 0x6
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n30, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n30
-	dAtA[i] = 0x92
-	i++
-	dAtA[i] = 0x6
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n31, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n31
 	return i, nil
 }
 
@@ -2960,6 +3451,74 @@ func (m *EndDevices) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *GetEndDeviceRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
+	n31, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n31
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
+	n32, err := m.FieldMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n32
+	return i, nil
+}
+
+func (m *ListEndDevicesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListEndDevicesRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n33, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n33
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
+	n34, err := m.FieldMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n34
+	return i, nil
+}
+
 func (m *SetDeviceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2978,21 +3537,19 @@ func (m *SetDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.Device.Size()))
-	n32, err := m.Device.MarshalTo(dAtA[i:])
+	n35, err := m.Device.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n32
-	if m.FieldMask != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-		n33, err := m.FieldMask.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n33
+	i += n35
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
+	n36, err := m.FieldMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
+	i += n36
 	return i, nil
 }
 
@@ -3011,10 +3568,10 @@ func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 	this.DevAddr = *v1
 	v2 := NewPopulatedSessionKeys(r, easy)
 	this.SessionKeys = *v2
-	this.NextFCntUp = r.Uint32()
-	this.NextNFCntDown = r.Uint32()
-	this.NextAFCntDown = r.Uint32()
-	this.LastConfFCntDown = r.Uint32()
+	this.NextFCntUp = uint32(r.Uint32())
+	this.NextNFCntDown = uint32(r.Uint32())
+	this.NextAFCntDown = uint32(r.Uint32())
+	this.LastConfFCntDown = uint32(r.Uint32())
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.StartedAt = *v3
 	if !easy && r.Intn(10) != 0 {
@@ -3024,13 +3581,13 @@ func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 
 func NewPopulatedEndDeviceBrand(r randyEndDevice, easy bool) *EndDeviceBrand {
 	this := &EndDeviceBrand{}
-	this.ID = randStringEndDevice(r)
-	this.Name = randStringEndDevice(r)
-	this.URL = randStringEndDevice(r)
+	this.ID = string(randStringEndDevice(r))
+	this.Name = string(randStringEndDevice(r))
+	this.URL = string(randStringEndDevice(r))
 	v4 := r.Intn(10)
 	this.Logos = make([]string, v4)
 	for i := 0; i < v4; i++ {
-		this.Logos[i] = randStringEndDevice(r)
+		this.Logos[i] = string(randStringEndDevice(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -3039,9 +3596,9 @@ func NewPopulatedEndDeviceBrand(r randyEndDevice, easy bool) *EndDeviceBrand {
 
 func NewPopulatedEndDeviceModel(r randyEndDevice, easy bool) *EndDeviceModel {
 	this := &EndDeviceModel{}
-	this.BrandID = randStringEndDevice(r)
-	this.ID = randStringEndDevice(r)
-	this.Name = randStringEndDevice(r)
+	this.BrandID = string(randStringEndDevice(r))
+	this.ID = string(randStringEndDevice(r))
+	this.Name = string(randStringEndDevice(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3049,12 +3606,10 @@ func NewPopulatedEndDeviceModel(r randyEndDevice, easy bool) *EndDeviceModel {
 
 func NewPopulatedEndDeviceVersionIdentifiers(r randyEndDevice, easy bool) *EndDeviceVersionIdentifiers {
 	this := &EndDeviceVersionIdentifiers{}
-	this.BrandID = randStringEndDevice(r)
-	this.ModelID = randStringEndDevice(r)
-	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.LoRaWANPHYVersion = PHYVersion([]int32{0, 1, 2, 3, 4, 5, 6}[r.Intn(7)])
-	this.HardwareVersion = randStringEndDevice(r)
-	this.FirmwareVersion = randStringEndDevice(r)
+	this.BrandID = string(randStringEndDevice(r))
+	this.ModelID = string(randStringEndDevice(r))
+	this.HardwareVersion = string(randStringEndDevice(r))
+	this.FirmwareVersion = string(randStringEndDevice(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3062,15 +3617,15 @@ func NewPopulatedEndDeviceVersionIdentifiers(r randyEndDevice, easy bool) *EndDe
 
 func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 	this := &MACSettings{}
-	this.DisableADR = bool(r.Intn(2) == 0)
-	this.ADRMargin = r.Uint32()
-	v5 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.UseADR = bool(bool(r.Intn(2) == 0))
+	this.ADRMargin = uint32(r.Uint32())
+	v5 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	this.ClassBTimeout = *v5
-	v6 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v6 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	this.ClassCTimeout = *v6
 	v7 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	this.StatusTimePeriodicity = *v7
-	this.StatusCountPeriodicity = uint64(r.Uint32())
+	this.StatusCountPeriodicity = uint64(uint64(r.Uint32()))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3090,13 +3645,34 @@ func NewPopulatedEndDevices(r randyEndDevice, easy bool) *EndDevices {
 	return this
 }
 
+func NewPopulatedGetEndDeviceRequest(r randyEndDevice, easy bool) *GetEndDeviceRequest {
+	this := &GetEndDeviceRequest{}
+	v9 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v9
+	v10 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v10
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedListEndDevicesRequest(r randyEndDevice, easy bool) *ListEndDevicesRequest {
+	this := &ListEndDevicesRequest{}
+	v11 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v11
+	v12 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v12
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedSetDeviceRequest(r randyEndDevice, easy bool) *SetDeviceRequest {
 	this := &SetDeviceRequest{}
-	v9 := NewPopulatedEndDevice(r, easy)
-	this.Device = *v9
-	if r.Intn(10) != 0 {
-		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
-	}
+	v13 := NewPopulatedEndDevice(r, easy)
+	this.Device = *v13
+	v14 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v14
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3121,9 +3697,9 @@ func randUTF8RuneEndDevice(r randyEndDevice) rune {
 	return rune(ru + 61)
 }
 func randStringEndDevice(r randyEndDevice) string {
-	v10 := r.Intn(100)
-	tmps := make([]rune, v10)
-	for i := 0; i < v10; i++ {
+	v15 := r.Intn(100)
+	tmps := make([]rune, v15)
+	for i := 0; i < v15; i++ {
 		tmps[i] = randUTF8RuneEndDevice(r)
 	}
 	return string(tmps)
@@ -3145,11 +3721,11 @@ func randFieldEndDevice(dAtA []byte, r randyEndDevice, fieldNumber int, wire int
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(key))
-		v11 := r.Int63()
+		v16 := r.Int63()
 		if r.Intn(2) == 0 {
-			v11 *= -1
+			v16 *= -1
 		}
-		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(v11))
+		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(v16))
 	case 1:
 		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -3168,7 +3744,7 @@ func randFieldEndDevice(dAtA []byte, r randyEndDevice, fieldNumber int, wire int
 }
 func encodeVarintPopulateEndDevice(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -3235,7 +3811,7 @@ func (m *MACParameters) Size() (n int) {
 		n += 1 + sovEndDevice(uint64(m.Rx2DataRateIndex))
 	}
 	if m.Rx2Frequency != 0 {
-		n += 1 + sovEndDevice(m.Rx2Frequency)
+		n += 1 + sovEndDevice(uint64(m.Rx2Frequency))
 	}
 	if m.RejoinTimePeriodicity != 0 {
 		n += 1 + sovEndDevice(uint64(m.RejoinTimePeriodicity))
@@ -3253,13 +3829,13 @@ func (m *MACParameters) Size() (n int) {
 		}
 	}
 	if m.PingSlotFrequency != 0 {
-		n += 2 + sovEndDevice(m.PingSlotFrequency)
+		n += 2 + sovEndDevice(uint64(m.PingSlotFrequency))
 	}
 	if m.PingSlotDataRateIndex != 0 {
 		n += 2 + sovEndDevice(uint64(m.PingSlotDataRateIndex))
 	}
 	if m.BeaconFrequency != 0 {
-		n += 2 + sovEndDevice(m.BeaconFrequency)
+		n += 2 + sovEndDevice(uint64(m.BeaconFrequency))
 	}
 	return n
 }
@@ -3268,10 +3844,10 @@ func (m *MACParameters_Channel) Size() (n int) {
 	var l int
 	_ = l
 	if m.UplinkFrequency != 0 {
-		n += 1 + sovEndDevice(m.UplinkFrequency)
+		n += 1 + sovEndDevice(uint64(m.UplinkFrequency))
 	}
 	if m.DownlinkFrequency != 0 {
-		n += 1 + sovEndDevice(m.DownlinkFrequency)
+		n += 1 + sovEndDevice(uint64(m.DownlinkFrequency))
 	}
 	if m.MinDataRateIndex != 0 {
 		n += 1 + sovEndDevice(uint64(m.MinDataRateIndex))
@@ -3279,7 +3855,7 @@ func (m *MACParameters_Channel) Size() (n int) {
 	if m.MaxDataRateIndex != 0 {
 		n += 1 + sovEndDevice(uint64(m.MaxDataRateIndex))
 	}
-	if m.UplinkEnabled {
+	if m.Masked {
 		n += 2
 	}
 	return n
@@ -3338,12 +3914,6 @@ func (m *EndDeviceVersionIdentifiers) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
-	if m.LoRaWANVersion != 0 {
-		n += 1 + sovEndDevice(uint64(m.LoRaWANVersion))
-	}
-	if m.LoRaWANPHYVersion != 0 {
-		n += 1 + sovEndDevice(uint64(m.LoRaWANPHYVersion))
-	}
 	l = len(m.HardwareVersion)
 	if l > 0 {
 		n += 1 + l + sovEndDevice(uint64(l))
@@ -3360,53 +3930,66 @@ func (m *EndDeviceVersion) Size() (n int) {
 	_ = l
 	l = m.EndDeviceVersionIdentifiers.Size()
 	n += 1 + l + sovEndDevice(uint64(l))
+	if m.LoRaWANVersion != 0 {
+		n += 1 + sovEndDevice(uint64(m.LoRaWANVersion))
+	}
+	if m.LoRaWANPHYVersion != 0 {
+		n += 1 + sovEndDevice(uint64(m.LoRaWANPHYVersion))
+	}
+	l = len(m.FrequencyPlanID)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
 	if len(m.Photos) > 0 {
 		for _, s := range m.Photos {
 			l = len(s)
 			n += 1 + l + sovEndDevice(uint64(l))
 		}
 	}
-	l = m.DefaultFormatters.Size()
-	n += 1 + l + sovEndDevice(uint64(l))
 	if m.DefaultMACParameters != nil {
 		l = m.DefaultMACParameters.Size()
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
 	if m.MinFrequency != 0 {
-		n += 1 + sovEndDevice(m.MinFrequency)
+		n += 1 + sovEndDevice(uint64(m.MinFrequency))
 	}
 	if m.MaxFrequency != 0 {
-		n += 1 + sovEndDevice(m.MaxFrequency)
+		n += 1 + sovEndDevice(uint64(m.MaxFrequency))
 	}
-	if m.FCntResets {
+	if m.ResetsFCnt {
 		n += 2
 	}
-	if m.Supports32BitFCnt {
+	if m.Uses32BitFCnt {
 		n += 2
 	}
-	if m.DisableJoinNonceCheck {
+	if m.SupportsJoin {
 		n += 2
 	}
+	if m.ResetsJoinNonces {
+		n += 2
+	}
+	l = m.DefaultFormatters.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
 	return n
 }
 
 func (m *MACSettings) Size() (n int) {
 	var l int
 	_ = l
-	if m.DisableADR {
+	if m.UseADR {
 		n += 2
 	}
 	if m.ADRMargin != 0 {
 		n += 1 + sovEndDevice(uint64(m.ADRMargin))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ClassBTimeout)
+	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassBTimeout)
 	n += 1 + l + sovEndDevice(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ClassCTimeout)
+	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassCTimeout)
 	n += 1 + l + sovEndDevice(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.StatusTimePeriodicity)
 	n += 1 + l + sovEndDevice(uint64(l))
 	if m.StatusCountPeriodicity != 0 {
-		n += 1 + sovEndDevice(m.StatusCountPeriodicity)
+		n += 1 + sovEndDevice(uint64(m.StatusCountPeriodicity))
 	}
 	return n
 }
@@ -3414,9 +3997,9 @@ func (m *MACSettings) Size() (n int) {
 func (m *MACState) Size() (n int) {
 	var l int
 	_ = l
-	l = m.MACParameters.Size()
+	l = m.CurrentParameters.Size()
 	n += 1 + l + sovEndDevice(uint64(l))
-	l = m.DesiredMACParameters.Size()
+	l = m.DesiredParameters.Size()
 	n += 1 + l + sovEndDevice(uint64(l))
 	if m.DeviceClass != 0 {
 		n += 1 + sovEndDevice(uint64(m.DeviceClass))
@@ -3455,60 +4038,113 @@ func (m *EndDevice) Size() (n int) {
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()
 	n += 1 + l + sovEndDevice(uint64(l))
-	l = m.EndDeviceVersionIdentifiers.Size()
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovEndDevice(uint64(l))
-	if m.RootKeys != nil {
-		l = m.RootKeys.Size()
-		n += 1 + l + sovEndDevice(uint64(l))
-	}
-	l = len(m.NetworkServerAddress)
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	n += 1 + l + sovEndDevice(uint64(l))
+	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
-	l = len(m.ApplicationServerAddress)
+	l = len(m.Description)
 	if l > 0 {
 		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if len(m.Attributes) > 0 {
+		for k, v := range m.Attributes {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovEndDevice(uint64(len(k))) + 1 + len(v) + sovEndDevice(uint64(len(v)))
+			n += mapEntrySize + 1 + sovEndDevice(uint64(mapEntrySize))
+		}
+	}
+	if m.VersionIds != nil {
+		l = m.VersionIds.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	l = len(m.ServiceProfileID)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.LoRaWANVersion != 0 {
+		n += 1 + sovEndDevice(uint64(m.LoRaWANVersion))
+	}
+	if m.LoRaWANPHYVersion != 0 {
+		n += 1 + sovEndDevice(uint64(m.LoRaWANPHYVersion))
 	}
 	l = len(m.FrequencyPlanID)
 	if l > 0 {
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
-	l = m.MACSettings.Size()
-	n += 1 + l + sovEndDevice(uint64(l))
-	if m.MACState != nil {
-		l = m.MACState.Size()
+	if m.DefaultMACParameters != nil {
+		l = m.DefaultMACParameters.Size()
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
-	if m.SupportsJoin {
+	if m.MinFrequency != 0 {
+		n += 1 + sovEndDevice(uint64(m.MinFrequency))
+	}
+	if m.MaxFrequency != 0 {
+		n += 1 + sovEndDevice(uint64(m.MaxFrequency))
+	}
+	if m.ResetsFCnt {
 		n += 2
+	}
+	if m.Uses32BitFCnt {
+		n += 3
+	}
+	if m.SupportsJoin {
+		n += 3
+	}
+	if m.ResetsJoinNonces {
+		n += 3
+	}
+	if m.RootKeys != nil {
+		l = m.RootKeys.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	l = len(m.NetworkServerAddress)
+	if l > 0 {
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	l = len(m.ApplicationServerAddress)
+	if l > 0 {
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.MACSettings != nil {
+		l = m.MACSettings.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.MACState != nil {
+		l = m.MACState.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
 	}
 	if m.Session != nil {
 		l = m.Session.Size()
-		n += 1 + l + sovEndDevice(uint64(l))
+		n += 2 + l + sovEndDevice(uint64(l))
 	}
 	if m.SessionFallback != nil {
 		l = m.SessionFallback.Size()
-		n += 1 + l + sovEndDevice(uint64(l))
+		n += 2 + l + sovEndDevice(uint64(l))
 	}
 	if m.NextDevNonce != 0 {
-		n += 1 + sovEndDevice(uint64(m.NextDevNonce))
+		n += 2 + sovEndDevice(uint64(m.NextDevNonce))
 	}
 	if len(m.UsedDevNonces) > 0 {
 		l = 0
 		for _, e := range m.UsedDevNonces {
 			l += sovEndDevice(uint64(e))
 		}
-		n += 1 + sovEndDevice(uint64(l)) + l
+		n += 2 + sovEndDevice(uint64(l)) + l
 	}
 	if m.NextJoinNonce != 0 {
-		n += 1 + sovEndDevice(uint64(m.NextJoinNonce))
+		n += 2 + sovEndDevice(uint64(m.NextJoinNonce))
 	}
 	if len(m.UsedJoinNonces) > 0 {
 		l = 0
 		for _, e := range m.UsedJoinNonces {
 			l += sovEndDevice(uint64(e))
 		}
-		n += 1 + sovEndDevice(uint64(l)) + l
+		n += 2 + sovEndDevice(uint64(l)) + l
 	}
 	if m.NextRJCount0 != 0 {
 		n += 2 + sovEndDevice(uint64(m.NextRJCount0))
@@ -3516,14 +4152,12 @@ func (m *EndDevice) Size() (n int) {
 	if m.NextRJCount1 != 0 {
 		n += 2 + sovEndDevice(uint64(m.NextRJCount1))
 	}
-	if m.Location != nil {
-		l = m.Location.Size()
-		n += 2 + l + sovEndDevice(uint64(l))
-	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.NextStatusAt)
-	n += 2 + l + sovEndDevice(uint64(l))
 	if m.NextStatusAfter != 0 {
-		n += 2 + sovEndDevice(m.NextStatusAfter)
+		n += 2 + sovEndDevice(uint64(m.NextStatusAfter))
+	}
+	if m.LastStatusReceivedAt != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)
+		n += 2 + l + sovEndDevice(uint64(l))
 	}
 	if m.BatteryPercentage != 0 {
 		n += 6
@@ -3549,20 +4183,21 @@ func (m *EndDevice) Size() (n int) {
 			n += 2 + l + sovEndDevice(uint64(l))
 		}
 	}
-	l = m.MessagePayloadFormatters.Size()
+	l = m.Formatters.Size()
 	n += 2 + l + sovEndDevice(uint64(l))
-	if m.Attributes != nil {
-		l = m.Attributes.Size()
-		n += 2 + l + sovEndDevice(uint64(l))
+	if len(m.Locations) > 0 {
+		for k, v := range m.Locations {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovEndDevice(uint64(l))
+			}
+			mapEntrySize := 1 + len(k) + sovEndDevice(uint64(len(k))) + l
+			n += mapEntrySize + 2 + sovEndDevice(uint64(mapEntrySize))
+		}
 	}
-	if m.StatusUpdatedAt != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StatusUpdatedAt)
-		n += 2 + l + sovEndDevice(uint64(l))
-	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
-	n += 2 + l + sovEndDevice(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
-	n += 2 + l + sovEndDevice(uint64(l))
 	return n
 }
 
@@ -3578,15 +4213,33 @@ func (m *EndDevices) Size() (n int) {
 	return n
 }
 
+func (m *GetEndDeviceRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
+	l = m.FieldMask.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
+	return n
+}
+
+func (m *ListEndDevicesRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
+	l = m.FieldMask.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
+	return n
+}
+
 func (m *SetDeviceRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Device.Size()
 	n += 1 + l + sovEndDevice(uint64(l))
-	if m.FieldMask != nil {
-		l = m.FieldMask.Size()
-		n += 1 + l + sovEndDevice(uint64(l))
-	}
+	l = m.FieldMask.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
 	return n
 }
 
@@ -3601,7 +4254,7 @@ func sovEndDevice(x uint64) (n int) {
 	return n
 }
 func sozEndDevice(x uint64) (n int) {
-	return sovEndDevice((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovEndDevice(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Session) String() string {
 	if this == nil {
@@ -3656,7 +4309,7 @@ func (this *MACParameters_Channel) String() string {
 		`DownlinkFrequency:` + fmt.Sprintf("%v", this.DownlinkFrequency) + `,`,
 		`MinDataRateIndex:` + fmt.Sprintf("%v", this.MinDataRateIndex) + `,`,
 		`MaxDataRateIndex:` + fmt.Sprintf("%v", this.MaxDataRateIndex) + `,`,
-		`UplinkEnabled:` + fmt.Sprintf("%v", this.UplinkEnabled) + `,`,
+		`Masked:` + fmt.Sprintf("%v", this.Masked) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3693,8 +4346,6 @@ func (this *EndDeviceVersionIdentifiers) String() string {
 	s := strings.Join([]string{`&EndDeviceVersionIdentifiers{`,
 		`BrandID:` + fmt.Sprintf("%v", this.BrandID) + `,`,
 		`ModelID:` + fmt.Sprintf("%v", this.ModelID) + `,`,
-		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
-		`LoRaWANPHYVersion:` + fmt.Sprintf("%v", this.LoRaWANPHYVersion) + `,`,
 		`HardwareVersion:` + fmt.Sprintf("%v", this.HardwareVersion) + `,`,
 		`FirmwareVersion:` + fmt.Sprintf("%v", this.FirmwareVersion) + `,`,
 		`}`,
@@ -3707,14 +4358,18 @@ func (this *EndDeviceVersion) String() string {
 	}
 	s := strings.Join([]string{`&EndDeviceVersion{`,
 		`EndDeviceVersionIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceVersionIdentifiers.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
+		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
+		`LoRaWANPHYVersion:` + fmt.Sprintf("%v", this.LoRaWANPHYVersion) + `,`,
+		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
 		`Photos:` + fmt.Sprintf("%v", this.Photos) + `,`,
-		`DefaultFormatters:` + strings.Replace(strings.Replace(this.DefaultFormatters.String(), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
 		`DefaultMACParameters:` + strings.Replace(fmt.Sprintf("%v", this.DefaultMACParameters), "MACParameters", "MACParameters", 1) + `,`,
 		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
 		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
-		`FCntResets:` + fmt.Sprintf("%v", this.FCntResets) + `,`,
-		`Supports32BitFCnt:` + fmt.Sprintf("%v", this.Supports32BitFCnt) + `,`,
-		`DisableJoinNonceCheck:` + fmt.Sprintf("%v", this.DisableJoinNonceCheck) + `,`,
+		`ResetsFCnt:` + fmt.Sprintf("%v", this.ResetsFCnt) + `,`,
+		`Uses32BitFCnt:` + fmt.Sprintf("%v", this.Uses32BitFCnt) + `,`,
+		`SupportsJoin:` + fmt.Sprintf("%v", this.SupportsJoin) + `,`,
+		`ResetsJoinNonces:` + fmt.Sprintf("%v", this.ResetsJoinNonces) + `,`,
+		`DefaultFormatters:` + strings.Replace(strings.Replace(this.DefaultFormatters.String(), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3724,10 +4379,10 @@ func (this *MACSettings) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&MACSettings{`,
-		`DisableADR:` + fmt.Sprintf("%v", this.DisableADR) + `,`,
+		`UseADR:` + fmt.Sprintf("%v", this.UseADR) + `,`,
 		`ADRMargin:` + fmt.Sprintf("%v", this.ADRMargin) + `,`,
-		`ClassBTimeout:` + strings.Replace(strings.Replace(this.ClassBTimeout.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`ClassCTimeout:` + strings.Replace(strings.Replace(this.ClassCTimeout.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`ClassBTimeout:` + strings.Replace(strings.Replace(this.ClassBTimeout.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`ClassCTimeout:` + strings.Replace(strings.Replace(this.ClassCTimeout.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
 		`StatusTimePeriodicity:` + strings.Replace(strings.Replace(this.StatusTimePeriodicity.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
 		`StatusCountPeriodicity:` + fmt.Sprintf("%v", this.StatusCountPeriodicity) + `,`,
 		`}`,
@@ -3739,8 +4394,8 @@ func (this *MACState) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&MACState{`,
-		`MACParameters:` + strings.Replace(strings.Replace(this.MACParameters.String(), "MACParameters", "MACParameters", 1), `&`, ``, 1) + `,`,
-		`DesiredMACParameters:` + strings.Replace(strings.Replace(this.DesiredMACParameters.String(), "MACParameters", "MACParameters", 1), `&`, ``, 1) + `,`,
+		`CurrentParameters:` + strings.Replace(strings.Replace(this.CurrentParameters.String(), "MACParameters", "MACParameters", 1), `&`, ``, 1) + `,`,
+		`DesiredParameters:` + strings.Replace(strings.Replace(this.DesiredParameters.String(), "MACParameters", "MACParameters", 1), `&`, ``, 1) + `,`,
 		`DeviceClass:` + fmt.Sprintf("%v", this.DeviceClass) + `,`,
 		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
 		`NextConfirmedDownlinkAt:` + strings.Replace(fmt.Sprintf("%v", this.NextConfirmedDownlinkAt), "Timestamp", "types.Timestamp", 1) + `,`,
@@ -3756,16 +4411,50 @@ func (this *EndDevice) String() string {
 	if this == nil {
 		return "nil"
 	}
+	keysForAttributes := make([]string, 0, len(this.Attributes))
+	for k, _ := range this.Attributes {
+		keysForAttributes = append(keysForAttributes, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)
+	mapStringForAttributes := "map[string]string{"
+	for _, k := range keysForAttributes {
+		mapStringForAttributes += fmt.Sprintf("%v: %v,", k, this.Attributes[k])
+	}
+	mapStringForAttributes += "}"
+	keysForLocations := make([]string, 0, len(this.Locations))
+	for k, _ := range this.Locations {
+		keysForLocations = append(keysForLocations, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForLocations)
+	mapStringForLocations := "map[string]*Location{"
+	for _, k := range keysForLocations {
+		mapStringForLocations += fmt.Sprintf("%v: %v,", k, this.Locations[k])
+	}
+	mapStringForLocations += "}"
 	s := strings.Join([]string{`&EndDevice{`,
 		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
-		`EndDeviceVersionIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceVersionIdentifiers.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`Attributes:` + mapStringForAttributes + `,`,
+		`VersionIds:` + strings.Replace(fmt.Sprintf("%v", this.VersionIds), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1) + `,`,
+		`ServiceProfileID:` + fmt.Sprintf("%v", this.ServiceProfileID) + `,`,
+		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
+		`LoRaWANPHYVersion:` + fmt.Sprintf("%v", this.LoRaWANPHYVersion) + `,`,
+		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
+		`DefaultMACParameters:` + strings.Replace(fmt.Sprintf("%v", this.DefaultMACParameters), "MACParameters", "MACParameters", 1) + `,`,
+		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
+		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
+		`ResetsFCnt:` + fmt.Sprintf("%v", this.ResetsFCnt) + `,`,
+		`Uses32BitFCnt:` + fmt.Sprintf("%v", this.Uses32BitFCnt) + `,`,
+		`SupportsJoin:` + fmt.Sprintf("%v", this.SupportsJoin) + `,`,
+		`ResetsJoinNonces:` + fmt.Sprintf("%v", this.ResetsJoinNonces) + `,`,
 		`RootKeys:` + strings.Replace(fmt.Sprintf("%v", this.RootKeys), "RootKeys", "RootKeys", 1) + `,`,
 		`NetworkServerAddress:` + fmt.Sprintf("%v", this.NetworkServerAddress) + `,`,
 		`ApplicationServerAddress:` + fmt.Sprintf("%v", this.ApplicationServerAddress) + `,`,
-		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
-		`MACSettings:` + strings.Replace(strings.Replace(this.MACSettings.String(), "MACSettings", "MACSettings", 1), `&`, ``, 1) + `,`,
+		`MACSettings:` + strings.Replace(fmt.Sprintf("%v", this.MACSettings), "MACSettings", "MACSettings", 1) + `,`,
 		`MACState:` + strings.Replace(fmt.Sprintf("%v", this.MACState), "MACState", "MACState", 1) + `,`,
-		`SupportsJoin:` + fmt.Sprintf("%v", this.SupportsJoin) + `,`,
 		`Session:` + strings.Replace(fmt.Sprintf("%v", this.Session), "Session", "Session", 1) + `,`,
 		`SessionFallback:` + strings.Replace(fmt.Sprintf("%v", this.SessionFallback), "Session", "Session", 1) + `,`,
 		`NextDevNonce:` + fmt.Sprintf("%v", this.NextDevNonce) + `,`,
@@ -3774,19 +4463,15 @@ func (this *EndDevice) String() string {
 		`UsedJoinNonces:` + fmt.Sprintf("%v", this.UsedJoinNonces) + `,`,
 		`NextRJCount0:` + fmt.Sprintf("%v", this.NextRJCount0) + `,`,
 		`NextRJCount1:` + fmt.Sprintf("%v", this.NextRJCount1) + `,`,
-		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
-		`NextStatusAt:` + strings.Replace(strings.Replace(this.NextStatusAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`NextStatusAfter:` + fmt.Sprintf("%v", this.NextStatusAfter) + `,`,
+		`LastStatusReceivedAt:` + strings.Replace(fmt.Sprintf("%v", this.LastStatusReceivedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`BatteryPercentage:` + fmt.Sprintf("%v", this.BatteryPercentage) + `,`,
 		`DownlinkMargin:` + fmt.Sprintf("%v", this.DownlinkMargin) + `,`,
 		`RecentUplinks:` + strings.Replace(fmt.Sprintf("%v", this.RecentUplinks), "UplinkMessage", "UplinkMessage", 1) + `,`,
 		`RecentDownlinks:` + strings.Replace(fmt.Sprintf("%v", this.RecentDownlinks), "DownlinkMessage", "DownlinkMessage", 1) + `,`,
 		`QueuedApplicationDownlinks:` + strings.Replace(fmt.Sprintf("%v", this.QueuedApplicationDownlinks), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
-		`MessagePayloadFormatters:` + strings.Replace(strings.Replace(this.MessagePayloadFormatters.String(), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
-		`Attributes:` + strings.Replace(fmt.Sprintf("%v", this.Attributes), "Struct", "types.Struct", 1) + `,`,
-		`StatusUpdatedAt:` + strings.Replace(fmt.Sprintf("%v", this.StatusUpdatedAt), "Timestamp", "types.Timestamp", 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Formatters:` + strings.Replace(strings.Replace(this.Formatters.String(), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
+		`Locations:` + mapStringForLocations + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3801,13 +4486,35 @@ func (this *EndDevices) String() string {
 	}, "")
 	return s
 }
+func (this *GetEndDeviceRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetEndDeviceRequest{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListEndDevicesRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListEndDevicesRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *SetDeviceRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&SetDeviceRequest{`,
 		`Device:` + strings.Replace(strings.Replace(this.Device.String(), "EndDevice", "EndDevice", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4073,9 +4780,9 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.MaxEIRP = math.Float32frombits(v)
+			m.MaxEIRP = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UplinkDwellTime", wireType)
@@ -4560,7 +5267,7 @@ func (m *MACParameters_Channel) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UplinkEnabled", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Masked", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -4577,7 +5284,7 @@ func (m *MACParameters_Channel) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UplinkEnabled = bool(v != 0)
+			m.Masked = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEndDevice(dAtA[iNdEx:])
@@ -4990,44 +5697,6 @@ func (m *EndDeviceVersionIdentifiers) Unmarshal(dAtA []byte) error {
 			m.ModelID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANVersion", wireType)
-			}
-			m.LoRaWANVersion = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LoRaWANVersion |= (MACVersion(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANPHYVersion", wireType)
-			}
-			m.LoRaWANPHYVersion = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LoRaWANPHYVersion |= (PHYVersion(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field HardwareVersion", wireType)
 			}
@@ -5056,7 +5725,7 @@ func (m *EndDeviceVersionIdentifiers) Unmarshal(dAtA []byte) error {
 			}
 			m.HardwareVersion = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FirmwareVersion", wireType)
 			}
@@ -5166,6 +5835,73 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANVersion", wireType)
+			}
+			m.LoRaWANVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LoRaWANVersion |= (MACVersion(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANPHYVersion", wireType)
+			}
+			m.LoRaWANPHYVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LoRaWANPHYVersion |= (PHYVersion(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Photos", wireType)
 			}
@@ -5194,37 +5930,7 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 			}
 			m.Photos = append(m.Photos, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultFormatters", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.DefaultFormatters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultMACParameters", wireType)
 			}
@@ -5257,7 +5963,7 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
 			}
@@ -5276,7 +5982,7 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 6:
+		case 8:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
 			}
@@ -5295,49 +6001,9 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FCntResets", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.FCntResets = bool(v != 0)
-		case 8:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Supports32BitFCnt", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Supports32BitFCnt = bool(v != 0)
 		case 9:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DisableJoinNonceCheck", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ResetsFCnt", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -5354,7 +6020,97 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.DisableJoinNonceCheck = bool(v != 0)
+			m.ResetsFCnt = bool(v != 0)
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uses32BitFCnt", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Uses32BitFCnt = bool(v != 0)
+		case 11:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SupportsJoin", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.SupportsJoin = bool(v != 0)
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResetsJoinNonces", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ResetsJoinNonces = bool(v != 0)
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultFormatters", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DefaultFormatters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEndDevice(dAtA[iNdEx:])
@@ -5407,7 +6163,7 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DisableADR", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UseADR", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -5424,7 +6180,7 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.DisableADR = bool(v != 0)
+			m.UseADR = bool(v != 0)
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ADRMargin", wireType)
@@ -5470,7 +6226,7 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ClassBTimeout, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ClassBTimeout, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5500,7 +6256,7 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ClassCTimeout, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ClassCTimeout, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5605,7 +6361,7 @@ func (m *MACState) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MACParameters", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrentParameters", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5629,13 +6385,13 @@ func (m *MACState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.MACParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.CurrentParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DesiredMACParameters", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DesiredParameters", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5659,7 +6415,7 @@ func (m *MACState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.DesiredMACParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DesiredParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5930,7 +6686,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceVersionIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5954,11 +6710,497 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.EndDeviceVersionIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Attributes == nil {
+				m.Attributes = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipEndDevice(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Attributes[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VersionIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.VersionIds == nil {
+				m.VersionIds = &EndDeviceVersionIdentifiers{}
+			}
+			if err := m.VersionIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceProfileID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceProfileID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANVersion", wireType)
+			}
+			m.LoRaWANVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LoRaWANVersion |= (MACVersion(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANPHYVersion", wireType)
+			}
+			m.LoRaWANPHYVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LoRaWANPHYVersion |= (PHYVersion(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultMACParameters", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DefaultMACParameters == nil {
+				m.DefaultMACParameters = &MACParameters{}
+			}
+			if err := m.DefaultMACParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
+			}
+			m.MinFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
+			}
+			m.MaxFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 15:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResetsFCnt", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ResetsFCnt = bool(v != 0)
+		case 16:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uses32BitFCnt", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Uses32BitFCnt = bool(v != 0)
+		case 17:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SupportsJoin", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.SupportsJoin = bool(v != 0)
+		case 18:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResetsJoinNonces", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ResetsJoinNonces = bool(v != 0)
+		case 19:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RootKeys", wireType)
 			}
@@ -5991,7 +7233,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 20:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkServerAddress", wireType)
 			}
@@ -6020,7 +7262,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			}
 			m.NetworkServerAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 21:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationServerAddress", wireType)
 			}
@@ -6049,36 +7291,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			}
 			m.ApplicationServerAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
+		case 22:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MACSettings", wireType)
 			}
@@ -6104,11 +7317,14 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
+			if m.MACSettings == nil {
+				m.MACSettings = &MACSettings{}
+			}
 			if err := m.MACSettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 8:
+		case 23:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MACState", wireType)
 			}
@@ -6141,27 +7357,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SupportsJoin", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.SupportsJoin = bool(v != 0)
-		case 10:
+		case 24:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Session", wireType)
 			}
@@ -6194,7 +7390,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 11:
+		case 25:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionFallback", wireType)
 			}
@@ -6227,7 +7423,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 12:
+		case 26:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NextDevNonce", wireType)
 			}
@@ -6246,7 +7442,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 13:
+		case 27:
 			if wireType == 0 {
 				var v uint32
 				for shift := uint(0); ; shift += 7 {
@@ -6308,7 +7504,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field UsedDevNonces", wireType)
 			}
-		case 14:
+		case 28:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NextJoinNonce", wireType)
 			}
@@ -6327,7 +7523,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 15:
+		case 29:
 			if wireType == 0 {
 				var v uint32
 				for shift := uint(0); ; shift += 7 {
@@ -6389,7 +7585,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field UsedJoinNonces", wireType)
 			}
-		case 16:
+		case 30:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NextRJCount0", wireType)
 			}
@@ -6408,7 +7604,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 17:
+		case 31:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NextRJCount1", wireType)
 			}
@@ -6427,70 +7623,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 18:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Location == nil {
-				m.Location = &Location{}
-			}
-			if err := m.Location.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 19:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextStatusAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.NextStatusAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 20:
+		case 32:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NextStatusAfter", wireType)
 			}
@@ -6509,7 +7642,40 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 21:
+		case 33:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastStatusReceivedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastStatusReceivedAt == nil {
+				m.LastStatusReceivedAt = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastStatusReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 34:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BatteryPercentage", wireType)
 			}
@@ -6517,10 +7683,10 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.BatteryPercentage = math.Float32frombits(v)
-		case 22:
+			m.BatteryPercentage = float32(math.Float32frombits(v))
+		case 35:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkMargin", wireType)
 			}
@@ -6539,7 +7705,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 23:
+		case 36:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RecentUplinks", wireType)
 			}
@@ -6570,7 +7736,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 24:
+		case 37:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RecentDownlinks", wireType)
 			}
@@ -6601,7 +7767,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 25:
+		case 38:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field QueuedApplicationDownlinks", wireType)
 			}
@@ -6632,9 +7798,9 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 26:
+		case 39:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MessagePayloadFormatters", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatters", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6658,13 +7824,13 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.MessagePayloadFormatters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Formatters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 27:
+		case 40:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Locations", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6688,105 +7854,102 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Attributes == nil {
-				m.Attributes = &types.Struct{}
+			if m.Locations == nil {
+				m.Locations = make(map[string]*Location)
 			}
-			if err := m.Attributes.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 28:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StatusUpdatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
+			var mapkey string
+			var mapvalue *Location
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= (int(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if mapmsglen < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &Location{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipEndDevice(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthEndDevice
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
 			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.StatusUpdatedAt == nil {
-				m.StatusUpdatedAt = new(time.Time)
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StatusUpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 97:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 98:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.Locations[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -6866,6 +8029,226 @@ func (m *EndDevices) Unmarshal(dAtA []byte) error {
 			}
 			m.EndDevices = append(m.EndDevices, &EndDevice{})
 			if err := m.EndDevices[len(m.EndDevices)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetEndDeviceRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetEndDeviceRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetEndDeviceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListEndDevicesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListEndDevicesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListEndDevicesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6974,9 +8357,6 @@ func (m *SetDeviceRequest) Unmarshal(dAtA []byte) error {
 			postIndex := iNdEx + msglen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			}
-			if m.FieldMask == nil {
-				m.FieldMask = &types.FieldMask{}
 			}
 			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -7109,185 +8489,196 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_6feaace214a25c75)
+	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_b404642f60074a6c)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_6feaace214a25c75)
+	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_b404642f60074a6c)
 }
 
-var fileDescriptor_end_device_6feaace214a25c75 = []byte{
-	// 2757 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x59, 0x3d, 0x70, 0x1b, 0x47,
-	0xb2, 0xc6, 0x82, 0x10, 0x09, 0x0c, 0x08, 0x02, 0x18, 0x92, 0xd2, 0x8a, 0xd2, 0x5b, 0xf0, 0x51,
-	0xb6, 0x1f, 0xed, 0x67, 0x83, 0x16, 0xe5, 0x57, 0xb2, 0x5d, 0xaf, 0xea, 0x8c, 0x1f, 0xc9, 0xa6,
-	0x4c, 0xf2, 0x58, 0x43, 0xc9, 0xaa, 0xf3, 0x95, 0x6b, 0x6b, 0xb0, 0x3b, 0x00, 0x57, 0x04, 0x76,
-	0xe1, 0x99, 0x01, 0x09, 0x64, 0xbe, 0xe4, 0xca, 0x99, 0x1d, 0x3a, 0x3b, 0xd7, 0x45, 0x0e, 0x2e,
-	0x70, 0x72, 0x55, 0x0e, 0x7d, 0x99, 0x43, 0x87, 0xae, 0x0b, 0x70, 0x26, 0x98, 0x38, 0x74, 0xe8,
-	0xec, 0xae, 0xe6, 0x67, 0x77, 0xf1, 0x43, 0xe9, 0xa8, 0xbb, 0x4b, 0x50, 0xbb, 0xdd, 0x5f, 0x7f,
-	0xf3, 0xd3, 0x3d, 0xdd, 0x3d, 0x0b, 0xb0, 0xd1, 0x0e, 0x28, 0x3e, 0xc5, 0xfe, 0x6b, 0x8c, 0x63,
-	0xe7, 0x78, 0x0b, 0x77, 0xbd, 0x2d, 0xe2, 0xbb, 0xb6, 0x4b, 0x4e, 0x3c, 0x87, 0x94, 0xbb, 0x34,
-	0xe0, 0x01, 0x5c, 0xe2, 0xdc, 0x2f, 0x6b, 0x5c, 0xf9, 0xe4, 0xce, 0xda, 0x6b, 0x2d, 0x8f, 0x1f,
-	0xf5, 0x1a, 0x65, 0x27, 0xe8, 0x6c, 0xb5, 0x82, 0x56, 0xb0, 0x25, 0x61, 0x8d, 0x5e, 0x53, 0xbe,
-	0xc9, 0x17, 0xf9, 0xa4, 0xcc, 0xd7, 0x6e, 0xb6, 0x82, 0xa0, 0xd5, 0x26, 0x92, 0x1b, 0xfb, 0x7e,
-	0xc0, 0x31, 0xf7, 0x02, 0x9f, 0x69, 0xad, 0xa5, 0xb5, 0x11, 0x87, 0xdb, 0xa3, 0x12, 0xa0, 0xf5,
-	0xeb, 0xd3, 0xfa, 0xa6, 0x47, 0xda, 0xae, 0xdd, 0xc1, 0xec, 0x78, 0x8a, 0x3f, 0x42, 0x30, 0x4e,
-	0x7b, 0x0e, 0xd7, 0xda, 0xd2, 0xb4, 0x96, 0x7b, 0x1d, 0xc2, 0x38, 0xee, 0x74, 0x35, 0xe0, 0xd6,
-	0xec, 0x0e, 0x78, 0x2e, 0xf1, 0xb9, 0xd7, 0xf4, 0x08, 0x0d, 0x67, 0x79, 0x73, 0x16, 0x74, 0x4c,
-	0x06, 0xa1, 0xb6, 0x34, 0xab, 0x0d, 0xb7, 0x4b, 0x2f, 0x62, 0x16, 0xd0, 0x21, 0x8c, 0xe1, 0x16,
-	0x61, 0xcf, 0x42, 0x70, 0xec, 0x62, 0x8e, 0x15, 0x62, 0xe3, 0xb3, 0x39, 0xb0, 0x70, 0x48, 0x18,
-	0xf3, 0x02, 0x1f, 0x3e, 0x06, 0x69, 0x97, 0x9c, 0xd8, 0xd8, 0x75, 0xa9, 0x99, 0x5c, 0x37, 0x36,
-	0x17, 0xab, 0xff, 0xff, 0xdd, 0xb0, 0x94, 0xf8, 0xeb, 0xb0, 0xf4, 0x46, 0x2b, 0x28, 0xf3, 0x23,
-	0xc2, 0x8f, 0x3c, 0xbf, 0xc5, 0xca, 0x3e, 0xe1, 0xa7, 0x01, 0x3d, 0xde, 0x9a, 0x24, 0xef, 0x1e,
-	0xb7, 0xb6, 0xf8, 0xa0, 0x4b, 0x58, 0xb9, 0x4e, 0x4e, 0x2a, 0xae, 0x4b, 0xd1, 0x82, 0xab, 0x1e,
-	0xe0, 0x5b, 0x20, 0x25, 0xd6, 0x65, 0xce, 0xad, 0x1b, 0x9b, 0xd9, 0xed, 0x1b, 0xe5, 0x49, 0xcf,
-	0x97, 0xf5, 0xf8, 0xef, 0x93, 0x01, 0xab, 0xa6, 0xc5, 0x88, 0xdf, 0x0f, 0x4b, 0x06, 0x92, 0x26,
-	0xf0, 0xbf, 0x41, 0xce, 0x27, 0x7d, 0x6e, 0x37, 0x6d, 0xc7, 0xe7, 0x76, 0xaf, 0x6b, 0xa6, 0xd6,
-	0x8d, 0xcd, 0x1c, 0x02, 0x42, 0x78, 0xbf, 0xe6, 0xf3, 0x47, 0x5d, 0xb8, 0x09, 0x8a, 0x12, 0xe2,
-	0x6b, 0x90, 0x1b, 0x9c, 0xfa, 0xe6, 0x15, 0x09, 0x93, 0xb6, 0xfb, 0x02, 0x57, 0x0f, 0x4e, 0xfd,
-	0x08, 0x89, 0xc7, 0x91, 0xf3, 0x31, 0xb2, 0x12, 0x21, 0xcb, 0x60, 0xa5, 0x8d, 0x19, 0xb7, 0x9d,
-	0xc0, 0x6f, 0x8e, 0x83, 0x17, 0x24, 0xb8, 0x20, 0x74, 0xb5, 0xc0, 0x6f, 0x46, 0xf8, 0x1a, 0x00,
-	0x8c, 0x63, 0xca, 0x89, 0x6b, 0x63, 0x6e, 0xa6, 0xe5, 0x3a, 0xd7, 0xca, 0x2a, 0x48, 0xca, 0x61,
-	0x90, 0x94, 0x1f, 0x86, 0x41, 0xa2, 0x96, 0xf9, 0xf9, 0xdf, 0x4a, 0x06, 0xca, 0x68, 0xbb, 0x0a,
-	0x7f, 0x90, 0x4a, 0x1b, 0x85, 0xe4, 0xc6, 0x5f, 0xb2, 0x20, 0xb7, 0x57, 0xa9, 0x1d, 0x60, 0x8a,
-	0x3b, 0x84, 0x13, 0xca, 0xe0, 0x4b, 0x20, 0xdd, 0xc1, 0x7d, 0x9b, 0x78, 0xb4, 0x6b, 0x1a, 0xeb,
-	0xc6, 0x66, 0xb2, 0x9a, 0x1d, 0x0d, 0x4b, 0x0b, 0x7b, 0xb8, 0x7f, 0x6f, 0x07, 0x1d, 0xa0, 0x85,
-	0x0e, 0xee, 0xdf, 0xf3, 0x68, 0x17, 0xbe, 0x02, 0x8a, 0xbd, 0x6e, 0xdb, 0xf3, 0x8f, 0x6d, 0xf7,
-	0x94, 0xb4, 0xdb, 0xb6, 0x88, 0x49, 0xe9, 0xc8, 0x34, 0xca, 0x2b, 0x45, 0x5d, 0xc8, 0xc5, 0x2c,
-	0x60, 0x19, 0x2c, 0x8b, 0x05, 0x4d, 0xa3, 0xe7, 0x24, 0xba, 0x18, 0xaa, 0x62, 0x7c, 0x03, 0x2c,
-	0x63, 0x97, 0xda, 0x22, 0x72, 0x6c, 0x8a, 0x39, 0xb1, 0x3d, 0xdf, 0x25, 0x7d, 0xe9, 0x8d, 0xa5,
-	0xed, 0xff, 0x9a, 0xf6, 0x68, 0x1d, 0x73, 0x8c, 0x30, 0x27, 0x3b, 0x02, 0x54, 0x5d, 0x19, 0x0d,
-	0x4b, 0x85, 0x4a, 0x1d, 0x4d, 0x48, 0x51, 0x01, 0xbb, 0x74, 0x42, 0x02, 0xdf, 0x01, 0x50, 0x8c,
-	0xc1, 0xfb, 0x76, 0x37, 0x38, 0x25, 0x54, 0x0f, 0x21, 0x3d, 0x59, 0x5d, 0x1e, 0x0d, 0x4b, 0xf9,
-	0x4a, 0x1d, 0x3d, 0xec, 0x1f, 0x08, 0x9d, 0xa2, 0xc8, 0x63, 0x97, 0x8e, 0x0b, 0xe0, 0xeb, 0x60,
-	0x51, 0x30, 0xf8, 0x0d, 0x9b, 0x53, 0xec, 0x33, 0xe5, 0xdb, 0xea, 0xd2, 0x68, 0x58, 0x02, 0x95,
-	0x3a, 0xda, 0x6f, 0x3c, 0x14, 0x52, 0x04, 0xb0, 0x4b, 0xf5, 0x33, 0xbc, 0x03, 0x72, 0xc2, 0x02,
-	0x3b, 0xc7, 0x76, 0xdb, 0xeb, 0x78, 0x5c, 0x79, 0xb8, 0x9a, 0x1f, 0x0d, 0x4b, 0xd9, 0x4a, 0x1d,
-	0x55, 0x9c, 0xe3, 0x5d, 0x21, 0x46, 0x59, 0xec, 0xd2, 0xf0, 0x65, 0xdc, 0xc8, 0x25, 0x6d, 0x3c,
-	0x90, 0x0e, 0x9f, 0x30, 0xaa, 0x0b, 0x71, 0x68, 0x24, 0x5f, 0xe0, 0x0d, 0x90, 0xa1, 0xfd, 0xdb,
-	0xda, 0x20, 0x23, 0xe3, 0x28, 0x4d, 0xfb, 0xb7, 0x95, 0x72, 0x0b, 0xac, 0x48, 0x65, 0xb4, 0xbd,
-	0x41, 0xb3, 0xc9, 0x08, 0x37, 0x81, 0xc4, 0x15, 0x05, 0x4e, 0x6f, 0xd5, 0xaf, 0xa5, 0x02, 0xee,
-	0x82, 0x65, 0xda, 0xdf, 0x9e, 0xf1, 0x47, 0xf6, 0x12, 0xfe, 0x40, 0x05, 0xda, 0xdf, 0x9e, 0xdc,
-	0xf9, 0x5b, 0x20, 0x27, 0xd8, 0x9a, 0x94, 0x7c, 0xdc, 0x23, 0xbe, 0x33, 0x30, 0x17, 0xd7, 0x8d,
-	0xcd, 0x14, 0x5a, 0xa4, 0xfd, 0xed, 0xfb, 0xa1, 0x0c, 0x7e, 0x08, 0xae, 0x51, 0xf2, 0x24, 0xf0,
-	0x7c, 0x19, 0x2a, 0x76, 0x97, 0x50, 0x2f, 0x70, 0x3d, 0xc7, 0xe3, 0x03, 0x33, 0x27, 0x87, 0xdd,
-	0x98, 0x1e, 0x16, 0x49, 0xb8, 0x88, 0x9f, 0x7b, 0xfd, 0x6e, 0xe0, 0x13, 0x9f, 0xa3, 0x55, 0x1a,
-	0xc9, 0x0e, 0x62, 0x02, 0xf8, 0x11, 0x30, 0x35, 0xb7, 0x13, 0xf4, 0x7c, 0x3e, 0x41, 0xbe, 0x24,
-	0xc9, 0x6f, 0x5d, 0x4c, 0x5e, 0x13, 0xf0, 0x88, 0xfd, 0x2a, 0x8d, 0x85, 0xe3, 0xf4, 0x55, 0x00,
-	0xdc, 0x1e, 0x1f, 0xd8, 0xce, 0xc0, 0x69, 0x13, 0x33, 0x7f, 0x31, 0x61, 0xa5, 0xd5, 0xa2, 0xa4,
-	0x85, 0x39, 0x71, 0xeb, 0x3d, 0x3e, 0xa8, 0x09, 0x28, 0xca, 0xb8, 0xe1, 0x23, 0xac, 0x80, 0xb4,
-	0x73, 0x84, 0x7d, 0x9f, 0xb4, 0x99, 0x59, 0x58, 0x9f, 0xdb, 0xcc, 0x6e, 0xbf, 0x38, 0xcd, 0x30,
-	0x71, 0x6c, 0xcb, 0x35, 0x85, 0x46, 0x91, 0x99, 0x38, 0x74, 0x5d, 0xcf, 0x6f, 0xd9, 0xac, 0x1d,
-	0xf0, 0xb1, 0xcd, 0x2e, 0xca, 0xcd, 0x2e, 0x0a, 0xd5, 0x61, 0x3b, 0xe0, 0xf1, 0x8e, 0x3f, 0x06,
-	0xd7, 0x63, 0xfc, 0xb4, 0xab, 0xe1, 0x65, 0x5c, 0xbd, 0x1a, 0x92, 0x4e, 0xfa, 0xfb, 0x65, 0x50,
-	0x68, 0x10, 0xec, 0x04, 0xfe, 0xd8, 0x2c, 0x96, 0xe5, 0x2c, 0xf2, 0x4a, 0x1e, 0xcd, 0x61, 0xed,
-	0x4f, 0x49, 0xb0, 0xa0, 0x57, 0x22, 0xcc, 0x74, 0x82, 0x89, 0xcd, 0x0c, 0x65, 0xa6, 0xe4, 0xf1,
-	0xd4, 0x5f, 0x03, 0x30, 0xca, 0x2f, 0x31, 0x38, 0xa9, 0x56, 0x1a, 0x6a, 0x62, 0xf8, 0x2e, 0x58,
-	0xee, 0x78, 0xfe, 0xcc, 0x1a, 0xe7, 0x2e, 0x15, 0xce, 0x1d, 0xcf, 0x9f, 0x5c, 0x9e, 0x60, 0xc3,
-	0xfd, 0x7f, 0x29, 0x59, 0xa1, 0x42, 0x07, 0xf7, 0x27, 0xd9, 0x5e, 0x04, 0x4b, 0x7a, 0xd5, 0xc4,
-	0xc7, 0x8d, 0x36, 0x71, 0x65, 0x4a, 0x4a, 0xa3, 0x9c, 0x92, 0xde, 0x53, 0xc2, 0xb7, 0x53, 0xdf,
-	0x7c, 0x59, 0x4a, 0xa8, 0xdf, 0x8d, 0x0e, 0x58, 0xba, 0xe7, 0xbb, 0x75, 0xd9, 0xee, 0x54, 0x29,
-	0xf6, 0x5d, 0x78, 0x15, 0x24, 0x3d, 0x57, 0x6e, 0x56, 0xa6, 0x3a, 0x3f, 0x1a, 0x96, 0x92, 0x3b,
-	0x75, 0x94, 0xf4, 0x5c, 0x08, 0x41, 0xca, 0xc7, 0x3a, 0x4d, 0x67, 0x90, 0x7c, 0x86, 0xd7, 0xc1,
-	0x5c, 0x8f, 0xb6, 0xe5, 0xe2, 0x33, 0xd5, 0x85, 0xd1, 0xb0, 0x34, 0xf7, 0x08, 0xed, 0x22, 0x21,
-	0x83, 0x2b, 0xe0, 0x4a, 0x3b, 0x68, 0x05, 0xcc, 0x4c, 0xad, 0xcf, 0x6d, 0x66, 0x90, 0x7a, 0xd9,
-	0x70, 0xc7, 0x86, 0xdb, 0x0b, 0x5c, 0xd2, 0x16, 0x25, 0xa3, 0x21, 0xc6, 0xb5, 0xa3, 0x41, 0x65,
-	0xc9, 0x90, 0x73, 0xd9, 0xa9, 0xa3, 0x05, 0xa9, 0xdc, 0x09, 0xa7, 0x95, 0x7c, 0xea, 0xb4, 0xe6,
-	0xe2, 0x69, 0x6d, 0xfc, 0x3d, 0x09, 0x6e, 0x44, 0xc3, 0x7c, 0x40, 0xa8, 0xa8, 0xd9, 0x3b, 0x71,
-	0x4f, 0x73, 0xe9, 0x31, 0x45, 0x39, 0x13, 0x93, 0xb4, 0xa3, 0x91, 0x55, 0x39, 0x13, 0x32, 0x81,
-	0x93, 0xca, 0x1d, 0x17, 0x3e, 0x06, 0x79, 0xed, 0x25, 0xfb, 0x44, 0x8d, 0xa6, 0xe3, 0x61, 0xed,
-	0x82, 0x73, 0xa7, 0xe7, 0x53, 0x85, 0xa3, 0x61, 0x69, 0x69, 0x37, 0x40, 0xf8, 0x71, 0x65, 0x5f,
-	0xcb, 0xd0, 0x92, 0x86, 0xea, 0x77, 0x88, 0xc1, 0x72, 0x48, 0xdc, 0x3d, 0x1a, 0x44, 0xe4, 0xa9,
-	0x8b, 0xc9, 0x0f, 0xde, 0xfb, 0x4d, 0x48, 0xbe, 0x3a, 0x1a, 0x96, 0x8a, 0x9a, 0x3c, 0x16, 0xa3,
-	0xa2, 0x46, 0x1f, 0x1c, 0x0d, 0xc2, 0x21, 0x5e, 0x06, 0x85, 0x23, 0x4c, 0xdd, 0x53, 0x4c, 0x49,
-	0xc4, 0x7f, 0x45, 0xee, 0x65, 0x3e, 0x94, 0x8f, 0x41, 0x9b, 0x1e, 0xed, 0x4c, 0x40, 0xe7, 0x15,
-	0x34, 0x94, 0x6b, 0xe8, 0xc6, 0x9f, 0x53, 0xa0, 0x30, 0xed, 0x01, 0xf8, 0x2e, 0x98, 0xf3, 0x5c,
-	0x26, 0x77, 0x3c, 0xbb, 0xfd, 0xbf, 0xd3, 0xb3, 0x7f, 0x86, 0xc3, 0xc6, 0x7a, 0x2d, 0xc1, 0x00,
-	0xaf, 0x82, 0xf9, 0xee, 0x51, 0xc0, 0x03, 0x66, 0x26, 0x65, 0x70, 0xe9, 0x37, 0xf8, 0x11, 0x80,
-	0x2e, 0x69, 0xe2, 0x5e, 0x9b, 0xdb, 0xcd, 0x80, 0x76, 0x30, 0x17, 0xd9, 0x4d, 0xf7, 0x72, 0x9b,
-	0x33, 0xae, 0x50, 0x0d, 0xe8, 0x01, 0x1e, 0xb4, 0x03, 0xec, 0xde, 0x8f, 0xf0, 0xd5, 0x94, 0x18,
-	0x0c, 0x15, 0x35, 0x53, 0xac, 0x80, 0x1d, 0x70, 0x35, 0xa4, 0xef, 0x60, 0xc7, 0xee, 0x46, 0x09,
-	0x54, 0x3a, 0x24, 0x3b, 0x7b, 0x5e, 0x27, 0xb2, 0x6c, 0xd5, 0x1c, 0x0d, 0x4b, 0x2b, 0x75, 0x45,
-	0x30, 0xa1, 0x41, 0x2b, 0x9a, 0x76, 0x0f, 0x3b, 0x63, 0xcd, 0xd4, 0x2d, 0x90, 0x13, 0x99, 0x26,
-	0xce, 0x49, 0x57, 0x54, 0xa9, 0xeb, 0x78, 0x71, 0xd2, 0x93, 0x20, 0xdc, 0x1f, 0x03, 0xcd, 0x6b,
-	0x10, 0xee, 0xc7, 0xa0, 0x75, 0xb0, 0xa8, 0x3a, 0x43, 0x4a, 0x18, 0xe1, 0x4c, 0x76, 0x0e, 0x69,
-	0x04, 0x9a, 0x35, 0x9f, 0x23, 0x29, 0x81, 0xef, 0x82, 0x55, 0xd6, 0xeb, 0x76, 0x03, 0xca, 0x99,
-	0x7d, 0x67, 0xdb, 0x6e, 0x78, 0xba, 0x8f, 0x95, 0xfd, 0x42, 0x5a, 0x85, 0xd3, 0xa1, 0x06, 0xdc,
-	0xd9, 0xae, 0x7a, 0xb2, 0xa3, 0x45, 0x45, 0x36, 0x2d, 0x82, 0x77, 0x81, 0xe9, 0x7a, 0x4c, 0xe4,
-	0x19, 0x5b, 0x16, 0x49, 0x3f, 0xf0, 0x1d, 0x62, 0x3b, 0x47, 0xc4, 0x39, 0x96, 0xad, 0x44, 0x1a,
-	0xad, 0x6a, 0xfd, 0x83, 0xc0, 0xf3, 0xf7, 0x85, 0xb6, 0x26, 0x94, 0x3a, 0x1d, 0xfd, 0x61, 0x0e,
-	0x64, 0xf7, 0x2a, 0xb5, 0x43, 0xc2, 0xb9, 0x68, 0xe0, 0xe1, 0x16, 0xc8, 0x86, 0x74, 0xd8, 0xa5,
-	0x32, 0x74, 0xd2, 0xaa, 0x4b, 0xaa, 0x2b, 0x71, 0xa5, 0x8e, 0x10, 0xd0, 0x90, 0x8a, 0x4b, 0xe1,
-	0xab, 0x40, 0xf4, 0x4c, 0x76, 0x07, 0xd3, 0x96, 0xe7, 0xcb, 0x43, 0x9b, 0xab, 0xe6, 0x46, 0xc3,
-	0x52, 0xa6, 0x52, 0x47, 0x7b, 0x52, 0x88, 0x32, 0xd8, 0xa5, 0xea, 0x11, 0xee, 0x82, 0xbc, 0xd3,
-	0xc6, 0x8c, 0xd9, 0x0d, 0xd9, 0x29, 0x04, 0x3d, 0xae, 0xa3, 0xe5, 0x72, 0x1d, 0x71, 0x4e, 0x1a,
-	0x57, 0x1f, 0x2a, 0xd3, 0x98, 0xcd, 0x89, 0xd8, 0x52, 0xcf, 0xcd, 0x56, 0x0b, 0xd9, 0x7e, 0x0b,
-	0xae, 0x31, 0x8e, 0x79, 0x8f, 0xcd, 0x36, 0x31, 0x57, 0x24, 0xeb, 0xf5, 0x19, 0xd6, 0xba, 0xbe,
-	0x3a, 0x2a, 0xd2, 0x2f, 0x04, 0xe9, 0xaa, 0xe2, 0x98, 0xee, 0x62, 0xde, 0x04, 0xa6, 0x26, 0x9f,
-	0xed, 0x62, 0x54, 0x04, 0x5d, 0x55, 0xfa, 0xe9, 0x06, 0x65, 0xe3, 0xb3, 0x79, 0x90, 0x16, 0x1e,
-	0xe2, 0x98, 0x13, 0xf8, 0x01, 0x80, 0x4e, 0x8f, 0x52, 0x22, 0x18, 0xe2, 0xd3, 0x60, 0x5c, 0xe6,
-	0x34, 0xc4, 0x47, 0xba, 0xa8, 0x29, 0xc6, 0x42, 0xff, 0x89, 0x38, 0xc8, 0xcc, 0xa3, 0xc4, 0x1d,
-	0xe7, 0x4d, 0x5e, 0x86, 0xf7, 0xa6, 0xe0, 0x55, 0x27, 0x4d, 0x12, 0x4c, 0x9e, 0xb4, 0xa2, 0xa6,
-	0x1d, 0x1b, 0xeb, 0x4d, 0xb0, 0xa8, 0x6e, 0xfb, 0xb6, 0xdc, 0x7f, 0x9d, 0xb9, 0x57, 0xa7, 0x47,
-	0xa9, 0x09, 0x25, 0xca, 0x2a, 0xa8, 0x7c, 0xb9, 0x28, 0xed, 0xa7, 0xfe, 0x23, 0x69, 0xff, 0x23,
-	0xb0, 0x26, 0x6f, 0x7f, 0xe2, 0x4e, 0xe7, 0xd1, 0x0e, 0x71, 0xed, 0xa8, 0x43, 0xc1, 0x5c, 0xfa,
-	0xe7, 0xd9, 0x31, 0x95, 0x92, 0xf1, 0x74, 0x4d, 0x70, 0xd4, 0x42, 0x8a, 0xba, 0x66, 0xa8, 0x70,
-	0x88, 0xc0, 0x6a, 0xdc, 0xac, 0x8d, 0x7b, 0x7e, 0x41, 0xce, 0xde, 0x9a, 0xa9, 0x2b, 0xba, 0x33,
-	0x53, 0x61, 0x80, 0x96, 0xbb, 0x13, 0xef, 0x2a, 0xa0, 0x08, 0xb8, 0xd9, 0x25, 0xbe, 0x2b, 0x68,
-	0x71, 0xb7, 0xdb, 0xf6, 0x1c, 0x19, 0x88, 0xd1, 0xbc, 0xf5, 0x45, 0x73, 0xb6, 0x93, 0x8d, 0xb1,
-	0xe1, 0x04, 0xd1, 0x9a, 0x26, 0xba, 0x40, 0x07, 0xef, 0x81, 0xc2, 0xc7, 0x3d, 0xd2, 0x23, 0xae,
-	0x48, 0x65, 0xdd, 0xc0, 0x67, 0x84, 0x99, 0x19, 0xd9, 0xe2, 0x5e, 0xb4, 0xe7, 0xb5, 0xa0, 0xd3,
-	0xc1, 0xbe, 0x8b, 0xf2, 0xca, 0x06, 0x85, 0x26, 0x82, 0x26, 0x9c, 0xad, 0x4c, 0x92, 0x8c, 0x33,
-	0x13, 0xfc, 0x73, 0x1a, 0x6d, 0x83, 0xb4, 0x89, 0xce, 0x59, 0xbf, 0xcb, 0x83, 0x4c, 0x54, 0xbc,
-	0xe0, 0x3b, 0xe3, 0x45, 0xee, 0x85, 0xa7, 0x16, 0xb9, 0x67, 0x54, 0xb7, 0x0f, 0x40, 0x56, 0x87,
-	0x93, 0x2d, 0x98, 0x92, 0xff, 0x4e, 0xb9, 0x04, 0x27, 0xa1, 0x96, 0xc1, 0xff, 0x03, 0x19, 0x1a,
-	0x04, 0xdc, 0x1e, 0xfb, 0xc0, 0x61, 0xce, 0x5c, 0x55, 0x82, 0x80, 0xbf, 0x4f, 0x06, 0x0c, 0xa5,
-	0xa9, 0x7e, 0x82, 0xfb, 0xe0, 0xaa, 0xfe, 0x8c, 0x62, 0x33, 0x42, 0x4f, 0x08, 0x95, 0x9f, 0x5d,
-	0x08, 0x53, 0x55, 0x2f, 0xa3, 0xca, 0xda, 0xbe, 0x42, 0x1c, 0x4a, 0x40, 0x45, 0xe9, 0xd1, 0x8a,
-	0x7f, 0x81, 0x14, 0x7e, 0x08, 0xd6, 0xc6, 0x23, 0x64, 0x8a, 0x53, 0xb6, 0x1e, 0xd5, 0x9b, 0xa3,
-	0x61, 0xc9, 0x1c, 0xf3, 0xff, 0x24, 0xaf, 0x89, 0x9f, 0xa2, 0x81, 0xbf, 0x02, 0xc5, 0xa8, 0x12,
-	0xda, 0xdd, 0x36, 0x16, 0x3b, 0xa8, 0x5a, 0x14, 0x75, 0x2d, 0x8f, 0x4a, 0xe2, 0x41, 0x1b, 0xfb,
-	0x3b, 0x75, 0x94, 0x6f, 0x4e, 0x08, 0x5c, 0x78, 0x08, 0x16, 0x45, 0x69, 0x67, 0xba, 0xfe, 0xc8,
-	0x13, 0x71, 0xc1, 0x77, 0xa0, 0xb1, 0x12, 0x55, 0x5d, 0xd6, 0x09, 0x67, 0xbc, 0x6e, 0xa1, 0x6c,
-	0x07, 0x3b, 0x51, 0x11, 0xab, 0x81, 0x8c, 0x24, 0x15, 0x29, 0x53, 0x1f, 0x04, 0xf3, 0x22, 0x46,
-	0xa1, 0xaf, 0x2e, 0x8e, 0x86, 0xa5, 0x28, 0xc1, 0xa2, 0xb4, 0xe0, 0x91, 0xa9, 0xf6, 0x16, 0xc8,
-	0x45, 0x15, 0x5a, 0x54, 0x56, 0x5d, 0x4d, 0x17, 0x43, 0xa1, 0x28, 0xa7, 0xf0, 0x36, 0x58, 0x60,
-	0xea, 0x13, 0x95, 0xbc, 0x8f, 0x67, 0xb7, 0xaf, 0x3d, 0xe5, 0x0b, 0x16, 0x0a, 0x71, 0xb0, 0x0a,
-	0x0a, 0xfa, 0xd1, 0x6e, 0xe2, 0x76, 0xbb, 0x81, 0x9d, 0x63, 0x79, 0x37, 0x7f, 0x86, 0x6d, 0x5e,
-	0x1b, 0xdc, 0xd7, 0x78, 0xf8, 0x02, 0x58, 0x92, 0xf9, 0xca, 0x25, 0x27, 0xaa, 0xe0, 0xcb, 0x5b,
-	0x79, 0x0e, 0x2d, 0x0a, 0x69, 0x9d, 0x9c, 0xc8, 0x32, 0x0f, 0x5f, 0x02, 0xf9, 0x1e, 0x23, 0x6e,
-	0x8c, 0x62, 0x66, 0x6e, 0x7d, 0x6e, 0x33, 0x87, 0x72, 0x42, 0x1c, 0xc2, 0x44, 0x77, 0x9e, 0x97,
-	0x6c, 0x71, 0xff, 0x20, 0x2f, 0xd6, 0xfa, 0xcb, 0x57, 0xd4, 0x36, 0xc0, 0x4d, 0x50, 0x90, 0x7c,
-	0x31, 0x8e, 0x99, 0x79, 0x49, 0xb8, 0x24, 0xe4, 0x11, 0x90, 0xc1, 0xbb, 0x9a, 0x91, 0x3e, 0xd1,
-	0xe5, 0xee, 0x75, 0xb3, 0x20, 0x3b, 0x83, 0xc2, 0x68, 0x58, 0x5a, 0xdc, 0x27, 0x7d, 0x8e, 0x1e,
-	0xc8, 0x42, 0xf7, 0xba, 0x9a, 0x32, 0x7a, 0xa2, 0xde, 0x66, 0x0d, 0x6f, 0xcb, 0x2b, 0xf0, 0xac,
-	0xe1, 0xed, 0x09, 0xc3, 0xdb, 0xf0, 0x0d, 0x90, 0x6e, 0x07, 0x2a, 0x42, 0xe5, 0xf5, 0xf7, 0x02,
-	0x8f, 0xef, 0x6a, 0x3d, 0x8a, 0x90, 0xf0, 0x81, 0xde, 0x47, 0x5d, 0x9a, 0x31, 0x97, 0x57, 0xdd,
-	0xcb, 0xf6, 0x0f, 0x72, 0x06, 0x87, 0xd2, 0xb4, 0xc2, 0xe1, 0x2b, 0xfa, 0x0b, 0x62, 0xc8, 0xd5,
-	0xe4, 0x84, 0x9a, 0x2b, 0xea, 0x0a, 0x3c, 0x06, 0x14, 0x62, 0x71, 0x05, 0x6e, 0xc8, 0x1e, 0x77,
-	0x20, 0xca, 0x81, 0x43, 0x7c, 0x8e, 0x5b, 0xc4, 0x5c, 0x5d, 0x37, 0x36, 0x93, 0xa8, 0xa8, 0x35,
-	0x07, 0x91, 0x02, 0xfe, 0x0f, 0xc8, 0x47, 0xf5, 0x48, 0x37, 0x5a, 0x57, 0xd7, 0x8d, 0xcd, 0x2b,
-	0x68, 0x29, 0x14, 0xeb, 0xf6, 0xaa, 0x0e, 0x96, 0x28, 0x11, 0x56, 0xb6, 0xba, 0x80, 0x32, 0xf3,
-	0x9a, 0x4c, 0xb2, 0x33, 0x25, 0xfc, 0x91, 0x54, 0xeb, 0x8e, 0x1c, 0xe5, 0x94, 0x91, 0x12, 0x32,
-	0xf8, 0x00, 0x14, 0x34, 0x4b, 0x48, 0xcf, 0x4c, 0x53, 0xf2, 0x94, 0x66, 0x2e, 0xc8, 0xe1, 0xf8,
-	0x9a, 0x29, 0xaf, 0x0c, 0x43, 0x31, 0x13, 0x65, 0x4a, 0xd7, 0x8f, 0x8b, 0xaa, 0x14, 0x33, 0xaf,
-	0x4b, 0xde, 0xcb, 0x95, 0x29, 0x45, 0x74, 0x81, 0x8a, 0x41, 0x04, 0xc0, 0xd8, 0x05, 0x64, 0xed,
-	0x39, 0x2f, 0x20, 0x63, 0xe9, 0x3b, 0x66, 0x81, 0x77, 0x01, 0xc0, 0x9c, 0x53, 0xaf, 0xd1, 0xe3,
-	0x84, 0x99, 0x37, 0xf4, 0x11, 0x9d, 0x0e, 0x8c, 0x43, 0xf9, 0xed, 0x1f, 0x8d, 0x41, 0xe1, 0x2e,
-	0x28, 0xea, 0x20, 0xe8, 0x75, 0x5d, 0xac, 0x3f, 0xfc, 0xde, 0xbc, 0x64, 0x13, 0x91, 0x57, 0xa6,
-	0x8f, 0x94, 0x65, 0x85, 0xc3, 0x1a, 0x00, 0x0e, 0x25, 0x21, 0x0d, 0x7e, 0x9e, 0xef, 0xc7, 0xda,
-	0x4e, 0x91, 0x8c, 0xcd, 0xa5, 0xf1, 0x3c, 0x24, 0xbd, 0x70, 0x26, 0xaa, 0xfa, 0x3e, 0x48, 0xa5,
-	0x9d, 0x82, 0xbb, 0xf1, 0x1e, 0x00, 0x51, 0x41, 0x64, 0xf0, 0x6d, 0x90, 0x8d, 0xff, 0xc4, 0x11,
-	0xb5, 0x78, 0x4e, 0xb6, 0xcb, 0x4f, 0xab, 0xa0, 0x08, 0x90, 0xc8, 0x76, 0xe3, 0xf7, 0x06, 0x28,
-	0x1c, 0x12, 0xae, 0x35, 0xaa, 0xd2, 0xc3, 0xbb, 0x60, 0x5e, 0x91, 0xe9, 0xba, 0xfe, 0x74, 0x2e,
-	0x7d, 0x7b, 0xd4, 0x70, 0xf8, 0x16, 0x00, 0xf1, 0xff, 0x35, 0xba, 0x94, 0xcf, 0x2e, 0xf4, 0xbe,
-	0x80, 0xec, 0x61, 0x76, 0x8c, 0x32, 0xcd, 0xf0, 0xb1, 0xfa, 0x47, 0xe3, 0xbb, 0x33, 0xcb, 0xf8,
-	0xfe, 0xcc, 0x32, 0x7e, 0x38, 0xb3, 0x12, 0x3f, 0x9e, 0x59, 0x89, 0x9f, 0xce, 0xac, 0xc4, 0xcf,
-	0x67, 0x56, 0xe2, 0x97, 0x33, 0xcb, 0xf8, 0x64, 0x64, 0x19, 0x9f, 0x8e, 0xac, 0xc4, 0x57, 0x23,
-	0xcb, 0xf8, 0x7a, 0x64, 0x25, 0xbe, 0x19, 0x59, 0x89, 0x6f, 0x47, 0x56, 0xe2, 0xbb, 0x91, 0x65,
-	0x7c, 0x3f, 0xb2, 0x8c, 0x1f, 0x46, 0x56, 0xe2, 0xc7, 0x91, 0x65, 0xfc, 0x34, 0xb2, 0x12, 0x3f,
-	0x8f, 0x2c, 0xe3, 0x97, 0x91, 0x95, 0xf8, 0xe4, 0xdc, 0x4a, 0x7c, 0x7a, 0x6e, 0x19, 0x9f, 0x9f,
-	0x5b, 0x89, 0x2f, 0xce, 0x2d, 0xe3, 0xcb, 0x73, 0x2b, 0xf1, 0xd5, 0xb9, 0x95, 0xf8, 0xfa, 0xdc,
-	0x32, 0xbe, 0x39, 0xb7, 0x8c, 0x6f, 0xcf, 0x2d, 0xe3, 0xc3, 0x57, 0x2f, 0xfb, 0x07, 0x0a, 0xf7,
-	0xbb, 0x8d, 0xc6, 0xbc, 0x5c, 0xc3, 0x9d, 0x7f, 0x04, 0x00, 0x00, 0xff, 0xff, 0xd4, 0x90, 0xc8,
-	0xa4, 0x47, 0x1b, 0x00, 0x00,
+var fileDescriptor_end_device_b404642f60074a6c = []byte{
+	// 2934 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x59, 0x4d, 0x70, 0x1b, 0x45,
+	0xf6, 0xd7, 0x58, 0x8e, 0x2d, 0xb5, 0xac, 0x0f, 0xb7, 0xed, 0x64, 0xe2, 0x84, 0x91, 0x71, 0x20,
+	0x08, 0xfe, 0x44, 0x21, 0xce, 0x7f, 0x0b, 0x96, 0xdd, 0x2d, 0x90, 0xac, 0x04, 0x1c, 0x9c, 0xe0,
+	0xea, 0x24, 0xa4, 0x60, 0x8b, 0x9a, 0x6a, 0x6b, 0x5a, 0xf2, 0x60, 0x69, 0x46, 0x74, 0xb7, 0x1c,
+	0xe9, 0xc6, 0x91, 0xc3, 0x56, 0x2d, 0x7b, 0xe3, 0xb2, 0x55, 0xd4, 0x9e, 0x38, 0xec, 0x81, 0xda,
+	0xbd, 0x70, 0xa4, 0x6a, 0x2f, 0x1c, 0x39, 0x52, 0x7b, 0x10, 0x78, 0x7c, 0xe1, 0x48, 0xd5, 0x5e,
+	0x38, 0x6e, 0xf5, 0xc7, 0x7c, 0xc8, 0x92, 0xb3, 0x4e, 0x16, 0xf6, 0xe2, 0xd2, 0xbc, 0xf7, 0x7b,
+	0xbf, 0x7e, 0xdd, 0xfd, 0xba, 0xfb, 0xd7, 0x6d, 0xb0, 0xde, 0xf1, 0x29, 0x7e, 0x88, 0xbd, 0x2b,
+	0x8c, 0xe3, 0xe6, 0xfe, 0x55, 0xdc, 0x73, 0xaf, 0x12, 0xcf, 0xb1, 0x1d, 0x72, 0xe0, 0x36, 0x49,
+	0xb5, 0x47, 0x7d, 0xee, 0xc3, 0x02, 0xe7, 0x5e, 0x55, 0xe3, 0xaa, 0x07, 0xd7, 0x57, 0xaf, 0xb4,
+	0x5d, 0xbe, 0xd7, 0xdf, 0xad, 0x36, 0xfd, 0xee, 0xd5, 0xb6, 0xdf, 0xf6, 0xaf, 0x4a, 0xd8, 0x6e,
+	0xbf, 0x25, 0xbf, 0xe4, 0x87, 0xfc, 0xa5, 0xc2, 0x57, 0x2f, 0xb6, 0x7d, 0xbf, 0xdd, 0x21, 0x92,
+	0x1b, 0x7b, 0x9e, 0xcf, 0x31, 0x77, 0x7d, 0x8f, 0x69, 0xaf, 0xa5, 0xbd, 0x11, 0x87, 0xd3, 0xa7,
+	0x12, 0xa0, 0xfd, 0x6b, 0xc7, 0xfd, 0x2d, 0x97, 0x74, 0x1c, 0xbb, 0x8b, 0xd9, 0xbe, 0x46, 0x94,
+	0x8f, 0x23, 0xb8, 0xdb, 0x25, 0x8c, 0xe3, 0x6e, 0x4f, 0x03, 0x2e, 0x4d, 0xf6, 0xd1, 0x75, 0x88,
+	0xc7, 0xdd, 0x96, 0x4b, 0x68, 0x98, 0xc7, 0xc5, 0x49, 0xd0, 0x3e, 0x19, 0x86, 0xde, 0xf2, 0xa4,
+	0x37, 0x1c, 0x10, 0x9d, 0xe6, 0x24, 0xa0, 0x4b, 0x18, 0xc3, 0x6d, 0xc2, 0x1e, 0x85, 0xe0, 0xd8,
+	0xc1, 0x1c, 0x2b, 0xc4, 0xfa, 0x1f, 0xd3, 0x60, 0xfe, 0x2e, 0x61, 0xcc, 0xf5, 0x3d, 0xf8, 0x00,
+	0x64, 0x1c, 0x72, 0x60, 0x63, 0xc7, 0xa1, 0xe6, 0xcc, 0x9a, 0x51, 0x59, 0xa8, 0xff, 0xf6, 0xeb,
+	0x51, 0x39, 0xf5, 0xcf, 0x51, 0xf9, 0xff, 0xdb, 0x7e, 0x95, 0xef, 0x11, 0xbe, 0xe7, 0x7a, 0x6d,
+	0x56, 0xf5, 0x08, 0x7f, 0xe8, 0xd3, 0xfd, 0xab, 0xe3, 0xe4, 0xbd, 0xfd, 0xf6, 0x55, 0x3e, 0xec,
+	0x11, 0x56, 0x6d, 0x90, 0x83, 0x9a, 0xe3, 0x50, 0x34, 0xef, 0xa8, 0x1f, 0xf0, 0xd7, 0x60, 0x56,
+	0xf4, 0xcb, 0x4c, 0xaf, 0x19, 0x95, 0xdc, 0xc6, 0x85, 0xea, 0xf8, 0xdc, 0x56, 0x75, 0xfb, 0x6f,
+	0x91, 0x21, 0xab, 0x67, 0x44, 0x8b, 0xdf, 0x8c, 0xca, 0x06, 0x92, 0x21, 0xf0, 0x69, 0x90, 0xf7,
+	0xc8, 0x80, 0xdb, 0x2d, 0xbb, 0xe9, 0x71, 0xbb, 0xdf, 0x33, 0x67, 0xd7, 0x8c, 0x4a, 0x1e, 0x01,
+	0x61, 0xbc, 0xb9, 0xe9, 0xf1, 0xfb, 0x3d, 0x58, 0x01, 0x8b, 0x12, 0xe2, 0x69, 0x90, 0xe3, 0x3f,
+	0xf4, 0xcc, 0x33, 0x12, 0x26, 0x63, 0xef, 0x08, 0x5c, 0xc3, 0x7f, 0xe8, 0x45, 0x48, 0x9c, 0x44,
+	0xce, 0xc5, 0xc8, 0x5a, 0x84, 0xac, 0x82, 0xe5, 0x0e, 0x66, 0xdc, 0x6e, 0xfa, 0x5e, 0x2b, 0x09,
+	0x9e, 0x97, 0xe0, 0x92, 0xf0, 0x6d, 0xfa, 0x5e, 0x2b, 0xc2, 0x6f, 0x02, 0xc0, 0x38, 0xa6, 0x9c,
+	0x38, 0x36, 0xe6, 0x66, 0x46, 0xf6, 0x73, 0xb5, 0xaa, 0x8a, 0xa4, 0x1a, 0x16, 0x49, 0xf5, 0x5e,
+	0x58, 0x24, 0xaa, 0x9b, 0x9f, 0x7c, 0x57, 0x36, 0x50, 0x56, 0xc7, 0xd5, 0xf8, 0xad, 0xd9, 0x8c,
+	0x51, 0x9a, 0x59, 0xff, 0x5b, 0x0e, 0xe4, 0x6f, 0xd7, 0x36, 0x77, 0x30, 0xc5, 0x5d, 0xc2, 0x09,
+	0x65, 0xf0, 0x32, 0xc8, 0x74, 0xf1, 0xc0, 0x26, 0x2e, 0xed, 0x99, 0xc6, 0x9a, 0x51, 0x99, 0xa9,
+	0xe7, 0x82, 0x51, 0x79, 0xfe, 0x36, 0x1e, 0xdc, 0xd8, 0x42, 0x3b, 0x68, 0xbe, 0x8b, 0x07, 0x37,
+	0x5c, 0xda, 0x83, 0x2f, 0x80, 0xc5, 0x7e, 0xaf, 0xe3, 0x7a, 0xfb, 0xb6, 0xf3, 0x90, 0x74, 0x3a,
+	0xb6, 0xa8, 0x49, 0x39, 0x91, 0x19, 0x54, 0x54, 0x8e, 0x86, 0xb0, 0x8b, 0x2c, 0x60, 0x15, 0x2c,
+	0x89, 0x0e, 0x1d, 0x47, 0xa7, 0x25, 0x7a, 0x31, 0x74, 0xc5, 0xf8, 0x5d, 0xb0, 0x84, 0x1d, 0x6a,
+	0x8b, 0xca, 0xb1, 0x29, 0xe6, 0xc4, 0x76, 0x3d, 0x87, 0x0c, 0xe4, 0x6c, 0x14, 0x36, 0x9e, 0x3a,
+	0x3e, 0xa3, 0x0d, 0xcc, 0x31, 0xc2, 0x9c, 0x6c, 0x09, 0x50, 0x7d, 0x39, 0x18, 0x95, 0x4b, 0xb5,
+	0x06, 0x1a, 0xb3, 0xa2, 0x12, 0x76, 0xe8, 0x98, 0x05, 0xbe, 0x0e, 0xa0, 0x68, 0x83, 0x0f, 0xec,
+	0x9e, 0xff, 0x90, 0x50, 0xdd, 0x84, 0x9c, 0xc9, 0xfa, 0x52, 0x30, 0x2a, 0x17, 0x6b, 0x0d, 0x74,
+	0x6f, 0xb0, 0x23, 0x7c, 0x8a, 0xa2, 0x88, 0x1d, 0x9a, 0x34, 0xc0, 0x97, 0xc0, 0x82, 0x60, 0xf0,
+	0x76, 0x6d, 0x4e, 0xb1, 0xc7, 0xd4, 0xdc, 0xd6, 0x0b, 0xc1, 0xa8, 0x0c, 0x6a, 0x0d, 0x74, 0x67,
+	0xf7, 0x9e, 0xb0, 0x22, 0x80, 0x1d, 0xaa, 0x7f, 0xc3, 0xeb, 0x20, 0x2f, 0x22, 0x70, 0x73, 0xdf,
+	0xee, 0xb8, 0x5d, 0x97, 0xab, 0x19, 0xae, 0x17, 0x83, 0x51, 0x39, 0x57, 0x6b, 0xa0, 0x5a, 0x73,
+	0x7f, 0x5b, 0x98, 0x51, 0x0e, 0x3b, 0x34, 0xfc, 0x48, 0x06, 0x39, 0xa4, 0x83, 0x87, 0x72, 0xc2,
+	0xc7, 0x82, 0x1a, 0xc2, 0x1c, 0x06, 0xc9, 0x0f, 0x78, 0x01, 0x64, 0xe9, 0xe0, 0x9a, 0x0e, 0xc8,
+	0xca, 0x3a, 0xca, 0xd0, 0xc1, 0x35, 0xe5, 0xbc, 0x0a, 0x96, 0xa5, 0x33, 0x1a, 0x5e, 0xbf, 0xd5,
+	0x62, 0x84, 0x9b, 0x40, 0xe2, 0x16, 0x05, 0x4e, 0x0f, 0xd5, 0xdb, 0xd2, 0x01, 0xb7, 0xc1, 0x12,
+	0x1d, 0x6c, 0x4c, 0xcc, 0x47, 0xee, 0x14, 0xf3, 0x81, 0x4a, 0x74, 0xb0, 0x31, 0x3e, 0xf2, 0x97,
+	0x40, 0x5e, 0xb0, 0xb5, 0x28, 0xf9, 0xb0, 0x4f, 0xbc, 0xe6, 0xd0, 0x5c, 0x58, 0x33, 0x2a, 0xb3,
+	0x68, 0x81, 0x0e, 0x36, 0x6e, 0x86, 0x36, 0xf8, 0x1e, 0x38, 0x47, 0xc9, 0x07, 0xbe, 0xeb, 0xc9,
+	0x52, 0xb1, 0x7b, 0x84, 0xba, 0xbe, 0xe3, 0x36, 0x5d, 0x3e, 0x34, 0xf3, 0xb2, 0xd9, 0xf5, 0xe3,
+	0xcd, 0x22, 0x09, 0x17, 0xf5, 0x73, 0x63, 0xd0, 0xf3, 0x3d, 0xe2, 0x71, 0xb4, 0x42, 0x23, 0xdb,
+	0x4e, 0x4c, 0x00, 0xdf, 0x07, 0xa6, 0xe6, 0x6e, 0xfa, 0x7d, 0x8f, 0x8f, 0x91, 0x17, 0x24, 0xf9,
+	0xa5, 0xe9, 0xe4, 0x9b, 0x02, 0x1e, 0xb1, 0x9f, 0xa5, 0xb1, 0x31, 0x49, 0x5f, 0x07, 0xc0, 0xe9,
+	0xf3, 0xa1, 0xdd, 0x1c, 0x36, 0x3b, 0xc4, 0x2c, 0x4e, 0x27, 0xac, 0xb5, 0xdb, 0x94, 0xb4, 0x31,
+	0x27, 0x4e, 0xa3, 0xcf, 0x87, 0x9b, 0x02, 0x8a, 0xb2, 0x4e, 0xf8, 0x13, 0xd6, 0x40, 0xa6, 0xb9,
+	0x87, 0x3d, 0x8f, 0x74, 0x98, 0x59, 0x5a, 0x4b, 0x57, 0x72, 0x1b, 0xcf, 0x1e, 0x67, 0x18, 0x5b,
+	0xb6, 0xd5, 0x4d, 0x85, 0x46, 0x51, 0x98, 0x58, 0x74, 0x3d, 0xd7, 0x6b, 0xdb, 0xac, 0xe3, 0xf3,
+	0xc4, 0x60, 0x2f, 0xca, 0xc1, 0x5e, 0x14, 0xae, 0xbb, 0x1d, 0x9f, 0xc7, 0x23, 0xfe, 0x00, 0x9c,
+	0x8f, 0xf1, 0xc7, 0xa7, 0x1a, 0x9e, 0x66, 0xaa, 0x57, 0x42, 0xd2, 0xf1, 0xf9, 0x7e, 0x1e, 0x94,
+	0x76, 0x09, 0x6e, 0xfa, 0x5e, 0x22, 0x8b, 0x25, 0x99, 0x45, 0x51, 0xd9, 0xa3, 0x1c, 0x56, 0xff,
+	0x3c, 0x03, 0xe6, 0x75, 0x4f, 0x44, 0x98, 0xde, 0x60, 0xe2, 0x30, 0x43, 0x85, 0x29, 0x7b, 0x9c,
+	0xfa, 0x15, 0x00, 0xa3, 0xfd, 0x25, 0x06, 0xcf, 0xa8, 0x9e, 0x86, 0x9e, 0x18, 0xbe, 0x0d, 0x96,
+	0xba, 0xae, 0x37, 0xd1, 0xc7, 0xf4, 0xa9, 0xca, 0xb9, 0xeb, 0x7a, 0xe3, 0xdd, 0x13, 0x6c, 0x78,
+	0xf0, 0x44, 0x9b, 0x15, 0x2a, 0x75, 0xf1, 0x60, 0x9c, 0xed, 0x2c, 0x98, 0x13, 0x27, 0x3f, 0x71,
+	0xe4, 0x56, 0x94, 0x41, 0xfa, 0xeb, 0xd5, 0xd9, 0x2f, 0x3f, 0x2b, 0xa7, 0xd4, 0xdf, 0xf5, 0x2e,
+	0x28, 0xdc, 0xf0, 0x9c, 0x86, 0x54, 0x30, 0x75, 0x8a, 0x3d, 0x07, 0x9e, 0x05, 0x33, 0xae, 0x23,
+	0x47, 0x27, 0x5b, 0x9f, 0x0b, 0x46, 0xe5, 0x99, 0xad, 0x06, 0x9a, 0x71, 0x1d, 0x08, 0xc1, 0xac,
+	0x87, 0xf5, 0xbe, 0x9c, 0x45, 0xf2, 0x37, 0x3c, 0x0f, 0xd2, 0x7d, 0xda, 0x91, 0xbd, 0xcd, 0xd6,
+	0xe7, 0x83, 0x51, 0x39, 0x7d, 0x1f, 0x6d, 0x23, 0x61, 0x83, 0xcb, 0xe0, 0x4c, 0xc7, 0x6f, 0xfb,
+	0xcc, 0x9c, 0x5d, 0x4b, 0x57, 0xb2, 0x48, 0x7d, 0xac, 0x3b, 0x89, 0xe6, 0x6e, 0xfb, 0x0e, 0xe9,
+	0x88, 0x33, 0x62, 0x57, 0xb4, 0x6b, 0x47, 0x8d, 0xca, 0x33, 0x42, 0xe6, 0xb2, 0xd5, 0x40, 0xf3,
+	0xd2, 0xb9, 0x15, 0xa6, 0x35, 0x73, 0x62, 0x5a, 0xe9, 0x38, 0xad, 0xf5, 0x7f, 0x18, 0xe0, 0x42,
+	0xd4, 0xcc, 0x3b, 0x84, 0x8a, 0x43, 0x7a, 0x2b, 0x16, 0x31, 0xa7, 0x6e, 0x53, 0x9c, 0x5f, 0x22,
+	0x49, 0x3b, 0x6a, 0x59, 0x9d, 0x5f, 0xc2, 0x26, 0x70, 0xd2, 0xb9, 0xe5, 0x88, 0xf2, 0xda, 0xc3,
+	0xd4, 0x79, 0x88, 0x29, 0xb1, 0x0f, 0x54, 0x73, 0x3a, 0x9f, 0x62, 0x68, 0xd7, 0x59, 0x08, 0x68,
+	0xcb, 0xa5, 0xdd, 0x31, 0xe8, 0xac, 0x82, 0x86, 0x76, 0x0d, 0x5d, 0xff, 0x6a, 0x0e, 0x94, 0x8e,
+	0xf7, 0x02, 0xbe, 0x01, 0xd2, 0xae, 0xc3, 0x64, 0xd6, 0xb9, 0x8d, 0xff, 0x3b, 0x5e, 0x11, 0x8f,
+	0xe8, 0x74, 0x42, 0xa0, 0x08, 0x06, 0xf8, 0x00, 0x14, 0x75, 0x60, 0x94, 0xc7, 0x8c, 0x2c, 0xb3,
+	0xd5, 0x29, 0x9b, 0x83, 0xa6, 0xab, 0xc3, 0x60, 0x54, 0x2e, 0x6c, 0xfb, 0x08, 0x3f, 0xa8, 0xdd,
+	0xd1, 0x36, 0x54, 0xd0, 0xd0, 0x30, 0x43, 0x0c, 0x96, 0x42, 0xe2, 0xde, 0xde, 0x70, 0x6c, 0x3c,
+	0xa6, 0x90, 0xef, 0xbc, 0xf9, 0x6e, 0x48, 0xbe, 0x12, 0x8c, 0xca, 0x8b, 0x9a, 0x3c, 0x36, 0xa3,
+	0x45, 0x8d, 0xde, 0xd9, 0x1b, 0x86, 0x4d, 0xbc, 0x06, 0x16, 0xa3, 0xa5, 0x69, 0xf7, 0x3a, 0xd8,
+	0x13, 0x13, 0x24, 0x47, 0x51, 0x1d, 0xb7, 0xd1, 0xf2, 0xdc, 0xe9, 0x60, 0x6f, 0xab, 0x81, 0x8a,
+	0xad, 0x31, 0x83, 0x28, 0xa6, 0xb9, 0xde, 0x9e, 0xcf, 0x7d, 0x66, 0x9e, 0x91, 0xd5, 0xa9, 0xbf,
+	0x60, 0x17, 0x9c, 0x75, 0x48, 0x0b, 0xf7, 0x3b, 0xdc, 0xee, 0xe2, 0xa6, 0xdd, 0x8b, 0xf6, 0x44,
+	0x79, 0x20, 0xe7, 0x26, 0x97, 0xe0, 0xd8, 0xc6, 0x59, 0x37, 0x83, 0x51, 0x79, 0xb9, 0xa1, 0x08,
+	0xc6, 0x3c, 0x68, 0x59, 0xd3, 0xde, 0xc6, 0xcd, 0x84, 0x3e, 0xba, 0x04, 0xf2, 0x62, 0xf3, 0x88,
+	0xb7, 0x99, 0x79, 0x75, 0x7a, 0x75, 0xdd, 0x78, 0x1f, 0x93, 0x20, 0x3c, 0x48, 0x80, 0x32, 0x1a,
+	0x84, 0x07, 0x31, 0x68, 0x0d, 0x2c, 0x50, 0xc2, 0x08, 0x67, 0x4a, 0xf3, 0xc9, 0x63, 0x3a, 0x83,
+	0x80, 0xb2, 0x09, 0xb1, 0x07, 0x7f, 0x03, 0x16, 0xfb, 0x8c, 0x30, 0xfb, 0xfa, 0x86, 0xbd, 0xeb,
+	0x6a, 0x59, 0x2a, 0x4f, 0xe9, 0x4c, 0x7d, 0x31, 0x18, 0x95, 0xf3, 0xf7, 0x19, 0x61, 0xd7, 0x37,
+	0xea, 0xae, 0x14, 0xa7, 0x28, 0xdf, 0x4f, 0x7e, 0x8a, 0x1c, 0x58, 0xbf, 0xd7, 0xf3, 0x29, 0x67,
+	0xb6, 0x38, 0xa7, 0xe4, 0x71, 0x9d, 0x41, 0x0b, 0xa1, 0xf1, 0x96, 0xef, 0x7a, 0xf0, 0x45, 0x00,
+	0x75, 0x0e, 0xf2, 0x3c, 0xf4, 0x7c, 0xaf, 0x49, 0x98, 0x3c, 0x90, 0x33, 0xa8, 0xa4, 0x3c, 0x02,
+	0x77, 0x47, 0xda, 0xe1, 0xfb, 0x00, 0x86, 0x43, 0xdd, 0xf2, 0x69, 0x17, 0x73, 0x39, 0xcc, 0x79,
+	0x39, 0xcc, 0x95, 0x89, 0x61, 0x56, 0xb7, 0x83, 0x1d, 0x3c, 0xec, 0xf8, 0xd8, 0xb9, 0x19, 0xe1,
+	0xeb, 0xb3, 0xa2, 0xa8, 0xd1, 0xa2, 0x66, 0x8a, 0x1d, 0x7a, 0x77, 0xfb, 0x53, 0x1a, 0xe4, 0x6e,
+	0xd7, 0x36, 0xef, 0x12, 0xce, 0xc5, 0x05, 0x00, 0x5e, 0x02, 0xf3, 0x7d, 0x46, 0x6c, 0xec, 0x50,
+	0xb9, 0x82, 0x32, 0x75, 0x10, 0x8c, 0xca, 0x73, 0xf7, 0x19, 0xa9, 0x35, 0x10, 0x9a, 0xeb, 0x33,
+	0x52, 0x73, 0x28, 0x7c, 0x11, 0x08, 0x9d, 0x65, 0x77, 0x31, 0x6d, 0xbb, 0x6a, 0x51, 0xe4, 0xeb,
+	0xf9, 0x60, 0x54, 0xce, 0xd6, 0x1a, 0xe8, 0xb6, 0x34, 0xa2, 0x2c, 0x76, 0xa8, 0xfa, 0x09, 0xdf,
+	0x02, 0xc5, 0x66, 0x07, 0x33, 0x66, 0xef, 0x4a, 0x75, 0xe1, 0xf7, 0xb9, 0xbe, 0x2d, 0x9c, 0x9f,
+	0x50, 0xd1, 0x0d, 0x7d, 0x59, 0x53, 0x4b, 0xf1, 0x53, 0x21, 0xa2, 0xf3, 0x32, 0xb6, 0x7e, 0x4f,
+	0x45, 0xc6, 0x64, 0xcd, 0x88, 0x6c, 0xf6, 0x71, 0xc9, 0x36, 0x43, 0xb2, 0xdf, 0x83, 0x73, 0x8c,
+	0x63, 0xde, 0x67, 0x93, 0xb2, 0xe7, 0xcc, 0xe9, 0x49, 0x57, 0x14, 0xc7, 0x71, 0xdd, 0xf3, 0x0a,
+	0x30, 0x35, 0xf9, 0xa4, 0xee, 0x99, 0x93, 0x05, 0x7a, 0x56, 0xf9, 0x8f, 0x4b, 0x9a, 0xf5, 0x7f,
+	0x9d, 0x01, 0x19, 0x31, 0x27, 0x1c, 0x73, 0x02, 0x11, 0x80, 0xcd, 0x3e, 0xa5, 0x44, 0x30, 0xc4,
+	0x8b, 0xcd, 0x38, 0xcd, 0x62, 0xd3, 0x53, 0xaf, 0xc3, 0x13, 0xab, 0x0a, 0x89, 0xca, 0x62, 0x2e,
+	0x25, 0x4e, 0x92, 0x73, 0xe6, 0x31, 0x38, 0x75, 0x78, 0x82, 0xf3, 0x15, 0xb0, 0xa0, 0x6e, 0xf9,
+	0xb6, 0x1c, 0x63, 0xbd, 0x9b, 0xad, 0x1c, 0x67, 0xdb, 0x14, 0x4e, 0x94, 0x53, 0x50, 0xf9, 0x31,
+	0x6d, 0x9f, 0x9d, 0xfd, 0x59, 0xf6, 0xd9, 0xf7, 0xc1, 0xaa, 0xbc, 0x13, 0x8a, 0x9b, 0x9e, 0x4b,
+	0xbb, 0xc4, 0xb1, 0x23, 0xdd, 0x82, 0xb9, 0xde, 0xaf, 0x1e, 0x75, 0x93, 0x9b, 0x95, 0xb7, 0xb8,
+	0x73, 0x82, 0x63, 0x33, 0xa4, 0x68, 0x68, 0x86, 0x1a, 0x87, 0x08, 0xac, 0xc4, 0x12, 0x2e, 0x39,
+	0xbb, 0xf3, 0x32, 0x7b, 0x6b, 0x62, 0x23, 0xd7, 0x7a, 0x4d, 0x4d, 0x35, 0x5a, 0xea, 0x8d, 0x7d,
+	0xab, 0xa2, 0x21, 0xe0, 0x62, 0x8f, 0x78, 0x8e, 0xa0, 0xc5, 0xbd, 0x5e, 0xc7, 0x6d, 0xca, 0x62,
+	0x8b, 0xf2, 0xd6, 0xd7, 0xcf, 0x49, 0x7d, 0x1b, 0x63, 0xc3, 0x04, 0xd1, 0xaa, 0x26, 0x9a, 0xe2,
+	0x83, 0x37, 0x40, 0xe9, 0xc3, 0x3e, 0xe9, 0x13, 0xc7, 0xa6, 0x84, 0xf5, 0x7c, 0x8f, 0x11, 0x66,
+	0x66, 0xa5, 0xf0, 0x9d, 0x36, 0xe6, 0x9b, 0x7e, 0xb7, 0x8b, 0x3d, 0x07, 0x15, 0x55, 0x0c, 0x0a,
+	0x43, 0x04, 0x4d, 0x98, 0xad, 0xdc, 0x67, 0x19, 0x67, 0x26, 0xf8, 0xcf, 0x34, 0x3a, 0x06, 0xe9,
+	0x10, 0xbd, 0x13, 0x7d, 0xb7, 0x0c, 0xb2, 0xd1, 0xe9, 0x0c, 0x5f, 0x4f, 0x9e, 0xe2, 0xcf, 0x9c,
+	0x78, 0x8a, 0x3f, 0xe2, 0xf8, 0xde, 0x04, 0xa0, 0x49, 0x09, 0xd6, 0xf7, 0xf6, 0x99, 0xc7, 0xb9,
+	0xb7, 0xeb, 0xb8, 0x1a, 0x17, 0x24, 0xfd, 0x9e, 0x13, 0x92, 0xa4, 0x1f, 0x87, 0x44, 0xc7, 0xd5,
+	0x78, 0x24, 0xc0, 0x66, 0x13, 0xba, 0x70, 0x0d, 0xe4, 0x1c, 0xc2, 0x9a, 0xd4, 0xed, 0x89, 0x89,
+	0x91, 0xdb, 0x4d, 0x16, 0x25, 0x4d, 0x70, 0x0b, 0x00, 0xcc, 0x39, 0x75, 0x77, 0xfb, 0x9c, 0x88,
+	0xd3, 0x55, 0x0c, 0xeb, 0xf3, 0x27, 0x0e, 0x44, 0xb5, 0x16, 0x61, 0x6f, 0x78, 0x9c, 0x0e, 0x51,
+	0x22, 0x18, 0x6e, 0x83, 0x9c, 0x5e, 0x59, 0xb6, 0x18, 0xd4, 0xf9, 0xc7, 0x96, 0x46, 0x08, 0x1c,
+	0x84, 0x36, 0x06, 0xeb, 0x00, 0x32, 0x42, 0xe5, 0x52, 0xef, 0x51, 0xbf, 0xe5, 0x76, 0x88, 0x10,
+	0x17, 0x19, 0x29, 0x2e, 0xe4, 0x7b, 0xc0, 0x5d, 0xe5, 0xdd, 0x51, 0xce, 0xad, 0x06, 0x2a, 0xb1,
+	0x71, 0x8b, 0x33, 0x6d, 0xcd, 0x67, 0x7f, 0x49, 0x6d, 0x05, 0x7e, 0x69, 0x6d, 0x95, 0x7b, 0x0c,
+	0x6d, 0x75, 0xb2, 0x86, 0x5a, 0xf8, 0x9f, 0x68, 0xa8, 0xfc, 0x69, 0x34, 0x54, 0xe1, 0x14, 0x1a,
+	0xaa, 0x78, 0x3a, 0x0d, 0x55, 0x7a, 0x52, 0x0d, 0xb5, 0x78, 0x6a, 0x0d, 0x05, 0x4f, 0xd0, 0x50,
+	0xbf, 0x02, 0x59, 0xea, 0xfb, 0xdc, 0x96, 0x6f, 0x94, 0x4b, 0x72, 0x74, 0xcd, 0x89, 0xd7, 0x06,
+	0xdf, 0xe7, 0x6f, 0x91, 0x21, 0x43, 0x19, 0xaa, 0x7f, 0xc1, 0x3b, 0xe0, 0xac, 0x7e, 0x09, 0xb5,
+	0x45, 0xe9, 0x12, 0x2a, 0x5f, 0x4e, 0x09, 0x63, 0xe6, 0xb2, 0x9c, 0x67, 0x39, 0x05, 0x77, 0x14,
+	0xe2, 0xae, 0x04, 0xd4, 0x94, 0x1f, 0x2d, 0x7b, 0x53, 0xac, 0xf0, 0x3d, 0xb0, 0x9a, 0xdc, 0xce,
+	0x8f, 0x71, 0xae, 0x48, 0xce, 0x8b, 0xc1, 0xa8, 0x6c, 0x26, 0x36, 0xeb, 0x71, 0x5e, 0x13, 0x9f,
+	0xe0, 0x81, 0x6f, 0x83, 0x05, 0x51, 0x45, 0x4c, 0x2b, 0x38, 0xf3, 0xec, 0xf4, 0x97, 0xd8, 0x84,
+	0xc8, 0x53, 0xaf, 0x59, 0x09, 0x03, 0xca, 0x75, 0x71, 0x33, 0x92, 0x80, 0x9b, 0x20, 0x2b, 0x09,
+	0x85, 0xfc, 0x30, 0xcf, 0x4d, 0x1f, 0xb3, 0x50, 0x9e, 0xd4, 0x17, 0x82, 0x51, 0x39, 0x12, 0x2b,
+	0x28, 0x23, 0x78, 0xa4, 0x6c, 0xb9, 0x06, 0xe6, 0x99, 0x7a, 0xfb, 0x35, 0x4d, 0x49, 0x71, 0xee,
+	0x84, 0xa7, 0x61, 0x14, 0xe2, 0x60, 0x1d, 0x94, 0xf4, 0x4f, 0xbb, 0x85, 0x3b, 0x9d, 0x5d, 0xdc,
+	0xdc, 0x37, 0xcf, 0x3f, 0x3a, 0xb6, 0xa8, 0x03, 0x6e, 0x6a, 0x3c, 0x7c, 0x06, 0x14, 0xe4, 0x91,
+	0xef, 0x90, 0x03, 0x55, 0x1a, 0xe6, 0xaa, 0x7c, 0x66, 0x5b, 0x10, 0xd6, 0x06, 0x39, 0x90, 0x65,
+	0x01, 0x2f, 0x83, 0x62, 0x9f, 0x11, 0x27, 0x46, 0x31, 0xf3, 0xc2, 0x5a, 0xba, 0x92, 0x97, 0x05,
+	0xe9, 0x84, 0x30, 0x71, 0x0b, 0x2e, 0x4a, 0xb6, 0xb8, 0xd2, 0xcc, 0x8b, 0xf1, 0x93, 0x72, 0x54,
+	0x66, 0xb0, 0x02, 0x4a, 0x92, 0x2f, 0x59, 0x91, 0x4f, 0x49, 0xc2, 0x82, 0xb0, 0x27, 0xea, 0xf1,
+	0x65, 0xcd, 0x48, 0x3f, 0xd0, 0xaa, 0xf0, 0x25, 0xd3, 0x92, 0xf2, 0xb9, 0x14, 0x8c, 0xca, 0x0b,
+	0x77, 0xc8, 0x80, 0xa3, 0x5b, 0x52, 0x0f, 0xbe, 0xa4, 0x52, 0x46, 0x1f, 0xa8, 0xaf, 0xc9, 0xc0,
+	0x6b, 0x66, 0x79, 0x6a, 0xe0, 0xb5, 0xb1, 0xc0, 0x6b, 0xf0, 0x05, 0xfd, 0x30, 0xae, 0xb5, 0x28,
+	0x6e, 0x71, 0x42, 0xcd, 0x35, 0xf5, 0xb2, 0x23, 0x1c, 0x77, 0xa5, 0xbd, 0x26, 0xcc, 0xf0, 0x01,
+	0x38, 0x27, 0x9f, 0xc6, 0x35, 0x96, 0x92, 0x26, 0x71, 0x0f, 0xd4, 0xd1, 0xf7, 0xf4, 0x29, 0xd5,
+	0x92, 0x7c, 0x5b, 0x57, 0x9c, 0x48, 0x87, 0xd7, 0x38, 0xbc, 0x02, 0xe0, 0xae, 0xbc, 0x76, 0x0c,
+	0x85, 0x50, 0x6a, 0x12, 0x8f, 0xe3, 0x36, 0x31, 0xd7, 0xd7, 0x8c, 0xca, 0x0c, 0x5a, 0xd4, 0x9e,
+	0x9d, 0xc8, 0x01, 0x9f, 0x03, 0xc5, 0x48, 0xa9, 0xe9, 0x4b, 0xc6, 0xa5, 0x35, 0xa3, 0x72, 0x06,
+	0x15, 0x42, 0xb3, 0xbe, 0x5a, 0x34, 0x40, 0x41, 0x24, 0x29, 0xff, 0x7d, 0x20, 0xcc, 0xcc, 0x7c,
+	0x46, 0x9e, 0x93, 0x13, 0x3b, 0xe8, 0x7d, 0xe9, 0xd6, 0x97, 0x24, 0x94, 0x57, 0x41, 0xca, 0xc8,
+	0xe0, 0x2d, 0x50, 0xd2, 0x2c, 0x21, 0x3d, 0x33, 0x9f, 0x95, 0x3c, 0xe5, 0x89, 0x07, 0xa5, 0xb0,
+	0x7d, 0xcd, 0x54, 0x54, 0x81, 0xa1, 0x99, 0x09, 0x01, 0xa7, 0x95, 0xd5, 0x34, 0xfd, 0xc6, 0xcc,
+	0xcb, 0x92, 0xf7, 0x74, 0x02, 0x4e, 0x11, 0x4d, 0x71, 0x89, 0x0d, 0x0a, 0x24, 0xee, 0x84, 0xcf,
+	0x3d, 0xd1, 0x9d, 0x30, 0xc1, 0x00, 0x6f, 0x82, 0x6c, 0xc7, 0x57, 0x8d, 0x30, 0xb3, 0x22, 0x73,
+	0xac, 0x9c, 0xac, 0x35, 0xb6, 0x43, 0xa8, 0x92, 0x1a, 0x71, 0xe8, 0xea, 0xef, 0x40, 0xf1, 0x98,
+	0x10, 0x81, 0x25, 0x90, 0xde, 0x27, 0xea, 0x31, 0x31, 0x8b, 0xc4, 0x4f, 0xb8, 0x0c, 0xce, 0x1c,
+	0xe0, 0x4e, 0x3f, 0x7c, 0x28, 0x53, 0x1f, 0xaf, 0xce, 0xbc, 0x62, 0xac, 0xbe, 0x03, 0x0a, 0xe3,
+	0xdc, 0x53, 0xa2, 0xab, 0xc9, 0xe8, 0x29, 0x5b, 0x53, 0x48, 0x90, 0xe0, 0xd5, 0x0a, 0xf3, 0x4d,
+	0x00, 0xa2, 0x3e, 0x30, 0xf8, 0x2a, 0xc8, 0xc5, 0xff, 0x9a, 0x14, 0x4a, 0x33, 0x2d, 0x2f, 0x7c,
+	0x27, 0x75, 0x1a, 0x01, 0x12, 0xc5, 0xae, 0xff, 0xd5, 0x00, 0x4b, 0x6f, 0x10, 0x1e, 0x3b, 0x95,
+	0x94, 0x85, 0xf7, 0x40, 0x21, 0xe6, 0xb4, 0x9f, 0x5c, 0xc0, 0x2e, 0x90, 0xd8, 0xcf, 0xe0, 0x6b,
+	0x00, 0xc4, 0xff, 0xa5, 0x3c, 0x51, 0xc9, 0xde, 0x14, 0x90, 0xdb, 0x98, 0xed, 0xeb, 0xe9, 0xcd,
+	0xb6, 0x42, 0xc3, 0xfa, 0xdf, 0x0d, 0xb0, 0xb2, 0xed, 0xb2, 0x38, 0x5f, 0x16, 0x26, 0xfc, 0x2e,
+	0x28, 0x26, 0xeb, 0x34, 0xce, 0xf8, 0xf2, 0x23, 0x2a, 0x74, 0x7a, 0xce, 0x05, 0x9c, 0x44, 0xfc,
+	0x0c, 0x59, 0xff, 0xc1, 0x00, 0xa5, 0xbb, 0x84, 0x8f, 0x8f, 0xf0, 0xcb, 0x60, 0x4e, 0x8d, 0xae,
+	0xce, 0xf3, 0xe4, 0x09, 0xd3, 0x84, 0x1a, 0xfe, 0x5f, 0xa7, 0x53, 0xff, 0x8b, 0xf1, 0xf5, 0xa1,
+	0x65, 0x7c, 0x73, 0x68, 0x19, 0xdf, 0x1e, 0x5a, 0xa9, 0xef, 0x0f, 0xad, 0xd4, 0x0f, 0x87, 0x56,
+	0xea, 0xc7, 0x43, 0x2b, 0xf5, 0xd3, 0xa1, 0x65, 0x7c, 0x14, 0x58, 0xc6, 0xc7, 0x81, 0x95, 0xfa,
+	0x3c, 0xb0, 0x8c, 0x2f, 0x02, 0x2b, 0xf5, 0x65, 0x60, 0xa5, 0xbe, 0x0a, 0xac, 0xd4, 0xd7, 0x81,
+	0x65, 0x7c, 0x13, 0x58, 0xc6, 0xb7, 0x81, 0x95, 0xfa, 0x3e, 0xb0, 0x8c, 0x1f, 0x02, 0x2b, 0xf5,
+	0x63, 0x60, 0x19, 0x3f, 0x05, 0x56, 0xea, 0xa3, 0x23, 0x2b, 0xf5, 0xf1, 0x91, 0x65, 0x7c, 0x72,
+	0x64, 0xa5, 0x3e, 0x3d, 0xb2, 0x8c, 0xcf, 0x8e, 0xac, 0xd4, 0xe7, 0x47, 0x56, 0xea, 0x8b, 0x23,
+	0xcb, 0xf8, 0xf2, 0xc8, 0x32, 0xbe, 0x3a, 0xb2, 0x8c, 0xf7, 0x5e, 0x3c, 0xed, 0xff, 0x67, 0xb9,
+	0xd7, 0xdb, 0xdd, 0x9d, 0x93, 0x3d, 0xb9, 0xfe, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0x43, 0x28,
+	0xd3, 0x74, 0x88, 0x1f, 0x00, 0x00,
 }

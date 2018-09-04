@@ -669,7 +669,7 @@ func randFieldGatewayserver(dAtA []byte, r randyGatewayserver, fieldNumber int, 
 }
 func encodeVarintPopulateGatewayserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -716,7 +716,7 @@ func sovGatewayserver(x uint64) (n int) {
 	return n
 }
 func sozGatewayserver(x uint64) (n int) {
-	return sovGatewayserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovGatewayserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *GatewayUp) String() string {
 	if this == nil {

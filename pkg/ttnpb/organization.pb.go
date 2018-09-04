@@ -925,7 +925,7 @@ func (m *Organization) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Description)
 	}
 	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
+		for k, _ := range m.Attributes {
 			dAtA[i] = 0x32
 			i++
 			v := m.Attributes[k]
@@ -1292,8 +1292,8 @@ func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringOrganization(r)
-	this.Description = randStringOrganization(r)
+	this.Name = string(randStringOrganization(r))
+	this.Description = string(randStringOrganization(r))
 	if r.Intn(10) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -1377,7 +1377,7 @@ func NewPopulatedCreateOrganizationAPIKeyRequest(r randyOrganization, easy bool)
 	this := &CreateOrganizationAPIKeyRequest{}
 	v13 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v13
-	this.Name = randStringOrganization(r)
+	this.Name = string(randStringOrganization(r))
 	v14 := r.Intn(10)
 	this.Rights = make([]Right, v14)
 	for i := 0; i < v14; i++ {
@@ -1403,7 +1403,7 @@ func NewPopulatedRemoveOrganizationAPIKeyRequest(r randyOrganization, easy bool)
 	this := &RemoveOrganizationAPIKeyRequest{}
 	v17 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v17
-	this.ID = randStringOrganization(r)
+	this.ID = string(randStringOrganization(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1486,7 +1486,7 @@ func randFieldOrganization(dAtA []byte, r randyOrganization, fieldNumber int, wi
 }
 func encodeVarintPopulateOrganization(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1644,14 +1644,14 @@ func sovOrganization(x uint64) (n int) {
 	return n
 }
 func sozOrganization(x uint64) (n int) {
-	return sovOrganization((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovOrganization(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Organization) String() string {
 	if this == nil {
 		return "nil"
 	}
 	keysForAttributes := make([]string, 0, len(this.Attributes))
-	for k := range this.Attributes {
+	for k, _ := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)

@@ -84,35 +84,37 @@ var LocationSource_value = map[string]int32{
 }
 
 func (LocationSource) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_75ad031c68a3db13, []int{0}
+	return fileDescriptor_metadata_0327ebad37bdb5cd, []int{0}
 }
 
 // Contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 type RxMetadata struct {
-	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
-	AntennaIndex       uint32 `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
+	AntennaIndex       uint32     `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
+	Time               *time.Time `protobuf:"bytes,3,opt,name=time,stdtime" json:"time,omitempty"`
 	// Gateway's internal timestamp when the Rx finished (nanoseconds)
 	// NOTE: most gateways use microsecond timestamps, so conversion may be needed
-	Timestamp uint64 `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	// Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds).
-	EncryptedFineTimestamp []byte `protobuf:"bytes,4,opt,name=encrypted_fine_timestamp,json=encryptedFineTimestamp,proto3" json:"encrypted_fine_timestamp,omitempty"`
+	Timestamp uint64 `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Gateway's internal fine timestamp when the Rx finished (nanoseconds).
-	FineTimestampValue uint64    `protobuf:"varint,5,opt,name=fine_timestamp_value,json=fineTimestampValue,proto3" json:"fine_timestamp_value,omitempty"`
-	Time               time.Time `protobuf:"bytes,6,opt,name=time,stdtime" json:"time"`
-	// Received signal strength in dBm.
-	RSSI float32 `protobuf:"fixed32,7,opt,name=rssi,proto3" json:"rssi,omitempty"`
-	// Received channel power in dBm.
-	ChannelRSSI float32 `protobuf:"fixed32,8,opt,name=channel_rssi,json=channelRssi,proto3" json:"channel_rssi,omitempty"`
+	FineTimestamp uint64 `protobuf:"varint,5,opt,name=fine_timestamp,json=fineTimestamp,proto3" json:"fine_timestamp,omitempty"`
+	// Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds).
+	EncryptedFineTimestamp      []byte `protobuf:"bytes,6,opt,name=encrypted_fine_timestamp,json=encryptedFineTimestamp,proto3" json:"encrypted_fine_timestamp,omitempty"`
+	EncryptedFineTimestampKeyID string `protobuf:"bytes,7,opt,name=encrypted_fine_timestamp_key_id,json=encryptedFineTimestampKeyId,proto3" json:"encrypted_fine_timestamp_key_id,omitempty"`
+	// Received signal strength (dBm).
+	RSSI float32 `protobuf:"fixed32,8,opt,name=rssi,proto3" json:"rssi,omitempty"`
+	// Received channel power (dBm).
+	ChannelRSSI float32 `protobuf:"fixed32,9,opt,name=channel_rssi,json=channelRssi,proto3" json:"channel_rssi,omitempty"`
 	// Standard deviation of the RSSI.
-	RSSIStandardDeviation float32 `protobuf:"fixed32,9,opt,name=rssi_standard_deviation,json=rssiStandardDeviation,proto3" json:"rssi_standard_deviation,omitempty"`
-	// Signal-to-noise-ratio in dB.
-	SNR float32 `protobuf:"fixed32,10,opt,name=snr,proto3" json:"snr,omitempty"`
+	RSSIStandardDeviation float32 `protobuf:"fixed32,10,opt,name=rssi_standard_deviation,json=rssiStandardDeviation,proto3" json:"rssi_standard_deviation,omitempty"`
+	// Signal-to-noise ratio (dB).
+	SNR float32 `protobuf:"fixed32,11,opt,name=snr,proto3" json:"snr,omitempty"`
 	// Frequency offset (Hz).
-	FrequencyOffset             int64                         `protobuf:"varint,11,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequency_offset,omitempty"`
-	Location                    *Location                     `protobuf:"bytes,12,opt,name=location" json:"location,omitempty"`
-	EncryptedFineTimestampKeyID string                        `protobuf:"bytes,13,opt,name=encrypted_fine_timestamp_key_id,json=encryptedFineTimestampKeyId,proto3" json:"encrypted_fine_timestamp_key_id,omitempty"`
-	DownlinkPathConstraint      GatewayDownlinkPathConstraint `protobuf:"varint,14,opt,name=downlink_path_constraint,json=downlinkPathConstraint,proto3,enum=ttn.lorawan.v3.GatewayDownlinkPathConstraint" json:"downlink_path_constraint,omitempty"`
+	FrequencyOffset int64 `protobuf:"varint,12,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequency_offset,omitempty"`
+	// Antenna location; injected by the Gateway Server.
+	Location *Location `protobuf:"bytes,13,opt,name=location" json:"location,omitempty"`
+	// Gateway downlink path constraint; injected by the Gateway Server.
+	DownlinkPathConstraint GatewayDownlinkPathConstraint `protobuf:"varint,14,opt,name=downlink_path_constraint,json=downlinkPathConstraint,proto3,enum=ttn.lorawan.v3.GatewayDownlinkPathConstraint" json:"downlink_path_constraint,omitempty"`
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
@@ -124,7 +126,7 @@ type RxMetadata struct {
 func (m *RxMetadata) Reset()      { *m = RxMetadata{} }
 func (*RxMetadata) ProtoMessage() {}
 func (*RxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_75ad031c68a3db13, []int{0}
+	return fileDescriptor_metadata_0327ebad37bdb5cd, []int{0}
 }
 func (m *RxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -160,9 +162,23 @@ func (m *RxMetadata) GetAntennaIndex() uint32 {
 	return 0
 }
 
+func (m *RxMetadata) GetTime() *time.Time {
+	if m != nil {
+		return m.Time
+	}
+	return nil
+}
+
 func (m *RxMetadata) GetTimestamp() uint64 {
 	if m != nil {
 		return m.Timestamp
+	}
+	return 0
+}
+
+func (m *RxMetadata) GetFineTimestamp() uint64 {
+	if m != nil {
+		return m.FineTimestamp
 	}
 	return 0
 }
@@ -174,18 +190,11 @@ func (m *RxMetadata) GetEncryptedFineTimestamp() []byte {
 	return nil
 }
 
-func (m *RxMetadata) GetFineTimestampValue() uint64 {
+func (m *RxMetadata) GetEncryptedFineTimestampKeyID() string {
 	if m != nil {
-		return m.FineTimestampValue
+		return m.EncryptedFineTimestampKeyID
 	}
-	return 0
-}
-
-func (m *RxMetadata) GetTime() time.Time {
-	if m != nil {
-		return m.Time
-	}
-	return time.Time{}
+	return ""
 }
 
 func (m *RxMetadata) GetRSSI() float32 {
@@ -230,13 +239,6 @@ func (m *RxMetadata) GetLocation() *Location {
 	return nil
 }
 
-func (m *RxMetadata) GetEncryptedFineTimestampKeyID() string {
-	if m != nil {
-		return m.EncryptedFineTimestampKeyID
-	}
-	return ""
-}
-
 func (m *RxMetadata) GetDownlinkPathConstraint() GatewayDownlinkPathConstraint {
 	if m != nil {
 		return m.DownlinkPathConstraint
@@ -254,10 +256,10 @@ func (m *RxMetadata) GetAdvanced() *types.Struct {
 // Contains metadata for a to-be-transmitted message.
 // It contains gateway-specific fields that are not in the TxSettings message
 type TxMetadata struct {
-	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
 	AntennaIndex       uint32    `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
-	Timestamp          uint64    `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Time               time.Time `protobuf:"bytes,4,opt,name=time,stdtime" json:"time"`
+	Time               time.Time `protobuf:"bytes,3,opt,name=time,stdtime" json:"time"`
+	Timestamp          uint64    `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
@@ -269,7 +271,7 @@ type TxMetadata struct {
 func (m *TxMetadata) Reset()      { *m = TxMetadata{} }
 func (*TxMetadata) ProtoMessage() {}
 func (*TxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_75ad031c68a3db13, []int{1}
+	return fileDescriptor_metadata_0327ebad37bdb5cd, []int{1}
 }
 func (m *TxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -305,18 +307,18 @@ func (m *TxMetadata) GetAntennaIndex() uint32 {
 	return 0
 }
 
-func (m *TxMetadata) GetTimestamp() uint64 {
-	if m != nil {
-		return m.Timestamp
-	}
-	return 0
-}
-
 func (m *TxMetadata) GetTime() time.Time {
 	if m != nil {
 		return m.Time
 	}
 	return time.Time{}
+}
+
+func (m *TxMetadata) GetTimestamp() uint64 {
+	if m != nil {
+		return m.Timestamp
+	}
+	return 0
 }
 
 func (m *TxMetadata) GetAdvanced() *types.Struct {
@@ -344,7 +346,7 @@ type Location struct {
 func (m *Location) Reset()      { *m = Location{} }
 func (*Location) ProtoMessage() {}
 func (*Location) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_75ad031c68a3db13, []int{2}
+	return fileDescriptor_metadata_0327ebad37bdb5cd, []int{2}
 }
 func (m *Location) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -450,16 +452,23 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 	if this.AntennaIndex != that1.AntennaIndex {
 		return false
 	}
+	if that1.Time == nil {
+		if this.Time != nil {
+			return false
+		}
+	} else if !this.Time.Equal(*that1.Time) {
+		return false
+	}
 	if this.Timestamp != that1.Timestamp {
+		return false
+	}
+	if this.FineTimestamp != that1.FineTimestamp {
 		return false
 	}
 	if !bytes.Equal(this.EncryptedFineTimestamp, that1.EncryptedFineTimestamp) {
 		return false
 	}
-	if this.FineTimestampValue != that1.FineTimestampValue {
-		return false
-	}
-	if !this.Time.Equal(that1.Time) {
+	if this.EncryptedFineTimestampKeyID != that1.EncryptedFineTimestampKeyID {
 		return false
 	}
 	if this.RSSI != that1.RSSI {
@@ -478,9 +487,6 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.Location.Equal(that1.Location) {
-		return false
-	}
-	if this.EncryptedFineTimestampKeyID != that1.EncryptedFineTimestampKeyID {
 		return false
 	}
 	if this.DownlinkPathConstraint != that1.DownlinkPathConstraint {
@@ -516,10 +522,10 @@ func (this *TxMetadata) Equal(that interface{}) bool {
 	if this.AntennaIndex != that1.AntennaIndex {
 		return false
 	}
-	if this.Timestamp != that1.Timestamp {
+	if !this.Time.Equal(that1.Time) {
 		return false
 	}
-	if !this.Time.Equal(that1.Time) {
+	if this.Timestamp != that1.Timestamp {
 		return false
 	}
 	if !this.Advanced.Equal(that1.Advanced) {
@@ -591,61 +597,69 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.AntennaIndex))
 	}
-	if m.Timestamp != 0 {
-		dAtA[i] = 0x18
+	if m.Time != nil {
+		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintMetadata(dAtA, i, m.Timestamp)
+		i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
+		n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if m.Timestamp != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
+	}
+	if m.FineTimestamp != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintMetadata(dAtA, i, uint64(m.FineTimestamp))
 	}
 	if len(m.EncryptedFineTimestamp) > 0 {
-		dAtA[i] = 0x22
+		dAtA[i] = 0x32
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestamp)))
 		i += copy(dAtA[i:], m.EncryptedFineTimestamp)
 	}
-	if m.FineTimestampValue != 0 {
-		dAtA[i] = 0x28
+	if len(m.EncryptedFineTimestampKeyID) > 0 {
+		dAtA[i] = 0x3a
 		i++
-		i = encodeVarintMetadata(dAtA, i, m.FineTimestampValue)
+		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestampKeyID)))
+		i += copy(dAtA[i:], m.EncryptedFineTimestampKeyID)
 	}
-	dAtA[i] = 0x32
-	i++
-	i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
 	if m.RSSI != 0 {
-		dAtA[i] = 0x3d
+		dAtA[i] = 0x45
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSI))))
 		i += 4
 	}
 	if m.ChannelRSSI != 0 {
-		dAtA[i] = 0x45
+		dAtA[i] = 0x4d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.ChannelRSSI))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.ChannelRSSI))))
 		i += 4
 	}
 	if m.RSSIStandardDeviation != 0 {
-		dAtA[i] = 0x4d
+		dAtA[i] = 0x55
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIStandardDeviation))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSIStandardDeviation))))
 		i += 4
 	}
 	if m.SNR != 0 {
-		dAtA[i] = 0x55
+		dAtA[i] = 0x5d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.SNR))))
 		i += 4
 	}
 	if m.FrequencyOffset != 0 {
-		dAtA[i] = 0x58
+		dAtA[i] = 0x60
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.FrequencyOffset))
 	}
 	if m.Location != nil {
-		dAtA[i] = 0x62
+		dAtA[i] = 0x6a
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.Location.Size()))
 		n3, err := m.Location.MarshalTo(dAtA[i:])
@@ -653,12 +667,6 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n3
-	}
-	if len(m.EncryptedFineTimestampKeyID) > 0 {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestampKeyID)))
-		i += copy(dAtA[i:], m.EncryptedFineTimestampKeyID)
 	}
 	if m.DownlinkPathConstraint != 0 {
 		dAtA[i] = 0x70
@@ -708,12 +716,7 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.AntennaIndex))
 	}
-	if m.Timestamp != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintMetadata(dAtA, i, m.Timestamp)
-	}
-	dAtA[i] = 0x22
+	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
 	n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
@@ -721,6 +724,11 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		return 0, err
 	}
 	i += n6
+	if m.Timestamp != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
+	}
 	if m.Advanced != nil {
 		dAtA[i] = 0x9a
 		i++
@@ -754,13 +762,13 @@ func (m *Location) MarshalTo(dAtA []byte) (int, error) {
 	if m.Latitude != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Latitude))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.Latitude))))
 		i += 4
 	}
 	if m.Longitude != 0 {
 		dAtA[i] = 0x15
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Longitude))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.Longitude))))
 		i += 4
 	}
 	if m.Altitude != 0 {
@@ -794,40 +802,41 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	this := &RxMetadata{}
 	v1 := NewPopulatedGatewayIdentifiers(r, easy)
 	this.GatewayIdentifiers = *v1
-	this.AntennaIndex = r.Uint32()
-	this.Timestamp = uint64(r.Uint32())
+	this.AntennaIndex = uint32(r.Uint32())
+	if r.Intn(10) != 0 {
+		this.Time = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	}
+	this.Timestamp = uint64(uint64(r.Uint32()))
+	this.FineTimestamp = uint64(uint64(r.Uint32()))
 	v2 := r.Intn(100)
 	this.EncryptedFineTimestamp = make([]byte, v2)
 	for i := 0; i < v2; i++ {
 		this.EncryptedFineTimestamp[i] = byte(r.Intn(256))
 	}
-	this.FineTimestampValue = uint64(r.Uint32())
-	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.Time = *v3
-	this.RSSI = r.Float32()
+	this.EncryptedFineTimestampKeyID = string(randStringMetadata(r))
+	this.RSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSI *= -1
 	}
-	this.ChannelRSSI = r.Float32()
+	this.ChannelRSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.ChannelRSSI *= -1
 	}
-	this.RSSIStandardDeviation = r.Float32()
+	this.RSSIStandardDeviation = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSIStandardDeviation *= -1
 	}
-	this.SNR = r.Float32()
+	this.SNR = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.SNR *= -1
 	}
-	this.FrequencyOffset = r.Int63()
+	this.FrequencyOffset = int64(r.Int63())
 	if r.Intn(2) == 0 {
 		this.FrequencyOffset *= -1
 	}
 	if r.Intn(10) != 0 {
 		this.Location = NewPopulatedLocation(r, easy)
 	}
-	this.EncryptedFineTimestampKeyID = randStringMetadata(r)
 	this.DownlinkPathConstraint = GatewayDownlinkPathConstraint([]int32{0, 1, 2}[r.Intn(3)])
 	if r.Intn(10) != 0 {
 		this.Advanced = types.NewPopulatedStruct(r, easy)
@@ -839,12 +848,12 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 
 func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 	this := &TxMetadata{}
-	v4 := NewPopulatedGatewayIdentifiers(r, easy)
-	this.GatewayIdentifiers = *v4
-	this.AntennaIndex = r.Uint32()
-	this.Timestamp = uint64(r.Uint32())
-	v5 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.Time = *v5
+	v3 := NewPopulatedGatewayIdentifiers(r, easy)
+	this.GatewayIdentifiers = *v3
+	this.AntennaIndex = uint32(r.Uint32())
+	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.Time = *v4
+	this.Timestamp = uint64(uint64(r.Uint32()))
 	if r.Intn(10) != 0 {
 		this.Advanced = types.NewPopulatedStruct(r, easy)
 	}
@@ -855,19 +864,19 @@ func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 
 func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 	this := &Location{}
-	this.Latitude = r.Float32()
+	this.Latitude = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.Latitude *= -1
 	}
-	this.Longitude = r.Float32()
+	this.Longitude = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.Longitude *= -1
 	}
-	this.Altitude = r.Int31()
+	this.Altitude = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.Altitude *= -1
 	}
-	this.Accuracy = r.Int31()
+	this.Accuracy = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.Accuracy *= -1
 	}
@@ -896,9 +905,9 @@ func randUTF8RuneMetadata(r randyMetadata) rune {
 	return rune(ru + 61)
 }
 func randStringMetadata(r randyMetadata) string {
-	v6 := r.Intn(100)
-	tmps := make([]rune, v6)
-	for i := 0; i < v6; i++ {
+	v5 := r.Intn(100)
+	tmps := make([]rune, v5)
+	for i := 0; i < v5; i++ {
 		tmps[i] = randUTF8RuneMetadata(r)
 	}
 	return string(tmps)
@@ -920,11 +929,11 @@ func randFieldMetadata(dAtA []byte, r randyMetadata, fieldNumber int, wire int) 
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateMetadata(dAtA, uint64(key))
-		v7 := r.Int63()
+		v6 := r.Int63()
 		if r.Intn(2) == 0 {
-			v7 *= -1
+			v6 *= -1
 		}
-		dAtA = encodeVarintPopulateMetadata(dAtA, uint64(v7))
+		dAtA = encodeVarintPopulateMetadata(dAtA, uint64(v6))
 	case 1:
 		dAtA = encodeVarintPopulateMetadata(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -943,7 +952,7 @@ func randFieldMetadata(dAtA []byte, r randyMetadata, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateMetadata(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -957,18 +966,24 @@ func (m *RxMetadata) Size() (n int) {
 	if m.AntennaIndex != 0 {
 		n += 1 + sovMetadata(uint64(m.AntennaIndex))
 	}
+	if m.Time != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)
+		n += 1 + l + sovMetadata(uint64(l))
+	}
 	if m.Timestamp != 0 {
-		n += 1 + sovMetadata(m.Timestamp)
+		n += 1 + sovMetadata(uint64(m.Timestamp))
+	}
+	if m.FineTimestamp != 0 {
+		n += 1 + sovMetadata(uint64(m.FineTimestamp))
 	}
 	l = len(m.EncryptedFineTimestamp)
 	if l > 0 {
 		n += 1 + l + sovMetadata(uint64(l))
 	}
-	if m.FineTimestampValue != 0 {
-		n += 1 + sovMetadata(m.FineTimestampValue)
+	l = len(m.EncryptedFineTimestampKeyID)
+	if l > 0 {
+		n += 1 + l + sovMetadata(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
-	n += 1 + l + sovMetadata(uint64(l))
 	if m.RSSI != 0 {
 		n += 5
 	}
@@ -986,10 +1001,6 @@ func (m *RxMetadata) Size() (n int) {
 	}
 	if m.Location != nil {
 		l = m.Location.Size()
-		n += 1 + l + sovMetadata(uint64(l))
-	}
-	l = len(m.EncryptedFineTimestampKeyID)
-	if l > 0 {
 		n += 1 + l + sovMetadata(uint64(l))
 	}
 	if m.DownlinkPathConstraint != 0 {
@@ -1010,11 +1021,11 @@ func (m *TxMetadata) Size() (n int) {
 	if m.AntennaIndex != 0 {
 		n += 1 + sovMetadata(uint64(m.AntennaIndex))
 	}
-	if m.Timestamp != 0 {
-		n += 1 + sovMetadata(m.Timestamp)
-	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
 	n += 1 + l + sovMetadata(uint64(l))
+	if m.Timestamp != 0 {
+		n += 1 + sovMetadata(uint64(m.Timestamp))
+	}
 	if m.Advanced != nil {
 		l = m.Advanced.Size()
 		n += 2 + l + sovMetadata(uint64(l))
@@ -1054,7 +1065,7 @@ func sovMetadata(x uint64) (n int) {
 	return n
 }
 func sozMetadata(x uint64) (n int) {
-	return sovMetadata((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMetadata(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *RxMetadata) String() string {
 	if this == nil {
@@ -1063,17 +1074,17 @@ func (this *RxMetadata) String() string {
 	s := strings.Join([]string{`&RxMetadata{`,
 		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
+		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1) + `,`,
 		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
+		`FineTimestamp:` + fmt.Sprintf("%v", this.FineTimestamp) + `,`,
 		`EncryptedFineTimestamp:` + fmt.Sprintf("%v", this.EncryptedFineTimestamp) + `,`,
-		`FineTimestampValue:` + fmt.Sprintf("%v", this.FineTimestampValue) + `,`,
-		`Time:` + strings.Replace(strings.Replace(this.Time.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`EncryptedFineTimestampKeyID:` + fmt.Sprintf("%v", this.EncryptedFineTimestampKeyID) + `,`,
 		`RSSI:` + fmt.Sprintf("%v", this.RSSI) + `,`,
 		`ChannelRSSI:` + fmt.Sprintf("%v", this.ChannelRSSI) + `,`,
 		`RSSIStandardDeviation:` + fmt.Sprintf("%v", this.RSSIStandardDeviation) + `,`,
 		`SNR:` + fmt.Sprintf("%v", this.SNR) + `,`,
 		`FrequencyOffset:` + fmt.Sprintf("%v", this.FrequencyOffset) + `,`,
 		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
-		`EncryptedFineTimestampKeyID:` + fmt.Sprintf("%v", this.EncryptedFineTimestampKeyID) + `,`,
 		`DownlinkPathConstraint:` + fmt.Sprintf("%v", this.DownlinkPathConstraint) + `,`,
 		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "types.Struct", 1) + `,`,
 		`}`,
@@ -1087,8 +1098,8 @@ func (this *TxMetadata) String() string {
 	s := strings.Join([]string{`&TxMetadata{`,
 		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
-		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
 		`Time:` + strings.Replace(strings.Replace(this.Time.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
 		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "types.Struct", 1) + `,`,
 		`}`,
 	}, "")
@@ -1195,6 +1206,39 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetadata
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMetadata
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Time == nil {
+				m.Time = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Time, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
 			}
@@ -1213,7 +1257,26 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 4:
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FineTimestamp", wireType)
+			}
+			m.FineTimestamp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetadata
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.FineTimestamp |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedFineTimestamp", wireType)
 			}
@@ -1244,30 +1307,11 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				m.EncryptedFineTimestamp = []byte{}
 			}
 			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FineTimestampValue", wireType)
-			}
-			m.FineTimestampValue = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FineTimestampValue |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
+		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedFineTimestampKeyID", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMetadata
@@ -1277,23 +1321,22 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthMetadata
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.EncryptedFineTimestampKeyID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 7:
+		case 8:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSI", wireType)
 			}
@@ -1301,10 +1344,10 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.RSSI = math.Float32frombits(v)
-		case 8:
+			m.RSSI = float32(math.Float32frombits(v))
+		case 9:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ChannelRSSI", wireType)
 			}
@@ -1312,10 +1355,10 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.ChannelRSSI = math.Float32frombits(v)
-		case 9:
+			m.ChannelRSSI = float32(math.Float32frombits(v))
+		case 10:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSIStandardDeviation", wireType)
 			}
@@ -1323,10 +1366,10 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.RSSIStandardDeviation = math.Float32frombits(v)
-		case 10:
+			m.RSSIStandardDeviation = float32(math.Float32frombits(v))
+		case 11:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SNR", wireType)
 			}
@@ -1334,10 +1377,10 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.SNR = math.Float32frombits(v)
-		case 11:
+			m.SNR = float32(math.Float32frombits(v))
+		case 12:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyOffset", wireType)
 			}
@@ -1356,7 +1399,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 12:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
 			}
@@ -1388,35 +1431,6 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if err := m.Location.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedFineTimestampKeyID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EncryptedFineTimestampKeyID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 14:
 			if wireType != 0 {
@@ -1570,25 +1584,6 @@ func (m *TxMetadata) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			m.Timestamp = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Timestamp |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
 			}
@@ -1618,6 +1613,25 @@ func (m *TxMetadata) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			m.Timestamp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetadata
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Timestamp |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		case 99:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Advanced", wireType)
@@ -1709,9 +1723,9 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.Latitude = math.Float32frombits(v)
+			m.Latitude = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Longitude", wireType)
@@ -1720,9 +1734,9 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.Longitude = math.Float32frombits(v)
+			m.Longitude = float32(math.Float32frombits(v))
 		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Altitude", wireType)
@@ -1907,73 +1921,73 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_75ad031c68a3db13)
+	proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_0327ebad37bdb5cd)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_75ad031c68a3db13)
+	golang_proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_0327ebad37bdb5cd)
 }
 
-var fileDescriptor_metadata_75ad031c68a3db13 = []byte{
-	// 968 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x95, 0x31, 0x50, 0x1b, 0x47,
-	0x14, 0x86, 0x6f, 0x85, 0x00, 0xb1, 0x80, 0x60, 0x36, 0xc1, 0x3e, 0x04, 0xd9, 0xd3, 0xe0, 0x46,
-	0xc9, 0x84, 0x53, 0x06, 0x32, 0x19, 0xb7, 0x08, 0x30, 0xa3, 0x01, 0x4b, 0x64, 0x25, 0xc7, 0x93,
-	0x34, 0x37, 0xcb, 0xdd, 0xea, 0x74, 0x83, 0xd8, 0x53, 0xee, 0x56, 0x60, 0x3a, 0x97, 0xcc, 0xa4,
-	0x71, 0xba, 0x94, 0x99, 0xa4, 0x71, 0xe9, 0x22, 0x85, 0x4b, 0x97, 0x94, 0x94, 0xae, 0x14, 0xeb,
-	0xd4, 0x50, 0xba, 0x74, 0x99, 0xb9, 0xd5, 0x72, 0xb2, 0x90, 0x29, 0x92, 0x2a, 0x9d, 0xde, 0xff,
-	0x7f, 0xff, 0x69, 0xdf, 0xbb, 0xb7, 0x12, 0xcc, 0xb7, 0xfc, 0x80, 0x9e, 0x51, 0xbe, 0x1e, 0x0a,
-	0x6a, 0x1f, 0x17, 0x69, 0xdb, 0x2b, 0x9e, 0x30, 0x41, 0x1d, 0x2a, 0xa8, 0xd9, 0x0e, 0x7c, 0xe1,
-	0xa3, 0xac, 0x10, 0xdc, 0x54, 0x94, 0x79, 0xba, 0x99, 0x5b, 0x77, 0x3d, 0xd1, 0xec, 0x1c, 0x99,
-	0xb6, 0x7f, 0x52, 0x74, 0x7d, 0xd7, 0x2f, 0x4a, 0xec, 0xa8, 0xd3, 0x90, 0x95, 0x2c, 0xe4, 0xa7,
-	0x41, 0x3c, 0xb7, 0xea, 0xfa, 0xbe, 0xdb, 0x62, 0x43, 0x2a, 0x14, 0x41, 0xc7, 0x16, 0xca, 0x35,
-	0x6e, 0xbb, 0xc2, 0x3b, 0x61, 0xa1, 0xa0, 0x27, 0x6d, 0x05, 0x7c, 0x31, 0x7e, 0x3e, 0xc6, 0x3b,
-	0x27, 0xa1, 0xb2, 0x1f, 0x8c, 0xdb, 0x9e, 0xc3, 0xb8, 0xf0, 0x1a, 0x1e, 0x0b, 0x14, 0xb4, 0x76,
-	0x3d, 0x05, 0x21, 0x79, 0xf6, 0x58, 0xb5, 0x85, 0xf6, 0x21, 0x74, 0xa9, 0x60, 0x67, 0xf4, 0xdc,
-	0xf2, 0x1c, 0x1d, 0xe4, 0x41, 0x61, 0x76, 0x63, 0xcd, 0x1c, 0xed, 0xd2, 0xdc, 0x1b, 0x10, 0xe5,
-	0xe1, 0xc3, 0x4a, 0x99, 0xcb, 0xae, 0xa1, 0x5d, 0x75, 0x0d, 0x40, 0x66, 0xdc, 0x1b, 0x17, 0x3d,
-	0x80, 0xf3, 0x94, 0x0b, 0xc6, 0x39, 0xb5, 0x3c, 0xee, 0xb0, 0x67, 0x7a, 0x2a, 0x0f, 0x0a, 0xf3,
-	0x64, 0x4e, 0x89, 0xe5, 0x58, 0x43, 0xab, 0x70, 0x26, 0xe9, 0x4b, 0x9f, 0xc8, 0x83, 0x42, 0x9a,
-	0x0c, 0x05, 0xf4, 0x10, 0xea, 0x8c, 0xdb, 0xc1, 0x79, 0x5b, 0x30, 0xc7, 0x6a, 0x78, 0x9c, 0x59,
-	0x43, 0x38, 0x9d, 0x07, 0x85, 0x39, 0x72, 0x2f, 0xf1, 0x1f, 0x79, 0x9c, 0xd5, 0x93, 0xe4, 0x37,
-	0xf0, 0xf3, 0x51, 0xde, 0x3a, 0xa5, 0xad, 0x0e, 0xd3, 0x27, 0xe5, 0x57, 0xa0, 0xc6, 0xc7, 0xf0,
-	0x0f, 0xb1, 0x83, 0x1e, 0xc2, 0x74, 0x0c, 0xeb, 0x53, 0xb2, 0xeb, 0x9c, 0x39, 0x18, 0xbf, 0x79,
-	0x33, 0x7e, 0x33, 0xc1, 0x07, 0xdd, 0xbe, 0xf8, 0xdb, 0x00, 0x44, 0x26, 0xd0, 0x2a, 0x4c, 0x07,
-	0x61, 0xe8, 0xe9, 0xd3, 0x79, 0x50, 0x48, 0x95, 0x32, 0x51, 0xd7, 0x48, 0x93, 0x5a, 0xad, 0x4c,
-	0xa4, 0x8a, 0x36, 0xe0, 0x9c, 0xdd, 0xa4, 0x9c, 0xb3, 0x96, 0x25, 0xa9, 0x8c, 0xa4, 0x16, 0xa2,
-	0xae, 0x31, 0xbb, 0x3d, 0xd0, 0x25, 0x3c, 0xab, 0x20, 0x12, 0x67, 0xbe, 0x87, 0xf7, 0x63, 0xd6,
-	0x0a, 0x05, 0xe5, 0x0e, 0x0d, 0x1c, 0xcb, 0x61, 0xa7, 0x1e, 0x15, 0x9e, 0xcf, 0xf5, 0x19, 0x19,
-	0x5f, 0x8e, 0xba, 0xc6, 0x52, 0x9c, 0xab, 0x29, 0x62, 0xe7, 0x06, 0x20, 0x4b, 0x71, 0x72, 0x4c,
-	0x46, 0xcb, 0x70, 0x22, 0xe4, 0x81, 0x0e, 0x65, 0x7c, 0x3a, 0xea, 0x1a, 0x13, 0xb5, 0x0a, 0x21,
-	0xb1, 0x86, 0xbe, 0x84, 0x8b, 0x8d, 0x80, 0xfd, 0xdc, 0x61, 0xdc, 0x3e, 0xb7, 0xfc, 0x46, 0x23,
-	0x64, 0x42, 0x9f, 0xcd, 0x83, 0xc2, 0x04, 0x59, 0x48, 0xf4, 0xaa, 0x94, 0xd1, 0xb7, 0x30, 0xd3,
-	0xf2, 0xed, 0xc1, 0x49, 0xe6, 0xe4, 0xa0, 0xf4, 0xdb, 0xeb, 0x71, 0xa0, 0x7c, 0x92, 0x90, 0x88,
-	0x41, 0xe3, 0xae, 0xd7, 0x68, 0x1d, 0x33, 0xb9, 0x6b, 0xf3, 0x79, 0x50, 0x98, 0x29, 0x19, 0x51,
-	0xd7, 0x58, 0xd9, 0xfd, 0xe4, 0x1b, 0xdd, 0x67, 0xe7, 0xe5, 0x1d, 0xb2, 0xc2, 0xee, 0x34, 0x1d,
-	0xe4, 0x42, 0xdd, 0xf1, 0xcf, 0x78, 0xcb, 0xe3, 0xc7, 0x56, 0x9b, 0x8a, 0xa6, 0x65, 0xfb, 0x3c,
-	0x14, 0x01, 0xf5, 0xb8, 0xd0, 0xb3, 0x79, 0x50, 0xc8, 0x6e, 0xac, 0xdf, 0xb1, 0xcb, 0x3b, 0x2a,
-	0x76, 0x48, 0x45, 0x73, 0x3b, 0x09, 0x91, 0x7b, 0xce, 0x27, 0x75, 0xb4, 0x09, 0x33, 0xd4, 0x39,
-	0xa5, 0xdc, 0x66, 0x8e, 0x6e, 0xcb, 0x29, 0xdc, 0x1f, 0x5b, 0x97, 0x9a, 0xbc, 0xcb, 0x24, 0x01,
-	0xd7, 0x7e, 0x49, 0x41, 0x58, 0xff, 0x3f, 0x5f, 0xb5, 0xc1, 0xfa, 0xa7, 0xff, 0xf5, 0xfa, 0xff,
-	0xa7, 0x69, 0xfc, 0x05, 0x60, 0xe6, 0x66, 0x53, 0x50, 0x0e, 0x66, 0x5a, 0x54, 0x78, 0xa2, 0xe3,
-	0x30, 0x39, 0x89, 0x14, 0x49, 0xea, 0xf8, 0xd4, 0x2d, 0x9f, 0xbb, 0x03, 0x33, 0x25, 0xcd, 0xa1,
-	0x10, 0x27, 0x69, 0x4b, 0x25, 0xe3, 0x96, 0x26, 0x49, 0x52, 0x4b, 0xcf, 0xb6, 0x3b, 0x01, 0xb5,
-	0xcf, 0x65, 0x57, 0xb1, 0xa7, 0x6a, 0xf4, 0x1d, 0x9c, 0x0a, 0xfd, 0x4e, 0x60, 0x0f, 0x7e, 0x10,
-	0xb2, 0x1b, 0xf8, 0xae, 0x2d, 0xae, 0x49, 0x8a, 0x28, 0xfa, 0xab, 0x5f, 0x53, 0x30, 0x3b, 0x6a,
-	0x21, 0x04, 0xb3, 0xb5, 0xea, 0x13, 0xb2, 0xbd, 0x6b, 0x3d, 0xa9, 0xec, 0x57, 0xaa, 0x4f, 0x2b,
-	0x8b, 0x1a, 0xca, 0x42, 0xa8, 0xb4, 0xbd, 0xc3, 0xda, 0x22, 0x40, 0x9f, 0xc1, 0x05, 0x55, 0x93,
-	0xdd, 0xbd, 0x72, 0xad, 0x4e, 0x7e, 0x5c, 0x9c, 0x40, 0xcb, 0x70, 0x49, 0x89, 0xe5, 0x43, 0x6b,
-	0x6f, 0xb7, 0x7a, 0x50, 0xdd, 0xde, 0xaa, 0x97, 0xab, 0x95, 0xc5, 0x34, 0xca, 0xc3, 0x55, 0x65,
-	0x3d, 0x2d, 0x3f, 0x2a, 0x5b, 0xf1, 0x45, 0x1f, 0x21, 0x26, 0x11, 0x86, 0x39, 0x45, 0x94, 0xea,
-	0xe3, 0xfe, 0xd4, 0x47, 0x4f, 0x38, 0xa8, 0x92, 0xad, 0x71, 0x62, 0xfa, 0x36, 0x51, 0xdf, 0xa9,
-	0x6e, 0x8d, 0x10, 0x19, 0x64, 0xc0, 0x15, 0x45, 0x6c, 0x57, 0x1f, 0x97, 0xca, 0x95, 0xdd, 0x9d,
-	0x11, 0x60, 0x26, 0x97, 0xbe, 0xf8, 0x13, 0x6b, 0xa5, 0x3f, 0xc0, 0x65, 0x0f, 0x83, 0xab, 0x1e,
-	0x06, 0x6f, 0x7b, 0x58, 0x7b, 0xd7, 0xc3, 0xda, 0x75, 0x0f, 0x6b, 0xef, 0x7b, 0x58, 0xfb, 0xd0,
-	0xc3, 0xe0, 0x79, 0x84, 0xc1, 0x45, 0x84, 0xb5, 0x97, 0x11, 0x06, 0xaf, 0x22, 0xac, 0xbd, 0x8e,
-	0xb0, 0xf6, 0x26, 0xc2, 0xda, 0x65, 0x84, 0xc1, 0x55, 0x84, 0xc1, 0xdb, 0x08, 0x6b, 0xef, 0x22,
-	0x0c, 0xae, 0x23, 0xac, 0xbd, 0x8f, 0x30, 0xf8, 0x10, 0x61, 0xed, 0x79, 0x1f, 0x6b, 0x17, 0x7d,
-	0x0c, 0x5e, 0xf4, 0xb1, 0xf6, 0x5b, 0x1f, 0x83, 0xdf, 0xfb, 0x58, 0x7b, 0xd9, 0xc7, 0xda, 0xab,
-	0x3e, 0x06, 0xaf, 0xfb, 0x18, 0xbc, 0xe9, 0x63, 0xf0, 0xd3, 0xd7, 0xae, 0x6f, 0x8a, 0x26, 0x13,
-	0x4d, 0x8f, 0xbb, 0xa1, 0xc9, 0x99, 0x38, 0xf3, 0x83, 0xe3, 0xe2, 0xe8, 0x9f, 0x5e, 0xfb, 0xd8,
-	0x2d, 0x0a, 0xc1, 0xdb, 0x47, 0x47, 0x53, 0x72, 0x15, 0x37, 0xff, 0x09, 0x00, 0x00, 0xff, 0xff,
-	0x8b, 0x5a, 0x3e, 0x8e, 0xd5, 0x07, 0x00, 0x00,
+var fileDescriptor_metadata_0327ebad37bdb5cd = []byte{
+	// 967 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x95, 0x41, 0x4c, 0x1b, 0x47,
+	0x14, 0x86, 0x77, 0x8c, 0x03, 0x66, 0x00, 0x83, 0xa6, 0x22, 0x59, 0x0c, 0x9d, 0x5d, 0x11, 0x55,
+	0x72, 0xab, 0xb2, 0x96, 0x20, 0xaa, 0x72, 0xc5, 0x40, 0xd0, 0x2a, 0x60, 0xd3, 0xb1, 0xa3, 0xa8,
+	0xbd, 0xac, 0x86, 0xdd, 0xf1, 0x7a, 0x85, 0x99, 0x75, 0x77, 0xc7, 0x10, 0x6e, 0x39, 0x72, 0xa9,
+	0x94, 0xde, 0x7a, 0xac, 0xda, 0x4b, 0x8e, 0x39, 0xf4, 0x90, 0x63, 0x8e, 0x1c, 0x39, 0x46, 0xaa,
+	0xe4, 0xc6, 0xeb, 0x4b, 0x8e, 0x39, 0xe6, 0x58, 0xed, 0x78, 0x30, 0x35, 0x0e, 0x52, 0xd4, 0x4b,
+	0x6f, 0x7e, 0xff, 0xff, 0xfd, 0x33, 0xf3, 0xc6, 0x6f, 0x6c, 0x68, 0xb6, 0xc2, 0x88, 0x9e, 0x52,
+	0xbe, 0x16, 0x0b, 0xea, 0x1e, 0x95, 0x68, 0x3b, 0x28, 0x1d, 0x33, 0x41, 0x3d, 0x2a, 0xa8, 0xd5,
+	0x8e, 0x42, 0x11, 0xa2, 0xbc, 0x10, 0xdc, 0x52, 0x94, 0x75, 0xb2, 0x51, 0x58, 0xf3, 0x03, 0xd1,
+	0xec, 0x1c, 0x5a, 0x6e, 0x78, 0x5c, 0xf2, 0x43, 0x3f, 0x2c, 0x49, 0xec, 0xb0, 0xd3, 0x90, 0x95,
+	0x2c, 0xe4, 0xa7, 0x41, 0xbc, 0xb0, 0xe2, 0x87, 0xa1, 0xdf, 0x62, 0xd7, 0x54, 0x2c, 0xa2, 0x8e,
+	0x2b, 0x94, 0x6b, 0xdc, 0x74, 0x45, 0x70, 0xcc, 0x62, 0x41, 0x8f, 0xdb, 0x0a, 0xf8, 0x72, 0xfc,
+	0x7c, 0x8c, 0x77, 0x8e, 0x63, 0x65, 0xdf, 0x1f, 0xb7, 0x03, 0x8f, 0x71, 0x11, 0x34, 0x02, 0x16,
+	0x29, 0x68, 0xf5, 0xaf, 0x49, 0x08, 0xc9, 0xb3, 0x7d, 0xd5, 0x16, 0xda, 0x87, 0x33, 0x3e, 0x15,
+	0xec, 0x94, 0x9e, 0x39, 0x81, 0x17, 0xeb, 0xc0, 0x04, 0xc5, 0x99, 0xf5, 0x55, 0x6b, 0xb4, 0x4d,
+	0x6b, 0x77, 0x80, 0xd8, 0xd7, 0xab, 0x95, 0x73, 0x17, 0x5d, 0x43, 0xbb, 0xec, 0x1a, 0x80, 0x40,
+	0xff, 0xca, 0x8d, 0xd1, 0x7d, 0x38, 0x47, 0xb9, 0x60, 0x9c, 0x53, 0x27, 0xe0, 0x1e, 0x7b, 0xa6,
+	0x67, 0x4c, 0x50, 0x9c, 0x23, 0xb3, 0x4a, 0xb4, 0x53, 0x0d, 0x3d, 0x80, 0xd9, 0xb4, 0x33, 0x7d,
+	0x42, 0x6e, 0x56, 0xb0, 0x06, 0x6d, 0x5b, 0x57, 0x6d, 0x5b, 0xf5, 0xab, 0xb6, 0xcb, 0xd9, 0x17,
+	0x7f, 0x1b, 0x80, 0x48, 0x1a, 0xad, 0xc0, 0xe9, 0xe1, 0x7d, 0xe8, 0x59, 0x13, 0x14, 0xb3, 0xe4,
+	0x5a, 0x40, 0x5f, 0xc1, 0x7c, 0x23, 0xe0, 0xcc, 0xb9, 0x46, 0xee, 0x48, 0x64, 0x2e, 0x55, 0x87,
+	0x0b, 0xa2, 0x87, 0x50, 0x67, 0xdc, 0x8d, 0xce, 0xda, 0x82, 0x79, 0xce, 0x8d, 0xc0, 0xa4, 0x09,
+	0x8a, 0xb3, 0xe4, 0xee, 0xd0, 0x7f, 0x34, 0x92, 0x64, 0xd0, 0xb8, 0x2d, 0xe9, 0x1c, 0xb1, 0xf4,
+	0xf6, 0xf4, 0x29, 0x13, 0x14, 0xa7, 0xcb, 0x46, 0xd2, 0x35, 0x96, 0x77, 0x3e, 0xb9, 0xc8, 0x63,
+	0x76, 0x66, 0x6f, 0x93, 0x65, 0x76, 0xab, 0xe9, 0xa1, 0x15, 0x98, 0x8d, 0xe2, 0x38, 0xd0, 0x73,
+	0x26, 0x28, 0x66, 0xca, 0xb9, 0xa4, 0x6b, 0x64, 0x49, 0xad, 0x66, 0x13, 0xa9, 0xa2, 0x75, 0x38,
+	0xeb, 0x36, 0x29, 0xe7, 0xac, 0xe5, 0x48, 0x6a, 0x5a, 0x52, 0xf3, 0x49, 0xd7, 0x98, 0xd9, 0x1a,
+	0xe8, 0x12, 0x9e, 0x51, 0x10, 0x49, 0x33, 0xdf, 0xc3, 0x7b, 0x29, 0xeb, 0xc4, 0x82, 0x72, 0x8f,
+	0x46, 0x9e, 0xe3, 0xb1, 0x93, 0x80, 0x8a, 0x20, 0xe4, 0x3a, 0x94, 0xf1, 0xa5, 0xa4, 0x6b, 0x2c,
+	0xa6, 0xb9, 0x9a, 0x22, 0xb6, 0xaf, 0x00, 0xb2, 0x98, 0x26, 0xc7, 0x64, 0xb4, 0x04, 0x27, 0x62,
+	0x1e, 0xe9, 0x33, 0x32, 0x3e, 0x95, 0x74, 0x8d, 0x89, 0x5a, 0x85, 0x90, 0x54, 0x43, 0x5f, 0xc3,
+	0x85, 0x46, 0xc4, 0x7e, 0xea, 0x30, 0xee, 0x9e, 0x39, 0x61, 0xa3, 0x11, 0x33, 0xa1, 0xcf, 0x9a,
+	0xa0, 0x38, 0x41, 0xe6, 0x87, 0x7a, 0x55, 0xca, 0xe8, 0x01, 0xcc, 0xb5, 0x42, 0x77, 0x70, 0x92,
+	0x39, 0x39, 0x0a, 0xfa, 0xcd, 0xb9, 0xdb, 0x53, 0x3e, 0x19, 0x92, 0xc8, 0x87, 0xba, 0x17, 0x9e,
+	0xf2, 0x56, 0xc0, 0x8f, 0x9c, 0x36, 0x15, 0x4d, 0xc7, 0x0d, 0x79, 0x2c, 0x22, 0x1a, 0x70, 0xa1,
+	0xe7, 0x4d, 0x50, 0xcc, 0xaf, 0xaf, 0xdd, 0x32, 0xbd, 0xdb, 0x2a, 0x76, 0x40, 0x45, 0x73, 0x6b,
+	0x18, 0x22, 0x77, 0xbd, 0x4f, 0xea, 0x68, 0x03, 0xe6, 0xa8, 0x77, 0x42, 0xb9, 0xcb, 0x3c, 0xdd,
+	0x95, 0xc7, 0xbb, 0x37, 0x36, 0xa9, 0x35, 0xf9, 0x7c, 0xc9, 0x10, 0x5c, 0xfd, 0x39, 0x03, 0x61,
+	0xfd, 0xff, 0x7d, 0x5d, 0x0f, 0x3f, 0xfb, 0x75, 0xc9, 0x4d, 0x3e, 0xfb, 0x85, 0xfd, 0xa7, 0xfb,
+	0xf8, 0x13, 0xc0, 0xdc, 0xd5, 0x97, 0x88, 0x0a, 0x30, 0xd7, 0xa2, 0x22, 0x10, 0x1d, 0x8f, 0xc9,
+	0xab, 0xc8, 0x90, 0x61, 0x9d, 0xee, 0xdd, 0x0a, 0xb9, 0x3f, 0x30, 0x33, 0xd2, 0xbc, 0x16, 0xd2,
+	0x24, 0x6d, 0xa9, 0x64, 0xda, 0xd7, 0x1d, 0x32, 0xac, 0xa5, 0xe7, 0xba, 0x9d, 0x88, 0xba, 0x67,
+	0xf2, 0xd0, 0xa9, 0xa7, 0x6a, 0xf4, 0x1d, 0x9c, 0x8c, 0xc3, 0x4e, 0xe4, 0x32, 0xf9, 0x6b, 0x90,
+	0x5f, 0xc7, 0xb7, 0x0d, 0x58, 0x4d, 0x52, 0x44, 0xd1, 0xdf, 0xfc, 0x92, 0x81, 0xf9, 0x51, 0x0b,
+	0x21, 0x98, 0xaf, 0x55, 0x9f, 0x90, 0xad, 0x1d, 0xe7, 0x49, 0xe5, 0x71, 0xa5, 0xfa, 0xb4, 0xb2,
+	0xa0, 0xa1, 0x3c, 0x84, 0x4a, 0xdb, 0x3d, 0xa8, 0x2d, 0x00, 0xf4, 0x05, 0x9c, 0x57, 0x35, 0xd9,
+	0xd9, 0xb5, 0x6b, 0x75, 0xf2, 0xc3, 0xc2, 0x04, 0x5a, 0x82, 0x8b, 0x4a, 0xb4, 0x0f, 0x9c, 0xdd,
+	0x9d, 0xea, 0x5e, 0x75, 0x6b, 0xb3, 0x6e, 0x57, 0x2b, 0x0b, 0x59, 0x64, 0xc2, 0x15, 0x65, 0x3d,
+	0xb5, 0x1f, 0xd9, 0x4e, 0xfa, 0x06, 0x47, 0x88, 0x3b, 0x08, 0xc3, 0x82, 0x22, 0xca, 0xf5, 0x71,
+	0x7f, 0xf2, 0x5f, 0x2b, 0xec, 0x55, 0xc9, 0xe6, 0x38, 0x31, 0x75, 0x93, 0xa8, 0x6f, 0x57, 0x37,
+	0x47, 0x88, 0x1c, 0x32, 0xe0, 0xb2, 0x22, 0xb6, 0xaa, 0xfb, 0x65, 0xbb, 0xb2, 0xb3, 0x3d, 0x02,
+	0x4c, 0x17, 0xb2, 0xe7, 0x7f, 0x60, 0xad, 0xfc, 0x3b, 0xb8, 0xe8, 0x61, 0x70, 0xd9, 0xc3, 0xe0,
+	0x6d, 0x0f, 0x6b, 0xef, 0x7a, 0x58, 0x7b, 0xdf, 0xc3, 0xda, 0x87, 0x1e, 0xd6, 0x3e, 0xf6, 0x30,
+	0x78, 0x9e, 0x60, 0x70, 0x9e, 0x60, 0xed, 0x65, 0x82, 0xc1, 0xab, 0x04, 0x6b, 0xaf, 0x13, 0xac,
+	0xbd, 0x49, 0xb0, 0x76, 0x91, 0x60, 0x70, 0x99, 0x60, 0xf0, 0x36, 0xc1, 0xda, 0xbb, 0x04, 0x83,
+	0xf7, 0x09, 0xd6, 0x3e, 0x24, 0x18, 0x7c, 0x4c, 0xb0, 0xf6, 0xbc, 0x8f, 0xb5, 0xf3, 0x3e, 0x06,
+	0x2f, 0xfa, 0x58, 0xfb, 0xb5, 0x8f, 0xc1, 0x6f, 0x7d, 0xac, 0xbd, 0xec, 0x63, 0xed, 0x55, 0x1f,
+	0x83, 0xd7, 0x7d, 0x0c, 0xde, 0xf4, 0x31, 0xf8, 0xf1, 0x5b, 0x3f, 0xb4, 0x44, 0x93, 0x89, 0x66,
+	0xc0, 0xfd, 0xd8, 0xe2, 0x4c, 0x9c, 0x86, 0xd1, 0x51, 0x69, 0xf4, 0x9f, 0xae, 0x7d, 0xe4, 0x97,
+	0x84, 0xe0, 0xed, 0xc3, 0xc3, 0x49, 0x39, 0x8a, 0x1b, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xf9,
+	0x83, 0x3e, 0x24, 0xca, 0x07, 0x00, 0x00,
 }

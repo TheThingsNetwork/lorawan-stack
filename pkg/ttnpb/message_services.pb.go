@@ -449,7 +449,7 @@ func NewPopulatedProcessUplinkMessageRequest(r randyMessageServices, easy bool) 
 	this.EndDeviceVersionIdentifiers = *v1
 	v2 := NewPopulatedUplinkMessage(r, easy)
 	this.Message = *v2
-	this.Parameter = randStringMessageServices(r)
+	this.Parameter = string(randStringMessageServices(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -461,7 +461,7 @@ func NewPopulatedProcessDownlinkMessageRequest(r randyMessageServices, easy bool
 	this.EndDeviceVersionIdentifiers = *v3
 	v4 := NewPopulatedDownlinkMessage(r, easy)
 	this.Message = *v4
-	this.Parameter = randStringMessageServices(r)
+	this.Parameter = string(randStringMessageServices(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -533,7 +533,7 @@ func randFieldMessageServices(dAtA []byte, r randyMessageServices, fieldNumber i
 }
 func encodeVarintPopulateMessageServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -578,7 +578,7 @@ func sovMessageServices(x uint64) (n int) {
 	return n
 }
 func sozMessageServices(x uint64) (n int) {
-	return sovMessageServices((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMessageServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ProcessUplinkMessageRequest) String() string {
 	if this == nil {

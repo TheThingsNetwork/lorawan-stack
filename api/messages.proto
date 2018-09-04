@@ -69,14 +69,13 @@ message UplinkMessage {
   //   - Lon: rx_metadata.location.longitude
 
   bytes raw_payload = 1;
-  Message payload = 2 [(gogoproto.nullable) = false];
-  EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Message payload = 2;
+  EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
   TxSettings settings = 4 [(gogoproto.nullable) = false];
   repeated RxMetadata rx_metadata = 5;
-  map<string,LocationSource> locations = 6;
   // Server time when the Gateway Server received the message.
-  google.protobuf.Timestamp received_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  repeated string correlation_ids = 8 [(gogoproto.customname) = "CorrelationIDs"];
+  google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  repeated string correlation_ids = 7 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 // Downlink message from the network to the end device
@@ -120,8 +119,8 @@ message DownlinkMessage {
   //   - ID: tx_metadata.gateway_id
 
   bytes raw_payload = 1;
-  Message payload = 2 [(gogoproto.nullable) = false];
-  EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Message payload = 2;
+  EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
   TxSettings settings = 4 [(gogoproto.nullable) = false];
   TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
@@ -151,6 +150,7 @@ message ApplicationUplink {
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   repeated RxMetadata rx_metadata = 5;
+  map<string,Location> locations = 6;
 }
 
 message ApplicationJoinAccept {
@@ -167,7 +167,6 @@ message ApplicationDownlink {
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   bool confirmed = 4;
-
   repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
@@ -176,9 +175,8 @@ message ApplicationDownlinks {
 }
 
 message ApplicationUp {
-  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"]; // TODO: This field is also in ApplicationDownlink (duplicate)
+  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
 
   oneof up {
     ApplicationUplink uplink_message = 3;
@@ -187,7 +185,7 @@ message ApplicationUp {
     ApplicationDownlink downlink_nack = 6;
     ApplicationDownlink downlink_sent = 7;
     ApplicationDownlink downlink_queued = 8;
-    // TODO: Downlink queue invalidated (LoRaWAN 1.0)
+    ApplicationDownlinks downlink_queue_invalidated = 9;
   }
 }
 

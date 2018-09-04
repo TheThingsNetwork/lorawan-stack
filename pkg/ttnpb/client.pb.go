@@ -835,7 +835,7 @@ func (m *Client) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Description)
 	}
 	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
+		for k, _ := range m.Attributes {
 			dAtA[i] = 0x32
 			i++
 			v := m.Attributes[k]
@@ -1167,8 +1167,8 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringClient(r)
-	this.Description = randStringClient(r)
+	this.Name = string(randStringClient(r))
+	this.Description = string(randStringClient(r))
 	if r.Intn(10) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -1183,15 +1183,15 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 			this.ContactInfo[i] = NewPopulatedContactInfo(r, easy)
 		}
 	}
-	this.Secret = randStringClient(r)
+	this.Secret = string(randStringClient(r))
 	v6 := r.Intn(10)
 	this.RedirectURIs = make([]string, v6)
 	for i := 0; i < v6; i++ {
-		this.RedirectURIs[i] = randStringClient(r)
+		this.RedirectURIs[i] = string(randStringClient(r))
 	}
 	this.State = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.SkipAuthorization = bool(r.Intn(2) == 0)
-	this.Endorsed = bool(r.Intn(2) == 0)
+	this.SkipAuthorization = bool(bool(r.Intn(2) == 0))
+	this.Endorsed = bool(bool(r.Intn(2) == 0))
 	v7 := r.Intn(10)
 	this.Grants = make([]GrantType, v7)
 	for i := 0; i < v7; i++ {
@@ -1344,7 +1344,7 @@ func randFieldClient(dAtA []byte, r randyClient, fieldNumber int, wire int) []by
 }
 func encodeVarintPopulateClient(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1494,14 +1494,14 @@ func sovClient(x uint64) (n int) {
 	return n
 }
 func sozClient(x uint64) (n int) {
-	return sovClient((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovClient(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Client) String() string {
 	if this == nil {
 		return "nil"
 	}
 	keysForAttributes := make([]string, 0, len(this.Attributes))
-	for k := range this.Attributes {
+	for k, _ := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)
