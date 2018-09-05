@@ -234,7 +234,7 @@ message EndDevice {
   map<string,string> attributes = 6;
 
   // Version Identifiers. Stored in Application Server.
-  EndDeviceVersionIdentifiers version_ids = 7;
+  EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
 
   // TODO: Service Profile Identifier
   string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID"];
@@ -332,7 +332,7 @@ message EndDevice {
 
   // The payload formatters for this end device. Stored in Application Server.
   // Copied on creation from template identified by version_ids.
-  MessagePayloadFormatters formatters = 39 [(gogoproto.nullable) = false];
+  MessagePayloadFormatters formatters = 39;
 
   // Location of the device. Stored in Application Server.
   map<string,Location> locations = 40;

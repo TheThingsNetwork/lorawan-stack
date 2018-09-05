@@ -557,7 +557,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 
 	for i, tc := range []struct {
 		Bytes       []byte
-		Identifiers EndDeviceIdentifiers
+		Identifiers *EndDeviceIdentifiers
 	}{
 		{
 			[]byte{
@@ -573,7 +573,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				/* MIC */
 				0x42, 0xff, 0xff, 0xff,
 			},
-			EndDeviceIdentifiers{
+			&EndDeviceIdentifiers{
 				JoinEUI: &joinEUI,
 				DevEUI:  &devEUI,
 			},
@@ -599,7 +599,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				/* MIC */
 				0x42, 0xff, 0xff, 0xff,
 			},
-			EndDeviceIdentifiers{
+			&EndDeviceIdentifiers{
 				DevAddr: &devAddr,
 			},
 		},
@@ -619,7 +619,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				/* MIC */
 				0x42, 0xff, 0xff, 0xff,
 			},
-			EndDeviceIdentifiers{
+			&EndDeviceIdentifiers{
 				DevEUI: &devEUI,
 			},
 		},
@@ -639,7 +639,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				/* MIC */
 				0x42, 0xff, 0xff, 0xff,
 			},
-			EndDeviceIdentifiers{
+			&EndDeviceIdentifiers{
 				JoinEUI: &joinEUI,
 				DevEUI:  &devEUI,
 			},
@@ -660,7 +660,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				/* MIC */
 				0x42, 0xff, 0xff, 0xff,
 			},
-			EndDeviceIdentifiers{
+			&EndDeviceIdentifiers{
 				DevEUI: &devEUI,
 			},
 		},
@@ -674,7 +674,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(msg.EndDeviceIdentifiers, should.Resemble, tc.Identifiers)
+			a.So(msg.EndDeviceIDs, should.Resemble, tc.Identifiers)
 		})
 	}
 }

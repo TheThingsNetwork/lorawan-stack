@@ -321,7 +321,7 @@ func NewPopulatedSetAsApplicationAPIKeyRequest(r randyApplicationserver, easy bo
 	this := &SetAsApplicationAPIKeyRequest{}
 	v1 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v1
-	this.APIKey = string(randStringApplicationserver(r))
+	this.APIKey = randStringApplicationserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -393,7 +393,7 @@ func randFieldApplicationserver(dAtA []byte, r randyApplicationserver, fieldNumb
 }
 func encodeVarintPopulateApplicationserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -422,7 +422,7 @@ func sovApplicationserver(x uint64) (n int) {
 	return n
 }
 func sozApplicationserver(x uint64) (n int) {
-	return sovApplicationserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovApplicationserver((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *SetAsApplicationAPIKeyRequest) String() string {
 	if this == nil {

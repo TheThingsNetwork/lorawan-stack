@@ -630,7 +630,7 @@ func (m *SearchEntitiesRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.DescriptionContains)
 	}
 	if len(m.AttributesContain) > 0 {
-		for k, _ := range m.AttributesContain {
+		for k := range m.AttributesContain {
 			dAtA[i] = 0x22
 			i++
 			v := m.AttributesContain[k]
@@ -699,7 +699,7 @@ func (m *SearchEndDevicesRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.DescriptionContains)
 	}
 	if len(m.AttributesContain) > 0 {
-		for k, _ := range m.AttributesContain {
+		for k := range m.AttributesContain {
 			dAtA[i] = 0x2a
 			i++
 			v := m.AttributesContain[k]
@@ -755,9 +755,9 @@ func encodeVarintSearchServices(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedSearchEntitiesRequest(r randySearchServices, easy bool) *SearchEntitiesRequest {
 	this := &SearchEntitiesRequest{}
-	this.IDContains = string(randStringSearchServices(r))
-	this.NameContains = string(randStringSearchServices(r))
-	this.DescriptionContains = string(randStringSearchServices(r))
+	this.IDContains = randStringSearchServices(r)
+	this.NameContains = randStringSearchServices(r)
+	this.DescriptionContains = randStringSearchServices(r)
 	if r.Intn(10) != 0 {
 		v1 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -776,9 +776,9 @@ func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *Sear
 	this := &SearchEndDevicesRequest{}
 	v3 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v3
-	this.IDContains = string(randStringSearchServices(r))
-	this.NameContains = string(randStringSearchServices(r))
-	this.DescriptionContains = string(randStringSearchServices(r))
+	this.IDContains = randStringSearchServices(r)
+	this.NameContains = randStringSearchServices(r)
+	this.DescriptionContains = randStringSearchServices(r)
 	if r.Intn(10) != 0 {
 		v4 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -786,9 +786,9 @@ func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *Sear
 			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
 		}
 	}
-	this.DevEUIContains = string(randStringSearchServices(r))
-	this.JoinEUIContains = string(randStringSearchServices(r))
-	this.DevAddrContains = string(randStringSearchServices(r))
+	this.DevEUIContains = randStringSearchServices(r)
+	this.JoinEUIContains = randStringSearchServices(r)
+	this.DevAddrContains = randStringSearchServices(r)
 	v5 := types.NewPopulatedFieldMask(r, easy)
 	this.FieldMask = *v5
 	if !easy && r.Intn(10) != 0 {
@@ -862,7 +862,7 @@ func randFieldSearchServices(dAtA []byte, r randySearchServices, fieldNumber int
 }
 func encodeVarintPopulateSearchServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -949,14 +949,14 @@ func sovSearchServices(x uint64) (n int) {
 	return n
 }
 func sozSearchServices(x uint64) (n int) {
-	return sovSearchServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovSearchServices((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *SearchEntitiesRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
 	keysForAttributesContain := make([]string, 0, len(this.AttributesContain))
-	for k, _ := range this.AttributesContain {
+	for k := range this.AttributesContain {
 		keysForAttributesContain = append(keysForAttributesContain, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributesContain)
@@ -980,7 +980,7 @@ func (this *SearchEndDevicesRequest) String() string {
 		return "nil"
 	}
 	keysForAttributesContain := make([]string, 0, len(this.AttributesContain))
-	for k, _ := range this.AttributesContain {
+	for k := range this.AttributesContain {
 		keysForAttributesContain = append(keysForAttributesContain, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributesContain)

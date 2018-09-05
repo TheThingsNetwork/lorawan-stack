@@ -902,9 +902,9 @@ func NewPopulatedRights(r randyRights, easy bool) *Rights {
 
 func NewPopulatedAPIKey(r randyRights, easy bool) *APIKey {
 	this := &APIKey{}
-	this.ID = string(randStringRights(r))
-	this.Key = string(randStringRights(r))
-	this.Name = string(randStringRights(r))
+	this.ID = randStringRights(r)
+	this.Key = randStringRights(r)
+	this.Name = randStringRights(r)
 	v2 := r.Intn(10)
 	this.Rights = make([]Right, v2)
 	for i := 0; i < v2; i++ {
@@ -1023,7 +1023,7 @@ func randFieldRights(dAtA []byte, r randyRights, fieldNumber int, wire int) []by
 }
 func encodeVarintPopulateRights(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1117,7 +1117,7 @@ func sovRights(x uint64) (n int) {
 	return n
 }
 func sozRights(x uint64) (n int) {
-	return sovRights(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovRights((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *Rights) String() string {
 	if this == nil {

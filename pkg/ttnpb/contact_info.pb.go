@@ -461,8 +461,8 @@ func NewPopulatedContactInfo(r randyContactInfo, easy bool) *ContactInfo {
 	this := &ContactInfo{}
 	this.ContactType = ContactType([]int32{0, 1, 2, 3}[r.Intn(4)])
 	this.ContactMethod = ContactMethod([]int32{0, 1, 2}[r.Intn(3)])
-	this.Value = string(randStringContactInfo(r))
-	this.Public = bool(bool(r.Intn(2) == 0))
+	this.Value = randStringContactInfo(r)
+	this.Public = bool(r.Intn(2) == 0)
 	if r.Intn(10) != 0 {
 		this.ValidatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -473,7 +473,7 @@ func NewPopulatedContactInfo(r randyContactInfo, easy bool) *ContactInfo {
 
 func NewPopulatedContactInfoValidation(r randyContactInfo, easy bool) *ContactInfoValidation {
 	this := &ContactInfoValidation{}
-	this.Token = string(randStringContactInfo(r))
+	this.Token = randStringContactInfo(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -545,7 +545,7 @@ func randFieldContactInfo(dAtA []byte, r randyContactInfo, fieldNumber int, wire
 }
 func encodeVarintPopulateContactInfo(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -595,7 +595,7 @@ func sovContactInfo(x uint64) (n int) {
 	return n
 }
 func sozContactInfo(x uint64) (n int) {
-	return sovContactInfo(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovContactInfo((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *ContactInfo) String() string {
 	if this == nil {

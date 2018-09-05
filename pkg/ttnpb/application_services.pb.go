@@ -1024,7 +1024,7 @@ func randFieldApplicationServices(dAtA []byte, r randyApplicationServices, field
 }
 func encodeVarintPopulateApplicationServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1055,7 +1055,7 @@ func sovApplicationServices(x uint64) (n int) {
 	return n
 }
 func sozApplicationServices(x uint64) (n int) {
-	return sovApplicationServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovApplicationServices((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *DownlinkQueueRequest) String() string {
 	if this == nil {

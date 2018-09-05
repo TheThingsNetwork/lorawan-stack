@@ -1246,7 +1246,7 @@ func (m *User) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Description)
 	}
 	if len(m.Attributes) > 0 {
-		for k, _ := range m.Attributes {
+		for k := range m.Attributes {
 			dAtA[i] = 0x32
 			i++
 			v := m.Attributes[k]
@@ -1748,8 +1748,8 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = string(randStringUser(r))
-	this.Description = string(randStringUser(r))
+	this.Name = randStringUser(r)
+	this.Description = randStringUser(r)
 	if r.Intn(10) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -1764,13 +1764,13 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 			this.ContactInfo[i] = NewPopulatedContactInfo(r, easy)
 		}
 	}
-	this.PrimaryEmailAddress = string(randStringUser(r))
-	this.Password = string(randStringUser(r))
+	this.PrimaryEmailAddress = randStringUser(r)
+	this.Password = randStringUser(r)
 	v6 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.PasswordUpdatedAt = *v6
-	this.RequirePasswordUpdate = bool(bool(r.Intn(2) == 0))
+	this.RequirePasswordUpdate = bool(r.Intn(2) == 0)
 	this.State = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Admin = bool(bool(r.Intn(2) == 0))
+	this.Admin = bool(r.Intn(2) == 0)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1825,8 +1825,8 @@ func NewPopulatedUpdateUserPasswordRequest(r randyUser, easy bool) *UpdateUserPa
 	this := &UpdateUserPasswordRequest{}
 	v13 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v13
-	this.New = string(randStringUser(r))
-	this.Old = string(randStringUser(r))
+	this.New = randStringUser(r)
+	this.Old = randStringUser(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1836,7 +1836,7 @@ func NewPopulatedCreateUserAPIKeyRequest(r randyUser, easy bool) *CreateUserAPIK
 	this := &CreateUserAPIKeyRequest{}
 	v14 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v14
-	this.Name = string(randStringUser(r))
+	this.Name = randStringUser(r)
 	v15 := r.Intn(10)
 	this.Rights = make([]Right, v15)
 	for i := 0; i < v15; i++ {
@@ -1862,7 +1862,7 @@ func NewPopulatedRemoveUserAPIKeyRequest(r randyUser, easy bool) *RemoveUserAPIK
 	this := &RemoveUserAPIKeyRequest{}
 	v18 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v18
-	this.ID = string(randStringUser(r))
+	this.ID = randStringUser(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1870,8 +1870,8 @@ func NewPopulatedRemoveUserAPIKeyRequest(r randyUser, easy bool) *RemoveUserAPIK
 
 func NewPopulatedInvitation(r randyUser, easy bool) *Invitation {
 	this := &Invitation{}
-	this.Email = string(randStringUser(r))
-	this.Token = string(randStringUser(r))
+	this.Email = randStringUser(r)
+	this.Token = randStringUser(r)
 	v19 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ExpiresAt = *v19
 	v20 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -1899,7 +1899,7 @@ func NewPopulatedInvitations(r randyUser, easy bool) *Invitations {
 
 func NewPopulatedSendInvitationRequest(r randyUser, easy bool) *SendInvitationRequest {
 	this := &SendInvitationRequest{}
-	this.Email = string(randStringUser(r))
+	this.Email = randStringUser(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1907,7 +1907,7 @@ func NewPopulatedSendInvitationRequest(r randyUser, easy bool) *SendInvitationRe
 
 func NewPopulatedDeleteInvitationRequest(r randyUser, easy bool) *DeleteInvitationRequest {
 	this := &DeleteInvitationRequest{}
-	this.Email = string(randStringUser(r))
+	this.Email = randStringUser(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1979,7 +1979,7 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateUser(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2198,14 +2198,14 @@ func sovUser(x uint64) (n int) {
 	return n
 }
 func sozUser(x uint64) (n int) {
-	return sovUser(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovUser((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *User) String() string {
 	if this == nil {
 		return "nil"
 	}
 	keysForAttributes := make([]string, 0, len(this.Attributes))
-	for k, _ := range this.Attributes {
+	for k := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)

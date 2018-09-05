@@ -69,7 +69,7 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 	if r.Intn(2) == 0 {
 		out.TxPower *= -1
 	}
-	out.PolarizationInversion = r.Intn(2) == 0
+	out.InvertPolarization = r.Intn(2) == 0
 	out.ChannelIndex = r.Uint32() % 255
 	out.DataRateIndex = NewPopulatedDataRateIndex(r, false) % 6
 	return out

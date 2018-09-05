@@ -588,6 +588,12 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 	if n == 0 {
 		return errMissing("PHYPayload")
 	}
+	if msg.Payload == nil {
+		msg.Payload = &Message{}
+	}
+	if msg.EndDeviceIDs == nil {
+		msg.EndDeviceIDs = &EndDeviceIdentifiers{}
+	}
 	if err := msg.Payload.MHDR.UnmarshalLoRaWAN(msg.RawPayload[0:1]); err != nil {
 		return errFailedDecoding("MHDR").WithCause(err)
 	}
@@ -598,7 +604,7 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 		}
 		var devAddr types.DevAddr
 		copyReverse(devAddr[:], msg.RawPayload[1:5])
-		msg.EndDeviceIdentifiers.DevAddr = &devAddr
+		msg.EndDeviceIDs.DevAddr = &devAddr
 		return nil
 	case MType_JOIN_REQUEST:
 		if n != 23 {
@@ -607,8 +613,8 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 		var joinEUI, devEUI types.EUI64
 		copyReverse(joinEUI[:], msg.RawPayload[1:9])
 		copyReverse(devEUI[:], msg.RawPayload[9:17])
-		msg.EndDeviceIdentifiers.JoinEUI = &joinEUI
-		msg.EndDeviceIdentifiers.DevEUI = &devEUI
+		msg.EndDeviceIDs.JoinEUI = &joinEUI
+		msg.EndDeviceIDs.DevEUI = &devEUI
 		return nil
 	case MType_REJOIN_REQUEST:
 		if n != 19 && n != 24 {
@@ -621,7 +627,7 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 			}
 			var devEUI types.EUI64
 			copyReverse(devEUI[:], msg.RawPayload[5:13])
-			msg.EndDeviceIdentifiers.DevEUI = &devEUI
+			msg.EndDeviceIDs.DevEUI = &devEUI
 		case 1:
 			if n != 24 {
 				return errExpectedLengthEqual("RejoinRequestPHYPayload", 24)(n)
@@ -629,8 +635,8 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 			var joinEUI, devEUI types.EUI64
 			copyReverse(joinEUI[:], msg.RawPayload[2:10])
 			copyReverse(devEUI[:], msg.RawPayload[10:18])
-			msg.EndDeviceIdentifiers.JoinEUI = &joinEUI
-			msg.EndDeviceIdentifiers.DevEUI = &devEUI
+			msg.EndDeviceIDs.JoinEUI = &joinEUI
+			msg.EndDeviceIDs.DevEUI = &devEUI
 		default:
 			return errUnknown("RejoinType")(msg.RawPayload[1])
 		}

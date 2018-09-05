@@ -239,13 +239,13 @@ func encodeVarintError(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedErrorDetails(r randyError, easy bool) *ErrorDetails {
 	this := &ErrorDetails{}
-	this.Namespace = string(randStringError(r))
-	this.Name = string(randStringError(r))
-	this.MessageFormat = string(randStringError(r))
+	this.Namespace = randStringError(r)
+	this.Name = randStringError(r)
+	this.MessageFormat = randStringError(r)
 	if r.Intn(10) != 0 {
 		this.Attributes = types.NewPopulatedStruct(r, easy)
 	}
-	this.CorrelationID = string(randStringError(r))
+	this.CorrelationID = randStringError(r)
 	if r.Intn(10) == 0 {
 		this.Cause = NewPopulatedErrorDetails(r, easy)
 	}
@@ -320,7 +320,7 @@ func randFieldError(dAtA []byte, r randyError, fieldNumber int, wire int) []byte
 }
 func encodeVarintPopulateError(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -367,7 +367,7 @@ func sovError(x uint64) (n int) {
 	return n
 }
 func sozError(x uint64) (n int) {
-	return sovError(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovError((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *ErrorDetails) String() string {
 	if this == nil {

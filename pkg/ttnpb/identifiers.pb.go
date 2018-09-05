@@ -1250,8 +1250,8 @@ func encodeVarintIdentifiers(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedUserIdentifiers(r randyIdentifiers, easy bool) *UserIdentifiers {
 	this := &UserIdentifiers{}
-	this.UserID = string(randStringIdentifiers(r))
-	this.Email = string(randStringIdentifiers(r))
+	this.UserID = randStringIdentifiers(r)
+	this.Email = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1259,7 +1259,7 @@ func NewPopulatedUserIdentifiers(r randyIdentifiers, easy bool) *UserIdentifiers
 
 func NewPopulatedClientIdentifiers(r randyIdentifiers, easy bool) *ClientIdentifiers {
 	this := &ClientIdentifiers{}
-	this.ClientID = string(randStringIdentifiers(r))
+	this.ClientID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1267,7 +1267,7 @@ func NewPopulatedClientIdentifiers(r randyIdentifiers, easy bool) *ClientIdentif
 
 func NewPopulatedOrganizationIdentifiers(r randyIdentifiers, easy bool) *OrganizationIdentifiers {
 	this := &OrganizationIdentifiers{}
-	this.OrganizationID = string(randStringIdentifiers(r))
+	this.OrganizationID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1412,7 +1412,7 @@ func randFieldIdentifiers(dAtA []byte, r randyIdentifiers, fieldNumber int, wire
 }
 func encodeVarintPopulateIdentifiers(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1580,7 +1580,7 @@ func sovIdentifiers(x uint64) (n int) {
 	return n
 }
 func sozIdentifiers(x uint64) (n int) {
-	return sovIdentifiers(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovIdentifiers((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *UserIdentifiers) String() string {
 	if this == nil {

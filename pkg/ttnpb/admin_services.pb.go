@@ -629,13 +629,13 @@ func encodeVarintAdminServices(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedUserRegistrationSettings(r randyAdminServices, easy bool) *UserRegistrationSettings {
 	this := &UserRegistrationSettings{}
-	this.RequireEmailValidation = bool(bool(r.Intn(2) == 0))
-	this.RequireInvitation = bool(bool(r.Intn(2) == 0))
-	this.RequireAdminApproval = bool(bool(r.Intn(2) == 0))
+	this.RequireEmailValidation = bool(r.Intn(2) == 0)
+	this.RequireInvitation = bool(r.Intn(2) == 0)
+	this.RequireAdminApproval = bool(r.Intn(2) == 0)
 	v1 := r.Intn(10)
 	this.AllowEmailPatterns = make([]string, v1)
 	for i := 0; i < v1; i++ {
-		this.AllowEmailPatterns[i] = string(randStringAdminServices(r))
+		this.AllowEmailPatterns[i] = randStringAdminServices(r)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -649,7 +649,7 @@ func NewPopulatedIdentityServerSettings(r randyAdminServices, easy bool) *Identi
 	v3 := r.Intn(10)
 	this.BlacklistedIDs = make([]string, v3)
 	for i := 0; i < v3; i++ {
-		this.BlacklistedIDs[i] = string(randStringAdminServices(r))
+		this.BlacklistedIDs[i] = randStringAdminServices(r)
 	}
 	v4 := NewPopulatedUserRegistrationSettings(r, easy)
 	this.UserRegistrationSettings = *v4
@@ -739,7 +739,7 @@ func randFieldAdminServices(dAtA []byte, r randyAdminServices, fieldNumber int, 
 }
 func encodeVarintPopulateAdminServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -807,7 +807,7 @@ func sovAdminServices(x uint64) (n int) {
 	return n
 }
 func sozAdminServices(x uint64) (n int) {
-	return sovAdminServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovAdminServices((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *UserRegistrationSettings) String() string {
 	if this == nil {

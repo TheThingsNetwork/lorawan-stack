@@ -1805,7 +1805,7 @@ func (m *ApplicationUplink) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Locations) > 0 {
-		for k, _ := range m.Locations {
+		for k := range m.Locations {
 			dAtA[i] = 0x32
 			i++
 			v := m.Locations[k]
@@ -2158,7 +2158,7 @@ func NewPopulatedTxAcknowledgment(r randyMessages, easy bool) *TxAcknowledgment 
 	v1 := r.Intn(10)
 	this.CorrelationIDs = make([]string, v1)
 	for i := 0; i < v1; i++ {
-		this.CorrelationIDs[i] = string(randStringMessages(r))
+		this.CorrelationIDs[i] = randStringMessages(r)
 	}
 	this.Result = TxAcknowledgment_Result([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8}[r.Intn(9)])
 	if !easy && r.Intn(10) != 0 {
@@ -2168,9 +2168,9 @@ func NewPopulatedTxAcknowledgment(r randyMessages, easy bool) *TxAcknowledgment 
 
 func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplink {
 	this := &ApplicationUplink{}
-	this.SessionKeyID = string(randStringMessages(r))
-	this.FPort = uint32(r.Uint32())
-	this.FCnt = uint32(r.Uint32())
+	this.SessionKeyID = randStringMessages(r)
+	this.FPort = r.Uint32()
+	this.FCnt = r.Uint32()
 	v2 := r.Intn(100)
 	this.FRMPayload = make([]byte, v2)
 	for i := 0; i < v2; i++ {
@@ -2197,7 +2197,7 @@ func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplin
 
 func NewPopulatedApplicationJoinAccept(r randyMessages, easy bool) *ApplicationJoinAccept {
 	this := &ApplicationJoinAccept{}
-	this.SessionKeyID = string(randStringMessages(r))
+	this.SessionKeyID = randStringMessages(r)
 	if r.Intn(10) != 0 {
 		this.AppSKey = NewPopulatedKeyEnvelope(r, easy)
 	}
@@ -2227,7 +2227,7 @@ func NewPopulatedApplicationUp(r randyMessages, easy bool) *ApplicationUp {
 	v7 := r.Intn(10)
 	this.CorrelationIDs = make([]string, v7)
 	for i := 0; i < v7; i++ {
-		this.CorrelationIDs[i] = string(randStringMessages(r))
+		this.CorrelationIDs[i] = randStringMessages(r)
 	}
 	oneofNumber_Up := []int32{3, 4, 5, 6, 7, 8, 9}[r.Intn(7)]
 	switch oneofNumber_Up {
@@ -2289,9 +2289,9 @@ func NewPopulatedApplicationUp_DownlinkQueueInvalidated(r randyMessages, easy bo
 func NewPopulatedMessagePayloadFormatters(r randyMessages, easy bool) *MessagePayloadFormatters {
 	this := &MessagePayloadFormatters{}
 	this.UpFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.UpFormatterParameter = string(randStringMessages(r))
+	this.UpFormatterParameter = randStringMessages(r)
 	this.DownFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.DownFormatterParameter = string(randStringMessages(r))
+	this.DownFormatterParameter = randStringMessages(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2363,7 +2363,7 @@ func randFieldMessages(dAtA []byte, r randyMessages, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateMessages(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2647,7 +2647,7 @@ func sovMessages(x uint64) (n int) {
 	return n
 }
 func sozMessages(x uint64) (n int) {
-	return sovMessages(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovMessages((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *UplinkMessage) String() string {
 	if this == nil {
@@ -2696,7 +2696,7 @@ func (this *ApplicationUplink) String() string {
 		return "nil"
 	}
 	keysForLocations := make([]string, 0, len(this.Locations))
-	for k, _ := range this.Locations {
+	for k := range this.Locations {
 		keysForLocations = append(keysForLocations, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForLocations)

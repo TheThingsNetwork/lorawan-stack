@@ -38,7 +38,7 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	}
 
 	msg := NewPopulatedMessageJoinRequest(r)
-	out.Payload = *msg
+	out.Payload = msg
 
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)

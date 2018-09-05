@@ -244,7 +244,7 @@ func (m *PeerInfo) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], dAtA2[:j1])
 	}
 	if len(m.Tags) > 0 {
-		for k, _ := range m.Tags {
+		for k := range m.Tags {
 			dAtA[i] = 0x22
 			i++
 			v := m.Tags[k]
@@ -274,8 +274,8 @@ func encodeVarintCluster(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedPeerInfo(r randyCluster, easy bool) *PeerInfo {
 	this := &PeerInfo{}
-	this.GRPCPort = uint32(r.Uint32())
-	this.TLS = bool(bool(r.Intn(2) == 0))
+	this.GRPCPort = r.Uint32()
+	this.TLS = bool(r.Intn(2) == 0)
 	v1 := r.Intn(10)
 	this.Roles = make([]PeerInfo_Role, v1)
 	for i := 0; i < v1; i++ {
@@ -359,7 +359,7 @@ func randFieldCluster(dAtA []byte, r randyCluster, fieldNumber int, wire int) []
 }
 func encodeVarintPopulateCluster(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -403,14 +403,14 @@ func sovCluster(x uint64) (n int) {
 	return n
 }
 func sozCluster(x uint64) (n int) {
-	return sovCluster(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovCluster((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *PeerInfo) String() string {
 	if this == nil {
 		return "nil"
 	}
 	keysForTags := make([]string, 0, len(this.Tags))
-	for k, _ := range this.Tags {
+	for k := range this.Tags {
 		keysForTags = append(keysForTags, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForTags)

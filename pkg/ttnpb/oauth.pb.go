@@ -737,9 +737,9 @@ func NewPopulatedOAuthAuthorizationCode(r randyOauth, easy bool) *OAuthAuthoriza
 	for i := 0; i < v8; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}[r.Intn(52)])
 	}
-	this.Code = string(randStringOauth(r))
-	this.RedirectURI = string(randStringOauth(r))
-	this.State = string(randStringOauth(r))
+	this.Code = randStringOauth(r)
+	this.RedirectURI = randStringOauth(r)
+	this.State = randStringOauth(r)
 	v9 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v9
 	v10 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -760,9 +760,9 @@ func NewPopulatedOAuthAccessToken(r randyOauth, easy bool) *OAuthAccessToken {
 	for i := 0; i < v13; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}[r.Intn(52)])
 	}
-	this.ID = string(randStringOauth(r))
-	this.AccessToken = string(randStringOauth(r))
-	this.RefreshToken = string(randStringOauth(r))
+	this.ID = randStringOauth(r)
+	this.AccessToken = randStringOauth(r)
+	this.RefreshToken = randStringOauth(r)
 	v14 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v14
 	v15 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -838,7 +838,7 @@ func randFieldOauth(dAtA []byte, r randyOauth, fieldNumber int, wire int) []byte
 }
 func encodeVarintPopulateOauth(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -942,7 +942,7 @@ func sovOauth(x uint64) (n int) {
 	return n
 }
 func sozOauth(x uint64) (n int) {
-	return sovOauth(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovOauth((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (this *OAuthClientAuthorization) String() string {
 	if this == nil {

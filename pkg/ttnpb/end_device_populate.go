@@ -29,9 +29,9 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	out.DefaultMACParameters = NewPopulatedMACParameters(r, easy)
 	out.MaxFrequency = uint64(r.Uint32())
 	out.MinFrequency = uint64(r.Uint32()) % out.MaxFrequency
-	out.FCntResets = bool(r.Intn(2) == 0)
-	out.Supports32BitFCnt = bool(r.Intn(2) == 0)
-	out.DisableJoinNonceCheck = bool(r.Intn(2) == 0)
+	out.ResetsFCnt = bool(r.Intn(2) == 0)
+	out.Uses32BitFCnt = bool(r.Intn(2) == 0)
+	out.ResetsJoinNonces = bool(r.Intn(2) == 0)
 	return out
 }
 
@@ -53,8 +53,8 @@ func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 			out.PendingRequests[i] = NewPopulatedMACCommand(r, easy)
 		}
 	}
-	out.MACParameters = *NewPopulatedMACParameters(r, easy)
-	out.DesiredMACParameters = *NewPopulatedMACParameters(r, easy)
+	out.CurrentParameters = *NewPopulatedMACParameters(r, easy)
+	out.DesiredParameters = *NewPopulatedMACParameters(r, easy)
 	if r.Intn(10) != 0 {
 		out.PendingApplicationDownlink = NewPopulatedApplicationDownlink(r, easy)
 	}
@@ -85,9 +85,9 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	}
 	out.BatteryPercentage = r.Float32()
 	out.FrequencyPlanID = "EU_863_870"
-	out.MACSettings = *NewPopulatedMACSettings(r, easy)
+	out.MACSettings = NewPopulatedMACSettings(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
-	out.MACState.MACParameters.Channels = []*MACParameters_Channel{
+	out.MACState.CurrentParameters.Channels = []*MACParameters_Channel{
 		{
 			UplinkFrequency:   868100000,
 			DownlinkFrequency: 868100000,
@@ -110,16 +110,12 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 			UplinkEnabled:     true,
 		},
 	}
-	out.MACState.DesiredMACParameters.Channels = deepcopy.Copy(out.MACState.MACParameters.Channels).([]*MACParameters_Channel)
-	if r.Intn(10) != 0 {
-		out.Location = NewPopulatedLocation(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		out.Attributes = pbtypes.NewPopulatedStruct(r, easy)
-	}
+	out.MACState.DesiredParameters.Channels = deepcopy.Copy(out.MACState.CurrentParameters.Channels).([]*MACParameters_Channel)
+	// TODO: Populate Locations
+	// TODO: Populate Attributes
 	out.NetworkServerAddress = randStringEndDevice(r)
 	out.ApplicationServerAddress = randStringEndDevice(r)
-	out.EndDeviceVersionIdentifiers = *NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	out.VersionIDs = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
 	if r.Intn(10) != 0 {
 		out.RecentUplinks = make([]*UplinkMessage, r.Intn(5))
 		for i := range out.RecentUplinks {
@@ -138,13 +134,13 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 			out.QueuedApplicationDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
-	out.StatusUpdatedAt = pbtypes.NewPopulatedStdTime(r, easy)
+	out.LastStatusReceivedAt = pbtypes.NewPopulatedStdTime(r, easy)
 	out.BatteryPercentage = r.Float32()
 	out.DownlinkMargin = r.Int31()
 	if r.Intn(2) == 0 {
 		out.DownlinkMargin *= -1
 	}
-	out.MessagePayloadFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
+	out.Formatters = NewPopulatedMessagePayloadFormatters(r, easy)
 	out.SupportsJoin = r.Intn(2) == 0
 	return out
 }

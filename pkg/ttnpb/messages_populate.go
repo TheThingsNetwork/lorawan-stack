@@ -47,11 +47,11 @@ func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey ty
 	}
 
 	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.Settings.ChannelIndex), confirmed)
-	out.Payload = *msg
+	out.Payload = msg
 
-	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
+	out.EndDeviceIDs = NewPopulatedEndDeviceIdentifiers(r, false)
 	devAddr := msg.GetMACPayload().DevAddr
-	out.EndDeviceIdentifiers.DevAddr = &devAddr
+	out.EndDeviceIDs.DevAddr = &devAddr
 
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
@@ -70,14 +70,14 @@ func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
 	}
 
 	msg := NewPopulatedMessageJoinRequest(r)
-	out.Payload = *msg
+	out.Payload = msg
 
-	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
+	out.EndDeviceIDs = NewPopulatedEndDeviceIdentifiers(r, false)
 	joinEUI := msg.GetJoinRequestPayload().JoinEUI
-	out.EndDeviceIdentifiers.JoinEUI = &joinEUI
+	out.EndDeviceIDs.JoinEUI = &joinEUI
 
 	devEUI := msg.GetJoinRequestPayload().DevEUI
-	out.EndDeviceIdentifiers.DevEUI = &devEUI
+	out.EndDeviceIDs.DevEUI = &devEUI
 
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
@@ -96,14 +96,14 @@ func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinType) *Upl
 	}
 
 	msg := NewPopulatedMessageRejoinRequest(r, typ)
-	out.Payload = *msg
+	out.Payload = msg
 
-	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
+	out.EndDeviceIDs = NewPopulatedEndDeviceIdentifiers(r, false)
 	joinEUI := msg.GetRejoinRequestPayload().JoinEUI
-	out.EndDeviceIdentifiers.JoinEUI = &joinEUI
+	out.EndDeviceIDs.JoinEUI = &joinEUI
 
 	devEUI := msg.GetRejoinRequestPayload().DevEUI
-	out.EndDeviceIdentifiers.DevEUI = &devEUI
+	out.EndDeviceIDs.DevEUI = &devEUI
 
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
@@ -125,16 +125,16 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	out.TxMetadata = *NewPopulatedTxMetadata(r, false)
 
 	msg := NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), r.Intn(2) == 1)
-	out.Payload = *msg
+	out.Payload = msg
 
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
 		panic(fmt.Sprintf("failed to encode downlink message to LoRaWAN: %s", err))
 	}
-	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
+	out.EndDeviceIDs = NewPopulatedEndDeviceIdentifiers(r, false)
 	devAddr := msg.GetMACPayload().DevAddr
-	out.EndDeviceIdentifiers.DevAddr = &devAddr
+	out.EndDeviceIDs.DevAddr = &devAddr
 	return out
 }
 

@@ -140,9 +140,9 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 	if rx.Time != nil {
 		goTime := time.Time(*rx.Time)
 		for mdIndex := range up.RxMetadata {
-			up.RxMetadata[mdIndex].Time = goTime
+			up.RxMetadata[mdIndex].Time = &goTime
 		}
-		up.RxMetadata[0].Time = goTime
+		up.RxMetadata[0].Time = &goTime
 	}
 
 	switch rx.Modu {
@@ -274,10 +274,10 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat) {
 func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 	msg := &ttnpb.DownlinkMessage{
 		Settings: ttnpb.TxSettings{
-			CodingRate:            tx.CodR,
-			Frequency:             uint64(tx.Freq * 1000000),
-			PolarizationInversion: tx.IPol,
-			TxPower:               int32(tx.Powe),
+			CodingRate:         tx.CodR,
+			Frequency:          uint64(tx.Freq * 1000000),
+			InvertPolarization: tx.IPol,
+			TxPower:            int32(tx.Powe),
 		},
 		TxMetadata: ttnpb.TxMetadata{
 			Timestamp: uint64(tx.Tmst * 1000),
@@ -318,7 +318,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		CodR: msg.Settings.CodingRate,
 		Freq: float64(msg.Settings.Frequency) / 1000000,
 		Imme: msg.TxMetadata.Timestamp == 0,
-		IPol: msg.Settings.PolarizationInversion,
+		IPol: msg.Settings.InvertPolarization,
 		Powe: uint8(msg.Settings.TxPower),
 		Size: uint16(len(payload)),
 		Tmst: uint32(tmst % math.MaxUint32),
