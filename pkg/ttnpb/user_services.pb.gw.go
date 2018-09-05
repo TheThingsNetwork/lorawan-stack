@@ -209,8 +209,8 @@ func request_UserAccess_ListUserRights_0(ctx context.Context, marshaler runtime.
 
 }
 
-func request_UserAccess_GenerateUserAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetUserAPIKeyRequest
+func request_UserAccess_CreateUserAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateUserAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -235,7 +235,7 @@ func request_UserAccess_GenerateUserAPIKey_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
 
-	msg, err := client.GenerateUserAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateUserAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -275,8 +275,8 @@ func request_UserAccess_ListUserAPIKeys_0(ctx context.Context, marshaler runtime
 
 }
 
-func request_UserAccess_SetUserAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetUserAPIKeyRequest
+func request_UserAccess_UpdateUserAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpdateUserAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -301,18 +301,18 @@ func request_UserAccess_SetUserAPIKey_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["api_key.id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "api_key.id")
 	}
 
-	protoReq.ID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "api_key.id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "api_key.id", err)
 	}
 
-	msg, err := client.SetUserAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateUserAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -633,7 +633,7 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("POST", pattern_UserAccess_GenerateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_UserAccess_CreateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -651,14 +651,14 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserAccess_GenerateUserAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserAccess_CreateUserAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserAccess_GenerateUserAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserAccess_CreateUserAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -691,7 +691,7 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("PUT", pattern_UserAccess_SetUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_UserAccess_UpdateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -709,14 +709,14 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserAccess_SetUserAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserAccess_UpdateUserAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserAccess_SetUserAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserAccess_UpdateUserAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -726,21 +726,21 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 var (
 	pattern_UserAccess_ListUserRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "rights"}, ""))
 
-	pattern_UserAccess_GenerateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, ""))
+	pattern_UserAccess_CreateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, ""))
 
 	pattern_UserAccess_ListUserAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "api-keys"}, ""))
 
-	pattern_UserAccess_SetUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "id"}, ""))
+	pattern_UserAccess_UpdateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "api_key.id"}, ""))
 )
 
 var (
 	forward_UserAccess_ListUserRights_0 = runtime.ForwardResponseMessage
 
-	forward_UserAccess_GenerateUserAPIKey_0 = runtime.ForwardResponseMessage
+	forward_UserAccess_CreateUserAPIKey_0 = runtime.ForwardResponseMessage
 
 	forward_UserAccess_ListUserAPIKeys_0 = runtime.ForwardResponseMessage
 
-	forward_UserAccess_SetUserAPIKey_0 = runtime.ForwardResponseMessage
+	forward_UserAccess_UpdateUserAPIKey_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterUserInvitationRegistryHandlerFromEndpoint is same as RegisterUserInvitationRegistryHandler but

@@ -88,7 +88,7 @@ service ApplicationAccess {
     };
   };
 
-  rpc GenerateApplicationAPIKey(SetApplicationAPIKeyRequest) returns (APIKey) {
+  rpc CreateApplicationAPIKey(CreateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/applications/{application_ids.application_id}/api-keys"
       body: "*"
@@ -101,10 +101,12 @@ service ApplicationAccess {
     };
   };
 
-  // Setting an API key without rights removes it.
-  rpc SetApplicationAPIKey(SetApplicationAPIKeyRequest) returns (APIKey) {
+  // Update the rights of an existing application API key. To generate an API key,
+  // the CreateApplicationAPIKey should be used. To delete an API key, update it
+  // with zero rights.
+  rpc UpdateApplicationAPIKey(UpdateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      put: "/applications/{application_ids.application_id}/api-keys/{id}"
+      put: "/applications/{application_ids.application_id}/api-keys/{api_key.id}"
       body: "*"
     };
   };

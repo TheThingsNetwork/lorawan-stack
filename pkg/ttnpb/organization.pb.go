@@ -48,7 +48,7 @@ type Organization struct {
 func (m *Organization) Reset()      { *m = Organization{} }
 func (*Organization) ProtoMessage() {}
 func (*Organization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{0}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{0}
 }
 func (m *Organization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -128,7 +128,7 @@ type Organizations struct {
 func (m *Organizations) Reset()      { *m = Organizations{} }
 func (*Organizations) ProtoMessage() {}
 func (*Organizations) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{1}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{1}
 }
 func (m *Organizations) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -174,7 +174,7 @@ type GetOrganizationRequest struct {
 func (m *GetOrganizationRequest) Reset()      { *m = GetOrganizationRequest{} }
 func (*GetOrganizationRequest) ProtoMessage() {}
 func (*GetOrganizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{2}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{2}
 }
 func (m *GetOrganizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -222,7 +222,7 @@ type ListOrganizationsRequest struct {
 func (m *ListOrganizationsRequest) Reset()      { *m = ListOrganizationsRequest{} }
 func (*ListOrganizationsRequest) ProtoMessage() {}
 func (*ListOrganizationsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{3}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{3}
 }
 func (m *ListOrganizationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -277,7 +277,7 @@ type CreateOrganizationRequest struct {
 func (m *CreateOrganizationRequest) Reset()      { *m = CreateOrganizationRequest{} }
 func (*CreateOrganizationRequest) ProtoMessage() {}
 func (*CreateOrganizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{4}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{4}
 }
 func (m *CreateOrganizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -323,7 +323,7 @@ type UpdateOrganizationRequest struct {
 func (m *UpdateOrganizationRequest) Reset()      { *m = UpdateOrganizationRequest{} }
 func (*UpdateOrganizationRequest) ProtoMessage() {}
 func (*UpdateOrganizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{5}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{5}
 }
 func (m *UpdateOrganizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -359,25 +359,25 @@ func (m *UpdateOrganizationRequest) GetFieldMask() types.FieldMask {
 	return types.FieldMask{}
 }
 
-type SetOrganizationAPIKeyRequest struct {
+type CreateOrganizationAPIKeyRequest struct {
 	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
-	ID                      string   `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Name                    string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Rights                  []Right  `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
 	XXX_sizecache           int32    `json:"-"`
 }
 
-func (m *SetOrganizationAPIKeyRequest) Reset()      { *m = SetOrganizationAPIKeyRequest{} }
-func (*SetOrganizationAPIKeyRequest) ProtoMessage() {}
-func (*SetOrganizationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{6}
+func (m *CreateOrganizationAPIKeyRequest) Reset()      { *m = CreateOrganizationAPIKeyRequest{} }
+func (*CreateOrganizationAPIKeyRequest) ProtoMessage() {}
+func (*CreateOrganizationAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{6}
 }
-func (m *SetOrganizationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
+func (m *CreateOrganizationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *SetOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CreateOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_SetOrganizationAPIKeyRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CreateOrganizationAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -387,31 +387,70 @@ func (m *SetOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (dst *SetOrganizationAPIKeyRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SetOrganizationAPIKeyRequest.Merge(dst, src)
+func (dst *CreateOrganizationAPIKeyRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateOrganizationAPIKeyRequest.Merge(dst, src)
 }
-func (m *SetOrganizationAPIKeyRequest) XXX_Size() int {
+func (m *CreateOrganizationAPIKeyRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *SetOrganizationAPIKeyRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SetOrganizationAPIKeyRequest.DiscardUnknown(m)
+func (m *CreateOrganizationAPIKeyRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateOrganizationAPIKeyRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SetOrganizationAPIKeyRequest proto.InternalMessageInfo
+var xxx_messageInfo_CreateOrganizationAPIKeyRequest proto.InternalMessageInfo
 
-func (m *SetOrganizationAPIKeyRequest) GetID() string {
+func (m *CreateOrganizationAPIKeyRequest) GetName() string {
 	if m != nil {
-		return m.ID
+		return m.Name
 	}
 	return ""
 }
 
-func (m *SetOrganizationAPIKeyRequest) GetRights() []Right {
+func (m *CreateOrganizationAPIKeyRequest) GetRights() []Right {
 	if m != nil {
 		return m.Rights
 	}
 	return nil
 }
+
+type UpdateOrganizationAPIKeyRequest struct {
+	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
+	APIKey                  `protobuf:"bytes,2,opt,name=api_key,json=apiKey,embedded=api_key" json:"api_key"`
+	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
+	XXX_sizecache           int32    `json:"-"`
+}
+
+func (m *UpdateOrganizationAPIKeyRequest) Reset()      { *m = UpdateOrganizationAPIKeyRequest{} }
+func (*UpdateOrganizationAPIKeyRequest) ProtoMessage() {}
+func (*UpdateOrganizationAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{7}
+}
+func (m *UpdateOrganizationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpdateOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpdateOrganizationAPIKeyRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *UpdateOrganizationAPIKeyRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateOrganizationAPIKeyRequest.Merge(dst, src)
+}
+func (m *UpdateOrganizationAPIKeyRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *UpdateOrganizationAPIKeyRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateOrganizationAPIKeyRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateOrganizationAPIKeyRequest proto.InternalMessageInfo
 
 type RemoveOrganizationAPIKeyRequest struct {
 	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
@@ -423,7 +462,7 @@ type RemoveOrganizationAPIKeyRequest struct {
 func (m *RemoveOrganizationAPIKeyRequest) Reset()      { *m = RemoveOrganizationAPIKeyRequest{} }
 func (*RemoveOrganizationAPIKeyRequest) ProtoMessage() {}
 func (*RemoveOrganizationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{7}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{8}
 }
 func (m *RemoveOrganizationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -469,7 +508,7 @@ type SetOrganizationCollaboratorRequest struct {
 func (m *SetOrganizationCollaboratorRequest) Reset()      { *m = SetOrganizationCollaboratorRequest{} }
 func (*SetOrganizationCollaboratorRequest) ProtoMessage() {}
 func (*SetOrganizationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_46caddbc8441a293, []int{8}
+	return fileDescriptor_organization_8c7feecd3a6a8c03, []int{9}
 }
 func (m *SetOrganizationCollaboratorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -520,8 +559,10 @@ func init() {
 	golang_proto.RegisterType((*CreateOrganizationRequest)(nil), "ttn.lorawan.v3.CreateOrganizationRequest")
 	proto.RegisterType((*UpdateOrganizationRequest)(nil), "ttn.lorawan.v3.UpdateOrganizationRequest")
 	golang_proto.RegisterType((*UpdateOrganizationRequest)(nil), "ttn.lorawan.v3.UpdateOrganizationRequest")
-	proto.RegisterType((*SetOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.SetOrganizationAPIKeyRequest")
-	golang_proto.RegisterType((*SetOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.SetOrganizationAPIKeyRequest")
+	proto.RegisterType((*CreateOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.CreateOrganizationAPIKeyRequest")
+	golang_proto.RegisterType((*CreateOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.CreateOrganizationAPIKeyRequest")
+	proto.RegisterType((*UpdateOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest")
+	golang_proto.RegisterType((*UpdateOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest")
 	proto.RegisterType((*RemoveOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.RemoveOrganizationAPIKeyRequest")
 	golang_proto.RegisterType((*RemoveOrganizationAPIKeyRequest)(nil), "ttn.lorawan.v3.RemoveOrganizationAPIKeyRequest")
 	proto.RegisterType((*SetOrganizationCollaboratorRequest)(nil), "ttn.lorawan.v3.SetOrganizationCollaboratorRequest")
@@ -716,14 +757,14 @@ func (this *UpdateOrganizationRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *SetOrganizationAPIKeyRequest) Equal(that interface{}) bool {
+func (this *CreateOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*SetOrganizationAPIKeyRequest)
+	that1, ok := that.(*CreateOrganizationAPIKeyRequest)
 	if !ok {
-		that2, ok := that.(SetOrganizationAPIKeyRequest)
+		that2, ok := that.(CreateOrganizationAPIKeyRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -738,7 +779,7 @@ func (this *SetOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 	if !this.OrganizationIdentifiers.Equal(&that1.OrganizationIdentifiers) {
 		return false
 	}
-	if this.ID != that1.ID {
+	if this.Name != that1.Name {
 		return false
 	}
 	if len(this.Rights) != len(that1.Rights) {
@@ -748,6 +789,33 @@ func (this *SetOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 		if this.Rights[i] != that1.Rights[i] {
 			return false
 		}
+	}
+	return true
+}
+func (this *UpdateOrganizationAPIKeyRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*UpdateOrganizationAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(UpdateOrganizationAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.OrganizationIdentifiers.Equal(&that1.OrganizationIdentifiers) {
+		return false
+	}
+	if !this.APIKey.Equal(&that1.APIKey) {
+		return false
 	}
 	return true
 }
@@ -1058,7 +1126,7 @@ func (m *UpdateOrganizationRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *SetOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+func (m *CreateOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -1068,7 +1136,7 @@ func (m *SetOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *SetOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *CreateOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1081,11 +1149,11 @@ func (m *SetOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 		return 0, err
 	}
 	i += n12
-	if len(m.ID) > 0 {
+	if len(m.Name) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
+		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
 	}
 	if len(m.Rights) > 0 {
 		dAtA14 := make([]byte, len(m.Rights)*10)
@@ -1107,6 +1175,40 @@ func (m *SetOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *UpdateOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
+	n15, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n15
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintOrganization(dAtA, i, uint64(m.APIKey.Size()))
+	n16, err := m.APIKey.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n16
+	return i, nil
+}
+
 func (m *RemoveOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1125,11 +1227,11 @@ func (m *RemoveOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n15, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
+	n17, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n15
+	i += n17
 	if len(m.ID) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -1157,19 +1259,19 @@ func (m *SetOrganizationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error)
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n16, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
+	n18, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n18
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintOrganization(dAtA, i, uint64(m.Collaborator.Size()))
-	n17, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n19, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n19
 	return i, nil
 }
 
@@ -1271,11 +1373,11 @@ func NewPopulatedUpdateOrganizationRequest(r randyOrganization, easy bool) *Upda
 	return this
 }
 
-func NewPopulatedSetOrganizationAPIKeyRequest(r randyOrganization, easy bool) *SetOrganizationAPIKeyRequest {
-	this := &SetOrganizationAPIKeyRequest{}
+func NewPopulatedCreateOrganizationAPIKeyRequest(r randyOrganization, easy bool) *CreateOrganizationAPIKeyRequest {
+	this := &CreateOrganizationAPIKeyRequest{}
 	v13 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v13
-	this.ID = randStringOrganization(r)
+	this.Name = randStringOrganization(r)
 	v14 := r.Intn(10)
 	this.Rights = make([]Right, v14)
 	for i := 0; i < v14; i++ {
@@ -1286,10 +1388,21 @@ func NewPopulatedSetOrganizationAPIKeyRequest(r randyOrganization, easy bool) *S
 	return this
 }
 
-func NewPopulatedRemoveOrganizationAPIKeyRequest(r randyOrganization, easy bool) *RemoveOrganizationAPIKeyRequest {
-	this := &RemoveOrganizationAPIKeyRequest{}
+func NewPopulatedUpdateOrganizationAPIKeyRequest(r randyOrganization, easy bool) *UpdateOrganizationAPIKeyRequest {
+	this := &UpdateOrganizationAPIKeyRequest{}
 	v15 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v15
+	v16 := NewPopulatedAPIKey(r, easy)
+	this.APIKey = *v16
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedRemoveOrganizationAPIKeyRequest(r randyOrganization, easy bool) *RemoveOrganizationAPIKeyRequest {
+	this := &RemoveOrganizationAPIKeyRequest{}
+	v17 := NewPopulatedOrganizationIdentifiers(r, easy)
+	this.OrganizationIdentifiers = *v17
 	this.ID = randStringOrganization(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -1298,10 +1411,10 @@ func NewPopulatedRemoveOrganizationAPIKeyRequest(r randyOrganization, easy bool)
 
 func NewPopulatedSetOrganizationCollaboratorRequest(r randyOrganization, easy bool) *SetOrganizationCollaboratorRequest {
 	this := &SetOrganizationCollaboratorRequest{}
-	v16 := NewPopulatedOrganizationIdentifiers(r, easy)
-	this.OrganizationIdentifiers = *v16
-	v17 := NewPopulatedCollaborator(r, easy)
-	this.Collaborator = *v17
+	v18 := NewPopulatedOrganizationIdentifiers(r, easy)
+	this.OrganizationIdentifiers = *v18
+	v19 := NewPopulatedCollaborator(r, easy)
+	this.Collaborator = *v19
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1326,9 +1439,9 @@ func randUTF8RuneOrganization(r randyOrganization) rune {
 	return rune(ru + 61)
 }
 func randStringOrganization(r randyOrganization) string {
-	v18 := r.Intn(100)
-	tmps := make([]rune, v18)
-	for i := 0; i < v18; i++ {
+	v20 := r.Intn(100)
+	tmps := make([]rune, v20)
+	for i := 0; i < v20; i++ {
 		tmps[i] = randUTF8RuneOrganization(r)
 	}
 	return string(tmps)
@@ -1350,11 +1463,11 @@ func randFieldOrganization(dAtA []byte, r randyOrganization, fieldNumber int, wi
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateOrganization(dAtA, uint64(key))
-		v19 := r.Int63()
+		v21 := r.Int63()
 		if r.Intn(2) == 0 {
-			v19 *= -1
+			v21 *= -1
 		}
-		dAtA = encodeVarintPopulateOrganization(dAtA, uint64(v19))
+		dAtA = encodeVarintPopulateOrganization(dAtA, uint64(v21))
 	case 1:
 		dAtA = encodeVarintPopulateOrganization(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1469,12 +1582,12 @@ func (m *UpdateOrganizationRequest) Size() (n int) {
 	return n
 }
 
-func (m *SetOrganizationAPIKeyRequest) Size() (n int) {
+func (m *CreateOrganizationAPIKeyRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.OrganizationIdentifiers.Size()
 	n += 1 + l + sovOrganization(uint64(l))
-	l = len(m.ID)
+	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovOrganization(uint64(l))
 	}
@@ -1485,6 +1598,16 @@ func (m *SetOrganizationAPIKeyRequest) Size() (n int) {
 		}
 		n += 1 + sovOrganization(uint64(l)) + l
 	}
+	return n
+}
+
+func (m *UpdateOrganizationAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.OrganizationIdentifiers.Size()
+	n += 1 + l + sovOrganization(uint64(l))
+	l = m.APIKey.Size()
+	n += 1 + l + sovOrganization(uint64(l))
 	return n
 }
 
@@ -1603,14 +1726,25 @@ func (this *UpdateOrganizationRequest) String() string {
 	}, "")
 	return s
 }
-func (this *SetOrganizationAPIKeyRequest) String() string {
+func (this *CreateOrganizationAPIKeyRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&SetOrganizationAPIKeyRequest{`,
+	s := strings.Join([]string{`&CreateOrganizationAPIKeyRequest{`,
 		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateOrganizationAPIKeyRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateOrganizationAPIKeyRequest{`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`APIKey:` + strings.Replace(strings.Replace(this.APIKey.String(), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2519,7 +2653,7 @@ func (m *UpdateOrganizationRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *SetOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
+func (m *CreateOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2542,10 +2676,10 @@ func (m *SetOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: SetOrganizationAPIKeyRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: CreateOrganizationAPIKeyRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SetOrganizationAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CreateOrganizationAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2580,7 +2714,7 @@ func (m *SetOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2605,7 +2739,7 @@ func (m *SetOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ID = string(dAtA[iNdEx:postIndex])
+			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType == 0 {
@@ -2669,6 +2803,116 @@ func (m *SetOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOrganization(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOrganization
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOrganization
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateOrganizationAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateOrganizationAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOrganization
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOrganization
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.OrganizationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOrganization
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOrganization
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.APIKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipOrganization(dAtA[iNdEx:])
@@ -3015,64 +3259,66 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_46caddbc8441a293)
+	proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_8c7feecd3a6a8c03)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_46caddbc8441a293)
+	golang_proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_8c7feecd3a6a8c03)
 }
 
-var fileDescriptor_organization_46caddbc8441a293 = []byte{
-	// 822 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x55, 0x31, 0x6c, 0x23, 0x45,
-	0x14, 0x9d, 0xb1, 0x73, 0x06, 0x8f, 0x73, 0x97, 0xd3, 0x02, 0xa7, 0x3d, 0x73, 0x1a, 0x5b, 0x0b,
-	0x12, 0x2e, 0xce, 0x6b, 0x29, 0xd7, 0x20, 0x24, 0x40, 0xb6, 0x8f, 0x20, 0x43, 0x50, 0x60, 0x43,
-	0x1a, 0x84, 0x64, 0x8d, 0xbd, 0xe3, 0xf5, 0xc8, 0xf6, 0x8e, 0xd9, 0x19, 0x27, 0x0a, 0x55, 0xca,
-	0x94, 0xe9, 0xa0, 0x44, 0x54, 0xa9, 0x50, 0x3a, 0x52, 0x46, 0xa2, 0x89, 0xa8, 0x5c, 0xa6, 0x32,
-	0xf1, 0x6e, 0x93, 0x32, 0x65, 0x4a, 0xb4, 0xeb, 0x35, 0xde, 0x75, 0x8c, 0xa5, 0x28, 0x22, 0xa2,
-	0x9b, 0xd9, 0xff, 0xfe, 0x9b, 0xf7, 0xdf, 0xff, 0xdf, 0x46, 0xef, 0x77, 0xb9, 0x43, 0xf6, 0x88,
-	0x5d, 0x14, 0x92, 0x34, 0x3b, 0x25, 0xd2, 0x67, 0x25, 0xee, 0x58, 0xc4, 0x66, 0x3f, 0x12, 0xc9,
-	0xb8, 0xad, 0xf7, 0x1d, 0x2e, 0xb9, 0xf2, 0x44, 0x4a, 0x5b, 0x0f, 0x91, 0xfa, 0xee, 0xab, 0x6c,
-	0xd1, 0x62, 0xb2, 0x3d, 0x68, 0xe8, 0x4d, 0xde, 0x2b, 0x59, 0xdc, 0xe2, 0xa5, 0x00, 0xd6, 0x18,
-	0xb4, 0x82, 0x5b, 0x70, 0x09, 0x4e, 0x93, 0xf4, 0x6c, 0xde, 0xe2, 0xdc, 0xea, 0xd2, 0x19, 0xaa,
-	0xc5, 0x68, 0xd7, 0xac, 0xf7, 0x88, 0xe8, 0x84, 0x88, 0xdc, 0x3c, 0x42, 0xb2, 0x1e, 0x15, 0x92,
-	0xf4, 0xfa, 0x21, 0x60, 0x81, 0xce, 0x26, 0xb7, 0x25, 0x69, 0xca, 0x3a, 0xb3, 0x5b, 0xd3, 0x87,
-	0xde, 0xbb, 0x8d, 0x62, 0x26, 0xb5, 0x25, 0x6b, 0x31, 0xea, 0x88, 0x10, 0x84, 0x6f, 0x83, 0x1c,
-	0x66, 0xb5, 0x65, 0x18, 0xd7, 0x2e, 0x93, 0x68, 0x75, 0x2b, 0xe2, 0x81, 0x52, 0x45, 0x49, 0x66,
-	0x0a, 0x15, 0xe6, 0x61, 0x21, 0xb3, 0xfe, 0x81, 0x1e, 0xf7, 0x42, 0x8f, 0x42, 0x6b, 0xb3, 0xc7,
-	0x2a, 0x6f, 0x9e, 0x8f, 0x72, 0x60, 0x38, 0xca, 0x41, 0xc3, 0xcf, 0x56, 0xaa, 0x08, 0x35, 0x1d,
-	0x4a, 0x24, 0x35, 0xeb, 0x44, 0xaa, 0x89, 0x80, 0x2b, 0xab, 0x4f, 0xca, 0xd6, 0xa7, 0x65, 0xeb,
-	0xdf, 0x4e, 0xcb, 0x9e, 0xa4, 0x1f, 0xfd, 0x95, 0x83, 0x46, 0x3a, 0xcc, 0x2b, 0x4b, 0x9f, 0x64,
-	0xd0, 0x37, 0xa7, 0x24, 0xc9, 0xbb, 0x90, 0x84, 0x79, 0x65, 0xa9, 0x28, 0x68, 0xc5, 0x26, 0x3d,
-	0xaa, 0xae, 0xe4, 0x61, 0x21, 0x6d, 0x04, 0x67, 0x25, 0x8f, 0x32, 0x26, 0x15, 0x4d, 0x87, 0xf5,
-	0xfd, 0x32, 0xd4, 0x47, 0x41, 0x28, 0xfa, 0x49, 0xd9, 0x44, 0x88, 0x48, 0xe9, 0xb0, 0xc6, 0x40,
-	0x52, 0xa1, 0xa6, 0xf2, 0xc9, 0x42, 0x66, 0xfd, 0xe5, 0x32, 0x2f, 0xf4, 0xf2, 0x3f, 0xf0, 0xcf,
-	0x6c, 0xe9, 0xec, 0x1b, 0x91, 0x7c, 0xe5, 0x13, 0xb4, 0x1a, 0x6d, 0x9f, 0xfa, 0x46, 0xc0, 0xf7,
-	0xee, 0x3c, 0x5f, 0x75, 0x82, 0xa9, 0xd9, 0x2d, 0x6e, 0x64, 0x9a, 0xb3, 0x4b, 0xf6, 0x63, 0xb4,
-	0x36, 0x47, 0xaf, 0x3c, 0x45, 0xc9, 0x0e, 0xdd, 0x0f, 0xba, 0x94, 0x36, 0xfc, 0xa3, 0xf2, 0x36,
-	0x7a, 0xb4, 0x4b, 0xba, 0x03, 0x1a, 0xb8, 0x9d, 0x36, 0x26, 0x97, 0x8f, 0x12, 0x1f, 0x42, 0x6d,
-	0x1b, 0x3d, 0x8e, 0x4a, 0x15, 0x4a, 0x05, 0x3d, 0x8e, 0x8e, 0xbd, 0xdf, 0x6c, 0x5f, 0xd0, 0x8b,
-	0x65, 0x05, 0x1a, 0xf1, 0x14, 0xed, 0x77, 0x88, 0x9e, 0x7d, 0x4e, 0x65, 0x0c, 0x42, 0x7f, 0x18,
-	0x50, 0x21, 0x95, 0xef, 0xd1, 0xd3, 0x28, 0xb6, 0x7e, 0xaf, 0x71, 0x5a, 0xe3, 0x31, 0x88, 0x50,
-	0x3e, 0x45, 0x68, 0xb6, 0x50, 0xff, 0x3a, 0x5a, 0x1b, 0x3e, 0xe4, 0x2b, 0x22, 0x3a, 0x95, 0x15,
-	0x9f, 0xca, 0x48, 0xb7, 0xa6, 0x1f, 0xb4, 0xdf, 0x20, 0x52, 0x37, 0x99, 0x88, 0x49, 0x17, 0x53,
-	0xed, 0xdf, 0xf8, 0xad, 0xea, 0x76, 0x49, 0x83, 0x3b, 0x44, 0x72, 0x27, 0xd4, 0x5d, 0x5c, 0xa6,
-	0x7b, 0xcb, 0xd9, 0x11, 0xd4, 0x89, 0xa8, 0x37, 0x62, 0x14, 0xf7, 0x17, 0x3c, 0x84, 0xe8, 0x79,
-	0x35, 0xd8, 0x8a, 0x45, 0x6e, 0x7f, 0x81, 0x56, 0xa3, 0x16, 0x85, 0x8a, 0x97, 0xf6, 0x32, 0x62,
-	0x6f, 0x2c, 0x57, 0xb1, 0x16, 0x74, 0x2e, 0x71, 0xb7, 0xce, 0xbd, 0xe5, 0x8e, 0x72, 0x6b, 0xb1,
-	0xe0, 0x6b, 0x71, 0xab, 0x89, 0xda, 0x31, 0x44, 0xcf, 0x77, 0x82, 0x1d, 0xfd, 0xaf, 0x4b, 0xba,
-	0xb7, 0xfb, 0x7f, 0x40, 0xf4, 0x62, 0x3b, 0x3e, 0xe8, 0xe5, 0xaf, 0x6b, 0x5f, 0xd2, 0xfd, 0x87,
-	0x19, 0xf7, 0x67, 0x28, 0xc1, 0xcc, 0xc9, 0x4e, 0x57, 0x52, 0xee, 0x28, 0x97, 0xa8, 0xbd, 0x36,
-	0x12, 0xcc, 0x54, 0x8a, 0x28, 0x35, 0xf9, 0x1d, 0x57, 0x93, 0xf9, 0x64, 0xe1, 0xc9, 0xfa, 0x3b,
-	0xf3, 0x6f, 0x19, 0x7e, 0xd4, 0x08, 0x41, 0xda, 0x4f, 0x10, 0xe5, 0x0c, 0xda, 0xe3, 0xbb, 0xf4,
-	0x7f, 0x56, 0x88, 0xf6, 0x27, 0x44, 0xda, 0x9c, 0xbf, 0xd5, 0xc8, 0xfa, 0x3c, 0x8c, 0xb8, 0x8d,
-	0xb9, 0xb5, 0x4f, 0x2c, 0x9e, 0xb8, 0xa8, 0xb0, 0x70, 0x52, 0x62, 0x79, 0x95, 0x5f, 0xe1, 0xf9,
-	0x18, 0xc3, 0xe1, 0x18, 0xc3, 0x8b, 0x31, 0x06, 0x97, 0x63, 0x0c, 0xae, 0xc6, 0x18, 0x5c, 0x8f,
-	0x31, 0xb8, 0x19, 0x63, 0x78, 0xe0, 0x62, 0x78, 0xe8, 0x62, 0x70, 0xec, 0x62, 0x78, 0xe2, 0x62,
-	0x70, 0xea, 0x62, 0x70, 0xe6, 0x62, 0x70, 0xee, 0x62, 0x38, 0x74, 0x31, 0xbc, 0x70, 0x31, 0xb8,
-	0x74, 0x31, 0xbc, 0x72, 0x31, 0xb8, 0x76, 0x31, 0xbc, 0x71, 0x31, 0x38, 0xf0, 0x30, 0x38, 0xf4,
-	0x30, 0x3c, 0xf2, 0x30, 0xf8, 0xd9, 0xc3, 0xf0, 0x17, 0x0f, 0x83, 0x63, 0x0f, 0x83, 0x13, 0x0f,
-	0xc3, 0x53, 0x0f, 0xc3, 0x33, 0x0f, 0xc3, 0xef, 0x5e, 0x5a, 0x5c, 0x97, 0x6d, 0x2a, 0xdb, 0xcc,
-	0xb6, 0x84, 0x6e, 0x53, 0xb9, 0xc7, 0x9d, 0x4e, 0x29, 0xfe, 0xcf, 0xdf, 0xef, 0x58, 0x25, 0x29,
-	0xed, 0x7e, 0xa3, 0x91, 0x0a, 0xc6, 0xfe, 0xd5, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x64,
-	0x52, 0x27, 0x0e, 0x09, 0x00, 0x00,
+var fileDescriptor_organization_8c7feecd3a6a8c03 = []byte{
+	// 860 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x3d, 0x8c, 0x1b, 0x45,
+	0x14, 0x9e, 0x59, 0x5f, 0x1c, 0x3c, 0x77, 0xc9, 0x45, 0x0b, 0x9c, 0x36, 0x07, 0x9a, 0xb5, 0x16,
+	0x24, 0xae, 0x88, 0xd7, 0xd2, 0xa5, 0x01, 0x24, 0x40, 0xb6, 0x43, 0x90, 0x49, 0x50, 0x60, 0x43,
+	0x1a, 0x84, 0x64, 0x8d, 0xbd, 0xe3, 0xf5, 0xc8, 0xf6, 0xce, 0xb2, 0x33, 0xbe, 0xc8, 0x54, 0x29,
+	0x53, 0xa6, 0x83, 0x12, 0x51, 0x5d, 0x85, 0xd2, 0x11, 0x51, 0x45, 0x54, 0x27, 0x2a, 0x97, 0xa9,
+	0xcc, 0x79, 0xb7, 0x49, 0x99, 0x32, 0x25, 0xda, 0x1f, 0xe3, 0x5d, 0xdb, 0x58, 0x8a, 0x4e, 0x5c,
+	0xba, 0x99, 0x9d, 0xef, 0x7d, 0xf3, 0xbd, 0xef, 0xcd, 0x7b, 0x5a, 0xf4, 0xfe, 0x80, 0xfb, 0xe4,
+	0x3e, 0x71, 0x2b, 0x42, 0x92, 0x4e, 0xbf, 0x4a, 0x3c, 0x56, 0xe5, 0xbe, 0x43, 0x5c, 0xf6, 0x23,
+	0x91, 0x8c, 0xbb, 0xa6, 0xe7, 0x73, 0xc9, 0xd5, 0xcb, 0x52, 0xba, 0x66, 0x8a, 0x34, 0x8f, 0xae,
+	0xef, 0x57, 0x1c, 0x26, 0x7b, 0xa3, 0xb6, 0xd9, 0xe1, 0xc3, 0xaa, 0xc3, 0x1d, 0x5e, 0x8d, 0x61,
+	0xed, 0x51, 0x37, 0xde, 0xc5, 0x9b, 0x78, 0x95, 0x84, 0xef, 0x97, 0x1d, 0xce, 0x9d, 0x01, 0x5d,
+	0xa0, 0xba, 0x8c, 0x0e, 0xec, 0xd6, 0x90, 0x88, 0x7e, 0x8a, 0xd0, 0x97, 0x11, 0x92, 0x0d, 0xa9,
+	0x90, 0x64, 0xe8, 0xa5, 0x80, 0x35, 0x3a, 0x3b, 0xdc, 0x95, 0xa4, 0x23, 0x5b, 0xcc, 0xed, 0xce,
+	0x2f, 0x7a, 0x6f, 0x15, 0xc5, 0x6c, 0xea, 0x4a, 0xd6, 0x65, 0xd4, 0x17, 0x29, 0x08, 0xaf, 0x82,
+	0x7c, 0xe6, 0xf4, 0x64, 0x7a, 0x6e, 0x9c, 0x16, 0xd0, 0xce, 0x9d, 0x8c, 0x07, 0x6a, 0x03, 0x15,
+	0x98, 0x2d, 0x34, 0x58, 0x86, 0x07, 0xdb, 0x87, 0x1f, 0x98, 0x79, 0x2f, 0xcc, 0x2c, 0xb4, 0xb9,
+	0xb8, 0xac, 0xfe, 0xc6, 0xc9, 0x54, 0x07, 0x93, 0xa9, 0x0e, 0xad, 0x28, 0x5a, 0x6d, 0x20, 0xd4,
+	0xf1, 0x29, 0x91, 0xd4, 0x6e, 0x11, 0xa9, 0x29, 0x31, 0xd7, 0xbe, 0x99, 0xa4, 0x6d, 0xce, 0xd3,
+	0x36, 0xbf, 0x9d, 0xa7, 0x9d, 0x84, 0x3f, 0xfa, 0x5b, 0x87, 0x56, 0x29, 0x8d, 0xab, 0xc9, 0x88,
+	0x64, 0xe4, 0xd9, 0x73, 0x92, 0xc2, 0xab, 0x90, 0xa4, 0x71, 0x35, 0xa9, 0xaa, 0x68, 0xcb, 0x25,
+	0x43, 0xaa, 0x6d, 0x95, 0xe1, 0x41, 0xc9, 0x8a, 0xd7, 0x6a, 0x19, 0x6d, 0xdb, 0x54, 0x74, 0x7c,
+	0xe6, 0x45, 0x69, 0x68, 0x17, 0xe2, 0xa3, 0xec, 0x27, 0xf5, 0x36, 0x42, 0x44, 0x4a, 0x9f, 0xb5,
+	0x47, 0x92, 0x0a, 0xad, 0x58, 0x2e, 0x1c, 0x6c, 0x1f, 0x5e, 0xdb, 0xe4, 0x85, 0x59, 0xfb, 0x17,
+	0xfe, 0xb9, 0x2b, 0xfd, 0xb1, 0x95, 0x89, 0x57, 0x3f, 0x45, 0x3b, 0xd9, 0xf2, 0x69, 0x17, 0x63,
+	0xbe, 0x77, 0x96, 0xf9, 0x1a, 0x09, 0xa6, 0xe9, 0x76, 0xb9, 0xb5, 0xdd, 0x59, 0x6c, 0xf6, 0x3f,
+	0x41, 0xbb, 0x4b, 0xf4, 0xea, 0x15, 0x54, 0xe8, 0xd3, 0x71, 0x5c, 0xa5, 0x92, 0x15, 0x2d, 0xd5,
+	0xb7, 0xd0, 0x85, 0x23, 0x32, 0x18, 0xd1, 0xd8, 0xed, 0x92, 0x95, 0x6c, 0x3e, 0x56, 0x3e, 0x84,
+	0xc6, 0x5d, 0x74, 0x29, 0x2b, 0x55, 0xa8, 0x75, 0x74, 0x29, 0xfb, 0xec, 0xa3, 0x62, 0x47, 0x82,
+	0xde, 0xdd, 0x94, 0xa0, 0x95, 0x0f, 0x31, 0x7e, 0x87, 0x68, 0xef, 0x0b, 0x2a, 0x73, 0x10, 0xfa,
+	0xc3, 0x88, 0x0a, 0xa9, 0x7e, 0x8f, 0xae, 0x64, 0xb1, 0xad, 0x33, 0x3d, 0xa7, 0x5d, 0x9e, 0x83,
+	0x08, 0xf5, 0x33, 0x84, 0x16, 0x0d, 0xf5, 0x9f, 0x4f, 0xeb, 0x66, 0x04, 0xf9, 0x8a, 0x88, 0x7e,
+	0x7d, 0x2b, 0xa2, 0xb2, 0x4a, 0xdd, 0xf9, 0x07, 0xe3, 0x37, 0x88, 0xb4, 0xdb, 0x4c, 0xe4, 0xa4,
+	0x8b, 0xb9, 0xf6, 0x6f, 0xa2, 0x52, 0x0d, 0x06, 0xa4, 0xcd, 0x7d, 0x22, 0xb9, 0x9f, 0xea, 0xae,
+	0x6c, 0xd2, 0x7d, 0xc7, 0xbf, 0x27, 0xa8, 0x9f, 0x51, 0x6f, 0xe5, 0x28, 0xce, 0x2e, 0x78, 0x02,
+	0xd1, 0xd5, 0x46, 0xdc, 0x15, 0xeb, 0xdc, 0xfe, 0x12, 0xed, 0x64, 0x2d, 0x4a, 0x15, 0x6f, 0xac,
+	0x65, 0xc6, 0xde, 0x5c, 0xac, 0xea, 0xac, 0xa9, 0x9c, 0xf2, 0x6a, 0x95, 0x7b, 0x33, 0x98, 0xea,
+	0xbb, 0xb9, 0xc3, 0x1b, 0x62, 0xa5, 0x88, 0xc6, 0x31, 0x44, 0x57, 0xef, 0xc5, 0x3d, 0xfa, 0x7f,
+	0xa7, 0x74, 0x66, 0xf7, 0xff, 0x84, 0x48, 0x5f, 0x75, 0xbf, 0xf6, 0x75, 0xf3, 0x16, 0x1d, 0x9f,
+	0xcf, 0x8b, 0x9f, 0x8f, 0x30, 0x25, 0x33, 0xc2, 0x2a, 0xa8, 0x98, 0x8c, 0x71, 0xad, 0x50, 0x2e,
+	0x1c, 0x5c, 0x3e, 0x7c, 0x7b, 0xf9, 0x1e, 0x2b, 0x3a, 0xb5, 0x52, 0x90, 0xf1, 0x07, 0x44, 0xfa,
+	0xaa, 0xdf, 0xe7, 0x99, 0xc4, 0x47, 0xe8, 0x22, 0xf1, 0x58, 0x2b, 0x1a, 0x5a, 0x49, 0x11, 0xf6,
+	0x96, 0x49, 0x13, 0x35, 0x19, 0x8e, 0x22, 0xf1, 0xd8, 0x2d, 0x3a, 0x36, 0x7e, 0x82, 0x48, 0xb7,
+	0xe8, 0x90, 0x1f, 0xbd, 0x36, 0xf1, 0x7b, 0x48, 0x61, 0x76, 0xe2, 0x7f, 0xbd, 0x18, 0x4c, 0x75,
+	0xa5, 0x79, 0xc3, 0x52, 0x98, 0x6d, 0xfc, 0x05, 0x91, 0x71, 0x37, 0x3f, 0x04, 0x1b, 0x99, 0xd6,
+	0x3f, 0x1f, 0x71, 0x37, 0x97, 0x46, 0x96, 0xb2, 0xbe, 0x5b, 0xb2, 0xc2, 0xd2, 0x57, 0x9e, 0x8b,
+	0xab, 0xff, 0x0a, 0x4f, 0x66, 0x18, 0x4e, 0x66, 0x18, 0x3e, 0x9b, 0x61, 0x70, 0x3a, 0xc3, 0xe0,
+	0xf9, 0x0c, 0x83, 0x17, 0x33, 0x0c, 0x5e, 0xce, 0x30, 0x7c, 0x10, 0x60, 0xf8, 0x30, 0xc0, 0xe0,
+	0x38, 0xc0, 0xf0, 0x71, 0x80, 0xc1, 0x93, 0x00, 0x83, 0xa7, 0x01, 0x06, 0x27, 0x01, 0x86, 0x93,
+	0x00, 0xc3, 0x67, 0x01, 0x06, 0xa7, 0x01, 0x86, 0xcf, 0x03, 0x0c, 0x5e, 0x04, 0x18, 0xbe, 0x0c,
+	0x30, 0x78, 0x10, 0x62, 0xf0, 0x30, 0xc4, 0xf0, 0x51, 0x88, 0xc1, 0xcf, 0x21, 0x86, 0xbf, 0x84,
+	0x18, 0x1c, 0x87, 0x18, 0x3c, 0x0e, 0x31, 0x7c, 0x12, 0x62, 0xf8, 0x34, 0xc4, 0xf0, 0xbb, 0x6b,
+	0x0e, 0x37, 0x65, 0x8f, 0xca, 0x1e, 0x73, 0x1d, 0x61, 0xba, 0x54, 0xde, 0xe7, 0x7e, 0xbf, 0x9a,
+	0xff, 0x6b, 0xf1, 0xfa, 0x4e, 0x55, 0x4a, 0xd7, 0x6b, 0xb7, 0x8b, 0x71, 0xcb, 0x5e, 0xff, 0x27,
+	0x00, 0x00, 0xff, 0xff, 0x43, 0x17, 0xc5, 0xa9, 0xca, 0x09, 0x00, 0x00,
 }

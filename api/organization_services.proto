@@ -79,7 +79,7 @@ service OrganizationAccess {
     };
   };
 
-  rpc GenerateOrganizationAPIKey(SetOrganizationAPIKeyRequest) returns (APIKey) {
+  rpc CreateOrganizationAPIKey(CreateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/organizations/{organization_ids.organization_id}/api-keys"
       body: "*"
@@ -92,12 +92,12 @@ service OrganizationAccess {
     };
   };
 
-  // Set the rights of an existing organization API key. To generate an API key,
-  // the GenerateOrganizationAPIKey should be used. To delete an API key, set it
-  // without any rights.
-  rpc SetOrganizationAPIKey(SetOrganizationAPIKeyRequest) returns (APIKey) {
+  // Update the rights of an existing organization API key. To generate an API key,
+  // the CreateOrganizationAPIKey should be used. To delete an API key, update it
+  // with zero rights.
+  rpc UpdateOrganizationAPIKey(UpdateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      put: "/organizations/{organization_ids.organization_id}/api-keys/{id}"
+      put: "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}"
       body: "*"
     };
   };

@@ -68,10 +68,15 @@ message UpdateOrganizationRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
-message SetOrganizationAPIKeyRequest {
+message CreateOrganizationAPIKeyRequest {
   OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string id = 2 [(gogoproto.customname) = "ID"];
+  string name = 2;
   repeated Right rights = 3;
+}
+
+message UpdateOrganizationAPIKeyRequest {
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message RemoveOrganizationAPIKeyRequest {

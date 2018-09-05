@@ -80,10 +80,15 @@ message UpdateUserPasswordRequest {
   string old = 3;
 }
 
-message SetUserAPIKeyRequest {
+message CreateUserAPIKeyRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string id = 2 [(gogoproto.customname) = "ID"];
+  string name = 2;
   repeated Right rights = 3;
+}
+
+message UpdateUserAPIKeyRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message RemoveUserAPIKeyRequest {

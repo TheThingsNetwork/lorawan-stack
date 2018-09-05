@@ -88,7 +88,7 @@ service GatewayAccess {
     };
   };
 
-  rpc GenerateGatewayAPIKey(SetGatewayAPIKeyRequest) returns (APIKey) {
+  rpc CreateGatewayAPIKey(CreateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/gateways/{gateway_ids.gateway_id}/api-keys"
       body: "*"
@@ -101,12 +101,12 @@ service GatewayAccess {
     };
   };
 
-  // Set the rights of an existing gateway API key. To generate an API key,
-  // the GenerateGatewayAPIKey should be used. To delete an API key, set it
-  // without any rights.
-  rpc SetGatewayAPIKey(SetGatewayAPIKeyRequest) returns (APIKey) {
+  // Update the rights of an existing gateway API key. To generate an API key,
+  // the CreateGatewayAPIKey should be used. To delete an API key, update it
+  // with zero rights.
+  rpc UpdateGatewayAPIKey(UpdateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      put: "/gateways/{gateway_ids.gateway_id}/api-keys/{id}"
+      put: "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}"
       body: "*"
     };
   };

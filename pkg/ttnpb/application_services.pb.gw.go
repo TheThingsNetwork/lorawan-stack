@@ -279,8 +279,8 @@ func request_ApplicationAccess_ListApplicationRights_0(ctx context.Context, mars
 
 }
 
-func request_ApplicationAccess_GenerateApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetApplicationAPIKeyRequest
+func request_ApplicationAccess_CreateApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateApplicationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -305,7 +305,7 @@ func request_ApplicationAccess_GenerateApplicationAPIKey_0(ctx context.Context, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	msg, err := client.GenerateApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -337,8 +337,8 @@ func request_ApplicationAccess_ListApplicationAPIKeys_0(ctx context.Context, mar
 
 }
 
-func request_ApplicationAccess_SetApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetApplicationAPIKeyRequest
+func request_ApplicationAccess_UpdateApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpdateApplicationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -363,18 +363,18 @@ func request_ApplicationAccess_SetApplicationAPIKey_0(ctx context.Context, marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["api_key.id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "api_key.id")
 	}
 
-	protoReq.ID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "api_key.id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "api_key.id", err)
 	}
 
-	msg, err := client.SetApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -997,7 +997,7 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("POST", pattern_ApplicationAccess_GenerateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ApplicationAccess_CreateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -1015,14 +1015,14 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_GenerateApplicationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_CreateApplicationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_GenerateApplicationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_CreateApplicationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1055,7 +1055,7 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("PUT", pattern_ApplicationAccess_SetApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ApplicationAccess_UpdateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -1073,14 +1073,14 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_SetApplicationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_UpdateApplicationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_SetApplicationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_UpdateApplicationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1148,11 +1148,11 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 var (
 	pattern_ApplicationAccess_ListApplicationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "rights"}, ""))
 
-	pattern_ApplicationAccess_GenerateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
+	pattern_ApplicationAccess_CreateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
 
 	pattern_ApplicationAccess_ListApplicationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "api-keys"}, ""))
 
-	pattern_ApplicationAccess_SetApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "id"}, ""))
+	pattern_ApplicationAccess_UpdateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "api_key.id"}, ""))
 
 	pattern_ApplicationAccess_SetApplicationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
 
@@ -1162,11 +1162,11 @@ var (
 var (
 	forward_ApplicationAccess_ListApplicationRights_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_GenerateApplicationAPIKey_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_CreateApplicationAPIKey_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationAccess_ListApplicationAPIKeys_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_SetApplicationAPIKey_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_UpdateApplicationAPIKey_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationAccess_SetApplicationCollaborator_0 = runtime.ForwardResponseMessage
 
