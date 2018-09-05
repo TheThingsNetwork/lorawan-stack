@@ -35,8 +35,6 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Application is the message that defines an Application in the network.
-// The persistence of the Application is divided between the Entity Registry and the Application Server.
-// SDKs are responsible for combining (if desired) the two.
 type Application struct {
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
 	CreatedAt              time.Time                 `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
@@ -53,7 +51,7 @@ type Application struct {
 func (m *Application) Reset()      { *m = Application{} }
 func (*Application) ProtoMessage() {}
 func (*Application) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{0}
+	return fileDescriptor_application_879b800f916cada2, []int{0}
 }
 func (m *Application) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -140,7 +138,7 @@ type Applications struct {
 func (m *Applications) Reset()      { *m = Applications{} }
 func (*Applications) ProtoMessage() {}
 func (*Applications) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{1}
+	return fileDescriptor_application_879b800f916cada2, []int{1}
 }
 func (m *Applications) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -186,7 +184,7 @@ type GetApplicationRequest struct {
 func (m *GetApplicationRequest) Reset()      { *m = GetApplicationRequest{} }
 func (*GetApplicationRequest) ProtoMessage() {}
 func (*GetApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{2}
+	return fileDescriptor_application_879b800f916cada2, []int{2}
 }
 func (m *GetApplicationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -232,7 +230,7 @@ type ListApplicationsRequest struct {
 func (m *ListApplicationsRequest) Reset()      { *m = ListApplicationsRequest{} }
 func (*ListApplicationsRequest) ProtoMessage() {}
 func (*ListApplicationsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{3}
+	return fileDescriptor_application_879b800f916cada2, []int{3}
 }
 func (m *ListApplicationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -287,7 +285,7 @@ type CreateApplicationRequest struct {
 func (m *CreateApplicationRequest) Reset()      { *m = CreateApplicationRequest{} }
 func (*CreateApplicationRequest) ProtoMessage() {}
 func (*CreateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{4}
+	return fileDescriptor_application_879b800f916cada2, []int{4}
 }
 func (m *CreateApplicationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -333,7 +331,7 @@ type UpdateApplicationRequest struct {
 func (m *UpdateApplicationRequest) Reset()      { *m = UpdateApplicationRequest{} }
 func (*UpdateApplicationRequest) ProtoMessage() {}
 func (*UpdateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{5}
+	return fileDescriptor_application_879b800f916cada2, []int{5}
 }
 func (m *UpdateApplicationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -380,7 +378,7 @@ type CreateApplicationAPIKeyRequest struct {
 func (m *CreateApplicationAPIKeyRequest) Reset()      { *m = CreateApplicationAPIKeyRequest{} }
 func (*CreateApplicationAPIKeyRequest) ProtoMessage() {}
 func (*CreateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{6}
+	return fileDescriptor_application_879b800f916cada2, []int{6}
 }
 func (m *CreateApplicationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -433,7 +431,7 @@ type UpdateApplicationAPIKeyRequest struct {
 func (m *UpdateApplicationAPIKeyRequest) Reset()      { *m = UpdateApplicationAPIKeyRequest{} }
 func (*UpdateApplicationAPIKeyRequest) ProtoMessage() {}
 func (*UpdateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{7}
+	return fileDescriptor_application_879b800f916cada2, []int{7}
 }
 func (m *UpdateApplicationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -472,7 +470,7 @@ type RemoveApplicationAPIKeyRequest struct {
 func (m *RemoveApplicationAPIKeyRequest) Reset()      { *m = RemoveApplicationAPIKeyRequest{} }
 func (*RemoveApplicationAPIKeyRequest) ProtoMessage() {}
 func (*RemoveApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{8}
+	return fileDescriptor_application_879b800f916cada2, []int{8}
 }
 func (m *RemoveApplicationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -518,7 +516,7 @@ type SetApplicationCollaboratorRequest struct {
 func (m *SetApplicationCollaboratorRequest) Reset()      { *m = SetApplicationCollaboratorRequest{} }
 func (*SetApplicationCollaboratorRequest) ProtoMessage() {}
 func (*SetApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_12bd1b1d78a08c90, []int{9}
+	return fileDescriptor_application_879b800f916cada2, []int{9}
 }
 func (m *SetApplicationCollaboratorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3323,13 +3321,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_12bd1b1d78a08c90)
+	proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_879b800f916cada2)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_12bd1b1d78a08c90)
+	golang_proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_879b800f916cada2)
 }
 
-var fileDescriptor_application_12bd1b1d78a08c90 = []byte{
+var fileDescriptor_application_879b800f916cada2 = []byte{
 	// 950 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x41, 0x6c, 0x1b, 0x45,
 	0x14, 0xdd, 0xb1, 0x53, 0xb7, 0x1e, 0x47, 0x49, 0x59, 0x68, 0x59, 0x85, 0x32, 0x36, 0x06, 0x81,

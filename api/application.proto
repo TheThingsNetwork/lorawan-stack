@@ -29,8 +29,6 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // Application is the message that defines an Application in the network.
-// The persistence of the Application is divided between the Entity Registry and the Application Server.
-// SDKs are responsible for combining (if desired) the two.
 message Application {
   ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
