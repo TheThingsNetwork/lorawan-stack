@@ -70,7 +70,7 @@ message MACParameters {
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
   uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay"];
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
-  uint32 rx1_delay = 9; // TODO: Make enum.
+  RxDelay rx1_delay = 9;
   // Data rate offset for Rx1.
   uint32 rx1_data_rate_offset = 10;
   // Data rate index for Rx2.
@@ -236,7 +236,6 @@ message EndDevice {
   // Version Identifiers. Stored in Application Server.
   EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
 
-  // TODO: Service Profile Identifier
   string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID"];
 
   // LoRaWAN MAC version. Stored in Network Server.

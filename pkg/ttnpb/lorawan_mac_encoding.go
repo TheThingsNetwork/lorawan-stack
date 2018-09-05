@@ -276,7 +276,7 @@ func (cmd *MACCommand_ResetInd) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errExpectedLengthEqual("ResetInd", 1)(len(b))
 	}
-	cmd.MinorVersion = uint32(b[0] & 0xf)
+	cmd.MinorVersion = Minor(b[0] & 0xf)
 	return nil
 }
 
@@ -307,7 +307,7 @@ func (cmd *MACCommand_ResetConf) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errExpectedLengthEqual("ResetConf", 1)(len(b))
 	}
-	cmd.MinorVersion = uint32(b[0] & 0xf)
+	cmd.MinorVersion = Minor(b[0] & 0xf)
 	return nil
 }
 
@@ -750,7 +750,7 @@ func (cmd *MACCommand_RxTimingSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errExpectedLengthEqual("RxTimingSetupReq", 1)(len(b))
 	}
-	cmd.Delay = uint32(b[0] & 0xf)
+	cmd.Delay = RxDelay(b[0] & 0xf)
 	return nil
 }
 
@@ -813,7 +813,7 @@ func (cmd *MACCommand_RekeyInd) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errExpectedLengthEqual("RekeyInd", 1)(len(b))
 	}
-	cmd.MinorVersion = uint32(b[0] & 0xf)
+	cmd.MinorVersion = Minor(b[0] & 0xf)
 	return nil
 }
 
@@ -841,7 +841,7 @@ func (cmd *MACCommand_RekeyConf) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errExpectedLengthEqual("RekeyConf", 1)(len(b))
 	}
-	cmd.MinorVersion = uint32(b[0] & 0xf)
+	cmd.MinorVersion = Minor(b[0] & 0xf)
 	return nil
 }
 
@@ -961,7 +961,7 @@ func (cmd *MACCommand_ForceRejoinReq) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 2 {
 		return errExpectedLengthEqual("ForceRejoinReq", 2)(len(b))
 	}
-	cmd.PeriodExponent = uint32(b[0] >> 3)
+	cmd.PeriodExponent = RejoinPeriodExponent(uint32(b[0] >> 3))
 	cmd.MaxRetries = uint32(b[0] & 0x7)
 	cmd.RejoinType = uint32(b[1] >> 4)
 	cmd.DataRateIndex = DataRateIndex(b[1] & 0xf)

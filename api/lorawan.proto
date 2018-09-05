@@ -301,10 +301,10 @@ message MACCommand {
   }
 
   message ResetInd {
-    uint32 minor_version = 1; // TODO: Make enum.
+    Minor minor_version = 1;
   }
   message ResetConf {
-    uint32 minor_version = 1; // TODO: Make enum.
+    Minor minor_version = 1;
   }
   message LinkCheckAns {
     // Indicates the link margin in dB of the received LinkCheckReq, relative to the demodulation floor.
@@ -365,7 +365,7 @@ message MACCommand {
     bool frequency_ack = 2;
   }
   message RxTimingSetupReq {
-    uint32 delay = 1; // TODO: Make enum.
+    RxDelay delay = 1;
   }
   message TxParamSetupReq {
     // Indicates the maximum EIRP value in dBm, indexed by the following vector:
@@ -375,10 +375,10 @@ message MACCommand {
     bool downlink_dwell_time = 3;
   }
   message RekeyInd {
-    uint32 minor_version = 1; // TODO: Make enum.
+    Minor minor_version = 1;
   }
   message RekeyConf {
-    uint32 minor_version = 1; // TODO: Make enum.
+    Minor minor_version = 1;
   }
   message ADRParamSetupReq {
     // Exponent e that configures the ADR_ACK_LIMIT = 2^e messages.
@@ -394,7 +394,7 @@ message MACCommand {
     DataRateIndex data_rate_index = 2;
     uint32 max_retries = 3;
     // Exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds.
-    uint32 period_exponent = 4; // TODO: Make enum.
+    RejoinPeriodExponent period_exponent = 4;
   }
   message RejoinParamSetupReq {
     // Exponent e that configures the rejoin counter = 2^(e+4) messages.
@@ -550,6 +550,27 @@ enum RejoinTimeExponent {
   REJOIN_TIME_15 = 15;
 }
 
+enum RejoinPeriodExponent {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // Every 32 to 64 seconds.
+  REJOIN_PERIOD_0 = 0;
+  // Every 64 to 96 seconds.
+  REJOIN_PERIOD_1 = 1;
+  // Every 128 to 160 seconds.
+  REJOIN_PERIOD_2 = 2;
+  // Every 256 to 288 seconds.
+  REJOIN_PERIOD_3 = 3;
+  // Every 512 to 544 seconds.
+  REJOIN_PERIOD_4 = 4;
+  // Every 1024 to 1056 seconds.
+  REJOIN_PERIOD_5 = 5;
+  // Every 2048 to 2080 seconds.
+  REJOIN_PERIOD_6 = 6;
+  // Every 4096 to 4128 seconds.
+  REJOIN_PERIOD_7 = 7;
+}
+
 enum DeviceEIRP {
   option (gogoproto.goproto_enum_prefix) = false;
 
@@ -611,4 +632,46 @@ enum ADRAckDelayExponent {
   ADR_ACK_DELAY_8192 = 13;
   ADR_ACK_DELAY_16384 = 14;
   ADR_ACK_DELAY_32768 = 15;
+}
+
+enum RxDelay {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  RX_DELAY_1  = 0;
+  RX_DELAY_2  = 1;
+  RX_DELAY_3  = 2;
+  RX_DELAY_4  = 3;
+  RX_DELAY_5  = 4;
+  RX_DELAY_6  = 5;
+  RX_DELAY_7  = 6;
+  RX_DELAY_8  = 7;
+  RX_DELAY_9  = 8;
+  RX_DELAY_10 = 9;
+  RX_DELAY_11 = 10;
+  RX_DELAY_12 = 11;
+  RX_DELAY_13 = 12;
+  RX_DELAY_14 = 13;
+  RX_DELAY_15 = 14;
+  RX_DELAY_16 = 15;
+}
+
+enum Minor {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  MINOR_RFU_0  = 0;
+  MINOR_1      = 1;
+  MINOR_RFU_2  = 2;
+  MINOR_RFU_3  = 3;
+  MINOR_RFU_4  = 4;
+  MINOR_RFU_5  = 5;
+  MINOR_RFU_6  = 6;
+  MINOR_RFU_7  = 7;
+  MINOR_RFU_8  = 8;
+  MINOR_RFU_9  = 9;
+  MINOR_RFU_10 = 10;
+  MINOR_RFU_11 = 11;
+  MINOR_RFU_12 = 12;
+  MINOR_RFU_13 = 13;
+  MINOR_RFU_14 = 14;
+  MINOR_RFU_15 = 15;
 }

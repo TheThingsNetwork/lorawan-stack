@@ -111,8 +111,6 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		},
 	}
 	out.MACState.DesiredParameters.Channels = deepcopy.Copy(out.MACState.CurrentParameters.Channels).([]*MACParameters_Channel)
-	// TODO: Populate Locations
-	// TODO: Populate Attributes
 	out.NetworkServerAddress = randStringEndDevice(r)
 	out.ApplicationServerAddress = randStringEndDevice(r)
 	out.VersionIDs = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
@@ -178,7 +176,7 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	for i := range out.Channels {
 		out.Channels[i] = NewPopulatedMACParameters_Channel(r, easy)
 	}
-	out.Rx1Delay = r.Uint32()
+	out.Rx1Delay = RxDelay(r.Uint32() % 16)
 	out.Rx1DataRateOffset = r.Uint32() % 6
 	out.Rx2DataRateIndex = NewPopulatedDataRateIndex(r, false)
 	out.Rx2Frequency = NewPopulatedFrequency(r, false)
