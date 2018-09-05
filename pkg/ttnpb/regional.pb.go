@@ -60,7 +60,7 @@ type FrequencyPlan struct {
 func (m *FrequencyPlan) Reset()      { *m = FrequencyPlan{} }
 func (*FrequencyPlan) ProtoMessage() {}
 func (*FrequencyPlan) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_b6f98e4ad53ca850, []int{0}
+	return fileDescriptor_regional_b247159eba304b21, []int{0}
 }
 func (m *FrequencyPlan) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -173,7 +173,7 @@ type FrequencyPlan_DwellTime struct {
 func (m *FrequencyPlan_DwellTime) Reset()      { *m = FrequencyPlan_DwellTime{} }
 func (*FrequencyPlan_DwellTime) ProtoMessage() {}
 func (*FrequencyPlan_DwellTime) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_b6f98e4ad53ca850, []int{0, 0}
+	return fileDescriptor_regional_b247159eba304b21, []int{0, 0}
 }
 func (m *FrequencyPlan_DwellTime) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -237,7 +237,7 @@ type FrequencyPlan_Channel struct {
 func (m *FrequencyPlan_Channel) Reset()      { *m = FrequencyPlan_Channel{} }
 func (*FrequencyPlan_Channel) ProtoMessage() {}
 func (*FrequencyPlan_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_b6f98e4ad53ca850, []int{0, 1}
+	return fileDescriptor_regional_b247159eba304b21, []int{0, 1}
 }
 func (m *FrequencyPlan_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -297,7 +297,7 @@ type FrequencyPlan_Channel_ForceDataRate struct {
 func (m *FrequencyPlan_Channel_ForceDataRate) Reset()      { *m = FrequencyPlan_Channel_ForceDataRate{} }
 func (*FrequencyPlan_Channel_ForceDataRate) ProtoMessage() {}
 func (*FrequencyPlan_Channel_ForceDataRate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_b6f98e4ad53ca850, []int{0, 1, 0}
+	return fileDescriptor_regional_b247159eba304b21, []int{0, 1, 0}
 }
 func (m *FrequencyPlan_Channel_ForceDataRate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -345,7 +345,7 @@ type FrequencyPlan_LBTConfiguration struct {
 func (m *FrequencyPlan_LBTConfiguration) Reset()      { *m = FrequencyPlan_LBTConfiguration{} }
 func (*FrequencyPlan_LBTConfiguration) ProtoMessage() {}
 func (*FrequencyPlan_LBTConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_b6f98e4ad53ca850, []int{0, 2}
+	return fileDescriptor_regional_b247159eba304b21, []int{0, 2}
 }
 func (m *FrequencyPlan_LBTConfiguration) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -407,7 +407,7 @@ type FrequencyPlan_TimeOffAir struct {
 func (m *FrequencyPlan_TimeOffAir) Reset()      { *m = FrequencyPlan_TimeOffAir{} }
 func (*FrequencyPlan_TimeOffAir) ProtoMessage() {}
 func (*FrequencyPlan_TimeOffAir) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_b6f98e4ad53ca850, []int{0, 3}
+	return fileDescriptor_regional_b247159eba304b21, []int{0, 3}
 }
 func (m *FrequencyPlan_TimeOffAir) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -463,68 +463,6 @@ func init() {
 	golang_proto.RegisterType((*FrequencyPlan_LBTConfiguration)(nil), "ttn.lorawan.v3.FrequencyPlan.LBTConfiguration")
 	proto.RegisterType((*FrequencyPlan_TimeOffAir)(nil), "ttn.lorawan.v3.FrequencyPlan.TimeOffAir")
 	golang_proto.RegisterType((*FrequencyPlan_TimeOffAir)(nil), "ttn.lorawan.v3.FrequencyPlan.TimeOffAir")
-}
-func (this *FrequencyPlan) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FrequencyPlan)
-	if !ok {
-		that2, ok := that.(FrequencyPlan)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FrequencyPlan")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FrequencyPlan but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FrequencyPlan but is not nil && this == nil")
-	}
-	if this.BandID != that1.BandID {
-		return fmt.Errorf("BandID this(%v) Not Equal that(%v)", this.BandID, that1.BandID)
-	}
-	if len(this.Channels) != len(that1.Channels) {
-		return fmt.Errorf("Channels this(%v) Not Equal that(%v)", len(this.Channels), len(that1.Channels))
-	}
-	for i := range this.Channels {
-		if !this.Channels[i].Equal(that1.Channels[i]) {
-			return fmt.Errorf("Channels this[%v](%v) Not Equal that[%v](%v)", i, this.Channels[i], i, that1.Channels[i])
-		}
-	}
-	if !this.LoraStandardChannel.Equal(that1.LoraStandardChannel) {
-		return fmt.Errorf("LoraStandardChannel this(%v) Not Equal that(%v)", this.LoraStandardChannel, that1.LoraStandardChannel)
-	}
-	if !this.FSKChannel.Equal(that1.FSKChannel) {
-		return fmt.Errorf("FSKChannel this(%v) Not Equal that(%v)", this.FSKChannel, that1.FSKChannel)
-	}
-	if !this.LBT.Equal(that1.LBT) {
-		return fmt.Errorf("LBT this(%v) Not Equal that(%v)", this.LBT, that1.LBT)
-	}
-	if !this.TimeOffAir.Equal(that1.TimeOffAir) {
-		return fmt.Errorf("TimeOffAir this(%v) Not Equal that(%v)", this.TimeOffAir, that1.TimeOffAir)
-	}
-	if !this.DwellTime.Equal(that1.DwellTime) {
-		return fmt.Errorf("DwellTime this(%v) Not Equal that(%v)", this.DwellTime, that1.DwellTime)
-	}
-	if !this.PingSlot.Equal(that1.PingSlot) {
-		return fmt.Errorf("PingSlot this(%v) Not Equal that(%v)", this.PingSlot, that1.PingSlot)
-	}
-	if !this.Rx2.Equal(that1.Rx2) {
-		return fmt.Errorf("Rx2 this(%v) Not Equal that(%v)", this.Rx2, that1.Rx2)
-	}
-	if this.MaxEIRP != that1.MaxEIRP {
-		return fmt.Errorf("MaxEIRP this(%v) Not Equal that(%v)", this.MaxEIRP, that1.MaxEIRP)
-	}
-	return nil
 }
 func (this *FrequencyPlan) Equal(that interface{}) bool {
 	if that == nil {
@@ -582,48 +520,6 @@ func (this *FrequencyPlan) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *FrequencyPlan_DwellTime) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FrequencyPlan_DwellTime)
-	if !ok {
-		that2, ok := that.(FrequencyPlan_DwellTime)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FrequencyPlan_DwellTime")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FrequencyPlan_DwellTime but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FrequencyPlan_DwellTime but is not nil && this == nil")
-	}
-	if this.Uplinks != that1.Uplinks {
-		return fmt.Errorf("Uplinks this(%v) Not Equal that(%v)", this.Uplinks, that1.Uplinks)
-	}
-	if this.Downlinks != that1.Downlinks {
-		return fmt.Errorf("Downlinks this(%v) Not Equal that(%v)", this.Downlinks, that1.Downlinks)
-	}
-	if this.Duration != nil && that1.Duration != nil {
-		if *this.Duration != *that1.Duration {
-			return fmt.Errorf("Duration this(%v) Not Equal that(%v)", *this.Duration, *that1.Duration)
-		}
-	} else if this.Duration != nil {
-		return fmt.Errorf("this.Duration == nil && that.Duration != nil")
-	} else if that1.Duration != nil {
-		return fmt.Errorf("Duration this(%v) Not Equal that(%v)", this.Duration, that1.Duration)
-	}
-	return nil
-}
 func (this *FrequencyPlan_DwellTime) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -660,42 +556,6 @@ func (this *FrequencyPlan_DwellTime) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *FrequencyPlan_Channel) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FrequencyPlan_Channel)
-	if !ok {
-		that2, ok := that.(FrequencyPlan_Channel)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FrequencyPlan_Channel")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FrequencyPlan_Channel but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FrequencyPlan_Channel but is not nil && this == nil")
-	}
-	if this.Frequency != that1.Frequency {
-		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
-	}
-	if !this.DataRate.Equal(that1.DataRate) {
-		return fmt.Errorf("DataRate this(%v) Not Equal that(%v)", this.DataRate, that1.DataRate)
-	}
-	if !this.DwellTime.Equal(that1.DwellTime) {
-		return fmt.Errorf("DwellTime this(%v) Not Equal that(%v)", this.DwellTime, that1.DwellTime)
-	}
-	return nil
-}
 func (this *FrequencyPlan_Channel) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -726,36 +586,6 @@ func (this *FrequencyPlan_Channel) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *FrequencyPlan_Channel_ForceDataRate) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FrequencyPlan_Channel_ForceDataRate)
-	if !ok {
-		that2, ok := that.(FrequencyPlan_Channel_ForceDataRate)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FrequencyPlan_Channel_ForceDataRate")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FrequencyPlan_Channel_ForceDataRate but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FrequencyPlan_Channel_ForceDataRate but is not nil && this == nil")
-	}
-	if this.Index != that1.Index {
-		return fmt.Errorf("Index this(%v) Not Equal that(%v)", this.Index, that1.Index)
-	}
-	return nil
-}
 func (this *FrequencyPlan_Channel_ForceDataRate) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -779,42 +609,6 @@ func (this *FrequencyPlan_Channel_ForceDataRate) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *FrequencyPlan_LBTConfiguration) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FrequencyPlan_LBTConfiguration)
-	if !ok {
-		that2, ok := that.(FrequencyPlan_LBTConfiguration)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FrequencyPlan_LBTConfiguration")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FrequencyPlan_LBTConfiguration but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FrequencyPlan_LBTConfiguration but is not nil && this == nil")
-	}
-	if this.RSSITarget != that1.RSSITarget {
-		return fmt.Errorf("RSSITarget this(%v) Not Equal that(%v)", this.RSSITarget, that1.RSSITarget)
-	}
-	if this.RSSIOffset != that1.RSSIOffset {
-		return fmt.Errorf("RSSIOffset this(%v) Not Equal that(%v)", this.RSSIOffset, that1.RSSIOffset)
-	}
-	if this.ScanTime != that1.ScanTime {
-		return fmt.Errorf("ScanTime this(%v) Not Equal that(%v)", this.ScanTime, that1.ScanTime)
-	}
-	return nil
 }
 func (this *FrequencyPlan_LBTConfiguration) Equal(that interface{}) bool {
 	if that == nil {
@@ -845,45 +639,6 @@ func (this *FrequencyPlan_LBTConfiguration) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *FrequencyPlan_TimeOffAir) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FrequencyPlan_TimeOffAir)
-	if !ok {
-		that2, ok := that.(FrequencyPlan_TimeOffAir)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FrequencyPlan_TimeOffAir")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FrequencyPlan_TimeOffAir but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FrequencyPlan_TimeOffAir but is not nil && this == nil")
-	}
-	if this.Fraction != that1.Fraction {
-		return fmt.Errorf("Fraction this(%v) Not Equal that(%v)", this.Fraction, that1.Fraction)
-	}
-	if this.Duration != nil && that1.Duration != nil {
-		if *this.Duration != *that1.Duration {
-			return fmt.Errorf("Duration this(%v) Not Equal that(%v)", *this.Duration, *that1.Duration)
-		}
-	} else if this.Duration != nil {
-		return fmt.Errorf("this.Duration == nil && that.Duration != nil")
-	} else if that1.Duration != nil {
-		return fmt.Errorf("Duration this(%v) Not Equal that(%v)", this.Duration, that1.Duration)
-	}
-	return nil
 }
 func (this *FrequencyPlan_TimeOffAir) Equal(that interface{}) bool {
 	if that == nil {
@@ -2545,13 +2300,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/regional.proto", fileDescriptor_regional_b6f98e4ad53ca850)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/regional.proto", fileDescriptor_regional_b247159eba304b21)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/regional.proto", fileDescriptor_regional_b6f98e4ad53ca850)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/regional.proto", fileDescriptor_regional_b247159eba304b21)
 }
 
-var fileDescriptor_regional_b6f98e4ad53ca850 = []byte{
+var fileDescriptor_regional_b247159eba304b21 = []byte{
 	// 1024 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x96, 0x3d, 0x6c, 0xdb, 0x46,
 	0x1b, 0xc7, 0x79, 0x92, 0x6d, 0x49, 0xe7, 0xd8, 0xaf, 0xc1, 0xe4, 0x05, 0x14, 0x35, 0x39, 0xba,
@@ -2609,12 +2364,12 @@ var fileDescriptor_regional_b6f98e4ad53ca850 = []byte{
 	0x6d, 0xb5, 0x08, 0xc9, 0xca, 0xe8, 0x76, 0x55, 0x7c, 0xcb, 0x72, 0xfc, 0x0a, 0x20, 0x9c, 0xbe,
 	0x49, 0xe2, 0xf6, 0x78, 0x0c, 0x77, 0xe5, 0x48, 0x66, 0xc9, 0xdc, 0x9e, 0xce, 0x5d, 0x11, 0x99,
 	0xeb, 0x60, 0xb1, 0x39, 0x37, 0xcd, 0xa5, 0x7f, 0x73, 0x9a, 0xef, 0x2d, 0x9c, 0xbe, 0xd0, 0x14,
-	0xeb, 0x37, 0xf0, 0x66, 0x84, 0xc0, 0xdb, 0x11, 0x02, 0xef, 0x46, 0x48, 0x79, 0x3f, 0x42, 0xe0,
-	0xc3, 0x08, 0x29, 0x67, 0x23, 0xa4, 0x7c, 0x1c, 0x21, 0xf0, 0x34, 0x41, 0xe0, 0x59, 0x82, 0x94,
-	0x97, 0x09, 0x02, 0xaf, 0x12, 0xa4, 0x9c, 0x26, 0x48, 0x79, 0x9d, 0x20, 0xf0, 0x26, 0x41, 0xe0,
-	0x6d, 0x82, 0xc0, 0xbb, 0x04, 0x29, 0xef, 0x13, 0x04, 0x3e, 0x24, 0x48, 0x39, 0x4b, 0x10, 0xf8,
-	0x98, 0x20, 0xe5, 0xe9, 0x18, 0x29, 0xcf, 0xc6, 0x08, 0xfc, 0x32, 0x46, 0xca, 0xf3, 0x31, 0x02,
-	0x2f, 0xc6, 0x48, 0x79, 0x39, 0x46, 0xca, 0xab, 0x31, 0x02, 0xa7, 0x63, 0x04, 0x5e, 0x8f, 0x11,
-	0xf8, 0x71, 0xf3, 0x12, 0xff, 0x3f, 0x06, 0x3d, 0xbf, 0xc9, 0x79, 0x38, 0xe8, 0x74, 0x96, 0x64,
-	0xaa, 0x5b, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0xe1, 0xe3, 0x53, 0x0e, 0xb6, 0x08, 0x00, 0x00,
+	0xeb, 0x37, 0xf0, 0x66, 0x84, 0xc0, 0xdb, 0x11, 0x02, 0xef, 0x46, 0x48, 0x79, 0x3f, 0x42, 0xca,
+	0x87, 0x11, 0x52, 0xce, 0x46, 0x48, 0xf9, 0x38, 0x42, 0xe0, 0x69, 0x82, 0xc0, 0xb3, 0x04, 0x29,
+	0x2f, 0x13, 0x04, 0x5e, 0x25, 0x48, 0x39, 0x4d, 0x90, 0xf2, 0x3a, 0x41, 0xca, 0x9b, 0x04, 0x81,
+	0xb7, 0x09, 0x02, 0xef, 0x12, 0xa4, 0xbc, 0x4f, 0x10, 0xf8, 0x90, 0x20, 0xe5, 0x2c, 0x41, 0xe0,
+	0x63, 0x82, 0x94, 0xa7, 0x63, 0xa4, 0x3c, 0x1b, 0x23, 0xf0, 0xcb, 0x18, 0x29, 0xcf, 0xc7, 0x08,
+	0xbc, 0x18, 0x23, 0xe5, 0xe5, 0x18, 0x29, 0xaf, 0xc6, 0x08, 0x9c, 0x8e, 0x11, 0x78, 0x3d, 0x46,
+	0xe0, 0xc7, 0xcd, 0x4b, 0xfc, 0xff, 0x18, 0xf4, 0xfc, 0x26, 0xe7, 0xe1, 0xa0, 0xd3, 0x59, 0x92,
+	0xa9, 0x6e, 0xfd, 0x1d, 0x00, 0x00, 0xff, 0xff, 0xbf, 0x95, 0x0f, 0x8e, 0xb6, 0x08, 0x00, 0x00,
 }

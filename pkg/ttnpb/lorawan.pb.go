@@ -72,7 +72,7 @@ var MType_value = map[string]int32{
 }
 
 func (MType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{0}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{0}
 }
 
 type Major int32
@@ -89,7 +89,7 @@ var Major_value = map[string]int32{
 }
 
 func (Major) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{1}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{1}
 }
 
 type MACVersion int32
@@ -118,7 +118,7 @@ var MACVersion_value = map[string]int32{
 }
 
 func (MACVersion) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{2}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{2}
 }
 
 type PHYVersion int32
@@ -153,7 +153,7 @@ var PHYVersion_value = map[string]int32{
 }
 
 func (PHYVersion) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{3}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{3}
 }
 
 type DataRateIndex int32
@@ -215,7 +215,7 @@ var DataRateIndex_value = map[string]int32{
 }
 
 func (DataRateIndex) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{4}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{4}
 }
 
 type RejoinType int32
@@ -238,7 +238,7 @@ var RejoinType_value = map[string]int32{
 }
 
 func (RejoinType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{5}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{5}
 }
 
 type CFListType int32
@@ -258,7 +258,7 @@ var CFListType_value = map[string]int32{
 }
 
 func (CFListType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{6}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{6}
 }
 
 type Modulation int32
@@ -278,7 +278,7 @@ var Modulation_value = map[string]int32{
 }
 
 func (Modulation) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{7}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{7}
 }
 
 type Class int32
@@ -301,7 +301,7 @@ var Class_value = map[string]int32{
 }
 
 func (Class) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{8}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{8}
 }
 
 type MACCommandIdentifier int32
@@ -378,7 +378,7 @@ var MACCommandIdentifier_value = map[string]int32{
 }
 
 func (MACCommandIdentifier) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{9}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{9}
 }
 
 type AggregatedDutyCycle int32
@@ -456,7 +456,7 @@ var AggregatedDutyCycle_value = map[string]int32{
 }
 
 func (AggregatedDutyCycle) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{10}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{10}
 }
 
 type PingSlotPeriod int32
@@ -502,7 +502,7 @@ var PingSlotPeriod_value = map[string]int32{
 }
 
 func (PingSlotPeriod) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11}
 }
 
 type RejoinCountExponent int32
@@ -564,7 +564,7 @@ var RejoinCountExponent_value = map[string]int32{
 }
 
 func (RejoinCountExponent) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{12}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{12}
 }
 
 type RejoinTimeExponent int32
@@ -643,7 +643,7 @@ var RejoinTimeExponent_value = map[string]int32{
 }
 
 func (RejoinTimeExponent) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{13}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{13}
 }
 
 // DeviceEIRP indicates the device's EIRP value levels.
@@ -706,7 +706,7 @@ var DeviceEIRP_value = map[string]int32{
 }
 
 func (DeviceEIRP) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{14}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{14}
 }
 
 type ADRAckLimitExponent int32
@@ -768,7 +768,7 @@ var ADRAckLimitExponent_value = map[string]int32{
 }
 
 func (ADRAckLimitExponent) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{15}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{15}
 }
 
 type ADRAckDelayExponent int32
@@ -830,7 +830,7 @@ var ADRAckDelayExponent_value = map[string]int32{
 }
 
 func (ADRAckDelayExponent) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{16}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{16}
 }
 
 type Message struct {
@@ -855,7 +855,7 @@ type Message struct {
 func (m *Message) Reset()      { *m = Message{} }
 func (*Message) ProtoMessage() {}
 func (*Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{0}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{0}
 }
 func (m *Message) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -887,7 +887,6 @@ var xxx_messageInfo_Message proto.InternalMessageInfo
 type isMessage_Payload interface {
 	isMessage_Payload()
 	Equal(interface{}) bool
-	VerboseEqual(interface{}) error
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
@@ -1074,7 +1073,7 @@ type MHDR struct {
 func (m *MHDR) Reset()      { *m = MHDR{} }
 func (*MHDR) ProtoMessage() {}
 func (*MHDR) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{1}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{1}
 }
 func (m *MHDR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1129,7 +1128,7 @@ type MACPayload struct {
 func (m *MACPayload) Reset()      { *m = MACPayload{} }
 func (*MACPayload) ProtoMessage() {}
 func (*MACPayload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{2}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{2}
 }
 func (m *MACPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1191,7 +1190,7 @@ type FHDR struct {
 func (m *FHDR) Reset()      { *m = FHDR{} }
 func (*FHDR) ProtoMessage() {}
 func (*FHDR) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{3}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{3}
 }
 func (m *FHDR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1247,7 +1246,7 @@ type FCtrl struct {
 func (m *FCtrl) Reset()      { *m = FCtrl{} }
 func (*FCtrl) ProtoMessage() {}
 func (*FCtrl) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{4}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{4}
 }
 func (m *FCtrl) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1322,7 +1321,7 @@ type JoinRequestPayload struct {
 func (m *JoinRequestPayload) Reset()      { *m = JoinRequestPayload{} }
 func (*JoinRequestPayload) ProtoMessage() {}
 func (*JoinRequestPayload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{5}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{5}
 }
 func (m *JoinRequestPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1364,7 +1363,7 @@ type RejoinRequestPayload struct {
 func (m *RejoinRequestPayload) Reset()      { *m = RejoinRequestPayload{} }
 func (*RejoinRequestPayload) ProtoMessage() {}
 func (*RejoinRequestPayload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{6}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{6}
 }
 func (m *RejoinRequestPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1422,7 +1421,7 @@ type JoinAcceptPayload struct {
 func (m *JoinAcceptPayload) Reset()      { *m = JoinAcceptPayload{} }
 func (*JoinAcceptPayload) ProtoMessage() {}
 func (*JoinAcceptPayload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{7}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{7}
 }
 func (m *JoinAcceptPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1484,7 +1483,7 @@ type DLSettings struct {
 func (m *DLSettings) Reset()      { *m = DLSettings{} }
 func (*DLSettings) ProtoMessage() {}
 func (*DLSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{8}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{8}
 }
 func (m *DLSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1550,7 +1549,7 @@ type CFList struct {
 func (m *CFList) Reset()      { *m = CFList{} }
 func (*CFList) ProtoMessage() {}
 func (*CFList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{9}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{9}
 }
 func (m *CFList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1632,7 +1631,7 @@ type TxSettings struct {
 func (m *TxSettings) Reset()      { *m = TxSettings{} }
 func (*TxSettings) ProtoMessage() {}
 func (*TxSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{10}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{10}
 }
 func (m *TxSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1773,7 +1772,7 @@ type MACCommand struct {
 func (m *MACCommand) Reset()      { *m = MACCommand{} }
 func (*MACCommand) ProtoMessage() {}
 func (*MACCommand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11}
 }
 func (m *MACCommand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1805,7 +1804,6 @@ var xxx_messageInfo_MACCommand proto.InternalMessageInfo
 type isMACCommand_Payload interface {
 	isMACCommand_Payload()
 	Equal(interface{}) bool
-	VerboseEqual(interface{}) error
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
@@ -2797,7 +2795,7 @@ type MACCommand_ResetInd struct {
 func (m *MACCommand_ResetInd) Reset()      { *m = MACCommand_ResetInd{} }
 func (*MACCommand_ResetInd) ProtoMessage() {}
 func (*MACCommand_ResetInd) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 0}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 0}
 }
 func (m *MACCommand_ResetInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2842,7 +2840,7 @@ type MACCommand_ResetConf struct {
 func (m *MACCommand_ResetConf) Reset()      { *m = MACCommand_ResetConf{} }
 func (*MACCommand_ResetConf) ProtoMessage() {}
 func (*MACCommand_ResetConf) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 1}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 1}
 }
 func (m *MACCommand_ResetConf) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2889,7 +2887,7 @@ type MACCommand_LinkCheckAns struct {
 func (m *MACCommand_LinkCheckAns) Reset()      { *m = MACCommand_LinkCheckAns{} }
 func (*MACCommand_LinkCheckAns) ProtoMessage() {}
 func (*MACCommand_LinkCheckAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 2}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 2}
 }
 func (m *MACCommand_LinkCheckAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2945,7 +2943,7 @@ type MACCommand_LinkADRReq struct {
 func (m *MACCommand_LinkADRReq) Reset()      { *m = MACCommand_LinkADRReq{} }
 func (*MACCommand_LinkADRReq) ProtoMessage() {}
 func (*MACCommand_LinkADRReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 3}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 3}
 }
 func (m *MACCommand_LinkADRReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3020,7 +3018,7 @@ type MACCommand_LinkADRAns struct {
 func (m *MACCommand_LinkADRAns) Reset()      { *m = MACCommand_LinkADRAns{} }
 func (*MACCommand_LinkADRAns) ProtoMessage() {}
 func (*MACCommand_LinkADRAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 4}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 4}
 }
 func (m *MACCommand_LinkADRAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3079,7 +3077,7 @@ type MACCommand_DutyCycleReq struct {
 func (m *MACCommand_DutyCycleReq) Reset()      { *m = MACCommand_DutyCycleReq{} }
 func (*MACCommand_DutyCycleReq) ProtoMessage() {}
 func (*MACCommand_DutyCycleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 5}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 5}
 }
 func (m *MACCommand_DutyCycleReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3126,7 +3124,7 @@ type MACCommand_RxParamSetupReq struct {
 func (m *MACCommand_RxParamSetupReq) Reset()      { *m = MACCommand_RxParamSetupReq{} }
 func (*MACCommand_RxParamSetupReq) ProtoMessage() {}
 func (*MACCommand_RxParamSetupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 6}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 6}
 }
 func (m *MACCommand_RxParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3187,7 +3185,7 @@ type MACCommand_RxParamSetupAns struct {
 func (m *MACCommand_RxParamSetupAns) Reset()      { *m = MACCommand_RxParamSetupAns{} }
 func (*MACCommand_RxParamSetupAns) ProtoMessage() {}
 func (*MACCommand_RxParamSetupAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 7}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 7}
 }
 func (m *MACCommand_RxParamSetupAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3252,7 +3250,7 @@ type MACCommand_DevStatusAns struct {
 func (m *MACCommand_DevStatusAns) Reset()      { *m = MACCommand_DevStatusAns{} }
 func (*MACCommand_DevStatusAns) ProtoMessage() {}
 func (*MACCommand_DevStatusAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 8}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 8}
 }
 func (m *MACCommand_DevStatusAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3307,7 +3305,7 @@ type MACCommand_NewChannelReq struct {
 func (m *MACCommand_NewChannelReq) Reset()      { *m = MACCommand_NewChannelReq{} }
 func (*MACCommand_NewChannelReq) ProtoMessage() {}
 func (*MACCommand_NewChannelReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 9}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 9}
 }
 func (m *MACCommand_NewChannelReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3374,7 +3372,7 @@ type MACCommand_NewChannelAns struct {
 func (m *MACCommand_NewChannelAns) Reset()      { *m = MACCommand_NewChannelAns{} }
 func (*MACCommand_NewChannelAns) ProtoMessage() {}
 func (*MACCommand_NewChannelAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 10}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 10}
 }
 func (m *MACCommand_NewChannelAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3427,7 +3425,7 @@ type MACCommand_DLChannelReq struct {
 func (m *MACCommand_DLChannelReq) Reset()      { *m = MACCommand_DLChannelReq{} }
 func (*MACCommand_DLChannelReq) ProtoMessage() {}
 func (*MACCommand_DLChannelReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 11}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 11}
 }
 func (m *MACCommand_DLChannelReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3480,7 +3478,7 @@ type MACCommand_DLChannelAns struct {
 func (m *MACCommand_DLChannelAns) Reset()      { *m = MACCommand_DLChannelAns{} }
 func (*MACCommand_DLChannelAns) ProtoMessage() {}
 func (*MACCommand_DLChannelAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 12}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 12}
 }
 func (m *MACCommand_DLChannelAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3532,7 +3530,7 @@ type MACCommand_RxTimingSetupReq struct {
 func (m *MACCommand_RxTimingSetupReq) Reset()      { *m = MACCommand_RxTimingSetupReq{} }
 func (*MACCommand_RxTimingSetupReq) ProtoMessage() {}
 func (*MACCommand_RxTimingSetupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 13}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 13}
 }
 func (m *MACCommand_RxTimingSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3581,7 +3579,7 @@ type MACCommand_TxParamSetupReq struct {
 func (m *MACCommand_TxParamSetupReq) Reset()      { *m = MACCommand_TxParamSetupReq{} }
 func (*MACCommand_TxParamSetupReq) ProtoMessage() {}
 func (*MACCommand_TxParamSetupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 14}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 14}
 }
 func (m *MACCommand_TxParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3640,7 +3638,7 @@ type MACCommand_RekeyInd struct {
 func (m *MACCommand_RekeyInd) Reset()      { *m = MACCommand_RekeyInd{} }
 func (*MACCommand_RekeyInd) ProtoMessage() {}
 func (*MACCommand_RekeyInd) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 15}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 15}
 }
 func (m *MACCommand_RekeyInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3685,7 +3683,7 @@ type MACCommand_RekeyConf struct {
 func (m *MACCommand_RekeyConf) Reset()      { *m = MACCommand_RekeyConf{} }
 func (*MACCommand_RekeyConf) ProtoMessage() {}
 func (*MACCommand_RekeyConf) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 16}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 16}
 }
 func (m *MACCommand_RekeyConf) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3733,7 +3731,7 @@ type MACCommand_ADRParamSetupReq struct {
 func (m *MACCommand_ADRParamSetupReq) Reset()      { *m = MACCommand_ADRParamSetupReq{} }
 func (*MACCommand_ADRParamSetupReq) ProtoMessage() {}
 func (*MACCommand_ADRParamSetupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 17}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 17}
 }
 func (m *MACCommand_ADRParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3785,7 +3783,7 @@ type MACCommand_DeviceTimeAns struct {
 func (m *MACCommand_DeviceTimeAns) Reset()      { *m = MACCommand_DeviceTimeAns{} }
 func (*MACCommand_DeviceTimeAns) ProtoMessage() {}
 func (*MACCommand_DeviceTimeAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 18}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 18}
 }
 func (m *MACCommand_DeviceTimeAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3834,7 +3832,7 @@ type MACCommand_ForceRejoinReq struct {
 func (m *MACCommand_ForceRejoinReq) Reset()      { *m = MACCommand_ForceRejoinReq{} }
 func (*MACCommand_ForceRejoinReq) ProtoMessage() {}
 func (*MACCommand_ForceRejoinReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 19}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 19}
 }
 func (m *MACCommand_ForceRejoinReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3903,7 +3901,7 @@ type MACCommand_RejoinParamSetupReq struct {
 func (m *MACCommand_RejoinParamSetupReq) Reset()      { *m = MACCommand_RejoinParamSetupReq{} }
 func (*MACCommand_RejoinParamSetupReq) ProtoMessage() {}
 func (*MACCommand_RejoinParamSetupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 20}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 20}
 }
 func (m *MACCommand_RejoinParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3955,7 +3953,7 @@ type MACCommand_RejoinParamSetupAns struct {
 func (m *MACCommand_RejoinParamSetupAns) Reset()      { *m = MACCommand_RejoinParamSetupAns{} }
 func (*MACCommand_RejoinParamSetupAns) ProtoMessage() {}
 func (*MACCommand_RejoinParamSetupAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 21}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 21}
 }
 func (m *MACCommand_RejoinParamSetupAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4000,7 +3998,7 @@ type MACCommand_PingSlotInfoReq struct {
 func (m *MACCommand_PingSlotInfoReq) Reset()      { *m = MACCommand_PingSlotInfoReq{} }
 func (*MACCommand_PingSlotInfoReq) ProtoMessage() {}
 func (*MACCommand_PingSlotInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 22}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 22}
 }
 func (m *MACCommand_PingSlotInfoReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4046,7 +4044,7 @@ type MACCommand_PingSlotChannelReq struct {
 func (m *MACCommand_PingSlotChannelReq) Reset()      { *m = MACCommand_PingSlotChannelReq{} }
 func (*MACCommand_PingSlotChannelReq) ProtoMessage() {}
 func (*MACCommand_PingSlotChannelReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 23}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 23}
 }
 func (m *MACCommand_PingSlotChannelReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4099,7 +4097,7 @@ type MACCommand_PingSlotChannelAns struct {
 func (m *MACCommand_PingSlotChannelAns) Reset()      { *m = MACCommand_PingSlotChannelAns{} }
 func (*MACCommand_PingSlotChannelAns) ProtoMessage() {}
 func (*MACCommand_PingSlotChannelAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 24}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 24}
 }
 func (m *MACCommand_PingSlotChannelAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4152,7 +4150,7 @@ type MACCommand_BeaconTimingAns struct {
 func (m *MACCommand_BeaconTimingAns) Reset()      { *m = MACCommand_BeaconTimingAns{} }
 func (*MACCommand_BeaconTimingAns) ProtoMessage() {}
 func (*MACCommand_BeaconTimingAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 25}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 25}
 }
 func (m *MACCommand_BeaconTimingAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4204,7 +4202,7 @@ type MACCommand_BeaconFreqReq struct {
 func (m *MACCommand_BeaconFreqReq) Reset()      { *m = MACCommand_BeaconFreqReq{} }
 func (*MACCommand_BeaconFreqReq) ProtoMessage() {}
 func (*MACCommand_BeaconFreqReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 26}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 26}
 }
 func (m *MACCommand_BeaconFreqReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4249,7 +4247,7 @@ type MACCommand_BeaconFreqAns struct {
 func (m *MACCommand_BeaconFreqAns) Reset()      { *m = MACCommand_BeaconFreqAns{} }
 func (*MACCommand_BeaconFreqAns) ProtoMessage() {}
 func (*MACCommand_BeaconFreqAns) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 27}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 27}
 }
 func (m *MACCommand_BeaconFreqAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4294,7 +4292,7 @@ type MACCommand_DeviceModeInd struct {
 func (m *MACCommand_DeviceModeInd) Reset()      { *m = MACCommand_DeviceModeInd{} }
 func (*MACCommand_DeviceModeInd) ProtoMessage() {}
 func (*MACCommand_DeviceModeInd) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 28}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 28}
 }
 func (m *MACCommand_DeviceModeInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4339,7 +4337,7 @@ type MACCommand_DeviceModeConf struct {
 func (m *MACCommand_DeviceModeConf) Reset()      { *m = MACCommand_DeviceModeConf{} }
 func (*MACCommand_DeviceModeConf) ProtoMessage() {}
 func (*MACCommand_DeviceModeConf) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lorawan_07677509ba81182f, []int{11, 29}
+	return fileDescriptor_lorawan_4c783e313febcda7, []int{11, 29}
 }
 func (m *MACCommand_DeviceModeConf) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4600,168 +4598,6 @@ func (x ADRAckDelayExponent) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
-func (this *Message) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Message)
-	if !ok {
-		that2, ok := that.(Message)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Message")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Message but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Message but is not nil && this == nil")
-	}
-	if !this.MHDR.Equal(&that1.MHDR) {
-		return fmt.Errorf("MHDR this(%v) Not Equal that(%v)", this.MHDR, that1.MHDR)
-	}
-	if !bytes.Equal(this.MIC, that1.MIC) {
-		return fmt.Errorf("MIC this(%v) Not Equal that(%v)", this.MIC, that1.MIC)
-	}
-	if that1.Payload == nil {
-		if this.Payload != nil {
-			return fmt.Errorf("this.Payload != nil && that1.Payload == nil")
-		}
-	} else if this.Payload == nil {
-		return fmt.Errorf("this.Payload == nil && that1.Payload != nil")
-	} else if err := this.Payload.VerboseEqual(that1.Payload); err != nil {
-		return err
-	}
-	return nil
-}
-func (this *Message_MACPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Message_MACPayload)
-	if !ok {
-		that2, ok := that.(Message_MACPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Message_MACPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Message_MACPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Message_MACPayload but is not nil && this == nil")
-	}
-	if !this.MACPayload.Equal(that1.MACPayload) {
-		return fmt.Errorf("MACPayload this(%v) Not Equal that(%v)", this.MACPayload, that1.MACPayload)
-	}
-	return nil
-}
-func (this *Message_JoinRequestPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Message_JoinRequestPayload)
-	if !ok {
-		that2, ok := that.(Message_JoinRequestPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Message_JoinRequestPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Message_JoinRequestPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Message_JoinRequestPayload but is not nil && this == nil")
-	}
-	if !this.JoinRequestPayload.Equal(that1.JoinRequestPayload) {
-		return fmt.Errorf("JoinRequestPayload this(%v) Not Equal that(%v)", this.JoinRequestPayload, that1.JoinRequestPayload)
-	}
-	return nil
-}
-func (this *Message_JoinAcceptPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Message_JoinAcceptPayload)
-	if !ok {
-		that2, ok := that.(Message_JoinAcceptPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Message_JoinAcceptPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Message_JoinAcceptPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Message_JoinAcceptPayload but is not nil && this == nil")
-	}
-	if !this.JoinAcceptPayload.Equal(that1.JoinAcceptPayload) {
-		return fmt.Errorf("JoinAcceptPayload this(%v) Not Equal that(%v)", this.JoinAcceptPayload, that1.JoinAcceptPayload)
-	}
-	return nil
-}
-func (this *Message_RejoinRequestPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Message_RejoinRequestPayload)
-	if !ok {
-		that2, ok := that.(Message_RejoinRequestPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Message_RejoinRequestPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Message_RejoinRequestPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Message_RejoinRequestPayload but is not nil && this == nil")
-	}
-	if !this.RejoinRequestPayload.Equal(that1.RejoinRequestPayload) {
-		return fmt.Errorf("RejoinRequestPayload this(%v) Not Equal that(%v)", this.RejoinRequestPayload, that1.RejoinRequestPayload)
-	}
-	return nil
-}
 func (this *Message) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -4894,39 +4730,6 @@ func (this *Message_RejoinRequestPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MHDR) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MHDR)
-	if !ok {
-		that2, ok := that.(MHDR)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MHDR")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MHDR but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MHDR but is not nil && this == nil")
-	}
-	if this.MType != that1.MType {
-		return fmt.Errorf("MType this(%v) Not Equal that(%v)", this.MType, that1.MType)
-	}
-	if this.Major != that1.Major {
-		return fmt.Errorf("Major this(%v) Not Equal that(%v)", this.Major, that1.Major)
-	}
-	return nil
-}
 func (this *MHDR) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -4953,45 +4756,6 @@ func (this *MHDR) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACPayload)
-	if !ok {
-		that2, ok := that.(MACPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACPayload but is not nil && this == nil")
-	}
-	if !this.FHDR.Equal(&that1.FHDR) {
-		return fmt.Errorf("FHDR this(%v) Not Equal that(%v)", this.FHDR, that1.FHDR)
-	}
-	if this.FPort != that1.FPort {
-		return fmt.Errorf("FPort this(%v) Not Equal that(%v)", this.FPort, that1.FPort)
-	}
-	if !bytes.Equal(this.FRMPayload, that1.FRMPayload) {
-		return fmt.Errorf("FRMPayload this(%v) Not Equal that(%v)", this.FRMPayload, that1.FRMPayload)
-	}
-	if !this.DecodedPayload.Equal(that1.DecodedPayload) {
-		return fmt.Errorf("DecodedPayload this(%v) Not Equal that(%v)", this.DecodedPayload, that1.DecodedPayload)
-	}
-	return nil
 }
 func (this *MACPayload) Equal(that interface{}) bool {
 	if that == nil {
@@ -5026,45 +4790,6 @@ func (this *MACPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *FHDR) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FHDR)
-	if !ok {
-		that2, ok := that.(FHDR)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FHDR")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FHDR but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FHDR but is not nil && this == nil")
-	}
-	if !this.DevAddr.Equal(that1.DevAddr) {
-		return fmt.Errorf("DevAddr this(%v) Not Equal that(%v)", this.DevAddr, that1.DevAddr)
-	}
-	if !this.FCtrl.Equal(&that1.FCtrl) {
-		return fmt.Errorf("FCtrl this(%v) Not Equal that(%v)", this.FCtrl, that1.FCtrl)
-	}
-	if this.FCnt != that1.FCnt {
-		return fmt.Errorf("FCnt this(%v) Not Equal that(%v)", this.FCnt, that1.FCnt)
-	}
-	if !bytes.Equal(this.FOpts, that1.FOpts) {
-		return fmt.Errorf("FOpts this(%v) Not Equal that(%v)", this.FOpts, that1.FOpts)
-	}
-	return nil
-}
 func (this *FHDR) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5097,48 +4822,6 @@ func (this *FHDR) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *FCtrl) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*FCtrl)
-	if !ok {
-		that2, ok := that.(FCtrl)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *FCtrl")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *FCtrl but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *FCtrl but is not nil && this == nil")
-	}
-	if this.ADR != that1.ADR {
-		return fmt.Errorf("ADR this(%v) Not Equal that(%v)", this.ADR, that1.ADR)
-	}
-	if this.ADRAckReq != that1.ADRAckReq {
-		return fmt.Errorf("ADRAckReq this(%v) Not Equal that(%v)", this.ADRAckReq, that1.ADRAckReq)
-	}
-	if this.Ack != that1.Ack {
-		return fmt.Errorf("Ack this(%v) Not Equal that(%v)", this.Ack, that1.Ack)
-	}
-	if this.FPending != that1.FPending {
-		return fmt.Errorf("FPending this(%v) Not Equal that(%v)", this.FPending, that1.FPending)
-	}
-	if this.ClassB != that1.ClassB {
-		return fmt.Errorf("ClassB this(%v) Not Equal that(%v)", this.ClassB, that1.ClassB)
-	}
-	return nil
 }
 func (this *FCtrl) Equal(that interface{}) bool {
 	if that == nil {
@@ -5176,42 +4859,6 @@ func (this *FCtrl) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *JoinRequestPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*JoinRequestPayload)
-	if !ok {
-		that2, ok := that.(JoinRequestPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *JoinRequestPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *JoinRequestPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *JoinRequestPayload but is not nil && this == nil")
-	}
-	if !this.JoinEUI.Equal(that1.JoinEUI) {
-		return fmt.Errorf("JoinEUI this(%v) Not Equal that(%v)", this.JoinEUI, that1.JoinEUI)
-	}
-	if !this.DevEUI.Equal(that1.DevEUI) {
-		return fmt.Errorf("DevEUI this(%v) Not Equal that(%v)", this.DevEUI, that1.DevEUI)
-	}
-	if !this.DevNonce.Equal(that1.DevNonce) {
-		return fmt.Errorf("DevNonce this(%v) Not Equal that(%v)", this.DevNonce, that1.DevNonce)
-	}
-	return nil
-}
 func (this *JoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5241,48 +4888,6 @@ func (this *JoinRequestPayload) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *RejoinRequestPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*RejoinRequestPayload)
-	if !ok {
-		that2, ok := that.(RejoinRequestPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *RejoinRequestPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *RejoinRequestPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *RejoinRequestPayload but is not nil && this == nil")
-	}
-	if this.RejoinType != that1.RejoinType {
-		return fmt.Errorf("RejoinType this(%v) Not Equal that(%v)", this.RejoinType, that1.RejoinType)
-	}
-	if !this.NetID.Equal(that1.NetID) {
-		return fmt.Errorf("NetID this(%v) Not Equal that(%v)", this.NetID, that1.NetID)
-	}
-	if !this.JoinEUI.Equal(that1.JoinEUI) {
-		return fmt.Errorf("JoinEUI this(%v) Not Equal that(%v)", this.JoinEUI, that1.JoinEUI)
-	}
-	if !this.DevEUI.Equal(that1.DevEUI) {
-		return fmt.Errorf("DevEUI this(%v) Not Equal that(%v)", this.DevEUI, that1.DevEUI)
-	}
-	if this.RejoinCnt != that1.RejoinCnt {
-		return fmt.Errorf("RejoinCnt this(%v) Not Equal that(%v)", this.RejoinCnt, that1.RejoinCnt)
-	}
-	return nil
 }
 func (this *RejoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
@@ -5319,54 +4924,6 @@ func (this *RejoinRequestPayload) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *JoinAcceptPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*JoinAcceptPayload)
-	if !ok {
-		that2, ok := that.(JoinAcceptPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *JoinAcceptPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *JoinAcceptPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *JoinAcceptPayload but is not nil && this == nil")
-	}
-	if !bytes.Equal(this.Encrypted, that1.Encrypted) {
-		return fmt.Errorf("Encrypted this(%v) Not Equal that(%v)", this.Encrypted, that1.Encrypted)
-	}
-	if !this.JoinNonce.Equal(that1.JoinNonce) {
-		return fmt.Errorf("JoinNonce this(%v) Not Equal that(%v)", this.JoinNonce, that1.JoinNonce)
-	}
-	if !this.NetID.Equal(that1.NetID) {
-		return fmt.Errorf("NetID this(%v) Not Equal that(%v)", this.NetID, that1.NetID)
-	}
-	if !this.DevAddr.Equal(that1.DevAddr) {
-		return fmt.Errorf("DevAddr this(%v) Not Equal that(%v)", this.DevAddr, that1.DevAddr)
-	}
-	if !this.DLSettings.Equal(&that1.DLSettings) {
-		return fmt.Errorf("DLSettings this(%v) Not Equal that(%v)", this.DLSettings, that1.DLSettings)
-	}
-	if this.RxDelay != that1.RxDelay {
-		return fmt.Errorf("RxDelay this(%v) Not Equal that(%v)", this.RxDelay, that1.RxDelay)
-	}
-	if !this.CFList.Equal(that1.CFList) {
-		return fmt.Errorf("CFList this(%v) Not Equal that(%v)", this.CFList, that1.CFList)
-	}
-	return nil
 }
 func (this *JoinAcceptPayload) Equal(that interface{}) bool {
 	if that == nil {
@@ -5410,42 +4967,6 @@ func (this *JoinAcceptPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *DLSettings) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*DLSettings)
-	if !ok {
-		that2, ok := that.(DLSettings)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *DLSettings")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *DLSettings but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *DLSettings but is not nil && this == nil")
-	}
-	if this.Rx1DROffset != that1.Rx1DROffset {
-		return fmt.Errorf("Rx1DROffset this(%v) Not Equal that(%v)", this.Rx1DROffset, that1.Rx1DROffset)
-	}
-	if this.Rx2DR != that1.Rx2DR {
-		return fmt.Errorf("Rx2DR this(%v) Not Equal that(%v)", this.Rx2DR, that1.Rx2DR)
-	}
-	if this.OptNeg != that1.OptNeg {
-		return fmt.Errorf("OptNeg this(%v) Not Equal that(%v)", this.OptNeg, that1.OptNeg)
-	}
-	return nil
-}
 func (this *DLSettings) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5475,52 +4996,6 @@ func (this *DLSettings) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *CFList) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*CFList)
-	if !ok {
-		that2, ok := that.(CFList)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *CFList")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *CFList but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *CFList but is not nil && this == nil")
-	}
-	if this.Type != that1.Type {
-		return fmt.Errorf("Type this(%v) Not Equal that(%v)", this.Type, that1.Type)
-	}
-	if len(this.Freq) != len(that1.Freq) {
-		return fmt.Errorf("Freq this(%v) Not Equal that(%v)", len(this.Freq), len(that1.Freq))
-	}
-	for i := range this.Freq {
-		if this.Freq[i] != that1.Freq[i] {
-			return fmt.Errorf("Freq this[%v](%v) Not Equal that[%v](%v)", i, this.Freq[i], i, that1.Freq[i])
-		}
-	}
-	if len(this.ChMasks) != len(that1.ChMasks) {
-		return fmt.Errorf("ChMasks this(%v) Not Equal that(%v)", len(this.ChMasks), len(that1.ChMasks))
-	}
-	for i := range this.ChMasks {
-		if this.ChMasks[i] != that1.ChMasks[i] {
-			return fmt.Errorf("ChMasks this[%v](%v) Not Equal that[%v](%v)", i, this.ChMasks[i], i, that1.ChMasks[i])
-		}
-	}
-	return nil
 }
 func (this *CFList) Equal(that interface{}) bool {
 	if that == nil {
@@ -5561,63 +5036,6 @@ func (this *CFList) Equal(that interface{}) bool {
 		}
 	}
 	return true
-}
-func (this *TxSettings) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*TxSettings)
-	if !ok {
-		that2, ok := that.(TxSettings)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *TxSettings")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *TxSettings but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *TxSettings but is not nil && this == nil")
-	}
-	if this.Modulation != that1.Modulation {
-		return fmt.Errorf("Modulation this(%v) Not Equal that(%v)", this.Modulation, that1.Modulation)
-	}
-	if this.DataRateIndex != that1.DataRateIndex {
-		return fmt.Errorf("DataRateIndex this(%v) Not Equal that(%v)", this.DataRateIndex, that1.DataRateIndex)
-	}
-	if this.Bandwidth != that1.Bandwidth {
-		return fmt.Errorf("Bandwidth this(%v) Not Equal that(%v)", this.Bandwidth, that1.Bandwidth)
-	}
-	if this.SpreadingFactor != that1.SpreadingFactor {
-		return fmt.Errorf("SpreadingFactor this(%v) Not Equal that(%v)", this.SpreadingFactor, that1.SpreadingFactor)
-	}
-	if this.BitRate != that1.BitRate {
-		return fmt.Errorf("BitRate this(%v) Not Equal that(%v)", this.BitRate, that1.BitRate)
-	}
-	if this.CodingRate != that1.CodingRate {
-		return fmt.Errorf("CodingRate this(%v) Not Equal that(%v)", this.CodingRate, that1.CodingRate)
-	}
-	if this.Frequency != that1.Frequency {
-		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
-	}
-	if this.TxPower != that1.TxPower {
-		return fmt.Errorf("TxPower this(%v) Not Equal that(%v)", this.TxPower, that1.TxPower)
-	}
-	if this.PolarizationInversion != that1.PolarizationInversion {
-		return fmt.Errorf("PolarizationInversion this(%v) Not Equal that(%v)", this.PolarizationInversion, that1.PolarizationInversion)
-	}
-	if this.ChannelIndex != that1.ChannelIndex {
-		return fmt.Errorf("ChannelIndex this(%v) Not Equal that(%v)", this.ChannelIndex, that1.ChannelIndex)
-	}
-	return nil
 }
 func (this *TxSettings) Equal(that interface{}) bool {
 	if that == nil {
@@ -5669,975 +5087,6 @@ func (this *TxSettings) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand)
-	if !ok {
-		that2, ok := that.(MACCommand)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand but is not nil && this == nil")
-	}
-	if this.CID != that1.CID {
-		return fmt.Errorf("CID this(%v) Not Equal that(%v)", this.CID, that1.CID)
-	}
-	if that1.Payload == nil {
-		if this.Payload != nil {
-			return fmt.Errorf("this.Payload != nil && that1.Payload == nil")
-		}
-	} else if this.Payload == nil {
-		return fmt.Errorf("this.Payload == nil && that1.Payload != nil")
-	} else if err := this.Payload.VerboseEqual(that1.Payload); err != nil {
-		return err
-	}
-	return nil
-}
-func (this *MACCommand_RawPayload) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RawPayload)
-	if !ok {
-		that2, ok := that.(MACCommand_RawPayload)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RawPayload")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RawPayload but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RawPayload but is not nil && this == nil")
-	}
-	if !bytes.Equal(this.RawPayload, that1.RawPayload) {
-		return fmt.Errorf("RawPayload this(%v) Not Equal that(%v)", this.RawPayload, that1.RawPayload)
-	}
-	return nil
-}
-func (this *MACCommand_ResetInd_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ResetInd_)
-	if !ok {
-		that2, ok := that.(MACCommand_ResetInd_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ResetInd_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ResetInd_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ResetInd_ but is not nil && this == nil")
-	}
-	if !this.ResetInd.Equal(that1.ResetInd) {
-		return fmt.Errorf("ResetInd this(%v) Not Equal that(%v)", this.ResetInd, that1.ResetInd)
-	}
-	return nil
-}
-func (this *MACCommand_ResetConf_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ResetConf_)
-	if !ok {
-		that2, ok := that.(MACCommand_ResetConf_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ResetConf_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ResetConf_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ResetConf_ but is not nil && this == nil")
-	}
-	if !this.ResetConf.Equal(that1.ResetConf) {
-		return fmt.Errorf("ResetConf this(%v) Not Equal that(%v)", this.ResetConf, that1.ResetConf)
-	}
-	return nil
-}
-func (this *MACCommand_LinkCheckAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_LinkCheckAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_LinkCheckAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_LinkCheckAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_LinkCheckAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_LinkCheckAns_ but is not nil && this == nil")
-	}
-	if !this.LinkCheckAns.Equal(that1.LinkCheckAns) {
-		return fmt.Errorf("LinkCheckAns this(%v) Not Equal that(%v)", this.LinkCheckAns, that1.LinkCheckAns)
-	}
-	return nil
-}
-func (this *MACCommand_LinkADRReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_LinkADRReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_LinkADRReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_LinkADRReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_LinkADRReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_LinkADRReq_ but is not nil && this == nil")
-	}
-	if !this.LinkADRReq.Equal(that1.LinkADRReq) {
-		return fmt.Errorf("LinkADRReq this(%v) Not Equal that(%v)", this.LinkADRReq, that1.LinkADRReq)
-	}
-	return nil
-}
-func (this *MACCommand_LinkADRAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_LinkADRAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_LinkADRAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_LinkADRAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_LinkADRAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_LinkADRAns_ but is not nil && this == nil")
-	}
-	if !this.LinkADRAns.Equal(that1.LinkADRAns) {
-		return fmt.Errorf("LinkADRAns this(%v) Not Equal that(%v)", this.LinkADRAns, that1.LinkADRAns)
-	}
-	return nil
-}
-func (this *MACCommand_DutyCycleReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DutyCycleReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_DutyCycleReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DutyCycleReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DutyCycleReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DutyCycleReq_ but is not nil && this == nil")
-	}
-	if !this.DutyCycleReq.Equal(that1.DutyCycleReq) {
-		return fmt.Errorf("DutyCycleReq this(%v) Not Equal that(%v)", this.DutyCycleReq, that1.DutyCycleReq)
-	}
-	return nil
-}
-func (this *MACCommand_RxParamSetupReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RxParamSetupReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_RxParamSetupReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RxParamSetupReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupReq_ but is not nil && this == nil")
-	}
-	if !this.RxParamSetupReq.Equal(that1.RxParamSetupReq) {
-		return fmt.Errorf("RxParamSetupReq this(%v) Not Equal that(%v)", this.RxParamSetupReq, that1.RxParamSetupReq)
-	}
-	return nil
-}
-func (this *MACCommand_RxParamSetupAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RxParamSetupAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_RxParamSetupAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RxParamSetupAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupAns_ but is not nil && this == nil")
-	}
-	if !this.RxParamSetupAns.Equal(that1.RxParamSetupAns) {
-		return fmt.Errorf("RxParamSetupAns this(%v) Not Equal that(%v)", this.RxParamSetupAns, that1.RxParamSetupAns)
-	}
-	return nil
-}
-func (this *MACCommand_DevStatusAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DevStatusAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_DevStatusAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DevStatusAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DevStatusAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DevStatusAns_ but is not nil && this == nil")
-	}
-	if !this.DevStatusAns.Equal(that1.DevStatusAns) {
-		return fmt.Errorf("DevStatusAns this(%v) Not Equal that(%v)", this.DevStatusAns, that1.DevStatusAns)
-	}
-	return nil
-}
-func (this *MACCommand_NewChannelReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_NewChannelReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_NewChannelReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_NewChannelReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_NewChannelReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_NewChannelReq_ but is not nil && this == nil")
-	}
-	if !this.NewChannelReq.Equal(that1.NewChannelReq) {
-		return fmt.Errorf("NewChannelReq this(%v) Not Equal that(%v)", this.NewChannelReq, that1.NewChannelReq)
-	}
-	return nil
-}
-func (this *MACCommand_NewChannelAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_NewChannelAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_NewChannelAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_NewChannelAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_NewChannelAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_NewChannelAns_ but is not nil && this == nil")
-	}
-	if !this.NewChannelAns.Equal(that1.NewChannelAns) {
-		return fmt.Errorf("NewChannelAns this(%v) Not Equal that(%v)", this.NewChannelAns, that1.NewChannelAns)
-	}
-	return nil
-}
-func (this *MACCommand_DlChannelReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DlChannelReq)
-	if !ok {
-		that2, ok := that.(MACCommand_DlChannelReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DlChannelReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DlChannelReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DlChannelReq but is not nil && this == nil")
-	}
-	if !this.DlChannelReq.Equal(that1.DlChannelReq) {
-		return fmt.Errorf("DlChannelReq this(%v) Not Equal that(%v)", this.DlChannelReq, that1.DlChannelReq)
-	}
-	return nil
-}
-func (this *MACCommand_DlChannelAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DlChannelAns)
-	if !ok {
-		that2, ok := that.(MACCommand_DlChannelAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DlChannelAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DlChannelAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DlChannelAns but is not nil && this == nil")
-	}
-	if !this.DlChannelAns.Equal(that1.DlChannelAns) {
-		return fmt.Errorf("DlChannelAns this(%v) Not Equal that(%v)", this.DlChannelAns, that1.DlChannelAns)
-	}
-	return nil
-}
-func (this *MACCommand_RxTimingSetupReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RxTimingSetupReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_RxTimingSetupReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RxTimingSetupReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RxTimingSetupReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RxTimingSetupReq_ but is not nil && this == nil")
-	}
-	if !this.RxTimingSetupReq.Equal(that1.RxTimingSetupReq) {
-		return fmt.Errorf("RxTimingSetupReq this(%v) Not Equal that(%v)", this.RxTimingSetupReq, that1.RxTimingSetupReq)
-	}
-	return nil
-}
-func (this *MACCommand_TxParamSetupReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_TxParamSetupReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_TxParamSetupReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_TxParamSetupReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_TxParamSetupReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_TxParamSetupReq_ but is not nil && this == nil")
-	}
-	if !this.TxParamSetupReq.Equal(that1.TxParamSetupReq) {
-		return fmt.Errorf("TxParamSetupReq this(%v) Not Equal that(%v)", this.TxParamSetupReq, that1.TxParamSetupReq)
-	}
-	return nil
-}
-func (this *MACCommand_RekeyInd_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RekeyInd_)
-	if !ok {
-		that2, ok := that.(MACCommand_RekeyInd_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RekeyInd_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RekeyInd_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RekeyInd_ but is not nil && this == nil")
-	}
-	if !this.RekeyInd.Equal(that1.RekeyInd) {
-		return fmt.Errorf("RekeyInd this(%v) Not Equal that(%v)", this.RekeyInd, that1.RekeyInd)
-	}
-	return nil
-}
-func (this *MACCommand_RekeyConf_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RekeyConf_)
-	if !ok {
-		that2, ok := that.(MACCommand_RekeyConf_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RekeyConf_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RekeyConf_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RekeyConf_ but is not nil && this == nil")
-	}
-	if !this.RekeyConf.Equal(that1.RekeyConf) {
-		return fmt.Errorf("RekeyConf this(%v) Not Equal that(%v)", this.RekeyConf, that1.RekeyConf)
-	}
-	return nil
-}
-func (this *MACCommand_ADRParamSetupReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ADRParamSetupReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_ADRParamSetupReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ADRParamSetupReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ADRParamSetupReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ADRParamSetupReq_ but is not nil && this == nil")
-	}
-	if !this.ADRParamSetupReq.Equal(that1.ADRParamSetupReq) {
-		return fmt.Errorf("ADRParamSetupReq this(%v) Not Equal that(%v)", this.ADRParamSetupReq, that1.ADRParamSetupReq)
-	}
-	return nil
-}
-func (this *MACCommand_DeviceTimeAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DeviceTimeAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_DeviceTimeAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DeviceTimeAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DeviceTimeAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DeviceTimeAns_ but is not nil && this == nil")
-	}
-	if !this.DeviceTimeAns.Equal(that1.DeviceTimeAns) {
-		return fmt.Errorf("DeviceTimeAns this(%v) Not Equal that(%v)", this.DeviceTimeAns, that1.DeviceTimeAns)
-	}
-	return nil
-}
-func (this *MACCommand_ForceRejoinReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ForceRejoinReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_ForceRejoinReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ForceRejoinReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ForceRejoinReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ForceRejoinReq_ but is not nil && this == nil")
-	}
-	if !this.ForceRejoinReq.Equal(that1.ForceRejoinReq) {
-		return fmt.Errorf("ForceRejoinReq this(%v) Not Equal that(%v)", this.ForceRejoinReq, that1.ForceRejoinReq)
-	}
-	return nil
-}
-func (this *MACCommand_RejoinParamSetupReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RejoinParamSetupReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_RejoinParamSetupReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RejoinParamSetupReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupReq_ but is not nil && this == nil")
-	}
-	if !this.RejoinParamSetupReq.Equal(that1.RejoinParamSetupReq) {
-		return fmt.Errorf("RejoinParamSetupReq this(%v) Not Equal that(%v)", this.RejoinParamSetupReq, that1.RejoinParamSetupReq)
-	}
-	return nil
-}
-func (this *MACCommand_RejoinParamSetupAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RejoinParamSetupAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_RejoinParamSetupAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RejoinParamSetupAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupAns_ but is not nil && this == nil")
-	}
-	if !this.RejoinParamSetupAns.Equal(that1.RejoinParamSetupAns) {
-		return fmt.Errorf("RejoinParamSetupAns this(%v) Not Equal that(%v)", this.RejoinParamSetupAns, that1.RejoinParamSetupAns)
-	}
-	return nil
-}
-func (this *MACCommand_PingSlotInfoReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_PingSlotInfoReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_PingSlotInfoReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_PingSlotInfoReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_PingSlotInfoReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_PingSlotInfoReq_ but is not nil && this == nil")
-	}
-	if !this.PingSlotInfoReq.Equal(that1.PingSlotInfoReq) {
-		return fmt.Errorf("PingSlotInfoReq this(%v) Not Equal that(%v)", this.PingSlotInfoReq, that1.PingSlotInfoReq)
-	}
-	return nil
-}
-func (this *MACCommand_PingSlotChannelReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_PingSlotChannelReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_PingSlotChannelReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_PingSlotChannelReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelReq_ but is not nil && this == nil")
-	}
-	if !this.PingSlotChannelReq.Equal(that1.PingSlotChannelReq) {
-		return fmt.Errorf("PingSlotChannelReq this(%v) Not Equal that(%v)", this.PingSlotChannelReq, that1.PingSlotChannelReq)
-	}
-	return nil
-}
-func (this *MACCommand_PingSlotChannelAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_PingSlotChannelAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_PingSlotChannelAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_PingSlotChannelAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelAns_ but is not nil && this == nil")
-	}
-	if !this.PingSlotChannelAns.Equal(that1.PingSlotChannelAns) {
-		return fmt.Errorf("PingSlotChannelAns this(%v) Not Equal that(%v)", this.PingSlotChannelAns, that1.PingSlotChannelAns)
-	}
-	return nil
-}
-func (this *MACCommand_BeaconTimingAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_BeaconTimingAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_BeaconTimingAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_BeaconTimingAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_BeaconTimingAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_BeaconTimingAns_ but is not nil && this == nil")
-	}
-	if !this.BeaconTimingAns.Equal(that1.BeaconTimingAns) {
-		return fmt.Errorf("BeaconTimingAns this(%v) Not Equal that(%v)", this.BeaconTimingAns, that1.BeaconTimingAns)
-	}
-	return nil
-}
-func (this *MACCommand_BeaconFreqReq_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_BeaconFreqReq_)
-	if !ok {
-		that2, ok := that.(MACCommand_BeaconFreqReq_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_BeaconFreqReq_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqReq_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqReq_ but is not nil && this == nil")
-	}
-	if !this.BeaconFreqReq.Equal(that1.BeaconFreqReq) {
-		return fmt.Errorf("BeaconFreqReq this(%v) Not Equal that(%v)", this.BeaconFreqReq, that1.BeaconFreqReq)
-	}
-	return nil
-}
-func (this *MACCommand_BeaconFreqAns_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_BeaconFreqAns_)
-	if !ok {
-		that2, ok := that.(MACCommand_BeaconFreqAns_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_BeaconFreqAns_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqAns_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqAns_ but is not nil && this == nil")
-	}
-	if !this.BeaconFreqAns.Equal(that1.BeaconFreqAns) {
-		return fmt.Errorf("BeaconFreqAns this(%v) Not Equal that(%v)", this.BeaconFreqAns, that1.BeaconFreqAns)
-	}
-	return nil
-}
-func (this *MACCommand_DeviceModeInd_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DeviceModeInd_)
-	if !ok {
-		that2, ok := that.(MACCommand_DeviceModeInd_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DeviceModeInd_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DeviceModeInd_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DeviceModeInd_ but is not nil && this == nil")
-	}
-	if !this.DeviceModeInd.Equal(that1.DeviceModeInd) {
-		return fmt.Errorf("DeviceModeInd this(%v) Not Equal that(%v)", this.DeviceModeInd, that1.DeviceModeInd)
-	}
-	return nil
-}
-func (this *MACCommand_DeviceModeConf_) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DeviceModeConf_)
-	if !ok {
-		that2, ok := that.(MACCommand_DeviceModeConf_)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DeviceModeConf_")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DeviceModeConf_ but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DeviceModeConf_ but is not nil && this == nil")
-	}
-	if !this.DeviceModeConf.Equal(that1.DeviceModeConf) {
-		return fmt.Errorf("DeviceModeConf this(%v) Not Equal that(%v)", this.DeviceModeConf, that1.DeviceModeConf)
-	}
-	return nil
 }
 func (this *MACCommand) Equal(that interface{}) bool {
 	if that == nil {
@@ -7416,36 +5865,6 @@ func (this *MACCommand_DeviceModeConf_) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_ResetInd) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ResetInd)
-	if !ok {
-		that2, ok := that.(MACCommand_ResetInd)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ResetInd")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ResetInd but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ResetInd but is not nil && this == nil")
-	}
-	if this.MinorVersion != that1.MinorVersion {
-		return fmt.Errorf("MinorVersion this(%v) Not Equal that(%v)", this.MinorVersion, that1.MinorVersion)
-	}
-	return nil
-}
 func (this *MACCommand_ResetInd) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7470,36 +5889,6 @@ func (this *MACCommand_ResetInd) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_ResetConf) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ResetConf)
-	if !ok {
-		that2, ok := that.(MACCommand_ResetConf)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ResetConf")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ResetConf but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ResetConf but is not nil && this == nil")
-	}
-	if this.MinorVersion != that1.MinorVersion {
-		return fmt.Errorf("MinorVersion this(%v) Not Equal that(%v)", this.MinorVersion, that1.MinorVersion)
-	}
-	return nil
-}
 func (this *MACCommand_ResetConf) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7523,39 +5912,6 @@ func (this *MACCommand_ResetConf) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_LinkCheckAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_LinkCheckAns)
-	if !ok {
-		that2, ok := that.(MACCommand_LinkCheckAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_LinkCheckAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_LinkCheckAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_LinkCheckAns but is not nil && this == nil")
-	}
-	if this.Margin != that1.Margin {
-		return fmt.Errorf("Margin this(%v) Not Equal that(%v)", this.Margin, that1.Margin)
-	}
-	if this.GatewayCount != that1.GatewayCount {
-		return fmt.Errorf("GatewayCount this(%v) Not Equal that(%v)", this.GatewayCount, that1.GatewayCount)
-	}
-	return nil
 }
 func (this *MACCommand_LinkCheckAns) Equal(that interface{}) bool {
 	if that == nil {
@@ -7583,53 +5939,6 @@ func (this *MACCommand_LinkCheckAns) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_LinkADRReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_LinkADRReq)
-	if !ok {
-		that2, ok := that.(MACCommand_LinkADRReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_LinkADRReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_LinkADRReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_LinkADRReq but is not nil && this == nil")
-	}
-	if this.DataRateIndex != that1.DataRateIndex {
-		return fmt.Errorf("DataRateIndex this(%v) Not Equal that(%v)", this.DataRateIndex, that1.DataRateIndex)
-	}
-	if this.TxPowerIndex != that1.TxPowerIndex {
-		return fmt.Errorf("TxPowerIndex this(%v) Not Equal that(%v)", this.TxPowerIndex, that1.TxPowerIndex)
-	}
-	if len(this.ChannelMask) != len(that1.ChannelMask) {
-		return fmt.Errorf("ChannelMask this(%v) Not Equal that(%v)", len(this.ChannelMask), len(that1.ChannelMask))
-	}
-	for i := range this.ChannelMask {
-		if this.ChannelMask[i] != that1.ChannelMask[i] {
-			return fmt.Errorf("ChannelMask this[%v](%v) Not Equal that[%v](%v)", i, this.ChannelMask[i], i, that1.ChannelMask[i])
-		}
-	}
-	if this.ChannelMaskControl != that1.ChannelMaskControl {
-		return fmt.Errorf("ChannelMaskControl this(%v) Not Equal that(%v)", this.ChannelMaskControl, that1.ChannelMaskControl)
-	}
-	if this.NbTrans != that1.NbTrans {
-		return fmt.Errorf("NbTrans this(%v) Not Equal that(%v)", this.NbTrans, that1.NbTrans)
-	}
-	return nil
 }
 func (this *MACCommand_LinkADRReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -7672,42 +5981,6 @@ func (this *MACCommand_LinkADRReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_LinkADRAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_LinkADRAns)
-	if !ok {
-		that2, ok := that.(MACCommand_LinkADRAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_LinkADRAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_LinkADRAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_LinkADRAns but is not nil && this == nil")
-	}
-	if this.ChannelMaskAck != that1.ChannelMaskAck {
-		return fmt.Errorf("ChannelMaskAck this(%v) Not Equal that(%v)", this.ChannelMaskAck, that1.ChannelMaskAck)
-	}
-	if this.DataRateIndexAck != that1.DataRateIndexAck {
-		return fmt.Errorf("DataRateIndexAck this(%v) Not Equal that(%v)", this.DataRateIndexAck, that1.DataRateIndexAck)
-	}
-	if this.TxPowerIndexAck != that1.TxPowerIndexAck {
-		return fmt.Errorf("TxPowerIndexAck this(%v) Not Equal that(%v)", this.TxPowerIndexAck, that1.TxPowerIndexAck)
-	}
-	return nil
-}
 func (this *MACCommand_LinkADRAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7738,36 +6011,6 @@ func (this *MACCommand_LinkADRAns) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_DutyCycleReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DutyCycleReq)
-	if !ok {
-		that2, ok := that.(MACCommand_DutyCycleReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DutyCycleReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DutyCycleReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DutyCycleReq but is not nil && this == nil")
-	}
-	if this.MaxDutyCycle != that1.MaxDutyCycle {
-		return fmt.Errorf("MaxDutyCycle this(%v) Not Equal that(%v)", this.MaxDutyCycle, that1.MaxDutyCycle)
-	}
-	return nil
-}
 func (this *MACCommand_DutyCycleReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7791,42 +6034,6 @@ func (this *MACCommand_DutyCycleReq) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_RxParamSetupReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RxParamSetupReq)
-	if !ok {
-		that2, ok := that.(MACCommand_RxParamSetupReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RxParamSetupReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupReq but is not nil && this == nil")
-	}
-	if this.Rx2DataRateIndex != that1.Rx2DataRateIndex {
-		return fmt.Errorf("Rx2DataRateIndex this(%v) Not Equal that(%v)", this.Rx2DataRateIndex, that1.Rx2DataRateIndex)
-	}
-	if this.Rx1DataRateOffset != that1.Rx1DataRateOffset {
-		return fmt.Errorf("Rx1DataRateOffset this(%v) Not Equal that(%v)", this.Rx1DataRateOffset, that1.Rx1DataRateOffset)
-	}
-	if this.Rx2Frequency != that1.Rx2Frequency {
-		return fmt.Errorf("Rx2Frequency this(%v) Not Equal that(%v)", this.Rx2Frequency, that1.Rx2Frequency)
-	}
-	return nil
 }
 func (this *MACCommand_RxParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -7858,42 +6065,6 @@ func (this *MACCommand_RxParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_RxParamSetupAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RxParamSetupAns)
-	if !ok {
-		that2, ok := that.(MACCommand_RxParamSetupAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RxParamSetupAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RxParamSetupAns but is not nil && this == nil")
-	}
-	if this.Rx2DataRateIndexAck != that1.Rx2DataRateIndexAck {
-		return fmt.Errorf("Rx2DataRateIndexAck this(%v) Not Equal that(%v)", this.Rx2DataRateIndexAck, that1.Rx2DataRateIndexAck)
-	}
-	if this.Rx1DataRateOffsetAck != that1.Rx1DataRateOffsetAck {
-		return fmt.Errorf("Rx1DataRateOffsetAck this(%v) Not Equal that(%v)", this.Rx1DataRateOffsetAck, that1.Rx1DataRateOffsetAck)
-	}
-	if this.Rx2FrequencyAck != that1.Rx2FrequencyAck {
-		return fmt.Errorf("Rx2FrequencyAck this(%v) Not Equal that(%v)", this.Rx2FrequencyAck, that1.Rx2FrequencyAck)
-	}
-	return nil
-}
 func (this *MACCommand_RxParamSetupAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7924,39 +6095,6 @@ func (this *MACCommand_RxParamSetupAns) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_DevStatusAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DevStatusAns)
-	if !ok {
-		that2, ok := that.(MACCommand_DevStatusAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DevStatusAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DevStatusAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DevStatusAns but is not nil && this == nil")
-	}
-	if this.Battery != that1.Battery {
-		return fmt.Errorf("Battery this(%v) Not Equal that(%v)", this.Battery, that1.Battery)
-	}
-	if this.Margin != that1.Margin {
-		return fmt.Errorf("Margin this(%v) Not Equal that(%v)", this.Margin, that1.Margin)
-	}
-	return nil
-}
 func (this *MACCommand_DevStatusAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7983,45 +6121,6 @@ func (this *MACCommand_DevStatusAns) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_NewChannelReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_NewChannelReq)
-	if !ok {
-		that2, ok := that.(MACCommand_NewChannelReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_NewChannelReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_NewChannelReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_NewChannelReq but is not nil && this == nil")
-	}
-	if this.ChannelIndex != that1.ChannelIndex {
-		return fmt.Errorf("ChannelIndex this(%v) Not Equal that(%v)", this.ChannelIndex, that1.ChannelIndex)
-	}
-	if this.Frequency != that1.Frequency {
-		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
-	}
-	if this.MinDataRateIndex != that1.MinDataRateIndex {
-		return fmt.Errorf("MinDataRateIndex this(%v) Not Equal that(%v)", this.MinDataRateIndex, that1.MinDataRateIndex)
-	}
-	if this.MaxDataRateIndex != that1.MaxDataRateIndex {
-		return fmt.Errorf("MaxDataRateIndex this(%v) Not Equal that(%v)", this.MaxDataRateIndex, that1.MaxDataRateIndex)
-	}
-	return nil
 }
 func (this *MACCommand_NewChannelReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -8056,39 +6155,6 @@ func (this *MACCommand_NewChannelReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_NewChannelAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_NewChannelAns)
-	if !ok {
-		that2, ok := that.(MACCommand_NewChannelAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_NewChannelAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_NewChannelAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_NewChannelAns but is not nil && this == nil")
-	}
-	if this.FrequencyAck != that1.FrequencyAck {
-		return fmt.Errorf("FrequencyAck this(%v) Not Equal that(%v)", this.FrequencyAck, that1.FrequencyAck)
-	}
-	if this.DataRateAck != that1.DataRateAck {
-		return fmt.Errorf("DataRateAck this(%v) Not Equal that(%v)", this.DataRateAck, that1.DataRateAck)
-	}
-	return nil
-}
 func (this *MACCommand_NewChannelAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8115,39 +6181,6 @@ func (this *MACCommand_NewChannelAns) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_DLChannelReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DLChannelReq)
-	if !ok {
-		that2, ok := that.(MACCommand_DLChannelReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DLChannelReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DLChannelReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DLChannelReq but is not nil && this == nil")
-	}
-	if this.ChannelIndex != that1.ChannelIndex {
-		return fmt.Errorf("ChannelIndex this(%v) Not Equal that(%v)", this.ChannelIndex, that1.ChannelIndex)
-	}
-	if this.Frequency != that1.Frequency {
-		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
-	}
-	return nil
 }
 func (this *MACCommand_DLChannelReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -8176,39 +6209,6 @@ func (this *MACCommand_DLChannelReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_DLChannelAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DLChannelAns)
-	if !ok {
-		that2, ok := that.(MACCommand_DLChannelAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DLChannelAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DLChannelAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DLChannelAns but is not nil && this == nil")
-	}
-	if this.ChannelIndexAck != that1.ChannelIndexAck {
-		return fmt.Errorf("ChannelIndexAck this(%v) Not Equal that(%v)", this.ChannelIndexAck, that1.ChannelIndexAck)
-	}
-	if this.FrequencyAck != that1.FrequencyAck {
-		return fmt.Errorf("FrequencyAck this(%v) Not Equal that(%v)", this.FrequencyAck, that1.FrequencyAck)
-	}
-	return nil
-}
 func (this *MACCommand_DLChannelAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8236,36 +6236,6 @@ func (this *MACCommand_DLChannelAns) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_RxTimingSetupReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RxTimingSetupReq)
-	if !ok {
-		that2, ok := that.(MACCommand_RxTimingSetupReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RxTimingSetupReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RxTimingSetupReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RxTimingSetupReq but is not nil && this == nil")
-	}
-	if this.Delay != that1.Delay {
-		return fmt.Errorf("Delay this(%v) Not Equal that(%v)", this.Delay, that1.Delay)
-	}
-	return nil
-}
 func (this *MACCommand_RxTimingSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8289,42 +6259,6 @@ func (this *MACCommand_RxTimingSetupReq) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_TxParamSetupReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_TxParamSetupReq)
-	if !ok {
-		that2, ok := that.(MACCommand_TxParamSetupReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_TxParamSetupReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_TxParamSetupReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_TxParamSetupReq but is not nil && this == nil")
-	}
-	if this.MaxEIRPIndex != that1.MaxEIRPIndex {
-		return fmt.Errorf("MaxEIRPIndex this(%v) Not Equal that(%v)", this.MaxEIRPIndex, that1.MaxEIRPIndex)
-	}
-	if this.UplinkDwellTime != that1.UplinkDwellTime {
-		return fmt.Errorf("UplinkDwellTime this(%v) Not Equal that(%v)", this.UplinkDwellTime, that1.UplinkDwellTime)
-	}
-	if this.DownlinkDwellTime != that1.DownlinkDwellTime {
-		return fmt.Errorf("DownlinkDwellTime this(%v) Not Equal that(%v)", this.DownlinkDwellTime, that1.DownlinkDwellTime)
-	}
-	return nil
 }
 func (this *MACCommand_TxParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -8356,36 +6290,6 @@ func (this *MACCommand_TxParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_RekeyInd) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RekeyInd)
-	if !ok {
-		that2, ok := that.(MACCommand_RekeyInd)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RekeyInd")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RekeyInd but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RekeyInd but is not nil && this == nil")
-	}
-	if this.MinorVersion != that1.MinorVersion {
-		return fmt.Errorf("MinorVersion this(%v) Not Equal that(%v)", this.MinorVersion, that1.MinorVersion)
-	}
-	return nil
-}
 func (this *MACCommand_RekeyInd) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8410,36 +6314,6 @@ func (this *MACCommand_RekeyInd) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_RekeyConf) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RekeyConf)
-	if !ok {
-		that2, ok := that.(MACCommand_RekeyConf)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RekeyConf")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RekeyConf but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RekeyConf but is not nil && this == nil")
-	}
-	if this.MinorVersion != that1.MinorVersion {
-		return fmt.Errorf("MinorVersion this(%v) Not Equal that(%v)", this.MinorVersion, that1.MinorVersion)
-	}
-	return nil
-}
 func (this *MACCommand_RekeyConf) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8463,39 +6337,6 @@ func (this *MACCommand_RekeyConf) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_ADRParamSetupReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ADRParamSetupReq)
-	if !ok {
-		that2, ok := that.(MACCommand_ADRParamSetupReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ADRParamSetupReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ADRParamSetupReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ADRParamSetupReq but is not nil && this == nil")
-	}
-	if this.ADRAckLimitExponent != that1.ADRAckLimitExponent {
-		return fmt.Errorf("ADRAckLimitExponent this(%v) Not Equal that(%v)", this.ADRAckLimitExponent, that1.ADRAckLimitExponent)
-	}
-	if this.ADRAckDelayExponent != that1.ADRAckDelayExponent {
-		return fmt.Errorf("ADRAckDelayExponent this(%v) Not Equal that(%v)", this.ADRAckDelayExponent, that1.ADRAckDelayExponent)
-	}
-	return nil
 }
 func (this *MACCommand_ADRParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -8524,36 +6365,6 @@ func (this *MACCommand_ADRParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_DeviceTimeAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DeviceTimeAns)
-	if !ok {
-		that2, ok := that.(MACCommand_DeviceTimeAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DeviceTimeAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DeviceTimeAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DeviceTimeAns but is not nil && this == nil")
-	}
-	if !this.Time.Equal(that1.Time) {
-		return fmt.Errorf("Time this(%v) Not Equal that(%v)", this.Time, that1.Time)
-	}
-	return nil
-}
 func (this *MACCommand_DeviceTimeAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8577,45 +6388,6 @@ func (this *MACCommand_DeviceTimeAns) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_ForceRejoinReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_ForceRejoinReq)
-	if !ok {
-		that2, ok := that.(MACCommand_ForceRejoinReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_ForceRejoinReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_ForceRejoinReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_ForceRejoinReq but is not nil && this == nil")
-	}
-	if this.RejoinType != that1.RejoinType {
-		return fmt.Errorf("RejoinType this(%v) Not Equal that(%v)", this.RejoinType, that1.RejoinType)
-	}
-	if this.DataRateIndex != that1.DataRateIndex {
-		return fmt.Errorf("DataRateIndex this(%v) Not Equal that(%v)", this.DataRateIndex, that1.DataRateIndex)
-	}
-	if this.MaxRetries != that1.MaxRetries {
-		return fmt.Errorf("MaxRetries this(%v) Not Equal that(%v)", this.MaxRetries, that1.MaxRetries)
-	}
-	if this.PeriodExponent != that1.PeriodExponent {
-		return fmt.Errorf("PeriodExponent this(%v) Not Equal that(%v)", this.PeriodExponent, that1.PeriodExponent)
-	}
-	return nil
 }
 func (this *MACCommand_ForceRejoinReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -8650,39 +6422,6 @@ func (this *MACCommand_ForceRejoinReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_RejoinParamSetupReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RejoinParamSetupReq)
-	if !ok {
-		that2, ok := that.(MACCommand_RejoinParamSetupReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RejoinParamSetupReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupReq but is not nil && this == nil")
-	}
-	if this.MaxCountExponent != that1.MaxCountExponent {
-		return fmt.Errorf("MaxCountExponent this(%v) Not Equal that(%v)", this.MaxCountExponent, that1.MaxCountExponent)
-	}
-	if this.MaxTimeExponent != that1.MaxTimeExponent {
-		return fmt.Errorf("MaxTimeExponent this(%v) Not Equal that(%v)", this.MaxTimeExponent, that1.MaxTimeExponent)
-	}
-	return nil
-}
 func (this *MACCommand_RejoinParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8710,36 +6449,6 @@ func (this *MACCommand_RejoinParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_RejoinParamSetupAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_RejoinParamSetupAns)
-	if !ok {
-		that2, ok := that.(MACCommand_RejoinParamSetupAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_RejoinParamSetupAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_RejoinParamSetupAns but is not nil && this == nil")
-	}
-	if this.MaxTimeExponentAck != that1.MaxTimeExponentAck {
-		return fmt.Errorf("MaxTimeExponentAck this(%v) Not Equal that(%v)", this.MaxTimeExponentAck, that1.MaxTimeExponentAck)
-	}
-	return nil
-}
 func (this *MACCommand_RejoinParamSetupAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8764,36 +6473,6 @@ func (this *MACCommand_RejoinParamSetupAns) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_PingSlotInfoReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_PingSlotInfoReq)
-	if !ok {
-		that2, ok := that.(MACCommand_PingSlotInfoReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_PingSlotInfoReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_PingSlotInfoReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_PingSlotInfoReq but is not nil && this == nil")
-	}
-	if this.Period != that1.Period {
-		return fmt.Errorf("Period this(%v) Not Equal that(%v)", this.Period, that1.Period)
-	}
-	return nil
-}
 func (this *MACCommand_PingSlotInfoReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8817,39 +6496,6 @@ func (this *MACCommand_PingSlotInfoReq) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_PingSlotChannelReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_PingSlotChannelReq)
-	if !ok {
-		that2, ok := that.(MACCommand_PingSlotChannelReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_PingSlotChannelReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelReq but is not nil && this == nil")
-	}
-	if this.Frequency != that1.Frequency {
-		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
-	}
-	if this.DataRateIndex != that1.DataRateIndex {
-		return fmt.Errorf("DataRateIndex this(%v) Not Equal that(%v)", this.DataRateIndex, that1.DataRateIndex)
-	}
-	return nil
 }
 func (this *MACCommand_PingSlotChannelReq) Equal(that interface{}) bool {
 	if that == nil {
@@ -8878,39 +6524,6 @@ func (this *MACCommand_PingSlotChannelReq) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_PingSlotChannelAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_PingSlotChannelAns)
-	if !ok {
-		that2, ok := that.(MACCommand_PingSlotChannelAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_PingSlotChannelAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_PingSlotChannelAns but is not nil && this == nil")
-	}
-	if this.FrequencyAck != that1.FrequencyAck {
-		return fmt.Errorf("FrequencyAck this(%v) Not Equal that(%v)", this.FrequencyAck, that1.FrequencyAck)
-	}
-	if this.DataRateIndexAck != that1.DataRateIndexAck {
-		return fmt.Errorf("DataRateIndexAck this(%v) Not Equal that(%v)", this.DataRateIndexAck, that1.DataRateIndexAck)
-	}
-	return nil
-}
 func (this *MACCommand_PingSlotChannelAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8937,39 +6550,6 @@ func (this *MACCommand_PingSlotChannelAns) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_BeaconTimingAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_BeaconTimingAns)
-	if !ok {
-		that2, ok := that.(MACCommand_BeaconTimingAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_BeaconTimingAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_BeaconTimingAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_BeaconTimingAns but is not nil && this == nil")
-	}
-	if this.Delay != that1.Delay {
-		return fmt.Errorf("Delay this(%v) Not Equal that(%v)", this.Delay, that1.Delay)
-	}
-	if this.ChannelIndex != that1.ChannelIndex {
-		return fmt.Errorf("ChannelIndex this(%v) Not Equal that(%v)", this.ChannelIndex, that1.ChannelIndex)
-	}
-	return nil
 }
 func (this *MACCommand_BeaconTimingAns) Equal(that interface{}) bool {
 	if that == nil {
@@ -8998,36 +6578,6 @@ func (this *MACCommand_BeaconTimingAns) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_BeaconFreqReq) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_BeaconFreqReq)
-	if !ok {
-		that2, ok := that.(MACCommand_BeaconFreqReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_BeaconFreqReq")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqReq but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqReq but is not nil && this == nil")
-	}
-	if this.Frequency != that1.Frequency {
-		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
-	}
-	return nil
-}
 func (this *MACCommand_BeaconFreqReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -9051,36 +6601,6 @@ func (this *MACCommand_BeaconFreqReq) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_BeaconFreqAns) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_BeaconFreqAns)
-	if !ok {
-		that2, ok := that.(MACCommand_BeaconFreqAns)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_BeaconFreqAns")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqAns but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_BeaconFreqAns but is not nil && this == nil")
-	}
-	if this.FrequencyAck != that1.FrequencyAck {
-		return fmt.Errorf("FrequencyAck this(%v) Not Equal that(%v)", this.FrequencyAck, that1.FrequencyAck)
-	}
-	return nil
 }
 func (this *MACCommand_BeaconFreqAns) Equal(that interface{}) bool {
 	if that == nil {
@@ -9106,36 +6626,6 @@ func (this *MACCommand_BeaconFreqAns) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_DeviceModeInd) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DeviceModeInd)
-	if !ok {
-		that2, ok := that.(MACCommand_DeviceModeInd)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DeviceModeInd")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DeviceModeInd but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DeviceModeInd but is not nil && this == nil")
-	}
-	if this.Class != that1.Class {
-		return fmt.Errorf("Class this(%v) Not Equal that(%v)", this.Class, that1.Class)
-	}
-	return nil
-}
 func (this *MACCommand_DeviceModeInd) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -9159,36 +6649,6 @@ func (this *MACCommand_DeviceModeInd) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *MACCommand_DeviceModeConf) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*MACCommand_DeviceModeConf)
-	if !ok {
-		that2, ok := that.(MACCommand_DeviceModeConf)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *MACCommand_DeviceModeConf")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *MACCommand_DeviceModeConf but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *MACCommand_DeviceModeConf but is not nil && this == nil")
-	}
-	if this.Class != that1.Class {
-		return fmt.Errorf("Class this(%v) Not Equal that(%v)", this.Class, that1.Class)
-	}
-	return nil
 }
 func (this *MACCommand_DeviceModeConf) Equal(that interface{}) bool {
 	if that == nil {
@@ -19360,13 +16820,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/lorawan.proto", fileDescriptor_lorawan_07677509ba81182f)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/lorawan.proto", fileDescriptor_lorawan_4c783e313febcda7)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/lorawan.proto", fileDescriptor_lorawan_07677509ba81182f)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/lorawan.proto", fileDescriptor_lorawan_4c783e313febcda7)
 }
 
-var fileDescriptor_lorawan_07677509ba81182f = []byte{
+var fileDescriptor_lorawan_4c783e313febcda7 = []byte{
 	// 4408 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x5a, 0x4b, 0x6c, 0x23, 0xc9,
 	0x79, 0x66, 0x8b, 0xa4, 0x48, 0xfe, 0x24, 0xc5, 0x56, 0x49, 0x33, 0xa3, 0xa5, 0x77, 0xa9, 0xd9,
@@ -19635,13 +17095,13 @@ var fileDescriptor_lorawan_07677509ba81182f = []byte{
 	0x9b, 0x82, 0xcb, 0xe5, 0x37, 0x05, 0x83, 0x03, 0xa6, 0xe0, 0x24, 0x01, 0x53, 0x70, 0x96, 0x80,
 	0x29, 0xf8, 0x02, 0x03, 0xa6, 0xe0, 0x6b, 0x0c, 0x98, 0xc2, 0x59, 0x66, 0xc0, 0x14, 0xce, 0x4a,
 	0x5d, 0xa6, 0x28, 0xfd, 0x8d, 0xf0, 0xf9, 0xb3, 0x9c, 0xf0, 0xc5, 0xb3, 0x9c, 0xf0, 0xe5, 0xb3,
-	0x5c, 0xe8, 0x37, 0xcf, 0x72, 0xc2, 0x6f, 0x9f, 0xe5, 0x42, 0xbf, 0x7b, 0x96, 0x0b, 0x7d, 0xf5,
-	0x2c, 0x27, 0xfc, 0x64, 0x98, 0x13, 0x3e, 0x19, 0xe6, 0x42, 0xbf, 0x18, 0xe6, 0x84, 0x4f, 0x87,
-	0xb9, 0xd0, 0x67, 0xc3, 0x5c, 0xe8, 0x57, 0xc3, 0x9c, 0xf0, 0xf9, 0x30, 0x27, 0x7c, 0x31, 0xcc,
-	0x09, 0x5f, 0x0e, 0x73, 0xa1, 0xdf, 0x0c, 0x73, 0xc2, 0x6f, 0x87, 0xb9, 0xd0, 0xef, 0x86, 0x39,
-	0xe1, 0xab, 0x61, 0x2e, 0xf4, 0x93, 0xe7, 0xb9, 0xd0, 0x27, 0xcf, 0x73, 0xc2, 0x4f, 0x9f, 0xe7,
-	0x42, 0x7f, 0xf5, 0x3c, 0x27, 0xfc, 0xfc, 0x79, 0x2e, 0xf4, 0x8b, 0xe7, 0xb9, 0xd0, 0xa7, 0xcf,
-	0x73, 0xc2, 0x67, 0xcf, 0x73, 0xc2, 0xaf, 0x9e, 0xe7, 0x84, 0x8f, 0xbf, 0x7d, 0xd5, 0x7f, 0xae,
-	0xda, 0x46, 0xef, 0xe8, 0x68, 0x9a, 0x5e, 0xef, 0xad, 0xfe, 0x7f, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0xc5, 0xf1, 0x0a, 0x20, 0xeb, 0x33, 0x00, 0x00,
+	0x5c, 0xe8, 0x37, 0xcf, 0x72, 0xa1, 0xdf, 0x3e, 0xcb, 0x85, 0x7e, 0xf7, 0x2c, 0x17, 0xfa, 0xea,
+	0x59, 0x4e, 0xf8, 0xc9, 0x30, 0x27, 0x7c, 0x32, 0xcc, 0x85, 0x7e, 0x31, 0xcc, 0x09, 0x9f, 0x0e,
+	0x73, 0xa1, 0xcf, 0x86, 0xb9, 0xd0, 0xaf, 0x86, 0xb9, 0xd0, 0xe7, 0xc3, 0x9c, 0xf0, 0xc5, 0x30,
+	0x27, 0x7c, 0x39, 0xcc, 0x85, 0x7e, 0x33, 0xcc, 0x09, 0xbf, 0x1d, 0xe6, 0x42, 0xbf, 0x1b, 0xe6,
+	0x84, 0xaf, 0x86, 0xb9, 0xd0, 0x4f, 0x9e, 0xe7, 0x42, 0x9f, 0x3c, 0xcf, 0x09, 0x3f, 0x7d, 0x9e,
+	0x0b, 0xfd, 0xd5, 0xf3, 0x9c, 0xf0, 0xf3, 0xe7, 0xb9, 0xd0, 0x2f, 0x9e, 0xe7, 0x42, 0x9f, 0x3e,
+	0xcf, 0x09, 0x9f, 0x3d, 0xcf, 0x09, 0xbf, 0x7a, 0x9e, 0x13, 0x3e, 0xfe, 0xf6, 0x55, 0xff, 0xb9,
+	0x6a, 0x1b, 0xbd, 0xa3, 0xa3, 0x69, 0x7a, 0xbd, 0xb7, 0xfa, 0xff, 0x01, 0x00, 0x00, 0xff, 0xff,
+	0x9b, 0x87, 0x56, 0xa0, 0xeb, 0x33, 0x00, 0x00,
 }

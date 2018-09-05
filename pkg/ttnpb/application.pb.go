@@ -59,7 +59,7 @@ type Application struct {
 func (m *Application) Reset()      { *m = Application{} }
 func (*Application) ProtoMessage() {}
 func (*Application) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_d73da506e228ba00, []int{0}
+	return fileDescriptor_application_18f9ff44efbf2ca7, []int{0}
 }
 func (m *Application) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -146,7 +146,7 @@ type Applications struct {
 func (m *Applications) Reset()      { *m = Applications{} }
 func (*Applications) ProtoMessage() {}
 func (*Applications) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_d73da506e228ba00, []int{1}
+	return fileDescriptor_application_18f9ff44efbf2ca7, []int{1}
 }
 func (m *Applications) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -201,7 +201,7 @@ type ApplicationUp struct {
 func (m *ApplicationUp) Reset()      { *m = ApplicationUp{} }
 func (*ApplicationUp) ProtoMessage() {}
 func (*ApplicationUp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_d73da506e228ba00, []int{2}
+	return fileDescriptor_application_18f9ff44efbf2ca7, []int{2}
 }
 func (m *ApplicationUp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -233,7 +233,6 @@ var xxx_messageInfo_ApplicationUp proto.InternalMessageInfo
 type isApplicationUp_Up interface {
 	isApplicationUp_Up()
 	Equal(interface{}) bool
-	VerboseEqual(interface{}) error
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
@@ -479,7 +478,7 @@ type ApplicationDownlinks struct {
 func (m *ApplicationDownlinks) Reset()      { *m = ApplicationDownlinks{} }
 func (*ApplicationDownlinks) ProtoMessage() {}
 func (*ApplicationDownlinks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_d73da506e228ba00, []int{3}
+	return fileDescriptor_application_18f9ff44efbf2ca7, []int{3}
 }
 func (m *ApplicationDownlinks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -525,7 +524,7 @@ type DownlinkQueueRequest struct {
 func (m *DownlinkQueueRequest) Reset()      { *m = DownlinkQueueRequest{} }
 func (*DownlinkQueueRequest) ProtoMessage() {}
 func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_d73da506e228ba00, []int{4}
+	return fileDescriptor_application_18f9ff44efbf2ca7, []int{4}
 }
 func (m *DownlinkQueueRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -573,57 +572,6 @@ func init() {
 	proto.RegisterType((*DownlinkQueueRequest)(nil), "ttn.lorawan.v3.DownlinkQueueRequest")
 	golang_proto.RegisterType((*DownlinkQueueRequest)(nil), "ttn.lorawan.v3.DownlinkQueueRequest")
 }
-func (this *Application) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Application)
-	if !ok {
-		that2, ok := that.(Application)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Application")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Application but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Application but is not nil && this == nil")
-	}
-	if !this.ApplicationIdentifiers.Equal(&that1.ApplicationIdentifiers) {
-		return fmt.Errorf("ApplicationIdentifiers this(%v) Not Equal that(%v)", this.ApplicationIdentifiers, that1.ApplicationIdentifiers)
-	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if !this.CreatedAt.Equal(that1.CreatedAt) {
-		return fmt.Errorf("CreatedAt this(%v) Not Equal that(%v)", this.CreatedAt, that1.CreatedAt)
-	}
-	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
-		return fmt.Errorf("UpdatedAt this(%v) Not Equal that(%v)", this.UpdatedAt, that1.UpdatedAt)
-	}
-	if this.UpFormatter != that1.UpFormatter {
-		return fmt.Errorf("UpFormatter this(%v) Not Equal that(%v)", this.UpFormatter, that1.UpFormatter)
-	}
-	if this.UpFormatterParameter != that1.UpFormatterParameter {
-		return fmt.Errorf("UpFormatterParameter this(%v) Not Equal that(%v)", this.UpFormatterParameter, that1.UpFormatterParameter)
-	}
-	if this.DownFormatter != that1.DownFormatter {
-		return fmt.Errorf("DownFormatter this(%v) Not Equal that(%v)", this.DownFormatter, that1.DownFormatter)
-	}
-	if this.DownFormatterParameter != that1.DownFormatterParameter {
-		return fmt.Errorf("DownFormatterParameter this(%v) Not Equal that(%v)", this.DownFormatterParameter, that1.DownFormatterParameter)
-	}
-	return nil
-}
 func (this *Application) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -669,41 +617,6 @@ func (this *Application) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *Applications) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Applications)
-	if !ok {
-		that2, ok := that.(Applications)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Applications")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Applications but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Applications but is not nil && this == nil")
-	}
-	if len(this.Applications) != len(that1.Applications) {
-		return fmt.Errorf("Applications this(%v) Not Equal that(%v)", len(this.Applications), len(that1.Applications))
-	}
-	for i := range this.Applications {
-		if !this.Applications[i].Equal(that1.Applications[i]) {
-			return fmt.Errorf("Applications this[%v](%v) Not Equal that[%v](%v)", i, this.Applications[i], i, that1.Applications[i])
-		}
-	}
-	return nil
-}
 func (this *Applications) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -732,233 +645,6 @@ func (this *Applications) Equal(that interface{}) bool {
 		}
 	}
 	return true
-}
-func (this *ApplicationUp) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp)
-	if !ok {
-		that2, ok := that.(ApplicationUp)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp but is not nil && this == nil")
-	}
-	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
-		return fmt.Errorf("EndDeviceIdentifiers this(%v) Not Equal that(%v)", this.EndDeviceIdentifiers, that1.EndDeviceIdentifiers)
-	}
-	if len(this.CorrelationIDs) != len(that1.CorrelationIDs) {
-		return fmt.Errorf("CorrelationIDs this(%v) Not Equal that(%v)", len(this.CorrelationIDs), len(that1.CorrelationIDs))
-	}
-	for i := range this.CorrelationIDs {
-		if this.CorrelationIDs[i] != that1.CorrelationIDs[i] {
-			return fmt.Errorf("CorrelationIDs this[%v](%v) Not Equal that[%v](%v)", i, this.CorrelationIDs[i], i, that1.CorrelationIDs[i])
-		}
-	}
-	if that1.Up == nil {
-		if this.Up != nil {
-			return fmt.Errorf("this.Up != nil && that1.Up == nil")
-		}
-	} else if this.Up == nil {
-		return fmt.Errorf("this.Up == nil && that1.Up != nil")
-	} else if err := this.Up.VerboseEqual(that1.Up); err != nil {
-		return err
-	}
-	return nil
-}
-func (this *ApplicationUp_UplinkMessage) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp_UplinkMessage)
-	if !ok {
-		that2, ok := that.(ApplicationUp_UplinkMessage)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp_UplinkMessage")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp_UplinkMessage but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp_UplinkMessage but is not nil && this == nil")
-	}
-	if !this.UplinkMessage.Equal(that1.UplinkMessage) {
-		return fmt.Errorf("UplinkMessage this(%v) Not Equal that(%v)", this.UplinkMessage, that1.UplinkMessage)
-	}
-	return nil
-}
-func (this *ApplicationUp_JoinAccept) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp_JoinAccept)
-	if !ok {
-		that2, ok := that.(ApplicationUp_JoinAccept)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp_JoinAccept")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp_JoinAccept but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp_JoinAccept but is not nil && this == nil")
-	}
-	if !this.JoinAccept.Equal(that1.JoinAccept) {
-		return fmt.Errorf("JoinAccept this(%v) Not Equal that(%v)", this.JoinAccept, that1.JoinAccept)
-	}
-	return nil
-}
-func (this *ApplicationUp_DownlinkAck) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp_DownlinkAck)
-	if !ok {
-		that2, ok := that.(ApplicationUp_DownlinkAck)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp_DownlinkAck")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkAck but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkAck but is not nil && this == nil")
-	}
-	if !this.DownlinkAck.Equal(that1.DownlinkAck) {
-		return fmt.Errorf("DownlinkAck this(%v) Not Equal that(%v)", this.DownlinkAck, that1.DownlinkAck)
-	}
-	return nil
-}
-func (this *ApplicationUp_DownlinkNack) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp_DownlinkNack)
-	if !ok {
-		that2, ok := that.(ApplicationUp_DownlinkNack)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp_DownlinkNack")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkNack but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkNack but is not nil && this == nil")
-	}
-	if !this.DownlinkNack.Equal(that1.DownlinkNack) {
-		return fmt.Errorf("DownlinkNack this(%v) Not Equal that(%v)", this.DownlinkNack, that1.DownlinkNack)
-	}
-	return nil
-}
-func (this *ApplicationUp_DownlinkSent) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp_DownlinkSent)
-	if !ok {
-		that2, ok := that.(ApplicationUp_DownlinkSent)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp_DownlinkSent")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkSent but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkSent but is not nil && this == nil")
-	}
-	if !this.DownlinkSent.Equal(that1.DownlinkSent) {
-		return fmt.Errorf("DownlinkSent this(%v) Not Equal that(%v)", this.DownlinkSent, that1.DownlinkSent)
-	}
-	return nil
-}
-func (this *ApplicationUp_DownlinkQueued) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUp_DownlinkQueued)
-	if !ok {
-		that2, ok := that.(ApplicationUp_DownlinkQueued)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUp_DownlinkQueued")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkQueued but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUp_DownlinkQueued but is not nil && this == nil")
-	}
-	if !this.DownlinkQueued.Equal(that1.DownlinkQueued) {
-		return fmt.Errorf("DownlinkQueued this(%v) Not Equal that(%v)", this.DownlinkQueued, that1.DownlinkQueued)
-	}
-	return nil
 }
 func (this *ApplicationUp) Equal(that interface{}) bool {
 	if that == nil {
@@ -1145,41 +831,6 @@ func (this *ApplicationUp_DownlinkQueued) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ApplicationDownlinks) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationDownlinks)
-	if !ok {
-		that2, ok := that.(ApplicationDownlinks)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationDownlinks")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationDownlinks but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationDownlinks but is not nil && this == nil")
-	}
-	if len(this.Downlinks) != len(that1.Downlinks) {
-		return fmt.Errorf("Downlinks this(%v) Not Equal that(%v)", len(this.Downlinks), len(that1.Downlinks))
-	}
-	for i := range this.Downlinks {
-		if !this.Downlinks[i].Equal(that1.Downlinks[i]) {
-			return fmt.Errorf("Downlinks this[%v](%v) Not Equal that[%v](%v)", i, this.Downlinks[i], i, that1.Downlinks[i])
-		}
-	}
-	return nil
-}
 func (this *ApplicationDownlinks) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1208,44 +859,6 @@ func (this *ApplicationDownlinks) Equal(that interface{}) bool {
 		}
 	}
 	return true
-}
-func (this *DownlinkQueueRequest) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*DownlinkQueueRequest)
-	if !ok {
-		that2, ok := that.(DownlinkQueueRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *DownlinkQueueRequest")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *DownlinkQueueRequest but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *DownlinkQueueRequest but is not nil && this == nil")
-	}
-	if len(this.Downlinks) != len(that1.Downlinks) {
-		return fmt.Errorf("Downlinks this(%v) Not Equal that(%v)", len(this.Downlinks), len(that1.Downlinks))
-	}
-	for i := range this.Downlinks {
-		if !this.Downlinks[i].Equal(that1.Downlinks[i]) {
-			return fmt.Errorf("Downlinks this[%v](%v) Not Equal that[%v](%v)", i, this.Downlinks[i], i, that1.Downlinks[i])
-		}
-	}
-	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
-		return fmt.Errorf("EndDeviceIdentifiers this(%v) Not Equal that(%v)", this.EndDeviceIdentifiers, that1.EndDeviceIdentifiers)
-	}
-	return nil
 }
 func (this *DownlinkQueueRequest) Equal(that interface{}) bool {
 	if that == nil {
@@ -3341,14 +2954,14 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/application.proto", fileDescriptor_application_d73da506e228ba00)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/application.proto", fileDescriptor_application_18f9ff44efbf2ca7)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/application.proto", fileDescriptor_application_d73da506e228ba00)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/application.proto", fileDescriptor_application_18f9ff44efbf2ca7)
 }
 
-var fileDescriptor_application_d73da506e228ba00 = []byte{
-	// 1020 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_application_18f9ff44efbf2ca7 = []byte{
+	// 1021 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x4f, 0x68, 0x1b, 0xc7,
 	0x1b, 0xdd, 0x91, 0xfc, 0xf3, 0x2f, 0x1a, 0xd9, 0x0a, 0x1d, 0x8c, 0x11, 0x4a, 0x19, 0xa9, 0x6a,
 	0x5a, 0x44, 0xa9, 0x57, 0x54, 0x69, 0x21, 0x50, 0x68, 0x91, 0xec, 0xb4, 0xb2, 0x69, 0x5c, 0x67,
@@ -3405,12 +3018,12 @@ var fileDescriptor_application_d73da506e228ba00 = []byte{
 	0xd1, 0x82, 0x7c, 0x60, 0xd1, 0x6f, 0xe0, 0xc2, 0x57, 0x1e, 0xcd, 0x51, 0xf8, 0x2f, 0xe7, 0xf8,
 	0x15, 0x5c, 0x72, 0xce, 0xca, 0xdf, 0xc9, 0xa9, 0xbe, 0x46, 0xeb, 0xc7, 0xa7, 0x4a, 0x3c, 0xca,
 	0xe9, 0xfe, 0xf7, 0xc1, 0xc5, 0xc7, 0x38, 0xb2, 0xfc, 0xde, 0xa5, 0x58, 0x6e, 0x3c, 0x06, 0x07,
-	0x7d, 0x0c, 0x0e, 0xfb, 0x18, 0x3c, 0xeb, 0x63, 0xe5, 0x79, 0x1f, 0x83, 0x17, 0x7d, 0xac, 0xbc,
-	0xec, 0x63, 0xe5, 0x55, 0x1f, 0x83, 0x07, 0x1e, 0x06, 0x0f, 0x3d, 0xac, 0xec, 0x79, 0x18, 0xec,
-	0x7b, 0x58, 0x79, 0xe2, 0x61, 0xe5, 0xa9, 0x87, 0xc1, 0x81, 0x87, 0xc1, 0xa1, 0x87, 0xc1, 0x33,
-	0x0f, 0x2b, 0xcf, 0x3d, 0x0c, 0x5e, 0x78, 0x58, 0x79, 0xe9, 0x61, 0xf0, 0xca, 0xc3, 0xca, 0x83,
-	0x01, 0x56, 0x1e, 0x0e, 0x30, 0x78, 0x34, 0xc0, 0xca, 0xcf, 0x03, 0x0c, 0x7e, 0x19, 0x60, 0x65,
-	0x6f, 0x80, 0x95, 0xfd, 0x01, 0x06, 0x4f, 0x06, 0x18, 0x3c, 0x1d, 0x60, 0xf0, 0xed, 0xfb, 0x09,
-	0x7e, 0xa4, 0xb3, 0x4e, 0xbb, 0x2a, 0x84, 0xc5, 0x36, 0x36, 0xa6, 0xe5, 0x95, 0xdc, 0xf8, 0x37,
-	0x00, 0x00, 0xff, 0xff, 0xc1, 0x65, 0x4d, 0x72, 0x00, 0x0d, 0x00, 0x00,
+	0x7d, 0x0c, 0x0e, 0xfb, 0x18, 0x3c, 0xeb, 0x63, 0xe5, 0x79, 0x1f, 0x2b, 0x2f, 0xfa, 0x58, 0x79,
+	0xd9, 0xc7, 0xca, 0xab, 0x3e, 0x06, 0x0f, 0x3c, 0x0c, 0x1e, 0x7a, 0x58, 0xd9, 0xf3, 0x30, 0xd8,
+	0xf7, 0xb0, 0xf2, 0xc4, 0xc3, 0xca, 0x53, 0x0f, 0x2b, 0x07, 0x1e, 0x06, 0x87, 0x1e, 0x06, 0xcf,
+	0x3c, 0xac, 0x3c, 0xf7, 0x30, 0x78, 0xe1, 0x61, 0xe5, 0xa5, 0x87, 0xc1, 0x2b, 0x0f, 0x2b, 0x0f,
+	0x06, 0x58, 0x79, 0x38, 0xc0, 0xe0, 0xd1, 0x00, 0x2b, 0x3f, 0x0f, 0x30, 0xf8, 0x65, 0x80, 0x95,
+	0xbd, 0x01, 0x56, 0xf6, 0x07, 0x18, 0x3c, 0x19, 0x60, 0xf0, 0x74, 0x80, 0xc1, 0xb7, 0xef, 0x27,
+	0xf8, 0x91, 0xce, 0x3a, 0xed, 0xaa, 0x10, 0x16, 0xdb, 0xd8, 0x98, 0x96, 0x57, 0x72, 0xe3, 0xdf,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x9f, 0x13, 0x11, 0xf2, 0x00, 0x0d, 0x00, 0x00,
 }

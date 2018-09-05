@@ -59,7 +59,7 @@ var ReviewingState_value = map[string]int32{
 }
 
 func (ReviewingState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_client_ac623c96bb8e8429, []int{0}
+	return fileDescriptor_client_87facf0736dbd94e, []int{0}
 }
 
 // Client is the message that defines a third-party client on the network.
@@ -98,7 +98,7 @@ type Client struct {
 func (m *Client) Reset()      { *m = Client{} }
 func (*Client) ProtoMessage() {}
 func (*Client) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_ac623c96bb8e8429, []int{0}
+	return fileDescriptor_client_87facf0736dbd94e, []int{0}
 }
 func (m *Client) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -209,76 +209,6 @@ func (x ReviewingState) String() string {
 		return s
 	}
 	return strconv.Itoa(int(x))
-}
-func (this *Client) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Client)
-	if !ok {
-		that2, ok := that.(Client)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Client")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Client but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Client but is not nil && this == nil")
-	}
-	if !this.ClientIdentifiers.Equal(&that1.ClientIdentifiers) {
-		return fmt.Errorf("ClientIdentifiers this(%v) Not Equal that(%v)", this.ClientIdentifiers, that1.ClientIdentifiers)
-	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if this.Secret != that1.Secret {
-		return fmt.Errorf("Secret this(%v) Not Equal that(%v)", this.Secret, that1.Secret)
-	}
-	if this.RedirectURI != that1.RedirectURI {
-		return fmt.Errorf("RedirectURI this(%v) Not Equal that(%v)", this.RedirectURI, that1.RedirectURI)
-	}
-	if this.State != that1.State {
-		return fmt.Errorf("State this(%v) Not Equal that(%v)", this.State, that1.State)
-	}
-	if this.SkipAuthorization != that1.SkipAuthorization {
-		return fmt.Errorf("SkipAuthorization this(%v) Not Equal that(%v)", this.SkipAuthorization, that1.SkipAuthorization)
-	}
-	if len(this.Grants) != len(that1.Grants) {
-		return fmt.Errorf("Grants this(%v) Not Equal that(%v)", len(this.Grants), len(that1.Grants))
-	}
-	for i := range this.Grants {
-		if this.Grants[i] != that1.Grants[i] {
-			return fmt.Errorf("Grants this[%v](%v) Not Equal that[%v](%v)", i, this.Grants[i], i, that1.Grants[i])
-		}
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
-	}
-	if !this.CreatorIDs.Equal(&that1.CreatorIDs) {
-		return fmt.Errorf("CreatorIDs this(%v) Not Equal that(%v)", this.CreatorIDs, that1.CreatorIDs)
-	}
-	if !this.CreatedAt.Equal(that1.CreatedAt) {
-		return fmt.Errorf("CreatedAt this(%v) Not Equal that(%v)", this.CreatedAt, that1.CreatedAt)
-	}
-	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
-		return fmt.Errorf("UpdatedAt this(%v) Not Equal that(%v)", this.UpdatedAt, that1.UpdatedAt)
-	}
-	return nil
 }
 func (this *Client) Equal(that interface{}) bool {
 	if that == nil {
@@ -1185,13 +1115,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/client.proto", fileDescriptor_client_ac623c96bb8e8429)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/client.proto", fileDescriptor_client_87facf0736dbd94e)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/client.proto", fileDescriptor_client_ac623c96bb8e8429)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/client.proto", fileDescriptor_client_87facf0736dbd94e)
 }
 
-var fileDescriptor_client_ac623c96bb8e8429 = []byte{
+var fileDescriptor_client_87facf0736dbd94e = []byte{
 	// 658 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x3d, 0x50, 0x13, 0x41,
 	0x14, 0xde, 0xe5, 0x27, 0xc2, 0x46, 0x23, 0xec, 0x8c, 0xce, 0x99, 0xe2, 0x25, 0x5a, 0x65, 0x1c,
@@ -1227,12 +1157,12 @@ var fileDescriptor_client_ac623c96bb8e8429 = []byte{
 	0x45, 0xf2, 0x64, 0xa3, 0x59, 0x69, 0xd6, 0x5b, 0xeb, 0xf5, 0xb5, 0x5a, 0x63, 0x6d, 0x75, 0x01,
 	0x51, 0x4a, 0x32, 0x71, 0xab, 0xb2, 0xbe, 0xce, 0x3e, 0x7e, 0xae, 0xd7, 0x16, 0xf0, 0x6d, 0x8f,
 	0xd5, 0x3f, 0xd4, 0xab, 0xcd, 0x7a, 0x6d, 0x61, 0x2a, 0x3b, 0x73, 0xf0, 0x0b, 0xd0, 0xca, 0x4f,
-	0x7c, 0x36, 0x02, 0x7c, 0x3e, 0x02, 0x7c, 0x31, 0x02, 0x74, 0x39, 0x02, 0x7c, 0x35, 0x02, 0x74,
+	0x7c, 0x36, 0x02, 0x7c, 0x3e, 0x02, 0x7c, 0x31, 0x02, 0x74, 0x39, 0x02, 0x74, 0x35, 0x02, 0x74,
 	0x3d, 0x02, 0x74, 0x33, 0x02, 0xbc, 0xaf, 0x01, 0x1f, 0x68, 0x40, 0x47, 0x1a, 0xf0, 0xb1, 0x06,
-	0x74, 0xa2, 0x01, 0x9d, 0x6a, 0xc0, 0x67, 0x1a, 0xf0, 0xb9, 0x06, 0x7c, 0xa1, 0x01, 0x5d, 0x6a,
+	0x74, 0xa2, 0x01, 0x9d, 0x6a, 0x40, 0x67, 0x1a, 0xf0, 0xb9, 0x06, 0x7c, 0xa1, 0x01, 0x5d, 0x6a,
 	0xc0, 0x57, 0x1a, 0xd0, 0xb5, 0x06, 0x7c, 0xa3, 0x01, 0xed, 0x07, 0x80, 0x0e, 0x02, 0xc0, 0x87,
 	0x01, 0xa0, 0xef, 0x01, 0xe0, 0x1f, 0x01, 0xa0, 0xa3, 0x00, 0xd0, 0x71, 0x00, 0xf8, 0x24, 0x00,
 	0x7c, 0x1a, 0x00, 0xfe, 0xf2, 0x66, 0x82, 0xbf, 0xd5, 0xeb, 0xdb, 0x25, 0xa5, 0x1c, 0xaf, 0xdd,
-	0x4e, 0x45, 0x01, 0x2d, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x1b, 0xa5, 0x57, 0xde, 0x96, 0x04,
+	0x4e, 0x45, 0x01, 0x2d, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x45, 0xd3, 0x0b, 0x5e, 0x96, 0x04,
 	0x00, 0x00,
 }

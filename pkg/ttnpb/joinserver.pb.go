@@ -43,7 +43,7 @@ type SessionKeyRequest struct {
 func (m *SessionKeyRequest) Reset()      { *m = SessionKeyRequest{} }
 func (*SessionKeyRequest) ProtoMessage() {}
 func (*SessionKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_66786318af684559, []int{0}
+	return fileDescriptor_joinserver_1cde1fd737354924, []int{0}
 }
 func (m *SessionKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -93,7 +93,7 @@ type NwkSKeysResponse struct {
 func (m *NwkSKeysResponse) Reset()      { *m = NwkSKeysResponse{} }
 func (*NwkSKeysResponse) ProtoMessage() {}
 func (*NwkSKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_66786318af684559, []int{1}
+	return fileDescriptor_joinserver_1cde1fd737354924, []int{1}
 }
 func (m *NwkSKeysResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -153,7 +153,7 @@ type AppSKeyResponse struct {
 func (m *AppSKeyResponse) Reset()      { *m = AppSKeyResponse{} }
 func (*AppSKeyResponse) ProtoMessage() {}
 func (*AppSKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_66786318af684559, []int{2}
+	return fileDescriptor_joinserver_1cde1fd737354924, []int{2}
 }
 func (m *AppSKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -197,39 +197,6 @@ func init() {
 	proto.RegisterType((*AppSKeyResponse)(nil), "ttn.lorawan.v3.AppSKeyResponse")
 	golang_proto.RegisterType((*AppSKeyResponse)(nil), "ttn.lorawan.v3.AppSKeyResponse")
 }
-func (this *SessionKeyRequest) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*SessionKeyRequest)
-	if !ok {
-		that2, ok := that.(SessionKeyRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *SessionKeyRequest")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *SessionKeyRequest but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *SessionKeyRequest but is not nil && this == nil")
-	}
-	if this.SessionKeyID != that1.SessionKeyID {
-		return fmt.Errorf("SessionKeyID this(%v) Not Equal that(%v)", this.SessionKeyID, that1.SessionKeyID)
-	}
-	if !this.DevEUI.Equal(that1.DevEUI) {
-		return fmt.Errorf("DevEUI this(%v) Not Equal that(%v)", this.DevEUI, that1.DevEUI)
-	}
-	return nil
-}
 func (this *SessionKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -256,42 +223,6 @@ func (this *SessionKeyRequest) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *NwkSKeysResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*NwkSKeysResponse)
-	if !ok {
-		that2, ok := that.(NwkSKeysResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *NwkSKeysResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *NwkSKeysResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *NwkSKeysResponse but is not nil && this == nil")
-	}
-	if !this.FNwkSIntKey.Equal(&that1.FNwkSIntKey) {
-		return fmt.Errorf("FNwkSIntKey this(%v) Not Equal that(%v)", this.FNwkSIntKey, that1.FNwkSIntKey)
-	}
-	if !this.SNwkSIntKey.Equal(&that1.SNwkSIntKey) {
-		return fmt.Errorf("SNwkSIntKey this(%v) Not Equal that(%v)", this.SNwkSIntKey, that1.SNwkSIntKey)
-	}
-	if !this.NwkSEncKey.Equal(&that1.NwkSEncKey) {
-		return fmt.Errorf("NwkSEncKey this(%v) Not Equal that(%v)", this.NwkSEncKey, that1.NwkSEncKey)
-	}
-	return nil
 }
 func (this *NwkSKeysResponse) Equal(that interface{}) bool {
 	if that == nil {
@@ -322,36 +253,6 @@ func (this *NwkSKeysResponse) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *AppSKeyResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*AppSKeyResponse)
-	if !ok {
-		that2, ok := that.(AppSKeyResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *AppSKeyResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *AppSKeyResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *AppSKeyResponse but is not nil && this == nil")
-	}
-	if !this.AppSKey.Equal(&that1.AppSKey) {
-		return fmt.Errorf("AppSKey this(%v) Not Equal that(%v)", this.AppSKey, that1.AppSKey)
-	}
-	return nil
 }
 func (this *AppSKeyResponse) Equal(that interface{}) bool {
 	if that == nil {
@@ -1281,13 +1182,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_66786318af684559)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_1cde1fd737354924)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_66786318af684559)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_1cde1fd737354924)
 }
 
-var fileDescriptor_joinserver_66786318af684559 = []byte{
+var fileDescriptor_joinserver_1cde1fd737354924 = []byte{
 	// 588 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x31, 0x4c, 0xdb, 0x4e,
 	0x14, 0xc6, 0xef, 0xf8, 0x23, 0x10, 0x07, 0x7f, 0xa0, 0x9e, 0x50, 0x5a, 0xbd, 0x50, 0x26, 0x86,
@@ -1319,11 +1220,11 @@ var fileDescriptor_joinserver_66786318af684559 = []byte{
 	0x4f, 0xfe, 0xfd, 0x73, 0x6c, 0xa8, 0xc1, 0x66, 0xab, 0xa8, 0x7e, 0x47, 0x62, 0x3c, 0x4d, 0x8b,
 	0xef, 0x6d, 0x56, 0x6e, 0x39, 0x2d, 0x49, 0xe7, 0x59, 0x7c, 0xc3, 0x26, 0x37, 0x87, 0x26, 0x77,
 	0x18, 0xab, 0xa2, 0x1a, 0x5f, 0x41, 0x16, 0x74, 0x3e, 0x2d, 0x49, 0x5d, 0x5f, 0xe9, 0x2b, 0x3d,
-	0x8f, 0x80, 0x5e, 0x44, 0x40, 0x2f, 0x23, 0x20, 0x57, 0x11, 0xd0, 0xeb, 0x08, 0xc8, 0x4d, 0x04,
+	0x8f, 0x80, 0x5e, 0x44, 0x40, 0x2f, 0x23, 0x20, 0x57, 0x11, 0x90, 0xeb, 0x08, 0xc8, 0x4d, 0x04,
 	0xe4, 0x36, 0x02, 0x7a, 0xa8, 0x81, 0x1e, 0x69, 0x20, 0xc7, 0x1a, 0xe8, 0x89, 0x06, 0x72, 0xaa,
-	0x81, 0x9c, 0x69, 0xa0, 0xe7, 0x1a, 0xe8, 0x85, 0x06, 0x7a, 0xa9, 0x81, 0x5c, 0x69, 0xa0, 0xd7,
+	0x81, 0x9c, 0x69, 0x20, 0xe7, 0x1a, 0xe8, 0x85, 0x06, 0x7a, 0xa9, 0x81, 0x5c, 0x69, 0xa0, 0xd7,
 	0x1a, 0xc8, 0x8d, 0x06, 0x7a, 0xab, 0x81, 0x1c, 0xc6, 0x40, 0x8e, 0x62, 0xa0, 0x9f, 0x62, 0x20,
 	0x9f, 0x63, 0xa0, 0x5f, 0x62, 0x20, 0xc7, 0x31, 0x90, 0x93, 0x18, 0xe8, 0x69, 0x0c, 0xf4, 0x2c,
 	0x06, 0xfa, 0xf6, 0x59, 0xd6, 0xdd, 0x57, 0xdc, 0x6f, 0xb5, 0xa6, 0x92, 0x77, 0xb9, 0xfe, 0x2b,
-	0x00, 0x00, 0xff, 0xff, 0xd5, 0xe0, 0x23, 0x39, 0xb0, 0x04, 0x00, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x8b, 0x96, 0x7f, 0xb9, 0xb0, 0x04, 0x00, 0x00,
 }

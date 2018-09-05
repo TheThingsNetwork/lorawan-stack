@@ -58,7 +58,7 @@ type Organization struct {
 func (m *Organization) Reset()      { *m = Organization{} }
 func (*Organization) ProtoMessage() {}
 func (*Organization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_e25c0bf788b04f35, []int{0}
+	return fileDescriptor_organization_4f6990d535b7011f, []int{0}
 }
 func (m *Organization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -150,7 +150,7 @@ type OrganizationMember struct {
 func (m *OrganizationMember) Reset()      { *m = OrganizationMember{} }
 func (*OrganizationMember) ProtoMessage() {}
 func (*OrganizationMember) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_e25c0bf788b04f35, []int{1}
+	return fileDescriptor_organization_4f6990d535b7011f, []int{1}
 }
 func (m *OrganizationMember) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -191,57 +191,6 @@ func init() {
 	golang_proto.RegisterType((*Organization)(nil), "ttn.lorawan.v3.Organization")
 	proto.RegisterType((*OrganizationMember)(nil), "ttn.lorawan.v3.OrganizationMember")
 	golang_proto.RegisterType((*OrganizationMember)(nil), "ttn.lorawan.v3.OrganizationMember")
-}
-func (this *Organization) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Organization)
-	if !ok {
-		that2, ok := that.(Organization)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Organization")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Organization but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Organization but is not nil && this == nil")
-	}
-	if !this.OrganizationIdentifiers.Equal(&that1.OrganizationIdentifiers) {
-		return fmt.Errorf("OrganizationIdentifiers this(%v) Not Equal that(%v)", this.OrganizationIdentifiers, that1.OrganizationIdentifiers)
-	}
-	if this.Name != that1.Name {
-		return fmt.Errorf("Name this(%v) Not Equal that(%v)", this.Name, that1.Name)
-	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if this.URL != that1.URL {
-		return fmt.Errorf("URL this(%v) Not Equal that(%v)", this.URL, that1.URL)
-	}
-	if this.Location != that1.Location {
-		return fmt.Errorf("Location this(%v) Not Equal that(%v)", this.Location, that1.Location)
-	}
-	if this.Email != that1.Email {
-		return fmt.Errorf("Email this(%v) Not Equal that(%v)", this.Email, that1.Email)
-	}
-	if !this.CreatedAt.Equal(that1.CreatedAt) {
-		return fmt.Errorf("CreatedAt this(%v) Not Equal that(%v)", this.CreatedAt, that1.CreatedAt)
-	}
-	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
-		return fmt.Errorf("UpdatedAt this(%v) Not Equal that(%v)", this.UpdatedAt, that1.UpdatedAt)
-	}
-	return nil
 }
 func (this *Organization) Equal(that interface{}) bool {
 	if that == nil {
@@ -287,47 +236,6 @@ func (this *Organization) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *OrganizationMember) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*OrganizationMember)
-	if !ok {
-		that2, ok := that.(OrganizationMember)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *OrganizationMember")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *OrganizationMember but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *OrganizationMember but is not nil && this == nil")
-	}
-	if !this.OrganizationIdentifiers.Equal(&that1.OrganizationIdentifiers) {
-		return fmt.Errorf("OrganizationIdentifiers this(%v) Not Equal that(%v)", this.OrganizationIdentifiers, that1.OrganizationIdentifiers)
-	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
-		return fmt.Errorf("UserIdentifiers this(%v) Not Equal that(%v)", this.UserIdentifiers, that1.UserIdentifiers)
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
-	}
-	return nil
 }
 func (this *OrganizationMember) Equal(that interface{}) bool {
 	if that == nil {
@@ -1264,13 +1172,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/organization.proto", fileDescriptor_organization_e25c0bf788b04f35)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/organization.proto", fileDescriptor_organization_4f6990d535b7011f)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/organization.proto", fileDescriptor_organization_e25c0bf788b04f35)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/organization.proto", fileDescriptor_organization_4f6990d535b7011f)
 }
 
-var fileDescriptor_organization_e25c0bf788b04f35 = []byte{
+var fileDescriptor_organization_4f6990d535b7011f = []byte{
 	// 566 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x93, 0x3f, 0x4c, 0xdb, 0x4c,
 	0x18, 0xc6, 0xef, 0x08, 0x7f, 0xc2, 0xf1, 0x89, 0xaf, 0x3a, 0xb5, 0x92, 0x9b, 0x4a, 0xaf, 0x23,
@@ -1300,12 +1208,12 @@ var fileDescriptor_organization_e25c0bf788b04f35 = []byte{
 	0xed, 0x7f, 0x6a, 0xfd, 0x7f, 0x79, 0xcf, 0x92, 0xd2, 0x57, 0xa4, 0x99, 0xa5, 0x5c, 0x59, 0xea,
 	0x94, 0xa5, 0xba, 0xe3, 0xd4, 0xad, 0x94, 0xab, 0x3f, 0xd3, 0xe6, 0x32, 0x2b, 0xa5, 0x74, 0x85,
 	0xcc, 0x56, 0x4f, 0xd3, 0x69, 0xb4, 0x1b, 0xcb, 0x8b, 0xab, 0x8f, 0xc6, 0x19, 0x41, 0xa9, 0x06,
-	0xb5, 0x69, 0xe3, 0x3b, 0x3e, 0xcb, 0x01, 0x9f, 0xe7, 0x80, 0x2f, 0x72, 0x40, 0x57, 0x39, 0xe0,
+	0xb5, 0x69, 0xe3, 0x3b, 0x3e, 0xcb, 0x01, 0x9f, 0xe7, 0x80, 0x2f, 0x72, 0x40, 0x57, 0x39, 0xa0,
 	0xeb, 0x1c, 0xd0, 0x4d, 0x0e, 0xe8, 0x36, 0x07, 0xbc, 0x6f, 0x00, 0x1f, 0x18, 0x40, 0x47, 0x06,
-	0xf0, 0xb1, 0x01, 0x74, 0x62, 0x00, 0x9d, 0x1a, 0xc0, 0x67, 0x06, 0xf0, 0xb9, 0x01, 0x7c, 0x61,
+	0xf0, 0xb1, 0x01, 0x74, 0x62, 0x00, 0x9d, 0x1a, 0x40, 0x67, 0x06, 0xf0, 0xb9, 0x01, 0x7c, 0x61,
 	0x00, 0x5d, 0x19, 0xc0, 0xd7, 0x06, 0xd0, 0x8d, 0x01, 0x7c, 0x6b, 0x00, 0xed, 0x17, 0x80, 0x0e,
 	0x0a, 0xc0, 0x87, 0x05, 0xa0, 0xaf, 0x05, 0xe0, 0x6f, 0x05, 0xa0, 0xa3, 0x02, 0xd0, 0x71, 0x01,
 	0xf8, 0xa4, 0x00, 0x7c, 0x5a, 0x00, 0xfe, 0xf0, 0x6c, 0x82, 0xaf, 0x2c, 0xd9, 0x0d, 0x7d, 0xad,
-	0xe3, 0xa4, 0xd3, 0x99, 0xb5, 0xff, 0xdb, 0xda, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc0, 0xee,
-	0x0c, 0x32, 0x54, 0x04, 0x00, 0x00,
+	0xe3, 0xa4, 0xd3, 0x99, 0xb5, 0xff, 0xdb, 0xda, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9e, 0x98,
+	0x50, 0xb2, 0x54, 0x04, 0x00, 0x00,
 }

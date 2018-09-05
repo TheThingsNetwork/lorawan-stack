@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GOGO_REPO=github.com/gogo/protobuf
-GRPC_GATEWAY_REPO=github.com/grpc-ecosystem/grpc-gateway
-
 DOCKER ?= docker
 
-PROTOC_VERSION ?= 3.0.8
-PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:$(PROTOC_VERSION)
-PROTOC_DOCKER_ARGS = run --user `id -u` --rm -v$(GO_PATH):$(GO_PATH) -w$(PWD)
-PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I/usr/include
-PROTOC += -I$(PWD)/vendor -I$(GO_PATH)/src -I$(PWD)/vendor/$(GRPC_GATEWAY_REPO)/third_party/googleapis
+PROTOC_GOPATH ?= /go
+PROTOC_STACK_PATH ?= $(PROTOC_GOPATH)/src/go.thethings.network/lorawan-stack
+
+PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.9
+PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
+                     --mount type=bind,src=$(PWD)/api,dst=$(PROTOC_STACK_PATH)/api,ro=true \
+                     --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_STACK_PATH)/pkg/ttnpb \
+                     --mount type=bind,src=$(PWD)/vendor,dst=$(PROTOC_STACK_PATH)/vendor,ro=true \
+                     -w $(PROTOC_STACK_PATH)
+PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(PROTOC_GOPATH)/src
 
 protoc:
 	$(DOCKER) pull $(PROTOC_DOCKER_IMAGE)
-
-PROTO_DIR=$(PWD)/api
 
 include .make/protos/go.make
 

@@ -41,7 +41,7 @@ type KeyEnvelope struct {
 func (m *KeyEnvelope) Reset()      { *m = KeyEnvelope{} }
 func (*KeyEnvelope) ProtoMessage() {}
 func (*KeyEnvelope) Descriptor() ([]byte, []int) {
-	return fileDescriptor_keys_6be323f39f22fb3e, []int{0}
+	return fileDescriptor_keys_e5708edfae8caaee, []int{0}
 }
 func (m *KeyEnvelope) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -92,7 +92,7 @@ type RootKeys struct {
 func (m *RootKeys) Reset()      { *m = RootKeys{} }
 func (*RootKeys) ProtoMessage() {}
 func (*RootKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_keys_6be323f39f22fb3e, []int{1}
+	return fileDescriptor_keys_e5708edfae8caaee, []int{1}
 }
 func (m *RootKeys) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -162,7 +162,7 @@ type SessionKeys struct {
 func (m *SessionKeys) Reset()      { *m = SessionKeys{} }
 func (*SessionKeys) ProtoMessage() {}
 func (*SessionKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_keys_6be323f39f22fb3e, []int{2}
+	return fileDescriptor_keys_e5708edfae8caaee, []int{2}
 }
 func (m *SessionKeys) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -234,43 +234,6 @@ func init() {
 	proto.RegisterType((*SessionKeys)(nil), "ttn.lorawan.v3.SessionKeys")
 	golang_proto.RegisterType((*SessionKeys)(nil), "ttn.lorawan.v3.SessionKeys")
 }
-func (this *KeyEnvelope) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*KeyEnvelope)
-	if !ok {
-		that2, ok := that.(KeyEnvelope)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *KeyEnvelope")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *KeyEnvelope but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *KeyEnvelope but is not nil && this == nil")
-	}
-	if that1.Key == nil {
-		if this.Key != nil {
-			return fmt.Errorf("this.Key != nil && that1.Key == nil")
-		}
-	} else if !this.Key.Equal(*that1.Key) {
-		return fmt.Errorf("Key this(%v) Not Equal that(%v)", this.Key, that1.Key)
-	}
-	if this.KEKLabel != that1.KEKLabel {
-		return fmt.Errorf("KEKLabel this(%v) Not Equal that(%v)", this.KEKLabel, that1.KEKLabel)
-	}
-	return nil
-}
 func (this *KeyEnvelope) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -302,42 +265,6 @@ func (this *KeyEnvelope) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *RootKeys) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*RootKeys)
-	if !ok {
-		that2, ok := that.(RootKeys)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *RootKeys")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *RootKeys but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *RootKeys but is not nil && this == nil")
-	}
-	if this.RootKeyID != that1.RootKeyID {
-		return fmt.Errorf("RootKeyID this(%v) Not Equal that(%v)", this.RootKeyID, that1.RootKeyID)
-	}
-	if !this.AppKey.Equal(that1.AppKey) {
-		return fmt.Errorf("AppKey this(%v) Not Equal that(%v)", this.AppKey, that1.AppKey)
-	}
-	if !this.NwkKey.Equal(that1.NwkKey) {
-		return fmt.Errorf("NwkKey this(%v) Not Equal that(%v)", this.NwkKey, that1.NwkKey)
-	}
-	return nil
-}
 func (this *RootKeys) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -367,48 +294,6 @@ func (this *RootKeys) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *SessionKeys) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*SessionKeys)
-	if !ok {
-		that2, ok := that.(SessionKeys)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *SessionKeys")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *SessionKeys but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *SessionKeys but is not nil && this == nil")
-	}
-	if this.SessionKeyID != that1.SessionKeyID {
-		return fmt.Errorf("SessionKeyID this(%v) Not Equal that(%v)", this.SessionKeyID, that1.SessionKeyID)
-	}
-	if !this.FNwkSIntKey.Equal(that1.FNwkSIntKey) {
-		return fmt.Errorf("FNwkSIntKey this(%v) Not Equal that(%v)", this.FNwkSIntKey, that1.FNwkSIntKey)
-	}
-	if !this.SNwkSIntKey.Equal(that1.SNwkSIntKey) {
-		return fmt.Errorf("SNwkSIntKey this(%v) Not Equal that(%v)", this.SNwkSIntKey, that1.SNwkSIntKey)
-	}
-	if !this.NwkSEncKey.Equal(that1.NwkSEncKey) {
-		return fmt.Errorf("NwkSEncKey this(%v) Not Equal that(%v)", this.NwkSEncKey, that1.NwkSEncKey)
-	}
-	if !this.AppSKey.Equal(that1.AppSKey) {
-		return fmt.Errorf("AppSKey this(%v) Not Equal that(%v)", this.AppSKey, that1.AppSKey)
-	}
-	return nil
 }
 func (this *SessionKeys) Equal(that interface{}) bool {
 	if that == nil {
@@ -1381,13 +1266,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/keys.proto", fileDescriptor_keys_6be323f39f22fb3e)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/keys.proto", fileDescriptor_keys_e5708edfae8caaee)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/keys.proto", fileDescriptor_keys_6be323f39f22fb3e)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/keys.proto", fileDescriptor_keys_e5708edfae8caaee)
 }
 
-var fileDescriptor_keys_6be323f39f22fb3e = []byte{
+var fileDescriptor_keys_e5708edfae8caaee = []byte{
 	// 548 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0x31, 0x4c, 0xdb, 0x40,
 	0x18, 0x85, 0xef, 0x80, 0x52, 0x7c, 0x0e, 0xb4, 0xf2, 0x84, 0x68, 0xf5, 0x07, 0x31, 0x51, 0xa9,
@@ -1417,11 +1302,11 @@ var fileDescriptor_keys_6be323f39f22fb3e = []byte{
 	0x04, 0xa0, 0xbc, 0x6d, 0x00, 0x33, 0xcf, 0x03, 0x08, 0x4f, 0x59, 0xa3, 0xce, 0xdb, 0x65, 0xfe,
 	0x23, 0xb1, 0xca, 0x9b, 0x97, 0x26, 0xfb, 0xe2, 0xf9, 0x6c, 0xf9, 0x9e, 0x1a, 0x3e, 0xcd, 0xb6,
 	0x67, 0x06, 0xa7, 0x55, 0x54, 0xfb, 0x85, 0x2f, 0x73, 0xc0, 0x57, 0x39, 0xe0, 0xeb, 0x1c, 0xd0,
-	0x4d, 0x0e, 0xf8, 0x36, 0x07, 0x74, 0x97, 0x03, 0xba, 0xcf, 0x01, 0x1f, 0x6b, 0xc0, 0x27, 0x1a,
-	0xd0, 0x99, 0x06, 0x7c, 0xae, 0x01, 0x0d, 0x34, 0xa0, 0x0b, 0x0d, 0xf8, 0x52, 0x03, 0xbe, 0xd2,
+	0x4d, 0x0e, 0xe8, 0x36, 0x07, 0x74, 0x97, 0x03, 0xba, 0xcf, 0x01, 0x1f, 0x6b, 0xc0, 0x27, 0x1a,
+	0xd0, 0x99, 0x06, 0x7c, 0xae, 0x01, 0x0d, 0x34, 0xa0, 0x0b, 0x0d, 0xe8, 0x52, 0x03, 0xbe, 0xd2,
 	0x80, 0xaf, 0x35, 0xa0, 0x1b, 0x0d, 0xf8, 0x56, 0x03, 0xba, 0xd3, 0x80, 0xef, 0x35, 0xa0, 0xe3,
 	0x02, 0xd0, 0x49, 0x01, 0xf8, 0x47, 0x01, 0xe8, 0x67, 0x01, 0xf8, 0xb4, 0x00, 0x74, 0x56, 0x00,
 	0x3a, 0x2f, 0x00, 0x0f, 0x0a, 0xc0, 0x17, 0x05, 0xe0, 0xaf, 0xef, 0x27, 0xfd, 0xa6, 0x15, 0x4f,
-	0x5a, 0xad, 0x59, 0xf3, 0xa7, 0x6c, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff, 0xf6, 0x3e, 0x08, 0xdf,
+	0x5a, 0xad, 0x59, 0xf3, 0xa7, 0x6c, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff, 0xa8, 0x48, 0x54, 0x5f,
 	0xbb, 0x03, 0x00, 0x00,
 }

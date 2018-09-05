@@ -83,7 +83,7 @@ var LocationSource_value = map[string]int32{
 }
 
 func (LocationSource) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_013836f6dd509ce7, []int{0}
+	return fileDescriptor_metadata_318c805e9e966dae, []int{0}
 }
 
 // RxMetadata contains metadata for a received message. Each antenna that receives
@@ -127,7 +127,7 @@ type RxMetadata struct {
 func (m *RxMetadata) Reset()      { *m = RxMetadata{} }
 func (*RxMetadata) ProtoMessage() {}
 func (*RxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_013836f6dd509ce7, []int{0}
+	return fileDescriptor_metadata_318c805e9e966dae, []int{0}
 }
 func (m *RxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -270,7 +270,7 @@ type TxMetadata struct {
 func (m *TxMetadata) Reset()      { *m = TxMetadata{} }
 func (*TxMetadata) ProtoMessage() {}
 func (*TxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_013836f6dd509ce7, []int{1}
+	return fileDescriptor_metadata_318c805e9e966dae, []int{1}
 }
 func (m *TxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -346,7 +346,7 @@ type Location struct {
 func (m *Location) Reset()      { *m = Location{} }
 func (*Location) ProtoMessage() {}
 func (*Location) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_013836f6dd509ce7, []int{2}
+	return fileDescriptor_metadata_318c805e9e966dae, []int{2}
 }
 func (m *Location) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -427,75 +427,6 @@ func (x LocationSource) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
-func (this *RxMetadata) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*RxMetadata)
-	if !ok {
-		that2, ok := that.(RxMetadata)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *RxMetadata")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *RxMetadata but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *RxMetadata but is not nil && this == nil")
-	}
-	if !this.GatewayIdentifiers.Equal(&that1.GatewayIdentifiers) {
-		return fmt.Errorf("GatewayIdentifiers this(%v) Not Equal that(%v)", this.GatewayIdentifiers, that1.GatewayIdentifiers)
-	}
-	if this.AntennaIndex != that1.AntennaIndex {
-		return fmt.Errorf("AntennaIndex this(%v) Not Equal that(%v)", this.AntennaIndex, that1.AntennaIndex)
-	}
-	if this.Timestamp != that1.Timestamp {
-		return fmt.Errorf("Timestamp this(%v) Not Equal that(%v)", this.Timestamp, that1.Timestamp)
-	}
-	if this.EncryptedFineTimestamp != that1.EncryptedFineTimestamp {
-		return fmt.Errorf("EncryptedFineTimestamp this(%v) Not Equal that(%v)", this.EncryptedFineTimestamp, that1.EncryptedFineTimestamp)
-	}
-	if this.FineTimestampValue != that1.FineTimestampValue {
-		return fmt.Errorf("FineTimestampValue this(%v) Not Equal that(%v)", this.FineTimestampValue, that1.FineTimestampValue)
-	}
-	if !this.Time.Equal(that1.Time) {
-		return fmt.Errorf("Time this(%v) Not Equal that(%v)", this.Time, that1.Time)
-	}
-	if this.RSSI != that1.RSSI {
-		return fmt.Errorf("RSSI this(%v) Not Equal that(%v)", this.RSSI, that1.RSSI)
-	}
-	if this.ChannelRSSI != that1.ChannelRSSI {
-		return fmt.Errorf("ChannelRSSI this(%v) Not Equal that(%v)", this.ChannelRSSI, that1.ChannelRSSI)
-	}
-	if this.RSSIStandardDeviation != that1.RSSIStandardDeviation {
-		return fmt.Errorf("RSSIStandardDeviation this(%v) Not Equal that(%v)", this.RSSIStandardDeviation, that1.RSSIStandardDeviation)
-	}
-	if this.SNR != that1.SNR {
-		return fmt.Errorf("SNR this(%v) Not Equal that(%v)", this.SNR, that1.SNR)
-	}
-	if this.FrequencyOffset != that1.FrequencyOffset {
-		return fmt.Errorf("FrequencyOffset this(%v) Not Equal that(%v)", this.FrequencyOffset, that1.FrequencyOffset)
-	}
-	if !this.Location.Equal(that1.Location) {
-		return fmt.Errorf("Location this(%v) Not Equal that(%v)", this.Location, that1.Location)
-	}
-	if this.AESKeyID != that1.AESKeyID {
-		return fmt.Errorf("AESKeyID this(%v) Not Equal that(%v)", this.AESKeyID, that1.AESKeyID)
-	}
-	if !this.Advanced.Equal(that1.Advanced) {
-		return fmt.Errorf("Advanced this(%v) Not Equal that(%v)", this.Advanced, that1.Advanced)
-	}
-	return nil
-}
 func (this *RxMetadata) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -559,48 +490,6 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *TxMetadata) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*TxMetadata)
-	if !ok {
-		that2, ok := that.(TxMetadata)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *TxMetadata")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *TxMetadata but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *TxMetadata but is not nil && this == nil")
-	}
-	if !this.GatewayIdentifiers.Equal(&that1.GatewayIdentifiers) {
-		return fmt.Errorf("GatewayIdentifiers this(%v) Not Equal that(%v)", this.GatewayIdentifiers, that1.GatewayIdentifiers)
-	}
-	if this.Timestamp != that1.Timestamp {
-		return fmt.Errorf("Timestamp this(%v) Not Equal that(%v)", this.Timestamp, that1.Timestamp)
-	}
-	if !this.Time.Equal(that1.Time) {
-		return fmt.Errorf("Time this(%v) Not Equal that(%v)", this.Time, that1.Time)
-	}
-	if this.EnableCRC != that1.EnableCRC {
-		return fmt.Errorf("EnableCRC this(%v) Not Equal that(%v)", this.EnableCRC, that1.EnableCRC)
-	}
-	if !this.Advanced.Equal(that1.Advanced) {
-		return fmt.Errorf("Advanced this(%v) Not Equal that(%v)", this.Advanced, that1.Advanced)
-	}
-	return nil
-}
 func (this *TxMetadata) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -636,48 +525,6 @@ func (this *TxMetadata) Equal(that interface{}) bool {
 		return false
 	}
 	return true
-}
-func (this *Location) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*Location)
-	if !ok {
-		that2, ok := that.(Location)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *Location")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *Location but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *Location but is not nil && this == nil")
-	}
-	if this.Latitude != that1.Latitude {
-		return fmt.Errorf("Latitude this(%v) Not Equal that(%v)", this.Latitude, that1.Latitude)
-	}
-	if this.Longitude != that1.Longitude {
-		return fmt.Errorf("Longitude this(%v) Not Equal that(%v)", this.Longitude, that1.Longitude)
-	}
-	if this.Altitude != that1.Altitude {
-		return fmt.Errorf("Altitude this(%v) Not Equal that(%v)", this.Altitude, that1.Altitude)
-	}
-	if this.Accuracy != that1.Accuracy {
-		return fmt.Errorf("Accuracy this(%v) Not Equal that(%v)", this.Accuracy, that1.Accuracy)
-	}
-	if this.Source != that1.Source {
-		return fmt.Errorf("Source this(%v) Not Equal that(%v)", this.Source, that1.Source)
-	}
-	return nil
 }
 func (this *Location) Equal(that interface{}) bool {
 	if that == nil {
@@ -2030,13 +1877,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("go.thethings.network/lorawan-stack/api/metadata.proto", fileDescriptor_metadata_013836f6dd509ce7)
+	proto.RegisterFile("go.thethings.network/lorawan-stack/api/metadata.proto", fileDescriptor_metadata_318c805e9e966dae)
 }
 func init() {
-	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/metadata.proto", fileDescriptor_metadata_013836f6dd509ce7)
+	golang_proto.RegisterFile("go.thethings.network/lorawan-stack/api/metadata.proto", fileDescriptor_metadata_318c805e9e966dae)
 }
 
-var fileDescriptor_metadata_013836f6dd509ce7 = []byte{
+var fileDescriptor_metadata_318c805e9e966dae = []byte{
 	// 952 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x95, 0x3f, 0x6c, 0xdb, 0x46,
 	0x14, 0xc6, 0x79, 0x92, 0x6c, 0x53, 0xe7, 0xbf, 0xb8, 0xd6, 0x0d, 0xad, 0x1a, 0x47, 0xc1, 0x5d,
@@ -2090,12 +1937,12 @@ var fileDescriptor_metadata_013836f6dd509ce7 = []byte{
 	0xfa, 0xd3, 0xef, 0xad, 0xb0, 0xd7, 0x22, 0x5b, 0x37, 0x89, 0x99, 0xeb, 0x44, 0x7b, 0xbb, 0xb5,
 	0x35, 0x41, 0xa8, 0x48, 0x87, 0x9f, 0x67, 0x44, 0xbd, 0x75, 0xbf, 0x66, 0x36, 0x1b, 0xdb, 0x13,
 	0x40, 0xb1, 0x54, 0x38, 0xfb, 0x03, 0x2b, 0xb5, 0xdf, 0xc1, 0xf9, 0x10, 0x83, 0x8b, 0x21, 0x06,
-	0xaf, 0x86, 0x58, 0x79, 0x3d, 0xc4, 0xe0, 0xcd, 0x10, 0x2b, 0x6f, 0x87, 0x58, 0x79, 0x37, 0xc4,
-	0xe0, 0x49, 0x8c, 0xc1, 0x59, 0x8c, 0x95, 0x67, 0x31, 0x06, 0xcf, 0x63, 0xac, 0xbc, 0x88, 0xb1,
-	0xf2, 0x32, 0xc6, 0xe0, 0x3c, 0xc6, 0xe0, 0x22, 0xc6, 0xe0, 0x55, 0x8c, 0x95, 0xd7, 0x31, 0x06,
-	0x6f, 0x62, 0xac, 0xbc, 0x8d, 0x31, 0x78, 0x17, 0x63, 0xe5, 0xc9, 0x08, 0x2b, 0x67, 0x23, 0x0c,
-	0x9e, 0x8e, 0xb0, 0xf2, 0xeb, 0x08, 0x83, 0xdf, 0x46, 0x58, 0x79, 0x36, 0xc2, 0xca, 0xf3, 0x11,
-	0x06, 0x2f, 0x46, 0x18, 0xbc, 0x1c, 0x61, 0xf0, 0xe3, 0x9d, 0x0f, 0xf8, 0x8f, 0xf5, 0x0e, 0xbd,
-	0xaa, 0x10, 0xbc, 0xb7, 0xbf, 0x3f, 0x2d, 0xa3, 0xb8, 0xf1, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x8c, 0xb1, 0xcc, 0x22, 0x45, 0x07, 0x00, 0x00,
+	0xaf, 0x86, 0x58, 0x79, 0x3d, 0xc4, 0xca, 0x9b, 0x21, 0x56, 0xde, 0x0e, 0xb1, 0xf2, 0x6e, 0x88,
+	0xc1, 0x93, 0x18, 0x83, 0xb3, 0x18, 0x2b, 0xcf, 0x62, 0x0c, 0x9e, 0xc7, 0x58, 0x79, 0x11, 0x63,
+	0xe5, 0x65, 0x8c, 0x95, 0xf3, 0x18, 0x83, 0x8b, 0x18, 0x83, 0x57, 0x31, 0x56, 0x5e, 0xc7, 0x18,
+	0xbc, 0x89, 0xb1, 0xf2, 0x36, 0xc6, 0xe0, 0x5d, 0x8c, 0x95, 0x27, 0x23, 0xac, 0x9c, 0x8d, 0x30,
+	0x78, 0x3a, 0xc2, 0xca, 0xaf, 0x23, 0x0c, 0x7e, 0x1b, 0x61, 0xe5, 0xd9, 0x08, 0x2b, 0xcf, 0x47,
+	0x18, 0xbc, 0x18, 0x61, 0xf0, 0x72, 0x84, 0xc1, 0x8f, 0x77, 0x3e, 0xe0, 0x3f, 0xd6, 0x3b, 0xf4,
+	0xaa, 0x42, 0xf0, 0xde, 0xfe, 0xfe, 0xb4, 0x8c, 0xe2, 0xc6, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff,
+	0xd2, 0xc7, 0x90, 0xa2, 0x45, 0x07, 0x00, 0x00,
 }
