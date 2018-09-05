@@ -20,11 +20,6 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
-import "lorawan-stack/api/application.proto";
-import "lorawan-stack/api/client.proto";
-import "lorawan-stack/api/gateway.proto";
-import "lorawan-stack/api/organization.proto";
-import "lorawan-stack/api/user.proto";
 
 package ttn.lorawan.v3;
 
@@ -58,21 +53,8 @@ message UpdateSettingsRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
-// This message is used for finding entities in the IsAdmin service.
-// This functionality may not be available on deployments where these fields
-// are not indexed.
-message FindEntitiesRequest {
-  // Find entities where the ID contains this substring.
-  string id_contains = 1 [(gogoproto.customname) = "IDContains"];
-  // Find entities where the name contains this substring.
-  string name_contains = 2;
-  // Find entities where the description contains this substring.
-  string description_contains = 3;
-
-  // TODO: add filter for approval state.
-}
-
-service IsAdmin {
+// This service is exposed by the Identity Server and is only available for admins.
+service IsSettings {
   rpc GetSettings(google.protobuf.Empty) returns (IdentityServerSettings) {
     option (google.api.http) = {
       get: "/is/admin/settings"
@@ -85,34 +67,4 @@ service IsAdmin {
       body: "*"
     };
   };
-
-  rpc FindApplications(FindEntitiesRequest) returns (Applications) {
-    option (google.api.http) = {
-      get: "/is/admin/applications"
-    };
-  }
-
-  rpc FindClients(FindEntitiesRequest) returns (Clients) {
-    option (google.api.http) = {
-      get: "/is/admin/clients"
-    };
-  }
-
-  rpc FindGateways(FindEntitiesRequest) returns (Gateways) {
-    option (google.api.http) = {
-      get: "/is/admin/gateways"
-    };
-  }
-
-  rpc FindOrganizations(FindEntitiesRequest) returns (Organizations) {
-    option (google.api.http) = {
-      get: "/is/admin/organizations"
-    };
-  }
-
-  rpc FindUsers(FindEntitiesRequest) returns (Users) {
-    option (google.api.http) = {
-      get: "/is/admin/users"
-    };
-  }
 }

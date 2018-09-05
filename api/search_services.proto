@@ -1,0 +1,114 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "lorawan-stack/api/application.proto";
+import "lorawan-stack/api/client.proto";
+import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/gateway.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/organization.proto";
+import "lorawan-stack/api/user.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+// This message is used for finding entities in the EntityRegistrySearch service.
+message SearchEntitiesRequest {
+  // Find entities where the ID contains this substring.
+  string id_contains = 1 [(gogoproto.customname) = "IDContains"];
+  // Find entities where the name contains this substring.
+  string name_contains = 2;
+  // Find entities where the description contains this substring.
+  string description_contains = 3;
+  // Find entities where the given attributes contain these substrings.
+  map<string,string> attributes_contain = 4;
+
+  reserved 5; // TODO: Add filter for approval state (admin only).
+
+  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+}
+
+// The EntityRegistrySearch service indexes entities in the various registries
+// and enables searching for them.
+// This service is not implemented on all deployments.
+service EntityRegistrySearch {
+  rpc SearchApplications(SearchEntitiesRequest) returns (Applications) {
+    option (google.api.http) = {
+      get: "/search/applications"
+    };
+  }
+
+  rpc SearchClients(SearchEntitiesRequest) returns (Clients) {
+    option (google.api.http) = {
+      get: "/search/clients"
+    };
+  }
+
+  rpc SearchGateways(SearchEntitiesRequest) returns (Gateways) {
+    option (google.api.http) = {
+      get: "/search/gateways"
+    };
+  }
+
+  rpc SearchOrganizations(SearchEntitiesRequest) returns (Organizations) {
+    option (google.api.http) = {
+      get: "/search/organizations"
+    };
+  }
+
+  rpc SearchUsers(SearchEntitiesRequest) returns (Users) {
+    option (google.api.http) = {
+      get: "/search/users"
+    };
+  }
+}
+
+message SearchEndDevicesRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // Find end devices where the ID contains this substring.
+  string id_contains = 2 [(gogoproto.customname) = "IDContains"];
+  // Find end devices where the name contains this substring.
+  string name_contains = 3;
+  // Find end devices where the description contains this substring.
+  string description_contains = 4;
+  // Find end devices where the given attributes contain these substrings.
+  map<string,string> attributes_contain = 5;
+
+  // Find end devices where the (hexadecimal) DevEUI contains this substring.
+  string dev_eui_contains = 6 [(gogoproto.customname) = "DevEUIContains"];
+  // Find end devices where the (hexadecimal) JoinEUI contains this substring.
+  string join_eui_contains = 7 [(gogoproto.customname) = "JoinEUIContains"];
+  // Find end devices where the (hexadecimal) DevAddr contains this substring.
+  string dev_addr_contains = 8 [(gogoproto.customname) = "DevAddrContains"];
+
+  google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false];
+}
+
+// The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry
+// and enables searching for them.
+// This service is not implemented on all deployments.
+service EndDeviceRegistrySearch {
+  rpc SearchEndDevices(SearchEndDevicesRequest) returns (EndDevices) {
+    option (google.api.http) = {
+      get: "/search/applications/{application_ids.application_id}/devices"
+    };
+  }
+}
