@@ -14,11 +14,11 @@
 
 syntax = "proto3";
 
-import "lorawan-stack/api/enums.proto";
-import "lorawan-stack/api/identifiers.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/enums.proto";
+import "lorawan-stack/api/identifiers.proto";
 
 package ttn.lorawan.v3;
 

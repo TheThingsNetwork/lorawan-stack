@@ -15,14 +15,14 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/client.proto";
 import "lorawan-stack/api/contact_info.proto";
 import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/rights.proto";
-import "google/protobuf/empty.proto";
-import "google/protobuf/field_mask.proto";
-import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 

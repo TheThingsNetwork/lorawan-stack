@@ -14,9 +14,9 @@
 
 syntax = "proto3";
 
-import "lorawan-stack/api/gateway.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
+import "lorawan-stack/api/gateway.proto";
 
 package ttn.lorawan.v3;
 

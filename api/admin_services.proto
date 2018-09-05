@@ -15,16 +15,16 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "lorawan-stack/api/application.proto";
-import "lorawan-stack/api/client.proto";
-import "lorawan-stack/api/gateway.proto";
-import "lorawan-stack/api/organization.proto";
-import "lorawan-stack/api/user.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/application.proto";
+import "lorawan-stack/api/client.proto";
+import "lorawan-stack/api/gateway.proto";
+import "lorawan-stack/api/organization.proto";
+import "lorawan-stack/api/user.proto";
 
 package ttn.lorawan.v3;
 
