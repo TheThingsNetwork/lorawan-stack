@@ -83,7 +83,7 @@ func RegisterContactInfoRegistryHandler(ctx context.Context, mux *runtime.ServeM
 // "ContactInfoRegistryClient" to call the correct interceptors.
 func RegisterContactInfoRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ContactInfoRegistryClient) error {
 
-	mux.Handle("GET", pattern_ContactInfoRegistry_Validate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PATCH", pattern_ContactInfoRegistry_Validate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {

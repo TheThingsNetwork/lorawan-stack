@@ -55,7 +55,7 @@ message ContactInfoValidation {
 service ContactInfoRegistry {
   rpc Validate(ContactInfoValidation) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      get: "/contact_info/validate"
+      patch: "/contact_info/validate"
     };
   };
 }
