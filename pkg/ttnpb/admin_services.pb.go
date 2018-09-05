@@ -53,7 +53,7 @@ type UserRegistrationSettings struct {
 func (m *UserRegistrationSettings) Reset()      { *m = UserRegistrationSettings{} }
 func (*UserRegistrationSettings) ProtoMessage() {}
 func (*UserRegistrationSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_dd2cd4f6b781cf72, []int{0}
+	return fileDescriptor_admin_services_964214ebd6d74f24, []int{0}
 }
 func (m *UserRegistrationSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -126,7 +126,7 @@ type IdentityServerSettings struct {
 func (m *IdentityServerSettings) Reset()      { *m = IdentityServerSettings{} }
 func (*IdentityServerSettings) ProtoMessage() {}
 func (*IdentityServerSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_dd2cd4f6b781cf72, []int{1}
+	return fileDescriptor_admin_services_964214ebd6d74f24, []int{1}
 }
 func (m *IdentityServerSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -193,7 +193,7 @@ type UpdateSettingsRequest struct {
 func (m *UpdateSettingsRequest) Reset()      { *m = UpdateSettingsRequest{} }
 func (*UpdateSettingsRequest) ProtoMessage() {}
 func (*UpdateSettingsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_dd2cd4f6b781cf72, []int{2}
+	return fileDescriptor_admin_services_964214ebd6d74f24, []int{2}
 }
 func (m *UpdateSettingsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -253,7 +253,7 @@ type FindEntitiesRequest struct {
 func (m *FindEntitiesRequest) Reset()      { *m = FindEntitiesRequest{} }
 func (*FindEntitiesRequest) ProtoMessage() {}
 func (*FindEntitiesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_dd2cd4f6b781cf72, []int{3}
+	return fileDescriptor_admin_services_964214ebd6d74f24, []int{3}
 }
 func (m *FindEntitiesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1886,13 +1886,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_dd2cd4f6b781cf72)
+	proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_964214ebd6d74f24)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_dd2cd4f6b781cf72)
+	golang_proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_964214ebd6d74f24)
 }
 
-var fileDescriptor_admin_services_dd2cd4f6b781cf72 = []byte{
+var fileDescriptor_admin_services_964214ebd6d74f24 = []byte{
 	// 1052 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x55, 0x3d, 0x6c, 0x1b, 0x37,
 	0x18, 0x3d, 0xda, 0x6e, 0x6a, 0xd1, 0xa9, 0x13, 0xd3, 0x8e, 0x25, 0xab, 0x0e, 0x65, 0xc8, 0x6d,

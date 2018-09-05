@@ -26,8 +26,6 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// The ApplicationRegistry service, exposed by the Identity Server,
-// manages the application registry.
 service ApplicationRegistry {
   // Create a new application. This also sets the current user as first collaborator
   // with all possible rights. When including organization identifiers, this instead
@@ -79,8 +77,6 @@ service ApplicationRegistry {
   };
 }
 
-// The ApplicationAccess service, exposed by the Identity Server,
-// manages access to applications.
 service ApplicationAccess {
   rpc ListApplicationRights(ApplicationIdentifiers) returns (Rights) {
     option (google.api.http) = {

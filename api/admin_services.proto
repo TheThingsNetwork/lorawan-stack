@@ -72,7 +72,6 @@ message FindEntitiesRequest {
   // TODO: add filter for approval state.
 }
 
-// This service is exposed by the Identity Server and is only available for admins.
 service IsAdmin {
   rpc GetSettings(google.protobuf.Empty) returns (IdentityServerSettings) {
     option (google.api.http) = {

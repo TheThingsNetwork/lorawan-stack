@@ -26,8 +26,6 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// The GatewayRegistry service, exposed by the Identity Server,
-// manages the gateway registry.
 service GatewayRegistry {
   // Create a new gateway. This also sets the current user as first collaborator
   // with all possible rights. When including organization identifiers, this instead
@@ -79,8 +77,6 @@ service GatewayRegistry {
   };
 }
 
-// The GatewayAccess service, exposed by the Identity Server,
-// manages access to gateways.
 service GatewayAccess {
   rpc ListGatewayRights(GatewayIdentifiers) returns (Rights) {
     option (google.api.http) = {

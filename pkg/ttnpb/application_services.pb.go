@@ -41,7 +41,7 @@ type DownlinkQueueRequest struct {
 func (m *DownlinkQueueRequest) Reset()      { *m = DownlinkQueueRequest{} }
 func (*DownlinkQueueRequest) ProtoMessage() {}
 func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_services_11ee925b8c7252be, []int{0}
+	return fileDescriptor_application_services_4b830194247f97fe, []int{0}
 }
 func (m *DownlinkQueueRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1293,13 +1293,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_11ee925b8c7252be)
+	proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_4b830194247f97fe)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_11ee925b8c7252be)
+	golang_proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_4b830194247f97fe)
 }
 
-var fileDescriptor_application_services_11ee925b8c7252be = []byte{
+var fileDescriptor_application_services_4b830194247f97fe = []byte{
 	// 1054 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x97, 0x5d, 0x68, 0x1c, 0x55,
 	0x14, 0xc7, 0xe7, 0x46, 0x88, 0xf6, 0x16, 0x8b, 0x7b, 0xd5, 0xa6, 0x4c, 0xe3, 0x6d, 0x98, 0x7e,

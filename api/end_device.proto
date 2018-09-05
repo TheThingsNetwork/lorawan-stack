@@ -212,7 +212,9 @@ message MACState {
   // TODO: Add info about failed MAC requests
 }
 
-// TODO: Split the EndDevice into NS/AS/JS messages (https://github.com/TheThingsIndustries/lorawan-stack/issues/1036)
+// Defines an End Device registration and its state on the network.
+// The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
+// SDKs are responsible for combining (if desired) the three.
 message EndDevice {
   option (gogoproto.populate) = false;
 
