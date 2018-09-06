@@ -29,7 +29,7 @@ func TestFrequenciesCFList(t *testing.T) {
 
 	euFP := frequencyplans.FrequencyPlan{
 		BandID: "EU_863_870",
-		Channels: []frequencyplans.Channel{
+		UplinkChannels: []frequencyplans.Channel{
 			{Frequency: 867100000},
 			{Frequency: 867300000},
 			{Frequency: 867500000},
@@ -49,7 +49,7 @@ func TestFrequenciesCFList(t *testing.T) {
 	a.So(err, should.BeNil)
 
 fpChannels:
-	for _, channel := range euFP.Channels {
+	for _, channel := range euFP.UplinkChannels {
 		for _, bandChannel := range euBand.UplinkChannels {
 			if bandChannel.Frequency == channel.Frequency {
 				continue fpChannels
@@ -71,7 +71,7 @@ func TestChannelMasksCFList(t *testing.T) {
 
 	usFP := frequencyplans.FrequencyPlan{
 		BandID: "US_902_928",
-		Channels: []frequencyplans.Channel{
+		UplinkChannels: []frequencyplans.Channel{
 			{Frequency: 903900000},
 			{Frequency: 904100000},
 			{Frequency: 904300000},
@@ -103,7 +103,7 @@ func TestUnimplementedCFList(t *testing.T) {
 
 	usFP := frequencyplans.FrequencyPlan{
 		BandID: "US_902_928",
-		Channels: []frequencyplans.Channel{
+		UplinkChannels: []frequencyplans.Channel{
 			{Frequency: 903900000},
 			{Frequency: 904100000},
 			{Frequency: 904300000},

@@ -16,13 +16,11 @@ package frequencyplans_test
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"testing"
+	"time"
 
-	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -51,172 +49,121 @@ func Example() {
 	fmt.Println(euFP)
 }
 
-func TestFailToLoadDescriptions(t *testing.T) {
+func TestInvalidStore(t *testing.T) {
 	a := assertions.New(t)
 
-	dir, err := ioutil.TempDir("", "")
-	if !a.So(err, should.BeNil) {
-		panic(err)
-	}
-	defer func() {
-		if err := os.RemoveAll(dir); err != nil {
-			t.Logf("could not remove %s: %s\n", dir, err)
-		}
-	}()
+	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{
+		"frequency-plans.yml": []byte(`invalid-yaml`),
+	}))
 
-	// Fill frequency plans store
-	{
-		err = ioutil.WriteFile(
-			filepath.Join(dir, "frequency-plans.yml"),
-			[]byte(`- id: AS_923
-        description: Asian plan
-base_freq: 923
-  file: AS_923.yml
-`),
-			0755,
-		)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-	}
+	_, err := store.GetAllIDs()
+	a.So(err, should.NotBeNil)
+}
 
-	s := frequencyplans.NewStore(fetch.FromFilesystem(dir))
+func TestEmptyStore(t *testing.T) {
+	a := assertions.New(t)
 
-	// GetAllIDs
-	{
-		_, err := s.GetAllIDs()
-		a.So(err, should.NotBeNil)
-	}
+	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{}))
+
+	_, err := store.GetAllIDs()
+	a.So(err, should.NotBeNil)
+
+	_, err = store.GetByID("EU_863_870")
+	a.So(err, should.NotBeNil)
 }
 
 func TestStore(t *testing.T) {
 	a := assertions.New(t)
 
-	dir, err := ioutil.TempDir("", "")
-	if !a.So(err, should.BeNil) {
-		panic(err)
-	}
-	defer func() {
-		if err := os.RemoveAll(dir); err != nil {
-			t.Logf("could not remove %s: %s\n", dir, err)
-		}
-	}()
-
-	// Fill frequency plans store
-	{
-		err = ioutil.WriteFile(
-			filepath.Join(dir, "frequency-plans.yml"),
-			[]byte(`- id: AS_923
-  description: Asian plan
-  base_freq: 923
+	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{
+		"frequency-plans.yml": []byte(`- id: AS_923
+  description: South East Asia
+  base-frequency: 915
   file: AS_923.yml
 - id: JP
-  description: Japanese plan
-  base_freq: 923
+  description: Japan
+  base-frequency: 915
   file: JP.yml
   base: AS_923
-- id: JP_2
-  description: Japanese plan 2
-  base_freq: 923
-  file: JP_2.yml
+- id: KR
+  description: South Korea
+  base-frequency: 915
+  file: KR.yml
   base: AS_923
 - id: EU_863_870
-  description: European frequency plan (Not saved on disk)
+  description: European Union
   file: EU.yml
-  base_freq: 863
+  base-frequency: 868
 - id: US_915
-  description: US frequency plan (Invalid YAML)
-  file: US.yml
-  base_freq: 915
+  description: United States
+  file: US_915.yml
+  base-frequency: 915
 - id: SA
-  description: South African frequency plan (Inexistant base)
+  description: South Africa
   file: AS_923.yml
-  base_freq: 863
+  base-frequency: 868
   base: AFRICA
 - id: CA
-  description: Canadian frequency plan (Base has invalid yaml)
+  description: Canada
   file: EU.yml
-  base_freq: 863
+  base-frequency: 915
   base: US_915
 `),
-			0755,
-		)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-
-		err = ioutil.WriteFile(
-			filepath.Join(dir, "AS_923.yml"),
-			[]byte(`band-id: AS_923
-channels: [{frequency: 923000000}]`),
-			0755,
-		)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-
-		err = ioutil.WriteFile(
-			filepath.Join(dir, "US.yml"),
-			[]byte(`band-id: US_915
-            channels: [{frequency: 915000000}]`),
-			0755,
-		)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-
-		err = ioutil.WriteFile(
-			filepath.Join(dir, "JP.yml"),
-			[]byte(`
-listen-before-talk: {rssi-target: 1.1, rssi-offset: 2.2, scan-time: 80}
-dwell-time: {uplinks: true, downlinks: true, duration: 400ms}
-`),
-			0755,
-		)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-
-		err = ioutil.WriteFile(
-			filepath.Join(dir, "JP_2.yml"),
-			[]byte(`
-listen-before-talk: {rssi-target: 1.1, rssi-offset: 2.2, scan-time: 80}
-dwell-time: {uplinks: true, downlinks: true, duration: 400ms}
-channels:
+		"AS_923.yml": []byte(`band-id: AS_923
+uplink-channels:
 - frequency: 923000000
-  dwell-time: {downlinks: true, duration: 400ms}
 `),
-			0755,
-		)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-	}
+		"US_915.yml": []byte(`invalid-yaml`),
+		"JP.yml": []byte(`listen-before-talk:
+  rssi-target: 1.1
+  rssi-offset: 2.2
+  scan-time: 80
+dwell-time:
+  uplinks: true
+  downlinks: true
+  duration: 400ms
+uplink-channels:
+- frequency: 923000000
+  dwell-time:
+    enabled: true
+    duration: 400ms
+`),
+		"KR.yml": []byte(`dwell-time:
+  uplinks: true
+  downlinks: true
+uplink-channels:
+- frequency: 923000000
+  dwell-time:
+    enabled: true
+`),
+	}))
 
-	s := frequencyplans.NewStore(fetch.FromFilesystem(dir))
-
-	// GetAllIDs
 	{
-		ids, err := s.GetAllIDs()
+		ids, err := store.GetAllIDs()
 		if !a.So(err, should.BeNil) {
-			panic(err)
+			t.FailNow()
 		}
 
 		a.So(ids, should.Contain, "AS_923")
 		a.So(ids, should.Contain, "JP")
+		a.So(ids, should.Contain, "KR")
+		a.So(ids, should.Contain, "EU_863_870")
+		a.So(ids, should.Contain, "US_915")
+		a.So(ids, should.Contain, "SA")
+		a.So(ids, should.Contain, "CA")
 	}
 
-	assertAS923Content := func(fp frequencyplans.FrequencyPlan) {
-		a.So(fp.Channels, should.HaveLength, 1)
-		a.So(fp.Channels[0].Frequency, should.Equal, 923000000)
+	assertAS923Content := func(fp *frequencyplans.FrequencyPlan) {
+		a.So(fp.UplinkChannels, should.HaveLength, 1)
+		a.So(fp.UplinkChannels[0].Frequency, should.Equal, 923000000)
 		a.So(fp.BandID, should.Equal, "AS_923")
 	}
 
 	// AS923 Frequency plan
 	{
-		fp, err := s.GetByID("AS_923")
+		fp, err := store.GetByID("AS_923")
 		if !a.So(err, should.BeNil) {
-			panic(err)
+			t.FailNow()
 		}
 
 		assertAS923Content(fp)
@@ -224,79 +171,53 @@ channels:
 
 	// JP Frequency plan
 	{
-		fp, err := s.GetByID("JP")
+		fp, err := store.GetByID("JP")
 		if !a.So(err, should.BeNil) {
-			panic(err)
+			t.FailNow()
 		}
 
 		assertAS923Content(fp)
 		a.So(fp.LBT, should.NotBeNil)
 		a.So(fp.LBT.RSSIOffset, should.AlmostEqual, 2.2, 0.00001)
 		a.So(fp.LBT.ScanTime, should.Equal, 80)
+		a.So(*fp.UplinkChannels[0].DwellTime.Enabled, should.BeTrue)
 	}
 
-	// JP 2 Frequency plan
+	// Invalid frequency plan (no dwell time duration)
 	{
-		fp, err := s.GetByID("JP_2")
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-
-		assertAS923Content(fp)
-		a.So(fp.Channels[0].DwellTime.OnDownlinks(), should.BeTrue)
+		_, err := store.GetByID("KR")
+		a.So(errors.IsDataLoss(err), should.BeTrue)
 	}
 
 	// Unknown frequency plan
 	{
-		_, err = s.GetByID("Unknown")
-		a.So(err, should.NotBeNil)
+		_, err := store.GetByID("Unknown")
+		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 
-	// Frequency plan not saved
+	// Frequency plan non-existent
 	{
-		_, err = s.GetByID("EU_863_870")
-		a.So(err, should.NotBeNil)
+		_, err := store.GetByID("EU_863_870")
+		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 
-	// Frequency plan with invalid YAML
+	// Frequency plan with invalid yaml
 	{
-		_, err = s.GetByID("US_915")
+		_, err := store.GetByID("US_915")
 		a.So(err, should.NotBeNil)
 	}
 
-	// Frequency plan with inexistant base
+	// Frequency plan with non-existent base
 	{
-		_, err = s.GetByID("SA")
-		a.So(err, should.NotBeNil)
+		_, err := store.GetByID("SA")
+		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 
-	// Frequency plan with base with invalid YAML
+	// Frequency plan with base with invalid yaml
 	{
-		_, err = s.GetByID("CA")
+		_, err := store.GetByID("CA")
 		a.So(err, should.NotBeNil)
 	}
-}
-
-func TestNotInitializedStore(t *testing.T) {
-	a := assertions.New(t)
-
-	dir, err := ioutil.TempDir("", "")
-	if !a.So(err, should.BeNil) {
-		panic(err)
-	}
-	defer func() {
-		if err := os.RemoveAll(dir); err != nil {
-			t.Logf("could not remove %s: %s\n", dir, err)
-		}
-	}()
-
-	s := frequencyplans.NewStore(fetch.FromFilesystem(dir))
-
-	_, err = s.GetAllIDs()
-	a.So(err, should.NotBeNil)
-
-	_, err = s.GetByID("EU")
-	a.So(err, should.NotBeNil)
 }
 
 func TestProtoConversion(t *testing.T) {
@@ -307,7 +228,15 @@ func TestProtoConversion(t *testing.T) {
 	}{
 		{
 			fp: &frequencyplans.FrequencyPlan{
-				Channels: []frequencyplans.Channel{
+				UplinkChannels: []frequencyplans.Channel{
+					{Frequency: 922100000, Radio: 0},
+					{Frequency: 922300000, Radio: 0},
+					{
+						Frequency: 922500000,
+						Radio:     0,
+					},
+				},
+				DownlinkChannels: []frequencyplans.Channel{
 					{Frequency: 922100000, Radio: 0},
 					{Frequency: 922300000, Radio: 0},
 					{
@@ -415,11 +344,137 @@ func TestProtoConversion(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("Proto%d", i), func(t *testing.T) {
-			result := tc.fp.ToConcentratorConfig()
-			diff := pretty.Diff(result, tc.expected)
-			if len(diff) > 0 {
-				t.Fatalf("unexpected difference when generating the proto:\n%s", diff)
-			}
+			a := assertions.New(t)
+			a.So(tc.fp.ToConcentratorConfig(), should.Resemble, tc.expected)
+		})
+	}
+}
+
+func TestRespectsDwellTime(t *testing.T) {
+	a := assertions.New(t)
+
+	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{
+		"frequency-plans.yml": []byte(`- id: Test
+  description: Test
+  base-frequency: 915
+  file: test.yml
+`),
+		"test.yml": []byte(`band-id: AS_923
+uplink-channels:
+- frequency: 1
+- frequency: 2
+  dwell-time:
+    enabled: true
+    duration: 100ms
+- frequency: 3
+  dwell-time:
+    enabled: true
+downlink-channels:
+- frequency: 1
+  dwell-time:
+    enabled: false
+- frequency: 2
+  dwell-time:
+    duration: 100ms
+- frequency: 3
+dwell-time:
+  uplinks: false
+  downlinks: true
+  duration: 400ms
+`),
+	}))
+
+	fp, err := store.GetByID("Test")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	for _, tc := range []struct {
+		IsDownlink bool
+		Frequency  uint64
+		Duration   time.Duration
+		Expected   bool
+	}{
+		{
+			IsDownlink: false,
+			Frequency:  1,
+			Duration:   1 * time.Second,
+			Expected:   true,
+		},
+		{
+			IsDownlink: false,
+			Frequency:  2,
+			Duration:   50 * time.Millisecond,
+			Expected:   true,
+		},
+		{
+			IsDownlink: false,
+			Frequency:  2,
+			Duration:   150 * time.Millisecond,
+			Expected:   false,
+		},
+		{
+			IsDownlink: false,
+			Frequency:  3,
+			Duration:   300 * time.Millisecond,
+			Expected:   true,
+		},
+		{
+			IsDownlink: false,
+			Frequency:  3,
+			Duration:   500 * time.Millisecond,
+			Expected:   false,
+		},
+		{
+			IsDownlink: false,
+			Frequency:  4,
+			Duration:   500 * time.Millisecond,
+			Expected:   true,
+		},
+		{
+			IsDownlink: true,
+			Frequency:  1,
+			Duration:   1 * time.Second,
+			Expected:   true,
+		},
+		{
+			IsDownlink: true,
+			Frequency:  2,
+			Duration:   50 * time.Millisecond,
+			Expected:   true,
+		},
+		{
+			IsDownlink: true,
+			Frequency:  2,
+			Duration:   150 * time.Millisecond,
+			Expected:   false,
+		},
+		{
+			IsDownlink: true,
+			Frequency:  3,
+			Duration:   100 * time.Millisecond,
+			Expected:   true,
+		},
+		{
+			IsDownlink: true,
+			Frequency:  3,
+			Duration:   500 * time.Millisecond,
+			Expected:   false,
+		},
+		{
+			IsDownlink: true,
+			Frequency:  4,
+			Duration:   500 * time.Millisecond,
+			Expected:   false,
+		},
+	} {
+		dir := "DL"
+		if !tc.IsDownlink {
+			dir = "UL"
+		}
+		t.Run(fmt.Sprintf("%v/%v/%v", dir, tc.Frequency, tc.Duration), func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(fp.RespectsDwellTime(tc.IsDownlink, tc.Frequency, tc.Duration), should.Equal, tc.Expected)
 		})
 	}
 }

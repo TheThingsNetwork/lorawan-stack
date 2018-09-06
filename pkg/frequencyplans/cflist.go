@@ -55,7 +55,7 @@ func chMaskCFList(fp FrequencyPlan, band band.Band) *ttnpb.CFList {
 
 	for _, bandChannel := range band.UplinkChannels {
 		var channelEnabled bool
-		for _, fpChannel := range fp.Channels {
+		for _, fpChannel := range fp.UplinkChannels {
 			if fpChannel.Frequency == bandChannel.Frequency {
 				channelEnabled = true
 			}
@@ -70,7 +70,7 @@ func frequenciesCFList(fp FrequencyPlan, band band.Band) *ttnpb.CFList {
 	cfList := &ttnpb.CFList{Type: ttnpb.CFListType_FREQUENCIES}
 
 fpChannelsList:
-	for _, fpChannel := range fp.Channels {
+	for _, fpChannel := range fp.UplinkChannels {
 		for _, bandChannel := range band.UplinkChannels {
 			if fpChannel.Frequency == bandChannel.Frequency {
 				continue fpChannelsList
