@@ -36,8 +36,8 @@ type Server interface {
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
 	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*Connection, error)
-	// GetFrequencyPlan gets the specified frequency plan by its identifier.
-	GetFrequencyPlan(ctx context.Context, id string) (frequencyplans.FrequencyPlan, error)
+	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
+	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.

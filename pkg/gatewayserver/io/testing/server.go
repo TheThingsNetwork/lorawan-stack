@@ -70,7 +70,7 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 		return nil, err
 	}
 	gtw := &ttnpb.Gateway{GatewayIdentifiers: ids}
-	fp, err := s.store.GetByID("EU_863_870")
+	fp, err := s.store.GetByID(test.EUFrequencyPlanID)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +87,8 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 }
 
 // GetFrequencyPlan implements io.Server.
-func (s *server) GetFrequencyPlan(ctx context.Context, id string) (frequencyplans.FrequencyPlan, error) {
-	return s.store.GetByID(id)
+func (s *server) GetFrequencyPlan(ctx context.Context, _ ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error) {
+	return s.store.GetByID(test.EUFrequencyPlanID)
 }
 
 // ClaimDownlink implements io.Server.

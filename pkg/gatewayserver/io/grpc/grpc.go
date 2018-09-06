@@ -17,17 +17,16 @@ package grpc
 import (
 	"context"
 
-	"google.golang.org/grpc/peer"
-
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/validate"
+	"google.golang.org/grpc/peer"
 )
 
 type impl struct {
@@ -125,22 +124,21 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	}
 }
 
-func (s *impl) GetFrequencyPlan(ctx context.Context, req *ttnpb.GetFrequencyPlanRequest) (*frequencyplans.FrequencyPlan, error) {
-	ctx = log.NewContextWithField(ctx, "namespace", "io/grpc")
+func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ConcentratorConfig, error) {
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/grpc")
 
 	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	if err := validate.ID(id.GetGatewayID()); err != nil {
+	if err := validate.ID(id.GatewayID); err != nil {
 		return nil, err
 	}
 	if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-
-	fp, err := s.server.GetFrequencyPlan(ctx, req.FrequencyPlanID)
+	fp, err := s.server.GetFrequencyPlan(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return &fp, nil
+	return fp.ToConcentratorConfig(), nil
 }

@@ -289,7 +289,7 @@ func TestTraffic(t *testing.T) {
 	cancelCtx()
 }
 
-func TestFrequencyPlan(t *testing.T) {
+func TestConcentratorConfig(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
@@ -300,16 +300,6 @@ func TestFrequencyPlan(t *testing.T) {
 
 	ctx = contextWithKey(ctx, registeredGatewayID, registeredGatewayKey)()
 
-	// Happy flow
-	{
-		fp, err := srv.GetFrequencyPlan(ctx, &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: test.EUFrequencyPlanID})
-		a.So(err, should.BeNil)
-		a.So(fp.BandID, should.Equal, "EU_863_870")
-	}
-
-	// Not found
-	{
-		_, err := srv.GetFrequencyPlan(ctx, &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "INVALID_123_456"})
-		a.So(errors.IsNotFound(err), should.BeTrue)
-	}
+	_, err := srv.GetConcentratorConfig(ctx, ttnpb.Empty)
+	a.So(err, should.BeNil)
 }
