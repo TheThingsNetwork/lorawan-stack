@@ -20,15 +20,15 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-enum GatewayDownlinkPathConstraint {
+enum DownlinkPathConstraint {
   option (gogoproto.goproto_enum_prefix) = false;
 
   // Indicates that the gateway can be selected for downlink without constraints by the Network Server.
-  NONE = 0;
+  DOWNLINK_PATH_CONSTRAINT_NONE = 0;
   // Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.
-  PREFER_OTHER = 1;
+  DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER = 1;
   // Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path.
-  NEVER = 2;
+  DOWNLINK_PATH_CONSTRAINT_NEVER = 2;
 }
 
 // State enum defines states that an entity can be in.

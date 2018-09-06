@@ -51,7 +51,7 @@ message RxMetadata {
   // Antenna location; injected by the Gateway Server.
   Location location = 13;
   // Gateway downlink path constraint; injected by the Gateway Server.
-  GatewayDownlinkPathConstraint downlink_path_constraint = 14;
+  DownlinkPathConstraint downlink_path_constraint = 14;
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

@@ -109,7 +109,7 @@ message Gateway {
   // Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
   // duty cycle only in controlled research and development environments.
   bool enforce_duty_cycle = 17;
-  GatewayDownlinkPathConstraint downlink_path_constraint = 18;
+  DownlinkPathConstraint downlink_path_constraint = 18;
 }
 
 message Gateways {
