@@ -65,10 +65,10 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 	)
 }
 
-func contextWithKey(ctx context.Context, id ttnpb.GatewayIdentifiers, key string) func() context.Context {
+func contextWithKey(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) func() context.Context {
 	return func() context.Context {
 		md := metadata.New(map[string]string{
-			"id":            id.GatewayID,
+			"id":            ids.GatewayID,
 			"authorization": fmt.Sprintf("Key %v", key),
 		})
 		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {

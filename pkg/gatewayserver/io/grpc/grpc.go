@@ -44,16 +44,17 @@ var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_u
 func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	ctx := log.NewContextWithField(link.Context(), "namespace", "gatewayserver/io/grpc")
 
-	id := ttnpb.GatewayIdentifiers{
+	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	if err = validate.ID(id.GatewayID); err != nil {
+	// TODO: Remove (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
+	if err = validate.ID(ids.GatewayID); err != nil {
 		return
 	}
-	if err = rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err = rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return
 	}
-	ctx, id, err = s.server.FillGatewayContext(ctx, id)
+	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		return
 	}
@@ -61,18 +62,18 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	if peer, ok := peer.FromContext(ctx); ok {
 		ctx = log.NewContextWithField(ctx, "remote_addr", peer.Addr.String())
 	}
-	uid := unique.ID(ctx, id)
+	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
 
-	conn, err := s.server.Connect(ctx, "grpc", id)
+	conn, err := s.server.Connect(ctx, "grpc", ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)
 	}
 	logger.Info("Connected")
 	defer logger.Info("Disconnected")
-	if err = s.server.ClaimDownlink(ctx, id); err != nil {
+	if err = s.server.ClaimDownlink(ctx, ids); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink")
 		return
 	}
@@ -127,16 +128,17 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ConcentratorConfig, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/grpc")
 
-	id := ttnpb.GatewayIdentifiers{
+	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	if err := validate.ID(id.GatewayID); err != nil {
+	// TODO: Remove (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
+	if err := validate.ID(ids.GatewayID); err != nil {
 		return nil, err
 	}
-	if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-	fp, err := s.server.GetFrequencyPlan(ctx, id)
+	fp, err := s.server.GetFrequencyPlan(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
