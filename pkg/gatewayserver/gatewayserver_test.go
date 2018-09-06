@@ -102,7 +102,7 @@ func TestGatewayServer(t *testing.T) {
 	test.Must(nil, c.Start())
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_NETWORK_SERVER)
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_IDENTITY_SERVER)
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 	is.add(ctx, ttnpb.GatewayIdentifiers{
 		GatewayID: registeredGatewayID,
 		EUI:       &registeredGatewayEUI,
@@ -119,7 +119,6 @@ func TestGatewayServer(t *testing.T) {
 				return id.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
 			Link: func(ctx context.Context, t *testing.T, id ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				a := assertions.New(t)
 				conn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
 				if err != nil {
 					return err
@@ -130,11 +129,10 @@ func TestGatewayServer(t *testing.T) {
 					"authorization", fmt.Sprintf("Key %v", key),
 				)
 				client := ttnpb.NewGtwGsClient(conn)
-				fp, err := client.GetFrequencyPlan(ctx, &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: test.EUFrequencyPlanID})
+				_, err = client.GetConcentratorConfig(ctx, ttnpb.Empty)
 				if err != nil {
 					return err
 				}
-				a.So(fp.BandID, should.Equal, "EU_863_870")
 				link, err := client.LinkGateway(ctx)
 				if err != nil {
 					return err

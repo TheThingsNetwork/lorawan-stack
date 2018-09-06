@@ -22,6 +22,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -166,9 +167,9 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 }
 
 var (
-	errIdentityServerNotFound = errors.DefineNotFound(
-		"identity_server_not_found",
-		"Identity Server not found",
+	errEntityRegistryNotFound = errors.DefineNotFound(
+		"entity_registry_not_found",
+		"Entity Registry not found",
 	)
 	errGatewayNotRegistered = errors.DefineNotFound(
 		"gateway_not_registered",
@@ -191,11 +192,21 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_conn:%s", events.NewCorrelationID()))
 
-	is := gs.GetPeer(ctx, ttnpb.PeerInfo_IDENTITY_SERVER, nil)
-	if is == nil {
-		return nil, errIdentityServerNotFound
+	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
+	if er == nil {
+		return nil, errEntityRegistryNotFound
 	}
-	gtw, err := ttnpb.NewIsGatewayClient(is.Conn()).GetGateway(ctx, &ids)
+	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetGateway(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIdentifiers: ids,
+		FieldMask: types.FieldMask{
+			Paths: []string{
+				"frequency_plan_id",
+				"schedule_downlink_late",
+				"enforce_duty_cycle",
+				"downlink_path_constraint",
+			},
+		},
+	})
 	if errors.IsNotFound(err) {
 		if gs.config.RequireRegisteredGateways {
 			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
@@ -206,8 +217,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 		}
 		logger.Warn("Connecting unregistered gateway")
 		gtw = &ttnpb.Gateway{
-			GatewayIdentifiers: ids,
-			FrequencyPlanID:    fpID,
+			GatewayIdentifiers:     ids,
+			FrequencyPlanID:        fpID,
+			EnforceDutyCycle:       true,
+			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		}
 	} else if err != nil {
 		return nil, err
@@ -261,7 +274,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				drop(err)
 				break
 			}
-			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, msg.EndDeviceIdentifiers)
+			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, msg.EndDeviceIDs)
 			if ns == nil {
 				drop(errNoNetworkServer)
 				break
@@ -278,9 +291,20 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 	}
 }
 
-// GetFrequencyPlan gets the specified frequency plan by its identifier.
-func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, id string) (frequencyplans.FrequencyPlan, error) {
-	return gs.FrequencyPlans.GetByID(id)
+// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
+func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error) {
+	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
+	if er == nil {
+		return nil, errEntityRegistryNotFound
+	}
+	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetGateway(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIdentifiers: ids,
+		FieldMask:          types.FieldMask{Paths: []string{"frequency_plan_id"}},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return gs.FrequencyPlans.GetByID(gtw.FrequencyPlanID)
 }
 
 // ClaimDownlink claims the downlink path for the given gateway.
