@@ -30,12 +30,9 @@ const yamlFetchErrorCache = 1 * time.Minute
 
 // LBT contains the listen-before-talk requirements for a region.
 type LBT struct {
-	RSSITarget float32 `yaml:"rssi-target"`
-	RSSIOffset float32 `yaml:"rssi-offset,omitempty"`
-
-	// ScanTime in microseconds.
-	// TODO: Make duration
-	ScanTime int32 `yaml:"scan-time"`
+	RSSITarget float32       `yaml:"rssi-target"`
+	RSSIOffset float32       `yaml:"rssi-offset,omitempty"`
+	ScanTime   time.Duration `yaml:"scan-time"`
 }
 
 // Clone returns a cloned LBT.

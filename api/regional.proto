@@ -24,6 +24,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ConcentratorConfig {
   message Channel {
+    // Frequency (Hz).
     uint64 frequency = 1;
     uint32 radio = 2;
   }
@@ -31,24 +32,25 @@ message ConcentratorConfig {
 
   message LoRaStandardChannel {
     Channel channel = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-    // Bandwidth in Hz.
+    // Bandwidth (Hz).
     uint32 bandwidth = 2;
     uint32 spreading_factor = 3;
   }
   LoRaStandardChannel lora_standard_channel = 2 [(gogoproto.customname) = "LoRaStandardChannel"];
   message FSKChannel {
     Channel channel = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-    // Bandwidth in Hz.
+    // Bandwidth (Hz).
     uint32 bandwidth = 2;
     uint32 bit_rate = 3;
   }
   FSKChannel fsk_channel = 3 [(gogoproto.customname) = "FSKChannel"];
 
   message LBTConfiguration {
+    // Received signal strength (dBm).
     float rssi_target = 1 [(gogoproto.customname) = "RSSITarget"];
-    // RSSIOffset describes the LBT config-specific RSSI offset.
+    // Received signal strength offset (dBm).
     float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset"];
-    int32 scan_time = 3;
+    google.protobuf.Duration scan_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
   }
   LBTConfiguration lbt = 4 [(gogoproto.customname) = "LBT"];
 
