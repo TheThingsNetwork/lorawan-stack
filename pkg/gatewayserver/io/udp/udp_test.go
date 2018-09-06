@@ -42,12 +42,12 @@ var (
 	testConfig = Config{
 		PacketHandlers:      2,
 		PacketBuffer:        10,
-		DownlinkPathExpires: 100 * time.Millisecond,
-		ConnectionExpires:   250 * time.Millisecond,
+		DownlinkPathExpires: 50 * test.Delay,
+		ConnectionExpires:   125 * test.Delay,
 		ScheduleLateTime:    0,
 	}
 
-	timeout = 10 * time.Millisecond
+	timeout = 10 * test.Delay
 )
 
 func TestConnection(t *testing.T) {
@@ -342,7 +342,7 @@ func TestTraffic(t *testing.T) {
 				ExpectConnect: true,
 			},
 			{
-				Name:          "DownlinkMessageImmediate",
+				Name:          "TxImmediate",
 				EUI:           eui2,
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
@@ -366,7 +366,7 @@ func TestTraffic(t *testing.T) {
 				SendTxAck:          false,
 			},
 			{
-				Name:          "DownlinkMessagePreferLateNoClock",
+				Name:          "TxPreferLateNoClock",
 				EUI:           eui2,
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
@@ -390,7 +390,7 @@ func TestTraffic(t *testing.T) {
 				SendTxAck:          false,
 			},
 			{
-				Name:          "DownlinkMessagePreferLateOK",
+				Name:          "TxPreferLateOK",
 				EUI:           eui2,
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
@@ -406,7 +406,7 @@ func TestTraffic(t *testing.T) {
 						Frequency:       869525000,
 					},
 					TxMetadata: ttnpb.TxMetadata{
-						Timestamp: uint64(200 * time.Millisecond),
+						Timestamp: uint64(testConfig.DownlinkPathExpires * 100 / 150),
 					},
 				},
 				PreferScheduleLate: true,
@@ -414,7 +414,7 @@ func TestTraffic(t *testing.T) {
 				SendTxAck:          true, // From now on, immediate scheduling takes priority over scheduling late preference.
 			},
 			{
-				Name:          "DownlinkMessagePreferLateOverruled",
+				Name:          "TxPreferLateOverruled",
 				EUI:           eui2,
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
@@ -439,6 +439,7 @@ func TestTraffic(t *testing.T) {
 			},
 		} {
 			tcok := t.Run(tc.Name, func(t *testing.T) {
+				a := assertions.New(t)
 				buf, err := tc.Packet.MarshalBinary()
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -479,18 +480,18 @@ func TestTraffic(t *testing.T) {
 					expectAck(t, udpConn, true, encoding.PushAck, token)
 				}
 
-				// Set expected time for the pull response.
-				expectedTime := time.Now()
-				if tc.ScheduledLate {
-					expectedTime = expectedTime.Add(time.Duration(tc.Message.TxMetadata.Timestamp))
-					expectedTime = expectedTime.Add(-testConfig.ScheduleLateTime)
-				}
-
 				// Send the downlink message, optionally buffer first.
 				conn.Gateway().ScheduleDownlinkLate = tc.PreferScheduleLate
 				err = conn.SendDown(tc.Message)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
+				}
+
+				// Set expected time for the pull response.
+				expectedTime := time.Now()
+				if tc.ScheduledLate {
+					expectedTime = expectedTime.Add(time.Duration(tc.Message.TxMetadata.Timestamp))
+					expectedTime = expectedTime.Add(-testConfig.ScheduleLateTime)
 				}
 
 				// Read the response, taking care of expected time.
