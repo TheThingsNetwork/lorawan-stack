@@ -51,7 +51,7 @@ type Scheduler interface {
 }
 
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan, and starts a goroutine for cleanup. The scheduler is based on the dwell time, time off air, and the frequency plan's band. Assumption is made that no two duty cycles on a given band overlap.
-func FrequencyPlanScheduler(ctx context.Context, fp frequencyplans.FrequencyPlan) (Scheduler, error) {
+func FrequencyPlanScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan) (Scheduler, error) {
 	scheduler := &frequencyPlanScheduling{
 		respectsDwellTime: fp.RespectsDwellTime,
 		timeOffAir:        fp.TimeOffAir,

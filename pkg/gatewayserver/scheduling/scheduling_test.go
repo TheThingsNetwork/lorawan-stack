@@ -27,8 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func emptyEUFrequencyPlan() frequencyplans.FrequencyPlan {
-	return frequencyplans.FrequencyPlan{
+func emptyEUFrequencyPlan() *frequencyplans.FrequencyPlan {
+	return &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	}
 }
@@ -52,10 +52,12 @@ func TestEmptyScheduler(t *testing.T) {
 	a.So(err, should.NotBeNil)
 }
 
-func TestInexistantBand(t *testing.T) {
+func TestNotExistingBand(t *testing.T) {
 	a := assertions.New(t)
 
-	_, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{})
+	_, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
+		BandID: "not-existing",
+	})
 	a.So(err, should.NotBeNil)
 }
 
@@ -64,7 +66,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 	dwellTimeDuration := 400 * time.Millisecond
 
 	dtDownlinks := true
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 		DwellTime: frequencyplans.DwellTime{
 			Downlinks: &dtDownlinks,
@@ -83,7 +85,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 func TestScheduleAnytime(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -104,7 +106,7 @@ func TestScheduleAnytime(t *testing.T) {
 func TestScheduleAnytime2(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -127,7 +129,7 @@ func TestScheduleAnytime2(t *testing.T) {
 func TestScheduleAnytimeFullDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -153,7 +155,7 @@ func TestScheduleAnytimeFullDutyCycle(t *testing.T) {
 func TestScheduleAnytimeFullDutyCycleAfterRegisteredEmission(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -173,7 +175,7 @@ func TestScheduleAnytimeFullDutyCycleAfterRegisteredEmission(t *testing.T) {
 func TestScheduleFullDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -196,7 +198,7 @@ func TestScheduleFullDutyCycle(t *testing.T) {
 func TestScheduleOrdering(t *testing.T) {
 	a := assertions.New(t)
 
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 	})
 	a.So(err, should.BeNil)
@@ -219,7 +221,7 @@ func TestTimeOffAirError(t *testing.T) {
 	a := assertions.New(t)
 
 	toa := time.Minute
-	s, err := scheduling.FrequencyPlanScheduler(test.Context(), frequencyplans.FrequencyPlan{
+	s, err := scheduling.FrequencyPlanScheduler(test.Context(), &frequencyplans.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: toa,
