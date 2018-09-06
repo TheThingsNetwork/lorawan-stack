@@ -259,7 +259,7 @@ func (m *MACParameters) GetRx1Delay() RxDelay {
 	if m != nil {
 		return m.Rx1Delay
 	}
-	return RX_DELAY_1
+	return RX_DELAY_0
 }
 
 func (m *MACParameters) GetRx1DataRateOffset() uint32 {

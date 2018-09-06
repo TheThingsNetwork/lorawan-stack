@@ -437,59 +437,35 @@ message MACCommand {
 enum AggregatedDutyCycle {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // 100%.
-  DUTY_CYCLE_1 = 0;
-  // 50%.
-  DUTY_CYCLE_2 = 1;
-  // 25%.
-  DUTY_CYCLE_4 = 2;
-  // 12.5%.
-  DUTY_CYCLE_8 = 3;
-  // 6.25%.
-  DUTY_CYCLE_16 = 4;
-  // 3.125%.
-  DUTY_CYCLE_32 = 5;
-  // 1.5625%.
-  DUTY_CYCLE_64 = 6;
-  // Roughly 0.781%.
-  DUTY_CYCLE_128 = 7;
-  // Roughly 0.390%.
-  DUTY_CYCLE_256 = 8;
-  // Roughly 0.195%.
-  DUTY_CYCLE_512 = 9;
-  // Roughly 0.098%.
-  DUTY_CYCLE_1024 = 10;
-  // Roughly 0.049%.
-  DUTY_CYCLE_2048 = 11;
-  // Roughly 0.024%.
-  DUTY_CYCLE_4096 = 12;
-  // Roughly 0.012%.
-  DUTY_CYCLE_8192 = 13;
-  // Roughly 0.006%.
-  DUTY_CYCLE_16384 = 14;
-  // Roughly 0.003%.
-  DUTY_CYCLE_32768 = 15;
+  DUTY_CYCLE_1 = 0;      // 100%.
+  DUTY_CYCLE_2 = 1;      // 50%.
+  DUTY_CYCLE_4 = 2;      // 25%.
+  DUTY_CYCLE_8 = 3;      // 12.5%.
+  DUTY_CYCLE_16 = 4;     // 6.25%.
+  DUTY_CYCLE_32 = 5;     // 3.125%.
+  DUTY_CYCLE_64 = 6;     // 1.5625%.
+  DUTY_CYCLE_128 = 7;    // Roughly 0.781%.
+  DUTY_CYCLE_256 = 8;    // Roughly 0.390%.
+  DUTY_CYCLE_512 = 9;    // Roughly 0.195%.
+  DUTY_CYCLE_1024 = 10;  // Roughly 0.098%.
+  DUTY_CYCLE_2048 = 11;  // Roughly 0.049%.
+  DUTY_CYCLE_4096 = 12;  // Roughly 0.024%.
+  DUTY_CYCLE_8192 = 13;  // Roughly 0.012%.
+  DUTY_CYCLE_16384 = 14; // Roughly 0.006%.
+  DUTY_CYCLE_32768 = 15; // Roughly 0.003%.
 }
 
 enum PingSlotPeriod {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // Every second.
-  PING_EVERY_1S = 0;
-  // Every 2 seconds.
-  PING_EVERY_2S = 1;
-  // Every 4 seconds.
-  PING_EVERY_4S = 2;
-  // Every 8 seconds.
-  PING_EVERY_8S = 3;
-  // Every 16 seconds.
-  PING_EVERY_16S = 4;
-  // Every 32 seconds.
-  PING_EVERY_32S = 5;
-  // Every 64 seconds.
-  PING_EVERY_64S = 6;
-  // Every 128 seconds.
-  PING_EVERY_128S = 7;
+  PING_EVERY_1S = 0;   // Every second.
+  PING_EVERY_2S = 1;   // Every 2 seconds.
+  PING_EVERY_4S = 2;   // Every 4 seconds.
+  PING_EVERY_8S = 3;   // Every 8 seconds.
+  PING_EVERY_16S = 4;  // Every 16 seconds.
+  PING_EVERY_32S = 5;  // Every 32 seconds.
+  PING_EVERY_64S = 6;  // Every 64 seconds.
+  PING_EVERY_128S = 7; // Every 128 seconds.
 }
 
 enum RejoinCountExponent {
@@ -516,80 +492,56 @@ enum RejoinCountExponent {
 enum RejoinTimeExponent {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // Every ~17.1 minutes.
-  REJOIN_TIME_0 = 0;
-  // Every ~34.1 minutes.
-  REJOIN_TIME_1 = 1;
-  // Every ~1.1 hours.
-  REJOIN_TIME_2 = 2;
-  // Every ~2.3 hours.
-  REJOIN_TIME_3 = 3;
-  // Every ~4.6 hours.
-  REJOIN_TIME_4 = 4;
-  // Every ~9.1 hours.
-  REJOIN_TIME_5 = 5;
-  // Every ~18.2 hours.
-  REJOIN_TIME_6 = 6;
-  // Every ~1.5 days.
-  REJOIN_TIME_7 = 7;
-  // Every ~3.0 days.
-  REJOIN_TIME_8 = 8;
-  // Every ~6.1 days.
-  REJOIN_TIME_9 = 9;
-  // Every ~12.1 days.
-  REJOIN_TIME_10 = 10;
-  // Every ~3.5 weeks.
-  REJOIN_TIME_11 = 11;
-  // Every ~1.6 months.
-  REJOIN_TIME_12 = 12;
-  // Every ~3.2 months.
-  REJOIN_TIME_13 = 13;
-  // Every ~6.4 months.
-  REJOIN_TIME_14 = 14;
-  // Every ~1.1 year.
-  REJOIN_TIME_15 = 15;
+  REJOIN_TIME_0 = 0;   // Every ~17.1 minutes.
+  REJOIN_TIME_1 = 1;   // Every ~34.1 minutes.
+  REJOIN_TIME_2 = 2;   // Every ~1.1 hours.
+  REJOIN_TIME_3 = 3;   // Every ~2.3 hours.
+  REJOIN_TIME_4 = 4;   // Every ~4.6 hours.
+  REJOIN_TIME_5 = 5;   // Every ~9.1 hours.
+  REJOIN_TIME_6 = 6;   // Every ~18.2 hours.
+  REJOIN_TIME_7 = 7;   // Every ~1.5 days.
+  REJOIN_TIME_8 = 8;   // Every ~3.0 days.
+  REJOIN_TIME_9 = 9;   // Every ~6.1 days.
+  REJOIN_TIME_10 = 10; // Every ~12.1 days.
+  REJOIN_TIME_11 = 11; // Every ~3.5 weeks.
+  REJOIN_TIME_12 = 12; // Every ~1.6 months.
+  REJOIN_TIME_13 = 13; // Every ~3.2 months.
+  REJOIN_TIME_14 = 14; // Every ~6.4 months.
+  REJOIN_TIME_15 = 15; // Every ~1.1 year.
 }
 
 enum RejoinPeriodExponent {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // Every 32 to 64 seconds.
-  REJOIN_PERIOD_0 = 0;
-  // Every 64 to 96 seconds.
-  REJOIN_PERIOD_1 = 1;
-  // Every 128 to 160 seconds.
-  REJOIN_PERIOD_2 = 2;
-  // Every 256 to 288 seconds.
-  REJOIN_PERIOD_3 = 3;
-  // Every 512 to 544 seconds.
-  REJOIN_PERIOD_4 = 4;
-  // Every 1024 to 1056 seconds.
-  REJOIN_PERIOD_5 = 5;
-  // Every 2048 to 2080 seconds.
-  REJOIN_PERIOD_6 = 6;
-  // Every 4096 to 4128 seconds.
-  REJOIN_PERIOD_7 = 7;
+  REJOIN_PERIOD_0 = 0; // Every 32 to 64 seconds.
+  REJOIN_PERIOD_1 = 1; // Every 64 to 96 seconds.
+  REJOIN_PERIOD_2 = 2; // Every 128 to 160 seconds.
+  REJOIN_PERIOD_3 = 3; // Every 256 to 288 seconds.
+  REJOIN_PERIOD_4 = 4; // Every 512 to 544 seconds.
+  REJOIN_PERIOD_5 = 5; // Every 1024 to 1056 seconds.
+  REJOIN_PERIOD_6 = 6; // Every 2048 to 2080 seconds.
+  REJOIN_PERIOD_7 = 7; // Every 4096 to 4128 seconds.
 }
 
 enum DeviceEIRP {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  DEVICE_EIRP_8  = 0;
-  DEVICE_EIRP_10 = 1;
-  DEVICE_EIRP_12 = 2;
-  DEVICE_EIRP_13 = 3;
-  DEVICE_EIRP_14 = 4;
-  DEVICE_EIRP_16 = 5;
-  DEVICE_EIRP_18 = 6;
-  DEVICE_EIRP_20 = 7;
-  DEVICE_EIRP_21 = 8;
-  DEVICE_EIRP_24 = 9;
-  DEVICE_EIRP_26 = 10;
-  DEVICE_EIRP_27 = 11;
-  DEVICE_EIRP_29 = 12;
-  DEVICE_EIRP_30 = 13;
-  DEVICE_EIRP_33 = 14;
-  DEVICE_EIRP_36 = 15;
+  DEVICE_EIRP_8 = 0;   // 8 dBm.
+  DEVICE_EIRP_10 = 1;  // 10 dBm.
+  DEVICE_EIRP_12 = 2;  // 12 dBm.
+  DEVICE_EIRP_13 = 3;  // 13 dBm.
+  DEVICE_EIRP_14 = 4;  // 14 dBm.
+  DEVICE_EIRP_16 = 5;  // 16 dBm.
+  DEVICE_EIRP_18 = 6;  // 18 dBm.
+  DEVICE_EIRP_20 = 7;  // 20 dBm.
+  DEVICE_EIRP_21 = 8;  // 21 dBm.
+  DEVICE_EIRP_24 = 9;  // 24 dBm.
+  DEVICE_EIRP_26 = 10; // 26 dBm.
+  DEVICE_EIRP_27 = 11; // 27 dBm.
+  DEVICE_EIRP_29 = 12; // 29 dBm.
+  DEVICE_EIRP_30 = 13; // 30 dBm.
+  DEVICE_EIRP_33 = 14; // 33 dBm.
+  DEVICE_EIRP_36 = 15; // 36 dBm.
 }
 
 enum ADRAckLimitExponent {
@@ -637,37 +589,37 @@ enum ADRAckDelayExponent {
 enum RxDelay {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  RX_DELAY_1  = 0;
-  RX_DELAY_2  = 1;
-  RX_DELAY_3  = 2;
-  RX_DELAY_4  = 3;
-  RX_DELAY_5  = 4;
-  RX_DELAY_6  = 5;
-  RX_DELAY_7  = 6;
-  RX_DELAY_8  = 7;
-  RX_DELAY_9  = 8;
-  RX_DELAY_10 = 9;
-  RX_DELAY_11 = 10;
-  RX_DELAY_12 = 11;
-  RX_DELAY_13 = 12;
-  RX_DELAY_14 = 13;
-  RX_DELAY_15 = 14;
-  RX_DELAY_16 = 15;
+  RX_DELAY_0 = 0;   // 1 second.
+  RX_DELAY_1 = 1;   // 1 second.
+  RX_DELAY_2 = 2;   // 2 seconds.
+  RX_DELAY_3 = 3;   // 3 seconds.
+  RX_DELAY_4 = 4;   // 4 seconds.
+  RX_DELAY_5 = 5;   // 5 seconds.
+  RX_DELAY_6 = 6;   // 6 seconds.
+  RX_DELAY_7 = 7;   // 7 seconds.
+  RX_DELAY_8 = 8;   // 8 seconds.
+  RX_DELAY_9 = 9;   // 9 seconds.
+  RX_DELAY_10 = 10; // 10 seconds.
+  RX_DELAY_11 = 11; // 11 seconds.
+  RX_DELAY_12 = 12; // 12 seconds.
+  RX_DELAY_13 = 13; // 13 seconds.
+  RX_DELAY_14 = 14; // 14 seconds.
+  RX_DELAY_15 = 15; // 15 seconds.
 }
 
 enum Minor {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  MINOR_RFU_0  = 0;
-  MINOR_1      = 1;
-  MINOR_RFU_2  = 2;
-  MINOR_RFU_3  = 3;
-  MINOR_RFU_4  = 4;
-  MINOR_RFU_5  = 5;
-  MINOR_RFU_6  = 6;
-  MINOR_RFU_7  = 7;
-  MINOR_RFU_8  = 8;
-  MINOR_RFU_9  = 9;
+  MINOR_RFU_0 = 0;
+  MINOR_1 = 1;
+  MINOR_RFU_2 = 2;
+  MINOR_RFU_3 = 3;
+  MINOR_RFU_4 = 4;
+  MINOR_RFU_5 = 5;
+  MINOR_RFU_6 = 6;
+  MINOR_RFU_7 = 7;
+  MINOR_RFU_8 = 8;
+  MINOR_RFU_9 = 9;
   MINOR_RFU_10 = 10;
   MINOR_RFU_11 = 11;
   MINOR_RFU_12 = 12;
