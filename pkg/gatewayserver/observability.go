@@ -120,22 +120,26 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus) {
-	events.Publish(evtReceiveStatus(ctx, gtw.GatewayIdentifiers, nil))
+	events.Publish(evtReceiveStatus(ctx, gtw, nil))
 	gsMetrics.statusReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
 func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUp(ctx, ttnpb.CombineIdentifiers(gtw.GatewayIdentifiers, msg.EndDeviceIdentifiers), nil))
+	events.Publish(evtReceiveUp(ctx, gtw, nil))
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
 func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, peer cluster.Peer) {
-	events.Publish(evtForwardUp(ctx, ttnpb.CombineIdentifiers(gtw.GatewayIdentifiers, msg.EndDeviceIdentifiers), nil))
+	events.Publish(evtForwardUp(ctx, ttnpb.CombineIdentifiers(gtw, msg.EndDeviceIDs), nil))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, peer.Name()).Inc()
 }
 
 func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
-	events.Publish(evtDropUp(ctx, ttnpb.CombineIdentifiers(gtw.GatewayIdentifiers, msg.EndDeviceIdentifiers), err))
+	var ids ttnpb.Identifiers = gtw
+	if msg.EndDeviceIDs != nil {
+		ids = ttnpb.CombineIdentifiers(ids, *msg.EndDeviceIDs)
+	}
+	events.Publish(evtDropUp(ctx, ids, err))
 	if ttnErr, ok := errors.From(err); ok {
 		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
 	} else {
@@ -144,6 +148,6 @@ func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.Upli
 }
 
 func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage) {
-	events.Publish(evtSendDown(ctx, ttnpb.CombineIdentifiers(gtw.GatewayIdentifiers, msg.EndDeviceIdentifiers), nil))
+	events.Publish(evtSendDown(ctx, gtw, nil))
 	gsMetrics.downlinkSent.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
