@@ -130,7 +130,7 @@ func TestConnection(t *testing.T) {
 			Disconnects:       false,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
+		tcok := t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			// Send packet.
@@ -176,6 +176,9 @@ func TestConnection(t *testing.T) {
 				a.So(hasClaim, should.BeTrue)
 			}
 		})
+		if !tcok {
+			t.FailNow()
+		}
 	}
 
 	cancelCtx()
@@ -250,7 +253,7 @@ func TestTraffic(t *testing.T) {
 				ExpectConnect: false,
 			},
 		} {
-			t.Run(tc.Name, func(t *testing.T) {
+			tcok := t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
 				var buf []byte
@@ -300,6 +303,9 @@ func TestTraffic(t *testing.T) {
 					}
 				}
 			})
+			if !tcok {
+				t.FailNow()
+			}
 		}
 	})
 
@@ -432,7 +438,7 @@ func TestTraffic(t *testing.T) {
 				SendTxAck:          true,
 			},
 		} {
-			t.Run(tc.Name, func(t *testing.T) {
+			tcok := t.Run(tc.Name, func(t *testing.T) {
 				buf, err := tc.Packet.MarshalBinary()
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -524,6 +530,9 @@ func TestTraffic(t *testing.T) {
 					}
 				}
 			})
+			if !tcok {
+				t.FailNow()
+			}
 		}
 	})
 
