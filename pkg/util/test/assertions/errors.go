@@ -122,7 +122,7 @@ func assertErrorCompatibleEquals(actual, expected errors.Interface) string {
 	if !reflect.DeepEqual(actual.Attributes(), expected.Attributes()) {
 		return fmt.Sprintf(shouldHaveAttributes, expected.Attributes(), actual.Attributes())
 	}
-	if actual.Cause() != expected.Cause() {
+	if ret := ShouldEqualErrorOrDefinition(actual.Cause(), expected.Cause()); ret != success {
 		return fmt.Sprintf(shouldHaveCause, expected.Cause(), actual.Cause())
 	}
 	if !reflect.DeepEqual(actual.Details(), expected.Details()) {
