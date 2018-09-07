@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
@@ -206,7 +207,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 				"downlink_path_constraint",
 			},
 		},
-	})
+	}, rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()))
 	if errors.IsNotFound(err) {
 		if gs.config.RequireRegisteredGateways {
 			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
@@ -279,7 +280,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				drop(errNoNetworkServer)
 				break
 			}
-			if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg); err != nil {
+			if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg, gs.WithClusterAuth()); err != nil {
 				drop(err)
 				break
 			}
@@ -300,7 +301,7 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetGateway(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          types.FieldMask{Paths: []string{"frequency_plan_id"}},
-	})
+	}, rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()))
 	if err != nil {
 		return nil, err
 	}

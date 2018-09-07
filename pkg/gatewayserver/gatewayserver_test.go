@@ -30,6 +30,7 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -124,16 +125,18 @@ func TestGatewayServer(t *testing.T) {
 					return err
 				}
 				defer conn.Close()
-				ctx = metadata.AppendToOutgoingContext(ctx,
-					"id", id.GatewayID,
-					"authorization", fmt.Sprintf("Key %v", key),
-				)
+				md := rpcmetadata.MD{
+					ID:            id.GatewayID,
+					AuthType:      "Key",
+					AuthValue:     key,
+					AllowInsecure: true,
+				}
 				client := ttnpb.NewGtwGsClient(conn)
-				_, err = client.GetConcentratorConfig(ctx, ttnpb.Empty)
+				_, err = client.GetConcentratorConfig(ctx, ttnpb.Empty, grpc.PerRPCCredentials(md))
 				if err != nil {
 					return err
 				}
-				link, err := client.LinkGateway(ctx)
+				link, err := client.LinkGateway(ctx, grpc.PerRPCCredentials(md))
 				if err != nil {
 					return err
 				}
