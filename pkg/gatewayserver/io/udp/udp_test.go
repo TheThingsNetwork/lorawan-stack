@@ -465,7 +465,9 @@ func TestTraffic(t *testing.T) {
 				}
 
 				// Sync the clock at 0, i.e. approximate time.Now().
+				var clockSynced time.Time
 				if tc.SyncClock {
+					clockSynced = time.Now()
 					packet := generatePushData(eui2, false, 0)
 					buf, err = packet.MarshalBinary()
 					if !a.So(err, should.BeNil) {
@@ -490,6 +492,9 @@ func TestTraffic(t *testing.T) {
 				// Set expected time for the pull response.
 				expectedTime := time.Now()
 				if tc.ScheduledLate {
+					if tc.SyncClock {
+						expectedTime = expectedTime.Add(-time.Since(clockSynced))
+					}
 					expectedTime = expectedTime.Add(time.Duration(tc.Message.TxMetadata.Timestamp))
 					expectedTime = expectedTime.Add(-testConfig.ScheduleLateTime)
 				}
