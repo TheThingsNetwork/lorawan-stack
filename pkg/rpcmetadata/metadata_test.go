@@ -62,7 +62,10 @@ func TestMD(t *testing.T) {
 	{
 		md, err := md1.GetRequestMetadata(test.Context())
 		a.So(err, should.BeNil)
-		a.So(md, should.Resemble, map[string]string{"authorization": "Key foo"})
+		a.So(md, should.Resemble, map[string]string{
+			"id":            "some-id",
+			"authorization": "Key foo",
+		})
 	}
 
 	{
@@ -71,15 +74,25 @@ func TestMD(t *testing.T) {
 		a.So(md, should.BeEmpty)
 	}
 
-	ctx = metadata.NewIncomingContext(test.Context(), metadata.Pairs("authorization", "Key foo"))
-	md3 := FromIncomingContext(ctx)
-	a.So(md3.AuthType, should.Equal, "Key")
-	a.So(md3.AuthValue, should.Equal, "foo")
+	{
+		ctx := metadata.NewIncomingContext(test.Context(), metadata.New(map[string]string{
+			"id":            "some-id",
+			"authorization": "Key foo",
+			"host":          "test.local",
+		}))
+		callOpt := WithForwardedAuth(ctx, true).(grpc.PerRPCCredsCallOption)
+		requestMD, err := callOpt.Creds.GetRequestMetadata(ctx)
+		a.So(err, should.BeNil)
+		a.So(requestMD, should.Resemble, map[string]string{
+			"id":            "some-id",
+			"authorization": "Key foo",
+		})
+	}
 
 	{
-		callOpt := WithForwardedAuth(ctx, true).(grpc.PerRPCCredsCallOption)
-		md, err := callOpt.Creds.GetRequestMetadata(ctx)
-		a.So(err, should.BeNil)
-		a.So(md, should.Resemble, map[string]string{"authorization": "Key foo"})
+		ctx := metadata.NewIncomingContext(test.Context(), metadata.Pairs("authorization", "Key foo"))
+		md3 := FromIncomingContext(ctx)
+		a.So(md3.AuthType, should.Equal, "Key")
+		a.So(md3.AuthValue, should.Equal, "foo")
 	}
 }

@@ -53,6 +53,7 @@ func (m MD) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]s
 		return nil, nil
 	}
 	return map[string]string{
+		"id":            m.ID,
 		"authorization": m.AuthType + " " + m.AuthValue,
 	}, nil
 }
