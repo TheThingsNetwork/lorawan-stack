@@ -52,7 +52,7 @@ func newContext(md *rpcmetadata.MD, s grpc.ServerTransportStream, rs ...ttnpb.Ri
 	ctx := rights.NewContextWithFetcher(
 		test.Context(),
 		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
-			return &ttnpb.Rights{rs}, nil
+			return &ttnpb.Rights{Rights: rs}, nil
 		}),
 	)
 	if s != nil {
@@ -154,14 +154,15 @@ func TestSetDeviceNoProcessor(t *testing.T) {
 
 	old := deepcopy.Copy(pb).(*ttnpb.EndDevice)
 
-	for pb.GetLocation().GetLatitude() == old.GetLocation().GetLatitude() {
-		pb.Location = ttnpb.NewPopulatedLocation(test.Randy, false)
+	for pb.GetFormatters().GetUpFormatter() == old.GetFormatters().GetUpFormatter() ||
+		pb.GetFormatters().GetUpFormatterParameter() == old.GetFormatters().GetUpFormatterParameter() {
+		pb.Formatters = ttnpb.NewPopulatedMessagePayloadFormatters(test.Randy, false)
 	}
 
 	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{
 		Device: *pb,
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"location.latitude"},
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{"formatters.up_formatter", "formatters.up_formatter_parameter"},
 		},
 	})
 	a.So(err, should.BeNil)
@@ -171,10 +172,11 @@ func TestSetDeviceNoProcessor(t *testing.T) {
 		pretty.Ldiff(t, dev, pb)
 	}
 
-	if old.Location == nil {
-		old.Location = &ttnpb.Location{}
+	if old.Formatters == nil {
+		old.Formatters = &ttnpb.MessagePayloadFormatters{}
 	}
-	old.Location.Latitude = pb.GetLocation().GetLatitude()
+	old.Formatters.UpFormatter = pb.GetFormatters().GetUpFormatter()
+	old.Formatters.UpFormatterParameter = pb.GetFormatters().GetUpFormatterParameter()
 	pb = old
 
 	got, err := FindByIdentifiers(dr.Interface, &pb.EndDeviceIdentifiers)

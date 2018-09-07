@@ -165,17 +165,13 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 		return nil, err
 	}
 
-	var fields []string
-	if req.FieldMask != nil {
-		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.Device)
-	}
-
 	dev, err := FindByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
 	notFound := errors.IsNotFound(err)
 	if err != nil && !notFound {
 		return nil, err
 	}
 
+	fields := gogoproto.GoFieldsPaths(&req.FieldMask, req.Device)
 	setDev := &req.Device
 	if r.setDeviceProcessor != nil {
 		setDev, fields, err = r.setDeviceProcessor(ctx, notFound, setDev, fields...)

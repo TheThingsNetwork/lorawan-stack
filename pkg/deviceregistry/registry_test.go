@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
@@ -39,22 +38,7 @@ func TestRegistry(t *testing.T) {
 	start := time.Now()
 
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	pb.Attributes = &pbtypes.Struct{
-		Fields: map[string]*pbtypes.Value{
-			"null":   {Kind: &pbtypes.Value_NullValue{}},
-			"bool":   {Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
-			"str":    {Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
-			"number": {Kind: &pbtypes.Value_NumberValue{NumberValue: 42}},
-			"list": {Kind: &pbtypes.Value_ListValue{ListValue: &pbtypes.ListValue{Values: []*pbtypes.Value{
-				{Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
-				{Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
-			}}}},
-			"struct": {Kind: &pbtypes.Value_StructValue{StructValue: &pbtypes.Struct{Fields: map[string]*pbtypes.Value{
-				"bool": {Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
-				"str":  {Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
-			}}}},
-		},
-	}
+	pb.Attributes = map[string]string{"foo": "bar"}
 
 	found, err := FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
