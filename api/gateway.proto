@@ -132,9 +132,8 @@ message ListGatewaysRequest {
 
 message CreateGatewayRequest {
   Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // By default the account of the caller is set as first collaborator with admin rights.
-  // Set the organization to instead make the organization the first collaborator with admin rights.
-  OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+  // Collaborator to grant all rights on the newly created gateway.
+  OrganizationOrUserIdentifiers collaborator = 2;
 }
 
 message UpdateGatewayRequest {

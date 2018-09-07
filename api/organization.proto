@@ -47,7 +47,7 @@ message GetOrganizationRequest {
 
 message ListOrganizationsRequest {
   // By default we list all organizations the caller has rights on.
-  // Set the user (not both) to instead list the organizations
+  // Set the user to instead list the organizations
   // where the user or organization is collaborator on.
 
   // NOTE: It is currently not possible to have organizations collaborating on
@@ -58,9 +58,10 @@ message ListOrganizationsRequest {
 
 message CreateOrganizationRequest {
   Organization organization = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // By default the account of the caller is set as first collaborator with admin rights.
-  // Set the organization to instead make the organization the first collaborator with admin rights.
-  OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+  // Collaborator to grant all rights on the newly created application.
+  // NOTE: It is currently not possible to have organizations collaborating on
+  // other organizations.
+  OrganizationOrUserIdentifiers collaborator = 2;
 }
 
 message UpdateOrganizationRequest {

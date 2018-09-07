@@ -27,15 +27,14 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 service ApplicationRegistry {
-  // Create a new application. This also sets the current user as first collaborator
-  // with all possible rights. When including organization identifiers, this instead
-  // grants those rights to the given organization.
+  // Create a new application. This also sets the given organization or user as
+  // first collaborator with all possible rights.
   rpc CreateApplication(CreateApplicationRequest) returns (Application) {
     option (google.api.http) = {
-      post: "/applications"
+      post: "/users/{collaborator.user_ids.user_id}/applications"
       body: "*"
       additional_bindings {
-        post: "/organizations/{organization_ids.organization_id}/applications"
+        post: "/organizations/{collaborator.organization_ids.organization_id}/applications"
         body: "*"
       }
     };

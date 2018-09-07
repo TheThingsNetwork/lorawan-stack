@@ -26,11 +26,11 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 service OrganizationRegistry {
-  // Create a new organization. This also sets the current user as first collaborator
-  // with all possible rights.
+  // Create a new organization. This also sets the given user as
+  // first collaborator with all possible rights.
   rpc CreateOrganization(CreateOrganizationRequest) returns (Organization) {
     option (google.api.http) = {
-      post: "/organizations"
+      post: "/users/{collaborator.user_ids.user_id}/organizations"
       body: "*"
     };
   };
