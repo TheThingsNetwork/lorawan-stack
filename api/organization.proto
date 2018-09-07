@@ -61,7 +61,7 @@ message CreateOrganizationRequest {
   // Collaborator to grant all rights on the newly created application.
   // NOTE: It is currently not possible to have organizations collaborating on
   // other organizations.
-  OrganizationOrUserIdentifiers collaborator = 2;
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateOrganizationRequest {

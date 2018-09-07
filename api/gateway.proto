@@ -133,7 +133,7 @@ message ListGatewaysRequest {
 message CreateGatewayRequest {
   Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // Collaborator to grant all rights on the newly created gateway.
-  OrganizationOrUserIdentifiers collaborator = 2;
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateGatewayRequest {

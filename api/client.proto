@@ -94,7 +94,7 @@ message ListClientsRequest {
 message CreateClientRequest {
   Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // Collaborator to grant all rights on the newly created client.
-  OrganizationOrUserIdentifiers collaborator = 2;
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateClientRequest {

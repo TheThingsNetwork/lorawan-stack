@@ -63,7 +63,7 @@ message ListApplicationsRequest {
 message CreateApplicationRequest {
   Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // Collaborator to grant all rights on the newly created application.
-  OrganizationOrUserIdentifiers collaborator = 2;
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateApplicationRequest {
