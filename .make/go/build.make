@@ -16,7 +16,10 @@
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 
-# default main file
+# Default vendor folder
+VENDOR_DIR ?= vendor
+
+# Default main file
 MAIN ?= ./main.go
 
 # Build the executable
