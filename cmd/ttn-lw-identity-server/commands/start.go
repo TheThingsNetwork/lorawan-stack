@@ -34,17 +34,16 @@ var (
 
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {
-				return shared.ErrIdentityServerInitialize.WithCause(err)
+				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
-			config.IS.OAuth.Assets = assets
 
-			is, err := identityserver.New(c, config.IS)
+			_, err = identityserver.New(c, assets, &config.IS)
 			if err != nil {
 				return shared.ErrIdentityServerInitialize.WithCause(err)
 			}
 
 			logger.Info("Starting Identity Server...")
-			return is.Run()
+			return c.Run()
 		},
 	}
 )

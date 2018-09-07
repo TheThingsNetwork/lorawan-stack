@@ -35,19 +35,3 @@ var DefaultConfig = Config{
 	IS:          shared_identityserver.DefaultIdentityServerConfig,
 	Assets:      shared.DefaultAssetsConfig,
 }
-
-// InitConfig for the `init` command.
-type InitConfig struct {
-	conf.ServiceBase `name:",squash"`
-	IS               identityserver.Config      `name:"is"`
-	Assets           assets.Config              `name:"assets"`
-	InitialData      identityserver.InitialData `name:"initial-data"`
-}
-
-// DefaultInitConfig contains the default config for the ttn-lw-identity-server binary.
-var DefaultInitConfig = InitConfig{
-	ServiceBase: shared.DefaultServiceBase,
-	IS:          shared_identityserver.DefaultIdentityServerConfig,
-	Assets:      shared.DefaultAssetsConfig,
-	InitialData: shared_identityserver.DefaultIdentityServerInitialData,
-}

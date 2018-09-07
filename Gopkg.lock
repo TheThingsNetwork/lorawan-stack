@@ -18,14 +18,6 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
-  digest = "1:fd7b5197ee54b40879b8adaccf480e7207e197a4f4491c12290e0575773367f7"
-  name = "github.com/RangelReale/osin"
-  packages = ["."]
-  pruneopts = ""
-  revision = "0f3357bb07e801ea62327872d19913969001dd7a"
-  version = "v1.0.1"
-
-[[projects]]
   branch = "master"
   digest = "1:41570f2e69ee26436a35dad3802bcfdc87ba76c92cff4601035399aeef70227c"
   name = "github.com/TheThingsIndustries/mystique"
@@ -73,14 +65,6 @@
   pruneopts = ""
   revision = "deb3ae2ef2610fde3330947281941c562861188b"
   version = "2018.01.18"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c05e492e19a0704f4fee4d546ca899586c176b73f31c4a06051473ea75e7eaa2"
-  name = "github.com/cockroachdb/cockroach-go"
-  packages = ["crdb"]
-  pruneopts = ""
-  revision = "59c0560478b705bf9bd12f9252224a0fad7c87df"
 
 [[projects]]
   digest = "1:6098222470fe0172157ce9bbef5d2200df4edde17ee649c5d6e48330e4afa4c6"
@@ -300,25 +284,6 @@
   revision = "c73681c634de898c869684602cf0c0d2ce938c4d"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d90c6c1d8c3a177b31271aa2166f1a31ccb488f261264527e88c34fa6d9b6fc3"
-  name = "github.com/jaytaylor/html2text"
-  packages = ["."]
-  pruneopts = ""
-  revision = "57d518f124b0cf46ea2021f25a01396b3522e6fb"
-
-[[projects]]
-  branch = "master"
-  digest = "1:617ee2434b77e911fa26b678730be9a617f75243b194eadc8201c8ac860844aa"
-  name = "github.com/jmoiron/sqlx"
-  packages = [
-    ".",
-    "reflectx",
-  ]
-  pruneopts = ""
-  revision = "0dae4fefe7c0e190f7b5a78dac28a1c82cc8d849"
-
-[[projects]]
   digest = "1:3108ec0946181c60040ff51b811908f89d03e521e2b4ade5ef5c65b3c0e911ae"
   name = "github.com/kr/pretty"
   packages = ["."]
@@ -359,17 +324,6 @@
   version = "0.2.6"
 
 [[projects]]
-  digest = "1:29145d7af4adafd72a79df5e41456ac9e232d5a28c1cd4dacf3ff008a217fc10"
-  name = "github.com/lib/pq"
-  packages = [
-    ".",
-    "oid",
-  ]
-  pruneopts = ""
-  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
-  version = "v1.0.0"
-
-[[projects]]
   digest = "1:961dc3b1d11f969370533390fdf203813162980c858e1dabe827b60940c909a5"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -392,14 +346,6 @@
   pruneopts = ""
   revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
   version = "v0.0.4"
-
-[[projects]]
-  digest = "1:82b912465c1da0668582a7d1117339c278e786c2536b3c3623029a0c7141c2d0"
-  name = "github.com/mattn/go-runewidth"
-  packages = ["."]
-  pruneopts = ""
-  revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
-  version = "v0.0.3"
 
 [[projects]]
   digest = "1:63722a4b1e1717be7b98fc686e0b30d5e7f734b9e93d7dee86293b6deab7ea28"
@@ -432,22 +378,6 @@
   pruneopts = ""
   revision = "8356aea91ceecc7d00ef87508040d1031adb2953"
   version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:816e800c7b5689e114c0dc6acf494553d1e7a52575764c5d6de67fb32bd8bbb2"
-  name = "github.com/olekukonko/tablewriter"
-  packages = ["."]
-  pruneopts = ""
-  revision = "d4647c9c7a84d847478d890b816b7d8b62b0b279"
-
-[[projects]]
-  digest = "1:63e142fc50307bcb3c57494913cfc9c12f6061160bdf97a678f78c71615f939b"
-  name = "github.com/pborman/uuid"
-  packages = ["."]
-  pruneopts = ""
-  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
-  version = "v1.1"
 
 [[projects]]
   digest = "1:894aef961c056b6d85d12bac890bf60c44e99b46292888bfa66caf529f804457"
@@ -544,25 +474,6 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:f66a8bd3128df79a2648daea552403c5c66d841c7ae844d5d22b445afbdf0878"
-  name = "github.com/sendgrid/rest"
-  packages = ["."]
-  pruneopts = ""
-  revision = "306b9bef57dc36f3435ccfcc08fe6ae2c6920344"
-  version = "v2.4.1"
-
-[[projects]]
-  digest = "1:f03d623f2a89d6a506655dc152c24f4d1eee449a8c335bfe229972bba4047fa5"
-  name = "github.com/sendgrid/sendgrid-go"
-  packages = [
-    ".",
-    "helpers/mail",
-  ]
-  pruneopts = ""
-  revision = "8caf17aa96b4a98bae8bd216878dd50ff12897b5"
-  version = "v3.4.1"
-
-[[projects]]
   branch = "master"
   digest = "1:7984ea8b3555db5d97adfeed56f1e61e24777f39e0009d2e60ce23af60f08577"
   name = "github.com/smartystreets/assertions"
@@ -633,14 +544,6 @@
   packages = ["."]
   pruneopts = ""
   revision = "0ac2068de99fd349edc4954d0e9b4a600d75da44"
-
-[[projects]]
-  branch = "master"
-  digest = "1:f1e3a889b271bb29598c04dc70a94ff66f674adbb862832b64fcb77bbf06b225"
-  name = "github.com/ssor/bom"
-  packages = ["."]
-  pruneopts = ""
-  revision = "6386211fdfcf24c0bfbdaceafd02849ed9a8a509"
 
 [[projects]]
   digest = "1:cae65c1f3471b1f456a9d8a160440f4824ad50c718a15da4144490fbc3b12e49"
@@ -717,8 +620,6 @@
   packages = [
     "context",
     "context/ctxhttp",
-    "html",
-    "html/atom",
     "http/httpguts",
     "http2",
     "http2/hpack",
@@ -874,7 +775,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/PuerkitoBio/purell",
-    "github.com/RangelReale/osin",
     "github.com/TheThingsIndustries/mystique/pkg/auth",
     "github.com/TheThingsIndustries/mystique/pkg/log",
     "github.com/TheThingsIndustries/mystique/pkg/net",
@@ -883,7 +783,6 @@
     "github.com/TheThingsIndustries/mystique/pkg/topic",
     "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp",
     "github.com/blang/semver",
-    "github.com/cockroachdb/cockroach-go/crdb",
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/fsnotify/fsnotify",
     "github.com/getsentry/raven-go",
@@ -910,13 +809,10 @@
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/jacobsa/crypto/cmac",
-    "github.com/jaytaylor/html2text",
-    "github.com/jmoiron/sqlx",
     "github.com/kr/pretty",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/labstack/gommon/log",
-    "github.com/lib/pq",
     "github.com/mattn/go-isatty",
     "github.com/mitchellh/mapstructure",
     "github.com/mohae/deepcopy",
@@ -925,8 +821,6 @@
     "github.com/prometheus/client_golang/prometheus",
     "github.com/robertkrimen/otto",
     "github.com/satori/go.uuid",
-    "github.com/sendgrid/sendgrid-go",
-    "github.com/sendgrid/sendgrid-go/helpers/mail",
     "github.com/smartystreets/assertions",
     "github.com/smartystreets/assertions/should",
     "github.com/soheilhy/cmux",

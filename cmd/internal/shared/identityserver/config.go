@@ -15,37 +15,8 @@
 package identityserver
 
 import (
-	"fmt"
-	"time"
-
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 )
 
 // DefaultIdentityServerConfig is the default configuration for the Identity Server.
-var DefaultIdentityServerConfig = identityserver.Config{
-	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
-	PublicURL:        "http://localhost:1885",
-	OrganizationName: "The Things Network",
-	OAuth: oauth.Config{
-		AuthorizationCodeTTL: time.Minute * 5,
-		AccessTokenTTL:       time.Hour,
-		PublicURL:            shared.DefaultOAuthPublicURL,
-	},
-}
-
-// DefaultIdentityServerInitialData is the default initial data.
-var DefaultIdentityServerInitialData = identityserver.InitialData{
-	Settings: identityserver.DefaultSettings,
-	Admin: identityserver.InitialAdminData{
-		UserID:   "admin",
-		Email:    "admin@localhost",
-		Password: "admin",
-	},
-	Console: identityserver.InitialConsoleData{
-		ClientSecret:      "console",
-		RedirectURI:       fmt.Sprintf("%s/oauth/callback", shared.DefaultConsolePublicURL),
-		SkipAuthorization: true,
-	},
-}
+var DefaultIdentityServerConfig = identityserver.Config{}

@@ -67,11 +67,10 @@ var (
 
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {
-				return shared.ErrIdentityServerInitialize.WithCause(err)
+				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
-			config.IS.OAuth.Assets = assets
 
-			_, err = identityserver.New(c, config.IS)
+			_, err = identityserver.New(c, assets, &config.IS)
 			if err != nil {
 				return shared.ErrIdentityServerInitialize.WithCause(err)
 			}
