@@ -93,21 +93,21 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 			DownlinkFrequency: 868100000,
 			MinDataRateIndex:  0,
 			MaxDataRateIndex:  5,
-			UplinkEnabled:     true,
+			EnableUplink:      true,
 		},
 		{
 			UplinkFrequency:   868300000,
 			DownlinkFrequency: 868300000,
 			MinDataRateIndex:  0,
 			MaxDataRateIndex:  5,
-			UplinkEnabled:     true,
+			EnableUplink:      true,
 		},
 		{
 			UplinkFrequency:   868500000,
 			DownlinkFrequency: 868500000,
 			MinDataRateIndex:  0,
 			MaxDataRateIndex:  5,
-			UplinkEnabled:     true,
+			EnableUplink:      true,
 		},
 	}
 	out.MACState.DesiredParameters.Channels = deepcopy.Copy(out.MACState.CurrentParameters.Channels).([]*MACParameters_Channel)

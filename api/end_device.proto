@@ -36,13 +36,13 @@ message Session {
   // Known by Network Server, Application Server and Join Server. Owned by Network Server.
   bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (gogoproto.nullable) = false];
   SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // Next FCntUp to expect. Network Server only. Application Server assumes the Network Server checked it.
+  // Next FCntUp to be expected. Network Server only. Application Server assumes the Network Server checked it.
   uint32 next_f_cnt_up = 4;
   // Next NFCntDown to be used. Network Server only.
   uint32 next_n_f_cnt_down = 5;
   // Next AFCntDown to be used. Application Server only.
   uint32 next_a_f_cnt_down = 6;
-  // Last FCntDown of the last confirmed message. Network Server only.
+  // FCnt of the last confirmed downlink message sent. Network Server only.
   uint32 last_conf_f_cnt_down = 7;
   // Time when the session started. Network Server only.
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -79,7 +79,7 @@ message MACParameters {
   uint64 rx2_frequency = 12;
   // Time within which a rejoin-request must be sent.
   RejoinTimeExponent rejoin_time_periodicity = 13;
-  // Message count after which a rejoin-request must be sent.
+  // Message count within which a rejoin-request must be sent.
   RejoinCountExponent rejoin_count_periodicity = 14;
   // Aggregated uplink duty cycle (of all channels).
   AggregatedDutyCycle duty_cycle = 15;
@@ -96,7 +96,7 @@ message MACParameters {
     // Index of the maximum data rate for uplink.
     DataRateIndex max_data_rate_index = 4;
     // Channel can be used by device for uplink.
-    bool uplink_enabled = 5;
+    bool enable_uplink = 5;
   }
 
   // Configured uplink channels and optionally Rx1 frequency.
@@ -299,10 +299,10 @@ message EndDevice {
   // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0).
   // Stored in Join Server.
   repeated uint32 used_join_nonces = 29;
-  // Next Rejoin counter (type 0/2) to expect.
+  // Next Rejoin counter (type 0/2) to be expected.
   // Stored in Join Server.
   uint32 next_rj_count_0 = 30 [(gogoproto.customname) = "NextRJCount0"];
-  // Next Rejoin counter (type 1) to expect.
+  // Next Rejoin counter (type 1) to be expected.
   // Stored in Join Server.
   uint32 next_rj_count_1 = 31 [(gogoproto.customname) = "NextRJCount1"];
 
