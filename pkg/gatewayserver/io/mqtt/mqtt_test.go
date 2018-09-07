@@ -190,24 +190,35 @@ func TestTraffic(t *testing.T) {
 				OK: false, // invalid topic format
 			},
 		} {
-			t.Run(tc.Topic, func(t *testing.T) {
+			tcok := t.Run(tc.Topic, func(t *testing.T) {
 				a := assertions.New(t)
 				buf, err := tc.Message.Marshal()
 				a.So(err, should.BeNil)
 				if token := client.Publish(tc.Topic, 1, false, buf); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
 					t.FailNow()
 				}
-				if tc.OK {
-					select {
-					case up := <-conn.Up():
+				select {
+				case up := <-conn.Up():
+					if tc.OK {
 						a.So(up, should.Resemble, tc.Message)
-					case status := <-conn.Status():
+					} else {
+						t.Fatalf("Did not expect uplink message, but have %v", up)
+					}
+				case status := <-conn.Status():
+					if tc.OK {
 						a.So(status, should.Resemble, tc.Message)
-					case <-time.After(timeout):
+					} else {
+						t.Fatalf("Did not expect status message, but have %v", status)
+					}
+				case <-time.After(timeout):
+					if tc.OK {
 						t.Fatal("Receive expected upstream timeout")
 					}
 				}
 			})
+			if !tcok {
+				t.FailNow()
+			}
 		}
 	})
 
