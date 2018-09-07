@@ -20,6 +20,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -75,4 +76,10 @@ func TestMD(t *testing.T) {
 	a.So(md3.AuthType, should.Equal, "Key")
 	a.So(md3.AuthValue, should.Equal, "foo")
 
+	{
+		callOpt := WithForwardedAuth(ctx, true).(grpc.PerRPCCredsCallOption)
+		md, err := callOpt.Creds.GetRequestMetadata(ctx)
+		a.So(err, should.BeNil)
+		a.So(md, should.Resemble, map[string]string{"authorization": "Key foo"})
+	}
 }

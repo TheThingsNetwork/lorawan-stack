@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -142,14 +143,21 @@ func FromMetadata(md metadata.MD) (m MD) {
 	return
 }
 
-// FromOutgoingContext returns the TTN metadata from the outgoing context.Context
+// FromOutgoingContext returns the TTN metadata from the outgoing context ctx.
 func FromOutgoingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromOutgoingContext(ctx)
 	return FromMetadata(md)
 }
 
-// FromIncomingContext returns the TTN metadata from the incoming context.Context
+// FromIncomingContext returns the TTN metadata from the incoming context ctx.
 func FromIncomingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	return FromMetadata(md)
+}
+
+// WithForwardedAuth returns a grpc.CallOption with authentication from the incoming context ctx.
+func WithForwardedAuth(ctx context.Context, allowInsecure bool) grpc.CallOption {
+	md := FromIncomingContext(ctx)
+	md.AllowInsecure = allowInsecure
+	return grpc.PerRPCCredentials(md)
 }
