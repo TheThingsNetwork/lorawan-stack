@@ -45,8 +45,6 @@ func (h *host) createEnvironment(version *ttnpb.EndDeviceVersionIdentifiers) map
 	env["model"] = version.ModelID
 	env["hardware_version"] = version.HardwareVersion
 	env["firmware_version"] = version.FirmwareVersion
-	env["lorawan_version"], _ = ttnpb.MACVersion_name[int32(version.LoRaWANVersion)]
-	env["lorawan_phy_version"], _ = ttnpb.PHYVersion_name[int32(version.LoRaWANPHYVersion)]
 	return env
 }
 
@@ -64,39 +62,32 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *
 	if payload == nil {
 		return nil, errNoPayload
 	}
-
 	decoded := payload.DecodedPayload
 	if decoded == nil {
 		return msg, nil
 	}
-
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
 		return nil, errInput.WithCause(err)
 	}
-
 	env := h.createEnvironment(version)
-	env["application_id"] = msg.ApplicationID
-	env["device_id"] = msg.DeviceID
-	env["dev_eui"] = msg.DevEUI
-	env["join_eui"] = msg.JoinEUI
+	if ids := msg.EndDeviceIDs; ids != nil {
+		env["application_id"] = ids.ApplicationID
+		env["device_id"] = ids.DeviceID
+	}
 	env["payload"] = m
 	env["f_port"] = payload.FPort
-
 	script = fmt.Sprintf(`
 		%s
 		Encoder(env.payload, env.f_port)
 	`, script)
-
 	value, err := h.engine.Run(ctx, script, env)
 	if err != nil {
 		return nil, err
 	}
-
 	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
 		return nil, errOutputType
 	}
-
 	slice := reflect.ValueOf(value)
 	l := slice.Len()
 	payload.FRMPayload = make([]byte, l)
@@ -134,7 +125,6 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *
 		}
 		payload.FRMPayload[i] = byte(b)
 	}
-
 	return msg, nil
 }
 
@@ -144,35 +134,29 @@ func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, version *tt
 	if payload == nil {
 		return nil, errNoPayload
 	}
-
 	env := h.createEnvironment(version)
-	env["application_id"] = msg.ApplicationID
-	env["device_id"] = msg.DeviceID
-	env["dev_eui"] = msg.DevEUI
-	env["join_eui"] = msg.JoinEUI
+	if ids := msg.EndDeviceIDs; ids != nil {
+		env["application_id"] = ids.ApplicationID
+		env["device_id"] = ids.DeviceID
+	}
 	env["payload"] = payload.FRMPayload
 	env["f_port"] = payload.FPort
-
 	script = fmt.Sprintf(`
 		%s
 		Decoder(env.payload, env.f_port)
 	`, script)
-
 	value, err := h.engine.Run(ctx, script, env)
 	if err != nil {
 		return nil, err
 	}
-
 	m, ok := value.(map[string]interface{})
 	if !ok {
 		return nil, errOutput
 	}
-
 	s, err := gogoproto.Struct(m)
 	if err != nil {
 		return nil, errOutput.WithCause(err)
 	}
-
 	payload.DecodedPayload = s
 	return msg, nil
 }
