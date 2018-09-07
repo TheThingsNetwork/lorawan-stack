@@ -189,12 +189,12 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			cs.io, cs.ioErr = io, err
 			close(cs.ioWait)
 		}()
-		id := ttnpb.GatewayIdentifiers{EUI: &eui}
-		ctx, id, err = s.server.FillGatewayContext(ctx, id)
+		ids := ttnpb.GatewayIdentifiers{EUI: &eui}
+		ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 		if err != nil {
 			return nil, err
 		}
-		uid := unique.ID(ctx, id)
+		uid := unique.ID(ctx, ids)
 		ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 		ctx = rights.NewContext(ctx, rights.Rights{
 			GatewayRights: map[string]*ttnpb.Rights{
@@ -203,7 +203,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				},
 			},
 		})
-		io, err = s.server.Connect(ctx, "udp", id)
+		io, err = s.server.Connect(ctx, "udp", ids)
 		if err != nil {
 			return nil, err
 		}

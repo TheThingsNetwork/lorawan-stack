@@ -186,13 +186,13 @@ type gatewayTopics struct {
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
-	id, err := unique.ToGatewayID(info.Username)
+	ids, err := unique.ToGatewayID(info.Username)
 	if err != nil {
 		return nil, err
 	}
 
 	md := metadata.New(map[string]string{
-		"id":            id.GatewayID,
+		"id":            ids.GatewayID,
 		"authorization": fmt.Sprintf("Key %s", info.Password),
 	})
 	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
@@ -200,18 +200,18 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	}
 	ctx = metadata.NewIncomingContext(ctx, md)
 
-	ctx, id, err = c.server.FillGatewayContext(ctx, id)
+	ctx, ids, err = c.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
-	uid := unique.ID(ctx, id)
+	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
-	c.io, err = c.server.Connect(ctx, "mqtt", id)
+	c.io, err = c.server.Connect(ctx, "mqtt", ids)
 	if err != nil {
 		return nil, err
 	}
-	if err = c.server.ClaimDownlink(ctx, id); err != nil {
+	if err = c.server.ClaimDownlink(ctx, ids); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to claim downlink")
 		return nil, err
 	}

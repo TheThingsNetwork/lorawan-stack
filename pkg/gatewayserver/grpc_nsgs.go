@@ -34,13 +34,13 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		return nil, err
 	}
 
-	id := down.TxMetadata.GatewayIdentifiers
+	ids := down.TxMetadata.GatewayIdentifiers
 	// TODO: Remove validation (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
-	if err := validate.ID(id.GatewayID); err != nil {
+	if err := validate.ID(ids.GatewayID); err != nil {
 		return nil, err
 	}
 
-	uid := unique.ID(ctx, id)
+	uid := unique.ID(ctx, ids)
 	val, ok := gs.connections.Load(uid)
 	if !ok {
 		return nil, errNotConnected.WithAttributes("gateway_uid", uid)

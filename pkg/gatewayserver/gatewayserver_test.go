@@ -111,22 +111,22 @@ func TestGatewayServer(t *testing.T) {
 
 	for _, ptc := range []struct {
 		Protocol  string
-		ValidAuth func(ctx context.Context, id ttnpb.GatewayIdentifiers, key string) bool
-		Link      func(ctx context.Context, t *testing.T, id ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+		ValidAuth func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
+		Link      func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
 			Protocol: "grpc",
-			ValidAuth: func(ctx context.Context, id ttnpb.GatewayIdentifiers, key string) bool {
-				return id.GatewayID == registeredGatewayID && key == registeredGatewayKey
+			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
-			Link: func(ctx context.Context, t *testing.T, id ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
 				conn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
 				if err != nil {
 					return err
 				}
 				defer conn.Close()
 				md := rpcmetadata.MD{
-					ID:            id.GatewayID,
+					ID:            ids.GatewayID,
 					AuthType:      "Key",
 					AuthValue:     key,
 					AllowInsecure: true,
@@ -176,16 +176,16 @@ func TestGatewayServer(t *testing.T) {
 		},
 		{
 			Protocol: "mqtt",
-			ValidAuth: func(ctx context.Context, id ttnpb.GatewayIdentifiers, key string) bool {
-				return id.GatewayID == registeredGatewayID && key == registeredGatewayKey
+			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
-			Link: func(ctx context.Context, t *testing.T, id ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if id.GatewayID == "" {
+			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+				if ids.GatewayID == "" {
 					t.SkipNow()
 				}
 				clientOpts := mqtt.NewClientOptions()
 				clientOpts.AddBroker("tcp://0.0.0.0:1882")
-				clientOpts.SetUsername(unique.ID(ctx, id))
+				clientOpts.SetUsername(unique.ID(ctx, ids))
 				clientOpts.SetPassword(key)
 				client := mqtt.NewClient(clientOpts)
 				if token := client.Connect(); !token.WaitTimeout(timeout) {
@@ -208,7 +208,7 @@ func TestGatewayServer(t *testing.T) {
 									errCh <- err
 									return
 								}
-								if token := client.Publish(fmt.Sprintf("v3/%v/up", id.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
+								if token := client.Publish(fmt.Sprintf("v3/%v/up", ids.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
 									errCh <- token.Error()
 									return
 								}
@@ -219,7 +219,7 @@ func TestGatewayServer(t *testing.T) {
 									errCh <- err
 									return
 								}
-								if token := client.Publish(fmt.Sprintf("v3/%v/status", id.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
+								if token := client.Publish(fmt.Sprintf("v3/%v/status", ids.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
 									errCh <- token.Error()
 									return
 								}
@@ -228,7 +228,7 @@ func TestGatewayServer(t *testing.T) {
 					}
 				}()
 				// Read downstream.
-				token := client.Subscribe(fmt.Sprintf("v3/%v/down", id.GatewayID), 1, func(_ mqtt.Client, raw mqtt.Message) {
+				token := client.Subscribe(fmt.Sprintf("v3/%v/down", ids.GatewayID), 1, func(_ mqtt.Client, raw mqtt.Message) {
 					var msg ttnpb.GatewayDown
 					if err := msg.Unmarshal(raw.Payload()); err != nil {
 						errCh <- err
@@ -249,11 +249,11 @@ func TestGatewayServer(t *testing.T) {
 		},
 		{
 			Protocol: "udp",
-			ValidAuth: func(ctx context.Context, id ttnpb.GatewayIdentifiers, key string) bool {
-				return id.EUI != nil
+			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+				return ids.EUI != nil
 			},
-			Link: func(ctx context.Context, t *testing.T, id ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if id.EUI == nil {
+			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+				if ids.EUI == nil {
 					t.SkipNow()
 				}
 				upConn, err := net.Dial("udp", ":1700")
@@ -276,7 +276,7 @@ func TestGatewayServer(t *testing.T) {
 						case up := <-upCh:
 							token++
 							packet := encoding.Packet{
-								GatewayEUI:      id.EUI,
+								GatewayEUI:      ids.EUI,
 								ProtocolVersion: encoding.Version1,
 								Token:           [2]byte{0x00, token},
 								PacketType:      encoding.PushData,
@@ -311,7 +311,7 @@ func TestGatewayServer(t *testing.T) {
 						case <-ticker.C:
 							token++
 							pull := encoding.Packet{
-								GatewayEUI:      id.EUI,
+								GatewayEUI:      ids.EUI,
 								ProtocolVersion: encoding.Version1,
 								Token:           [2]byte{0x01, token},
 								PacketType:      encoding.PullData,
@@ -420,7 +420,7 @@ func TestGatewayServer(t *testing.T) {
 			ctx, cancel := context.WithCancel(ctx)
 			upCh := make(chan *ttnpb.GatewayUp)
 			downCh := make(chan *ttnpb.GatewayDown)
-			id := ttnpb.GatewayIdentifiers{
+			ids := ttnpb.GatewayIdentifiers{
 				GatewayID: registeredGatewayID,
 				EUI:       &registeredGatewayEUI,
 			}
@@ -433,14 +433,14 @@ func TestGatewayServer(t *testing.T) {
 			}
 			defer statsConn.Close()
 			statsCtx := metadata.AppendToOutgoingContext(test.Context(),
-				"id", id.GatewayID,
+				"id", ids.GatewayID,
 				"authorization", fmt.Sprintf("Key %v", registeredGatewayKey),
 			)
 			statsClient := ttnpb.NewGsClient(statsConn)
 
 			// The gateway should not be connected before testing traffic.
 			t.Run("NotConnected", func(t *testing.T) {
-				_, err := statsClient.GetGatewayConnectionStats(statsCtx, &id)
+				_, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 				if !a.So(errors.IsNotFound(err), should.BeTrue) {
 					t.Fatal("Expected gateway not to be connected yet, but it is")
 				}
@@ -450,7 +450,7 @@ func TestGatewayServer(t *testing.T) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				err := ptc.Link(ctx, t, id, registeredGatewayKey, upCh, downCh)
+				err := ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
 				if !errors.IsCanceled(err) {
 					t.Fatalf("Expected context canceled, but have %v", err)
 				}
@@ -485,7 +485,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
-											GatewayIdentifiers: id,
+											GatewayIdentifiers: ids,
 											Timestamp:          4242000,
 											RSSI:               -69,
 											SNR:                11,
@@ -509,7 +509,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
-											GatewayIdentifiers: id,
+											GatewayIdentifiers: ids,
 											Timestamp:          4242000,
 											RSSI:               -69,
 											SNR:                11,
@@ -535,7 +535,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
-											GatewayIdentifiers: id,
+											GatewayIdentifiers: ids,
 											Timestamp:          1234560000,
 											RSSI:               -112,
 											SNR:                2,
@@ -553,7 +553,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
-											GatewayIdentifiers: id,
+											GatewayIdentifiers: ids,
 											Timestamp:          4242000,
 											RSSI:               -69,
 											SNR:                11,
@@ -571,7 +571,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
-											GatewayIdentifiers: id,
+											GatewayIdentifiers: ids,
 											Timestamp:          2424000,
 											RSSI:               -36,
 											SNR:                5,
@@ -611,7 +611,7 @@ func TestGatewayServer(t *testing.T) {
 						// Wait for gateway status to be processed; no event available here.
 						time.Sleep(timeout)
 
-						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &id)
+						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
@@ -654,7 +654,7 @@ func TestGatewayServer(t *testing.T) {
 								Frequency:       869525000,
 							},
 							TxMetadata: ttnpb.TxMetadata{
-								GatewayIdentifiers: id,
+								GatewayIdentifiers: ids,
 								Timestamp:          0,
 							},
 						},
@@ -671,7 +671,7 @@ func TestGatewayServer(t *testing.T) {
 								Frequency:       869525000,
 							},
 							TxMetadata: ttnpb.TxMetadata{
-								GatewayIdentifiers: id,
+								GatewayIdentifiers: ids,
 								Timestamp:          0,
 							},
 						},
@@ -694,7 +694,7 @@ func TestGatewayServer(t *testing.T) {
 
 						select {
 						case msg := <-downCh:
-							msg.DownlinkMessage.TxMetadata.GatewayIdentifiers = id
+							msg.DownlinkMessage.TxMetadata.GatewayIdentifiers = ids
 							a.So(msg.DownlinkMessage.Settings, should.Resemble, tc.Message.Settings)
 							a.So(msg.DownlinkMessage.TxMetadata, should.Resemble, tc.Message.TxMetadata)
 							a.So(msg.DownlinkMessage.RawPayload, should.Resemble, tc.Message.RawPayload)
@@ -702,7 +702,7 @@ func TestGatewayServer(t *testing.T) {
 							t.Fatal("Expected downlink timeout")
 						}
 
-						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &id)
+						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
@@ -719,7 +719,7 @@ func TestGatewayServer(t *testing.T) {
 
 			// After canceling the context and awaiting the link, the connection should be gone.
 			t.Run("Disconnected", func(t *testing.T) {
-				_, err := statsClient.GetGatewayConnectionStats(statsCtx, &id)
+				_, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 				if !a.So(errors.IsNotFound(err), should.BeTrue) {
 					t.Fatalf("Expected gateway to be disconnected, but it's not")
 				}
