@@ -43,6 +43,6 @@ message JoinRequest {
 message JoinResponse {
   bytes raw_payload = 1;
   SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.Duration lifetime = 3;
+  google.protobuf.Duration lifetime = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
   repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
 }
