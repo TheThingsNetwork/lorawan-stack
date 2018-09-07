@@ -141,13 +141,6 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayID.GatewayID),
-				Message: &ttnpb.DownlinkMessage{
-					RawPayload: []byte{0x02},
-				},
-				OK: false, // downlink to an uplink topic
-			},
-			{
 				Topic: fmt.Sprintf("v3/%v/up", "invalid-gateway"),
 				Message: &ttnpb.UplinkMessage{
 					RawPayload: []byte{0x03},
