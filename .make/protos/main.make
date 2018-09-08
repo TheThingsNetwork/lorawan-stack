@@ -21,7 +21,6 @@ PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.9
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
                      --mount type=bind,src=$(PWD)/api,dst=$(PROTOC_STACK_PATH)/api,ro=true \
                      --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_STACK_PATH)/pkg/ttnpb \
-                     --mount type=bind,src=$(PWD)/vendor,dst=$(PROTOC_STACK_PATH)/vendor,ro=true \
                      -w $(PROTOC_STACK_PATH)
 PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(PROTOC_GOPATH)/src
 
