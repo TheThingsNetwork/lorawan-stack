@@ -1396,24 +1396,24 @@ outer:
 			err = handleLinkCheckReq(ctx, dev.EndDevice, msg)
 		case ttnpb.CID_LINK_ADR:
 			pld := cmd.GetLinkADRAns()
-			i := 0
-			for i = range cmds {
-				switch {
-				case cmds[i].CID != ttnpb.CID_LINK_ADR,
-					dev.EndDevice.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_1) <= 0:
-					break
-
-				case dev.EndDevice.LoRaWANVersion == ttnpb.MAC_V1_0_2 && *cmds[i].GetLinkADRAns() != *pld,
-					dev.EndDevice.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
-					err = errInvalidPayload
-					break
+			dupCount := 0
+			if dev.EndDevice.MACState.LoRaWANVersion == ttnpb.MAC_V1_0_2 {
+				for _, dup := range cmds {
+					if dup.CID != ttnpb.CID_LINK_ADR {
+						break
+					}
+					if *dup.GetLinkADRAns() != *pld {
+						err = errInvalidPayload
+						break
+					}
+					dupCount++
 				}
 			}
 			if err != nil {
 				break
 			}
-			cmds = cmds[i:]
-			err = handleLinkADRAns(ctx, dev.EndDevice, pld, uint(i+1), ns.Component.FrequencyPlans)
+			cmds = cmds[dupCount:]
+			err = handleLinkADRAns(ctx, dev.EndDevice, pld, uint(dupCount), ns.Component.FrequencyPlans)
 		case ttnpb.CID_DUTY_CYCLE:
 			err = handleDutyCycleAns(ctx, dev.EndDevice)
 		case ttnpb.CID_RX_PARAM_SETUP:

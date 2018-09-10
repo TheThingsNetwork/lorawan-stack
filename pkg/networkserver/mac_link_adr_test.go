@@ -37,7 +37,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 	}{
 		{
 			Name:     "nil payload",
-			DupCount: 1,
+			DupCount: 0,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -55,7 +55,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		},
 		{
 			Name:     "no request",
-			DupCount: 1,
+			DupCount: 0,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -73,7 +73,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		},
 		{
 			Name:     "1 request/all ack",
-			DupCount: 1,
+			DupCount: 0,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -132,7 +132,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		},
 		{
 			Name:     "1.1/2 requests/all ack",
-			DupCount: 1,
+			DupCount: 0,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -216,7 +216,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		},
 		{
 			Name:     "1.0.2/2 requests/all ack",
-			DupCount: 2,
+			DupCount: 1,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -301,7 +301,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		},
 		{
 			Name:     "1.0/2 requests/all ack",
-			DupCount: 1,
+			DupCount: 0,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
