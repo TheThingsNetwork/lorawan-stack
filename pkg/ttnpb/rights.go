@@ -24,7 +24,6 @@ var (
 	AllApplicationRights  = &Rights{}
 	AllGatewayRights      = &Rights{}
 	AllOrganizationRights = &Rights{}
-	otherRights           = &Rights{}
 	AllRights             = &Rights{}
 )
 
@@ -40,13 +39,13 @@ func init() {
 		case strings.HasPrefix(k, "RIGHT_ORGANIZATION_"):
 			AllOrganizationRights.Rights = append(AllOrganizationRights.Rights, Right(v))
 		}
+		AllRights.Rights = append(AllRights.Rights, Right(v))
 	}
 	AllUserRights = AllUserRights.Sorted()
 	AllApplicationRights = AllApplicationRights.Sorted()
 	AllGatewayRights = AllGatewayRights.Sorted()
 	AllOrganizationRights = AllOrganizationRights.Sorted()
-	otherRights = RightsFrom(RIGHT_SEND_INVITES)
-	AllRights = AllRights.Union(AllUserRights, AllApplicationRights, AllGatewayRights, AllOrganizationRights, otherRights).Sorted()
+	AllRights = AllRights.Sorted()
 }
 
 // Implied returns the Right together with its implied rights.
@@ -61,7 +60,7 @@ func (r Right) Implied() *Rights {
 		return AllGatewayRights
 	case RIGHT_ORGANIZATION_ALL:
 		return AllOrganizationRights
-	case RIGHT_ADMIN:
+	case RIGHT_ALL:
 		return AllRights
 	}
 	return RightsFrom(r)

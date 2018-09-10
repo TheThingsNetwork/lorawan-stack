@@ -142,7 +142,7 @@ enum Right {
   RIGHT_SEND_INVITES = 52; // note that this is not prefixed with "USER_"; it is not a right on the user entity.
 
   // The pseudo-right for all (current and future) possible rights.
-  RIGHT_ADMIN = 53;
+  RIGHT_ALL = 53;
 }
 
 message Rights {

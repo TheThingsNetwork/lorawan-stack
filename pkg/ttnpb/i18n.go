@@ -154,5 +154,7 @@ func init() {
 	defineEnum(RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR, "add the organization as a collaborator on an existing entity")
 	defineEnum(RIGHT_ORGANIZATION_ALL, "all organization rights")
 
-	defineEnum(RIGHT_ADMIN, "admin rights")
+	defineEnum(RIGHT_SEND_INVITES, "send user invites")
+
+	defineEnum(RIGHT_ALL, "all possible rights")
 }
