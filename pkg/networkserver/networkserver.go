@@ -376,7 +376,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		}
 	}
 
-	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.LoRaWANVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || dev.Session.NwkSEncKey.Key.IsZero() {
 			return nil, errMissingNwkSEncKey
 		}
@@ -1249,7 +1249,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	if err != nil {
 		return errDeviceNotFound.WithCause(err)
 	}
-	if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		// LoRaWAN1.1+ device will send a RekeyInd.
 		dev.SessionFallback = nil
 	}
@@ -1346,7 +1346,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		mac = pld.FRMPayload
 	}
 
-	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.LoRaWANVersion.EncryptFOpts()) {
+	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || dev.Session.NwkSEncKey.Key.IsZero() {
 			return errMissingNwkSEncKey
 		}
@@ -1547,7 +1547,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			DevAddr: &devAddr,
 		},
 		NetID:              ns.NetID,
-		SelectedMacVersion: dev.LoRaWANVersion,
+		SelectedMacVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
 		RxDelay:            dev.MACState.DesiredMACParameters.Rx1Delay,
 		CFList:             frequencyplans.CFList(fp, dev.LoRaWANPHYVersion),
 		DownlinkSettings: ttnpb.DLSettings{
@@ -1582,7 +1582,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		dev.MACState.Rx1Delay = req.RxDelay
 		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
 		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
-		if req.DownlinkSettings.OptNeg && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
+		if req.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
 			// The version will be further negotiated via RekeyInd/RekeyConf
 			dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 		}
