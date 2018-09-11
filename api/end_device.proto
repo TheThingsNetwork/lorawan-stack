@@ -279,9 +279,9 @@ message EndDevice {
   // Device root keys stored by the Join Server.
   RootKeys root_keys = 19;
   // The address (host:port) of the Network Server associated with this device.
-  string network_server_address = 20 [(gogoproto.customname) = "NetworkServerAddress"];
+  string network_server_address = 20;
   // The address (host:port) of the Application Server associated with this device.
-  string application_server_address = 21 [(gogoproto.customname) = "ApplicationServerAddress"];
+  string application_server_address = 21;
 
   // NOTE: Join Server address can be derived from join EUI.
 

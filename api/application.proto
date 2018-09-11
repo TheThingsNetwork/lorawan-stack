@@ -19,7 +19,6 @@ import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/contact_info.proto";
-import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
 import "lorawan-stack/api/rights.proto";
