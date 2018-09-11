@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-const memFetcherSeparator = "."
+const memFetcherSeparator = "/"
 
 // MemFetcher represents the memory fetcher.
 type memFetcher struct {
