@@ -47,11 +47,13 @@ type asImplementation struct {
 	up chan *ttnpb.ApplicationUp
 }
 
-func (as *asImplementation) SetApplicationAPIKey(context.Context, *ttnpb.SetAsApplicationAPIKeyRequest) (*types.Empty, error) {
+func (as *asImplementation) GetLink(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
 	return nil, errors.New("not implemented")
 }
-
-func (as *asImplementation) DeleteApplicationAPIKey(context.Context, *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (as *asImplementation) SetLink(context.Context, *ttnpb.SetApplicationLinkRequest) (*types.Empty, error) {
+	return nil, errors.New("not implemented")
+}
+func (as *asImplementation) DeleteLink(context.Context, *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return nil, errors.New("not implemented")
 }
 
