@@ -31,8 +31,10 @@ func TestFrequencyPlans(t *testing.T) {
 	euFP, err := fp.GetByID(test.EUFrequencyPlanID)
 	a.So(err, should.BeNil)
 	a.So(euFP.BandID, should.Equal, "EU_863_870")
+
 	krFP, err := fp.GetByID(test.KRFrequencyPlanID)
-	a.So(krFP.Channels[0].Frequency, should.Equal, 922100000)
+	a.So(err, should.BeNil)
+	a.So(krFP.UplinkChannels[0].Frequency, should.Equal, 922100000)
 
 	a.So(err, should.BeNil)
 }

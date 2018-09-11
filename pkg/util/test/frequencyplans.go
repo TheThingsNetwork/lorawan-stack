@@ -21,17 +21,26 @@ import (
 const (
 	frequencyPlansDescription = `- id: EU_863_870
   description: Europe 868MHz
-  base_freq: 868
+  base-frequency: 868
   file: EU_863_870.yml
 - id: KR_920_923
   description: Korea 920-923MHz
-  base_freq: 915
+  base-frequency: 915
   file: KR_920_923.yml`
 
 	// EUFrequencyPlanID available in the store.
 	EUFrequencyPlanID = "EU_863_870"
 	euFrequencyPlan   = `band-id: EU_863_870
-channels:
+uplink-channels:
+- frequency: 867100000
+- frequency: 867300000
+- frequency: 867500000
+- frequency: 867700000
+- frequency: 867900000
+- frequency: 868100000
+- frequency: 868300000
+- frequency: 868500000
+downlink-channels:
 - frequency: 867100000
 - frequency: 867300000
 - frequency: 867500000
@@ -52,7 +61,15 @@ fsk-channel:
 	// KRFrequencyPlanID available in the store.
 	KRFrequencyPlanID = "KR_920_923"
 	krFrequencyPlan   = `band-id: KR_920_923
-channels:
+uplink-channels:
+- frequency: 922100000
+- frequency: 922300000
+- frequency: 922500000
+- frequency: 922700000
+- frequency: 922900000
+- frequency: 923100000
+- frequency: 923300000
+downlink-channels:
 - frequency: 922100000
 - frequency: 922300000
 - frequency: 922500000
