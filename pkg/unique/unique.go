@@ -73,6 +73,11 @@ func ID(ctx context.Context, id ttnpb.Identifiers) (res string) {
 
 var errFormat = errors.DefineInvalidArgument("format", "invalid format in value `{value}`")
 
+// WithContext returns the given context.
+func WithContext(ctx context.Context, uid string) (context.Context, error) {
+	return ctx, nil
+}
+
 // ToApplicationID returns the application identifier of the specified unique ID.
 func ToApplicationID(uid string) (ttnpb.ApplicationIdentifiers, error) {
 	return ttnpb.ApplicationIdentifiers{ApplicationID: uid}, nil
