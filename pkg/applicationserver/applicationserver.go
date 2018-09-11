@@ -15,98 +15,50 @@
 package applicationserver
 
 import (
-	"context"
-
-	ptypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // ApplicationServer implements the Application Server component.
 //
-// The Application Server exposes the As, DeviceRegistry and ApplicationDownlinkQueue services.
+// The Application Server exposes the As, AsDeviceRegistry and ApplicationDownlinkQueue services.
 type ApplicationServer struct {
 	*component.Component
-	ApplicationRegistryRPC *applicationregistry.RegistryRPC
-	applicationRegistry    applicationregistry.Interface
-	DeviceRegistryRPC      *deviceregistry.RegistryRPC
-	deviceRegistry         deviceregistry.Interface
+
+	config *Config
 }
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	ApplicationRegistry applicationregistry.Interface
-	DeviceRegistry      deviceregistry.Interface
+	Devices DeviceRegistry
+	Links   LinkRegistry
 }
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	as := &ApplicationServer{
-		Component:           c,
-		applicationRegistry: conf.ApplicationRegistry,
-		deviceRegistry:      conf.DeviceRegistry,
+		Component: c,
+		config:    conf,
 	}
-
-	applicationRegistryRPC, err := applicationregistry.NewRPC(c, conf.ApplicationRegistry)
-	if err != nil {
-		return nil, err
-	}
-	as.ApplicationRegistryRPC = applicationRegistryRPC
-
-	deviceRegistryRPC, err := deviceregistry.NewRPC(c, conf.DeviceRegistry, deviceregistry.ForComponents(ttnpb.PeerInfo_APPLICATION_SERVER))
-	if err != nil {
-		return nil, err
-	}
-	as.DeviceRegistryRPC = deviceRegistryRPC
 
 	c.RegisterGRPC(as)
 	return as, nil
-}
-
-// Subscribe subscribes to application uplink messages for an EndDevice filter.
-func (as *ApplicationServer) Subscribe(req *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
-	return status.Errorf(codes.Unimplemented, "not implemented")
-}
-
-// DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
-func (as *ApplicationServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*ptypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
-}
-
-// DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
-func (as *ApplicationServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*ptypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
-}
-
-// DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
-func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
-}
-
-// DownlinkQueueClear is called by the Application Server to clear the downlink queue for a device.
-func (as *ApplicationServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ptypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
 	ttnpb.RegisterAsApplicationDownlinkQueueServer(s, as)
-	ttnpb.RegisterAsApplicationRegistryServer(s, as.ApplicationRegistryRPC)
-	ttnpb.RegisterAsDeviceRegistryServer(s, as.DeviceRegistryRPC)
+	// TODO: Register AsDeviceRegistryServer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterAsHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsApplicationDownlinkQueueHandler(as.Context(), s, conn)
-	ttnpb.RegisterAsApplicationRegistryHandler(as.Context(), s, conn)
-	ttnpb.RegisterAsDeviceRegistryHandler(as.Context(), s, conn)
+	// TODO: Register AsDeviceRegistryHandler (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 
 // Roles returns the roles that the Application Server fulfills.
