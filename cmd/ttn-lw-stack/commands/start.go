@@ -17,7 +17,6 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -41,6 +40,7 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
+			// TODO: Replace by new registry (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 			nsRedis := redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"ns", "devices"},
@@ -48,20 +48,16 @@ var (
 			})
 			config.NS.Registry = deviceregistry.New(store.NewByteMapStoreClient(nsRedis))
 
-			asAppsRedis := redis.New(&redis.Config{
+			config.AS.Links = applicationserver.NewRedisLinkRegistry(redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "applications"},
-				IndexKeys: applicationregistry.Identifiers,
-			})
-			config.AS.ApplicationRegistry = applicationregistry.New(store.NewByteMapStoreClient(asAppsRedis))
-
-			asDevsRedis := redis.New(&redis.Config{
+			}))
+			config.AS.Devices = applicationserver.NewRedisDeviceRegistry(redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
-				IndexKeys: deviceregistry.Identifiers,
-			})
-			config.AS.DeviceRegistry = deviceregistry.New(store.NewByteMapStoreClient(asDevsRedis))
+			}))
 
+			// TODO: Replace by new registry (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 			jsRedis := redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"js", "devices"},

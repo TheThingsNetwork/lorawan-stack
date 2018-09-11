@@ -17,11 +17,8 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
-	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/redis"
 )
 
@@ -35,21 +32,14 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
-			appsRedis := redis.New(&redis.Config{
+			config.AS.Links = applicationserver.NewRedisLinkRegistry(redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "applications"},
-				IndexKeys: applicationregistry.Identifiers,
-			})
-			appsReg := applicationregistry.New(store.NewByteMapStoreClient(appsRedis))
-			config.AS.ApplicationRegistry = appsReg
-
-			devsRedis := redis.New(&redis.Config{
+			}))
+			config.AS.Devices = applicationserver.NewRedisDeviceRegistry(redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
-				IndexKeys: deviceregistry.Identifiers,
-			})
-			devsReg := deviceregistry.New(store.NewByteMapStoreClient(devsRedis))
-			config.AS.DeviceRegistry = devsReg
+			}))
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
