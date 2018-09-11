@@ -15,7 +15,6 @@
 package devicerepository_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -26,19 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-type testFetcher map[string][]byte
-
-var errNotFound = errors.DefineNotFound("not_found", "not found")
-
-func (t testFetcher) File(name ...string) ([]byte, error) {
-	if content, ok := t[strings.Join(name, "/")]; ok {
-		return content, nil
-	}
-	return nil, errNotFound
-}
-
 var (
-	validFetcher = testFetcher(map[string][]byte{
+	validFetcher = fetch.NewMemFetcher(map[string][]byte{
 		"brands.yml": []byte(`version: '3'
 brands:
   thethingsproducts:
@@ -64,12 +52,12 @@ hardware_versions:
           parameter: encoder.js`),
 		"thethingsproducts/thethingsuno/1.0/encoder.js": []byte(`function Encoder() { return { led: 1 } }`)})
 
-	invalidFetcher = testFetcher(map[string][]byte{
+	invalidFetcher = fetch.NewMemFetcher(map[string][]byte{
 		"brands.yml":                                  []byte(`invalid yaml`),
 		"thethingsproducts/devices.yml":               []byte(`invalid yaml`),
 		"thethingsproducts/thethingsuno/versions.yml": []byte(`invalid yaml`)})
 
-	emptyFetcher = testFetcher(map[string][]byte{})
+	emptyFetcher = fetch.NewMemFetcher(map[string][]byte{})
 )
 
 func TestBrand(t *testing.T) {
@@ -124,10 +112,9 @@ func TestDeviceModels(t *testing.T) {
 		ExpectedValue interface{}
 	}{
 		{
-			Name:        "Normal",
-			BrandID:     "thethingsproducts",
-			Fetcher:     validFetcher,
-			ExpectedErr: func(err error) bool { return err == nil },
+			Name:    "Normal",
+			BrandID: "thethingsproducts",
+			Fetcher: validFetcher,
 			ExpectedValue: map[string]ttnpb.EndDeviceModel{
 				"thethingsuno": {
 					BrandID: "thethingsproducts",
@@ -161,7 +148,11 @@ func TestDeviceModels(t *testing.T) {
 
 			repo := Client{Fetcher: tc.Fetcher}
 			models, err := repo.DeviceModels(tc.BrandID)
-			if a.So(tc.ExpectedErr(err), should.BeTrue) && err == nil {
+			if tc.ExpectedErr == nil {
+				if err != nil {
+					t.Fatalf("Did not expect error but got %v", err)
+				}
+			} else if a.So(tc.ExpectedErr(err), should.BeTrue) && err == nil {
 				a.So(models, should.Resemble, tc.ExpectedValue)
 			}
 		})
