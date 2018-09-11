@@ -184,12 +184,14 @@ func TestDeviceVersions(t *testing.T) {
 			ExpectedErr: func(err error) bool { return err == nil },
 			ExpectedValue: []ttnpb.EndDeviceVersion{
 				{
-					BrandID:         "thethingsproducts",
-					ModelID:         "thethingsuno",
-					HardwareVersion: "1.0",
-					FirmwareVersion: "1.1",
-					Photos:          []string{"front.jpg", "back.jpg"},
-					DefaultFormatters: ttnpb.EndDeviceFormatters{
+					EndDeviceVersionIdentifiers: ttnpb.EndDeviceVersionIdentifiers{
+						BrandID:         "thethingsproducts",
+						ModelID:         "thethingsuno",
+						HardwareVersion: "1.0",
+						FirmwareVersion: "1.1",
+					},
+					Photos: []string{"front.jpg", "back.jpg"},
+					DefaultFormatters: ttnpb.MessagePayloadFormatters{
 						UpFormatter:            ttnpb.PayloadFormatter_FORMATTER_GRPC_SERVICE,
 						UpFormatterParameter:   "hosted-service:1234",
 						DownFormatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,

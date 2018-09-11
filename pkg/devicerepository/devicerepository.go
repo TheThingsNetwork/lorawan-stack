@@ -28,8 +28,7 @@ type Client struct {
 }
 
 type brand struct {
-	id string
-
+	id    string
 	Name  string   `yaml:"name,omitempty"`
 	URL   string   `yaml:"url,omitempty"`
 	Logos []string `yaml:"logos,omitempty"`
@@ -156,7 +155,7 @@ func (c Client) DeviceVersions(brandID, modelID string) ([]ttnpb.EndDeviceVersio
 				}
 			}
 
-			formatters := ttnpb.EndDeviceFormatters{}
+			formatters := ttnpb.MessagePayloadFormatters{}
 			if version.PayloadFormats.Up != nil {
 				formatters.UpFormatter, formatters.UpFormatterParameter, err = parseFormatter(*version.PayloadFormats.Up)
 				if err != nil {
@@ -175,10 +174,12 @@ func (c Client) DeviceVersions(brandID, modelID string) ([]ttnpb.EndDeviceVersio
 			}
 
 			versions = append(versions, ttnpb.EndDeviceVersion{
-				BrandID:           brandID,
-				ModelID:           modelID,
-				HardwareVersion:   hwVersion,
-				FirmwareVersion:   version.FirmwareVersion,
+				EndDeviceVersionIdentifiers: ttnpb.EndDeviceVersionIdentifiers{
+					BrandID:         brandID,
+					ModelID:         modelID,
+					HardwareVersion: hwVersion,
+					FirmwareVersion: version.FirmwareVersion,
+				},
 				Photos:            version.Photos,
 				DefaultFormatters: formatters,
 			})
