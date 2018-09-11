@@ -16,12 +16,15 @@ package test
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
+
+var colorTerm = os.Getenv("COLORTERM") != "0"
 
 type kv struct {
 	k string
@@ -69,10 +72,18 @@ func (l *testLogger) format(level log.Level, msg string, v ...interface{}) strin
 	if len(v) > 0 {
 		msg = fmt.Sprintf(msg, v...)
 	}
-	formatted := fmt.Sprintf("\033[%dm%6s\033[0m %-40s", log.Colors[level], strings.ToUpper(level.String()), msg)
+	levelStr := strings.ToUpper(level.String())
+	if colorTerm {
+		levelStr = fmt.Sprintf("\033[%dm%6s\033[0m", log.Colors[level], level)
+	}
+	formatted := fmt.Sprintf("%s %-40s", levelStr, msg)
 	if len(l.fields) > 0 {
 		for _, kv := range l.fields.unique().sorted() {
-			formatted += fmt.Sprintf(" \033[%dm%s\033[0m=%v", log.Colors[level], kv.k, kv.v)
+			key := kv.k
+			if colorTerm {
+				key = fmt.Sprintf(" \033[%dm%s\033[0m", log.Colors[level], kv.k)
+			}
+			formatted += fmt.Sprintf(" %s=%v", key, kv.v)
 		}
 	}
 	return formatted
