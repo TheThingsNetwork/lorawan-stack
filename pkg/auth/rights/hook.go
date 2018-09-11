@@ -61,8 +61,10 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		combined := ids.CombinedIdentifiers()
 		results := Rights{
 			ApplicationRights:  make(map[string]*ttnpb.Rights, len(combined.ApplicationIDs)),
+			ClientRights:       make(map[string]*ttnpb.Rights, len(combined.ClientIDs)),
 			GatewayRights:      make(map[string]*ttnpb.Rights, len(combined.GatewayIDs)),
 			OrganizationRights: make(map[string]*ttnpb.Rights, len(combined.OrganizationIDs)),
+			UserRights:         make(map[string]*ttnpb.Rights, len(combined.UserIDs)),
 		}
 		for _, id := range combined.ApplicationIDs {
 			uid := unique.ID(ctx, id)
@@ -72,6 +74,18 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 				results.ApplicationRights[uid] = rights
 			case errors.IsPermissionDenied(err):
 				results.ApplicationRights[uid] = nil
+			default:
+				return nil, err
+			}
+		}
+		for _, id := range combined.ClientIDs {
+			uid := unique.ID(ctx, id)
+			rights, err := fetcher.ClientRights(ctx, *id)
+			switch {
+			case err == nil:
+				results.ClientRights[uid] = rights
+			case errors.IsPermissionDenied(err):
+				results.ClientRights[uid] = nil
 			default:
 				return nil, err
 			}
@@ -96,6 +110,18 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 				results.OrganizationRights[uid] = rights
 			case errors.IsPermissionDenied(err):
 				results.OrganizationRights[uid] = nil
+			default:
+				return nil, err
+			}
+		}
+		for _, id := range combined.UserIDs {
+			uid := unique.ID(ctx, id)
+			rights, err := fetcher.UserRights(ctx, *id)
+			switch {
+			case err == nil:
+				results.UserRights[uid] = rights
+			case errors.IsPermissionDenied(err):
+				results.UserRights[uid] = nil
 			default:
 				return nil, err
 			}

@@ -44,7 +44,11 @@ func TestCache(t *testing.T) {
 
 	c := NewInMemoryCache(mockFetcher, 5*time.Minute, time.Minute).(*inMemoryCache)
 
-	mockFetcher.applicationError, mockFetcher.gatewayError, mockFetcher.organizationError = mockErr, mockErr, mockErr
+	mockFetcher.applicationError = mockErr
+	mockFetcher.clientError = mockErr
+	mockFetcher.gatewayError = mockErr
+	mockFetcher.organizationError = mockErr
+	mockFetcher.userError = mockErr
 
 	ctxA := context.WithValue(test.Context(), struct{}{}, "A")
 	res := fetchRights(ctxA, "foo", c)

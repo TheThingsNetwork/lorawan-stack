@@ -27,6 +27,11 @@ var errMissingApplicationRights = errors.DefinePermissionDenied(
 	"missing rights for application `{uid}`",
 )
 
+var errMissingClientRights = errors.DefinePermissionDenied(
+	"missing_client_rights",
+	"missing rights for client `{uid}`",
+)
+
 var errMissingGatewayRights = errors.DefinePermissionDenied(
 	"missing_gateway_rights",
 	"missing rights for gateway `{uid}`",
@@ -37,8 +42,13 @@ var errMissingOrganizationRights = errors.DefinePermissionDenied(
 	"missing rights for organization `{uid}`",
 )
 
+var errMissingUserRights = errors.DefinePermissionDenied(
+	"missing_user_rights",
+	"missing rights for user `{uid}`",
+)
+
 // RequireApplication checks that context contains the required rights for the
-// given Application ID.
+// given application ID.
 func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
 	appUID := unique.ID(ctx, appID)
 	rights, ok := FromContext(ctx)
@@ -62,8 +72,33 @@ func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers,
 	return nil
 }
 
+// RequireClient checks that context contains the required rights for the
+// given client ID.
+func RequireClient(ctx context.Context, cliID ttnpb.ClientIdentifiers, required ...ttnpb.Right) error {
+	cliUID := unique.ID(ctx, cliID)
+	rights, ok := FromContext(ctx)
+	if !ok {
+		fetcher, ok := fetcherFromContext(ctx)
+		if !ok {
+			panic(errNoFetcher)
+		}
+		cliRights, err := fetcher.ClientRights(ctx, cliID)
+		switch {
+		case err == nil, errors.IsPermissionDenied(err):
+			break
+		default:
+			return err
+		}
+		rights.ClientRights = map[string]*ttnpb.Rights{cliUID: cliRights}
+	}
+	if !rights.IncludesClientRights(cliUID, required...) {
+		return errMissingClientRights.WithAttributes("uid", cliUID)
+	}
+	return nil
+}
+
 // RequireGateway checks that context contains the required rights for the
-// given Gateway ID.
+// given gateway ID.
 func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
 	gtwUID := unique.ID(ctx, gtwID)
 	rights, ok := FromContext(ctx)
@@ -108,6 +143,31 @@ func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifier
 	}
 	if !rights.IncludesOrganizationRights(orgUID, required...) {
 		return errMissingOrganizationRights.WithAttributes("uid", orgUID)
+	}
+	return nil
+}
+
+// RequireUser checks that context contains the required rights for the
+// given user ID.
+func RequireUser(ctx context.Context, usrID ttnpb.UserIdentifiers, required ...ttnpb.Right) error {
+	usrUID := unique.ID(ctx, usrID)
+	rights, ok := FromContext(ctx)
+	if !ok {
+		fetcher, ok := fetcherFromContext(ctx)
+		if !ok {
+			panic(errNoFetcher)
+		}
+		usrRights, err := fetcher.UserRights(ctx, usrID)
+		switch {
+		case err == nil, errors.IsPermissionDenied(err):
+			break
+		default:
+			return err
+		}
+		rights.UserRights = map[string]*ttnpb.Rights{usrUID: usrRights}
+	}
+	if !rights.IncludesUserRights(usrUID, required...) {
+		return errMissingUserRights.WithAttributes("uid", usrUID)
 	}
 	return nil
 }

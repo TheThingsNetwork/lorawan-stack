@@ -32,15 +32,23 @@ import (
 func fetchRights(ctx context.Context, id string, f Fetcher) (res struct {
 	AppRights *ttnpb.Rights
 	AppErr    error
+	CliRights *ttnpb.Rights
+	CliErr    error
 	GtwRights *ttnpb.Rights
 	GtwErr    error
 	OrgRights *ttnpb.Rights
 	OrgErr    error
+	UsrRights *ttnpb.Rights
+	UsrErr    error
 }) {
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(5)
 	go func() {
 		res.AppRights, res.AppErr = f.ApplicationRights(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: id})
+		wg.Done()
+	}()
+	go func() {
+		res.CliRights, res.CliErr = f.ClientRights(ctx, ttnpb.ClientIdentifiers{ClientID: id})
 		wg.Done()
 	}()
 	go func() {
@@ -51,22 +59,30 @@ func fetchRights(ctx context.Context, id string, f Fetcher) (res struct {
 		res.OrgRights, res.OrgErr = f.OrganizationRights(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: id})
 		wg.Done()
 	}()
+	go func() {
+		res.UsrRights, res.UsrErr = f.UserRights(ctx, ttnpb.UserIdentifiers{UserID: id})
+		wg.Done()
+	}()
 	wg.Wait()
 	return
 }
 
 type mockIdentityServer struct {
 	ttnpb.ApplicationAccessServer
+	ttnpb.ClientAccessServer
 	ttnpb.GatewayAccessServer
 	ttnpb.OrganizationAccessServer
+	ttnpb.UserAccessServer
 	mockFetcher
 }
 
 func (is *mockIdentityServer) Server() *grpc.Server {
 	srv := grpc.NewServer()
 	ttnpb.RegisterApplicationAccessServer(srv, is)
+	ttnpb.RegisterClientAccessServer(srv, is)
 	ttnpb.RegisterGatewayAccessServer(srv, is)
 	ttnpb.RegisterOrganizationAccessServer(srv, is)
+	ttnpb.RegisterUserAccessServer(srv, is)
 	return srv
 }
 
@@ -76,6 +92,14 @@ func (is *mockIdentityServer) ListApplicationRights(ctx context.Context, ids *tt
 		return nil, is.applicationError
 	}
 	return is.applicationRights, nil
+}
+
+func (is *mockIdentityServer) ListClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+	is.clientCtx, is.clientIDs = ctx, *ids
+	if is.clientError != nil {
+		return nil, is.clientError
+	}
+	return is.clientRights, nil
 }
 
 func (is *mockIdentityServer) ListGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
@@ -92,6 +116,14 @@ func (is *mockIdentityServer) ListOrganizationRights(ctx context.Context, ids *t
 		return nil, is.organizationError
 	}
 	return is.organizationRights, nil
+}
+
+func (is *mockIdentityServer) ListUserRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+	is.userCtx, is.userIDs = ctx, *ids
+	if is.userError != nil {
+		return nil, is.userError
+	}
+	return is.userRights, nil
 }
 
 func TestFetcherFunc(t *testing.T) {
@@ -115,14 +147,18 @@ func TestFetcherFunc(t *testing.T) {
 
 	res := fetchRights(test.Context(), "foo", f)
 	a.So(res.AppErr, should.Resemble, fetcher.err)
+	a.So(res.CliErr, should.Resemble, fetcher.err)
 	a.So(res.GtwErr, should.Resemble, fetcher.err)
 	a.So(res.OrgErr, should.Resemble, fetcher.err)
+	a.So(res.UsrErr, should.Resemble, fetcher.err)
 
-	a.So(fetcher.ids, should.HaveLength, 3)
+	a.So(fetcher.ids, should.HaveLength, 5)
 	a.So(ttnpb.CombineIdentifiers(fetcher.ids...), should.Resemble, &ttnpb.CombinedIdentifiers{
 		ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
+		ClientIDs:       []*ttnpb.ClientIdentifiers{{ClientID: "foo"}},
 		GatewayIDs:      []*ttnpb.GatewayIdentifiers{{GatewayID: "foo"}},
 		OrganizationIDs: []*ttnpb.OrganizationIdentifiers{{OrganizationID: "foo"}},
+		UserIDs:         []*ttnpb.UserIdentifiers{{UserID: "foo"}},
 	})
 }
 
@@ -132,8 +168,10 @@ func TestAccessFetcher(t *testing.T) {
 	is := &mockIdentityServer{
 		mockFetcher: mockFetcher{
 			applicationRights:  ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
+			clientRights:       ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
 			gatewayRights:      ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
 			organizationRights: ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
+			userRights:         ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
 		},
 	}
 	srv := is.Server()
@@ -154,8 +192,10 @@ func TestAccessFetcher(t *testing.T) {
 	}, false)
 	unavailableRes := fetchRights(test.Context(), "foo", unavailableFetcher)
 	a.So(errors.IsUnavailable(unavailableRes.AppErr), should.BeTrue)
+	a.So(errors.IsUnavailable(unavailableRes.CliErr), should.BeTrue)
 	a.So(errors.IsUnavailable(unavailableRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnavailable(unavailableRes.OrgErr), should.BeTrue)
+	a.So(errors.IsUnavailable(unavailableRes.UsrErr), should.BeTrue)
 
 	onlySecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
@@ -163,8 +203,10 @@ func TestAccessFetcher(t *testing.T) {
 
 	bgRes := fetchRights(test.Context(), "foo", onlySecureFetcher)
 	a.So(errors.IsUnauthenticated(bgRes.AppErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(bgRes.CliErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(bgRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(bgRes.OrgErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(bgRes.UsrErr), should.BeTrue)
 
 	md := metadata.Pairs("authorization", "Bearer token")
 	if ctxMd, ok := metadata.FromIncomingContext(test.Context()); ok {
@@ -174,8 +216,10 @@ func TestAccessFetcher(t *testing.T) {
 
 	authRes := fetchRights(authCtx, "foo", onlySecureFetcher)
 	a.So(errors.IsUnauthenticated(authRes.AppErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(authRes.CliErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(authRes.GtwErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(authRes.OrgErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(authRes.UsrErr), should.BeTrue)
 
 	alsoInsecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
@@ -183,10 +227,14 @@ func TestAccessFetcher(t *testing.T) {
 
 	authRes = fetchRights(authCtx, "foo", alsoInsecureFetcher)
 	a.So(authRes.AppErr, should.BeNil)
+	a.So(authRes.CliErr, should.BeNil)
 	a.So(authRes.GtwErr, should.BeNil)
 	a.So(authRes.OrgErr, should.BeNil)
+	a.So(authRes.UsrErr, should.BeNil)
 
 	a.So(authRes.AppRights, should.Resemble, is.mockFetcher.applicationRights)
+	a.So(authRes.CliRights, should.Resemble, is.mockFetcher.clientRights)
 	a.So(authRes.GtwRights, should.Resemble, is.mockFetcher.gatewayRights)
 	a.So(authRes.OrgRights, should.Resemble, is.mockFetcher.organizationRights)
+	a.So(authRes.UsrRights, should.Resemble, is.mockFetcher.userRights)
 }

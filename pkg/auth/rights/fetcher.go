@@ -26,8 +26,10 @@ import (
 // Fetcher interface for rights fetching.
 type Fetcher interface {
 	ApplicationRights(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error)
+	ClientRights(context.Context, ttnpb.ClientIdentifiers) (*ttnpb.Rights, error)
 	GatewayRights(context.Context, ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error)
 	OrganizationRights(context.Context, ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error)
+	UserRights(context.Context, ttnpb.UserIdentifiers) (*ttnpb.Rights, error)
 }
 
 // FetcherFunc is a function that implements the Fetcher interface.
@@ -49,6 +51,13 @@ func (f FetcherFunc) ApplicationRights(ctx context.Context, ids ttnpb.Applicatio
 	return rights, err
 }
 
+// ClientRights implements the Fetcher interface.
+func (f FetcherFunc) ClientRights(ctx context.Context, ids ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+	rights, err := f(ctx, ids)
+	registerRightsFetch(ctx, "client", rights, err)
+	return rights, err
+}
+
 // GatewayRights implements the Fetcher interface.
 func (f FetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := f(ctx, ids)
@@ -60,6 +69,13 @@ func (f FetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentif
 func (f FetcherFunc) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := f(ctx, ids)
 	registerRightsFetch(ctx, "organization", rights, err)
+	return rights, err
+}
+
+// UserRights implements the Fetcher interface.
+func (f FetcherFunc) UserRights(ctx context.Context, ids ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+	rights, err := f(ctx, ids)
+	registerRightsFetch(ctx, "user", rights, err)
 	return rights, err
 }
 
@@ -120,6 +136,23 @@ func (f accessFetcher) ApplicationRights(ctx context.Context, appID ttnpb.Applic
 	return rights, nil
 }
 
+func (f accessFetcher) ClientRights(ctx context.Context, clientID ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+	cc := f.getConn(ctx)
+	if cc == nil {
+		return nil, errNoISConn
+	}
+	ctx, md, err := f.forwardAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rights, err := ttnpb.NewClientAccessClient(cc).ListClientRights(ctx, &clientID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "client", rights, err)
+	if err != nil {
+		return nil, err
+	}
+	return rights, nil
+}
+
 func (f accessFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
@@ -148,6 +181,23 @@ func (f accessFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.Organ
 	}
 	rights, err := ttnpb.NewOrganizationAccessClient(cc).ListOrganizationRights(ctx, &orgID, grpc.PerRPCCredentials(md))
 	registerRightsFetch(ctx, "organization", rights, err)
+	if err != nil {
+		return nil, err
+	}
+	return rights, nil
+}
+
+func (f accessFetcher) UserRights(ctx context.Context, userID ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+	cc := f.getConn(ctx)
+	if cc == nil {
+		return nil, errNoISConn
+	}
+	ctx, md, err := f.forwardAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rights, err := ttnpb.NewUserAccessClient(cc).ListUserRights(ctx, &userID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "user", rights, err)
 	if err != nil {
 		return nil, err
 	}

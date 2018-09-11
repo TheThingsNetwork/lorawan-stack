@@ -87,8 +87,10 @@ func NewInMemoryCache(fetcher Fetcher, successTTL, errorTTL time.Duration) Fetch
 		errorTTL:           errorTTL,
 		lastCleanup:        now(),
 		applicationRights:  make(map[cachedReq]*cachedRes),
+		clientRights:       make(map[cachedReq]*cachedRes),
 		gatewayRights:      make(map[cachedReq]*cachedRes),
 		organizationRights: make(map[cachedReq]*cachedRes),
+		userRights:         make(map[cachedReq]*cachedRes),
 	}
 }
 
@@ -99,8 +101,10 @@ type inMemoryCache struct {
 	mu                 sync.Mutex
 	lastCleanup        time.Time
 	applicationRights  map[cachedReq]*cachedRes
+	clientRights       map[cachedReq]*cachedRes
 	gatewayRights      map[cachedReq]*cachedRes
 	organizationRights map[cachedReq]*cachedRes
+	userRights         map[cachedReq]*cachedRes
 }
 
 // maybeCleanup cleans up expired results if necessary.
@@ -117,6 +121,11 @@ func (f *inMemoryCache) maybeCleanup() {
 			delete(f.applicationRights, req)
 		}
 	}
+	for req, res := range f.clientRights {
+		if !res.valid(f.successTTL, f.errorTTL) {
+			delete(f.clientRights, req)
+		}
+	}
 	for req, res := range f.gatewayRights {
 		if !res.valid(f.successTTL, f.errorTTL) {
 			delete(f.gatewayRights, req)
@@ -125,6 +134,11 @@ func (f *inMemoryCache) maybeCleanup() {
 	for req, res := range f.organizationRights {
 		if !res.valid(f.successTTL, f.errorTTL) {
 			delete(f.organizationRights, req)
+		}
+	}
+	for req, res := range f.userRights {
+		if !res.valid(f.successTTL, f.errorTTL) {
+			delete(f.userRights, req)
 		}
 	}
 	f.lastCleanup = now()
@@ -139,6 +153,22 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.Appli
 		res = newRes()
 		f.applicationRights[req] = res
 		go res.set(f.Fetcher.ApplicationRights(ctx, appID))
+	}
+	f.maybeCleanup()
+	f.mu.Unlock()
+	res.wait()
+	return res.rights, res.err
+}
+
+func (f *inMemoryCache) ClientRights(ctx context.Context, clientID ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
+	defer func() { registerRightsRequest(ctx, "client", rights, err) }()
+	req := newReq(ctx, clientID)
+	f.mu.Lock()
+	res := f.clientRights[req]
+	if !res.valid(f.successTTL, f.errorTTL) {
+		res = newRes()
+		f.clientRights[req] = res
+		go res.set(f.Fetcher.ClientRights(ctx, clientID))
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
@@ -171,6 +201,22 @@ func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.Orga
 		res = newRes()
 		f.organizationRights[req] = res
 		go res.set(f.Fetcher.OrganizationRights(ctx, orgID))
+	}
+	f.maybeCleanup()
+	f.mu.Unlock()
+	res.wait()
+	return res.rights, res.err
+}
+
+func (f *inMemoryCache) UserRights(ctx context.Context, userID ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
+	defer func() { registerRightsRequest(ctx, "user", rights, err) }()
+	req := newReq(ctx, userID)
+	f.mu.Lock()
+	res := f.userRights[req]
+	if !res.valid(f.successTTL, f.errorTTL) {
+		res = newRes()
+		f.userRights[req] = res
+		go res.set(f.Fetcher.UserRights(ctx, userID))
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
