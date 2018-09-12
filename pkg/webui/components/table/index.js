@@ -16,122 +16,195 @@ import React from 'react'
 import PropTypes from '../../lib/prop-types'
 
 import Pagination from '../pagination'
-import Overlay from '../overlay'
-import Message from '../../lib/components/message'
-import DataCell from './data-cell'
-import HeaderCell from './header-cell'
+import Table from './table'
 
-import orders from './orders'
-import style from './table.styl'
+import style from './tabular.styl'
 
-const Table = function ({
-  className,
-  pageCount = 1,
-  headers,
-  rows,
-  emptyMessage,
-  loading = false,
-  page = 0,
-  order = orders.DEFAULT,
-  small = false,
-  orderedBy,
-  onPageChange,
-  onSortByColumn,
-}) {
+@bind
+class Tabular extends React.Component {
 
-  return (
-    <div className={className}>
-      <Overlay visible={loading} loading>
-        <table className={style.table}>
-          <thead>
-            <tr className={style.headerRow}>
-              {headers.map((header, index) => (
-                <HeaderCell
-                  key={index}
-                  centered={header.centered}
-                  active={orderedBy === header.name}
-                  sortable={header.sortable}
-                  name={header.name}
-                  content={header.displayName}
-                  order={order}
-                  onSort={onSortByColumn}
-                />
-              )
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {
-              !!rows.length
-                ? rows.map((row, index) => (
-                  <tr className={style.dataRow} key={index} data-hook="data-row">
-                    {headers.map(function (header, idx) {
-                      return (
-                        <DataCell
-                          key={idx}
-                          centered={header.centered}
-                          small={small}
-                        >
-                          {row[header.name]}
-                        </DataCell>
-                      )
-                    })}
-                  </tr>
-                ))
-                : <tr>
-                  <td colSpan={headers.length} data-hook="empty-message">
-                    <Message
-                      className={style.emptyMessage}
-                      content={emptyMessage}
-                    />
-                  </td>
-                </tr>
-            }
-          </tbody>
-        </table>
-        <Pagination
-          className={style.pagination}
-          disableInitialCallback
-          pageCount={pageCount || 1}
-          onPageChange={function (page) {
-            onPageChange(page.selected)
-          }}
-          forcePage={page}
-        />
-      </Overlay>
-    </div>
-  )
+  onPageChange (page) {
+    this.props.onPageChange(page.selected)
+  }
+
+  onSortRequest (newOrderBy) {
+    const { order, orderBy } = this.props
+    const sameColumn = orderBy === newOrderBy
+
+    if (sameColumn && order === 'asc') {
+      this.props.onSortRequest('desc', orderBy)
+
+      return
+    } else if (sameColumn && order === 'desc') {
+      this.props.onSortRequest(undefined, undefined)
+
+      return
+    }
+
+    this.props.onSortRequest('asc', newOrderBy)
+  }
+
+  render () {
+    const {
+      className,
+      loading = false,
+      small = false,
+      onRowSelect,
+      page,
+      order = undefined,
+      orderBy = undefined,
+      totalCount,
+      pageSize,
+      initialPage = 0,
+      paginated = false,
+      data,
+      headers,
+      emptyMessage,
+    } = this.props
+
+    const onSortRequest = this.onSortRequest
+
+    const columns = (
+      <Table.Row>
+        {
+          headers.map((header, key) => (
+            <Table.HeadCell
+              key={key}
+              centered={header.centered}
+              content={header.sortable ? undefined : header.displayName}
+              name={header.name}
+            >
+              {
+                header.sortable ? (
+                  <Table.SortButton
+                    title={header.displayName}
+                    direction={order}
+                    active={orderBy === header.name}
+                    onSort={function () {
+                      onSortRequest(header.name)
+                    }}
+                  />
+                ) : null
+              }
+            </Table.HeadCell>
+          ))
+        }
+      </Table.Row>
+    )
+
+    const rows = data.length > 0 ? (
+      data.map((row, rowKey) => (
+        <Table.Row
+          key={rowKey}
+          onSelect={
+            row.selectable ? function () {
+              onRowSelect(rowKey)
+            } : undefined
+          }
+        >
+          {
+            headers.map((header, index) => (
+              <Table.DataCell
+                key={index}
+                centered={header.centered}
+                small={small}
+              >
+                {row[headers[index].name]}
+              </Table.DataCell>
+            ))
+          }
+        </Table.Row>
+      ))
+    ) : (
+      <Table.Empty
+        colSpan={headers.length}
+        message={emptyMessage}
+      />
+    )
+
+    const pagination = paginated ? (
+      <Table.Row>
+        <Table.DataCell
+          className={style.paginationCell}
+          colSpan={headers.length}
+          small={small}
+        >
+          <Pagination
+            className={style.pagination}
+            pageCount={Math.ceil(totalCount / pageSize)}
+            initialPage={initialPage}
+            onPageChange={this.onPageChange}
+            disableInitialCallback
+            pageRangeDisplayed={2}
+            forcePage={page}
+          />
+        </Table.DataCell>
+      </Table.Row>
+    ) : null
+
+    return (
+      <div className={className}>
+        <Overlay visible={loading} loading={loading}>
+          <Table>
+            <Table.Head>
+              {columns}
+            </Table.Head>
+            <Table.Body>
+              {rows}
+            </Table.Body>
+            <Table.Footer>
+              {pagination}
+            </Table.Footer>
+          </Table>
+        </Overlay>
+      </div>
+    )
+  }
 }
 
-Table.propTypes = {
-  /** The current page */
+Tabular.propTypes = {
+  /** The current page of the pagination*/
   page: PropTypes.number,
-  /** The total number of pages */
-  pageCount: PropTypes.number,
-  /** The name of a header cell according which the table is sorted */
-  orderedBy: PropTypes.string,
+  /** The initial page of pagination */
+  initialPage: PropTypes.number,
+  /** The total number of available entries */
+  totalCount: PropTypes.number,
+  /** The number of entries to display per page */
+  pageSize: PropTypes.number,
+  /** A flag identifying whether the table should have pagination */
+  paginated: PropTypes.bool,
   /** A flag specifying the height of data cells */
   small: PropTypes.bool,
-  /**  The current order of the table */
-  order: PropTypes.oneOf(Object.values(orders)),
-  /** The header cells of the table */
-  headers: PropTypes.array.isRequired,
-  /** The data rows of the table */
-  rows: PropTypes.array.isRequired,
+  /** The current order of the table */
+  order: PropTypes.string,
+  /** The name of the column that the table is sorted according to */
+  orderBy: PropTypes.string,
   /** The empty message to be displayed when no data provided */
-  emptyMessage: PropTypes.message.isRequired,
+  emptyMessage: PropTypes.oneOfType([ PropTypes.message, PropTypes.string ]).isRequired,
+  /** Function to be called when the table row gets selected */
+  onRowSelect: PropTypes.func,
   /**
    * Function to be called when the page is changed. Passes the new
    * page number as an argument [0...pageCount - 1].
    */
-  onPageChange: PropTypes.func.isRequired,
+  onPageChange: PropTypes.func,
   /**
-   * Function to be called when a sortable header cell is pressed.
-   * Passes the name of a header cell.
+   * Function to be called when the table should be sorted. Passes
+   * the new ordering type and the name of the head cell that the
+   * table should sorted according to.
    */
-  onSortByColumn: PropTypes.func.isRequired,
+  onSortRequest: PropTypes.func,
   /** A flag specifying whether the table should covered with the loading overlay */
   loading: PropTypes.bool,
+  /** A list of data entries to display within the table body */
+  data: PropTypes.arrayOf(PropTypes.object),
+  /** A list of head entries to displat within the table head */
+  headers: PropTypes.arrayOf(PropTypes.shape({
+    displayName: PropTypes.oneOfType([ PropTypes.message, PropTypes.string ]).isRequired,
+    name: PropTypes.string.isRequired,
+    centered: PropTypes.bool,
+    sortable: PropTypes.bool,
+  })),
 }
 
 export default Table
