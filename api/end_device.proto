@@ -44,7 +44,7 @@ message Session {
   uint32 next_a_f_cnt_down = 6;
   // FCnt of the last confirmed downlink message sent. Network Server only.
   uint32 last_conf_f_cnt_down = 7;
-  // Time when the session started. Network Server only.
+  // Time when the session started. Network Server and Application Server.
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
@@ -289,7 +289,7 @@ message EndDevice {
   MACSettings mac_settings = 22 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.
   MACState mac_state = 23 [(gogoproto.customname) = "MACState"];
-  // Current session. Stored in Network Server.
+  // Current session. Stored in Network Server and Application Server.
   Session session = 24;
   // Fallback session (stored in Network Server until RekeyInd is received).
   Session session_fallback = 25;

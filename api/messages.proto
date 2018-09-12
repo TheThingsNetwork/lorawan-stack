@@ -156,7 +156,7 @@ message ApplicationUplink {
 message ApplicationJoinAccept {
   // Join Server issued identifier for the session keys negotiated in this join.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
-  // The (encrypted) Application Session Key.
+  // Encrypted Application Session Key (if Join Server sent it to Network Server).
   KeyEnvelope app_s_key = 2;
 }
 
