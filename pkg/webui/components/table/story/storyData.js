@@ -86,6 +86,16 @@ export default {
     headers,
     rows,
   },
+  paginatedExample: {
+    headers,
+    rows: rows.concat(rows).concat(rows).concat(rows).concat(rows),
+  },
+  clickableRowsExample: {
+    headers,
+    rows: rows.slice(0, 3).map(row => Object.assign({}, row, {
+      clickable: true,
+    })),
+  },
   customCellExample: {
     headers: [ ...headers, {
       name: 'options',

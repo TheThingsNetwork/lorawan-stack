@@ -12,246 +12,282 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import React, { Component } from 'react'
+import React from 'react'
 import bind from 'autobind-decorator'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
+import { action } from '@storybook/addon-actions'
 
-import Button from '../../button'
-import Tabs from '../../tabs'
-import Input from '../../input'
-import orders from '../orders'
-import Table from '../'
-import style from './story.styl'
+import doc from '../table.md'
+
+import Tabular from '../'
 import examples from './storyData'
 
-const PAGE_SIZE = 5
-
-const getNextOrder = function (order) {
-  switch (order) {
-  case orders.DEFAULT:
-    return orders.ASCENDING
-  case orders.ASCENDING:
-    return orders.DESCENDING
-  default:
-    return orders.DEFAULT
-  }
-}
 
 @bind
-class Example extends Component {
-
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      totalSize: props.data.length,
-      dataShown: props.data.slice(0, PAGE_SIZE),
-      page: 0,
-      order: orders.DEFAULT,
-      orderedBy: undefined,
-    }
+class LoadingExample extends React.Component {
+  state = {
+    loading: true,
   }
 
-  onSort (columnName) {
-    const {
-      order,
-      orderedBy,
-    } = this.state
-
-    if (!!order && !!orderedBy && columnName !== orderedBy) {
-      this.onDataRequest(0, getNextOrder(orders.DEFAULT), columnName)
-      return
-    }
-
-    const newOrder = getNextOrder(order)
-    const newOrderedBy = newOrder === orders.DEFAULT ? undefined : columnName
-    this.onDataRequest(0, newOrder, newOrderedBy)
-  }
-
-  onPageChange (page) {
-    const {
-      order,
-      orderedBy,
-    } = this.state
-
-    this.onDataRequest(page, order, orderedBy)
-  }
-
-  componentDidUpdate (prevProps) {
-    const prevLength = prevProps.data.length
-    const newLength = this.props.data.length
-
-    // not robust check, but for this specific example is sufficient
-    if (prevLength !== newLength) {
-      this.setState({
-        totalSize: newLength,
-        dataShown: this.props.data.slice(0, PAGE_SIZE),
-        page: this.props.forcePage,
-      })
-    }
-  }
-
-  onDataRequest (page, order = orders.DEFAULT, orderedBy) {
-    let customSort = null
-    if (order === orders.ASCENDING) {
-      customSort = (a, b) => (
-        a[orderedBy] > b[orderedBy]
-          ? 1
-          : a[orderedBy] < b[orderedBy]
-            ? -1
-            : 0
-      )
-    } else if (order === orders.DESCENDING) {
-      customSort = (a, b) => (
-        a[orderedBy] < b[orderedBy]
-          ? 1
-          : a[orderedBy] > b[orderedBy]
-            ? -1
-            : 0
-      )
-    } else {
-      customSort = () => 0
-    }
-
-    const offset = page * PAGE_SIZE
-    const { data } = this.props
-
-    this.setState({
-      dataShown: [].concat(data)
-        .sort(customSort)
-        .slice(offset, offset + PAGE_SIZE),
-      order,
-      orderedBy,
-      page,
-    })
+  toggleLoading () {
+    this.setState(prev => ({
+      loading: !prev.loading,
+    }))
   }
 
   render () {
-    const {
-      totalSize,
-      dataShown,
-      page,
-      order,
-      orderedBy,
-    } = this.state
-
-    const {
-      headers,
-      ...rest
-    } = this.props
-
+    const { loading } = this.state
     return (
-      <Table
-        {...rest}
-        pageCount={Math.ceil(totalSize / PAGE_SIZE)}
-        onPageChange={this.onPageChange}
-        onSortByColumn={this.onSort}
-        headers={headers}
-        rows={dataShown}
-        emptyMessage="You have no applications"
-        page={page}
-        order={order}
-        orderedBy={orderedBy}
-      />
-    )
-  }
-}
-
-@bind
-class TabbedExample extends Component {
-
-  constructor (props) {
-    super(props)
-
-    const { tab, data } = props
-
-    this.state = {
-      tab,
-      dataShown: data.filter(d => d.tabs.includes(tab)),
-    }
-  }
-
-  onTabChange (tab) {
-    const { data } = this.props
-    this.setState({
-      tab,
-      dataShown: data.filter(d => d.tabs.includes(tab)),
-    })
-  }
-
-  render () {
-    const { tab, dataShown } = this.state
-    const { onTabChange } = this
-    const { headers, tabs } = this.props
-
-    return (
-      <div >
-        <div className={style.wrapperHeader}>
-          <Tabs
-            className={style.tabs}
-            tabs={tabs}
-            onTabChange={onTabChange}
-            active={tab}
-          />
-          <div className={style.search}>
-            <Input className={style.searchInput} icon="search" placeholder="Applications" />
-            <Button className={style.searchButton} message="Add Application" icon="add" />
-          </div>
+      <div>
+        <Tabular {...this.props} loading={loading} />
+        <div style={{ textAlign: 'center' }}>
+          <button style={{ marginTop: '20px' }} onClick={this.toggleLoading}>
+            { loading ? 'Stop Loading' : 'Start Loading'}
+          </button>
         </div>
-        <Example
-          forcePage={0}
-          headers={headers}
-          data={dataShown}
-        />
       </div>
     )
   }
 }
 
-storiesOf('Table', module)
+const PAGE_SIZE = 3
+
+@bind
+class PaginatedExample extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      page: 0,
+      loading: true,
+      data: [],
+    }
+  }
+
+  componentDidMount () {
+    this.requestNextPage(0)
+  }
+
+  componentWillUnmount () {
+    window.clearTimeout(this.timeout)
+  }
+
+  getDelay (slow) {
+    if (!slow) {
+      return Math.floor(Math.random() * (450 - 100)) + 100
+    }
+
+    return Math.floor(Math.random() * (3000 - 1000)) + 1000
+  }
+
+  requestNextPage (page) {
+    action('requestNextPage')(page)
+    const offset = page * PAGE_SIZE
+    const delay = this.getDelay(this.props.slow)
+    this.timeout = setTimeout(() => this.setState({
+      page,
+      loading: false,
+      data: this.props.data.slice(offset, offset + PAGE_SIZE),
+    }), delay)
+  }
+
+  onPageChange (page) {
+    this.setState(
+      { loading: true },
+      () => this.requestNextPage(page)
+    )
+  }
+
+  render () {
+    const {
+      page,
+      data,
+      loading,
+    } = this.state
+    const {
+      small,
+      headers,
+      ...rest
+    } = this.props
+
+    return (
+      <Tabular
+        {...rest}
+        paginated
+        small={small}
+        headers={headers}
+        data={data}
+        page={page}
+        totalCount={this.props.data.length}
+        pageSize={PAGE_SIZE}
+        loading={loading}
+        onPageChange={this.onPageChange}
+      />
+    )
+  }
+}
+
+@bind
+class ClickableExample extends React.Component {
+  state = {
+    clicked: null,
+  }
+
+  onRowClick (rowIndex) {
+    action('onRowClick')({ index: rowIndex, id: this.props.data[rowIndex].appId })
+    // push to history if link functionality required
+    this.setState({ clicked: this.props.data[rowIndex].appId })
+  }
+
+  render () {
+    const { clicked } = this.state
+
+    return (
+      <div>
+        <Tabular
+          {...this.props}
+          onRowClick={this.onRowClick}
+        />
+        <span>You clicked on: <strong>{clicked ? clicked : 'nothing'}</strong></span>
+      </div>
+    )
+  }
+}
+
+@bind
+class SortableExample extends React.Component {
+
+  state = {
+    order: undefined,
+    orderBy: undefined,
+    loading: false,
+    data: [],
+  }
+
+  componentDidMount () {
+    this.onSortRequest(undefined, undefined)
+  }
+
+  componentWillUnmount () {
+    window.clearTimeout(this.timeout)
+  }
+
+  asc (a, b) {
+    return a > b ? 1 : a < b ? -1 : 0
+  }
+
+  onSort (order, orderBy) {
+    // this.setState({ order, orderBy })
+    const data = this.props.data
+    const asc = this.asc
+    action('onSort')({ order, orderBy })
+
+    this.timeout = setTimeout(() => this.setState({
+      loading: false,
+      data: [].concat(data).sort((a, b) => (
+        order === 'asc'
+          ? asc(a[orderBy], b[orderBy])
+          : order === 'desc'
+            ? -asc(a[orderBy], b[orderBy])
+            : 0
+      )),
+    }), 800)
+
+  }
+
+  onSortRequest (order, orderBy) {
+    this.setState(
+      { loading: true, order, orderBy },
+      () => this.onSort(order, orderBy)
+    )
+  }
+
+  render () {
+    const {
+      order,
+      orderBy,
+      loading,
+    } = this.state
+    const {
+      data,
+      ...rest
+    } = this.props
+
+    return (
+      <Tabular
+        {...rest}
+        order={order}
+        orderBy={orderBy}
+        data={this.state.data}
+        loading={loading}
+        onSortRequest={this.onSortRequest}
+      />
+    )
+  }
+}
+
+storiesOf('Table/Tabular', module)
   .addDecorator((story, context) => withInfo({
     inline: true,
     header: false,
     source: false,
-    propTables: [ Table ],
-    propTablesExclude: [ Example ],
+    propTables: [ Tabular ],
+    propTablesExclude: [ LoadingExample, PaginatedExample, ClickableExample ],
+    text: doc,
   })(story)(context))
   .add('Default', () => (
-    <Example
-      headers={examples.defaultExample.headers}
+    <Tabular
       data={examples.defaultExample.rows}
+      headers={examples.defaultExample.headers}
+      emptyMessage="No entries to display"
     />
-  )).add('Loading', () => (
-    <Example
-      loading
-      headers={examples.loadingExample.headers}
-      data={examples.loadingExample.rows}
-    />
-  )).add('Custom cell', () => (
-    <Example
-      headers={examples.customCellExample.headers}
-      data={examples.customCellExample.rows}
-      small
-    />
-  )).add('Sortable', () => (
-    <Example
-      headers={examples.sortableExample.headers}
-      data={examples.sortableExample.rows}
+  )).add('Loading (slow)', () => (
+    <LoadingExample
+      slow
+      data={examples.defaultExample.rows}
+      headers={examples.defaultExample.headers}
+      emptyMessage="No entries to display"
     />
   )).add('Empty', () => (
-    <Example
-      headers={examples.emptyExample.headers}
+    <Tabular
       data={examples.emptyExample.rows}
+      headers={examples.emptyExample.headers}
+      emptyMessage="No entries to display"
     />
-  )).add('With custom wrapper', function () {
-    return (
-      <TabbedExample
-        headers={examples.customWrapperExample.headers}
-        data={examples.customWrapperExample.rows}
-        tabs={[{ title: 'All', name: 'all' }, { title: 'Starred', name: 'starred' }]}
-        tab={'all'}
-      />
-    )
-  })
+  )).add('Paginated (slow loading)', () => (
+    <PaginatedExample
+      slow
+      data={examples.paginatedExample.rows}
+      headers={examples.paginatedExample.headers}
+      emptyMessage="No entries to display"
+    />
+  )).add('Paginated (fast loading)', () => (
+    <PaginatedExample
+      fast
+      data={examples.paginatedExample.rows}
+      headers={examples.paginatedExample.headers}
+      emptyMessage="No entries to display"
+    />
+  )).add('Small', () => (
+    <PaginatedExample
+      small
+      fast
+      data={examples.defaultExample.rows}
+      headers={examples.defaultExample.headers}
+      emptyMessage="No entries to display"
+    />
+  )).add('Clickable rows', () => (
+    <ClickableExample
+      data={examples.clickableRowsExample.rows}
+      headers={examples.clickableRowsExample.headers}
+      emptyMessage="No entries to display"
+    />
+  )).add('Sortable', () => (
+    <SortableExample
+      data={examples.sortableExample.rows}
+      headers={examples.sortableExample.headers}
+      emptyMessage="No entries to display"
+    />
+  ))
