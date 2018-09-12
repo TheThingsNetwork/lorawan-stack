@@ -18,19 +18,42 @@ import (
 	"context"
 
 	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
+// GetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
+	}
+	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers)
 }
 
+// SetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
+	}
+	err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) {
+		return &req.ApplicationLink, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Stop/start link.
+	return &req.ApplicationLink, nil
 }
 
+// DeleteLink implements ttnpb.AsServer.
 func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
+	}
+	err := as.linkRegistry.Set(ctx, *ids, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) { return nil, nil })
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Stop link.
+	return ttnpb.Empty, nil
 }

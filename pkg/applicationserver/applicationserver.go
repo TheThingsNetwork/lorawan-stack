@@ -28,6 +28,9 @@ type ApplicationServer struct {
 	*component.Component
 
 	config *Config
+
+	linkRegistry   LinkRegistry
+	deviceRegistry DeviceRegistry
 }
 
 // Config represents the ApplicationServer configuration.
@@ -39,8 +42,10 @@ type Config struct {
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	as := &ApplicationServer{
-		Component: c,
-		config:    conf,
+		Component:      c,
+		config:         conf,
+		linkRegistry:   conf.Links,
+		deviceRegistry: conf.Devices,
 	}
 
 	c.RegisterGRPC(as)
