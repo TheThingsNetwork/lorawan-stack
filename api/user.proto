@@ -67,6 +67,7 @@ message GetUserRequest {
 
 message CreateUserRequest {
   User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string invitation_token = 2;
 }
 
 message UpdateUserRequest {
