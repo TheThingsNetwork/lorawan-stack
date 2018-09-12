@@ -80,11 +80,6 @@ message UpdateOrganizationAPIKeyRequest {
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
-message RemoveOrganizationAPIKeyRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string id = 2 [(gogoproto.customname) = "ID"];
-}
-
 message SetOrganizationCollaboratorRequest {
   OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   Collaborator collaborator = 2 [(gogoproto.nullable) = false];

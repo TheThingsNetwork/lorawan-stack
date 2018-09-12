@@ -91,11 +91,6 @@ message UpdateUserAPIKeyRequest {
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
-message RemoveUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string id = 2 [(gogoproto.customname) = "ID"];
-}
-
 message Invitation {
   string email = 1;
   string token = 2;
