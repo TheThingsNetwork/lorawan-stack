@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
+import bind from 'autobind-decorator'
 import PropTypes from '../../lib/prop-types'
 
+import Overlay from '../overlay'
 import Pagination from '../pagination'
 import Table from './table'
 
@@ -36,7 +38,7 @@ class Tabular extends React.Component {
 
       return
     } else if (sameColumn && order === 'desc') {
-      this.props.onSortRequest(undefined, undefined)
+      this.props.onSortRequest()
 
       return
     }
@@ -49,7 +51,7 @@ class Tabular extends React.Component {
       className,
       loading = false,
       small = false,
-      onRowSelect,
+      onRowClick,
       page,
       order = undefined,
       orderBy = undefined,
@@ -96,9 +98,9 @@ class Tabular extends React.Component {
       data.map((row, rowKey) => (
         <Table.Row
           key={rowKey}
-          onSelect={
-            row.selectable ? function () {
-              onRowSelect(rowKey)
+          onClick={
+            row.clickable ? function () {
+              onRowClick(rowKey)
             } : undefined
           }
         >
@@ -181,8 +183,8 @@ Tabular.propTypes = {
   orderBy: PropTypes.string,
   /** The empty message to be displayed when no data provided */
   emptyMessage: PropTypes.oneOfType([ PropTypes.message, PropTypes.string ]).isRequired,
-  /** Function to be called when the table row gets selected */
-  onRowSelect: PropTypes.func,
+  /** Function to be called when the table row gets clicked */
+  onRowClick: PropTypes.func,
   /**
    * Function to be called when the page is changed. Passes the new
    * page number as an argument [0...pageCount - 1].
@@ -200,11 +202,11 @@ Tabular.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object),
   /** A list of head entries to displat within the table head */
   headers: PropTypes.arrayOf(PropTypes.shape({
-    displayName: PropTypes.oneOfType([ PropTypes.message, PropTypes.string ]).isRequired,
+    displayName: PropTypes.message.isRequired,
     name: PropTypes.string.isRequired,
     centered: PropTypes.bool,
     sortable: PropTypes.bool,
   })),
 }
 
-export default Table
+export { Tabular as default, Table }
