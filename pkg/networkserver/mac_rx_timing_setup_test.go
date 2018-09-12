@@ -56,7 +56,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: 42,
 					},
 					PendingRequests: []*ttnpb.MACCommand{},

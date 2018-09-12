@@ -41,10 +41,10 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 
 		req := cmd.GetDlChannelReq()
 
-		if uint(req.ChannelIndex) >= uint(len(dev.MACState.Channels)) || dev.MACState.MACParameters.Channels[req.ChannelIndex] == nil {
+		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) || dev.MACState.CurrentParameters.Channels[req.ChannelIndex] == nil {
 			return errCorruptedMACState.WithCause(errUnknownChannel)
 		}
-		dev.MACState.MACParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
+		dev.MACState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 
 		events.Publish(evtMacDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil

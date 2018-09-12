@@ -30,7 +30,7 @@ func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err erro
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRxTimingSetupReq()
 
-		dev.MACState.Rx1Delay = req.Delay
+		dev.MACState.CurrentParameters.Rx1Delay = req.Delay
 
 		events.Publish(evtMACRxTimingAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil

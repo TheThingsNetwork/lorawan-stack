@@ -70,7 +70,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
 					},
@@ -86,7 +86,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Name: "no ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						RejoinTimePeriodicity: ttnpb.REJOIN_TIME_1,
 					},
 					PendingRequests: []*ttnpb.MACCommand{
@@ -99,7 +99,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_1024,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_1,
 					},

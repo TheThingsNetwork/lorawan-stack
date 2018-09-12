@@ -82,88 +82,100 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	}
 
 	dev.MACState = &ttnpb.MACState{
-		LoRaWANVersion: dev.EndDeviceVersion.LoRaWANVersion,
-		MACParameters: ttnpb.MACParameters{
+		LoRaWANVersion: dev.LoRaWANVersion,
+		CurrentParameters: ttnpb.MACParameters{
 			ADRAckDelay:       uint32(band.ADRAckDelay),
 			ADRAckLimit:       uint32(band.ADRAckLimit),
 			ADRNbTrans:        1,
 			DutyCycle:         ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:           band.DefaultMaxEIRP,
-			Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
+			Rx1Delay:          ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
 			Rx1DataRateOffset: 0,
 			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
 			Rx2Frequency:      band.DefaultRx2Parameters.Frequency,
 		},
 	}
 
-	// NOTE: dev.MACState.MACParameters must not contain pointer values at this point.
-	dev.MACState.DesiredMACParameters = dev.MACState.MACParameters
+	// NOTE: dev.MACState.CurrentParameters must not contain pointer values at this point.
+	dev.MACState.DesiredParameters = dev.MACState.CurrentParameters
 
-	dev.MACState.MACParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
-	dev.MACState.DesiredMACParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(dev.MACState.MACParameters.Channels)), float64(len(fp.Channels)))))
-
-	if len(band.DownlinkChannels) > len(band.UplinkChannels) {
+	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) {
 		// NOTE: In case the spec changes and this assumption is not valid anymore,
 		// the implementation of this function won't be valid and has to be changed.
 		return errInvalidFrequencyPlan
 	}
 
+	dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
+	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(dev.MACState.CurrentParameters.Channels)), float64(len(fp.UplinkChannels)))))
+
 	for i, upCh := range band.UplinkChannels {
-		ch := &ttnpb.MACParameters_Channel{
-			UplinkFrequency:   upCh.Frequency,
-			DownlinkFrequency: upCh.Frequency,
-			MinDataRateIndex:  ttnpb.DataRateIndex(upCh.DataRateIndexes[0]),
-			MaxDataRateIndex:  ttnpb.DataRateIndex(upCh.DataRateIndexes[len(upCh.DataRateIndexes)-1]),
-		}
-		if len(band.DownlinkChannels) > i {
-			ch.DownlinkFrequency = band.DownlinkChannels[i].Frequency
-		}
-
-		dev.MACState.MACParameters.Channels[i] = ch
-
-		chCopy := *ch
-		dev.MACState.DesiredMACParameters.Channels[i] = &chCopy
-	}
-
-	for i, fpCh := range fp.Channels {
-		ch := dev.MACState.DesiredMACParameters.Channels[i]
-		if ch == nil {
-			ch = &ttnpb.MACParameters_Channel{}
-			dev.MACState.DesiredMACParameters.Channels[i] = ch
-		}
-
-		ch.UplinkFrequency = fpCh.Frequency
-		ch.DownlinkFrequency = fpCh.Frequency
-
-		if ch.MinDataRateIndex > ttnpb.DataRateIndex(fpCh.DataRate.GetIndex()) || ttnpb.DataRateIndex(fpCh.DataRate.GetIndex()) > ch.MaxDataRateIndex {
+		if len(upCh.DataRateIndexes) == 0 {
 			return errInvalidFrequencyPlan
 		}
-		// TODO: This should be fixed once https://github.com/TheThingsIndustries/lorawan-stack/issues/927 is resolved.
-		ch.MinDataRateIndex = ttnpb.DataRateIndex(fpCh.DataRate.GetIndex())
-		ch.MaxDataRateIndex = ttnpb.DataRateIndex(fpCh.DataRate.GetIndex())
+
+		ch := &ttnpb.MACParameters_Channel{
+			UplinkFrequency:  upCh.Frequency,
+			MinDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[0]),
+			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[len(upCh.DataRateIndexes)-1]),
+		}
+		dev.MACState.CurrentParameters.Channels[i] = ch
+
+		chCopy := *ch
+		dev.MACState.DesiredParameters.Channels[i] = &chCopy
 	}
 
-	dev.MACState.DesiredMACParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
-	dev.MACState.DesiredMACParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
+	for i, downCh := range band.DownlinkChannels {
+		if i >= len(dev.MACState.CurrentParameters.Channels) {
+			return errInvalidFrequencyPlan
+		}
+		dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+	}
+
+	for i, upCh := range fp.UplinkChannels {
+		ch := dev.MACState.DesiredParameters.Channels[i]
+		if ch == nil {
+			dev.MACState.DesiredParameters.Channels[i] = &ttnpb.MACParameters_Channel{
+				MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
+				MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
+				UplinkFrequency:  upCh.Frequency,
+			}
+			continue
+		}
+
+		if ch.MinDataRateIndex > ttnpb.DataRateIndex(upCh.MinDataRate) || ttnpb.DataRateIndex(upCh.MaxDataRate) > ch.MaxDataRateIndex {
+			return errInvalidFrequencyPlan
+		}
+		ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
+		ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
+		ch.UplinkFrequency = upCh.Frequency
+	}
+
+	for i, downCh := range fp.DownlinkChannels {
+		if i >= len(dev.MACState.DesiredParameters.Channels) {
+			return errInvalidFrequencyPlan
+		}
+		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+	}
+
+	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
+	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
 
 	if fp.Rx2 != nil {
-		dev.MACState.DesiredMACParameters.Rx2Frequency = fp.Rx2.Frequency
-		dev.MACState.DesiredMACParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(fp.Rx2.DataRate.Index)
+		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2.Frequency
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(fp.Rx2.MinDataRate) // TODO: Get actual DRIdx
 	}
 
 	if fp.PingSlot != nil {
-		if fp.PingSlot.DataRate != nil {
-			dev.MACState.DesiredMACParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(fp.PingSlot.DataRate.Index)
-		}
-		dev.MACState.DesiredMACParameters.PingSlotFrequency = fp.PingSlot.Frequency
+		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(fp.PingSlot.MinDataRate) // TODO: Actual DRIdx
+		dev.MACState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
 	}
 
-	if fp.MaxEIRP > 0 {
-		dev.MACState.DesiredMACParameters.MaxEIRP = float32(math.Min(float64(dev.MACState.MaxEIRP), float64(fp.MaxEIRP)))
+	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 {
+		dev.MACState.DesiredParameters.MaxEIRP = float32(math.Min(float64(dev.MACState.CurrentParameters.MaxEIRP), float64(*fp.MaxEIRP)))
 	}
 
-	if dev.EndDeviceVersion.DefaultMACParameters != nil {
-		dev.MACState.MACParameters = deepcopy.Copy(*dev.EndDeviceVersion.DefaultMACParameters).(ttnpb.MACParameters)
+	if dev.DefaultMACParameters != nil {
+		dev.MACState.CurrentParameters = deepcopy.Copy(*dev.DefaultMACParameters).(ttnpb.MACParameters)
 	}
 
 	return nil
@@ -174,12 +186,12 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink and error if any.
 // If no downlink could be generated - nil, errNoDownlink is returned.
-// generateDownlink does not perform validation of dev.MACState.DesiredMACParameters,
+// generateDownlink does not perform validation of dev.MACState.DesiredParameters,
 // hence, it could potentially generate MAC command(s), which are not suported by the
 // regional parameters the device operates in.
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
-// dev.MACState.MACParameters.Channels is not equal to dev.MACState.DesiredMACParameters.Channels.
+// dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
 func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confFCnt uint32) (b []byte, err error) {
 	if !ack && confFCnt > 0 {
 		panic("confFCnt must be 0 if ack is false")
@@ -197,45 +209,43 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	// TODO: Queue LinkADRReq(https://github.com/TheThingsIndustries/ttn/issues/837)
 
-	if dev.MACState.DesiredMACParameters.DutyCycle != dev.MACState.MACParameters.DutyCycle {
+	if dev.MACState.DesiredParameters.DutyCycle != dev.MACState.CurrentParameters.DutyCycle {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DutyCycleReq{
-			MaxDutyCycle: dev.MACState.DesiredMACParameters.DutyCycle,
+			MaxDutyCycle: dev.MACState.DesiredParameters.DutyCycle,
 		}).MACCommand())
 	}
 
-	if dev.MACState.DesiredMACParameters.Rx2Frequency != dev.MACState.MACParameters.Rx2Frequency ||
-		dev.MACState.DesiredMACParameters.Rx2DataRateIndex != dev.MACState.MACParameters.Rx2DataRateIndex ||
-		dev.MACState.DesiredMACParameters.Rx1DataRateOffset != dev.MACState.MACParameters.Rx1DataRateOffset {
+	if dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency ||
+		dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
+		dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxParamSetupReq{
-			Rx2Frequency:      dev.MACState.DesiredMACParameters.Rx2Frequency,
-			Rx2DataRateIndex:  dev.MACState.DesiredMACParameters.Rx2DataRateIndex,
-			Rx1DataRateOffset: dev.MACState.DesiredMACParameters.Rx1DataRateOffset,
+			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
+			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
+			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
 		}).MACCommand())
 	}
 
-	if dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
-		dev.MACSettings.StatusTimePeriodicity > 0 && dev.NextStatusAt.Before(time.Now()) {
-		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
-		if dev.MACSettings.StatusTimePeriodicity > 0 {
-			dev.NextStatusAt = time.Now().Add(dev.MACSettings.StatusTimePeriodicity)
-		}
+	if dev.LastStatusReceivedAt == nil ||
+		dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
+		dev.MACSettings.StatusTimePeriodicity > 0 && dev.LastStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).Before(time.Now()) {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, ttnpb.CID_DEV_STATUS.MACCommand())
+		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
 
 	} else if dev.NextStatusAfter != 0 {
 		dev.NextStatusAfter--
 	}
 
-	for i := len(dev.MACState.DesiredMACParameters.Channels); i < len(dev.MACState.MACParameters.Channels); i++ {
+	for i := len(dev.MACState.DesiredParameters.Channels); i < len(dev.MACState.CurrentParameters.Channels); i++ {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_NewChannelReq{
 			ChannelIndex: uint32(i),
 		}).MACCommand())
 	}
 
-	for i, ch := range dev.MACState.DesiredMACParameters.Channels {
-		if len(dev.MACState.MACParameters.Channels) <= i ||
-			ch.MinDataRateIndex != dev.MACState.MACParameters.Channels[i].MinDataRateIndex ||
-			ch.MaxDataRateIndex != dev.MACState.MACParameters.Channels[i].MaxDataRateIndex ||
-			ch.UplinkFrequency != dev.MACState.MACParameters.Channels[i].UplinkFrequency {
+	for i, ch := range dev.MACState.DesiredParameters.Channels {
+		if len(dev.MACState.CurrentParameters.Channels) <= i ||
+			ch.MinDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex ||
+			ch.MaxDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex ||
+			ch.UplinkFrequency != dev.MACState.CurrentParameters.Channels[i].UplinkFrequency {
 
 			dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_NewChannelReq{
 				ChannelIndex:     uint32(i),
@@ -244,8 +254,8 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 			}).MACCommand())
 		}
 
-		if (len(dev.MACState.MACParameters.Channels) <= i && ch.UplinkFrequency != ch.DownlinkFrequency) ||
-			ch.DownlinkFrequency != dev.MACState.Channels[i].DownlinkFrequency {
+		if (len(dev.MACState.CurrentParameters.Channels) <= i && ch.UplinkFrequency != ch.DownlinkFrequency) ||
+			ch.DownlinkFrequency != dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
 
 			dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DLChannelReq{
 				ChannelIndex: uint32(i),
@@ -254,50 +264,50 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		}
 	}
 
-	if dev.MACState.DesiredMACParameters.Rx1Delay != dev.MACState.MACParameters.Rx1Delay {
+	if dev.MACState.DesiredParameters.Rx1Delay != dev.MACState.CurrentParameters.Rx1Delay {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxTimingSetupReq{
-			Delay: dev.MACState.DesiredMACParameters.Rx1Delay,
+			Delay: dev.MACState.DesiredParameters.Rx1Delay,
 		}).MACCommand())
 	}
 
-	if dev.MACState.DesiredMACParameters.MaxEIRP != dev.MACState.MACParameters.MaxEIRP ||
-		dev.MACState.DesiredMACParameters.DownlinkDwellTime != dev.MACState.MACParameters.DownlinkDwellTime ||
-		dev.MACState.DesiredMACParameters.UplinkDwellTime != dev.MACState.MACParameters.UplinkDwellTime {
+	if dev.MACState.DesiredParameters.MaxEIRP != dev.MACState.CurrentParameters.MaxEIRP ||
+		dev.MACState.DesiredParameters.DownlinkDwellTime != dev.MACState.CurrentParameters.DownlinkDwellTime ||
+		dev.MACState.DesiredParameters.UplinkDwellTime != dev.MACState.CurrentParameters.UplinkDwellTime {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_TxParamSetupReq{
-			MaxEIRPIndex:      ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredMACParameters.MaxEIRP),
-			DownlinkDwellTime: dev.MACState.DesiredMACParameters.DownlinkDwellTime,
-			UplinkDwellTime:   dev.MACState.DesiredMACParameters.UplinkDwellTime,
+			MaxEIRPIndex:      ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
+			DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime,
+			UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime,
 		}).MACCommand())
 	}
 
-	if dev.MACState.DesiredMACParameters.ADRAckLimit != dev.MACState.MACParameters.ADRAckLimit ||
-		dev.MACState.DesiredMACParameters.ADRAckDelay != dev.MACState.MACParameters.ADRAckDelay {
+	if dev.MACState.DesiredParameters.ADRAckLimit != dev.MACState.CurrentParameters.ADRAckLimit ||
+		dev.MACState.DesiredParameters.ADRAckDelay != dev.MACState.CurrentParameters.ADRAckDelay {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_ADRParamSetupReq{
-			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredMACParameters.ADRAckLimit),
-			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredMACParameters.ADRAckDelay),
+			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
+			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
 		}).MACCommand())
 	}
 
 	// TODO: Queue ForceRejoinReq(https://github.com/TheThingsIndustries/ttn/issues/837)
 
-	if dev.MACState.DesiredMACParameters.RejoinTimePeriodicity != dev.MACState.MACParameters.RejoinTimePeriodicity {
+	if dev.MACState.DesiredParameters.RejoinTimePeriodicity != dev.MACState.CurrentParameters.RejoinTimePeriodicity {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RejoinParamSetupReq{
-			MaxTimeExponent:  dev.MACState.DesiredMACParameters.RejoinTimePeriodicity,
-			MaxCountExponent: dev.MACState.DesiredMACParameters.RejoinCountPeriodicity,
+			MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
+			MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
 		}).MACCommand())
 	}
 
-	if dev.MACState.DesiredMACParameters.PingSlotDataRateIndex != dev.MACState.MACParameters.PingSlotDataRateIndex ||
-		dev.MACState.DesiredMACParameters.PingSlotFrequency != dev.MACState.MACParameters.PingSlotFrequency {
+	if dev.MACState.DesiredParameters.PingSlotDataRateIndex != dev.MACState.CurrentParameters.PingSlotDataRateIndex ||
+		dev.MACState.DesiredParameters.PingSlotFrequency != dev.MACState.CurrentParameters.PingSlotFrequency {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_PingSlotChannelReq{
-			Frequency:     dev.MACState.DesiredMACParameters.PingSlotFrequency,
-			DataRateIndex: dev.MACState.DesiredMACParameters.PingSlotDataRateIndex,
+			Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
+			DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndex,
 		}).MACCommand())
 	}
 
-	if dev.MACState.DesiredMACParameters.BeaconFrequency != dev.MACState.MACParameters.BeaconFrequency {
+	if dev.MACState.DesiredParameters.BeaconFrequency != dev.MACState.CurrentParameters.BeaconFrequency {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_BeaconFreqReq{
-			Frequency: dev.MACState.DesiredMACParameters.BeaconFrequency,
+			Frequency: dev.MACState.DesiredParameters.BeaconFrequency,
 		}).MACCommand())
 	}
 
@@ -904,8 +914,8 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	))
 
 	msg := &ttnpb.DownlinkMessage{
-		RawPayload:           b,
-		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		RawPayload:   b,
+		EndDeviceIDs: &dev.EndDeviceIdentifiers,
 	}
 
 	type tx struct {
@@ -932,7 +942,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 		mds = dev.RecentUplinks[len(dev.RecentUplinks)-1].RxMetadata
 	} else {
-		drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.Rx1DataRateOffset, dev.MACState.DownlinkDwellTime)
+		drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
 		if err != nil {
 			return err
 		}
@@ -941,29 +951,29 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		if err != nil {
 			return err
 		}
-		if uint(chIdx) >= uint(len(dev.MACState.Channels)) {
+		if uint(chIdx) >= uint(len(dev.MACState.CurrentParameters.Channels)) {
 			return errChannelIndexTooHigh
 		}
 
-		ch := dev.MACState.Channels[int(chIdx)]
+		ch := dev.MACState.CurrentParameters.Channels[int(chIdx)]
 		if ch == nil || ch.DownlinkFrequency == 0 {
 			return errUnknownChannel
 		}
 
 		rx1 := tx{
 			TxSettings: ttnpb.TxSettings{
-				DataRateIndex:         drIdx,
-				CodingRate:            "4/5",
-				PolarizationInversion: true,
-				ChannelIndex:          chIdx,
-				Frequency:             ch.DownlinkFrequency,
-				TxPower:               int32(band.DefaultMaxEIRP),
+				DataRateIndex:      drIdx,
+				CodingRate:         "4/5",
+				InvertPolarization: true,
+				ChannelIndex:       chIdx,
+				Frequency:          ch.DownlinkFrequency,
+				TxPower:            int32(band.DefaultMaxEIRP),
 			},
 		}
 		if isJoinAccept {
 			rx1.Delay = band.JoinAcceptDelay1
 		} else {
-			rx1.Delay = time.Second * time.Duration(dev.MACState.Rx1Delay)
+			rx1.Delay = time.Second * time.Duration(dev.MACState.CurrentParameters.Rx1Delay)
 		}
 
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
@@ -974,26 +984,26 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		slots = append(slots, rx1)
 	}
 
-	if uint(dev.MACState.Rx2DataRateIndex) > uint(len(band.DataRates)) {
+	if uint(dev.MACState.CurrentParameters.Rx2DataRateIndex) > uint(len(band.DataRates)) {
 		return errInvalidRx2DataRateIndex
 	}
 
 	rx2 := tx{
 		TxSettings: ttnpb.TxSettings{
-			DataRateIndex:         dev.MACState.Rx2DataRateIndex,
-			CodingRate:            "4/5",
-			PolarizationInversion: true,
-			Frequency:             dev.MACState.Rx2Frequency,
-			TxPower:               int32(band.DefaultMaxEIRP),
+			DataRateIndex:      dev.MACState.CurrentParameters.Rx2DataRateIndex,
+			CodingRate:         "4/5",
+			InvertPolarization: true,
+			Frequency:          dev.MACState.CurrentParameters.Rx2Frequency,
+			TxPower:            int32(band.DefaultMaxEIRP),
 		},
 	}
 	if isJoinAccept {
 		rx2.Delay = band.JoinAcceptDelay2
 	} else {
-		rx2.Delay = time.Second * time.Duration(1+dev.MACState.Rx1Delay)
+		rx2.Delay = time.Second * time.Duration(1+dev.MACState.CurrentParameters.Rx1Delay)
 	}
 
-	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.Rx2DataRateIndex]); err != nil {
+	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex]); err != nil {
 		return err
 	}
 
@@ -1120,7 +1130,7 @@ outer:
 		fCnt := pld.FCnt
 
 		switch {
-		case !dev.EndDeviceVersion.Supports32BitFCnt, fCnt >= dev.Session.NextFCntUp:
+		case !dev.Uses32BitFCnt, fCnt >= dev.Session.NextFCntUp:
 		case fCnt > dev.Session.NextFCntUp&0xffff:
 			fCnt |= dev.Session.NextFCntUp &^ 0xffff
 		case dev.Session.NextFCntUp < 0xffff<<16:
@@ -1128,7 +1138,7 @@ outer:
 		}
 
 		gap := uint32(math.MaxUint32)
-		if !dev.EndDeviceVersion.FCntResets {
+		if !dev.ResetsFCnt {
 			if dev.Session.NextFCntUp > fCnt {
 				continue outer
 			}
@@ -1157,7 +1167,7 @@ outer:
 			gap:    gap,
 			fCnt:   fCnt,
 		})
-		if dev.EndDeviceVersion.FCntResets && fCnt != pld.FCnt {
+		if dev.ResetsFCnt && fCnt != pld.FCnt {
 			matching = append(matching, device{
 				Device: dev,
 				gap:    gap,
@@ -1419,7 +1429,7 @@ outer:
 		case ttnpb.CID_RX_PARAM_SETUP:
 			err = handleRxParamSetupAns(ctx, dev.EndDevice, cmd.GetRxParamSetupAns())
 		case ttnpb.CID_DEV_STATUS:
-			err = handleDevStatusAns(ctx, dev.EndDevice, cmd.GetDevStatusAns())
+			err = handleDevStatusAns(ctx, dev.EndDevice, cmd.GetDevStatusAns(), msg.ReceivedAt)
 		case ttnpb.CID_NEW_CHANNEL:
 			err = handleNewChannelAns(ctx, dev.EndDevice, cmd.GetNewChannelAns())
 		case ttnpb.CID_RX_TIMING_SETUP:
@@ -1548,11 +1558,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		},
 		NetID:              ns.NetID,
 		SelectedMacVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
-		RxDelay:            dev.MACState.DesiredMACParameters.Rx1Delay,
-		CFList:             frequencyplans.CFList(fp, dev.LoRaWANPHYVersion),
+		RxDelay:            dev.MACState.DesiredParameters.Rx1Delay,
+		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
 		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: dev.MACState.DesiredMACParameters.Rx1DataRateOffset,
-			Rx2DR:       dev.MACState.DesiredMACParameters.Rx2DataRateIndex,
+			Rx1DROffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
+			Rx2DR:       dev.MACState.DesiredParameters.Rx2DataRateIndex,
 			OptNeg:      true,
 		},
 	}
@@ -1579,17 +1589,17 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		if err := resetMACState(ns.Component.FrequencyPlans, dev.EndDevice); err != nil {
 			return err
 		}
-		dev.MACState.Rx1Delay = req.RxDelay
-		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
-		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
+		dev.MACState.CurrentParameters.Rx1Delay = req.RxDelay
+		dev.MACState.CurrentParameters.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
+		dev.MACState.CurrentParameters.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
 		if req.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
 			// The version will be further negotiated via RekeyInd/RekeyConf
 			dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 		}
 
-		dev.MACState.DesiredMACParameters.Rx1Delay = dev.MACState.Rx1Delay
-		dev.MACState.DesiredMACParameters.Rx1DataRateOffset = dev.MACState.Rx1DataRateOffset
-		dev.MACState.DesiredMACParameters.Rx2DataRateIndex = dev.MACState.Rx2DataRateIndex
+		dev.MACState.DesiredParameters.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
+		dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACState.CurrentParameters.Rx1DataRateOffset
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
 
 		select {
 		case <-ctx.Done():

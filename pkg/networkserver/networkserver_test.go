@@ -475,9 +475,7 @@ func HandleUplinkTest() func(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		_, err := reg.Create(&ttnpb.EndDevice{
-			EndDeviceVersion: ttnpb.EndDeviceVersion{
-				LoRaWANVersion: ttnpb.MAC_V1_1,
-			},
+			LoRaWANVersion: ttnpb.MAC_V1_1,
 			Session: &ttnpb.Session{
 				DevAddr: DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
@@ -544,9 +542,10 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/unconfirmed",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -560,10 +559,8 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
-						FCntResets:     true,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+					ResetsFCnt:     true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -607,9 +604,10 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/unconfirmed/FCnt resets",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -623,10 +621,8 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
-						FCntResets:     true,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+					ResetsFCnt:     true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -670,10 +666,11 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/confirmed/ack",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_0,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -687,9 +684,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -738,10 +733,11 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_0,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -755,10 +751,8 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
-						FCntResets:     true,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0,
+					ResetsFCnt:     true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -807,9 +801,10 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/unconfirmed",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -823,9 +818,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -874,10 +867,11 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/confirmed/ack",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -891,9 +885,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -953,9 +945,10 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/unconfirmed/FCnt resets",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -969,10 +962,8 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-						FCntResets:     true,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+					ResetsFCnt:     true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -1021,10 +1012,11 @@ func HandleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
+					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
-						MACParameters: ttnpb.MACParameters{
+						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -1038,10 +1030,8 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-						FCntResets:     true,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+					ResetsFCnt:     true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -1367,7 +1357,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						errch <- err
 					}()
 
-					if !dev.FCntResets {
+					if !dev.ResetsFCnt {
 						close(deduplicationDoneCh)
 						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 						close(collectionDoneCh)
@@ -1539,9 +1529,7 @@ func HandleJoinTest() func(t *testing.T) {
 			{
 				"1.1/nil session",
 				&ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1567,9 +1555,7 @@ func HandleJoinTest() func(t *testing.T) {
 			{
 				"1.1/active session",
 				&ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1595,9 +1581,7 @@ func HandleJoinTest() func(t *testing.T) {
 			{
 				"1.0.2",
 				&ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0_2,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1623,9 +1607,7 @@ func HandleJoinTest() func(t *testing.T) {
 			{
 				"1.0.1",
 				&ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0_1,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1651,9 +1633,7 @@ func HandleJoinTest() func(t *testing.T) {
 			{
 				"1.0",
 				&ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
-					},
+					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1789,11 +1769,11 @@ func HandleJoinTest() func(t *testing.T) {
 					},
 					NetID:              ns.NetID,
 					SelectedMacVersion: tc.Device.LoRaWANVersion,
-					RxDelay:            tc.Device.MACState.DesiredMACParameters.Rx1Delay,
+					RxDelay:            tc.Device.MACState.DesiredParameters.Rx1Delay,
 					CFList:             nil,
 					DownlinkSettings: ttnpb.DLSettings{
-						Rx1DROffset: tc.Device.MACState.DesiredMACParameters.Rx1DataRateOffset,
-						Rx2DR:       tc.Device.MACState.DesiredMACParameters.Rx2DataRateIndex,
+						Rx1DROffset: tc.Device.MACState.DesiredParameters.Rx1DataRateOffset,
+						Rx2DR:       tc.Device.MACState.DesiredParameters.Rx2DataRateIndex,
 						OptNeg:      true,
 					},
 				}
@@ -1903,13 +1883,13 @@ func HandleJoinTest() func(t *testing.T) {
 						t.FailNow()
 					}
 
-					expected.MACState.Rx1Delay = tc.Device.MACState.DesiredMACParameters.Rx1Delay
-					expected.MACState.Rx1DataRateOffset = tc.Device.MACState.DesiredMACParameters.Rx1DataRateOffset
-					expected.MACState.Rx2DataRateIndex = tc.Device.MACState.DesiredMACParameters.Rx2DataRateIndex
+					expected.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
+					expected.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
+					expected.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
 
-					expected.MACState.DesiredMACParameters.Rx1Delay = expected.MACState.Rx1Delay
-					expected.MACState.DesiredMACParameters.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
-					expected.MACState.DesiredMACParameters.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
+					expected.MACState.DesiredParameters.Rx1Delay = expected.MACState.CurrentParameters.Rx1Delay
+					expected.MACState.DesiredParameters.Rx1DataRateOffset = expected.MACState.CurrentParameters.Rx1DataRateOffset
+					expected.MACState.DesiredParameters.Rx2DataRateIndex = expected.MACState.CurrentParameters.Rx2DataRateIndex
 
 					expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
 					expected.Session = &ttnpb.Session{

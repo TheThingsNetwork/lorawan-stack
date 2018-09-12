@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"testing"
+	"time"
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
@@ -31,6 +32,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DevStatusAns
+		ReceivedAt       time.Time
 		Error            error
 		ExpectedEvents   int
 	}{
@@ -42,8 +44,9 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: nil,
-			Error:   errMissingPayload,
+			Payload:    nil,
+			ReceivedAt: time.Unix(42, 0),
+			Error:      errMissingPayload,
 		},
 		{
 			Name: "no request",
@@ -53,8 +56,9 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: ttnpb.NewPopulatedMACCommand_DevStatusAns(test.Randy, false),
-			Error:   errMACRequestNotFound,
+			Payload:    ttnpb.NewPopulatedMACCommand_DevStatusAns(test.Randy, false),
+			ReceivedAt: time.Unix(42, 0),
+			Error:      errMACRequestNotFound,
 		},
 		{
 			Name: "battery 42, margin 4",
@@ -66,6 +70,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					// TODO: Modify status variables (https://github.com/TheThingsIndustries/ttn/issues/834)
@@ -75,6 +80,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 42,
 				Margin:  4,
 			},
+			ReceivedAt:     time.Unix(42, 0),
 			ExpectedEvents: 1,
 		},
 	} {
@@ -83,7 +89,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleDevStatusAns(test.Context(), dev, tc.Payload)
+			err := handleDevStatusAns(test.Context(), dev, tc.Payload, tc.ReceivedAt)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

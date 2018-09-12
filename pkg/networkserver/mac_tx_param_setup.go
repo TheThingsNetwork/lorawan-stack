@@ -30,12 +30,12 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()
 
-		dev.MACState.MACParameters.DownlinkDwellTime = req.DownlinkDwellTime
-		dev.MACState.MACParameters.UplinkDwellTime = req.UplinkDwellTime
-		dev.MACState.MACParameters.MaxEIRP = ttnpb.DeviceEIRPToFloat32(req.MaxEIRPIndex)
+		dev.MACState.CurrentParameters.DownlinkDwellTime = req.DownlinkDwellTime
+		dev.MACState.CurrentParameters.UplinkDwellTime = req.UplinkDwellTime
+		dev.MACState.CurrentParameters.MaxEIRP = ttnpb.DeviceEIRPToFloat32(req.MaxEIRPIndex)
 
-		if ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredMACParameters.MaxEIRP) == req.MaxEIRPIndex {
-			dev.MACState.DesiredMACParameters.MaxEIRP = dev.MACState.MACParameters.MaxEIRP
+		if ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP) == req.MaxEIRPIndex {
+			dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
 		}
 
 		events.Publish(evtMACTxParamAccept(ctx, dev.EndDeviceIdentifiers, req))

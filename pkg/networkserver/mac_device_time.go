@@ -28,7 +28,10 @@ var evtMACDeviceTime = events.Define("ns.mac.device_time", "handled device time 
 func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
 	ts := make([]time.Time, 0, len(msg.RxMetadata))
 	for _, md := range msg.RxMetadata {
-		ts = append(ts, md.Time)
+		if md.Time == nil {
+			continue
+		}
+		ts = append(ts, *md.Time)
 	}
 	sort.Slice(ts, func(i, j int) bool {
 		return ts[i].Before(ts[j])

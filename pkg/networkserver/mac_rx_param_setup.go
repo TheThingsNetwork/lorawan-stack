@@ -42,9 +42,9 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 
 		req := cmd.GetRxParamSetupReq()
 
-		dev.MACState.Rx1DataRateOffset = req.Rx1DataRateOffset
-		dev.MACState.Rx2DataRateIndex = req.Rx2DataRateIndex
-		dev.MACState.Rx2Frequency = req.Rx2Frequency
+		dev.MACState.CurrentParameters.Rx1DataRateOffset = req.Rx1DataRateOffset
+		dev.MACState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
+		dev.MACState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
 
 		events.Publish(evtMACRxParamAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil

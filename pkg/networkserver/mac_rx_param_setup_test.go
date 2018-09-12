@@ -60,7 +60,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Name: "all ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1DataRateOffset: 99,
 						Rx2Frequency:      99,
 					},
@@ -75,7 +75,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1DataRateOffset: 42,
 						Rx2DataRateIndex:  43,
 						Rx2Frequency:      44,
@@ -94,7 +94,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Name: "data rate ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1DataRateOffset: 99,
 						Rx2Frequency:      99,
 					},
@@ -109,7 +109,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1DataRateOffset: 99,
 						Rx2Frequency:      99,
 					},

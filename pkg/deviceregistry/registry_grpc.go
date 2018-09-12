@@ -111,8 +111,8 @@ func setPaginationHeaders(ctx context.Context, url string, limit, page, total ui
 }
 
 // ListDevices lists devices matching filter in underlying registry.
-func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevices, error) {
-	if err := rights.RequireApplication(ctx, filter.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+func (r *RegistryRPC) ListDevices(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (*ttnpb.EndDevices, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -135,24 +135,27 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 	}
 
 	eds := make([]*ttnpb.EndDevice, 0, defaultListCount)
-	total, err := RangeByIdentifiers(r.Interface, filter, "", count, offset, func(dev *Device) bool {
-		eds = append(eds, dev.EndDevice)
-		return count == 0 || uint64(len(eds)) < count
-	})
-	if err != nil {
-		return nil, err
-	}
 
-	return &ttnpb.EndDevices{EndDevices: eds}, setPaginationHeaders(ctx, path.Join(md.Host, md.URI), count, page, total)
+	_ = offset
+	// TODO: Range
+	//total, err := RangeByIdentifiers(r.Interface, req.ApplicationIdentifiers, "", count, offset, func(dev *Device) bool {
+	//eds = append(eds, dev.EndDevice)
+	//return count == 0 || uint64(len(eds)) < count
+	//})
+	//if err != nil {
+	//return nil, err
+	//}
+
+	return &ttnpb.EndDevices{EndDevices: eds}, setPaginationHeaders(ctx, path.Join(md.Host, md.URI), count, page, 0)
 }
 
-// GetDevice returns the device associated with id in underlying registry, if found.
-func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, id.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+// GetDevice returns the device associated with req.EndDeviceIdentifiers in underlying registry, if found.
+func (r *RegistryRPC) GetDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
-	dev, err := FindByIdentifiers(r.Interface, id)
+	dev, err := FindByIdentifiers(r.Interface, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}

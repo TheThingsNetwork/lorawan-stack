@@ -63,25 +63,21 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					DefaultMACParameters: &ttnpb.MACParameters{
-						MaxEIRP: 42,
-					},
+				DefaultMACParameters: &ttnpb.MACParameters{
+					MaxEIRP: 42,
 				},
 				SupportsJoin:    false,
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
-					MACParameters:        *ttnpb.NewPopulatedMACParameters(test.Randy, false),
-					DesiredMACParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
-					QueuedResponses:      []*ttnpb.MACCommand{},
+					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					QueuedResponses:   []*ttnpb.MACCommand{},
 				},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						DefaultMACParameters: &ttnpb.MACParameters{
-							MaxEIRP: 42,
-						},
+					DefaultMACParameters: &ttnpb.MACParameters{
+						MaxEIRP: 42,
 					},
 					SupportsJoin:    false,
 					FrequencyPlanID: test.EUFrequencyPlanID,
@@ -106,16 +102,14 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					DefaultMACParameters: &ttnpb.MACParameters{
-						MaxEIRP: 42,
-					},
+				DefaultMACParameters: &ttnpb.MACParameters{
+					MaxEIRP: 42,
 				},
 				SupportsJoin:    false,
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
-					MACParameters:        *ttnpb.NewPopulatedMACParameters(test.Randy, false),
-					DesiredMACParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
@@ -125,10 +119,8 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						DefaultMACParameters: &ttnpb.MACParameters{
-							MaxEIRP: 42,
-						},
+					DefaultMACParameters: &ttnpb.MACParameters{
+						MaxEIRP: 42,
 					},
 					SupportsJoin:    false,
 					FrequencyPlanID: test.EUFrequencyPlanID,

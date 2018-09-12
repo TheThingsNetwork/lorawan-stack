@@ -39,6 +39,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
+
 // TODO(#1008) Move eventCollector to the test package
 type eventCollector events.Channel
 
@@ -184,18 +188,18 @@ func TestScheduleDownlink(t *testing.T) {
 
 		msg := &ttnpb.DownlinkMessage{
 			RawPayload: testBytes,
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 				DeviceID:               DeviceID,
 				DevAddr:                &DevAddr,
 			},
 			Settings: ttnpb.TxSettings{
-				DataRateIndex:         drIdx,
-				CodingRate:            "4/5",
-				PolarizationInversion: true,
-				ChannelIndex:          chIdx,
-				Frequency:             channels[int(chIdx)].DownlinkFrequency,
-				TxPower:               int32(band.DefaultMaxEIRP), // TODO: Rename this to EIRP(https://github.com/TheThingsIndustries/lorawan-stack/issues/848)
+				DataRateIndex:      drIdx,
+				CodingRate:         "4/5",
+				InvertPolarization: true,
+				ChannelIndex:       chIdx,
+				Frequency:          channels[int(chIdx)].DownlinkFrequency,
+				TxPower:            int32(band.DefaultMaxEIRP),
 			},
 			TxMetadata: md,
 		}
@@ -206,17 +210,17 @@ func TestScheduleDownlink(t *testing.T) {
 	rx2Downlink := func(freq uint64, drIdx ttnpb.DataRateIndex, md ttnpb.TxMetadata) *ttnpb.DownlinkMessage {
 		msg := &ttnpb.DownlinkMessage{
 			RawPayload: testBytes,
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 				DeviceID:               DeviceID,
 				DevAddr:                &DevAddr,
 			},
 			Settings: ttnpb.TxSettings{
-				DataRateIndex:         drIdx,
-				CodingRate:            "4/5",
-				PolarizationInversion: true,
-				Frequency:             freq,
-				TxPower:               int32(band.DefaultMaxEIRP), // TODO: Rename this to EIRP(https://github.com/TheThingsIndustries/lorawan-stack/issues/848)
+				DataRateIndex:      drIdx,
+				CodingRate:         "4/5",
+				InvertPolarization: true,
+				Frequency:          freq,
+				TxPower:            int32(band.DefaultMaxEIRP),
 			},
 			TxMetadata: md,
 		}
@@ -248,7 +252,7 @@ func TestScheduleDownlink(t *testing.T) {
 					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay:          3,
 						Rx1DataRateOffset: 2,
 						Channels:          channels[:],
@@ -258,10 +262,10 @@ func TestScheduleDownlink(t *testing.T) {
 			},
 			Uplink: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
-					DataRateIndex:         ttnpb.DATA_RATE_0,
-					CodingRate:            "4/5",
-					PolarizationInversion: false,
-					ChannelIndex:          3,
+					DataRateIndex:      ttnpb.DATA_RATE_0,
+					CodingRate:         "4/5",
+					InvertPolarization: false,
+					ChannelIndex:       3,
 				},
 			},
 			Accumulator: newMetadataAccumulator(
@@ -360,7 +364,7 @@ func TestScheduleDownlink(t *testing.T) {
 					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay:          3,
 						Rx1DataRateOffset: 2,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_3,
@@ -372,10 +376,10 @@ func TestScheduleDownlink(t *testing.T) {
 			},
 			Uplink: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
-					DataRateIndex:         ttnpb.DATA_RATE_0,
-					CodingRate:            "4/5",
-					PolarizationInversion: false,
-					ChannelIndex:          3,
+					DataRateIndex:      ttnpb.DATA_RATE_0,
+					CodingRate:         "4/5",
+					InvertPolarization: false,
+					ChannelIndex:       3,
 				},
 			},
 			Accumulator: newMetadataAccumulator(
@@ -617,10 +621,12 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
+				MACSettings:          &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				Session: ttnpb.NewPopulatedSession(test.Randy, false),
+				Session:              ttnpb.NewPopulatedSession(test.Randy, false),
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:        false,
 			ConfFCnt:   0,
@@ -633,14 +639,15 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
-				MACSettings: ttnpb.MACSettings{
+				MACSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: 3,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				NextStatusAfter: 1,
-				Session:         ttnpb.NewPopulatedSession(test.Randy, false),
+				NextStatusAfter:      1,
+				Session:              ttnpb.NewPopulatedSession(test.Randy, false),
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:   false,
 			Bytes: nil,
@@ -654,14 +661,14 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
-				MACSettings: ttnpb.MACSettings{
-					StatusTimePeriodicity: time.Nanosecond,
+				MACSettings: &ttnpb.MACSettings{
+					StatusTimePeriodicity: 24 * time.Hour,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				NextStatusAt: time.Now().Add(24 * time.Hour),
-				Session:      ttnpb.NewPopulatedSession(test.Randy, false),
+				LastStatusReceivedAt: timePtr(time.Now()),
+				Session:              ttnpb.NewPopulatedSession(test.Randy, false),
 			},
 			Ack:        false,
 			ConfFCnt:   0,
@@ -676,6 +683,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
+				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -690,6 +698,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 				},
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:      true,
 			ConfFCnt: 24,
@@ -723,6 +732,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
+				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -744,6 +754,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:      false,
 			ConfFCnt: 0,
@@ -779,6 +790,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
+				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -800,6 +812,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:      true,
 			ConfFCnt: 24,
@@ -835,6 +848,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
+				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -856,6 +870,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:      false,
 			ConfFCnt: 0,
@@ -892,6 +907,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
+				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -913,6 +929,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 			},
 			Ack:      true,
 			ConfFCnt: 24,
@@ -949,7 +966,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
-				MACSettings: ttnpb.MACSettings{
+				MACSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: 3,
 				},
 				MACState: &ttnpb.MACState{
@@ -1007,7 +1024,7 @@ func TestGenerateDownlink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevAddr: &DevAddr,
 				},
-				MACSettings: ttnpb.MACSettings{
+				MACSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: time.Nanosecond,
 				},
 				MACState: &ttnpb.MACState{
@@ -1054,7 +1071,6 @@ func TestGenerateDownlink(t *testing.T) {
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				}
 				dev.Session.NextNFCntDown++
-				dev.NextStatusAt = time.Now().Add(dev.MACSettings.StatusTimePeriodicity)
 			},
 		},
 	} {
@@ -1063,7 +1079,6 @@ func TestGenerateDownlink(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			start := time.Now()
 			b, err := generateDownlink(tc.Context, dev, tc.Ack, tc.ConfFCnt)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
@@ -1075,11 +1090,6 @@ func TestGenerateDownlink(t *testing.T) {
 			expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 			if tc.DeviceDiff != nil {
 				tc.DeviceDiff(expected)
-			}
-
-			if tc.Device.MACSettings.StatusTimePeriodicity > 0 && tc.Device.NextStatusAt.Before(time.Now()) {
-				a.So([]time.Time{start, dev.NextStatusAt, expected.NextStatusAt}, should.BeChronological)
-				expected.NextStatusAt = dev.NextStatusAt
 			}
 			a.So(dev, should.Resemble, expected)
 		})

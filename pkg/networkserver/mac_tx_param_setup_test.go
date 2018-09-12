@@ -58,7 +58,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
 						DownlinkDwellTime: true,
 						UplinkDwellTime:   true,

@@ -72,7 +72,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							nil,
 							nil,

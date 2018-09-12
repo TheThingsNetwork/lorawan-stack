@@ -94,10 +94,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 							Frequency:    42,
 						}).MACCommand(),
 					},
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
-								UplinkEnabled: true,
+								EnableUplink: true,
 							},
 							nil,
 							{
@@ -111,10 +111,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					MACParameters: ttnpb.MACParameters{
+					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
-								UplinkEnabled: true,
+								EnableUplink: true,
 							},
 							nil,
 							{

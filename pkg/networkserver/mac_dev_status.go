@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -26,7 +27,7 @@ var (
 	evtMACDeviceStatus        = events.Define("ns.mac.device_status", "handled device status")
 )
 
-func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns) (err error) {
+func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, recvAt time.Time) (err error) {
 	if pld == nil {
 		return errMissingPayload
 	}
@@ -35,6 +36,7 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		// TODO: Modify status variables in MACState (https://github.com/TheThingsIndustries/ttn/issues/834)
 		_ = pld.Battery
 		_ = pld.Margin
+		dev.LastStatusReceivedAt = &recvAt
 
 		events.Publish(evtMACDeviceStatus(ctx, dev.EndDeviceIdentifiers, pld))
 		return nil

@@ -52,7 +52,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						Time: time.Unix(42, 42),
+						Time: timePtr(time.Unix(42, 42)),
 					},
 				},
 			},
@@ -85,13 +85,13 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						Time: time.Unix(42, 41),
+						Time: timePtr(time.Unix(42, 41)),
 					},
 					{
-						Time: time.Unix(42, 42),
+						Time: timePtr(time.Unix(42, 42)),
 					},
 					{
-						Time: time.Unix(420, 435353),
+						Time: timePtr(time.Unix(420, 435353)),
 					},
 				},
 			},
@@ -124,16 +124,16 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						Time: time.Unix(42, 44),
+						Time: timePtr(time.Unix(42, 44)),
 					},
 					{
-						Time: time.Unix(42, 44),
+						Time: timePtr(time.Unix(42, 44)),
 					},
 					{
-						Time: time.Unix(42, 46),
+						Time: timePtr(time.Unix(42, 46)),
 					},
 					{
-						Time: time.Unix(42, 47),
+						Time: timePtr(time.Unix(42, 47)),
 					},
 				},
 			},

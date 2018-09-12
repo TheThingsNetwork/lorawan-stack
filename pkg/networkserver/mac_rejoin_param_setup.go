@@ -34,12 +34,12 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRejoinParamSetupReq()
 
-		dev.MACState.RejoinCountPeriodicity = req.MaxCountExponent
+		dev.MACState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent
 		acked := &ttnpb.MACCommand_RejoinParamSetupReq{
 			MaxCountExponent: req.MaxCountExponent,
 		}
 		if pld.MaxTimeExponentAck {
-			dev.MACState.RejoinTimePeriodicity = req.MaxTimeExponent
+			dev.MACState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
 			acked.MaxTimeExponent = req.MaxTimeExponent
 		}
 

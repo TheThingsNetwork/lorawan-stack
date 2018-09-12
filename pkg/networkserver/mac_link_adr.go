@@ -75,7 +75,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		}
 
 		if req.NbTrans > 0 {
-			dev.MACState.ADRNbTrans = req.NbTrans
+			dev.MACState.CurrentParameters.ADRNbTrans = req.NbTrans
 		}
 
 		var mask [16]bool
@@ -89,13 +89,13 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		}
 
 		for i, masked := range m {
-			if i >= len(dev.MACState.Channels) || dev.MACState.MACParameters.Channels[i] == nil {
+			if i >= len(dev.MACState.CurrentParameters.Channels) || dev.MACState.CurrentParameters.Channels[i] == nil {
 				if !masked {
 					continue
 				}
 				return errCorruptedMACState.WithCause(errUnknownChannel)
 			}
-			dev.MACState.MACParameters.Channels[i].UplinkEnabled = masked
+			dev.MACState.CurrentParameters.Channels[i].EnableUplink = masked
 		}
 
 		events.Publish(evtMACLinkADRAccept(ctx, dev.EndDeviceIdentifiers, req))
@@ -106,7 +106,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return err
 	}
 
-	dev.MACState.ADRDataRateIndex = req.DataRateIndex
-	dev.MACState.ADRTxPowerIndex = req.TxPowerIndex
+	dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
+	dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
 	return nil
 }
