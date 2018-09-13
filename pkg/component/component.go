@@ -68,6 +68,8 @@ type Component struct {
 	FrequencyPlans *frequencyplans.Store
 
 	rightsFetcher rights.Fetcher
+
+	tasks []task
 }
 
 // MustNew calls New and returns a new component or panics on an error.
@@ -192,6 +194,10 @@ func (c *Component) Start() (err error) {
 		return err
 	}
 	c.logger.Debug("Joined cluster")
+
+	c.logger.Debug("Starting tasks")
+	c.startTasks()
+	c.logger.Debug("Started tasks")
 
 	return nil
 }
