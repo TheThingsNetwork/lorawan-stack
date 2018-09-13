@@ -71,7 +71,7 @@ func TestGatewayServer(t *testing.T) {
 		},
 	})
 	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
-	config := gatewayserver.Config{
+	config := &gatewayserver.Config{
 		RequireRegisteredGateways: false,
 		MQTT: gatewayserver.MQTTConfig{
 			Listen: ":1882",

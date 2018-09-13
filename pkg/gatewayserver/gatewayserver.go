@@ -46,7 +46,7 @@ type GatewayServer struct {
 	*component.Component
 	io.Server
 
-	config Config
+	config *Config
 
 	connections sync.Map
 }
@@ -60,7 +60,7 @@ var (
 )
 
 // New returns new *GatewayServer.
-func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
+func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 	gs = &GatewayServer{
 		Component: c,
 		config:    conf,

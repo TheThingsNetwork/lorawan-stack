@@ -31,7 +31,7 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
-			gs, err := gatewayserver.New(c, config.GS)
+			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
 				return shared.ErrGatewayServerInitialize.WithCause(err)
 			}
