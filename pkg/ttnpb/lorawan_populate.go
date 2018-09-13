@@ -124,7 +124,7 @@ func NewPopulatedJoinAcceptPayload(r randyLorawan, easy bool) *JoinAcceptPayload
 	out.NetID = *types.NewPopulatedNetID(r)
 	out.DevAddr = *types.NewPopulatedDevAddr(r)
 	out.DLSettings = *NewPopulatedDLSettings(r, easy)
-	out.RxDelay = uint32(r.Intn(256))
+	out.RxDelay = RxDelay(r.Intn(16))
 	if r.Intn(10) != 0 {
 		out.CFList = NewPopulatedCFList(r, false)
 	}

@@ -334,7 +334,7 @@ func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 	if err := msg.DLSettings.UnmarshalLoRaWAN(b[10:11]); err != nil {
 		return errFailedDecoding("DLSettings").WithCause(err)
 	}
-	msg.RxDelay = uint32(b[11])
+	msg.RxDelay = RxDelay(b[11])
 
 	if n == 12 {
 		return nil
