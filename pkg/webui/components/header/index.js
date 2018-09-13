@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 import React from 'react'
 
 import Logo from '../logo'
@@ -27,12 +26,12 @@ const defaultNavigationEntries = [
   {
     title: sharedMessages.overview,
     icon: 'overview',
-    path: '/console/overview',
+    path: '/console',
   },
   {
     title: sharedMessages.applications,
     icon: 'application',
-    path: '/console/overview',
+    path: '/console/applications',
   },
   {
     title: sharedMessages.gateways,
@@ -67,26 +66,38 @@ const Header = function ({
   handleSearchRequest = () => null,
   ...rest
 }) {
+  const isGuest = !Boolean(user)
 
   return (
     <header {...rest} className={styles.bar}>
-      <div className={styles.left}>
-        <div className={styles.logo}><Logo /></div>
-        <NavigationBar className={styles.navList} entries={navigationEntries} />
-      </div>
-      <div className={styles.right}>
-        <Input icon="search" onEnter={handleSearchRequest} />
-        <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} user={user} />
-      </div>
+      {
+        isGuest ? (
+          <div className={styles.left}>
+            <div className={styles.logo}><Logo /></div>
+          </div>
+        ) : (
+          <React.Fragment>
+            <div className={styles.left}>
+              <div className={styles.logo}><Logo /></div>
+              <NavigationBar className={styles.navList} entries={navigationEntries} />
+            </div>
+            <div className={styles.right}>
+              <Input icon="search" onEnter={handleSearchRequest} />
+              <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} user={user} />
+            </div>
+          </React.Fragment>
+        )
+      }
     </header>
   )
 }
 
 Header.propTypes = {
   /**
-  * The User object, retrieved from the API
+  * The User object, retrieved from the API. If it is
+  * `undefined`, then the guest header is rendered.
   */
-  user: PropTypes.object.isRequired,
+  user: PropTypes.object,
   /**
   * A list of items for the dropdown
   * @param {(string|Object)} title - The title to be displayed
