@@ -44,11 +44,8 @@ type task struct {
 	backoff []time.Duration
 }
 
-// RegisterTask registers a task, optionally with automatic restart, to be started after the component started.
+// RegisterTask registers a task, optionally with restart policy and backoff, to be started after the component started.
 func (c *Component) RegisterTask(fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
-	if len(backoff) == 0 {
-		backoff = defaultTaskBackoff[:]
-	}
 	c.tasks = append(c.tasks, task{
 		fn:      fn,
 		restart: restart,
@@ -56,36 +53,44 @@ func (c *Component) RegisterTask(fn TaskFunc, restart TaskRestart, backoff ...ti
 	})
 }
 
+// StartTask starts the specified task function, optionally with restart policy and backoff.
+func (c *Component) StartTask(ctx context.Context, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+	if len(backoff) == 0 {
+		backoff = defaultTaskBackoff[:]
+	}
+	go func() {
+		invocation := 0
+		for {
+			invocation++
+			err := fn(ctx)
+			if err != nil {
+				c.logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
+			}
+			switch restart {
+			case TaskRestartNever:
+				return
+			case TaskRestartAlways:
+			case TaskRestartOnFailure:
+				if err == nil {
+					return
+				}
+			}
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			bi := invocation - 1
+			if bi >= len(backoff) {
+				bi = len(backoff) - 1
+			}
+			time.Sleep(backoff[bi])
+		}
+	}()
+}
+
 func (c *Component) startTasks() {
 	for _, t := range c.tasks {
-		go func(t task) {
-			invocation := 0
-			for {
-				invocation++
-				err := t.fn(c.ctx)
-				if err != nil {
-					c.logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
-				}
-				switch t.restart {
-				case TaskRestartNever:
-					return
-				case TaskRestartAlways:
-				case TaskRestartOnFailure:
-					if err == nil {
-						return
-					}
-				}
-				select {
-				case <-c.ctx.Done():
-					return
-				default:
-				}
-				bi := invocation - 1
-				if bi >= len(t.backoff) {
-					bi = len(t.backoff) - 1
-				}
-				time.Sleep(t.backoff[bi])
-			}
-		}(t)
+		c.StartTask(c.ctx, t.fn, t.restart, t.backoff...)
 	}
 }
