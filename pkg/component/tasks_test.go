@@ -12,24 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package component_test
+package component
 
 import (
 	"context"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/component"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func init() {
+	defaultTaskBackoff = [...]time.Duration{
+		1 * test.Delay,
+		2 * test.Delay,
+		3 * test.Delay,
+		4 * test.Delay,
+	}
+}
+
 func TestTasks(t *testing.T) {
 	a := assertions.New(t)
 
-	c, err := component.New(test.GetLogger(t), &component.Config{})
+	c, err := New(test.GetLogger(t), &Config{})
 	a.So(err, should.BeNil)
 
 	// Register a one-off task.
@@ -38,7 +47,7 @@ func TestTasks(t *testing.T) {
 	c.RegisterTask(func(_ context.Context) error {
 		oneOffWg.Done()
 		return nil
-	}, component.TaskRestartNever)
+	}, TaskRestartNever)
 	// Register an always restarting task.
 	restartingWg := sync.WaitGroup{}
 	restartingWg.Add(5)
@@ -49,7 +58,7 @@ func TestTasks(t *testing.T) {
 			restartingWg.Done()
 		}
 		return nil
-	}, component.TaskRestartAlways)
+	}, TaskRestartAlways)
 
 	// Register a task that restarts on failure.
 	failingWg := sync.WaitGroup{}
@@ -62,7 +71,7 @@ func TestTasks(t *testing.T) {
 		}
 		failingWg.Done()
 		return nil
-	}, component.TaskRestartOnFailure)
+	}, TaskRestartOnFailure)
 
 	// Wait for all invocations.
 	test.Must(nil, c.Start())

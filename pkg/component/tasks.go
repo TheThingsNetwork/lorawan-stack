@@ -14,7 +14,10 @@
 
 package component
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // TaskFunc is the task function.
 type TaskFunc func(context.Context) error
@@ -28,31 +31,40 @@ const (
 	TaskRestartOnFailure
 )
 
+var defaultTaskBackoff = [...]time.Duration{
+	10 * time.Millisecond,
+	50 * time.Millisecond,
+	100 * time.Millisecond,
+	1 * time.Second,
+}
+
 type task struct {
 	fn      TaskFunc
 	restart TaskRestart
+	backoff []time.Duration
 }
 
 // RegisterTask registers a task, optionally with automatic restart, to be started after the component started.
-func (c *Component) RegisterTask(fn TaskFunc, restart TaskRestart) {
+func (c *Component) RegisterTask(fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+	if len(backoff) == 0 {
+		backoff = defaultTaskBackoff[:]
+	}
 	c.tasks = append(c.tasks, task{
 		fn:      fn,
 		restart: restart,
+		backoff: backoff,
 	})
 }
 
 func (c *Component) startTasks() {
 	for _, t := range c.tasks {
 		go func(t task) {
+			invocation := 0
 			for {
-				select {
-				case <-c.ctx.Done():
-					return
-				default:
-				}
+				invocation++
 				err := t.fn(c.ctx)
 				if err != nil {
-					c.logger.WithError(err).Warn("Task failed")
+					c.logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
 				}
 				switch t.restart {
 				case TaskRestartNever:
@@ -63,6 +75,16 @@ func (c *Component) startTasks() {
 						return
 					}
 				}
+				select {
+				case <-c.ctx.Done():
+					return
+				default:
+				}
+				bi := invocation - 1
+				if bi >= len(t.backoff) {
+					bi = len(t.backoff) - 1
+				}
+				time.Sleep(t.backoff[bi])
 			}
 		}(t)
 	}
