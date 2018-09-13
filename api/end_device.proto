@@ -216,6 +216,13 @@ message MACState {
   // TODO: Add info about failed MAC requests
 }
 
+// Power state of the device.
+enum PowerState {
+  POWER_UNKNOWN = 0;
+  POWER_BATTERY = 1;
+  POWER_EXTERNAL = 2;
+}
+
 // Defines an End Device registration and its state on the network.
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
@@ -312,29 +319,35 @@ message EndDevice {
   // Time when the device status was last received via the DevStatus MAC command.
   // Stored in Network Server.
   google.protobuf.Timestamp last_status_received_at = 33 [(gogoproto.stdtime) = true];
-  // Battery percentage of the device, received via the DevStatus MAC command at status_received_at.
+  // The power state of the device; whether it is battery-powered or connected to an external power source.
+  // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  float battery_percentage = 34;
-  // Demodulation signal-to-noise ratio (dB), received via the DevStatus MAC command at status_received_at.
+  PowerState power_state = 34;
+  // Latest-known battery percentage of the device.
+  // Received via the DevStatus MAC command at status_received_at or earlier.
   // Stored in Network Server.
-  int32 downlink_margin = 35;
+  float battery_percentage = 35;
+  // Demodulation signal-to-noise ratio (dB).
+  // Received via the DevStatus MAC command at status_received_at.
+  // Stored in Network Server.
+  int32 downlink_margin = 36;
 
   // Recent uplink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated UplinkMessage recent_uplinks = 36;
+  repeated UplinkMessage recent_uplinks = 37;
   // Recent downlink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated DownlinkMessage recent_downlinks = 37;
+  repeated DownlinkMessage recent_downlinks = 38;
   // Queued Application downlink messages. Stored in Application Server,
   // which sets them on the Network Server.
-  repeated ApplicationDownlink queued_application_downlinks = 38;
+  repeated ApplicationDownlink queued_application_downlinks = 39;
 
   // The payload formatters for this end device. Stored in Application Server.
   // Copied on creation from template identified by version_ids.
-  MessagePayloadFormatters formatters = 39;
+  MessagePayloadFormatters formatters = 40;
 
   // Location of the device. Stored in Application Server.
-  map<string,Location> locations = 40;
+  map<string,Location> locations = 41;
 }
 
 message EndDevices {
