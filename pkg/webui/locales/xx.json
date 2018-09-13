@@ -21,6 +21,8 @@
   "lib.shared-messages.settings": "Xxxxxxxx",
   "lib.shared-messages.traffic": "Xxxxxxx",
   "lib.shared-messages.userId": "Xxxx XX",
+  "views.console.login.index.welcome": "Xxxxxxx xx {ttnConsole}",
+  "views.console.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
   "views.oauth.authorize.index.modalTitle": "Xxxxxxx xxx Xxxxxxxxxx",
   "views.oauth.authorize.index.modalSubtitle": "{clientName} xx xxxxxxxxxx xxxxxxxxxxx xx xx xxx xxxxxxxxx:",
   "views.oauth.authorize.index.loginInfo": "Xxx xxx xxxxxx xx xx {userId}.",

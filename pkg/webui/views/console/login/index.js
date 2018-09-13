@@ -13,33 +13,48 @@
 // limitations under the License.
 
 import React from 'react'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
-import * as user from '../../../actions/user'
+import { connect } from 'react-redux'
+import { defineMessages } from 'react-intl'
+import { Redirect } from 'react-router-dom'
 
 import Button from '../../../components/button'
+import Message from '../../../lib/components/message'
 
-@withRouter
+import style from './login.styl'
+
+const m = defineMessages({
+  welcome: 'Welcome to {ttnConsole}',
+  login: 'You need to be logged in to use this site',
+})
+
 @connect(state => ({
   user: state.user.user,
 }))
 @bind
 export default class Login extends React.PureComponent {
   redirectToLogin () {
-    window.location = `/console/api/auth/login?path=${window.location.pathname}`
-  }
-
-  logout () {
-    this.props.dispatch(user.logout())
+    window.location = '/console/api/auth/login?path=/console/overview'
   }
 
   render () {
+    const { user } = this.props
+
+    // dont show the login page if the user is already logged in
+    if (Boolean(user)) {
+      return <Redirect to="/console" />
+    }
+
     return (
-      <div>
-        {!this.props.user
-          ? <Button message="Login via TTN Account" onClick={this.redirectToLogin} />
-          : <Button message="Logout" onClick={this.logout} />}
+      <div className={style.login}>
+        <Message
+          className={style.loginHeader}
+          values={{ ttnConsole: 'The Things Network Console' }}
+          component="h2"
+          content={m.welcome}
+        />
+        <Message className={style.loginSub} content={m.login} />
+        <Button message="Login via TTN Account" onClick={this.redirectToLogin} />
       </div>
     )
   }
