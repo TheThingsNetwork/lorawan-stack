@@ -73,7 +73,7 @@ func TestHandleJoin(t *testing.T) {
 	)).(*JoinServer)
 
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-	req.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
+	req.Payload = ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
 	resp, err := js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
@@ -145,9 +145,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			1,
@@ -235,7 +233,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				Lifetime: nil,
+				Lifetime: 0,
 			},
 			nil,
 		},
@@ -259,9 +257,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			0x2443,
@@ -349,7 +345,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				Lifetime: nil,
+				Lifetime: 0,
 			},
 			nil,
 		},
@@ -373,9 +369,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			0x2442,
@@ -432,9 +426,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: net.IPv4(0x45, 0x44, 0x43, 0x43).String(),
 			},
 			1,
@@ -487,9 +479,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0_2,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -562,7 +552,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				Lifetime: nil,
+				Lifetime: 0,
 			},
 			nil,
 		},
@@ -581,9 +571,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0_1,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0_1,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -656,7 +644,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				Lifetime: nil,
+				Lifetime: 0,
 			},
 			nil,
 		},
@@ -675,9 +663,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -750,7 +736,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				Lifetime: nil,
+				Lifetime: 0,
 			},
 			nil,
 		},
@@ -769,9 +755,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -844,7 +828,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				Lifetime: nil,
+				Lifetime: 0,
 			},
 			nil,
 		},
@@ -863,9 +847,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -919,9 +901,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -960,9 +940,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -974,7 +952,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
-				Payload: ttnpb.Message{
+				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
 					},
@@ -1007,9 +985,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -1021,7 +997,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
-				Payload: ttnpb.Message{
+				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
 						Major: ttnpb.Major(10),
@@ -1055,9 +1031,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -1069,7 +1043,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
-				Payload: ttnpb.Message{
+				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
 						Major: ttnpb.Major_LORAWAN_R1,
@@ -1107,9 +1081,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -1151,9 +1123,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			0,
@@ -1161,7 +1131,7 @@ func TestHandleJoin(t *testing.T) {
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MAC_V1_0,
-				Payload: ttnpb.Message{
+				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
 					},

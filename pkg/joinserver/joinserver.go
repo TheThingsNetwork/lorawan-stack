@@ -127,9 +127,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errMissingDevAddr
 	}
 
-	if req.Payload.Payload == nil {
+	if req.GetPayload().GetPayload() == nil {
 		if req.RawPayload == nil {
 			return nil, errMissingPayload
+		}
+		if req.Payload == nil {
+			req.Payload = &ttnpb.Message{}
 		}
 		if err = req.Payload.UnmarshalLoRaWAN(req.RawPayload); err != nil {
 			return nil, errUnmarshalPayloadFailed.WithCause(err)
@@ -229,7 +232,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	dn := binary.BigEndian.Uint16(pld.DevNonce[:])
-	if !dev.DisableJoinNonceCheck {
+	if !dev.ResetsJoinNonces {
 		switch req.SelectedMacVersion {
 		case ttnpb.MAC_V1_1:
 			if uint32(dn) < dev.NextDevNonce {
@@ -294,7 +297,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					KEKLabel: "",
 				},
 			},
-			Lifetime: nil,
+			Lifetime: 0,
 		}
 
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
@@ -323,7 +326,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					KEKLabel: "",
 				},
 			},
-			Lifetime: nil,
+			Lifetime: 0,
 		}
 
 	default:
