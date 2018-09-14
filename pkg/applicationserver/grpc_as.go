@@ -19,6 +19,8 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -41,7 +43,10 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Stop/start link.
+	if err := as.cancelLink(ctx, req.ApplicationIdentifiers); err != nil && !errors.IsNotFound(err) {
+		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
+	}
+	as.startLinkTask(ctx, req.ApplicationIdentifiers, &req.ApplicationLink)
 	return &req.ApplicationLink, nil
 }
 
@@ -54,6 +59,8 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Stop link.
+	if err := as.cancelLink(ctx, *ids); err != nil && !errors.IsNotFound(err) {
+		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
+	}
 	return ttnpb.Empty, nil
 }

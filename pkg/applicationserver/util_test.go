@@ -18,10 +18,8 @@ import (
 	"context"
 	"net"
 	"sync"
-	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -117,7 +115,13 @@ func (r *memDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 		if v != nil {
 			ed = v.(*ttnpb.EndDevice)
 		}
-		return f(ed)
+		if ed, err := f(ed); err != nil {
+			return nil, err
+		} else if ed == nil {
+			return nil, nil
+		} else {
+			return ed, nil
+		}
 	})
 }
 
@@ -148,7 +152,13 @@ func (r *memLinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifi
 		if v != nil {
 			l = v.(*ttnpb.ApplicationLink)
 		}
-		return f(l)
+		if l, err := f(l); err != nil {
+			return nil, err
+		} else if l == nil {
+			return nil, nil
+		} else {
+			return l, nil
+		}
 	})
 }
 
@@ -170,26 +180,18 @@ func (r *memLinkRegistry) Range(ctx context.Context, f func(ttnpb.ApplicationIde
 	return nil
 }
 
-func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
-	for i := 0; i < 20; i++ {
-		time.Sleep(20 * time.Millisecond)
-		if peer := c.GetPeer(ctx, role, nil); peer != nil {
-			return
-		}
-	}
-	panic("could not connect to peer")
-}
-
 type mockNS struct {
 	ttnpb.AsNsServer
-	linkCh chan ttnpb.ApplicationIdentifiers
-	upCh   chan *ttnpb.ApplicationUp
+	linkCh   chan ttnpb.ApplicationIdentifiers
+	unlinkCh chan ttnpb.ApplicationIdentifiers
+	upCh     chan *ttnpb.ApplicationUp
 }
 
 func startMockNS(ctx context.Context) (*mockNS, string) {
 	ns := &mockNS{
-		linkCh: make(chan ttnpb.ApplicationIdentifiers, 1),
-		upCh:   make(chan *ttnpb.ApplicationUp, 1),
+		linkCh:   make(chan ttnpb.ApplicationIdentifiers, 1),
+		unlinkCh: make(chan ttnpb.ApplicationIdentifiers, 1),
+		upCh:     make(chan *ttnpb.ApplicationUp, 1),
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterAsNsServer(srv.Server, ns)
@@ -203,6 +205,9 @@ func startMockNS(ctx context.Context) (*mockNS, string) {
 
 func (ns *mockNS) LinkApplication(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
 	ns.linkCh <- *ids
+	defer func() {
+		ns.unlinkCh <- *ids
+	}()
 	for {
 		select {
 		case <-stream.Context().Done():
