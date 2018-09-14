@@ -43,7 +43,7 @@ type SessionKeyRequest struct {
 func (m *SessionKeyRequest) Reset()      { *m = SessionKeyRequest{} }
 func (*SessionKeyRequest) ProtoMessage() {}
 func (*SessionKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_25ccf78700467805, []int{0}
+	return fileDescriptor_joinserver_9118ec1542bbd508, []int{0}
 }
 func (m *SessionKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -93,7 +93,7 @@ type NwkSKeysResponse struct {
 func (m *NwkSKeysResponse) Reset()      { *m = NwkSKeysResponse{} }
 func (*NwkSKeysResponse) ProtoMessage() {}
 func (*NwkSKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_25ccf78700467805, []int{1}
+	return fileDescriptor_joinserver_9118ec1542bbd508, []int{1}
 }
 func (m *NwkSKeysResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -153,7 +153,7 @@ type AppSKeyResponse struct {
 func (m *AppSKeyResponse) Reset()      { *m = AppSKeyResponse{} }
 func (*AppSKeyResponse) ProtoMessage() {}
 func (*AppSKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_25ccf78700467805, []int{2}
+	return fileDescriptor_joinserver_9118ec1542bbd508, []int{2}
 }
 func (m *AppSKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1182,13 +1182,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_25ccf78700467805)
+	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_9118ec1542bbd508)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_25ccf78700467805)
+	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_9118ec1542bbd508)
 }
 
-var fileDescriptor_joinserver_25ccf78700467805 = []byte{
+var fileDescriptor_joinserver_9118ec1542bbd508 = []byte{
 	// 575 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x3f, 0x4c, 0xdb, 0x40,
 	0x14, 0xc6, 0xef, 0x28, 0x02, 0x71, 0x50, 0xa0, 0x9e, 0x50, 0x8a, 0x5e, 0x68, 0x26, 0x86, 0xe2,

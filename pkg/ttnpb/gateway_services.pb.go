@@ -41,7 +41,7 @@ type PullGatewayConfigurationRequest struct {
 func (m *PullGatewayConfigurationRequest) Reset()      { *m = PullGatewayConfigurationRequest{} }
 func (*PullGatewayConfigurationRequest) ProtoMessage() {}
 func (*PullGatewayConfigurationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_services_4c6cc446947adde6, []int{0}
+	return fileDescriptor_gateway_services_a806f51d7089026c, []int{0}
 }
 func (m *PullGatewayConfigurationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1041,13 +1041,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_4c6cc446947adde6)
+	proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_a806f51d7089026c)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_4c6cc446947adde6)
+	golang_proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_a806f51d7089026c)
 }
 
-var fileDescriptor_gateway_services_4c6cc446947adde6 = []byte{
+var fileDescriptor_gateway_services_a806f51d7089026c = []byte{
 	// 913 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x41, 0x88, 0xdb, 0x46,
 	0x14, 0x9d, 0x09, 0x65, 0x69, 0x26, 0xdd, 0x96, 0xcc, 0xc2, 0xc6, 0xa8, 0xcd, 0x38, 0x51, 0xb6,

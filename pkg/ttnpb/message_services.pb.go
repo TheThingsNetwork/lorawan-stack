@@ -40,7 +40,7 @@ type ProcessUplinkMessageRequest struct {
 func (m *ProcessUplinkMessageRequest) Reset()      { *m = ProcessUplinkMessageRequest{} }
 func (*ProcessUplinkMessageRequest) ProtoMessage() {}
 func (*ProcessUplinkMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_services_ede65b0c20f05388, []int{0}
+	return fileDescriptor_message_services_f622ea71928fa376, []int{0}
 }
 func (m *ProcessUplinkMessageRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -101,7 +101,7 @@ type ProcessDownlinkMessageRequest struct {
 func (m *ProcessDownlinkMessageRequest) Reset()      { *m = ProcessDownlinkMessageRequest{} }
 func (*ProcessDownlinkMessageRequest) ProtoMessage() {}
 func (*ProcessDownlinkMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_services_ede65b0c20f05388, []int{1}
+	return fileDescriptor_message_services_f622ea71928fa376, []int{1}
 }
 func (m *ProcessDownlinkMessageRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -996,13 +996,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_ede65b0c20f05388)
+	proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_f622ea71928fa376)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_ede65b0c20f05388)
+	golang_proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_f622ea71928fa376)
 }
 
-var fileDescriptor_message_services_ede65b0c20f05388 = []byte{
+var fileDescriptor_message_services_f622ea71928fa376 = []byte{
 	// 486 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x93, 0x31, 0x68, 0xdb, 0x40,
 	0x14, 0x86, 0xef, 0xb5, 0xa5, 0x21, 0x57, 0xe8, 0xa0, 0x40, 0x30, 0x4e, 0xf3, 0x6c, 0x3c, 0x19,

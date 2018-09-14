@@ -40,7 +40,7 @@ type KeyEnvelope struct {
 func (m *KeyEnvelope) Reset()      { *m = KeyEnvelope{} }
 func (*KeyEnvelope) ProtoMessage() {}
 func (*KeyEnvelope) Descriptor() ([]byte, []int) {
-	return fileDescriptor_keys_ad3a915c25bb0c8f, []int{0}
+	return fileDescriptor_keys_f0b9942cf626cf2f, []int{0}
 }
 func (m *KeyEnvelope) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -92,7 +92,7 @@ type RootKeys struct {
 func (m *RootKeys) Reset()      { *m = RootKeys{} }
 func (*RootKeys) ProtoMessage() {}
 func (*RootKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_keys_ad3a915c25bb0c8f, []int{1}
+	return fileDescriptor_keys_f0b9942cf626cf2f, []int{1}
 }
 func (m *RootKeys) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -167,7 +167,7 @@ type SessionKeys struct {
 func (m *SessionKeys) Reset()      { *m = SessionKeys{} }
 func (*SessionKeys) ProtoMessage() {}
 func (*SessionKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_keys_ad3a915c25bb0c8f, []int{2}
+	return fileDescriptor_keys_f0b9942cf626cf2f, []int{2}
 }
 func (m *SessionKeys) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1270,12 +1270,12 @@ var (
 	ErrIntOverflowKeys   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("lorawan-stack/api/keys.proto", fileDescriptor_keys_ad3a915c25bb0c8f) }
+func init() { proto.RegisterFile("lorawan-stack/api/keys.proto", fileDescriptor_keys_f0b9942cf626cf2f) }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/keys.proto", fileDescriptor_keys_ad3a915c25bb0c8f)
+	golang_proto.RegisterFile("lorawan-stack/api/keys.proto", fileDescriptor_keys_f0b9942cf626cf2f)
 }
 
-var fileDescriptor_keys_ad3a915c25bb0c8f = []byte{
+var fileDescriptor_keys_f0b9942cf626cf2f = []byte{
 	// 532 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0x31, 0x4c, 0xdb, 0x40,
 	0x14, 0xbd, 0x03, 0x4a, 0xf1, 0x39, 0xd0, 0xca, 0x13, 0x6a, 0xab, 0x1f, 0xc4, 0x44, 0xa5, 0x62,

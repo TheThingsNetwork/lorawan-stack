@@ -52,7 +52,7 @@ type ErrorDetails struct {
 func (m *ErrorDetails) Reset()      { *m = ErrorDetails{} }
 func (*ErrorDetails) ProtoMessage() {}
 func (*ErrorDetails) Descriptor() ([]byte, []int) {
-	return fileDescriptor_error_89f9afd06f5fe535, []int{0}
+	return fileDescriptor_error_2b42b869c462ac05, []int{0}
 }
 func (m *ErrorDetails) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -730,13 +730,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/error.proto", fileDescriptor_error_89f9afd06f5fe535)
+	proto.RegisterFile("lorawan-stack/api/error.proto", fileDescriptor_error_2b42b869c462ac05)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/error.proto", fileDescriptor_error_89f9afd06f5fe535)
+	golang_proto.RegisterFile("lorawan-stack/api/error.proto", fileDescriptor_error_2b42b869c462ac05)
 }
 
-var fileDescriptor_error_89f9afd06f5fe535 = []byte{
+var fileDescriptor_error_2b42b869c462ac05 = []byte{
 	// 421 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x92, 0x31, 0x4c, 0x1b, 0x31,
 	0x14, 0x86, 0xfd, 0x28, 0x20, 0xe1, 0x36, 0x91, 0x7a, 0x4b, 0x4f, 0x28, 0x7d, 0x45, 0x95, 0x2a,

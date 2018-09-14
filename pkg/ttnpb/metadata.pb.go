@@ -84,7 +84,7 @@ var LocationSource_value = map[string]int32{
 }
 
 func (LocationSource) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_ffe12dec1f3a9b36, []int{0}
+	return fileDescriptor_metadata_0ba304e21b4ed843, []int{0}
 }
 
 // Contains metadata for a received message. Each antenna that receives
@@ -126,7 +126,7 @@ type RxMetadata struct {
 func (m *RxMetadata) Reset()      { *m = RxMetadata{} }
 func (*RxMetadata) ProtoMessage() {}
 func (*RxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_ffe12dec1f3a9b36, []int{0}
+	return fileDescriptor_metadata_0ba304e21b4ed843, []int{0}
 }
 func (m *RxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -271,7 +271,7 @@ type TxMetadata struct {
 func (m *TxMetadata) Reset()      { *m = TxMetadata{} }
 func (*TxMetadata) ProtoMessage() {}
 func (*TxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_ffe12dec1f3a9b36, []int{1}
+	return fileDescriptor_metadata_0ba304e21b4ed843, []int{1}
 }
 func (m *TxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -346,7 +346,7 @@ type Location struct {
 func (m *Location) Reset()      { *m = Location{} }
 func (*Location) ProtoMessage() {}
 func (*Location) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_ffe12dec1f3a9b36, []int{2}
+	return fileDescriptor_metadata_0ba304e21b4ed843, []int{2}
 }
 func (m *Location) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1921,13 +1921,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_ffe12dec1f3a9b36)
+	proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_0ba304e21b4ed843)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_ffe12dec1f3a9b36)
+	golang_proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_0ba304e21b4ed843)
 }
 
-var fileDescriptor_metadata_ffe12dec1f3a9b36 = []byte{
+var fileDescriptor_metadata_0ba304e21b4ed843 = []byte{
 	// 968 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x95, 0x31, 0x6c, 0xdb, 0x46,
 	0x14, 0x86, 0x79, 0xb2, 0x62, 0xcb, 0x67, 0x5b, 0x36, 0xae, 0x70, 0x42, 0xcb, 0xee, 0x91, 0x70,

@@ -45,7 +45,7 @@ type OAuthClientAuthorization struct {
 func (m *OAuthClientAuthorization) Reset()      { *m = OAuthClientAuthorization{} }
 func (*OAuthClientAuthorization) ProtoMessage() {}
 func (*OAuthClientAuthorization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_26ab16057cc4dc44, []int{0}
+	return fileDescriptor_oauth_b76118c64ab80311, []int{0}
 }
 func (m *OAuthClientAuthorization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -125,7 +125,7 @@ type OAuthAuthorizationCode struct {
 func (m *OAuthAuthorizationCode) Reset()      { *m = OAuthAuthorizationCode{} }
 func (*OAuthAuthorizationCode) ProtoMessage() {}
 func (*OAuthAuthorizationCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_26ab16057cc4dc44, []int{1}
+	return fileDescriptor_oauth_b76118c64ab80311, []int{1}
 }
 func (m *OAuthAuthorizationCode) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -226,7 +226,7 @@ type OAuthAccessToken struct {
 func (m *OAuthAccessToken) Reset()      { *m = OAuthAccessToken{} }
 func (*OAuthAccessToken) ProtoMessage() {}
 func (*OAuthAccessToken) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_26ab16057cc4dc44, []int{2}
+	return fileDescriptor_oauth_b76118c64ab80311, []int{2}
 }
 func (m *OAuthAccessToken) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1976,13 +1976,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_26ab16057cc4dc44)
+	proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_b76118c64ab80311)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_26ab16057cc4dc44)
+	golang_proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_b76118c64ab80311)
 }
 
-var fileDescriptor_oauth_26ab16057cc4dc44 = []byte{
+var fileDescriptor_oauth_b76118c64ab80311 = []byte{
 	// 634 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x94, 0xbd, 0x4f, 0x1b, 0x4b,
 	0x14, 0xc5, 0x67, 0x6c, 0x30, 0x78, 0xcc, 0x83, 0xf7, 0x56, 0x2f, 0xc8, 0x42, 0xca, 0x35, 0x1f,

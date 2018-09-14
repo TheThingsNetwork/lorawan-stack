@@ -258,7 +258,7 @@ var Right_value = map[string]int32{
 }
 
 func (Right) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rights_b9f4d6c02b7d2159, []int{0}
+	return fileDescriptor_rights_a3a73a4a0a5b58c1, []int{0}
 }
 
 type Rights struct {
@@ -270,7 +270,7 @@ type Rights struct {
 func (m *Rights) Reset()      { *m = Rights{} }
 func (*Rights) ProtoMessage() {}
 func (*Rights) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rights_b9f4d6c02b7d2159, []int{0}
+	return fileDescriptor_rights_a3a73a4a0a5b58c1, []int{0}
 }
 func (m *Rights) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -324,7 +324,7 @@ type APIKey struct {
 func (m *APIKey) Reset()      { *m = APIKey{} }
 func (*APIKey) ProtoMessage() {}
 func (*APIKey) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rights_b9f4d6c02b7d2159, []int{1}
+	return fileDescriptor_rights_a3a73a4a0a5b58c1, []int{1}
 }
 func (m *APIKey) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -390,7 +390,7 @@ type APIKeys struct {
 func (m *APIKeys) Reset()      { *m = APIKeys{} }
 func (*APIKeys) ProtoMessage() {}
 func (*APIKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rights_b9f4d6c02b7d2159, []int{2}
+	return fileDescriptor_rights_a3a73a4a0a5b58c1, []int{2}
 }
 func (m *APIKeys) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -436,7 +436,7 @@ type Collaborator struct {
 func (m *Collaborator) Reset()      { *m = Collaborator{} }
 func (*Collaborator) ProtoMessage() {}
 func (*Collaborator) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rights_b9f4d6c02b7d2159, []int{3}
+	return fileDescriptor_rights_a3a73a4a0a5b58c1, []int{3}
 }
 func (m *Collaborator) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -481,7 +481,7 @@ type Collaborators struct {
 func (m *Collaborators) Reset()      { *m = Collaborators{} }
 func (*Collaborators) ProtoMessage() {}
 func (*Collaborators) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rights_b9f4d6c02b7d2159, []int{4}
+	return fileDescriptor_rights_a3a73a4a0a5b58c1, []int{4}
 }
 func (m *Collaborators) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1909,13 +1909,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/rights.proto", fileDescriptor_rights_b9f4d6c02b7d2159)
+	proto.RegisterFile("lorawan-stack/api/rights.proto", fileDescriptor_rights_a3a73a4a0a5b58c1)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/rights.proto", fileDescriptor_rights_b9f4d6c02b7d2159)
+	golang_proto.RegisterFile("lorawan-stack/api/rights.proto", fileDescriptor_rights_a3a73a4a0a5b58c1)
 }
 
-var fileDescriptor_rights_b9f4d6c02b7d2159 = []byte{
+var fileDescriptor_rights_a3a73a4a0a5b58c1 = []byte{
 	// 1065 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x96, 0x3d, 0x50, 0xdb, 0x58,
 	0x10, 0xc7, 0xf5, 0x0c, 0x31, 0xb0, 0xc4, 0xe4, 0xf1, 0x02, 0xc4, 0x18, 0x78, 0x06, 0x43, 0x08,

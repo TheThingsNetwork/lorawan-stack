@@ -538,13 +538,13 @@ var _UserInvitationRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_194aa4d74cb0465d)
+	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_c793b6fcb2d020ac)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_194aa4d74cb0465d)
+	golang_proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_c793b6fcb2d020ac)
 }
 
-var fileDescriptor_user_services_194aa4d74cb0465d = []byte{
+var fileDescriptor_user_services_c793b6fcb2d020ac = []byte{
 	// 727 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x95, 0x4f, 0x48, 0xdc, 0x4c,
 	0x18, 0xc6, 0x67, 0xfc, 0x3e, 0xfc, 0x60, 0x3e, 0xd9, 0x6f, 0x1d, 0x44, 0x3f, 0xa3, 0xbc, 0x62,

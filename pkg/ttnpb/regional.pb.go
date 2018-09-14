@@ -48,7 +48,7 @@ type ConcentratorConfig struct {
 func (m *ConcentratorConfig) Reset()      { *m = ConcentratorConfig{} }
 func (*ConcentratorConfig) ProtoMessage() {}
 func (*ConcentratorConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_142dce3dd4832da8, []int{0}
+	return fileDescriptor_regional_1ee15d9ec45ddb80, []int{0}
 }
 func (m *ConcentratorConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -137,7 +137,7 @@ type ConcentratorConfig_Channel struct {
 func (m *ConcentratorConfig_Channel) Reset()      { *m = ConcentratorConfig_Channel{} }
 func (*ConcentratorConfig_Channel) ProtoMessage() {}
 func (*ConcentratorConfig_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_142dce3dd4832da8, []int{0, 0}
+	return fileDescriptor_regional_1ee15d9ec45ddb80, []int{0, 0}
 }
 func (m *ConcentratorConfig_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -194,7 +194,7 @@ func (m *ConcentratorConfig_LoRaStandardChannel) Reset() {
 }
 func (*ConcentratorConfig_LoRaStandardChannel) ProtoMessage() {}
 func (*ConcentratorConfig_LoRaStandardChannel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_142dce3dd4832da8, []int{0, 1}
+	return fileDescriptor_regional_1ee15d9ec45ddb80, []int{0, 1}
 }
 func (m *ConcentratorConfig_LoRaStandardChannel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -249,7 +249,7 @@ type ConcentratorConfig_FSKChannel struct {
 func (m *ConcentratorConfig_FSKChannel) Reset()      { *m = ConcentratorConfig_FSKChannel{} }
 func (*ConcentratorConfig_FSKChannel) ProtoMessage() {}
 func (*ConcentratorConfig_FSKChannel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_142dce3dd4832da8, []int{0, 2}
+	return fileDescriptor_regional_1ee15d9ec45ddb80, []int{0, 2}
 }
 func (m *ConcentratorConfig_FSKChannel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -305,7 +305,7 @@ type ConcentratorConfig_LBTConfiguration struct {
 func (m *ConcentratorConfig_LBTConfiguration) Reset()      { *m = ConcentratorConfig_LBTConfiguration{} }
 func (*ConcentratorConfig_LBTConfiguration) ProtoMessage() {}
 func (*ConcentratorConfig_LBTConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_regional_142dce3dd4832da8, []int{0, 3}
+	return fileDescriptor_regional_1ee15d9ec45ddb80, []int{0, 3}
 }
 func (m *ConcentratorConfig_LBTConfiguration) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1894,13 +1894,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_142dce3dd4832da8)
+	proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_1ee15d9ec45ddb80)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_142dce3dd4832da8)
+	golang_proto.RegisterFile("lorawan-stack/api/regional.proto", fileDescriptor_regional_1ee15d9ec45ddb80)
 }
 
-var fileDescriptor_regional_142dce3dd4832da8 = []byte{
+var fileDescriptor_regional_1ee15d9ec45ddb80 = []byte{
 	// 737 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0x3f, 0x4c, 0x3b, 0x37,
 	0x14, 0xb6, 0x7f, 0x01, 0x12, 0x9c, 0x42, 0xd1, 0xd1, 0xaa, 0x21, 0x42, 0x4e, 0xda, 0x29, 0xad,

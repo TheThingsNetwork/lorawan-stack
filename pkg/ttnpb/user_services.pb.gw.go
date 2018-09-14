@@ -366,14 +366,14 @@ func RegisterUserRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -387,8 +387,8 @@ func RegisterUserRegistryHandler(ctx context.Context, mux *runtime.ServeMux, con
 	return RegisterUserRegistryHandlerClient(ctx, mux, NewUserRegistryClient(conn))
 }
 
-// RegisterUserRegistryHandler registers the http handlers for service UserRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "UserRegistryClient".
+// RegisterUserRegistryHandlerClient registers the http handlers for service UserRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "UserRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "UserRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "UserRegistryClient" to call the correct interceptors.
@@ -576,14 +576,14 @@ func RegisterUserAccessHandlerFromEndpoint(ctx context.Context, mux *runtime.Ser
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -597,8 +597,8 @@ func RegisterUserAccessHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 	return RegisterUserAccessHandlerClient(ctx, mux, NewUserAccessClient(conn))
 }
 
-// RegisterUserAccessHandler registers the http handlers for service UserAccess to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "UserAccessClient".
+// RegisterUserAccessHandlerClient registers the http handlers for service UserAccess
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "UserAccessClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "UserAccessClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "UserAccessClient" to call the correct interceptors.
@@ -753,14 +753,14 @@ func RegisterUserInvitationRegistryHandlerFromEndpoint(ctx context.Context, mux 
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -774,8 +774,8 @@ func RegisterUserInvitationRegistryHandler(ctx context.Context, mux *runtime.Ser
 	return RegisterUserInvitationRegistryHandlerClient(ctx, mux, NewUserInvitationRegistryClient(conn))
 }
 
-// RegisterUserInvitationRegistryHandler registers the http handlers for service UserInvitationRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "UserInvitationRegistryClient".
+// RegisterUserInvitationRegistryHandlerClient registers the http handlers for service UserInvitationRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "UserInvitationRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "UserInvitationRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "UserInvitationRegistryClient" to call the correct interceptors.

@@ -43,7 +43,7 @@ type GatewayUp struct {
 func (m *GatewayUp) Reset()      { *m = GatewayUp{} }
 func (*GatewayUp) ProtoMessage() {}
 func (*GatewayUp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gatewayserver_522745ff18d09b93, []int{0}
+	return fileDescriptor_gatewayserver_4e2029f0a9c0036a, []int{0}
 }
 func (m *GatewayUp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -104,7 +104,7 @@ type GatewayDown struct {
 func (m *GatewayDown) Reset()      { *m = GatewayDown{} }
 func (*GatewayDown) ProtoMessage() {}
 func (*GatewayDown) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gatewayserver_522745ff18d09b93, []int{1}
+	return fileDescriptor_gatewayserver_4e2029f0a9c0036a, []int{1}
 }
 func (m *GatewayDown) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1084,13 +1084,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/gatewayserver.proto", fileDescriptor_gatewayserver_522745ff18d09b93)
+	proto.RegisterFile("lorawan-stack/api/gatewayserver.proto", fileDescriptor_gatewayserver_4e2029f0a9c0036a)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/gatewayserver.proto", fileDescriptor_gatewayserver_522745ff18d09b93)
+	golang_proto.RegisterFile("lorawan-stack/api/gatewayserver.proto", fileDescriptor_gatewayserver_4e2029f0a9c0036a)
 }
 
-var fileDescriptor_gatewayserver_522745ff18d09b93 = []byte{
+var fileDescriptor_gatewayserver_4e2029f0a9c0036a = []byte{
 	// 586 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x93, 0xb1, 0x53, 0x13, 0x41,
 	0x18, 0xc5, 0x77, 0x41, 0x9d, 0x71, 0x19, 0x01, 0x77, 0x46, 0x27, 0x84, 0xf1, 0x23, 0x13, 0x47,

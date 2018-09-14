@@ -62,7 +62,7 @@ type User struct {
 func (m *User) Reset()      { *m = User{} }
 func (*User) ProtoMessage() {}
 func (*User) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{0}
+	return fileDescriptor_user_69b81de12837bf0a, []int{0}
 }
 func (m *User) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -184,7 +184,7 @@ type Users struct {
 func (m *Users) Reset()      { *m = Users{} }
 func (*Users) ProtoMessage() {}
 func (*Users) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{1}
+	return fileDescriptor_user_69b81de12837bf0a, []int{1}
 }
 func (m *Users) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -230,7 +230,7 @@ type GetUserRequest struct {
 func (m *GetUserRequest) Reset()      { *m = GetUserRequest{} }
 func (*GetUserRequest) ProtoMessage() {}
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{2}
+	return fileDescriptor_user_69b81de12837bf0a, []int{2}
 }
 func (m *GetUserRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -276,7 +276,7 @@ type CreateUserRequest struct {
 func (m *CreateUserRequest) Reset()      { *m = CreateUserRequest{} }
 func (*CreateUserRequest) ProtoMessage() {}
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{3}
+	return fileDescriptor_user_69b81de12837bf0a, []int{3}
 }
 func (m *CreateUserRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -322,7 +322,7 @@ type UpdateUserRequest struct {
 func (m *UpdateUserRequest) Reset()      { *m = UpdateUserRequest{} }
 func (*UpdateUserRequest) ProtoMessage() {}
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{4}
+	return fileDescriptor_user_69b81de12837bf0a, []int{4}
 }
 func (m *UpdateUserRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -369,7 +369,7 @@ type UpdateUserPasswordRequest struct {
 func (m *UpdateUserPasswordRequest) Reset()      { *m = UpdateUserPasswordRequest{} }
 func (*UpdateUserPasswordRequest) ProtoMessage() {}
 func (*UpdateUserPasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{5}
+	return fileDescriptor_user_69b81de12837bf0a, []int{5}
 }
 func (m *UpdateUserPasswordRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -423,7 +423,7 @@ type CreateUserAPIKeyRequest struct {
 func (m *CreateUserAPIKeyRequest) Reset()      { *m = CreateUserAPIKeyRequest{} }
 func (*CreateUserAPIKeyRequest) ProtoMessage() {}
 func (*CreateUserAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{6}
+	return fileDescriptor_user_69b81de12837bf0a, []int{6}
 }
 func (m *CreateUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -476,7 +476,7 @@ type UpdateUserAPIKeyRequest struct {
 func (m *UpdateUserAPIKeyRequest) Reset()      { *m = UpdateUserAPIKeyRequest{} }
 func (*UpdateUserAPIKeyRequest) ProtoMessage() {}
 func (*UpdateUserAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{7}
+	return fileDescriptor_user_69b81de12837bf0a, []int{7}
 }
 func (m *UpdateUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -518,7 +518,7 @@ type Invitation struct {
 func (m *Invitation) Reset()      { *m = Invitation{} }
 func (*Invitation) ProtoMessage() {}
 func (*Invitation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{8}
+	return fileDescriptor_user_69b81de12837bf0a, []int{8}
 }
 func (m *Invitation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -591,7 +591,7 @@ type Invitations struct {
 func (m *Invitations) Reset()      { *m = Invitations{} }
 func (*Invitations) ProtoMessage() {}
 func (*Invitations) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{9}
+	return fileDescriptor_user_69b81de12837bf0a, []int{9}
 }
 func (m *Invitations) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -636,7 +636,7 @@ type SendInvitationRequest struct {
 func (m *SendInvitationRequest) Reset()      { *m = SendInvitationRequest{} }
 func (*SendInvitationRequest) ProtoMessage() {}
 func (*SendInvitationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{10}
+	return fileDescriptor_user_69b81de12837bf0a, []int{10}
 }
 func (m *SendInvitationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -681,7 +681,7 @@ type DeleteInvitationRequest struct {
 func (m *DeleteInvitationRequest) Reset()      { *m = DeleteInvitationRequest{} }
 func (*DeleteInvitationRequest) ProtoMessage() {}
 func (*DeleteInvitationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_9920ed255f9f02a3, []int{11}
+	return fileDescriptor_user_69b81de12837bf0a, []int{11}
 }
 func (m *DeleteInvitationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -4120,12 +4120,12 @@ var (
 	ErrIntOverflowUser   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_9920ed255f9f02a3) }
+func init() { proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_69b81de12837bf0a) }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_9920ed255f9f02a3)
+	golang_proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_69b81de12837bf0a)
 }
 
-var fileDescriptor_user_9920ed255f9f02a3 = []byte{
+var fileDescriptor_user_69b81de12837bf0a = []byte{
 	// 1016 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x3d, 0x6c, 0xdb, 0xc6,
 	0x17, 0xe7, 0x59, 0x92, 0x6d, 0x3d, 0xe5, 0xef, 0xd8, 0x4c, 0xfc, 0x37, 0xab, 0xb4, 0x67, 0x81,

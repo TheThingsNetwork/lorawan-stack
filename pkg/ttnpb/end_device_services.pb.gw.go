@@ -638,14 +638,14 @@ func RegisterNsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runti
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -659,8 +659,8 @@ func RegisterNsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 	return RegisterNsDeviceRegistryHandlerClient(ctx, mux, NewNsDeviceRegistryClient(conn))
 }
 
-// RegisterNsDeviceRegistryHandler registers the http handlers for service NsDeviceRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "NsDeviceRegistryClient".
+// RegisterNsDeviceRegistryHandlerClient registers the http handlers for service NsDeviceRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "NsDeviceRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "NsDeviceRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "NsDeviceRegistryClient" to call the correct interceptors.
@@ -848,14 +848,14 @@ func RegisterAsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runti
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -869,8 +869,8 @@ func RegisterAsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 	return RegisterAsDeviceRegistryHandlerClient(ctx, mux, NewAsDeviceRegistryClient(conn))
 }
 
-// RegisterAsDeviceRegistryHandler registers the http handlers for service AsDeviceRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "AsDeviceRegistryClient".
+// RegisterAsDeviceRegistryHandlerClient registers the http handlers for service AsDeviceRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AsDeviceRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AsDeviceRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "AsDeviceRegistryClient" to call the correct interceptors.
@@ -1058,14 +1058,14 @@ func RegisterJsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runti
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -1079,8 +1079,8 @@ func RegisterJsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 	return RegisterJsDeviceRegistryHandlerClient(ctx, mux, NewJsDeviceRegistryClient(conn))
 }
 
-// RegisterJsDeviceRegistryHandler registers the http handlers for service JsDeviceRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "JsDeviceRegistryClient".
+// RegisterJsDeviceRegistryHandlerClient registers the http handlers for service JsDeviceRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "JsDeviceRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "JsDeviceRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "JsDeviceRegistryClient" to call the correct interceptors.

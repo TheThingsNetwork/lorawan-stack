@@ -4,7 +4,7 @@
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 /*
-The Things Network v3 API
+	The Things Network v3 API
 */
 
 import proto "github.com/gogo/protobuf/proto"
@@ -24,12 +24,12 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-func init() { proto.RegisterFile("lorawan-stack/api/_api.proto", fileDescriptor__api_faafe73283ea2b27) }
+func init() { proto.RegisterFile("lorawan-stack/api/_api.proto", fileDescriptor__api_51166803f86d0f98) }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/_api.proto", fileDescriptor__api_faafe73283ea2b27)
+	golang_proto.RegisterFile("lorawan-stack/api/_api.proto", fileDescriptor__api_51166803f86d0f98)
 }
 
-var fileDescriptor__api_faafe73283ea2b27 = []byte{
+var fileDescriptor__api_51166803f86d0f98 = []byte{
 	// 209 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0xce, 0xa1, 0x4e, 0x03, 0x41,
 	0x10, 0x06, 0xe0, 0x19, 0x83, 0x40, 0x20, 0xd0, 0xe4, 0x7f, 0x02, 0xd8, 0x15, 0x7d, 0x03, 0x1e,

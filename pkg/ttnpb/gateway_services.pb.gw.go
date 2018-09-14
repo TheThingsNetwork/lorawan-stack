@@ -497,14 +497,14 @@ func RegisterGatewayRegistryHandlerFromEndpoint(ctx context.Context, mux *runtim
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -518,8 +518,8 @@ func RegisterGatewayRegistryHandler(ctx context.Context, mux *runtime.ServeMux, 
 	return RegisterGatewayRegistryHandlerClient(ctx, mux, NewGatewayRegistryClient(conn))
 }
 
-// RegisterGatewayRegistryHandler registers the http handlers for service GatewayRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "GatewayRegistryClient".
+// RegisterGatewayRegistryHandlerClient registers the http handlers for service GatewayRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GatewayRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GatewayRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "GatewayRegistryClient" to call the correct interceptors.
@@ -806,14 +806,14 @@ func RegisterGatewayAccessHandlerFromEndpoint(ctx context.Context, mux *runtime.
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -827,8 +827,8 @@ func RegisterGatewayAccessHandler(ctx context.Context, mux *runtime.ServeMux, co
 	return RegisterGatewayAccessHandlerClient(ctx, mux, NewGatewayAccessClient(conn))
 }
 
-// RegisterGatewayAccessHandler registers the http handlers for service GatewayAccess to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "GatewayAccessClient".
+// RegisterGatewayAccessHandlerClient registers the http handlers for service GatewayAccess
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GatewayAccessClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GatewayAccessClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "GatewayAccessClient" to call the correct interceptors.

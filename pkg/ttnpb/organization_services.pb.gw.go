@@ -399,14 +399,14 @@ func RegisterOrganizationRegistryHandlerFromEndpoint(ctx context.Context, mux *r
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -420,8 +420,8 @@ func RegisterOrganizationRegistryHandler(ctx context.Context, mux *runtime.Serve
 	return RegisterOrganizationRegistryHandlerClient(ctx, mux, NewOrganizationRegistryClient(conn))
 }
 
-// RegisterOrganizationRegistryHandler registers the http handlers for service OrganizationRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "OrganizationRegistryClient".
+// RegisterOrganizationRegistryHandlerClient registers the http handlers for service OrganizationRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "OrganizationRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "OrganizationRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "OrganizationRegistryClient" to call the correct interceptors.
@@ -642,14 +642,14 @@ func RegisterOrganizationAccessHandlerFromEndpoint(ctx context.Context, mux *run
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -663,8 +663,8 @@ func RegisterOrganizationAccessHandler(ctx context.Context, mux *runtime.ServeMu
 	return RegisterOrganizationAccessHandlerClient(ctx, mux, NewOrganizationAccessClient(conn))
 }
 
-// RegisterOrganizationAccessHandler registers the http handlers for service OrganizationAccess to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "OrganizationAccessClient".
+// RegisterOrganizationAccessHandlerClient registers the http handlers for service OrganizationAccess
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "OrganizationAccessClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "OrganizationAccessClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "OrganizationAccessClient" to call the correct interceptors.

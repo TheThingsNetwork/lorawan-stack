@@ -16,7 +16,7 @@ DOCKER ?= docker
 
 PROTOC_OUT ?= /out
 
-PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.9
+PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.10
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
                      --mount type=bind,src=$(PWD)/api,dst=$(PWD)/api,ro=true \
                      --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_OUT)/go.thethings.network/lorawan-stack/pkg/ttnpb \

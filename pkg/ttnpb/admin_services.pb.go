@@ -53,7 +53,7 @@ type UserRegistrationSettings struct {
 func (m *UserRegistrationSettings) Reset()      { *m = UserRegistrationSettings{} }
 func (*UserRegistrationSettings) ProtoMessage() {}
 func (*UserRegistrationSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_9ef609dfa093d515, []int{0}
+	return fileDescriptor_admin_services_aae4026b8858278d, []int{0}
 }
 func (m *UserRegistrationSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -126,7 +126,7 @@ type IdentityServerSettings struct {
 func (m *IdentityServerSettings) Reset()      { *m = IdentityServerSettings{} }
 func (*IdentityServerSettings) ProtoMessage() {}
 func (*IdentityServerSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_9ef609dfa093d515, []int{1}
+	return fileDescriptor_admin_services_aae4026b8858278d, []int{1}
 }
 func (m *IdentityServerSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -193,7 +193,7 @@ type UpdateSettingsRequest struct {
 func (m *UpdateSettingsRequest) Reset()      { *m = UpdateSettingsRequest{} }
 func (*UpdateSettingsRequest) ProtoMessage() {}
 func (*UpdateSettingsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_admin_services_9ef609dfa093d515, []int{2}
+	return fileDescriptor_admin_services_aae4026b8858278d, []int{2}
 }
 func (m *UpdateSettingsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1409,13 +1409,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_9ef609dfa093d515)
+	proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_aae4026b8858278d)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_9ef609dfa093d515)
+	golang_proto.RegisterFile("lorawan-stack/api/admin_services.proto", fileDescriptor_admin_services_aae4026b8858278d)
 }
 
-var fileDescriptor_admin_services_9ef609dfa093d515 = []byte{
+var fileDescriptor_admin_services_aae4026b8858278d = []byte{
 	// 796 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0x41, 0x6c, 0xdc, 0x44,
 	0x14, 0x9d, 0x49, 0x02, 0x4a, 0x26, 0x52, 0xa0, 0xa3, 0x90, 0x2c, 0x06, 0x66, 0xa3, 0x45, 0x54,

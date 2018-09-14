@@ -649,14 +649,14 @@ func RegisterApplicationRegistryHandlerFromEndpoint(ctx context.Context, mux *ru
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -670,8 +670,8 @@ func RegisterApplicationRegistryHandler(ctx context.Context, mux *runtime.ServeM
 	return RegisterApplicationRegistryHandlerClient(ctx, mux, NewApplicationRegistryClient(conn))
 }
 
-// RegisterApplicationRegistryHandler registers the http handlers for service ApplicationRegistry to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "ApplicationRegistryClient".
+// RegisterApplicationRegistryHandlerClient registers the http handlers for service ApplicationRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ApplicationRegistryClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ApplicationRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "ApplicationRegistryClient" to call the correct interceptors.
@@ -958,14 +958,14 @@ func RegisterApplicationAccessHandlerFromEndpoint(ctx context.Context, mux *runt
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -979,8 +979,8 @@ func RegisterApplicationAccessHandler(ctx context.Context, mux *runtime.ServeMux
 	return RegisterApplicationAccessHandlerClient(ctx, mux, NewApplicationAccessClient(conn))
 }
 
-// RegisterApplicationAccessHandler registers the http handlers for service ApplicationAccess to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "ApplicationAccessClient".
+// RegisterApplicationAccessHandlerClient registers the http handlers for service ApplicationAccess
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ApplicationAccessClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ApplicationAccessClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "ApplicationAccessClient" to call the correct interceptors.
@@ -1201,14 +1201,14 @@ func RegisterAsApplicationDownlinkQueueHandlerFromEndpoint(ctx context.Context, 
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -1222,8 +1222,8 @@ func RegisterAsApplicationDownlinkQueueHandler(ctx context.Context, mux *runtime
 	return RegisterAsApplicationDownlinkQueueHandlerClient(ctx, mux, NewAsApplicationDownlinkQueueClient(conn))
 }
 
-// RegisterAsApplicationDownlinkQueueHandler registers the http handlers for service AsApplicationDownlinkQueue to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "AsApplicationDownlinkQueueClient".
+// RegisterAsApplicationDownlinkQueueHandlerClient registers the http handlers for service AsApplicationDownlinkQueue
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AsApplicationDownlinkQueueClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AsApplicationDownlinkQueueClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "AsApplicationDownlinkQueueClient" to call the correct interceptors.

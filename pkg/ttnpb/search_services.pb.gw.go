@@ -158,14 +158,14 @@ func RegisterEntityRegistrySearchHandlerFromEndpoint(ctx context.Context, mux *r
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -179,8 +179,8 @@ func RegisterEntityRegistrySearchHandler(ctx context.Context, mux *runtime.Serve
 	return RegisterEntityRegistrySearchHandlerClient(ctx, mux, NewEntityRegistrySearchClient(conn))
 }
 
-// RegisterEntityRegistrySearchHandler registers the http handlers for service EntityRegistrySearch to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "EntityRegistrySearchClient".
+// RegisterEntityRegistrySearchHandlerClient registers the http handlers for service EntityRegistrySearch
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EntityRegistrySearchClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EntityRegistrySearchClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "EntityRegistrySearchClient" to call the correct interceptors.
@@ -368,14 +368,14 @@ func RegisterEndDeviceRegistrySearchHandlerFromEndpoint(ctx context.Context, mux
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Printf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
@@ -389,8 +389,8 @@ func RegisterEndDeviceRegistrySearchHandler(ctx context.Context, mux *runtime.Se
 	return RegisterEndDeviceRegistrySearchHandlerClient(ctx, mux, NewEndDeviceRegistrySearchClient(conn))
 }
 
-// RegisterEndDeviceRegistrySearchHandler registers the http handlers for service EndDeviceRegistrySearch to "mux".
-// The handlers forward requests to the grpc endpoint over the given implementation of "EndDeviceRegistrySearchClient".
+// RegisterEndDeviceRegistrySearchHandlerClient registers the http handlers for service EndDeviceRegistrySearch
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EndDeviceRegistrySearchClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EndDeviceRegistrySearchClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "EndDeviceRegistrySearchClient" to call the correct interceptors.

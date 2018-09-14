@@ -39,7 +39,7 @@ type UserIdentifiers struct {
 func (m *UserIdentifiers) Reset()      { *m = UserIdentifiers{} }
 func (*UserIdentifiers) ProtoMessage() {}
 func (*UserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{0}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{0}
 }
 func (m *UserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -91,7 +91,7 @@ type ApplicationIdentifiers struct {
 func (m *ApplicationIdentifiers) Reset()      { *m = ApplicationIdentifiers{} }
 func (*ApplicationIdentifiers) ProtoMessage() {}
 func (*ApplicationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{1}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{1}
 }
 func (m *ApplicationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -137,7 +137,7 @@ type GatewayIdentifiers struct {
 func (m *GatewayIdentifiers) Reset()      { *m = GatewayIdentifiers{} }
 func (*GatewayIdentifiers) ProtoMessage() {}
 func (*GatewayIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{2}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{2}
 }
 func (m *GatewayIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -189,7 +189,7 @@ type EndDeviceIdentifiers struct {
 func (m *EndDeviceIdentifiers) Reset()      { *m = EndDeviceIdentifiers{} }
 func (*EndDeviceIdentifiers) ProtoMessage() {}
 func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{3}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{3}
 }
 func (m *EndDeviceIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -234,7 +234,7 @@ type ClientIdentifiers struct {
 func (m *ClientIdentifiers) Reset()      { *m = ClientIdentifiers{} }
 func (*ClientIdentifiers) ProtoMessage() {}
 func (*ClientIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{4}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{4}
 }
 func (m *ClientIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -279,7 +279,7 @@ type OrganizationIdentifiers struct {
 func (m *OrganizationIdentifiers) Reset()      { *m = OrganizationIdentifiers{} }
 func (*OrganizationIdentifiers) ProtoMessage() {}
 func (*OrganizationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{5}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{5}
 }
 func (m *OrganizationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -327,7 +327,7 @@ type OrganizationOrUserIdentifiers struct {
 func (m *OrganizationOrUserIdentifiers) Reset()      { *m = OrganizationOrUserIdentifiers{} }
 func (*OrganizationOrUserIdentifiers) ProtoMessage() {}
 func (*OrganizationOrUserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{6}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{6}
 }
 func (m *OrganizationOrUserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -484,7 +484,7 @@ type CombinedIdentifiers struct {
 func (m *CombinedIdentifiers) Reset()      { *m = CombinedIdentifiers{} }
 func (*CombinedIdentifiers) ProtoMessage() {}
 func (*CombinedIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_9a974388f1bf56d8, []int{7}
+	return fileDescriptor_identifiers_674f442a4bed076f, []int{7}
 }
 func (m *CombinedIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2818,13 +2818,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_9a974388f1bf56d8)
+	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_674f442a4bed076f)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_9a974388f1bf56d8)
+	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_674f442a4bed076f)
 }
 
-var fileDescriptor_identifiers_9a974388f1bf56d8 = []byte{
+var fileDescriptor_identifiers_674f442a4bed076f = []byte{
 	// 847 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0x4d, 0x88, 0xdb, 0x46,
 	0x14, 0xc7, 0x67, 0x62, 0xaf, 0x3f, 0x9e, 0xb3, 0x76, 0xa3, 0x84, 0xd6, 0x14, 0x3a, 0x4a, 0x9d,

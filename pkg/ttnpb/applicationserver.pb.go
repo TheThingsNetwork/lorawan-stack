@@ -40,7 +40,7 @@ type SetAsApplicationAPIKeyRequest struct {
 func (m *SetAsApplicationAPIKeyRequest) Reset()      { *m = SetAsApplicationAPIKeyRequest{} }
 func (*SetAsApplicationAPIKeyRequest) ProtoMessage() {}
 func (*SetAsApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_c20314c5a369681c, []int{0}
+	return fileDescriptor_applicationserver_3781e3609f334eff, []int{0}
 }
 func (m *SetAsApplicationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -658,13 +658,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_c20314c5a369681c)
+	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_3781e3609f334eff)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_c20314c5a369681c)
+	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_3781e3609f334eff)
 }
 
-var fileDescriptor_applicationserver_c20314c5a369681c = []byte{
+var fileDescriptor_applicationserver_3781e3609f334eff = []byte{
 	// 473 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xb1, 0x4f, 0x1b, 0x4d,
 	0x10, 0xc5, 0x77, 0x5c, 0xf8, 0xfb, 0xb8, 0x48, 0x44, 0x3a, 0x45, 0x09, 0x72, 0xc4, 0xd8, 0x0a,

@@ -46,7 +46,7 @@ var DownlinkPathConstraint_value = map[string]int32{
 }
 
 func (DownlinkPathConstraint) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_enums_e9c2b3cac2350fd3, []int{0}
+	return fileDescriptor_enums_8b7f026bd95d10b3, []int{0}
 }
 
 // State enum defines states that an entity can be in.
@@ -81,7 +81,7 @@ var State_value = map[string]int32{
 }
 
 func (State) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_enums_e9c2b3cac2350fd3, []int{1}
+	return fileDescriptor_enums_8b7f026bd95d10b3, []int{1}
 }
 
 func init() {
@@ -106,13 +106,13 @@ func (x State) String() string {
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/enums.proto", fileDescriptor_enums_e9c2b3cac2350fd3)
+	proto.RegisterFile("lorawan-stack/api/enums.proto", fileDescriptor_enums_8b7f026bd95d10b3)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/enums.proto", fileDescriptor_enums_e9c2b3cac2350fd3)
+	golang_proto.RegisterFile("lorawan-stack/api/enums.proto", fileDescriptor_enums_8b7f026bd95d10b3)
 }
 
-var fileDescriptor_enums_e9c2b3cac2350fd3 = []byte{
+var fileDescriptor_enums_8b7f026bd95d10b3 = []byte{
 	// 422 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0xbf, 0x4f, 0xdc, 0x40,
 	0x10, 0x85, 0x67, 0x08, 0x49, 0xb1, 0x52, 0x88, 0xe3, 0x48, 0x29, 0x90, 0x18, 0x29, 0x91, 0x52,
