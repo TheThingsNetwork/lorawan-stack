@@ -732,4 +732,12 @@ func TestUnmarshalResilience(t *testing.T) {
 			}, should.NotPanic)
 		})
 	}
+
+	t.Run("Downlink without FPort", func(t *testing.T) {
+		a := assertions.New(t)
+		downlink := &DownlinkMessage{}
+		payload := []byte{0x60, 0x29, 0x2e, 0x01, 0x26, 0x20, 0x03, 0x00, 0xd0, 0x36, 0x78, 0xbd}
+		err := downlink.Payload.UnmarshalLoRaWAN(payload)
+		a.So(err, should.BeNil)
+	})
 }

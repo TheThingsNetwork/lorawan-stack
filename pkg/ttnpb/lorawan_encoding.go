@@ -164,7 +164,7 @@ func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	}
 
 	fPortIdx := fhdrLen
-	if n >= fPortIdx {
+	if n > fPortIdx {
 		msg.FPort = uint32(b[fPortIdx])
 
 		frmPayloadIdx := fPortIdx + 1
