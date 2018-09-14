@@ -18,7 +18,6 @@ import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import Header from '../../components/header'
 import * as user from '../../actions/user'
 
 /**
@@ -40,9 +39,6 @@ export class Auth extends React.PureComponent {
       user,
       fetching,
       children,
-      header = true,
-      handleLogout,
-      handleSearchRequest,
     } = this.props
 
     if (fetching) {
@@ -50,23 +46,17 @@ export class Auth extends React.PureComponent {
     }
 
     if (!user) {
-      return <Redirect to={`/${window.ENV.console ? 'console' : 'oauth'}/login`} />
+      return (
+        <Redirect
+          to={{
+            pathname: `/${window.ENV.console ? 'console' : 'oauth'}/login`,
+            state: { from: this.props.location.pathname },
+          }}
+        />
+      )
     }
 
-    const headerElement = (
-      <Header
-        user={user}
-        handleLogout={handleLogout}
-        handleSearchRequest={handleSearchRequest}
-      />
-    )
-
-    return (
-      <React.Fragment>
-        { window.ENV.console && header && headerElement }
-        {children}
-      </React.Fragment>
-    )
+    return children
   }
 }
 
