@@ -17,6 +17,7 @@ package io
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -32,7 +33,8 @@ type Server interface {
 
 // Connection is a connection to an application or integration managed by a frontend.
 type Connection struct {
-	ctx context.Context
+	ctx       context.Context
+	cancelCtx errorcontext.CancelFunc
 
 	protocol string
 	ttnpb.ApplicationIdentifiers
@@ -41,8 +43,10 @@ type Connection struct {
 }
 
 func NewConnection(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) *Connection {
+	ctx, cancelCtx := errorcontext.New(ctx)
 	return &Connection{
 		ctx:                    ctx,
+		cancelCtx:              cancelCtx,
 		protocol:               protocol,
 		ApplicationIdentifiers: ids,
 		upCh:                   make(chan *ttnpb.ApplicationUp, bufferSize),
@@ -51,6 +55,11 @@ func NewConnection(ctx context.Context, protocol string, ids ttnpb.ApplicationId
 
 // Context returns the connection context.
 func (c *Connection) Context() context.Context { return c.ctx }
+
+// Disconnect marks the connection as disconnected and cancels the context.
+func (c *Connection) Disconnect(err error) {
+	c.cancelCtx(err)
+}
 
 // Protocol returns the protocol used for the connection, i.e. grpc, mqtt or http.
 func (c *Connection) Protocol() string { return c.protocol }
