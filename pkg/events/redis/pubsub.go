@@ -29,8 +29,9 @@ func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub) {
 	ps = &PubSub{
 		PubSub: wrapped,
 		client: redis.NewClient(&redis.Options{
-			Addr: conf.Address,
-			DB:   conf.Database,
+			Addr:     conf.Address,
+			Password: conf.Password,
+			DB:       conf.Database,
 		}),
 		eventChannel: strings.Join(append(conf.Namespace, "events"), ":"),
 	}

@@ -62,8 +62,9 @@ func New(conf *Config) *Store {
 	}
 	return &Store{
 		Redis: redis.NewClient(&redis.Options{
-			Addr: conf.Address,
-			DB:   conf.Database,
+			Addr:     conf.Address,
+			Password: conf.Password,
+			DB:       conf.Database,
 		}),
 		config:    conf,
 		entropy:   rand.Reader,
