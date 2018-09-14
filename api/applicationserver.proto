@@ -27,6 +27,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message ApplicationLink {
   string network_server_address = 1;
   string api_key = 2 [(gogoproto.customname) = "APIKey"];
+  MessagePayloadFormatters default_formatters = 3;
 }
 
 message SetApplicationLinkRequest {

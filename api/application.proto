@@ -37,8 +37,6 @@ message Application {
   string description = 5;
   map<string,string> attributes = 6;
   repeated ContactInfo contact_info = 7;
-
-  MessagePayloadFormatters default_formatters = 8;
 }
 
 message Applications {
