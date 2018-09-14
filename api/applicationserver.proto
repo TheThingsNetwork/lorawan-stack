@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "lorawan-stack/api/application_services.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
 
@@ -35,7 +36,7 @@ message SetApplicationLinkRequest {
   ApplicationLink link = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
-// The As service connects an application or integration to an Application Server.
+// The As service manages the Application Server.
 service As {
   rpc GetLink(ApplicationIdentifiers) returns (ApplicationLink){
     option (google.api.http) = {
@@ -55,6 +56,30 @@ service As {
       delete: "/as/applications/{application_id}/link",
     };
   };
+}
 
+// The AppAs service connects an application or integration to an Application Server.
+service AppAs {
   rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
+
+  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
+    };
+  };
+  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
+    };
+  };
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
+    };
+  };
+  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
+    };
+  };
 }

@@ -23,7 +23,7 @@ import (
 
 // ApplicationServer implements the Application Server component.
 //
-// The Application Server exposes the As, AsDeviceRegistry and ApplicationDownlinkQueue services.
+// The Application Server exposes the As, AppAs and AsDeviceRegistry services.
 type ApplicationServer struct {
 	*component.Component
 
@@ -50,14 +50,14 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
-	ttnpb.RegisterAsApplicationDownlinkQueueServer(s, as)
+	ttnpb.RegisterAppAsServer(s, as)
 	// TODO: Register AsDeviceRegistryServer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
-	ttnpb.RegisterAsApplicationDownlinkQueueHandler(as.Context(), s, conn)
+	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	// TODO: Register AsDeviceRegistryHandler (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 

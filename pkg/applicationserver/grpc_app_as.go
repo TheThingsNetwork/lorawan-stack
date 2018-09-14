@@ -23,6 +23,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func (as *ApplicationServer) Subscribe(req *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_SubscribeServer) error {
+	return status.Errorf(codes.Unimplemented, "not implemented")
+}
+
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (as *ApplicationServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*ptypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")

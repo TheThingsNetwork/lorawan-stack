@@ -34,7 +34,3 @@ func (as *ApplicationServer) SetLink(ctx context.Context, ids *ttnpb.SetApplicat
 func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
-
-func (as *ApplicationServer) Subscribe(req *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
-	return status.Errorf(codes.Unimplemented, "not implemented")
-}
