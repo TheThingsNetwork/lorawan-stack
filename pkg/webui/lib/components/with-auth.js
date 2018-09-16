@@ -14,11 +14,9 @@
 
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-
-import * as user from '../../actions/user'
+import PropTypes from '../prop-types'
 
 /**
  * Auth is a component that wraps a tree that requires the user
@@ -27,12 +25,11 @@ import * as user from '../../actions/user'
  * If no user is authenticated, it renders the Landing view.
  */
 @withRouter
-export class Auth extends React.PureComponent {
-  static propTypes = {
-    user: PropTypes.object,
-    fetching: PropTypes.bool,
-    header: PropTypes.bool,
-  }
+@connect(state => ({
+  fetching: state.user.fetching,
+  user: state.user.user,
+}))
+class Auth extends React.PureComponent {
 
   render () {
     const {
@@ -45,7 +42,7 @@ export class Auth extends React.PureComponent {
       return null
     }
 
-    if (!user) {
+    if (!Boolean(user)) {
       return (
         <Redirect
           to={{
@@ -60,17 +57,9 @@ export class Auth extends React.PureComponent {
   }
 }
 
-const mapStateToProps = function (state) {
-  return {
-    fetching: state.user.fetching,
-    user: state.user.user,
-  }
+Auth.propTypes = {
+  user: PropTypes.object,
+  fetching: PropTypes.bool,
 }
 
-const mapDispatchToProps = dispatch => ({
-  handleLogout () {
-    dispatch(user.logout())
-  },
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(Auth)
+export default Auth
