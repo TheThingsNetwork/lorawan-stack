@@ -96,15 +96,14 @@ func TestAuthentication(t *testing.T) {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
-				if err := srv.LinkGateway(stream); err != nil {
-					if tc.OK && !a.So(errors.IsCanceled(err), should.BeTrue) {
-						t.Fatalf("Unexpected link error: %v", err)
-					}
-					if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
-						t.FailNow()
-					}
-					wg.Done()
+				err := srv.LinkGateway(stream)
+				if tc.OK && !a.So(errors.IsCanceled(err), should.BeTrue) {
+					t.Fatalf("Unexpected link error: %v", err)
 				}
+				if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
+					t.FailNow()
+				}
+				wg.Done()
 			}()
 
 			cancelCtx()
