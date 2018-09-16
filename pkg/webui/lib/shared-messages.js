@@ -33,8 +33,10 @@ export default defineMessages({
   overview: 'Overview',
   password: 'Password',
   payload_formats: 'Payload Formats',
+  privacyPolicy: 'Privacy Policy',
   profileSettings: 'Profile Settings',
   settings: 'Settings',
   traffic: 'Traffic',
+  termsAndCondition: 'Terms and Conditions',
   userId: 'User ID',
 })

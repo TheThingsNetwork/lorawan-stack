@@ -1,4 +1,5 @@
 {
+  "components.footer.index.footer": "Xxx xxx xxx xxxxxxx. Xxx'x xxxxx xxxx xxxxx xxxxxxxx.",
   "components.navigation.side.index.hideSidebar": "Xxxx Xxxxxxx",
   "lib.shared-messages.access": "Xxxxxx",
   "lib.shared-messages.applications": "Xxxxxxxxxxxx",
@@ -17,9 +18,11 @@
   "lib.shared-messages.overview": "Xxxxxxxx",
   "lib.shared-messages.password": "Xxxxxxxx",
   "lib.shared-messages.payload_formats": "Xxxxxxx Xxxxxxx",
+  "lib.shared-messages.privacyPolicy": "Xxxxxxx Xxxxxx",
   "lib.shared-messages.profileSettings": "Xxxxxxx Xxxxxxxx",
   "lib.shared-messages.settings": "Xxxxxxxx",
   "lib.shared-messages.traffic": "Xxxxxxx",
+  "lib.shared-messages.termsAndCondition": "Xxxxx xxx Xxxxxxxxxx",
   "lib.shared-messages.userId": "Xxxx XX",
   "views.console.login.index.welcome": "Xxxxxxx xx {ttnConsole}",
   "views.console.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",

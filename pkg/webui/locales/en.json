@@ -1,4 +1,5 @@
 {
+  "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.navigation.side.index.hideSidebar": "Hide Sidebar",
   "lib.shared-messages.access": "Access",
   "lib.shared-messages.applications": "Applications",
@@ -17,9 +18,11 @@
   "lib.shared-messages.overview": "Overview",
   "lib.shared-messages.password": "Password",
   "lib.shared-messages.payload_formats": "Payload Formats",
+  "lib.shared-messages.privacyPolicy": "Privacy Policy",
   "lib.shared-messages.profileSettings": "Profile Settings",
   "lib.shared-messages.settings": "Settings",
   "lib.shared-messages.traffic": "Traffic",
+  "lib.shared-messages.termsAndCondition": "Terms and Conditions",
   "lib.shared-messages.userId": "User ID",
   "views.console.login.index.welcome": "Welcome to {ttnConsole}",
   "views.console.login.index.login": "You need to be logged in to use this site",
