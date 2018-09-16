@@ -24,6 +24,7 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -118,11 +119,22 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	return conn, nil
 }
 
+var (
+	errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
+)
+
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	// TODO:
-	// - Handle join accept; update session
-	// - Recompute downlink queue on join accept and invalidation
-	// - Decrypt uplink messages
-	// - Report events on downlink queue changes
-	return nil
+	return as.deviceRegistry.Set(ctx, up.EndDeviceIdentifiers, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+		if ed == nil {
+			return nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
+		}
+
+		// TODO:
+		// - Handle join accept; update session
+		// - Recompute downlink queue on join accept and invalidation
+		// - Decrypt uplink messages
+		// - Report events on downlink queue changes
+
+		return ed, nil
+	})
 }
