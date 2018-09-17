@@ -40,12 +40,6 @@ const mockApplicationData = {
       validated_at: '2018-08-29T14:00:20.793Z',
     },
   ],
-  default_formatters: {
-    up_formatter: 'FORMATTER_JAVASCRIPT',
-    up_formatter_parameter: 'function Up(Bytes, Port) {}',
-    down_formatter: 'FORMATTER_JAVASCRIPT',
-    down_formatter_parameter: 'function Down(Bytes, Port) {}',
-  },
 }
 
 const mockDeviceData = {
