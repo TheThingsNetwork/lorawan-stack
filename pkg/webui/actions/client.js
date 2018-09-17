@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const GET_CLIENT = 'GET_CLIENT'
+export const GET_CLIENT_FAILURE = 'GET_CLIENT_FAILURE'
+export const GET_CLIENT_SUCCESS = 'GET_CLIENT_SUCCESS'
+
 export const getClient = clientId => (
-  { type: 'GET_CLIENT', clientId }
+  { type: GET_CLIENT, clientId }
 )
 
 export const getClientFailure = clientId => (
-  { type: 'GET_CLIENT_FAILURE', clientId }
+  { type: GET_CLIENT_FAILURE, clientId }
 )
 
 export const getClientSuccess = clientData => (
-  { type: 'GET_CLIENT_SUCCESS', clientData }
+  { type: GET_CLIENT_SUCCESS, clientData }
 )
-

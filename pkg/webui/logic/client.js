@@ -14,11 +14,11 @@
 
 import { createLogic } from 'redux-logic'
 
-import * as client from '../actions/client'
 import api from '../api'
+import * as client from '../actions/client'
 
 const clientLogic = createLogic({
-  type: 'GET_CLIENT',
+  type: client.GET_CLIENT,
   async process ({ getState, action }, dispatch, done) {
     try {
       const result = await api.v3.is.clients.get(action.clientId)

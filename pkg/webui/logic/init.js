@@ -22,7 +22,7 @@ import api from '../api'
 import * as accessToken from '../lib/access-token'
 
 const consoleLogic = createLogic({
-  type: 'INITIALIZE',
+  type: _console.INITIALIZE,
   async process ({ getState, action }, dispatch, done) {
     try {
       try {

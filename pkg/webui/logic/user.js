@@ -20,7 +20,7 @@ import * as accessToken from '../lib/access-token'
 
 export default [
   createLogic({
-    type: 'GET_USER_ME',
+    type: user.GET_USER_ME,
     async process ({ getState, action }, dispatch, done) {
       try {
         const result = window.ENV.console
@@ -34,7 +34,7 @@ export default [
     },
   }),
   createLogic({
-    type: 'LOGOUT',
+    type: user.LOGOUT,
     async process ({ getState, action }, dispatch, done) {
       try {
         if (window.ENV.console) {

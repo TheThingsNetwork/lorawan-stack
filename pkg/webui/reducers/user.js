@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  GET_USER_ME,
+  GET_USER_ME_FAILURE,
+  GET_USER_ME_SUCCESS,
+  LOGOUT,
+  LOGOUT_SUCCESS,
+} from '../actions/user'
+
 const defaultState = {
   fetching: false,
   user: undefined,
@@ -19,25 +27,25 @@ const defaultState = {
 
 const user = function (state = defaultState, action) {
   switch (action.type) {
-  case 'GET_USER_ME':
+  case GET_USER_ME:
     return Object.assign({}, state, {
       fetching: true,
     })
-  case 'GET_USER_ME_SUCCESS':
+  case GET_USER_ME_SUCCESS:
     return Object.assign({}, state, {
       fetching: false,
       user: action.userData,
     })
-  case 'GET_USER_ME_FAILURE':
+  case GET_USER_ME_FAILURE:
     return Object.assign({}, state, {
       fetching: false,
       user: undefined,
     })
-  case 'LOGOUT':
+  case LOGOUT:
     return Object.assign({}, state, {
       fetching: false,
     })
-  case 'LOGOUT_SUCCESS':
+  case LOGOUT_SUCCESS:
     return Object.assign({}, state, {
       user: undefined,
     })

@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  INITIALIZE,
+  INITIALIZE_FAILURE,
+  INITIALIZE_SUCCESS,
+} from '../actions/console'
+
 const c = function (state = [], action) {
   switch (action.type) {
-  case 'INITIALIZE':
+  case INITIALIZE:
     return Object.assign({}, state, { initialized: false })
-  case 'INITIALIZE_SUCCESS':
+  case INITIALIZE_SUCCESS:
     return Object.assign({}, state, { initialized: true })
-  case 'INITIALIZE_FAILURE':
+  case INITIALIZE_FAILURE:
     return Object.assign({}, state, { initialized: false })
   default:
     return state

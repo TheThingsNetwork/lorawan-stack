@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  GET_CLIENT,
+  GET_CLIENT_FAILURE,
+  GET_CLIENT_SUCCESS,
+} from '../actions/client'
+
 const client = function (state = [], action) {
   switch (action.type) {
-  case 'GET_CLIENT':
+  case GET_CLIENT:
     return {
       ...state,
       [action.clientId]: { fetching: true },
     }
-  case 'GET_CLIENT_SUCCESS':
+  case GET_CLIENT_SUCCESS:
     const clientId = action.clientData.ids.client_id
     return {
       ...state,
@@ -28,7 +34,7 @@ const client = function (state = [], action) {
         fetching: false,
       },
     }
-  case 'GET_CLIENT_FAILURE':
+  case GET_CLIENT_FAILURE:
     return {
       ...state,
       [action.clientId]: {

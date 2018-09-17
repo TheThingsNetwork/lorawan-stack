@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const INITIALIZE = 'INITIALIZE'
+export const INITIALIZE_FAILURE = 'INITIALIZE_FAILURE'
+export const INITIALIZE_SUCCESS = 'INITIALIZE_SUCCESS'
+
 export const initialize = () => (
-  { type: 'INITIALIZE' }
+  { type: INITIALIZE }
 )
 
 export const initializeFailure = () => (
-  { type: 'INITIALIZE_FAILURE' }
+  { type: INITIALIZE_FAILURE }
 )
 
 export const initializeSuccess = () => (
-  { type: 'INITIALIZE_SUCCESS' }
+  { type: INITIALIZE_SUCCESS }
 )

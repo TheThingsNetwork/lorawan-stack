@@ -12,27 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const GET_USER_ME = 'GET_USER_ME'
+export const GET_USER_ME_FAILURE = 'GET_USER_ME_FAILURE'
+export const GET_USER_ME_SUCCESS = 'GET_USER_ME_SUCCESS'
+export const LOGOUT = 'LOGOUT'
+export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
+export const LOGOUT_FAILURE = 'LOGOUT_FAILURE'
+
 export const getUserMe = () => (
-  { type: 'GET_USER_ME' }
+  { type: GET_USER_ME }
 )
 
 export const getUserMeFailure = () => (
-  { type: 'GET_USER_ME_FAILURE' }
+  { type: GET_USER_ME_FAILURE }
 )
 
 export const getUserMeSuccess = userData => (
-  { type: 'GET_USER_ME_SUCCESS', userData }
+  { type: GET_USER_ME_SUCCESS, userData }
 )
 
-
 export const logout = () => (
-  { type: 'LOGOUT' }
+  { type: LOGOUT }
 )
 
 export const logoutSuccess = () => (
-  { type: 'LOGOUT_SUCCESS' }
+  { type: LOGOUT_SUCCESS }
 )
 
 export const logoutFailure = () => (
-  { type: 'LOGOUT_FAILURE' }
+  { type: LOGOUT_FAILURE }
 )
