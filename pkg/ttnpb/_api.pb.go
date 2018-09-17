@@ -4,7 +4,7 @@
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 /*
-	The Things Network v3 API
+The Things Network v3 API
 */
 
 import proto "github.com/gogo/protobuf/proto"
