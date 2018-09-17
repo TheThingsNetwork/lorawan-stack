@@ -1,0 +1,1798 @@
+{
+  "files": [
+    {
+      "name": "lorawan-stack/api/application_services.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "DownlinkQueueRequest",
+          "longName": "DownlinkQueueRequest",
+          "fullName": "ttn.lorawan.v3.DownlinkQueueRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlinks",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "ApplicationAccess",
+          "longName": "ApplicationAccess",
+          "fullName": "ttn.lorawan.v3.ApplicationAccess",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListApplicationRights",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Rights",
+              "responseLongType": "Rights",
+              "responseFullType": "ttn.lorawan.v3.Rights",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_id}/rights"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CreateApplicationAPIKey",
+              "description": "",
+              "requestType": "CreateApplicationAPIKeyRequest",
+              "requestLongType": "CreateApplicationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateApplicationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/applications/{application_ids.application_id}/api-keys",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListApplicationAPIKeys",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "APIKeys",
+              "responseLongType": "APIKeys",
+              "responseFullType": "ttn.lorawan.v3.APIKeys",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateApplicationAPIKey",
+              "description": "Update the rights of an existing application API key. To generate an API key,\nthe CreateApplicationAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "requestType": "UpdateApplicationAPIKeyRequest",
+              "requestLongType": "UpdateApplicationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateApplicationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/applications/{application_ids.application_id}/api-keys/{api_key.id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetApplicationCollaborator",
+              "description": "Setting a collaborator without rights, removes them.",
+              "requestType": "SetApplicationCollaboratorRequest",
+              "requestLongType": "SetApplicationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.SetApplicationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/applications/{application_ids.application_id}/collaborators",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListApplicationCollaborators",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Collaborators",
+              "responseLongType": "Collaborators",
+              "responseFullType": "ttn.lorawan.v3.Collaborators",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationRegistry",
+          "longName": "ApplicationRegistry",
+          "fullName": "ttn.lorawan.v3.ApplicationRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "CreateApplication",
+              "description": "Create a new application. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
+              "requestType": "CreateApplicationRequest",
+              "requestLongType": "CreateApplicationRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateApplicationRequest",
+              "requestStreaming": false,
+              "responseType": "Application",
+              "responseLongType": "Application",
+              "responseFullType": "ttn.lorawan.v3.Application",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/applications",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/organizations/{collaborator.organization_ids.organization_id}/applications",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetApplication",
+              "description": "Get the application with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "requestType": "GetApplicationRequest",
+              "requestLongType": "GetApplicationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationRequest",
+              "requestStreaming": false,
+              "responseType": "Application",
+              "responseLongType": "Application",
+              "responseFullType": "ttn.lorawan.v3.Application",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListApplications",
+              "description": "List applications. See request message for details.",
+              "requestType": "ListApplicationsRequest",
+              "requestLongType": "ListApplicationsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationsRequest",
+              "requestStreaming": false,
+              "responseType": "Applications",
+              "responseLongType": "Applications",
+              "responseFullType": "ttn.lorawan.v3.Applications",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/applications"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{collaborator.organization_ids.organization_id}/applications"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateApplication",
+              "description": "",
+              "requestType": "UpdateApplicationRequest",
+              "requestLongType": "UpdateApplicationRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateApplicationRequest",
+              "requestStreaming": false,
+              "responseType": "Application",
+              "responseLongType": "Application",
+              "responseFullType": "ttn.lorawan.v3.Application",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/applications/{application.ids.application_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteApplication",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "AsApplicationDownlinkQueue",
+          "longName": "AsApplicationDownlinkQueue",
+          "fullName": "ttn.lorawan.v3.AsApplicationDownlinkQueue",
+          "description": "The AsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Application Server.",
+          "methods": [
+            {
+              "name": "DownlinkQueuePush",
+              "description": "",
+              "requestType": "DownlinkQueueRequest",
+              "requestLongType": "DownlinkQueueRequest",
+              "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DownlinkQueueReplace",
+              "description": "",
+              "requestType": "DownlinkQueueRequest",
+              "requestLongType": "DownlinkQueueRequest",
+              "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/as/applications/{end_device.application_ids.application_id}/devices/{end_device.device_id}/downlink-queue"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DownlinkQueueList",
+              "description": "",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "ApplicationDownlinks",
+              "responseLongType": "ApplicationDownlinks",
+              "responseFullType": "ttn.lorawan.v3.ApplicationDownlinks",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DownlinkQueueClear",
+              "description": "",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/as/applications/{application_ids.application_id}/devices/{device_id}/downlink-queue"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "NsApplicationDownlinkQueue",
+          "longName": "NsApplicationDownlinkQueue",
+          "fullName": "ttn.lorawan.v3.NsApplicationDownlinkQueue",
+          "description": "The NsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Network Server.\nThis API is typically used by the Application Server, and is therefore not exposed over HTTP.",
+          "methods": [
+            {
+              "name": "DownlinkQueueReplace",
+              "description": "",
+              "requestType": "DownlinkQueueRequest",
+              "requestLongType": "DownlinkQueueRequest",
+              "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
+            },
+            {
+              "name": "DownlinkQueuePush",
+              "description": "",
+              "requestType": "DownlinkQueueRequest",
+              "requestLongType": "DownlinkQueueRequest",
+              "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
+            },
+            {
+              "name": "DownlinkQueueList",
+              "description": "",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "ApplicationDownlinks",
+              "responseLongType": "ApplicationDownlinks",
+              "responseFullType": "ttn.lorawan.v3.ApplicationDownlinks",
+              "responseStreaming": false
+            },
+            {
+              "name": "DownlinkQueueClear",
+              "description": "",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lorawan-stack/api/client_services.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": false,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [],
+      "services": [
+        {
+          "name": "ClientAccess",
+          "longName": "ClientAccess",
+          "fullName": "ttn.lorawan.v3.ClientAccess",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListClientRights",
+              "description": "",
+              "requestType": "ClientIdentifiers",
+              "requestLongType": "ClientIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Rights",
+              "responseLongType": "Rights",
+              "responseFullType": "ttn.lorawan.v3.Rights",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_id}/rights"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetClientCollaborator",
+              "description": "Set the rights of a collaborator on the OAuth client. Users or organizations\nare considered to be a collaborator if they have at least one right on the\nOAuth client.",
+              "requestType": "SetClientCollaboratorRequest",
+              "requestLongType": "SetClientCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.SetClientCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/clients/{client_ids.client_id}/collaborators",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListClientCollaborators",
+              "description": "",
+              "requestType": "ClientIdentifiers",
+              "requestLongType": "ClientIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Collaborators",
+              "responseLongType": "Collaborators",
+              "responseFullType": "ttn.lorawan.v3.Collaborators",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ClientRegistry",
+          "longName": "ClientRegistry",
+          "fullName": "ttn.lorawan.v3.ClientRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "CreateClient",
+              "description": "Create a new OAuth client. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
+              "requestType": "CreateClientRequest",
+              "requestLongType": "CreateClientRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateClientRequest",
+              "requestStreaming": false,
+              "responseType": "Client",
+              "responseLongType": "Client",
+              "responseFullType": "ttn.lorawan.v3.Client",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/clients",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/organizations/{collaborator.organization_ids.organization_id}/clients",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetClient",
+              "description": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "requestType": "GetClientRequest",
+              "requestLongType": "GetClientRequest",
+              "requestFullType": "ttn.lorawan.v3.GetClientRequest",
+              "requestStreaming": false,
+              "responseType": "Client",
+              "responseLongType": "Client",
+              "responseFullType": "ttn.lorawan.v3.Client",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_ids.client_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListClients",
+              "description": "List OAuth clients. See request message for details.",
+              "requestType": "ListClientsRequest",
+              "requestLongType": "ListClientsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListClientsRequest",
+              "requestStreaming": false,
+              "responseType": "Clients",
+              "responseLongType": "Clients",
+              "responseFullType": "ttn.lorawan.v3.Clients",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/clients"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/clients"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{collaborator.organization_ids.organization_id}/clients"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateClient",
+              "description": "",
+              "requestType": "UpdateClientRequest",
+              "requestLongType": "UpdateClientRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateClientRequest",
+              "requestStreaming": false,
+              "responseType": "Client",
+              "responseLongType": "Client",
+              "responseFullType": "ttn.lorawan.v3.Client",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/clients/{client.ids.client_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteClient",
+              "description": "",
+              "requestType": "ClientIdentifiers",
+              "requestLongType": "ClientIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/clients/{client_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lorawan-stack/api/gateway_services.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "PullGatewayConfigurationRequest",
+          "longName": "PullGatewayConfigurationRequest",
+          "fullName": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "GatewayAccess",
+          "longName": "GatewayAccess",
+          "fullName": "ttn.lorawan.v3.GatewayAccess",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListGatewayRights",
+              "description": "",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Rights",
+              "responseLongType": "Rights",
+              "responseFullType": "ttn.lorawan.v3.Rights",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_id}/rights"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CreateGatewayAPIKey",
+              "description": "",
+              "requestType": "CreateGatewayAPIKeyRequest",
+              "requestLongType": "CreateGatewayAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateGatewayAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListGatewayAPIKeys",
+              "description": "",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "APIKeys",
+              "responseLongType": "APIKeys",
+              "responseFullType": "ttn.lorawan.v3.APIKeys",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateGatewayAPIKey",
+              "description": "Update the rights of an existing gateway API key. To generate an API key,\nthe CreateGatewayAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "requestType": "UpdateGatewayAPIKeyRequest",
+              "requestLongType": "UpdateGatewayAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateGatewayAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetGatewayCollaborator",
+              "description": "Set the rights of a collaborator on the gateway. Users or organizations\nare considered to be a collaborator if they have at least one right on the\ngateway.",
+              "requestType": "SetGatewayCollaboratorRequest",
+              "requestLongType": "SetGatewayCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.SetGatewayCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListGatewayCollaborators",
+              "description": "",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Collaborators",
+              "responseLongType": "Collaborators",
+              "responseFullType": "ttn.lorawan.v3.Collaborators",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayConfigurator",
+          "longName": "GatewayConfigurator",
+          "fullName": "ttn.lorawan.v3.GatewayConfigurator",
+          "description": "",
+          "methods": [
+            {
+              "name": "PullConfiguration",
+              "description": "",
+              "requestType": "PullGatewayConfigurationRequest",
+              "requestLongType": "PullGatewayConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "Gateway",
+              "responseLongType": "Gateway",
+              "responseFullType": "ttn.lorawan.v3.Gateway",
+              "responseStreaming": true
+            }
+          ]
+        },
+        {
+          "name": "GatewayRegistry",
+          "longName": "GatewayRegistry",
+          "fullName": "ttn.lorawan.v3.GatewayRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "CreateGateway",
+              "description": "Create a new gateway. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
+              "requestType": "CreateGatewayRequest",
+              "requestLongType": "CreateGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "Gateway",
+              "responseLongType": "Gateway",
+              "responseFullType": "ttn.lorawan.v3.Gateway",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/gateways",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/organizations/{collaborator.organization_ids.organization_id}/gateways",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetGateway",
+              "description": "Get the gateway with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "requestType": "GetGatewayRequest",
+              "requestLongType": "GetGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.GetGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "Gateway",
+              "responseLongType": "Gateway",
+              "responseFullType": "ttn.lorawan.v3.Gateway",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListGateways",
+              "description": "List gateways. See request message for details.",
+              "requestType": "ListGatewaysRequest",
+              "requestLongType": "ListGatewaysRequest",
+              "requestFullType": "ttn.lorawan.v3.ListGatewaysRequest",
+              "requestStreaming": false,
+              "responseType": "Gateways",
+              "responseLongType": "Gateways",
+              "responseFullType": "ttn.lorawan.v3.Gateways",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/gateways"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{collaborator.organization_ids.organization_id}/gateways"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateGateway",
+              "description": "",
+              "requestType": "UpdateGatewayRequest",
+              "requestLongType": "UpdateGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "Gateway",
+              "responseLongType": "Gateway",
+              "responseFullType": "ttn.lorawan.v3.Gateway",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/gateways/{gateway.ids.gateway_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteGateway",
+              "description": "",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lorawan-stack/api/user_services.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": false,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [],
+      "services": [
+        {
+          "name": "UserAccess",
+          "longName": "UserAccess",
+          "fullName": "ttn.lorawan.v3.UserAccess",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListUserRights",
+              "description": "",
+              "requestType": "UserIdentifiers",
+              "requestLongType": "UserIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Rights",
+              "responseLongType": "Rights",
+              "responseFullType": "ttn.lorawan.v3.Rights",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{user_id}/rights"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CreateUserAPIKey",
+              "description": "",
+              "requestType": "CreateUserAPIKeyRequest",
+              "requestLongType": "CreateUserAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateUserAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{user_ids.user_id}/api-keys",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListUserAPIKeys",
+              "description": "",
+              "requestType": "UserIdentifiers",
+              "requestLongType": "UserIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
+              "requestStreaming": false,
+              "responseType": "APIKeys",
+              "responseLongType": "APIKeys",
+              "responseFullType": "ttn.lorawan.v3.APIKeys",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{user_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateUserAPIKey",
+              "description": "Update the rights of an existing user API key. To generate an API key,\nthe CreateUserAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "requestType": "UpdateUserAPIKeyRequest",
+              "requestLongType": "UpdateUserAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateUserAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/users/{user_ids.user_id}/api-keys/{api_key.id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "UserInvitationRegistry",
+          "longName": "UserInvitationRegistry",
+          "fullName": "ttn.lorawan.v3.UserInvitationRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "SendInvitation",
+              "description": "",
+              "requestType": "SendInvitationRequest",
+              "requestLongType": "SendInvitationRequest",
+              "requestFullType": "ttn.lorawan.v3.SendInvitationRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/invitations",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListInvitations",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "Invitations",
+              "responseLongType": "Invitations",
+              "responseFullType": "ttn.lorawan.v3.Invitations",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/invitations"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteInvitation",
+              "description": "",
+              "requestType": "DeleteInvitationRequest",
+              "requestLongType": "DeleteInvitationRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteInvitationRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/invitations"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "UserRegistry",
+          "longName": "UserRegistry",
+          "fullName": "ttn.lorawan.v3.UserRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "CreateUser",
+              "description": "Register a new user. This method may be restricted by network settings.",
+              "requestType": "CreateUserRequest",
+              "requestLongType": "CreateUserRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateUserRequest",
+              "requestStreaming": false,
+              "responseType": "User",
+              "responseLongType": "User",
+              "responseFullType": "ttn.lorawan.v3.User",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetUser",
+              "description": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
+              "requestType": "GetUserRequest",
+              "requestLongType": "GetUserRequest",
+              "requestFullType": "ttn.lorawan.v3.GetUserRequest",
+              "requestStreaming": false,
+              "responseType": "User",
+              "responseLongType": "User",
+              "responseFullType": "ttn.lorawan.v3.User",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{user_ids.user_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateUser",
+              "description": "",
+              "requestType": "UpdateUserRequest",
+              "requestLongType": "UpdateUserRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateUserRequest",
+              "requestStreaming": false,
+              "responseType": "User",
+              "responseLongType": "User",
+              "responseFullType": "ttn.lorawan.v3.User",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/users/{user.ids.user_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateUserPassword",
+              "description": "",
+              "requestType": "UpdateUserPasswordRequest",
+              "requestLongType": "UpdateUserPasswordRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateUserPasswordRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/users/{user_ids.user_id}/password",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteUser",
+              "description": "",
+              "requestType": "UserIdentifiers",
+              "requestLongType": "UserIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lorawan-stack/api/organization_services.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": false,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [],
+      "services": [
+        {
+          "name": "OrganizationAccess",
+          "longName": "OrganizationAccess",
+          "fullName": "ttn.lorawan.v3.OrganizationAccess",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListOrganizationRights",
+              "description": "",
+              "requestType": "OrganizationIdentifiers",
+              "requestLongType": "OrganizationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Rights",
+              "responseLongType": "Rights",
+              "responseFullType": "ttn.lorawan.v3.Rights",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_id}/rights"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CreateOrganizationAPIKey",
+              "description": "",
+              "requestType": "CreateOrganizationAPIKeyRequest",
+              "requestLongType": "CreateOrganizationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateOrganizationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/organizations/{organization_ids.organization_id}/api-keys",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListOrganizationAPIKeys",
+              "description": "",
+              "requestType": "OrganizationIdentifiers",
+              "requestLongType": "OrganizationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "APIKeys",
+              "responseLongType": "APIKeys",
+              "responseFullType": "ttn.lorawan.v3.APIKeys",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateOrganizationAPIKey",
+              "description": "Update the rights of an existing organization API key. To generate an API key,\nthe CreateOrganizationAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "requestType": "UpdateOrganizationAPIKeyRequest",
+              "requestLongType": "UpdateOrganizationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetOrganizationCollaborator",
+              "description": "Set the rights of a collaborator (member) on the organization. Users\nare considered to be a collaborator if they have at least one right on the\norganization.\nNote that only users can collaborate (be member of) an organization.",
+              "requestType": "SetOrganizationCollaboratorRequest",
+              "requestLongType": "SetOrganizationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.SetOrganizationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborators",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListOrganizationCollaborators",
+              "description": "",
+              "requestType": "OrganizationIdentifiers",
+              "requestLongType": "OrganizationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Collaborators",
+              "responseLongType": "Collaborators",
+              "responseFullType": "ttn.lorawan.v3.Collaborators",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "OrganizationRegistry",
+          "longName": "OrganizationRegistry",
+          "fullName": "ttn.lorawan.v3.OrganizationRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "CreateOrganization",
+              "description": "Create a new organization. This also sets the given user as\nfirst collaborator with all possible rights.",
+              "requestType": "CreateOrganizationRequest",
+              "requestLongType": "CreateOrganizationRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateOrganizationRequest",
+              "requestStreaming": false,
+              "responseType": "Organization",
+              "responseLongType": "Organization",
+              "responseFullType": "ttn.lorawan.v3.Organization",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/organizations",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetOrganization",
+              "description": "Get the organization with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "requestType": "GetOrganizationRequest",
+              "requestLongType": "GetOrganizationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetOrganizationRequest",
+              "requestStreaming": false,
+              "responseType": "Organization",
+              "responseLongType": "Organization",
+              "responseFullType": "ttn.lorawan.v3.Organization",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_ids.organization_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListOrganizations",
+              "description": "List organizations. See request message for details.",
+              "requestType": "ListOrganizationsRequest",
+              "requestLongType": "ListOrganizationsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListOrganizationsRequest",
+              "requestStreaming": false,
+              "responseType": "Organizations",
+              "responseLongType": "Organizations",
+              "responseFullType": "ttn.lorawan.v3.Organizations",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{collaborator.user_ids.user_id}/organizations"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateOrganization",
+              "description": "",
+              "requestType": "UpdateOrganizationRequest",
+              "requestLongType": "UpdateOrganizationRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateOrganizationRequest",
+              "requestStreaming": false,
+              "responseType": "Organization",
+              "responseLongType": "Organization",
+              "responseFullType": "ttn.lorawan.v3.Organization",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/organizations/{organization.ids.organization_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteOrganization",
+              "description": "",
+              "requestType": "OrganizationIdentifiers",
+              "requestLongType": "OrganizationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/organizations/{organization_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scalarValueTypes": [
+    {
+      "protoType": "double",
+      "notes": "",
+      "cppType": "double",
+      "csType": "double",
+      "goType": "float64",
+      "javaType": "double",
+      "phpType": "float",
+      "pythonType": "float",
+      "rubyType": "Float"
+    },
+    {
+      "protoType": "float",
+      "notes": "",
+      "cppType": "float",
+      "csType": "float",
+      "goType": "float32",
+      "javaType": "float",
+      "phpType": "float",
+      "pythonType": "float",
+      "rubyType": "Float"
+    },
+    {
+      "protoType": "int32",
+      "notes": "Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.",
+      "cppType": "int32",
+      "csType": "int",
+      "goType": "int32",
+      "javaType": "int",
+      "phpType": "integer",
+      "pythonType": "int",
+      "rubyType": "Bignum or Fixnum (as required)"
+    },
+    {
+      "protoType": "int64",
+      "notes": "Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.",
+      "cppType": "int64",
+      "csType": "long",
+      "goType": "int64",
+      "javaType": "long",
+      "phpType": "integer/string",
+      "pythonType": "int/long",
+      "rubyType": "Bignum"
+    },
+    {
+      "protoType": "uint32",
+      "notes": "Uses variable-length encoding.",
+      "cppType": "uint32",
+      "csType": "uint",
+      "goType": "uint32",
+      "javaType": "int",
+      "phpType": "integer",
+      "pythonType": "int/long",
+      "rubyType": "Bignum or Fixnum (as required)"
+    },
+    {
+      "protoType": "uint64",
+      "notes": "Uses variable-length encoding.",
+      "cppType": "uint64",
+      "csType": "ulong",
+      "goType": "uint64",
+      "javaType": "long",
+      "phpType": "integer/string",
+      "pythonType": "int/long",
+      "rubyType": "Bignum or Fixnum (as required)"
+    },
+    {
+      "protoType": "sint32",
+      "notes": "Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.",
+      "cppType": "int32",
+      "csType": "int",
+      "goType": "int32",
+      "javaType": "int",
+      "phpType": "integer",
+      "pythonType": "int",
+      "rubyType": "Bignum or Fixnum (as required)"
+    },
+    {
+      "protoType": "sint64",
+      "notes": "Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.",
+      "cppType": "int64",
+      "csType": "long",
+      "goType": "int64",
+      "javaType": "long",
+      "phpType": "integer/string",
+      "pythonType": "int/long",
+      "rubyType": "Bignum"
+    },
+    {
+      "protoType": "fixed32",
+      "notes": "Always four bytes. More efficient than uint32 if values are often greater than 2^28.",
+      "cppType": "uint32",
+      "csType": "uint",
+      "goType": "uint32",
+      "javaType": "int",
+      "phpType": "integer",
+      "pythonType": "int",
+      "rubyType": "Bignum or Fixnum (as required)"
+    },
+    {
+      "protoType": "fixed64",
+      "notes": "Always eight bytes. More efficient than uint64 if values are often greater than 2^56.",
+      "cppType": "uint64",
+      "csType": "ulong",
+      "goType": "uint64",
+      "javaType": "long",
+      "phpType": "integer/string",
+      "pythonType": "int/long",
+      "rubyType": "Bignum"
+    },
+    {
+      "protoType": "sfixed32",
+      "notes": "Always four bytes.",
+      "cppType": "int32",
+      "csType": "int",
+      "goType": "int32",
+      "javaType": "int",
+      "phpType": "integer",
+      "pythonType": "int",
+      "rubyType": "Bignum or Fixnum (as required)"
+    },
+    {
+      "protoType": "sfixed64",
+      "notes": "Always eight bytes.",
+      "cppType": "int64",
+      "csType": "long",
+      "goType": "int64",
+      "javaType": "long",
+      "phpType": "integer/string",
+      "pythonType": "int/long",
+      "rubyType": "Bignum"
+    },
+    {
+      "protoType": "bool",
+      "notes": "",
+      "cppType": "bool",
+      "csType": "bool",
+      "goType": "bool",
+      "javaType": "boolean",
+      "phpType": "boolean",
+      "pythonType": "boolean",
+      "rubyType": "TrueClass/FalseClass"
+    },
+    {
+      "protoType": "string",
+      "notes": "A string must always contain UTF-8 encoded or 7-bit ASCII text.",
+      "cppType": "string",
+      "csType": "string",
+      "goType": "string",
+      "javaType": "String",
+      "phpType": "string",
+      "pythonType": "str/unicode",
+      "rubyType": "String (UTF-8)"
+    },
+    {
+      "protoType": "bytes",
+      "notes": "May contain any arbitrary sequence of bytes.",
+      "cppType": "string",
+      "csType": "ByteString",
+      "goType": "[]byte",
+      "javaType": "ByteString",
+      "phpType": "string",
+      "pythonType": "str",
+      "rubyType": "String (ASCII-8BIT)"
+    }
+  ]
+}

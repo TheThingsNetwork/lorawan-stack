@@ -87,7 +87,8 @@ $RECYCLE.BIN/
 /vendor/*/
 /release
 /.cache
-/node_modules
+node_modules/
+/sdk/js/dist
 /public
 /stories
 /pkg/webui/locales/.backend
@@ -101,3 +102,4 @@ key.pem
 
 # Javascript test coverage
 /coverage
+/sdk/js/coverage

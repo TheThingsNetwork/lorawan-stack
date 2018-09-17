@@ -1,0 +1,743 @@
+{
+  "ListApplicationRights": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/applications/{application_id}/rights",
+        "parameters": [
+          "application_id"
+        ]
+      }
+    ]
+  },
+  "CreateApplicationAPIKey": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/applications/{application_ids.application_id}/api-keys",
+        "body": "*",
+        "parameters": [
+          "application_ids.application_id"
+        ]
+      }
+    ]
+  },
+  "ListApplicationAPIKeys": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/applications/{application_id}/api-keys",
+        "parameters": [
+          "application_id"
+        ]
+      }
+    ]
+  },
+  "UpdateApplicationAPIKey": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/applications/{application_ids.application_id}/api-keys/{api_key.id}",
+        "body": "*",
+        "parameters": [
+          "application_ids.application_id",
+          "api_key.id"
+        ]
+      }
+    ]
+  },
+  "SetApplicationCollaborator": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/applications/{application_ids.application_id}/collaborators",
+        "body": "*",
+        "parameters": [
+          "application_ids.application_id"
+        ]
+      }
+    ]
+  },
+  "ListApplicationCollaborators": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/applications/{application_id}/collaborators",
+        "parameters": [
+          "application_id"
+        ]
+      }
+    ]
+  },
+  "CreateApplication": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/users/{collaborator.user_ids.user_id}/applications",
+        "body": "*",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      },
+      {
+        "method": "post",
+        "pattern": "/organizations/{collaborator.organization_ids.organization_id}/applications",
+        "body": "*",
+        "parameters": [
+          "collaborator.organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "GetApplication": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/applications/{application_ids.application_id}",
+        "parameters": [
+          "application_ids.application_id"
+        ]
+      }
+    ]
+  },
+  "ListApplications": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/applications",
+        "parameters": []
+      },
+      {
+        "method": "get",
+        "pattern": "/users/{collaborator.user_ids.user_id}/applications",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      },
+      {
+        "method": "get",
+        "pattern": "/organizations/{collaborator.organization_ids.organization_id}/applications",
+        "parameters": [
+          "collaborator.organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "UpdateApplication": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/applications/{application.ids.application_id}",
+        "body": "*",
+        "parameters": [
+          "application.ids.application_id"
+        ]
+      }
+    ]
+  },
+  "DeleteApplication": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": [
+      {
+        "method": "delete",
+        "pattern": "/applications/{application_id}",
+        "parameters": [
+          "application_id"
+        ]
+      }
+    ]
+  },
+  "DownlinkQueuePush": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": []
+  },
+  "DownlinkQueueReplace": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": []
+  },
+  "DownlinkQueueList": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": []
+  },
+  "DownlinkQueueClear": {
+    "file": "lorawan-stack/api/application_services.proto",
+    "http": []
+  },
+  "ListClientRights": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/clients/{client_id}/rights",
+        "parameters": [
+          "client_id"
+        ]
+      }
+    ]
+  },
+  "SetClientCollaborator": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/clients/{client_ids.client_id}/collaborators",
+        "body": "*",
+        "parameters": [
+          "client_ids.client_id"
+        ]
+      }
+    ]
+  },
+  "ListClientCollaborators": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/clients/{client_id}/collaborators",
+        "parameters": [
+          "client_id"
+        ]
+      }
+    ]
+  },
+  "CreateClient": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/users/{collaborator.user_ids.user_id}/clients",
+        "body": "*",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      },
+      {
+        "method": "post",
+        "pattern": "/organizations/{collaborator.organization_ids.organization_id}/clients",
+        "body": "*",
+        "parameters": [
+          "collaborator.organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "GetClient": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/clients/{client_ids.client_id}",
+        "parameters": [
+          "client_ids.client_id"
+        ]
+      }
+    ]
+  },
+  "ListClients": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/clients",
+        "parameters": []
+      },
+      {
+        "method": "get",
+        "pattern": "/users/{collaborator.user_ids.user_id}/clients",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      },
+      {
+        "method": "get",
+        "pattern": "/organizations/{collaborator.organization_ids.organization_id}/clients",
+        "parameters": [
+          "collaborator.organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "UpdateClient": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/clients/{client.ids.client_id}",
+        "body": "*",
+        "parameters": [
+          "client.ids.client_id"
+        ]
+      }
+    ]
+  },
+  "DeleteClient": {
+    "file": "lorawan-stack/api/client_services.proto",
+    "http": [
+      {
+        "method": "delete",
+        "pattern": "/clients/{client_id}",
+        "parameters": [
+          "client_id"
+        ]
+      }
+    ]
+  },
+  "ListGatewayRights": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/gateways/{gateway_id}/rights",
+        "parameters": [
+          "gateway_id"
+        ]
+      }
+    ]
+  },
+  "CreateGatewayAPIKey": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys",
+        "body": "*",
+        "parameters": [
+          "gateway_ids.gateway_id"
+        ]
+      }
+    ]
+  },
+  "ListGatewayAPIKeys": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/gateways/{gateway_id}/api-keys",
+        "parameters": [
+          "gateway_id"
+        ]
+      }
+    ]
+  },
+  "UpdateGatewayAPIKey": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}",
+        "body": "*",
+        "parameters": [
+          "gateway_ids.gateway_id",
+          "api_key.id"
+        ]
+      }
+    ]
+  },
+  "SetGatewayCollaborator": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
+        "body": "*",
+        "parameters": [
+          "gateway_ids.gateway_id"
+        ]
+      }
+    ]
+  },
+  "ListGatewayCollaborators": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/gateways/{gateway_id}/collaborators",
+        "parameters": [
+          "gateway_id"
+        ]
+      }
+    ]
+  },
+  "PullConfiguration": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": []
+  },
+  "CreateGateway": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/users/{collaborator.user_ids.user_id}/gateways",
+        "body": "*",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      },
+      {
+        "method": "post",
+        "pattern": "/organizations/{collaborator.organization_ids.organization_id}/gateways",
+        "body": "*",
+        "parameters": [
+          "collaborator.organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "GetGateway": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/gateways/{gateway_ids.gateway_id}",
+        "parameters": [
+          "gateway_ids.gateway_id"
+        ]
+      }
+    ]
+  },
+  "ListGateways": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/gateways",
+        "parameters": []
+      },
+      {
+        "method": "get",
+        "pattern": "/users/{collaborator.user_ids.user_id}/gateways",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      },
+      {
+        "method": "get",
+        "pattern": "/organizations/{collaborator.organization_ids.organization_id}/gateways",
+        "parameters": [
+          "collaborator.organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "UpdateGateway": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/gateways/{gateway.ids.gateway_id}",
+        "body": "*",
+        "parameters": [
+          "gateway.ids.gateway_id"
+        ]
+      }
+    ]
+  },
+  "DeleteGateway": {
+    "file": "lorawan-stack/api/gateway_services.proto",
+    "http": [
+      {
+        "method": "delete",
+        "pattern": "/gateways/{gateway_id}",
+        "parameters": [
+          "gateway_id"
+        ]
+      }
+    ]
+  },
+  "ListUserRights": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/users/{user_id}/rights",
+        "parameters": [
+          "user_id"
+        ]
+      }
+    ]
+  },
+  "CreateUserAPIKey": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/users/{user_ids.user_id}/api-keys",
+        "body": "*",
+        "parameters": [
+          "user_ids.user_id"
+        ]
+      }
+    ]
+  },
+  "ListUserAPIKeys": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/users/{user_id}/api-keys",
+        "parameters": [
+          "user_id"
+        ]
+      }
+    ]
+  },
+  "UpdateUserAPIKey": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/users/{user_ids.user_id}/api-keys/{api_key.id}",
+        "body": "*",
+        "parameters": [
+          "user_ids.user_id",
+          "api_key.id"
+        ]
+      }
+    ]
+  },
+  "SendInvitation": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/invitations",
+        "body": "*",
+        "parameters": []
+      }
+    ]
+  },
+  "ListInvitations": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/invitations",
+        "parameters": []
+      }
+    ]
+  },
+  "DeleteInvitation": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "delete",
+        "pattern": "/invitations",
+        "parameters": []
+      }
+    ]
+  },
+  "CreateUser": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/users",
+        "body": "*",
+        "parameters": []
+      }
+    ]
+  },
+  "GetUser": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/users/{user_ids.user_id}",
+        "parameters": [
+          "user_ids.user_id"
+        ]
+      }
+    ]
+  },
+  "UpdateUser": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/users/{user.ids.user_id}",
+        "body": "*",
+        "parameters": [
+          "user.ids.user_id"
+        ]
+      }
+    ]
+  },
+  "UpdateUserPassword": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/users/{user_ids.user_id}/password",
+        "body": "*",
+        "parameters": [
+          "user_ids.user_id"
+        ]
+      }
+    ]
+  },
+  "DeleteUser": {
+    "file": "lorawan-stack/api/user_services.proto",
+    "http": [
+      {
+        "method": "delete",
+        "pattern": "/users/{user_id}",
+        "parameters": [
+          "user_id"
+        ]
+      }
+    ]
+  },
+  "ListOrganizationRights": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/organizations/{organization_id}/rights",
+        "parameters": [
+          "organization_id"
+        ]
+      }
+    ]
+  },
+  "CreateOrganizationAPIKey": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/organizations/{organization_ids.organization_id}/api-keys",
+        "body": "*",
+        "parameters": [
+          "organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "ListOrganizationAPIKeys": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/organizations/{organization_id}/api-keys",
+        "parameters": [
+          "organization_id"
+        ]
+      }
+    ]
+  },
+  "UpdateOrganizationAPIKey": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}",
+        "body": "*",
+        "parameters": [
+          "organization_ids.organization_id",
+          "api_key.id"
+        ]
+      }
+    ]
+  },
+  "SetOrganizationCollaborator": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/organizations/{organization_ids.organization_id}/collaborators",
+        "body": "*",
+        "parameters": [
+          "organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "ListOrganizationCollaborators": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/organizations/{organization_id}/collaborators",
+        "parameters": [
+          "organization_id"
+        ]
+      }
+    ]
+  },
+  "CreateOrganization": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "post",
+        "pattern": "/users/{collaborator.user_ids.user_id}/organizations",
+        "body": "*",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      }
+    ]
+  },
+  "GetOrganization": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/organizations/{organization_ids.organization_id}",
+        "parameters": [
+          "organization_ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "ListOrganizations": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "get",
+        "pattern": "/organizations",
+        "parameters": []
+      },
+      {
+        "method": "get",
+        "pattern": "/users/{collaborator.user_ids.user_id}/organizations",
+        "parameters": [
+          "collaborator.user_ids.user_id"
+        ]
+      }
+    ]
+  },
+  "UpdateOrganization": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "put",
+        "pattern": "/organizations/{organization.ids.organization_id}",
+        "body": "*",
+        "parameters": [
+          "organization.ids.organization_id"
+        ]
+      }
+    ]
+  },
+  "DeleteOrganization": {
+    "file": "lorawan-stack/api/organization_services.proto",
+    "http": [
+      {
+        "method": "delete",
+        "pattern": "/organizations/{organization_id}",
+        "parameters": [
+          "organization_id"
+        ]
+      }
+    ]
+  }
+}

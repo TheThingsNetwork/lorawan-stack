@@ -1,0 +1,45 @@
+{
+  "name": "ttn-lw",
+  "version": "3.0.0-pre",
+  "description": "The Things Network Stack for LoRaWAN JavaScript SDK",
+  "url": "https://github.com/TheThingsIndustries/lorawan-stack/tree/ttn-master/sdk/js",
+  "main": "dist/index.js",
+  "license": "Apache-2.0",
+  "private": false,
+  "scripts": {
+    "build": "babel src -d dist",
+    "watch": "babel -w src -d dist"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-ttn": "^1.2.3",
+    "jest": "^23.5.0",
+    "jest-preset-ttn": "^0.0.3"
+  },
+  "babel": {
+    "presets": [
+      "ttn"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "../../config/eslintrc.yaml",
+    "rules": {
+      "import/named": "off",
+      "no-use-before-define": [
+        "warn",
+        {
+          "functions": false,
+          "classes": false
+        }
+      ]
+    }
+  },
+  "jest": {
+    "preset": "jest-preset-ttn"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "traverse": "^0.6.6"
+  }
+}
