@@ -150,7 +150,12 @@ message ApplicationUplink {
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   repeated RxMetadata rx_metadata = 5;
-  map<string,Location> locations = 6;
+}
+
+message ApplicationLocation {
+  string service = 1;
+  Location location = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  map<string,string> attributes = 3;
 }
 
 message ApplicationJoinAccept {
@@ -186,6 +191,7 @@ message ApplicationUp {
     ApplicationDownlink downlink_sent = 7;
     ApplicationDownlink downlink_queued = 8;
     ApplicationDownlinks downlink_queue_invalidated = 9;
+    ApplicationLocation location_solved = 10;
   }
 }
 
