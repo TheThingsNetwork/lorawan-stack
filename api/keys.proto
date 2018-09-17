@@ -22,7 +22,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message KeyEnvelope {
   // The (encrypted) key.
-  bytes key = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.AES128Key"];
+  bytes key = 1;
   // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.
   string kek_label = 2 [(gogoproto.customname) = "KEKLabel"];
 }
