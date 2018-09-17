@@ -57,7 +57,6 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
-	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	// TODO: Register AsDeviceRegistryHandler (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 
