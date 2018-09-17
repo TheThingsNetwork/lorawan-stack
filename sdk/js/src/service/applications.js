@@ -23,34 +23,34 @@ import Application from '../entity/application'
  */
 class Applications {
   constructor (api, { defaultUserId }) {
-    this.defaultUserId = defaultUserId
-    this.api = api
+    this._defaultUserId = defaultUserId
+    this._api = api
   }
 
   // Retrieval
 
   async getAll () {
-    const applications = await this.api.ListApplications()
+    const applications = await this._api.ListApplications()
     return applications
   }
 
   async getById (id) {
-    const data = await this.api.GetApplication({ 'application_ids.application_id': id })
-    return new Application(this, data, false)
+    const application = await this._api.GetApplication({ 'application_ids.application_id': id })
+    return new Application(this, application, false)
   }
 
   async getByOrganization (organizationId) {
-    return this.api.ListApplications({ 'collaborator.organization_ids.organization_id': organizationId })
+    return this._api.ListApplications({ 'collaborator.organization_ids.organization_id': organizationId })
   }
 
   async getByCollaborator (userId) {
-    return this.api.ListApplications({ 'collaborator.user_ids.user_id': userId })
+    return this._api.ListApplications({ 'collaborator.user_ids.user_id': userId })
   }
 
   // Update
 
   async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    return this.api.UpdateApplication({
+    return this._api.UpdateApplication({
       'application.ids.application_id': id,
     },
     {
@@ -61,20 +61,20 @@ class Applications {
 
   // Create
 
-  async create (userId = this.defaultUserId, application) {
-    return this.api.CreateApplication({ 'collaborator.user_ids.user_id': userId }, { application })
+  async create (userId = this._defaultUserId, application) {
+    return this._api.CreateApplication({ 'collaborator.user_ids.user_id': userId }, { application })
   }
 
   // Delete
 
   async deleteById (applicationId) {
-    return this.api.DeleteApplication({ application_id: applicationId })
+    return this._api.DeleteApplication({ application_id: applicationId })
   }
 
   // Shorthand to methods of single application
   withId (id) {
     const parent = this
-    const api = parent.api
+    const api = parent._api
     const idMask = { 'application_ids.application_id': id }
     return {
       async getDevices () {

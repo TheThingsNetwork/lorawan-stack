@@ -21,38 +21,36 @@ import Http from './http'
  * expose the same class API for both
  */
 class Api {
-  constructor (connectionType, connectionConfig, token) {
+  constructor (connectionType = 'http', connectionConfig, token) {
     this.connectionType = connectionType
     this.connectionConfig = connectionConfig
     this.token = token
 
-    this.connector = this.connectionType === 'http' ? new Http(token, connectionConfig) : null
+    if (this.connectionType !== 'http') {
+      throw new Error('Only http connection type is supported')
+    }
+
+    this.connector = new Http(token, connectionConfig)
     for (const rpcName of Object.keys(apiDefinition)) {
       const rpc = apiDefinition[rpcName]
       this[rpcName] = function (params = {}, body) {
-        if (this.connectionType === 'http') {
-          if (!rpc.http) {
-            throw new Error('gRPC connector is not implemented yet.')
-          }
+        const paramSignature = Object.keys(params).sort().join()
 
-          const paramSignature = Object.keys(params).sort().join()
+        const endpoint = rpc.http.find(function (prospect) {
+          return prospect.parameters.sort().join() === paramSignature
+        })
 
-          const endpoint = rpc.http.find(function (prospect) {
-            return prospect.parameters.sort().join() === paramSignature
-          })
-
-          if (!endpoint) {
-            throw new Error('The parameter signature did not match the one of the rpc.')
-          }
-
-          let route = endpoint.pattern
-
-          for (const parameter of endpoint.parameters) {
-            route = route.replace(`{${parameter}}`, params[parameter])
-          }
-
-          return this.connector[endpoint.method](route, body)
+        if (!endpoint) {
+          throw new Error('The parameter signature did not match the one of the rpc.')
         }
+
+        let route = endpoint.pattern
+
+        for (const parameter of endpoint.parameters) {
+          route = route.replace(`{${parameter}}`, params[parameter])
+        }
+
+        return this.connector[endpoint.method](route, body)
       }
     }
   }

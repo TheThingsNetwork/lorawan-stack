@@ -21,13 +21,13 @@ import Device from '../entity/device'
  */
 class Devices {
   constructor (api, applicationId) {
-    this.api = api
-    this.applicationId = applicationId
-    this.idMask = { 'application_ids.application_id': this.applicationId }
+    this._api = api
+    this._applicationId = applicationId
+    this._idMask = { 'application_ids.application_id': this._applicationId }
   }
 
   async getById (deviceId) {
-    const res = await this.api.GetDevice({
+    const res = await this._api.GetDevice({
       ...this.idMask,
       device_id: deviceId,
     })
@@ -36,7 +36,7 @@ class Devices {
   }
 
   async updateById (deviceId) {
-    return this.api.GetDevice({
+    return this._api.GetDevice({
       ...this.idMask,
       device_id: deviceId,
     })
