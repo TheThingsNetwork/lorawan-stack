@@ -42,7 +42,7 @@ jest.mock('../api', function () {
   return jest.fn().mockImplementation(function () {
     return {
       GetApplication: jest.fn().mockResolvedValue(mockApplicationData),
-      ListApplications: jest.fn().mockResolvedValue([ mockApplicationData ]),
+      ListApplications: jest.fn().mockResolvedValue({ applications: [ mockApplicationData ]}),
     }
   })
 })
@@ -79,5 +79,6 @@ describe('Applications', function () {
     expect(apps).toBeDefined()
     expect(apps.constructor.name).toBe('Array')
     expect(apps).toHaveLength(1)
+    expect(apps[0].constructor.name).toBe('Application')
   })
 })

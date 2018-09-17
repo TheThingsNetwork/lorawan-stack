@@ -30,8 +30,9 @@ class Applications {
   // Retrieval
 
   async getAll () {
-    const applications = await this._api.ListApplications()
-    return applications
+    let applications = await this._api.ListApplications()
+    applications = Marshaler.unwrapApplications(applications)
+    return applications.map(data => new Application(this, data, false))
   }
 
   async getById (id) {

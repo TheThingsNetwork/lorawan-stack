@@ -43,7 +43,7 @@ class Marshaler {
     return res
   }
 
-  static applications (raw) {
+  static unwrapApplications (raw) {
     return raw.applications
   }
 
