@@ -14,10 +14,10 @@
 
 /* eslint-disable no-console */
 
-import TtnLw from '../.'
+import TTN from '../.'
 
 const token = 'access-token-or-api-key'
-const ttn = new TtnLw( token, {
+const ttn = new TTN( token, {
   connectionType: 'http',
   baseURL: 'http://localhost:1885/api/v3',
   defaultUserId: 'testuser',

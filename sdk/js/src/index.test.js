@@ -16,7 +16,7 @@ import Applications from './service/applications'
 import Application from './entity/application'
 import Devices from './service/devices'
 import Device from './entity/device'
-import TtnLw from '.'
+import TTN from '.'
 
 const mockApplicationData = {
   ids: {
@@ -72,14 +72,14 @@ jest.mock('./api', function () {
 
 describe('SDK class', function () {
   const token = 'faketoken'
-  const ttn = new TtnLw( token, {
+  const ttn = new TTN( token, {
     connectionType: 'http',
     baseURL: 'http://localhost:1885/api/v3',
   })
 
   test('instance instanciates successfully', async function () {
     expect(ttn).toBeDefined()
-    expect(ttn).toBeInstanceOf(TtnLw)
+    expect(ttn).toBeInstanceOf(TTN)
     expect(ttn.Applications).toBeInstanceOf(Applications)
   })
 

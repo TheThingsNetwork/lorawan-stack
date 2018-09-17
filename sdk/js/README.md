@@ -10,10 +10,10 @@ $ yarn add ttn
 ## Usage
 ### Basic Setup
 ```javascript
-import Ttn from 'ttn'
+import TTN from 'ttn'
 
 const token = 'paste-your-token-here'
-const ttn = new Ttn(token, {
+const ttn = new TTN(token, {
   connectionType: 'http',
   baseURL: 'http://localhost:1885/api/v3',
   defaultUserId: 'testuser',
@@ -31,10 +31,10 @@ const appData = {
 }
 
 // Via Applications object
-const firstApp = await Ttn.Applications.create('testuser', appData)
+const firstApp = await ttn.Applications.create('testuser', appData)
 
 // Via Application class
-const secondApp = new Ttn.Application(appData)
+const secondApp = new ttn.Application(appData)
 await secondApp.save()
 ```
 
