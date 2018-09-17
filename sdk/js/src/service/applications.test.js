@@ -41,8 +41,10 @@ const mockApplicationData = {
 jest.mock('../api', function () {
   return jest.fn().mockImplementation(function () {
     return {
-      GetApplication: jest.fn().mockResolvedValue(mockApplicationData),
-      ListApplications: jest.fn().mockResolvedValue({ applications: [ mockApplicationData ]}),
+      ApplicationRegistry: {
+        Get: jest.fn().mockResolvedValue(mockApplicationData),
+        List: jest.fn().mockResolvedValue({ applications: [ mockApplicationData ]}),
+      },
     }
   })
 })
@@ -60,7 +62,7 @@ describe('Applications', function () {
     jest.resetModules()
 
     expect(applications).toBeInstanceOf(Applications)
-    expect(applications.api).toBeDefined()
+    expect(applications._api).toBeDefined()
   })
 
   test('instance returns an application instance on getById()', async function () {

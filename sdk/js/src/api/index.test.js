@@ -16,29 +16,28 @@ import Api from '.'
 
 jest.mock('../../generated/api-definition.json', () => (
   {
-    ListApplications: {
-      file: 'lorawan-stack/api/application_services.proto',
-      http: [
-        {
-          method: 'get',
-          pattern: '/applications',
-          parameters: [],
-        },
-        {
-          method: 'get',
-          pattern: '/users/{collaborator.user_ids.user_id}/applications',
-          parameters: [
-            'collaborator.user_ids.user_id',
-          ],
-        },
-        {
-          method: 'get',
-          pattern: '/organizations/{collaborator.organization_ids.organization_id}/applications',
-          parameters: [
-            'collaborator.organization_ids.organization_id',
-          ],
-        },
-      ],
+    ApplicationRegistry: {
+      Create: {
+        file: 'lorawan-stack/api/application_services.proto',
+        http: [
+          {
+            method: 'post',
+            pattern: '/users/{collaborator.user_ids.user_id}/applications',
+            body: '*',
+            parameters: [
+              'collaborator.user_ids.user_id',
+            ],
+          },
+          {
+            method: 'post',
+            pattern: '/organizations/{collaborator.organization_ids.organization_id}/applications',
+            body: '*',
+            parameters: [
+              'collaborator.organization_ids.organization_id',
+            ],
+          },
+        ],
+      },
     },
   }
 ))
@@ -47,26 +46,26 @@ describe('API', function () {
   let api
   beforeEach(function () {
     api = new Api('http', { baseURL: 'http://localhost:1885' })
-    api._connector.get = jest.fn()
+    api._connector.post = jest.fn()
   })
 
   test('it applies api definitions correctly', function () {
-    expect(api.ListApplications).toBeDefined()
-    expect(typeof api.ListApplications).toBe('function')
+    expect(api.ApplicationRegistry.Create).toBeDefined()
+    expect(typeof api.ApplicationRegistry.Create).toBe('function')
   })
 
   test('it applies parameters correctly', function () {
     api._connector.get = jest.fn()
 
-    api.ListApplications({ 'collaborator.user_ids.user_id': 'test' })
+    api.ApplicationRegistry.Create({ 'collaborator.user_ids.user_id': 'test' })
 
-    expect(api._connector.get).toHaveBeenCalledTimes(1)
-    expect(api._connector.get).toHaveBeenCalledWith('/users/test/applications', undefined)
+    expect(api._connector.post).toHaveBeenCalledTimes(1)
+    expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', undefined)
   })
 
   test('it throws when parameters mismatch', function () {
     expect(function () {
-      api.ListApplications({ 'some.other.param': 'test' })
+      api.ApplicationRegistry.Create({ 'some.other.param': 'test' })
     }).toThrow()
   })
 })

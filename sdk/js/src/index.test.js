@@ -57,9 +57,13 @@ const mockDeviceData = {
 jest.mock('./api', function () {
   return jest.fn().mockImplementation(function () {
     return {
-      GetApplication: jest.fn().mockResolvedValue(mockApplicationData),
-      ListApplications: jest.fn().mockResolvedValue([ mockApplicationData ]),
-      GetDevice: jest.fn().mockResolvedValue(mockDeviceData),
+      ApplicationRegistry: {
+        Get: jest.fn().mockResolvedValue(mockApplicationData),
+        List: jest.fn().mockResolvedValue([ mockApplicationData ]),
+      },
+      EndDeviceRegistry: {
+        Get: jest.fn().mockResolvedValue(mockDeviceData),
+      },
     }
   })
 })

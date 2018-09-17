@@ -41,8 +41,10 @@ const mockApplicationData = {
 jest.mock('../api', function () {
   return jest.fn().mockImplementation(function () {
     return {
-      GetApplication: jest.fn().mockResolvedValue(mockApplicationData),
-      ListApplications: jest.fn().mockResolvedValue([ mockApplicationData ]),
+      ApplicationAccess: {
+        Get: jest.fn().mockResolvedValue(mockApplicationData),
+        List: jest.fn().mockResolvedValue({ applications: [ mockApplicationData ]}),
+      },
     }
   })
 })
@@ -51,7 +53,7 @@ describe('Application', function () {
   let app
   beforeEach(function () {
     const Api = require('../api')
-    const Applications = require('./application').default
+    const Applications = require('../service/applications').default
     const applications = new Applications(new Api(), { defaultUserId: 'testuser' })
     app = new Application(applications, mockApplicationData)
   })
