@@ -26,13 +26,6 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // The NsDeviceRegistry service allows clients to manage their end devices on the Network Server.
 service NsDeviceRegistry {
-  // ListDevices returns the devices that match the given identifiers.
-  rpc List(ListEndDevicesRequest) returns (EndDevices) {
-    option (google.api.http) = {
-      get: "/ns/applications/{application_ids.application_id}/devices"
-    };
-  };
-
   // GetDevice returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
@@ -64,13 +57,6 @@ service NsDeviceRegistry {
 
 // The AsDeviceRegistry service allows clients to manage their end devices on the Application Server.
 service AsDeviceRegistry {
-  // ListDevices returns the devices that match the given identifiers.
-  rpc List(ListEndDevicesRequest) returns (EndDevices) {
-    option (google.api.http) = {
-      get: "/as/applications/{application_ids.application_id}/devices"
-    };
-  };
-
   // GetDevice returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
@@ -102,13 +88,6 @@ service AsDeviceRegistry {
 
 // The JsDeviceRegistry service allows clients to manage their end devices on the Join Server.
 service JsDeviceRegistry {
-  // ListDevices returns the devices that match the given identifiers.
-  rpc List(ListEndDevicesRequest) returns (EndDevices) {
-    option (google.api.http) = {
-      get: "/js/applications/{application_ids.application_id}/devices"
-    };
-  };
-
   // GetDevice returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
