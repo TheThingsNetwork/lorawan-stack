@@ -12,24 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Applications from './service/applications'
-import Application from './entity/application'
-import Api from './api'
+import Entity from './entity'
 
-class TtnLw {
-  constructor (token, {
-    baseURL,
-    connectionType,
-    defaultUserId,
-    axiosConfig = {},
-  }) {
+/**
+ * Devices Class wraps the single device data and provides abstractions that
+ * simplify communication with the API.
+ * @extends Entity
+ */
+class Device extends Entity {
+  constructor (data, api) {
+    super(data)
 
-    this.config = arguments.config
-    this.api = new Api(connectionType, { baseURL, ...axiosConfig }, token)
+    // TODO: Check for data validity
 
-    this.Applications = new Applications(this.api, { defaultUserId })
-    this.Application = Application.bind(null, this.Applications)
+    this._deviceId = data.ids.device_id
+    this._appId = data.ids.application_ids.application_id
+    this._appIdMask = { 'application_ids.application_id': this._appId }
+    this._api = api
+  }
+
+  save () {
+    return this.api.SetDevice({ ...this._appIdMask, device_id: this._deviceId }, this.toObject())
   }
 }
 
-export default TtnLw
+export default Device

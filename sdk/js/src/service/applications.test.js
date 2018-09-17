@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Application, Applications } from './applications'
+import Applications from './applications'
 
 const mockApplicationData = {
   ids: {
@@ -85,40 +85,5 @@ describe('Applications', function () {
     expect(apps).toBeDefined()
     expect(apps.constructor.name).toBe('Array')
     expect(apps).toHaveLength(1)
-  })
-})
-
-describe('Application', function () {
-  let app
-  beforeEach(function () {
-    const Api = require('../api')
-    const Applications = require('./applications').default
-    const applications = new Applications(new Api(), { defaultUserId: 'testuser' })
-    app = new Application(applications, mockApplicationData)
-  })
-
-  test('instance exposes a Devices Class Object', function () {
-    jest.resetModules()
-
-    expect(app).toBeDefined()
-    expect(app.Devices.constructor.name).toBe('Devices')
-  })
-
-  test('instance proxy keeps track of changes', function () {
-    jest.resetModules()
-
-    app.description = 'test'
-    expect(app._changed).toHaveLength(1)
-    expect(app._changed).toContain('description')
-    expect(app._changed).not.toContain('name')
-  })
-
-  test('instance toObject() returns plain application object, matching input', function () {
-    jest.resetModules()
-
-    const appObject = app.toObject()
-
-    expect(typeof appObject).toBe('object')
-    expect(appObject).toMatchObject(mockApplicationData)
   })
 })

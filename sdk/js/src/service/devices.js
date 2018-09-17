@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Entity from './entity'
+import Device from '../entity/device'
 
 /**
  * Devices Class provides an abstraction on all devices and manages data
@@ -36,30 +36,11 @@ class Devices {
   }
 
   async updateById (deviceId) {
-    return this.api.GetDevice(this.idMask)
+    return this.api.GetDevice({
+      ...this.idMask,
+      device_id: deviceId,
+    })
   }
 }
 
-/**
- * Devices Class wraps the single device data and provides abstractions that
- * simplify communication with the API.
- * @extends Entity
- */
-class Device extends Entity {
-  constructor (data, api) {
-    super(data)
-
-    // TODO: Check for data validity
-
-    this._deviceId = data.ids.device_id
-    this._appId = data.ids.application_ids.application_id
-    this._appIdMask = { 'application_ids.application_id': this._appId }
-    this._api = api
-  }
-
-  save () {
-    return this.api.SetDevice({ ...this._appIdMask, device_id: this._deviceId }, this.toObject())
-  }
-}
-
-export { Devices as default, Devices, Device }
+export default Devices

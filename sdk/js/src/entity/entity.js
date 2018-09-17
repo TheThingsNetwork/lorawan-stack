@@ -14,7 +14,6 @@
 
 /* eslint-disable no-invalid-this */
 
-import deleteKey from 'object-delete-key'
 import traverse from 'traverse'
 
 // The tracker proxy which will keep track of changes via setters and stores
@@ -52,6 +51,24 @@ function trackObject (obj) {
 }
 
 /**
+ * Traverse through the object and remove all _changed decorations.
+ * @param {Object} obj - The to be cleaned object.
+ * @param {boolean} clone - Whether the obj should be cloned before cleaning.
+ * @returns {Object} The cleaned object.
+ */
+function removeDecorations (obj, clone = false) {
+  const subject = clone ? traverse(obj).clone() : obj
+
+  traverse(subject).forEach(function (element) {
+    if (this.key === '_changed') {
+      this.remove()
+    }
+  })
+
+  return obj
+}
+
+/**
  * Entity class serves as an abstraction on data returned from the API. It will
  * keep track of changes and generate update masks that the API requires.
  */
@@ -61,7 +78,7 @@ class Entity {
     this._changed = []
 
     // We do not want to manipulate the original data so we take a copy instead
-    const clonedData = JSON.parse(JSON.stringify(data))
+    const clonedData = traverse(data).clone()
     const trackedObject = trackObject(clonedData)
     this.applyValues(trackedObject)
     this._rawData = data
@@ -77,11 +94,7 @@ class Entity {
   }
 
   clearValues () {
-    for (const key in this) {
-      if (!(key.startsWith('_'))) {
-        delete this[key]
-      }
-    }
+    removeDecorations(this)
   }
 
   toObject () {
@@ -90,7 +103,7 @@ class Entity {
       const leaf = this[key]
       if (typeof leaf === 'object') {
         // Clone and remove _changed property on objects
-        output[key] = deleteKey(Object.assign(leaf instanceof Array ? [] : {}, leaf), { key: '_changed' })
+        output[key] = removeDecorations(leaf, true)
       } else {
         output[key] = leaf
       }
@@ -127,7 +140,7 @@ class Entity {
         if (trails.length !== 0) {
           res = [ ...res, ...trails ]
         }
-      } else if (this._changed.indexOf(key) !== -1) {
+      } else if (this._changed && this._changed.indexOf(key) !== -1) {
         res = [ ...res, trail ]
       }
     }

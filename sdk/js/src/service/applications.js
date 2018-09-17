@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
-import { Devices, Device } from './devices'
-import Entity from './entity'
+import Device from '../entity/device'
+import Application from '../entity/application'
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -103,72 +103,4 @@ class Applications {
   }
 }
 
-/**
- * Application Class wraps the single application data and provides abstractions
- * that simplify communication with the API.
- * @extends Entity
- */
-class Application extends Entity {
-  constructor (parent, rawData, isNew = true) {
-    let data = rawData
-    if ('application' in rawData) {
-      data = rawData.application
-    }
-
-    super(data, isNew)
-
-    this._parent = parent
-    this._id = data.ids.application_id
-    this.Devices = new Devices(parent.api, this._id)
-  }
-
-  // Collaborators
-
-  async getCollaborators () {
-    return this._parent.withId(this._id).getCollaborators()
-  }
-
-  async addCollaborator (collaborator) {
-    return this._parent.withId(this._id).setCollaborator(collaborator)
-  }
-
-  // API Keys
-
-  async getApiKeys () {
-    return this._parent.withId(this._id).getApiKeys()
-  }
-
-  async addApiKey (key) {
-    return this._parent.withId(this._id).addApiKey(key)
-  }
-
-  // Devices
-
-  async getDevice (deviceId) {
-    return this._parent.withId(this._id).getDevice(deviceId)
-  }
-
-  async getDevices () {
-    return this._parent.withId(this._id).getDevices()
-  }
-
-  async save (userId) {
-    let res
-
-    try {
-      if (this._isNew) {
-        res = await this._parent.create(userId, this.toObject())
-      } else {
-        const updateMask = super.getUpdateMask()
-        res = await this._parent.updateById(this._id, super.mask(updateMask))
-      }
-      super.save(res)
-
-      return res
-    } catch (err) {
-      throw err
-    }
-  }
-}
-
-export { Applications as default, Application, Applications }
+export default Applications

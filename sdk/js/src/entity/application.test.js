@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Applications from './service/applications'
-import Application from './entity/application'
-import Devices from './service/devices'
-import Device from './entity/device'
-import TtnLw from '.'
+import Application from './application'
 
 const mockApplicationData = {
   ids: {
@@ -48,61 +44,46 @@ const mockApplicationData = {
   },
 }
 
-const mockDeviceData = {
-  ids: {
-    device_id: 'test-device',
-    application_ids: {
-      application_id: 'test',
-    },
-    dev_eui: 'string',
-    join_eui: 'string',
-    dev_addr: 'string',
-  },
-}
-
-jest.mock('./api', function () {
+jest.mock('../api', function () {
   return jest.fn().mockImplementation(function () {
     return {
       GetApplication: jest.fn().mockResolvedValue(mockApplicationData),
       ListApplications: jest.fn().mockResolvedValue([ mockApplicationData ]),
-      GetDevice: jest.fn().mockResolvedValue(mockDeviceData),
     }
   })
 })
 
-describe('SDK class', function () {
-  const token = 'faketoken'
-  const ttn = new TtnLw( token, {
-    connectionType: 'http',
-    baseURL: 'http://localhost:1885/api/v3',
+describe('Application', function () {
+  let app
+  beforeEach(function () {
+    const Api = require('../api')
+    const Applications = require('./application').default
+    const applications = new Applications(new Api(), { defaultUserId: 'testuser' })
+    app = new Application(applications, mockApplicationData)
   })
 
-  test('instance instanciates successfully', async function () {
-    expect(ttn).toBeDefined()
-    expect(ttn).toBeInstanceOf(TtnLw)
-    expect(ttn.Applications).toBeInstanceOf(Applications)
-  })
+  test('instance exposes a Devices Class Object', function () {
+    jest.resetModules()
 
-  test('retrieves application instance correctly', async function () {
-    const app = await ttn.Applications.getById('test')
     expect(app).toBeDefined()
-    expect(app).toBeInstanceOf(Application)
+    expect(app.Devices.constructor.name).toBe('Devices')
   })
 
-  test('retrieves device via app instance correctly', async function () {
-    const app = await ttn.Applications.getById('test')
-    const device = await app.Devices.getById('test-device')
+  test('instance proxy keeps track of changes', function () {
+    jest.resetModules()
 
-    expect(app.Devices).toBeInstanceOf(Devices)
-    expect(device).toBeDefined()
-    expect(device).toBeInstanceOf(Device)
+    app.description = 'test'
+    expect(app._changed).toHaveLength(1)
+    expect(app._changed).toContain('description')
+    expect(app._changed).not.toContain('name')
   })
 
-  test('retrieves device via shorthand correctly', async function () {
-    const device = await ttn.Applications.withId('test').getDevice('test-device')
+  test('instance toObject() returns plain application object, matching input', function () {
+    jest.resetModules()
 
-    expect(device).toBeDefined()
-    expect(device).toBeInstanceOf(Device)
+    const appObject = app.toObject()
+
+    expect(typeof appObject).toBe('object')
+    expect(appObject).toMatchObject(mockApplicationData)
   })
-
 })

@@ -49,4 +49,13 @@ describe('Entity', function () {
 
     expect(entity.getUpdateMask()).toEqual([ 'a.b.c', 'a.d', 'e' ])
   })
+
+  test('clears changes correctly', function () {
+    const entity = new Entity(mockData)
+
+    entity.e = 'foo'
+    expect(entity.getUpdateMask()).toEqual([ 'e' ])
+    entity.clearValues()
+    expect(entity.getUpdateMask()).toEqual([])
+  })
 })
