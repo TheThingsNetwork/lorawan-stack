@@ -34,13 +34,17 @@ func NewPopulatedID(r randyIdentifiers) string {
 
 func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceIdentifiers {
 	out := &EndDeviceIdentifiers{}
-	if r.Intn(10) == 0 {
-		out.DeviceID = NewPopulatedID(r)
-	}
+	out.DeviceID = NewPopulatedID(r)
 	out.ApplicationIdentifiers = *NewPopulatedApplicationIdentifiers(r, easy)
-	out.DevEUI = types.NewPopulatedEUI64(r)
-	out.JoinEUI = types.NewPopulatedEUI64(r)
-	out.DevAddr = types.NewPopulatedDevAddr(r)
+	if r.Intn(10) == 0 {
+		out.DevEUI = types.NewPopulatedEUI64(r)
+	}
+	if r.Intn(10) == 0 {
+		out.JoinEUI = types.NewPopulatedEUI64(r)
+	}
+	if r.Intn(10) == 0 {
+		out.DevAddr = types.NewPopulatedDevAddr(r)
+	}
 	return out
 }
 
