@@ -24,6 +24,7 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -41,6 +42,7 @@ type ApplicationServer struct {
 	linkMode       LinkMode
 	linkRegistry   LinkRegistry
 	deviceRegistry DeviceRegistry
+	keyVault       crypto.KeyVault
 
 	links sync.Map
 }
@@ -52,6 +54,7 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 		linkMode:       conf.LinkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
+		keyVault:       conf.KeyVault,
 	}
 
 	c.RegisterGRPC(as)

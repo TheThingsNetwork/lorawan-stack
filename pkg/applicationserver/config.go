@@ -14,6 +14,8 @@
 
 package applicationserver
 
+import "go.thethings.network/lorawan-stack/pkg/crypto"
+
 // LinkMode defines how applications are linked to their Network Server.
 type LinkMode int
 
@@ -29,4 +31,5 @@ type Config struct {
 	LinkMode LinkMode `name:"link-mode" description:"Mode used to link applications to their Network Server"`
 	Devices  DeviceRegistry
 	Links    LinkRegistry
+	KeyVault crypto.KeyVault
 }

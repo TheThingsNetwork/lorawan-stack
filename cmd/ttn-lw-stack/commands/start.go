@@ -54,6 +54,7 @@ var (
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
 			}))
+			config.AS.KeyVault = shared.KeyVault(config.ServiceBase)
 
 			config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
