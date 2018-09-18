@@ -45,20 +45,6 @@ type ApplicationServer struct {
 	links sync.Map
 }
 
-type LinkMode int
-
-const (
-	LinkAll LinkMode = iota
-	LinkExplicit
-)
-
-// Config represents the ApplicationServer configuration.
-type Config struct {
-	LinkMode LinkMode
-	Devices  DeviceRegistry
-	Links    LinkRegistry
-}
-
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	as := &ApplicationServer{
