@@ -87,6 +87,9 @@ var DefaultRightsConfig = config.Rights{
 	TTL: 2 * time.Minute,
 }
 
+// DefaultKeyVaultConfig is the default config for key vaults.
+var DefaultKeyVaultConfig = config.KeyVault{}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -98,6 +101,7 @@ var DefaultServiceBase = config.ServiceBase{
 	TLS:            DefaultTLSConfig,
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 	Rights:         DefaultRightsConfig,
+	KeyVault:       DefaultKeyVaultConfig,
 }
 
 // DefaultOAuthPublicURL is the default public URL where OAuth is served.
