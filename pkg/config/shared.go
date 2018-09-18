@@ -121,6 +121,12 @@ type Rights struct {
 	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
 }
 
+// KeyVault represents configuration for key vaults and which backend to use.
+type KeyVault struct {
+	Backend string            `name:"backend" description:"Backend to use as key vault (static)"`
+	Static  map[string][]byte `name:"static" description:"Static labeled key encryption keys"`
+}
+
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
 	Base           `name:",squash"`
@@ -133,6 +139,7 @@ type ServiceBase struct {
 	Sentry         Sentry         `name:"sentry"`
 	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
 	Rights         Rights         `name:"rights"`
+	KeyVault       KeyVault       `name:"key-vault"`
 }
 
 // FrequencyPlans represents frequency plans fetching configuration.
