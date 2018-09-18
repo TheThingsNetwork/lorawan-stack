@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
@@ -149,7 +150,8 @@ message ApplicationUplink {
   uint32 f_port = 2;
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
-  repeated RxMetadata rx_metadata = 5;
+  google.protobuf.Struct decoded_payload = 5;
+  repeated RxMetadata rx_metadata = 6;
 }
 
 message ApplicationLocation {
@@ -171,8 +173,9 @@ message ApplicationDownlink {
   uint32 f_port = 1;
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
-  bool confirmed = 4;
-  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
+  google.protobuf.Struct decoded_payload = 4;
+  bool confirmed = 5;
+  repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlinks {
