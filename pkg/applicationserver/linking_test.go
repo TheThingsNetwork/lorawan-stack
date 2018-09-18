@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationserver
+package applicationserver_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -30,10 +31,6 @@ import (
 )
 
 var timeout = 10 * test.Delay
-
-func init() {
-	linkBackoff = []time.Duration{1 * test.Delay}
-}
 
 func TestLink(t *testing.T) {
 	a := assertions.New(t)
@@ -56,7 +53,7 @@ func TestLink(t *testing.T) {
 			},
 		},
 	})
-	as, err := New(c, &Config{
+	as, err := applicationserver.New(c, &applicationserver.Config{
 		Links: linkRegistry,
 	})
 	if !a.So(err, should.BeNil) {
