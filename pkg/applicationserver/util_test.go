@@ -22,12 +22,12 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	ptypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc/metadata"
 )
@@ -40,6 +40,17 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerIn
 		}
 	}
 	panic("could not connect to peer")
+}
+
+func eui64Ptr(eui types.EUI64) *types.EUI64 {
+	return &eui
+}
+func devAddrPtr(devAddr types.DevAddr) *types.DevAddr {
+	return &devAddr
+}
+func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) ttnpb.EndDeviceIdentifiers {
+	ids.DevAddr = &devAddr
+	return ids
 }
 
 type memStore struct {
@@ -104,11 +115,17 @@ func (s *memStore) Range(f func(string, proto.Unmarshaler) bool) error {
 	return nil
 }
 
+func (s *memStore) Reset() {
+	s.mu.Lock()
+	s.items = map[string][]byte{}
+	s.mu.Unlock()
+}
+
 type memDeviceRegistry struct {
 	store memStore
 }
 
-func newMemDeviceRegistry() applicationserver.DeviceRegistry {
+func newMemDeviceRegistry() *memDeviceRegistry {
 	return &memDeviceRegistry{
 		store: memStore{
 			items: make(map[string][]byte),
@@ -141,11 +158,15 @@ func (r *memDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 	})
 }
 
+func (r *memDeviceRegistry) Reset() {
+	r.store.Reset()
+}
+
 type memLinkRegistry struct {
 	store memStore
 }
 
-func newMemLinkRegistry() applicationserver.LinkRegistry {
+func newMemLinkRegistry() *memLinkRegistry {
 	return &memLinkRegistry{
 		store: memStore{
 			items: make(map[string][]byte),
@@ -307,7 +328,7 @@ func (is *mockIS) ListApplications(context.Context, *ttnpb.ListApplicationsReque
 func (is *mockIS) UpdateApplication(context.Context, *ttnpb.UpdateApplicationRequest) (*ttnpb.Application, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) DeleteApplication(context.Context, *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (is *mockIS) DeleteApplication(context.Context, *ttnpb.ApplicationIdentifiers) (*ptypes.Empty, error) {
 	return nil, errors.New("not implemented")
 }
 func (is *mockIS) CreateApplicationAPIKey(context.Context, *ttnpb.CreateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
@@ -319,9 +340,41 @@ func (is *mockIS) ListApplicationAPIKeys(context.Context, *ttnpb.ApplicationIden
 func (is *mockIS) UpdateApplicationAPIKey(context.Context, *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) SetApplicationCollaborator(context.Context, *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
+func (is *mockIS) SetApplicationCollaborator(context.Context, *ttnpb.SetApplicationCollaboratorRequest) (*ptypes.Empty, error) {
 	return nil, errors.New("not implemented")
 }
 func (is *mockIS) ListApplicationCollaborators(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.Collaborators, error) {
 	return nil, errors.New("not implemented")
+}
+
+type mockJS struct {
+	keys map[string]ttnpb.KeyEnvelope
+}
+
+func startMockJS(ctx context.Context) (*mockJS, string) {
+	js := &mockJS{
+		keys: make(map[string]ttnpb.KeyEnvelope),
+	}
+	srv := rpcserver.New(ctx)
+	ttnpb.RegisterAsJsServer(srv.Server, js)
+	lis, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+	go srv.Serve(lis)
+	return js, lis.Addr().String()
+}
+
+func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID string, key ttnpb.KeyEnvelope) {
+	js.keys[fmt.Sprintf("%v:%v", devEUI, sessionKeyID)] = key
+}
+
+func (js *mockJS) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	key, ok := js.keys[fmt.Sprintf("%v:%v", req.DevEUI, req.SessionKeyID)]
+	if !ok {
+		return nil, errNotFound
+	}
+	return &ttnpb.AppSKeyResponse{
+		AppSKey: key,
+	}, nil
 }

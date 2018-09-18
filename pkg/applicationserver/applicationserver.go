@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
@@ -25,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -108,21 +110,119 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	return conn, nil
 }
 
+var errJSNotFound = errors.DefineNotFound("join_server_not_found", "Join Server not found for JoinEUI `{join_eui}`")
+
+func (as *ApplicationServer) getAppSKey(ctx context.Context, sessionKeyID string, ids ttnpb.EndDeviceIdentifiers) (ttnpb.KeyEnvelope, error) {
+	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
+	if js == nil {
+		return ttnpb.KeyEnvelope{}, errJSNotFound.WithAttributes("join_eui", *ids.JoinEUI)
+	}
+	client := ttnpb.NewAsJsClient(js.Conn())
+	req := &ttnpb.SessionKeyRequest{
+		SessionKeyID: sessionKeyID,
+		DevEUI:       *ids.DevEUI,
+	}
+	res, err := client.GetAppSKey(ctx, req, as.WithClusterAuth())
+	if err != nil {
+		return ttnpb.KeyEnvelope{}, err
+	}
+	return res.AppSKey, nil
+}
+
 var (
 	errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
+	errGetAppSKey     = errors.Define("app_s_key", "failed to get AppSKey")
+	errMissingAppSKey = errors.DefineCorruption("missing_app_s_key", "AppSKey is unknown")
 )
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	return as.deviceRegistry.Set(ctx, up.EndDeviceIdentifiers, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+		uid := unique.ID(ctx, up.EndDeviceIdentifiers)
+		logger := log.FromContext(ctx).WithField("device_uid", uid)
+		creating := false
 		if ed == nil {
-			return nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
+			logger.Info("Creating new device")
+			ed = &ttnpb.EndDevice{
+				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+			}
+			creating = true
+		}
+		resetDownlinkQueue := false
+
+		switch p := up.Up.(type) {
+		case *ttnpb.ApplicationUp_JoinAccept:
+			logger := logger.WithFields(log.Fields(
+				"join_eui", up.EndDeviceIdentifiers.JoinEUI,
+				"dev_eui", up.EndDeviceIdentifiers.DevEUI,
+				"session_key_id", p.JoinAccept.SessionKeyID,
+			))
+			logger.Debug("Handling join-accept...")
+			var appSKey ttnpb.KeyEnvelope
+			if p.JoinAccept.AppSKey != nil {
+				logger.Debug("Received AppSKey from Network Server")
+				appSKey = *p.JoinAccept.AppSKey
+			} else {
+				logger.Debug("Getting AppSKey from Join Server...")
+				key, err := as.getAppSKey(ctx, p.JoinAccept.SessionKeyID, up.EndDeviceIdentifiers)
+				if err != nil {
+					return nil, errGetAppSKey.WithCause(err)
+				}
+				appSKey = key
+				logger.Debug("Received AppSKey from Join Server")
+			}
+			ed.Session = &ttnpb.Session{
+				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: p.JoinAccept.SessionKeyID,
+					AppSKey:      &appSKey,
+				},
+				StartedAt: time.Now(),
+			}
+			p.JoinAccept.AppSKey = nil
+			resetDownlinkQueue = true
+			logger.Info("Handled join-accept")
+
+		case *ttnpb.ApplicationUp_UplinkMessage:
+			logger := logger.WithField("session_key_id", p.UplinkMessage.SessionKeyID)
+			logger.Debug("Handling uplink data...")
+			if ed.Session == nil || ed.Session.SessionKeyID != p.UplinkMessage.SessionKeyID {
+				if !creating {
+					logger.Warn("Session mismatch; restoring session...")
+				}
+				appSKey, err := as.getAppSKey(ctx, p.UplinkMessage.SessionKeyID, up.EndDeviceIdentifiers)
+				if err != nil {
+					return nil, errGetAppSKey.WithCause(err)
+				}
+				ed.Session = &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: p.UplinkMessage.SessionKeyID,
+						AppSKey:      &appSKey,
+					},
+					StartedAt: time.Now(),
+				}
+				logger.Debug("Session restored")
+			} else if ed.Session.AppSKey == nil {
+				return nil, errMissingAppSKey
+			}
+			appSKey, err := cryptoutil.UnwrapAES128Key(*ed.Session.AppSKey, as.keyVault)
+			if err != nil {
+				return nil, err
+			}
+			frmPayload, err := crypto.DecryptUplink(appSKey, *up.DevAddr, p.UplinkMessage.FCnt, p.UplinkMessage.FRMPayload)
+			if err != nil {
+				return nil, err
+			}
+			p.UplinkMessage.FRMPayload = frmPayload
+			// TODO:
+			// - Run uplink messages through message processors
+			// - Run uplink messages through location solvers async
+			logger.Info("Handled uplink data")
 		}
 
+		_ = resetDownlinkQueue
+
 		// TODO:
-		// - Handle join accept; update session
 		// - Recompute downlink queue on join accept and invalidation
-		// - Decrypt uplink messages
-		// - Report events on downlink queue changes
+		// - Report events
 
 		return ed, nil
 	})

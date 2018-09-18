@@ -30,8 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var timeout = 10 * test.Delay
-
 func TestLink(t *testing.T) {
 	a := assertions.New(t)
 
