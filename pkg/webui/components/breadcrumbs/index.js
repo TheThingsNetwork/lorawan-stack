@@ -12,60 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Fragment } from 'react'
-import classnames from 'classnames'
+import React from 'react'
 
-import PropTypes from '../../lib/prop-types'
-import Message from '../../lib/components/message'
-import Icon from '../icon'
-import Breacrumb from './breadcrumb'
+import Breadcrumbs from './breadcrumbs'
+import { BreadcrumbsConsumer } from './context'
 
-import style from './breadcrumbs.styl'
-
-const Breadcrumbs = function ({
-  className,
-  entries,
-}) {
-  return (
-    <nav className={classnames(className, style.breadcrumbs)}>
-      {entries.map(function (entry, index, arr) {
-        const {
-          title,
-          icon = null,
-          path,
-        } = entry
-
-        return (
-          <Fragment key={index}>
-            <Breacrumb
-              path={path}
-            >
-              {icon && <Icon icon={icon} className={style.icon} />}
-              <Message content={title} />
-            </Breacrumb>
-          </Fragment>
-        )
-      })}
-    </nav>
-  )
-}
-
-Breadcrumbs.propTypes = {
-  /**
-   * A list of breadcrumb entries.
-   * @param {(string|Object)} title - The title to be displayed
-   * @param {string} title - The icon name to be displayed next to the title
-   * @param {string} path - The path for a breadcrumb
-   */
-  entries: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.message.isRequired,
-    path: PropTypes.string.isRequired,
-    icon: PropTypes.string,
-  })),
-}
-
-Breadcrumbs.defaultProps = {
-  entries: [],
-}
-
-export default Breadcrumbs
+export default props => (
+  <BreadcrumbsConsumer>
+    {
+      ({ breadcrumbs }) => (
+        <Breadcrumbs {...props} breadcrumbs={breadcrumbs} />
+      )
+    }
+  </BreadcrumbsConsumer>
+)
