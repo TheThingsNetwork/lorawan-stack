@@ -13,25 +13,30 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import { Link } from 'react-router-dom'
+import Icon from '../../icon'
+import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
 
 import style from './breadcrumb.styl'
 
 const Breadcrumb = function ({
   className,
-  children,
   path,
-  exact = true,
+  content,
+  icon = null,
 }) {
+  const isRawText = typeof content === 'string' || typeof content === 'number'
+
   return (
     <Link
       to={path}
       className={classnames(className, style.link)}
     >
-      {children}
+      {icon && <Icon className={style.icon} icon={icon} />}
+      {isRawText ? <span>{content}</span> : <Message content={content} /> }
     </Link>
   )
 }
@@ -39,6 +44,10 @@ const Breadcrumb = function ({
 Breadcrumb.propTypes = {
   /** The path for a breadcrumb */
   path: PropTypes.string.isRequired,
+  /** The name of the icon to display within the breadcrumb */
+  icon: PropTypes.string,
+  /** The content of the breadcrumb */
+  content: PropTypes.message.isRequired,
 }
 
 export default Breadcrumb

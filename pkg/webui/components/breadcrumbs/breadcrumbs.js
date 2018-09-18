@@ -12,24 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.link
-  one-liner()
-  text-decoration: none
-  color: $tc-subtle-gray
+import React from 'react'
+import classnames from 'classnames'
+import PropTypes from '../../lib/prop-types'
 
-  &:not(:last-child):after
-    material-icon()
-    margin: 0 $cs.xxs
-    content: 'keyboard_arrow_right'
-    color: $tc-subtle-gray
+import style from './breadcrumbs.styl'
 
-  &:hover
-    text-decoration: underline
-    color: $tc-deep-gray
+const Breadcrumbs = ({ className, breadcrumbs }) => (
+  <nav className={classnames(className, style.breadcrumbs)}>
+    {breadcrumbs.map(function (component, index) {
+      return (
+        React.cloneElement(component, { key: index })
+      )
+    })}
+  </nav>
+)
 
-  +focus-visible()
-    text-decoration: underline
-    color: $tc-deep-gray
+Breadcrumbs.propTypes = {
+  /** A list of breadcrumb elements */
+  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.element,
+  ])),
+}
 
-.icon
-  margin-right: $cs.xxs
+export default Breadcrumbs
