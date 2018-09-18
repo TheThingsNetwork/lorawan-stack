@@ -13,33 +13,49 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route, BrowserRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
 
-import AuthRoute from '../../../lib/components/auth-route'
-import Init from '../../../lib/components/init'
-import WithLocale from '../../../lib/components/with-locale'
-import Login from '../login'
+import { Route, Switch, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import bind from 'autobind-decorator'
+
+import Header from '../../../components/header'
+import Footer from '../../../components/footer'
 import Landing from '../landing'
-import store from '../../../store'
+import Login from '../login'
 
-export default class ConsoleApp extends React.PureComponent {
+import { logout } from '../../../actions/user'
+
+import style from './app.styl'
+
+@withRouter
+@connect(state => ({
+  user: state.user.user,
+}))
+@bind
+export default class ConsoleApp extends React.Component {
+
+  handleLogout () {
+    const { dispatch } = this.props
+    dispatch(logout())
+  }
+
   render () {
+    const {
+      user,
+    } = this.props
+
     return (
-      <Provider store={store}>
-        <Init>
-          <WithLocale>
-            <BrowserRouter>
-              <React.Fragment>
-                <Switch>
-                  <AuthRoute exact path="/console" component={Landing} />
-                  <Route path="/console/login" component={Login} />
-                </Switch>
-              </React.Fragment>
-            </BrowserRouter>
-          </WithLocale>
-        </Init>
-      </Provider>
+      <div className={style.app}>
+        <Header className={style.header} user={user} handleLogout={this.handleLogout} />
+        <main className={style.main}>
+          <Switch>
+            {/* routes for registration, privacy policy, other public pages */}
+            <Route path="/console/login" component={Login} />
+            <Route path="/console" component={Landing} />
+          </Switch>
+        </main>
+        <Footer className={style.footer} />
+      </div>
     )
   }
 }

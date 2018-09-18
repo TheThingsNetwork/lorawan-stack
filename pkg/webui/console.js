@@ -14,8 +14,29 @@
 
 import React from 'react'
 import DOM from 'react-dom'
-import ConsoleApp from './views/console/app'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { BreadcrumbsProvider } from './components/breadcrumbs/context'
+
+import Init from './lib/components/init'
+import WithLocale from './lib/components/with-locale'
+
+import store from './store'
+import App from './views/console/app'
+
+const Console = () => (
+  <Provider store={store}>
+    <Init>
+      <WithLocale>
+        <Router>
+          <BreadcrumbsProvider>
+            <App />
+          </BreadcrumbsProvider>
+        </Router>
+      </WithLocale>
+    </Init>
+  </Provider>
+)
 
 const root = document.getElementById('app')
-DOM.render((<ConsoleApp />), root)
-
+DOM.render((<Console />), root)

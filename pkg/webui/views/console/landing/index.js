@@ -13,28 +13,33 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
+import { Switch, Route } from 'react-router-dom'
 
-const mapStateToProps = state => ({
-  user: state.user.user,
-})
+import WithAuth from '../../../lib/components/with-auth'
+import Overview from '../overview'
+import Applications from '../applications'
+import Gateways from '../gateways'
+import Organizations from '../organizations'
 
-@connect(mapStateToProps)
-@bind
+import Breadcrumbs from '../../../components/breadcrumbs'
+
 export default class Landing extends React.PureComponent {
 
-  handleSearchRequest () {
-    return null
-  }
-
   render () {
-    const {
-      user = {},
-    } = this.props
-
+    const { path } = this.props.match
     return (
-      <div>Welcome, {user.name}</div>
+      <React.Fragment>
+        <Breadcrumbs />
+        <Switch>
+          <WithAuth>
+            <Route exact path={`${path}`} component={Overview} />
+            <Route path={`${path}/applications`} component={Applications} />
+            <Route path={`${path}/gateways`} component={Gateways} />
+            <Route path={`${path}/organizations`} component={Organizations} />
+          </WithAuth>
+        </Switch>
+      </React.Fragment>
+      // TODO:  render not found
     )
   }
 }

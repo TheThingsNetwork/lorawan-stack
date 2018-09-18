@@ -33,6 +33,7 @@ const m = defineMessages({
 }))
 @bind
 export default class Login extends React.PureComponent {
+
   redirectToLogin () {
     const { from } = this.props.location.state || { from: { pathname: '/console' }}
     window.location = `/console/api/auth/login?path=${from}`
