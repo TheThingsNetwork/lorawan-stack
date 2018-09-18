@@ -77,6 +77,16 @@ var DefaultAssetsConfig = assets.Config{
 	SearchPath: []string{"public", "/srv/ttn-lorawan/public"},
 }
 
+// DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
+var DefaultFrequencyPlansConfig = config.FrequencyPlans{
+	StoreURL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
+}
+
+// DefaultRightsConfig is the default config to fetch rights from the Identity Server.
+var DefaultRightsConfig = config.Rights{
+	TTL: 2 * time.Minute,
+}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -88,16 +98,6 @@ var DefaultServiceBase = config.ServiceBase{
 	TLS:            DefaultTLSConfig,
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 	Rights:         DefaultRightsConfig,
-}
-
-// DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
-var DefaultFrequencyPlansConfig = config.FrequencyPlans{
-	StoreURL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
-}
-
-// DefaultRightsConfig is the default config to fetch rights from the Identity Server.
-var DefaultRightsConfig = config.Rights{
-	TTL: 2 * time.Minute,
 }
 
 // DefaultOAuthPublicURL is the default public URL where OAuth is served.
