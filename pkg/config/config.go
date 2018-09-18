@@ -16,7 +16,6 @@
 package config
 
 import (
-	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -113,6 +112,8 @@ var DefaultOptions = []Option{
 //                                           VAR="a b c" or --var a --var b --var c
 //     map[string]string                   Parsed by key=val pairs
 //                                           VAR="k=v q=r" or --var k=v --var q=r
+//     map[string][]byte                   Parsed by key=val pairs, val must be hex
+//                                           VAR="k=0x01 q=0x02" or --var k=0x01 --var q=0x02
 //     map[string][]string                 Parsed by key=val pairs where keys are repeated
 //                                           VAR="k=v1 k=v2 q=r" or --var k=v1 --var k=v2 --var q=r
 //     Configurable                        Parsed by the FromConfigString method
@@ -195,6 +196,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			stringSliceToStringMapHookFunc,
 			stringSliceToStringMapStringSliceHookFunc,
 			stringToStringMapHookFunc,
+			stringToBufferMapHookFunc,
 			stringSliceToStringHookFunc,
 			configurableInterfaceHook,
 			configurableInterfaceSliceHook,
@@ -433,6 +435,17 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				flags.StringSliceP(name, shorthand, defs, description)
 				m.viper.SetDefault(name, val)
 
+			case map[string][]byte:
+				defs := make([]string, 0, len(val))
+				for k, v := range val {
+					if len(v) > 0 {
+						defs = append(defs, fmt.Sprintf("%s=0x%X", k, v))
+					}
+				}
+
+				flags.StringSliceP(name, shorthand, defs, description)
+				m.viper.SetDefault(name, val)
+
 			case map[string][]string:
 				defs := make([]string, 0, len(val))
 				for k, vs := range val {
@@ -447,8 +460,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 			case []byte:
 				var str string
 				if len(val) > 0 {
-					str = "0x" + strings.ToUpper(hex.EncodeToString(val[:]))
-					m.viper.SetDefault(name, str)
+					m.viper.SetDefault(name, fmt.Sprintf("0x%X", val))
 				}
 				flags.StringP(name, shorthand, str, description)
 

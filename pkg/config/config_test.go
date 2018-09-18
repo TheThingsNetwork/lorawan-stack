@@ -70,6 +70,7 @@ type example struct {
 	Bytes     []byte        `name:"bytes" description:"A slice of bytes"`
 
 	StringMap      map[string]string   `name:"stringmap" description:"A map of strings"`
+	BufferMap      map[string][]byte   `name:"buffermap" description:"A map of buffers"`
 	StringMapSlice map[string][]string `name:"stringmapslice" description:"A map of string slices"`
 
 	Nested    NestedConfig  `name:"nested" description:"A nested struct"`
@@ -96,6 +97,10 @@ var (
 		Bytes:     []byte{0x01, 0xFA},
 		StringMap: map[string]string{
 			"foo": "bar",
+		},
+		BufferMap: map[string][]byte{
+			"foo": []byte{0xb, 0xa, 0xf},
+			"bar": []byte{0xf, 0x0, 0x0},
 		},
 		StringMapSlice: map[string][]string{
 			"foo": {"bar", "baz"},
@@ -164,6 +169,7 @@ func TestConfigEnv(t *testing.T) {
 	os.Setenv("TEST_STRINGPTR", "yo")
 	os.Setenv("TEST_BYTES", "FA00BB")
 	os.Setenv("TEST_STRINGMAP", "q=r s=t")
+	os.Setenv("TEST_BUFFERMAP", "a=0x0bcd c=0x0def")
 	os.Setenv("TEST_STRINGMAPSLICE", "a=b a=c d=e")
 	os.Setenv("TEST_NESTED_STRING", "mud")
 	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
@@ -191,6 +197,10 @@ func TestConfigEnv(t *testing.T) {
 		StringMap: map[string]string{
 			"q": "r",
 			"s": "t",
+		},
+		BufferMap: map[string][]byte{
+			"a": []byte{0xb, 0xcd},
+			"c": []byte{0xd, 0xef},
 		},
 		StringMapSlice: map[string][]string{
 			"a": {"b", "c"},
@@ -228,6 +238,7 @@ func TestConfigFlags(t *testing.T) {
 	os.Setenv("TEST_STRINGPTR", "")
 	os.Setenv("TEST_BYTES", "")
 	os.Setenv("TEST_STRINGMAP", "")
+	os.Setenv("TEST_BUFFERMAP", "")
 	os.Setenv("TEST_STRINGMAPSLICE", "")
 	os.Setenv("TEST_NESTED_STRING", "")
 	os.Setenv("TEST_NESTEDPTR_STRING", "")
@@ -247,6 +258,8 @@ func TestConfigFlags(t *testing.T) {
 		"--bytes", "99FD",
 		"--stringmap", "q=r",
 		"--stringmap", "s=t",
+		"--buffermap", "a=0x0bcd",
+		"--buffermap", "c=0x0def",
 		"--nested.string", "mud",
 		"--nestedptr.string", "mad",
 		"--custom", "bar",
@@ -275,6 +288,10 @@ func TestConfigFlags(t *testing.T) {
 		StringMap: map[string]string{
 			"q": "r",
 			"s": "t",
+		},
+		BufferMap: map[string][]byte{
+			"a": []byte{0xb, 0xcd},
+			"c": []byte{0xd, 0xef},
 		},
 		StringMapSlice: map[string][]string{
 			"a": {"b", "c"},

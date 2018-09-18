@@ -84,7 +84,7 @@ func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, d
 	return m, nil
 }
 
-// stringSliceToStringHookFunc is a hook function for mapstructure that converts []string to string by picking the first element.
+// stringSliceToStringHookFunc is a hook for mapstructure that decodes []string to string by picking the first element.
 func stringSliceToStringHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.String {
 		return data, nil
@@ -112,6 +112,36 @@ func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 	for _, s := range slice {
 		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
 			m[p[0]] = p[1]
+		}
+	}
+
+	return m, nil
+}
+
+// stringToBufferMapHookFunc is a hook for mapstructure that decodes string or []string to map[string][]byte.
+func stringToBufferMapHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if (f.Kind() != reflect.String && (f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String)) ||
+		t.Kind() != reflect.Map || t.Elem().Kind() != reflect.Slice || t.Elem().Elem().Kind() != reflect.Uint8 {
+		return data, nil
+	}
+
+	var slice []string
+	switch v := data.(type) {
+	case []string:
+		slice = v
+	case string:
+		slice = strings.Fields(v)
+	}
+
+	m := make(map[string][]byte, len(slice))
+	for _, s := range slice {
+		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
+			str := strings.TrimPrefix(p[1], "0x")
+			buf, err := hex.DecodeString(str)
+			if err != nil {
+				return nil, fmt.Errorf("Could not decode hex: %s", err)
+			}
+			m[p[0]] = buf
 		}
 	}
 
