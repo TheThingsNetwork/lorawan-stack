@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package crypto_test
+package cryptoutil_test
 
 import (
 	"encoding/hex"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -31,7 +31,7 @@ func TestMemKeyVault(t *testing.T) {
 	kek, _ := hex.DecodeString("000102030405060708090A0B0C0D0E0F")
 	ciphertext, _ := hex.DecodeString("1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5")
 
-	v := crypto.NewMemKeyVault(map[string][]byte{
+	v := cryptoutil.NewMemKeyVault(map[string][]byte{
 		"foo": kek,
 	})
 

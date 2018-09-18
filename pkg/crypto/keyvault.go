@@ -14,36 +14,8 @@
 
 package crypto
 
-import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-
 // KeyVault provides wrapping and unwrapping keys using KEK labels.
 type KeyVault interface {
 	Wrap(plaintext []byte, kekLabel string) ([]byte, error)
 	Unwrap(ciphertext []byte, kekLabel string) ([]byte, error)
-}
-
-type memKeyVault map[string][]byte
-
-// NewMemKeyVault returns a KeyVault that uses KEKs from memory. This implementation does not provide any security as
-// KEKs are stored in the clear.
-func NewMemKeyVault(m map[string][]byte) KeyVault {
-	return memKeyVault(m)
-}
-
-var errKEKNotFound = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")
-
-func (v memKeyVault) Wrap(plaintext []byte, kekLabel string) ([]byte, error) {
-	kek, ok := v[kekLabel]
-	if !ok {
-		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
-	}
-	return WrapKey(plaintext, kek)
-}
-
-func (v memKeyVault) Unwrap(ciphertext []byte, kekLabel string) ([]byte, error) {
-	kek, ok := v[kekLabel]
-	if !ok {
-		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
-	}
-	return UnwrapKey(ciphertext, kek)
 }

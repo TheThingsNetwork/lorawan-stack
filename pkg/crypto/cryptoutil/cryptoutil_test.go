@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -36,7 +35,7 @@ func TestWrapAES128Key(t *testing.T) {
 	kekOther, _ := hex.DecodeString("000102030405060708090A0B0C0D0E0F1011121314151617")
 	cipherOther, _ := hex.DecodeString("031D33264E15D33268F24EC260743EDCE1C6C7DDEE725A936BA814915C6762D2")
 
-	v := crypto.NewMemKeyVault(map[string][]byte{
+	v := cryptoutil.NewMemKeyVault(map[string][]byte{
 		"skey":  kekSKey,
 		"other": kekOther,
 	})
