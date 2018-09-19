@@ -33,7 +33,7 @@ const NavigationBar = function ({
           path,
           title,
           icon = null,
-          exact = true,
+          exact = false,
         } = entry
 
         return (

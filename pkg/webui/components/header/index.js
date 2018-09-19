@@ -27,6 +27,7 @@ const defaultNavigationEntries = [
     title: sharedMessages.overview,
     icon: 'overview',
     path: '/console',
+    exact: true,
   },
   {
     title: sharedMessages.applications,
