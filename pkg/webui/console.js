@@ -14,7 +14,7 @@
 
 import React from 'react'
 import DOM from 'react-dom'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { ConnectedRouter } from 'connected-react-router'
 import { Provider } from 'react-redux'
 import { BreadcrumbsProvider } from './components/breadcrumbs/context'
 
@@ -28,15 +28,14 @@ const Console = () => (
   <Provider store={store}>
     <Init>
       <WithLocale>
-        <Router>
+        <ConnectedRouter history={store.history}>
           <BreadcrumbsProvider>
             <App />
           </BreadcrumbsProvider>
-        </Router>
+        </ConnectedRouter>
       </WithLocale>
     </Init>
   </Provider>
 )
 
-const root = document.getElementById('app')
-DOM.render((<Console />), root)
+DOM.render((<Console />), document.getElementById('app'))

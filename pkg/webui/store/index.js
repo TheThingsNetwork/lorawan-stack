@@ -16,15 +16,27 @@
 
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createLogicMiddleware } from 'redux-logic'
+import { createBrowserHistory } from 'history'
+import { connectRouter, routerMiddleware } from 'connected-react-router'
 
 import reducer from '../reducers'
 import logic from '../logic'
+
+const history = createBrowserHistory()
 
 const composeEnhancers = (process.env.NODE_ENV === 'development'
   && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
 
 const middleware = applyMiddleware(
+  routerMiddleware(history),
   createLogicMiddleware(logic),
 )
 
-export default createStore(reducer, composeEnhancers(middleware))
+const store = createStore(
+  connectRouter(history)(reducer),
+  composeEnhancers(middleware)
+)
+
+store.history = history
+
+export default store
