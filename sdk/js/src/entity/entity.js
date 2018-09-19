@@ -16,57 +16,7 @@
 
 import traverse from 'traverse'
 
-// The tracker proxy which will keep track of changes via setters and stores
-// changed properties in the _changed array
-const trackerProxy = trackedData => ({
-  set (obj, prop, value) {
-    if (prop in trackedData) {
-      if (obj._changed === undefined) {
-        obj._changed = []
-      }
-      if (obj._changed.indexOf(prop) === -1) {
-        obj._changed.push(prop)
-      }
-    }
-    return Reflect.set(obj, prop, value)
-  },
-})
-
-/**
- * Traverse through the object and apply a tracker proxy to all child objects.
- * @param {Object} obj - The to be tracked object.
- * @returns {Object} The tracked object.
- */
-function trackObject (obj) {
-  for (const key in obj) {
-    const leaf = obj[key]
-    if (typeof leaf === 'object' && !(leaf instanceof Array)) {
-      obj[key] = new Proxy(leaf, trackerProxy(leaf))
-      trackObject(obj[key])
-      obj[key]._changed = []
-    }
-  }
-
-  return obj
-}
-
-/**
- * Traverse through the object and remove all _changed decorations.
- * @param {Object} obj - The to be cleaned object.
- * @param {boolean} clone - Whether the obj should be cloned before cleaning.
- * @returns {Object} The cleaned object.
- */
-function removeDecorations (obj, clone = false) {
-  const subject = clone ? traverse(obj).clone() : obj
-
-  traverse(subject).forEach(function (element) {
-    if (this.key === '_changed') {
-      this.remove()
-    }
-  })
-
-  return obj
-}
+import { trackerProxy, trackObject, removeDecorations } from '../util/obj-tracking'
 
 /**
  * Entity class serves as an abstraction on data returned from the API. It will
