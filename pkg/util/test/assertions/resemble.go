@@ -22,6 +22,15 @@ import (
 	"github.com/smartystreets/assertions"
 )
 
+func lastLine(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	ls := strings.Split(s, "\n")
+	return ls[len(ls)-1]
+}
+
 // ShouldResemble wraps assertions.ShouldResemble and prepends a diff if assertion fails.
 func ShouldResemble(actual interface{}, expected ...interface{}) (message string) {
 	if message = assertions.ShouldResemble(actual, expected...); message == success {
@@ -38,5 +47,5 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 	for _, d := range diff {
 		lines = append(lines, fmt.Sprintf("   %s", d))
 	}
-	return strings.Join(append(lines, message), "\n")
+	return strings.Join(append(lines, lastLine(message)), "\n")
 }
