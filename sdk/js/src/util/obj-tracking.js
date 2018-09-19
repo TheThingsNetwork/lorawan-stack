@@ -65,6 +65,8 @@ function removeDecorations (obj, clone = false) {
 
   traverse(subject).forEach(function (element) {
     if (this.key === '_changed') {
+      // "this" now contains information about the node
+      // see https://github.com/substack/js-traverse#context
       this.remove()
     }
   })

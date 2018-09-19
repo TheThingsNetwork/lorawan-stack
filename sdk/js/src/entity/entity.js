@@ -103,6 +103,8 @@ class Entity {
     const res = this.toObject()
 
     traverse(res).forEach(function (item) {
+      // "this" now contains information about the node
+      // see https://github.com/substack/js-traverse#context
       const path = this.path.join('.')
       if (this.notRoot && paths.indexOf(path) === -1) {
         this.remove()
@@ -116,7 +118,6 @@ class Entity {
     this._isNew = false
     this.applyValues(data)
   }
-
 }
 
 // In order to strip the console output of the object from all decorated props,
