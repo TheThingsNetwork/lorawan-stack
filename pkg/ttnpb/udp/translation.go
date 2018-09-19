@@ -27,7 +27,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
-const delta = 0.001 // For GPS comparisons
+const (
+	delta = 0.001 // For GPS comparisons
+	lora  = "LORA"
+	fsk   = "FSK"
+)
 
 var (
 	ttnVersions = map[string]string{
@@ -140,7 +144,7 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 	}
 
 	switch rx.Modu {
-	case "LORA":
+	case lora:
 		up.Settings.Modulation = ttnpb.Modulation_LORA
 		sf, err := rx.DatR.SpreadingFactor()
 		if err != nil {
@@ -150,7 +154,7 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 		if up.Settings.Bandwidth, err = rx.DatR.Bandwidth(); err != nil {
 			return up, errBandwidth.WithCause(err)
 		}
-	case "FSK":
+	case fsk:
 		up.Settings.Modulation = ttnpb.Modulation_FSK
 		up.Settings.BitRate = rx.DatR.FSK
 	default:
@@ -237,10 +241,10 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat) {
 		var dataRate types.DataRate
 		switch msg.Settings.Modulation {
 		case ttnpb.Modulation_LORA:
-			modulation = "LORA"
+			modulation = lora
 			dataRate.LoRa = fmt.Sprintf("SF%dBW%d", msg.Settings.SpreadingFactor, msg.Settings.Bandwidth/1000)
 		case ttnpb.Modulation_FSK:
-			modulation = "FSK"
+			modulation = fsk
 			dataRate.FSK = msg.Settings.BitRate
 		}
 		rxs = append(rxs, &RxPacket{
@@ -283,20 +287,21 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 		return nil, err
 	}
 	switch tx.Modu {
-	case "LORA":
+	case lora:
 		msg.Settings.Modulation = ttnpb.Modulation_LORA
 		msg.TxMetadata.EnableCRC = !tx.NCRC
-		if sf, err := tx.DatR.SpreadingFactor(); err != nil {
+		sf, err := tx.DatR.SpreadingFactor()
+		if err != nil {
 			return nil, err
-		} else {
-			msg.Settings.SpreadingFactor = uint32(sf)
 		}
-		if bw, err := tx.DatR.Bandwidth(); err != nil {
+		msg.Settings.SpreadingFactor = uint32(sf)
+		bw, err := tx.DatR.Bandwidth()
+		if err != nil {
 			return nil, err
-		} else {
-			msg.Settings.Bandwidth = bw
 		}
-	case "FSK":
+		msg.Settings.Bandwidth = bw
+
+	case fsk:
 		msg.Settings.Modulation = ttnpb.Modulation_FSK
 		msg.Settings.BitRate = tx.DatR.FSK
 	}

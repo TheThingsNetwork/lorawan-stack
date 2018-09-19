@@ -1691,15 +1691,6 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:invalid_payload": {
-    "translations": {
-      "en": "invalid payload"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
   "error:pkg/gatewayserver:listen_frontend": {
     "translations": {
       "en": "failed to start frontend listener `{protocol}` on address `{address}`"
@@ -2357,15 +2348,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:missing_gateway_id": {
-    "translations": {
-      "en": "gateway ID is unknown"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:missing_nwk_s_enc_key": {
     "translations": {
       "en": "NwkSEncKey is unknown"
@@ -2690,15 +2672,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:encoded_field_length_equal": {
-    "translations": {
-      "en": "`{lorawan_field}` encoded length should be equal to `{expected}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/ttnpb:encoded_field_length_multiple_choices": {
     "translations": {
       "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
@@ -2738,24 +2711,6 @@
   "error:pkg/ttnpb:field_bound": {
     "translations": {
       "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:field_equal": {
-    "translations": {
-      "en": "`{lorawan_field}` should be equal to `{expected}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:field_length_bound": {
-    "translations": {
-      "en": "`{lorawan_field}` length should between `{min}` and `{max}`"
     },
     "description": {
       "package": "pkg/ttnpb",

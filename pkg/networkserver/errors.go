@@ -44,7 +44,6 @@ var (
 	errMarshalPayloadFailed      = errors.Define("marshal_payload", "failed to marshal payload")
 	errMissingApplicationID      = errors.DefineNotFound("missing_application_id", "application ID is unknown")
 	errMissingFNwkSIntKey        = errors.DefineNotFound("missing_f_nwk_s_int_key", "FNwkSIntKey is unknown")
-	errMissingGatewayID          = errors.DefineNotFound("missing_gateway_id", "gateway ID is unknown")
 	errMissingNwkSEncKey         = errors.DefineNotFound("missing_nwk_s_enc_key", "NwkSEncKey is unknown")
 	errMissingPayload            = errors.DefineInvalidArgument("missing_payload", "message payload is missing")
 	errMissingSNwkSIntKey        = errors.DefineNotFound("missing_s_nwk_s_int_key", "SNwkSIntKey is unknown")

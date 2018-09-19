@@ -231,7 +231,6 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 }
 
 var (
-	errInvalidPayload  = errors.DefineInvalidArgument("invalid_payload", "invalid payload")
 	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
 )
 

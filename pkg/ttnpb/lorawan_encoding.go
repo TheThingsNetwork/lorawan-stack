@@ -582,6 +582,7 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// UnmarshalIdentifiers unmarshals the end device identifiers.
 func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 	n := len(msg.RawPayload)
 	if n == 0 {

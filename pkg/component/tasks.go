@@ -26,8 +26,11 @@ type TaskFunc func(context.Context) error
 type TaskRestart int
 
 const (
+	// TaskRestartNever denotes a restart policy that never restarts tasks after success or failure.
 	TaskRestartNever TaskRestart = iota
+	// TaskRestartAlways denotes a restart policy that always restarts tasks, on success and failure.
 	TaskRestartAlways
+	// TaskRestartOnFailure denotes a restart policy that restarts tasks on failure.
 	TaskRestartOnFailure
 )
 

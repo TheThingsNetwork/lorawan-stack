@@ -17,7 +17,8 @@
   "Exclude": [
     "^pkg/([[:alnum:]_]+/)*[[:alnum:]_]+(\\.pb|\\.pb\\.gw|_populate|pb_test)\\.go:.+",
     "^pkg/band/[[:alpha:]]{2}(_[[:digit:]]{3}){1,2}\\.go:([[:digit:]]+:){2}[[:alpha:]]+: (don't use ALL_CAPS in Go names; use CamelCase|don't use underscores in Go names;)",
-    "^pkg(/[[:alnum:]_]+)+_test.go:[[:digit:]]+::[[:alpha:]]+:.+\\(dupl\\)"
+    "^pkg(/[[:alnum:]_]+)+_test.go:[[:digit:]]+::[[:alpha:]]+:.+\\(dupl\\)",
+    "^pkg/ttnpb/([[:alnum:]_]+/)*[[:alnum:]_]+.go"
   ],
   "Cyclo": 25,
   "DuplThreshold": 200,
