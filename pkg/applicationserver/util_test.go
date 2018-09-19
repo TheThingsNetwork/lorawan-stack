@@ -241,9 +241,15 @@ func startMockNS(ctx context.Context) (*mockNS, string) {
 }
 
 func (ns *mockNS) LinkApplication(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
-	ns.linkCh <- *ids
+	select {
+	case ns.linkCh <- *ids:
+	default:
+	}
 	defer func() {
-		ns.unlinkCh <- *ids
+		select {
+		case ns.unlinkCh <- *ids:
+		default:
+		}
 	}()
 	for {
 		select {
