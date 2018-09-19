@@ -24,9 +24,9 @@ class TtnLw {
     axiosConfig = {},
   }) {
     this.config = arguments.config
-    this._api = new Api(connectionType, { baseURL, ...axiosConfig }, token)
+    this.api = new Api(connectionType, { baseURL, ...axiosConfig }, token)
 
-    this.Applications = new Applications(this._api, { defaultUserId })
+    this.Applications = new Applications(this.api, { defaultUserId })
     this.Application = Application.bind(null, this.Applications)
   }
 }

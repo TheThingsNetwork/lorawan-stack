@@ -47,7 +47,7 @@ describe('API', function () {
   let api
   beforeEach(function () {
     api = new Api('http', { baseURL: 'http://localhost:1885' })
-    api.connector.get = jest.fn()
+    api._connector.get = jest.fn()
   })
 
   test('it applies api definitions correctly', function () {
@@ -56,12 +56,12 @@ describe('API', function () {
   })
 
   test('it applies parameters correctly', function () {
-    api.connector.get = jest.fn()
+    api._connector.get = jest.fn()
 
     api.ListApplications({ 'collaborator.user_ids.user_id': 'test' })
 
-    expect(api.connector.get).toHaveBeenCalledTimes(1)
-    expect(api.connector.get).toHaveBeenCalledWith('/users/test/applications', undefined)
+    expect(api._connector.get).toHaveBeenCalledTimes(1)
+    expect(api._connector.get).toHaveBeenCalledWith('/users/test/applications', undefined)
   })
 
   test('it throws when parameters mismatch', function () {

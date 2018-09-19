@@ -30,7 +30,8 @@ class Api {
       throw new Error('Only http connection type is supported')
     }
 
-    this.connector = new Http(token, connectionConfig)
+    this._connector = new Http(token, connectionConfig)
+
     for (const rpcName of Object.keys(apiDefinition)) {
       const rpc = apiDefinition[rpcName]
       this[rpcName] = function (params = {}, body) {
@@ -50,7 +51,7 @@ class Api {
           route = route.replace(`{${parameter}}`, params[parameter])
         }
 
-        return this.connector[endpoint.method](route, body)
+        return this._connector[endpoint.method](route, body)
       }
     }
   }
