@@ -222,7 +222,6 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 
 		// TODO:
 		// - Recompute downlink queue on join accept and invalidation
-		// - Report events
 
 		return ed, nil
 	})

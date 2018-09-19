@@ -16,11 +16,13 @@ package applicationserver
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -87,10 +89,12 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		cancelCtx()
 		as.links.Delete(uid)
 	}()
+	var nsName string
 	var conn *grpc.ClientConn
 	var callOpt grpc.CallOption
 	if target.NetworkServerAddress != "" {
 		// TODO: Dial to external Network Server.
+		// nsName = target.NetworkServerAddress
 		// conn = grpc.Dial(...)
 		// callOpt = grpc.PerRPCCredentials(rpcmetadata.MD{
 		// 	AuthType:  "Key",
@@ -102,7 +106,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		if ns == nil {
 			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, ids))
 		}
-		conn, callOpt = ns.Conn(), as.WithClusterAuth()
+		nsName, conn, callOpt = ns.Name(), ns.Conn(), as.WithClusterAuth()
 	}
 	client := ttnpb.NewAsNsClient(conn)
 	logger := log.FromContext(ctx)
@@ -125,11 +129,15 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			}
 			return err
 		}
+		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
+		registerReceiveUplink(ctx, up, nsName)
 		if err := as.processUp(ctx, up); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
+			registerDropUplink(ctx, up, err)
 			continue
 		}
 		l.upCh <- up
+		registerForwardUplink(ctx, up)
 	}
 }
 
@@ -150,17 +158,20 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 }
 
 func (l *link) run() {
-	subscribers := make(map[*io.Connection]bool)
+	subscribers := make(map[*io.Connection]string)
 	for {
 		select {
 		case <-l.ctx.Done():
 			return
 		case conn := <-l.subscribeCh:
-			subscribers[conn] = true
+			correlationID := fmt.Sprintf("subscriber:%s", events.NewCorrelationID())
+			subscribers[conn] = correlationID
+			registerSubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), conn)
 			log.FromContext(conn.Context()).Debug("Subscribed")
 		case conn := <-l.unsubscribeCh:
-			if _, ok := subscribers[conn]; ok {
+			if correlationID, ok := subscribers[conn]; ok {
 				delete(subscribers, conn)
+				registerUnsubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), conn)
 				log.FromContext(conn.Context()).Debug("Unsubscribed")
 			}
 		case up := <-l.upCh:
