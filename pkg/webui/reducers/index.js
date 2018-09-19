@@ -16,9 +16,11 @@ import { combineReducers } from 'redux'
 import user from './user'
 import client from './client'
 import _console from './console' // conflicting name with window.console
+import applications from './applications'
 
 export default combineReducers({
   user,
   client,
   console: _console,
+  applications,
 })

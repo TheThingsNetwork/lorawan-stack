@@ -13,13 +13,103 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
+import Query from 'query-string'
 
+import { getApplicationsList } from '../../../actions/applications'
+
+@connect(({ applications }) => ({
+  applications: applications.applications,
+  totalCount: applications.totalCount,
+  fetching: applications.fetching,
+  fetchingSearch: applications.fetchingSearch,
+  error: applications.error,
+  filters: applications.filters,
+}))
 export default class List extends React.Component {
 
-  render () {
-    return <div>applications list</div>
+  componentDidMount () {
+    const {
+      dispatch,
+      location,
+      page,
+      order,
+      orderBy,
+    } = this.props
+
+    const queryParams = Query.parse(location.search)
+
+    const urlPage = queryParams.page || page
+    const urlOrder = queryParams.order || order
+    const urlOrderBy = queryParams.orderBy || orderBy
+
+    dispatch(getApplicationsList(urlPage, urlOrder, urlOrderBy))
   }
+
+  render () {
+    const {
+      applications,
+      totalCount,
+      error,
+      fetching,
+      fetchingSearch,
+    } = this.props
+
+    const { query, page, tab, ...filters } = this.props.filters
+
+    if (error) {
+      return (
+        <span>ERROR</span>
+      )
+    }
+
+    const apps = applications.map(app => ({ ...app, clickable: true }))
+
+    return (
+      <Row>
+        <Col sm={12}>
+          <div className={style.filters}>
+            <div className={style.filterLeft}>
+              <Tabs
+                active={tab}
+                className={style.tabs}
+                tabs={tabs}
+                onTabChange={this.onTabChange}
+              />
+            </div>
+            <div className={style.filtersRight}>
+              <Input
+                value={query || ''}
+                icon="search"
+                loading={fetchingSearch}
+                onChange={this.onQueryChange}
+              />
+              <Button
+                onClick={this.onApplicationAdd}
+                className={style.addButton}
+                message={m.add}
+                icon="add"
+              />
+            </div>
+          </div>
+          <Tabular
+            {...filters}
+            paginated
+            initialPage={page}
+            page={page}
+            totalCount={totalCount}
+            pageSize={PAGE_SIZE}
+            loading={fetching}
+            onSortRequest={this.onOrderChange}
+            onRowClick={this.onApplicationClick}
+            onPageChange={this.onPageChange}
+            headers={headers}
+            data={apps}
+            emptyMessage={sharedMessages.noMatch}
+          />
+        </Col>
+      </Row>
+    )
+  }
+
 }
-
-
-

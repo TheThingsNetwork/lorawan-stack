@@ -14,10 +14,12 @@
 
 import client from './client'
 import user from './user'
-import init from './init' // Conflicting name with window.console
+import init from './init'
+import applications from './applications'
 
 export default [
   client,
   ...user,
   init,
+  ...applications,
 ]
