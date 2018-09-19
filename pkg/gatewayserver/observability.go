@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
@@ -41,10 +40,10 @@ var (
 )
 
 const (
-	subsystem = "gs"
-	unknown   = "unknown"
-	gatewayID = "gateway_id"
-	peer      = "peer"
+	subsystem     = "gs"
+	unknown       = "unknown"
+	gatewayID     = "gateway_id"
+	networkServer = "network_server"
 )
 
 var gsMetrics = &messageMetrics{
@@ -80,7 +79,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_forwarded_total",
 			Help:      "Total number of forwarded uplinks",
 		},
-		[]string{peer},
+		[]string{networkServer},
 	),
 	uplinkDropped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -176,9 +175,9 @@ func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.U
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, peer cluster.Peer) {
+func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
 	events.Publish(evtForwardUp(ctx, ttnpb.CombineIdentifiers(gtw, msg.EndDeviceIDs), nil))
-	gsMetrics.uplinkForwarded.WithLabelValues(ctx, peer.Name()).Inc()
+	gsMetrics.uplinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {

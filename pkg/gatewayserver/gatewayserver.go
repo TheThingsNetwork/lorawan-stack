@@ -285,7 +285,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				drop(err)
 				break
 			}
-			registerForwardUplink(ctx, conn.Gateway(), msg, ns)
+			registerForwardUplink(ctx, conn.Gateway(), msg, ns.Name())
 		case status := <-conn.Status():
 			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_status:%s", events.NewCorrelationID()))
 			registerReceiveStatus(ctx, conn.Gateway(), status)
