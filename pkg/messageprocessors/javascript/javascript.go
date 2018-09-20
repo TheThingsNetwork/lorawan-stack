@@ -53,16 +53,11 @@ var (
 	errOutput      = errors.Define("output", "invalid output")
 	errOutputType  = errors.Define("output_type", "invalid output of type `{type}`")
 	errOutputRange = errors.Define("output_range", "output value `{value}` does not fall between `{low}` and `{high}`")
-	errNoPayload   = errors.DefineInvalidArgument("no_payload", "no message payload")
 )
 
-// Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.DownlinkMessage, error) {
-	payload := msg.Payload.GetMACPayload()
-	if payload == nil {
-		return nil, errNoPayload
-	}
-	decoded := payload.DecodedPayload
+// Encode encodes the message's DecodedPayload to FRMPayload using the given script.
+func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationDownlink, error) {
+	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return msg, nil
 	}
@@ -71,12 +66,8 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *
 		return nil, errInput.WithCause(err)
 	}
 	env := h.createEnvironment(version)
-	if ids := msg.EndDeviceIDs; ids != nil {
-		env["application_id"] = ids.ApplicationID
-		env["device_id"] = ids.DeviceID
-	}
 	env["payload"] = m
-	env["f_port"] = payload.FPort
+	env["f_port"] = msg.FPort
 	script = fmt.Sprintf(`
 		%s
 		Encoder(env.payload, env.f_port)
@@ -90,7 +81,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *
 	}
 	slice := reflect.ValueOf(value)
 	l := slice.Len()
-	payload.FRMPayload = make([]byte, l)
+	msg.FRMPayload = make([]byte, l)
 	for i := 0; i < l; i++ {
 		val := slice.Index(i).Interface()
 		var b int64
@@ -123,24 +114,16 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *
 				"high", 0xFF,
 			)
 		}
-		payload.FRMPayload[i] = byte(b)
+		msg.FRMPayload[i] = byte(b)
 	}
 	return msg, nil
 }
 
-// Decode decodes the message's MAC payload FRMPayload to DecodedPayload using script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.UplinkMessage, error) {
-	payload := msg.Payload.GetMACPayload()
-	if payload == nil {
-		return nil, errNoPayload
-	}
+// Decode decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationUplink, error) {
 	env := h.createEnvironment(version)
-	if ids := msg.EndDeviceIDs; ids != nil {
-		env["application_id"] = ids.ApplicationID
-		env["device_id"] = ids.DeviceID
-	}
-	env["payload"] = payload.FRMPayload
-	env["f_port"] = payload.FPort
+	env["payload"] = msg.FRMPayload
+	env["f_port"] = msg.FPort
 	script = fmt.Sprintf(`
 		%s
 		Decoder(env.payload, env.f_port)
@@ -157,6 +140,6 @@ func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, version *tt
 	if err != nil {
 		return nil, errOutput.WithCause(err)
 	}
-	payload.DecodedPayload = s
+	msg.DecodedPayload = s
 	return msg, nil
 }

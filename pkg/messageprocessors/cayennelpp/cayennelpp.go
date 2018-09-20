@@ -37,28 +37,20 @@ func New() messageprocessors.PayloadEncodeDecoder {
 }
 
 var (
-	errInput     = errors.DefineInvalidArgument("input", "invalid input")
-	errOutput    = errors.Define("output", "invalid output")
-	errNoPayload = errors.DefineInvalidArgument("no_payload", "missing payload")
+	errInput  = errors.DefineInvalidArgument("input", "invalid input")
+	errOutput = errors.Define("output", "invalid output")
 )
 
-// Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.DownlinkMessage, error) {
-	payload := msg.Payload.GetMACPayload()
-	if payload == nil {
-		return nil, errNoPayload
-	}
-
-	decoded := payload.DecodedPayload
+// Encode encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
+func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationDownlink, error) {
+	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return msg, nil
 	}
-
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
 		return nil, errInput.WithCause(err)
 	}
-
 	encoder := lpp.NewEncoder()
 	for name, value := range m {
 		key, channel, err := parseName(name)
@@ -72,29 +64,22 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, version *
 			}
 		}
 	}
-	payload.FRMPayload = encoder.Bytes()
+	msg.FRMPayload = encoder.Bytes()
 	return msg, nil
 }
 
-// Decode decodes the message's MAC payload FRMPayload to DecodedPayload using script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.UplinkMessage, error) {
-	payload := msg.Payload.GetMACPayload()
-	if payload == nil {
-		return nil, errNoPayload
-	}
-
-	decoder := lpp.NewDecoder(bytes.NewBuffer(payload.FRMPayload))
+// Decode decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
+func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationUplink, error) {
+	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {
 		return nil, errOutput.WithCause(err)
 	}
-
 	s, err := gogoproto.Struct(m)
 	if err != nil {
 		return nil, errOutput.WithCause(err)
 	}
-
-	payload.DecodedPayload = s
+	msg.DecodedPayload = s
 	return msg, nil
 }
 

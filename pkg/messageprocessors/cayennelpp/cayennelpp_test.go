@@ -41,18 +41,12 @@ func TestEncode(t *testing.T) {
 
 	// Happy flow.
 	{
-		message := &ttnpb.DownlinkMessage{
-			Payload: &ttnpb.Message{
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
-						DecodedPayload: &types.Struct{
-							Fields: map[string]*types.Value{
-								"value_2": {
-									Kind: &types.Value_NumberValue{
-										NumberValue: -50.51,
-									},
-								},
-							},
+		message := &ttnpb.ApplicationDownlink{
+			DecodedPayload: &types.Struct{
+				Fields: map[string]*types.Value{
+					"value_2": {
+						Kind: &types.Value_NumberValue{
+							NumberValue: -50.51,
 						},
 					},
 				},
@@ -61,42 +55,36 @@ func TestEncode(t *testing.T) {
 
 		output, err := host.Encode(ctx, message, version, "")
 		a.So(err, should.BeNil)
-		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{2, 236, 69})
+		a.So(output.FRMPayload, should.Resemble, []byte{2, 236, 69})
 	}
 
 	// Test resilience against custom fields from the user. Should be fine.
 	{
-		message := &ttnpb.DownlinkMessage{
-			Payload: &ttnpb.Message{
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
-						DecodedPayload: &types.Struct{
-							Fields: map[string]*types.Value{
-								"custom": {
-									Kind: &types.Value_NumberValue{
-										NumberValue: 8,
-									},
-								},
-								"digital_in_8": {
-									Kind: &types.Value_StringValue{
-										StringValue: "shouldn't be a string",
-									},
-								},
-								"custom_5": {
-									Kind: &types.Value_NumberValue{
-										NumberValue: 5,
-									},
-								},
-								"accelerometer_1": {
-									Kind: &types.Value_StructValue{
-										StructValue: &types.Struct{
-											Fields: map[string]*types.Value{
-												"x": {
-													Kind: &types.Value_StringValue{
-														StringValue: "test",
-													},
-												},
-											},
+		message := &ttnpb.ApplicationDownlink{
+			DecodedPayload: &types.Struct{
+				Fields: map[string]*types.Value{
+					"custom": {
+						Kind: &types.Value_NumberValue{
+							NumberValue: 8,
+						},
+					},
+					"digital_in_8": {
+						Kind: &types.Value_StringValue{
+							StringValue: "shouldn't be a string",
+						},
+					},
+					"custom_5": {
+						Kind: &types.Value_NumberValue{
+							NumberValue: 5,
+						},
+					},
+					"accelerometer_1": {
+						Kind: &types.Value_StructValue{
+							StructValue: &types.Struct{
+								Fields: map[string]*types.Value{
+									"x": {
+										Kind: &types.Value_StringValue{
+											StringValue: "test",
 										},
 									},
 								},
@@ -109,7 +97,7 @@ func TestEncode(t *testing.T) {
 
 		output, err := host.Encode(ctx, message, version, "")
 		a.So(err, should.BeNil)
-		a.So(output.Payload.GetMACPayload().FRMPayload, should.BeEmpty)
+		a.So(output.FRMPayload, should.BeEmpty)
 	}
 }
 
@@ -126,32 +114,26 @@ func TestDecode(t *testing.T) {
 		FirmwareVersion: "1.0.0",
 	}
 
-	message := &ttnpb.UplinkMessage{
-		Payload: &ttnpb.Message{
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					FRMPayload: []byte{
-						1, lpp.DigitalInput, 255,
-						2, lpp.DigitalOutput, 100,
-						3, lpp.AnalogInput, 21, 74,
-						4, lpp.AnalogOutput, 234, 182,
-						5, lpp.Luminosity, 1, 244,
-						6, lpp.Presence, 50,
-						7, lpp.Temperature, 255, 100,
-						8, lpp.RelativeHumidity, 99,
-						9, lpp.Accelerometer, 254, 88, 0, 15, 6, 130,
-						10, lpp.BarometricPressure, 41, 239,
-						11, lpp.Gyrometer, 1, 99, 2, 49, 254, 102,
-						12, lpp.GPS, 7, 253, 135, 0, 190, 245, 0, 8, 106,
-					},
-				},
-			},
+	message := &ttnpb.ApplicationUplink{
+		FRMPayload: []byte{
+			1, lpp.DigitalInput, 255,
+			2, lpp.DigitalOutput, 100,
+			3, lpp.AnalogInput, 21, 74,
+			4, lpp.AnalogOutput, 234, 182,
+			5, lpp.Luminosity, 1, 244,
+			6, lpp.Presence, 50,
+			7, lpp.Temperature, 255, 100,
+			8, lpp.RelativeHumidity, 99,
+			9, lpp.Accelerometer, 254, 88, 0, 15, 6, 130,
+			10, lpp.BarometricPressure, 41, 239,
+			11, lpp.Gyrometer, 1, 99, 2, 49, 254, 102,
+			12, lpp.GPS, 7, 253, 135, 0, 190, 245, 0, 8, 106,
 		},
 	}
 
 	output, err := host.Decode(ctx, message, version, "")
 	a.So(err, should.BeNil)
-	m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
+	m, err := gogoproto.Map(output.DecodedPayload)
 	a.So(err, should.BeNil)
 	a.So(m, should.HaveLength, 12)
 	a.So(m["digital_in_1"], should.Equal, 255)

@@ -38,18 +38,12 @@ func TestEncode(t *testing.T) {
 		FirmwareVersion: "1.0.0",
 	}
 
-	message := &ttnpb.DownlinkMessage{
-		Payload: &ttnpb.Message{
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					DecodedPayload: &types.Struct{
-						Fields: map[string]*types.Value{
-							"temperature": {
-								Kind: &types.Value_NumberValue{
-									NumberValue: -21.3,
-								},
-							},
-						},
+	message := &ttnpb.ApplicationDownlink{
+		DecodedPayload: &types.Struct{
+			Fields: map[string]*types.Value{
+				"temperature": {
+					Kind: &types.Value_NumberValue{
+						NumberValue: -21.3,
 					},
 				},
 			},
@@ -65,7 +59,7 @@ func TestEncode(t *testing.T) {
 		`
 		output, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{1, 2, 3})
+		a.So(output.FRMPayload, should.Resemble, []byte{1, 2, 3})
 	}
 
 	// Encode temperature.
@@ -81,7 +75,7 @@ func TestEncode(t *testing.T) {
 		`
 		output, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(output.FRMPayload, should.Resemble, []byte{247, 174})
 	}
 
 	// Encode temperature based on a specific model.
@@ -102,7 +96,7 @@ func TestEncode(t *testing.T) {
 		`
 		output, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(output.FRMPayload, should.Resemble, []byte{247, 174})
 
 		version.ModelID = "L-Tek FF1705"
 		_, err = host.Encode(ctx, message, version, script)
@@ -169,14 +163,8 @@ func TestDecode(t *testing.T) {
 		FirmwareVersion: "1.0.0",
 	}
 
-	message := &ttnpb.UplinkMessage{
-		Payload: &ttnpb.Message{
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					FRMPayload: []byte{247, 174},
-				},
-			},
-		},
+	message := &ttnpb.ApplicationUplink{
+		FRMPayload: []byte{247, 174},
 	}
 
 	// Return constant object.
@@ -190,7 +178,7 @@ func TestDecode(t *testing.T) {
 		`
 		output, err := host.Decode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
+		m, err := gogoproto.Map(output.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
@@ -210,7 +198,7 @@ func TestDecode(t *testing.T) {
 		`
 		output, err := host.Decode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
+		m, err := gogoproto.Map(output.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"brand":       "The Things Products",
