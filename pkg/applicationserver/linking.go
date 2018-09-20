@@ -131,7 +131,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		}
 		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
 		registerReceiveUplink(ctx, up, nsName)
-		if err := as.processUp(ctx, up); err != nil {
+		if err := as.processUp(ctx, up, target); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
 			registerDropUplink(ctx, up, err)
 			continue

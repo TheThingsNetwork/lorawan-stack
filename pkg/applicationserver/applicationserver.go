@@ -30,6 +30,9 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors/cayennelpp"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
@@ -41,10 +44,11 @@ import (
 type ApplicationServer struct {
 	*component.Component
 
-	linkMode       LinkMode
-	linkRegistry   LinkRegistry
-	deviceRegistry DeviceRegistry
-	keyVault       crypto.KeyVault
+	linkMode          LinkMode
+	linkRegistry      LinkRegistry
+	deviceRegistry    DeviceRegistry
+	keyVault          crypto.KeyVault
+	payloadFormatters map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder
 
 	links sync.Map
 }
@@ -57,6 +61,10 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
 		keyVault:       conf.KeyVault,
+		payloadFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder{
+			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
+			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
+		},
 	}
 
 	c.RegisterGRPC(as)
@@ -135,7 +143,7 @@ var (
 	errMissingAppSKey = errors.DefineCorruption("missing_app_s_key", "AppSKey is unknown")
 )
 
-func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
 	return as.deviceRegistry.Set(ctx, up.EndDeviceIdentifiers, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
 		uid := unique.ID(ctx, up.EndDeviceIdentifiers)
 		logger := log.FromContext(ctx).WithField("device_uid", uid)
@@ -212,8 +220,21 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 				return nil, err
 			}
 			p.UplinkMessage.FRMPayload = frmPayload
+			formatters := ed.Formatters
+			if formatters == nil {
+				formatters = link.DefaultFormatters
+			}
+			if formatters.GetUpFormatter() != ttnpb.PayloadFormatter_FORMATTER_NONE {
+				logger := logger.WithField("formatter", formatters.UpFormatter)
+				if formatter, ok := as.payloadFormatters[formatters.UpFormatter]; ok {
+					if err := formatter.Decode(ctx, p.UplinkMessage, ed.VersionIDs, formatters.UpFormatterParameter); err != nil {
+						logger.WithError(err).Warn("Failed to decode payload")
+					}
+				} else {
+					logger.Warn("Payload formatter not supported")
+				}
+			}
 			// TODO:
-			// - Run uplink messages through message processors
 			// - Run uplink messages through location solvers async
 			logger.Info("Handled uplink data")
 		}

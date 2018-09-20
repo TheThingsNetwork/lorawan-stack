@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -38,15 +39,30 @@ import (
 var (
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
-	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
-	registeredApplicationKey = "secret"
+	registeredApplicationID        = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
+	registeredApplicationKey       = "secret"
+	registeredApplicationFormatter = ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
 
 	// This device gets registered in the device registry of the Application Server.
-	registeredDeviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "foo-device",
-		JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-		DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+	registeredDevice = &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: registeredApplicationID,
+			DeviceID:               "foo-device",
+			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter: ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+			UpFormatterParameter: `function Decoder(payload, f_port) {
+	var sum = 0;
+	for (i = 0; i < payload.length; i++) {
+		sum += payload[i];
+	}
+	return {
+		sum: sum
+	};
+}`,
+		},
 	}
 
 	// This device does not get registered in the device registry of the Application Server and will be created on join
@@ -75,15 +91,18 @@ func TestApplicationServer(t *testing.T) {
 	// Register some sessions in the Join Server. Sometimes the keys are sent by the Network Server as part of the
 	// join-accept, and sometimes they are not sent by the Network Server so the Application Server gets them from the
 	// Join Server.
-	js.add(ctx, *registeredDeviceID.DevEUI, "session1", ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.DevEUI, "session1", ttnpb.KeyEnvelope{
+		// AppSKey is []byte{0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF}.
 		Key:      []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5},
 		KEKLabel: "test",
 	})
-	js.add(ctx, *registeredDeviceID.DevEUI, "session2", ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.DevEUI, "session2", ttnpb.KeyEnvelope{
+		// AppSKey is []byte{0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00}.
 		Key:      []byte{0xa3, 0x34, 0x38, 0x1c, 0xca, 0x1c, 0x12, 0x7a, 0x5b, 0xb1, 0xa8, 0x97, 0x39, 0xc7, 0x5, 0x34, 0x91, 0x26, 0x9b, 0x21, 0x4f, 0x27, 0x80, 0x19},
 		KEKLabel: "test",
 	})
-	js.add(ctx, *registeredDeviceID.DevEUI, "session3", ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.DevEUI, "session3", ttnpb.KeyEnvelope{
+		// AppSKey is []byte{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42}.
 		Key:      []byte{0x8c, 0xe9, 0x14, 0x4b, 0x82, 0x23, 0x8, 0x39, 0x65, 0x73, 0xd, 0x42, 0x9f, 0x2a, 0x7c, 0x9c, 0x9c, 0xbe, 0x38, 0xbe, 0x35, 0x5d, 0x44, 0xf},
 		KEKLabel: "test",
 	})
@@ -91,15 +110,18 @@ func TestApplicationServer(t *testing.T) {
 	deviceRegistry := newMemDeviceRegistry()
 	resetDeviceRegistry := func() {
 		deviceRegistry.Reset()
-		deviceRegistry.Set(ctx, registeredDeviceID, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			return &ttnpb.EndDevice{
-				EndDeviceIdentifiers: registeredDeviceID,
-			}, nil
+		deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+			return registeredDevice, nil
 		})
 	}
 	linkRegistry := newMemLinkRegistry()
 	linkRegistry.Set(ctx, registeredApplicationID, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) {
-		return &ttnpb.ApplicationLink{}, nil
+		return &ttnpb.ApplicationLink{
+			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
+				UpFormatter:   registeredApplicationFormatter,
+				DownFormatter: registeredApplicationFormatter,
+			},
+		}, nil
 	})
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
@@ -254,7 +276,7 @@ func TestApplicationServer(t *testing.T) {
 					{
 						Name: "JoinAccept/RegisteredDevice/WithoutAppSKey",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x84, 0xff, 0xff, 0xff}),
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x84, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyID: "session1",
@@ -264,7 +286,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x84, 0xff, 0xff, 0xff}),
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x84, 0xff, 0xff, 0xff}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyID: "session1",
@@ -285,7 +307,7 @@ func TestApplicationServer(t *testing.T) {
 					{
 						Name: "JoinAccept/RegisteredDevice/WithAppSKey",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyID: "session2",
@@ -299,7 +321,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyID: "session2",
@@ -320,26 +342,35 @@ func TestApplicationServer(t *testing.T) {
 					{
 						Name: "UplinkMessage/CurrentSession",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									SessionKeyID: "session2",
 									FPort:        42,
 									FCnt:         42,
-									FRMPayload:   []byte{0x01, 0x02, 0x03},
+									FRMPayload:   []byte{0x66, 0xd8, 0xbf},
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										SessionKeyID: "session2",
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x66, 0xd8, 0xbf},
+										FRMPayload:   []byte{0x01, 0x02, 0x03},
+										DecodedPayload: &pbtypes.Struct{
+											Fields: map[string]*pbtypes.Value{
+												"sum": {
+													Kind: &pbtypes.Value_NumberValue{
+														NumberValue: 6, // Payload formatter sums the bytes in FRMPayload.
+													},
+												},
+											},
+										},
 									},
 								},
 							})
@@ -348,26 +379,35 @@ func TestApplicationServer(t *testing.T) {
 					{
 						Name: "UplinkMessage/ChangedSession",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x24, 0x24, 0xff, 0xff}),
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x24, 0x24, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									SessionKeyID: "session3",
 									FPort:        24,
 									FCnt:         24,
-									FRMPayload:   []byte{0x01, 0x02, 0x03},
+									FRMPayload:   []byte{0x58, 0xca, 0xa1},
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDeviceID, types.DevAddr{0x24, 0x24, 0xff, 0xff}),
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x24, 0x24, 0xff, 0xff}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										SessionKeyID: "session3",
 										FPort:        24,
 										FCnt:         24,
-										FRMPayload:   []byte{0x3d, 0xac, 0xc6},
+										FRMPayload:   []byte{0x64, 0x64, 0x64},
+										DecodedPayload: &pbtypes.Struct{
+											Fields: map[string]*pbtypes.Value{
+												"sum": {
+													Kind: &pbtypes.Value_NumberValue{
+														NumberValue: 300, // Payload formatter sums the bytes in FRMPayload.
+													},
+												},
+											},
+										},
 									},
 								},
 							})
@@ -403,6 +443,52 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyID: "session1",
+									},
+								},
+							})
+						},
+						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
+							a := assertions.New(t)
+							a.So(dev.Session, should.NotBeNil)
+							a.So(dev.Session.SessionKeyID, should.Equal, "session1")
+							a.So(dev.Session.AppSKey, should.Resemble, &ttnpb.KeyEnvelope{
+								Key:      []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5},
+								KEKLabel: "test",
+							})
+						},
+					},
+					{
+						Name: "UplinkMessage/UnregisteredDevice",
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x24, 0xff, 0xff, 0xff}),
+							Up: &ttnpb.ApplicationUp_UplinkMessage{
+								UplinkMessage: &ttnpb.ApplicationUplink{
+									SessionKeyID: "session1",
+									FPort:        42,
+									FCnt:         24,
+									FRMPayload:   []byte{0x39, 0xf4, 0xb1, 0xc5},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x24, 0xff, 0xff, 0xff}),
+								Up: &ttnpb.ApplicationUp_UplinkMessage{
+									UplinkMessage: &ttnpb.ApplicationUplink{
+										SessionKeyID: "session1",
+										FPort:        42,
+										FCnt:         24,
+										FRMPayload:   []byte{0x7, 0x67, 0x0, 0xe1},
+										DecodedPayload: &pbtypes.Struct{
+											Fields: map[string]*pbtypes.Value{
+												"temperature_7": {
+													Kind: &pbtypes.Value_NumberValue{
+														NumberValue: 22.5, // Application's default formatter is CayenneLPP.
+													},
+												},
+											},
+										},
 									},
 								},
 							})
