@@ -24,6 +24,7 @@ import (
 func TestID(t *testing.T) {
 	a := assertions.New(t)
 	a.So(ID("app-test"), should.BeNil)
+	a.So(ID("app_test"), should.NotBeNil)
 	a.So(ID("_dd"), should.NotBeNil)
 	a.So(ID("A"), should.NotBeNil)
 	a.So(ID(1), should.NotBeNil)

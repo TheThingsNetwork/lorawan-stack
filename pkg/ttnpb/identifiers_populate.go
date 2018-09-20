@@ -25,8 +25,8 @@ func NewPopulatedID(r randyIdentifiers) string {
 	}
 	for n := 0; n < len(b)/8; n++ {
 		i := 1 + r.Intn(len(b)-2)
-		if b[i-1] != '_' && b[i-1] != '-' && b[i+1] != '_' && b[i+1] != '-' {
-			b[i] = "-_"[r.Intn(2)]
+		if b[i-1] != '-' && b[i+1] != '-' {
+			b[i] = '-'
 		}
 	}
 	return string(b)

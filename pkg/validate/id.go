@@ -22,14 +22,14 @@ import (
 )
 
 var (
-	idRegex = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){1,35}$")
+	idRegex = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){1,35}$")
 
-	errID = errors.DefineInvalidArgument("id", "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers, dashes and underscores. It may not start or end with a dash or an underscore.")
+	errID = errors.DefineInvalidArgument("id", "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash.")
 )
 
 // ID checks whether the input value is a valid ID according:
 //		- Length must be between 2 and 36
-//		- It consists only of numbers, dashs, underscores and lowercase letters
+//		- It consists only of numbers, dashes and lowercase letters
 //		- Must start by a number or lowercase letter
 //		- It cannot match any of the blacklisted IDs
 func ID(v interface{}) error {
@@ -37,11 +37,9 @@ func ID(v interface{}) error {
 	if !ok {
 		return errNotString.WithAttributes("type", fmt.Sprintf("%T", v))
 	}
-
 	if !idRegex.MatchString(id) {
 		return errID.WithAttributes("id", id)
 
 	}
-
 	return nil
 }

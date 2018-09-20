@@ -3070,7 +3070,7 @@
   },
   "error:pkg/validate:id": {
     "translations": {
-      "en": "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers, dashes and underscores. It may not start or end with a dash or an underscore."
+      "en": "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash."
     },
     "description": {
       "package": "pkg/validate",
