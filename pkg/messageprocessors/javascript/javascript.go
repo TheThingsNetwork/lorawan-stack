@@ -39,13 +39,16 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
-func (h *host) createEnvironment(version *ttnpb.EndDeviceVersionIdentifiers) map[string]interface{} {
-	env := make(map[string]interface{})
+func (h *host) createEnvironment(version *ttnpb.EndDeviceVersionIdentifiers) (env map[string]interface{}) {
+	env = make(map[string]interface{})
+	if version == nil {
+		return
+	}
 	env["brand"] = version.BrandID
 	env["model"] = version.ModelID
 	env["hardware_version"] = version.HardwareVersion
 	env["firmware_version"] = version.FirmwareVersion
-	return env
+	return
 }
 
 var (
