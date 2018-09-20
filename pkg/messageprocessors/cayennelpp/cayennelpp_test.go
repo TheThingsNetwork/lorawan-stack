@@ -53,9 +53,9 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		output, err := host.Encode(ctx, message, version, "")
+		err := host.Encode(ctx, message, version, "")
 		a.So(err, should.BeNil)
-		a.So(output.FRMPayload, should.Resemble, []byte{2, 236, 69})
+		a.So(message.FRMPayload, should.Resemble, []byte{2, 236, 69})
 	}
 
 	// Test resilience against custom fields from the user. Should be fine.
@@ -95,9 +95,9 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		output, err := host.Encode(ctx, message, version, "")
+		err := host.Encode(ctx, message, version, "")
 		a.So(err, should.BeNil)
-		a.So(output.FRMPayload, should.BeEmpty)
+		a.So(message.FRMPayload, should.BeEmpty)
 	}
 }
 
@@ -131,9 +131,9 @@ func TestDecode(t *testing.T) {
 		},
 	}
 
-	output, err := host.Decode(ctx, message, version, "")
+	err := host.Decode(ctx, message, version, "")
 	a.So(err, should.BeNil)
-	m, err := gogoproto.Map(output.DecodedPayload)
+	m, err := gogoproto.Map(message.DecodedPayload)
 	a.So(err, should.BeNil)
 	a.So(m, should.HaveLength, 12)
 	a.So(m["digital_in_1"], should.Equal, 255)

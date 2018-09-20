@@ -56,14 +56,14 @@ var (
 )
 
 // Encode encodes the message's DecodedPayload to FRMPayload using the given script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationDownlink, error) {
+func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
 	decoded := msg.DecodedPayload
 	if decoded == nil {
-		return msg, nil
+		return nil
 	}
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
-		return nil, errInput.WithCause(err)
+		return errInput.WithCause(err)
 	}
 	env := h.createEnvironment(version)
 	env["payload"] = m
@@ -74,15 +74,14 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, versi
 	`, script)
 	value, err := h.engine.Run(ctx, script, env)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
-		return nil, errOutputType
+		return errOutputType
 	}
 	slice := reflect.ValueOf(value)
-	l := slice.Len()
-	msg.FRMPayload = make([]byte, l)
-	for i := 0; i < l; i++ {
+	frmPayload := make([]byte, slice.Len())
+	for i := 0; i < slice.Len(); i++ {
 		val := slice.Index(i).Interface()
 		var b int64
 		switch i := val.(type) {
@@ -105,22 +104,23 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, versi
 		case uint64:
 			b = int64(i)
 		default:
-			return nil, errOutputType.WithAttributes("type", fmt.Sprintf("%T", i))
+			return errOutputType.WithAttributes("type", fmt.Sprintf("%T", i))
 		}
 		if b < 0x00 || b > 0xFF {
-			return nil, errOutputRange.WithAttributes(
+			return errOutputRange.WithAttributes(
 				"value", b,
 				"low", 0x00,
 				"high", 0xFF,
 			)
 		}
-		msg.FRMPayload[i] = byte(b)
+		frmPayload[i] = byte(b)
 	}
-	return msg, nil
+	msg.FRMPayload = frmPayload
+	return nil
 }
 
 // Decode decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationUplink, error) {
+func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
 	env := h.createEnvironment(version)
 	env["payload"] = msg.FRMPayload
 	env["f_port"] = msg.FPort
@@ -130,16 +130,16 @@ func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version
 	`, script)
 	value, err := h.engine.Run(ctx, script, env)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	m, ok := value.(map[string]interface{})
 	if !ok {
-		return nil, errOutput
+		return errOutput
 	}
 	s, err := gogoproto.Struct(m)
 	if err != nil {
-		return nil, errOutput.WithCause(err)
+		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload = s
-	return msg, nil
+	return nil
 }

@@ -57,9 +57,9 @@ func TestEncode(t *testing.T) {
 			return [1, 2, 3]
 		}
 		`
-		output, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		a.So(output.FRMPayload, should.Resemble, []byte{1, 2, 3})
+		a.So(message.FRMPayload, should.Resemble, []byte{1, 2, 3})
 	}
 
 	// Encode temperature.
@@ -73,9 +73,9 @@ func TestEncode(t *testing.T) {
 			]
 		}
 		`
-		output, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		a.So(output.FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
 	}
 
 	// Encode temperature based on a specific model.
@@ -94,12 +94,12 @@ func TestEncode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		a.So(output.FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
 
 		version.ModelID = "L-Tek FF1705"
-		_, err = host.Encode(ctx, message, version, script)
+		err = host.Encode(ctx, message, version, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -110,7 +110,7 @@ func TestEncode(t *testing.T) {
 			return [300, 0, 1]
 		}
 		`
-		_, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputRange)
 	}
 
@@ -121,7 +121,7 @@ func TestEncode(t *testing.T) {
 			return ['test']
 		}
 		`
-		_, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 
@@ -132,7 +132,7 @@ func TestEncode(t *testing.T) {
 			return null
 		}
 		`
-		_, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 
@@ -145,7 +145,7 @@ func TestEncode(t *testing.T) {
 			}
 		}
 		`
-		_, err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 }
@@ -176,9 +176,9 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(output.DecodedPayload)
+		m, err := gogoproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
@@ -196,9 +196,9 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, message, version, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(output.DecodedPayload)
+		m, err := gogoproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"brand":       "The Things Products",
@@ -214,7 +214,7 @@ func TestDecode(t *testing.T) {
 			return 42
 		}
 		`
-		_, err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, message, version, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -225,7 +225,7 @@ func TestDecode(t *testing.T) {
 			throw Error('unknown error')
 		}
 		`
-		_, err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, message, version, script)
 		a.So(err, should.NotBeNil)
 	}
 }

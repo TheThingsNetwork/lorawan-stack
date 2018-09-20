@@ -42,14 +42,14 @@ var (
 )
 
 // Encode encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationDownlink, error) {
+func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
 	decoded := msg.DecodedPayload
 	if decoded == nil {
-		return msg, nil
+		return nil
 	}
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
-		return nil, errInput.WithCause(err)
+		return errInput.WithCause(err)
 	}
 	encoder := lpp.NewEncoder()
 	for name, value := range m {
@@ -65,22 +65,22 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, versi
 		}
 	}
 	msg.FRMPayload = encoder.Bytes()
-	return msg, nil
+	return nil
 }
 
 // Decode decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) (*ttnpb.ApplicationUplink, error) {
+func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {
-		return nil, errOutput.WithCause(err)
+		return errOutput.WithCause(err)
 	}
 	s, err := gogoproto.Struct(m)
 	if err != nil {
-		return nil, errOutput.WithCause(err)
+		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload = s
-	return msg, nil
+	return nil
 }
 
 func (d decodedMap) DigitalInput(channel, value uint8) {
