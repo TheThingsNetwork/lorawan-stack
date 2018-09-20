@@ -17,6 +17,7 @@ package ttnpb
 import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
@@ -80,6 +81,11 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(10) != 0 {
 		out.Session = NewPopulatedSession(r, easy)
 	}
+	if out.Session != nil {
+		out.EndDeviceIdentifiers.DevAddr = &types.DevAddr{}
+		copy(out.EndDeviceIdentifiers.DevAddr[:], out.Session.DevAddr[:])
+	}
+
 	if r.Intn(10) != 0 {
 		out.SessionFallback = NewPopulatedSession(r, easy)
 	}
