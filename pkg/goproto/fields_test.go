@@ -108,8 +108,8 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 			expected: []string{"MACState", "RecentUplinks", "FrequencyPlanID"},
 		},
 		{
-			fields:   []string{"location.latitude"},
-			expected: []string{"Location.Latitude"},
+			fields:   []string{"session.next_f_cnt_up"},
+			expected: []string{"Session.NextFCntUp"},
 		},
 		{
 			fields:   []string{"ids.application_ids.application_id"},
@@ -117,8 +117,8 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 		},
 	} {
 		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
-			Location: &ttnpb.Location{
-				Latitude: 5,
+			Session: &ttnpb.Session{
+				NextFCntUp: 5,
 			},
 		})
 
