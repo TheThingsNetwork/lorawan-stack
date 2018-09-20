@@ -480,10 +480,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				DevAddr: DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: &FNwkSIntKey,
+						Key: FNwkSIntKey,
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: &SNwkSIntKey,
+						Key: SNwkSIntKey,
 					},
 				},
 			},
@@ -574,10 +574,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -636,10 +636,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -698,10 +698,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -766,10 +766,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -832,13 +832,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -900,13 +900,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -977,13 +977,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},
@@ -1046,13 +1046,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
+								Key: FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: NwkSEncKey,
 							},
 						},
 					},

@@ -79,10 +79,6 @@ func New(c *component.Component, conf *Config, rpcOptions ...deviceregistry.RPCO
 	return js, nil
 }
 
-func keyPointer(key types.AES128Key) *types.AES128Key {
-	return &key
-}
-
 func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	if n := len(rawPayload); n != 23 {
 		return errPayloadLengthMismatch.WithAttributes("length", n)
@@ -263,16 +259,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			return nil, errMissingNwkKey
 		}
 
-		if err := checkMIC(*dev.RootKeys.NwkKey.Key, rawPayload); err != nil {
+		if err := checkMIC(dev.RootKeys.NwkKey.Key, rawPayload); err != nil {
 			return nil, errMICCheckFailed.WithCause(err)
 		}
 
-		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(*dev.RootKeys.NwkKey.Key, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
+		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(dev.RootKeys.NwkKey.Key, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
 		if err != nil {
 			return nil, errMICComputeFailed.WithCause(err)
 		}
 
-		enc, err := crypto.EncryptJoinAccept(*dev.RootKeys.NwkKey.Key, append(b[1:], mic[:]...))
+		enc, err := crypto.EncryptJoinAccept(dev.RootKeys.NwkKey.Key, append(b[1:], mic[:]...))
 		if err != nil {
 			return nil, errEncryptPayloadFailed.WithCause(err)
 		}
@@ -280,20 +276,20 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			RawPayload: append(b[:1], enc...),
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveFNwkSIntKey(*dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      crypto.DeriveFNwkSIntKey(dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce),
 					KEKLabel: "",
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveSNwkSIntKey(*dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      crypto.DeriveSNwkSIntKey(dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce),
 					KEKLabel: "",
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveNwkSEncKey(*dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      crypto.DeriveNwkSEncKey(dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce),
 					KEKLabel: "",
 				},
 				// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveAppSKey(*dev.RootKeys.AppKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      crypto.DeriveAppSKey(dev.RootKeys.AppKey.Key, jn, pld.JoinEUI, pld.DevNonce),
 					KEKLabel: "",
 				},
 			},
@@ -301,16 +297,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-		if err := checkMIC(*dev.RootKeys.AppKey.Key, rawPayload); err != nil {
+		if err := checkMIC(dev.RootKeys.AppKey.Key, rawPayload); err != nil {
 			return nil, errMICCheckFailed.WithCause(err)
 		}
 
-		mic, err := crypto.ComputeLegacyJoinAcceptMIC(*dev.RootKeys.AppKey.Key, b)
+		mic, err := crypto.ComputeLegacyJoinAcceptMIC(dev.RootKeys.AppKey.Key, b)
 		if err != nil {
 			return nil, errMICComputeFailed.WithCause(err)
 		}
 
-		enc, err := crypto.EncryptJoinAccept(*dev.RootKeys.AppKey.Key, append(b[1:], mic[:]...))
+		enc, err := crypto.EncryptJoinAccept(dev.RootKeys.AppKey.Key, append(b[1:], mic[:]...))
 		if err != nil {
 			return nil, errEncryptPayloadFailed.WithCause(err)
 		}
@@ -318,11 +314,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			RawPayload: append(b[:1], enc...),
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveLegacyNwkSKey(*dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce)),
+					Key:      crypto.DeriveLegacyNwkSKey(dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce),
 					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveLegacyAppSKey(*dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce)),
+					Key:      crypto.DeriveLegacyAppSKey(dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce),
 					KEKLabel: "",
 				},
 			},

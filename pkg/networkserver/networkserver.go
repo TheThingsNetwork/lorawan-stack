@@ -391,7 +391,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 			return nil, errMissingNwkSEncKey
 		}
 
-		cmdBuf, err = crypto.EncryptDownlink(*dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		cmdBuf, err = crypto.EncryptDownlink(dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
 			return nil, errMACEncryptFailed.WithCause(err)
 		}
@@ -442,12 +442,12 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		if dev.Session.FNwkSIntKey == nil || dev.Session.FNwkSIntKey.Key.IsZero() {
 			return nil, errMissingFNwkSIntKey
 		}
-		key = *dev.Session.FNwkSIntKey.Key
+		key = dev.Session.FNwkSIntKey.Key
 	} else {
 		if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 			return nil, errMissingSNwkSIntKey
 		}
-		key = *dev.Session.SNwkSIntKey.Key
+		key = dev.Session.SNwkSIntKey.Key
 	}
 
 	mic, err := crypto.ComputeDownlinkMIC(
@@ -1202,7 +1202,7 @@ outer:
 		var err error
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
-				*dev.Session.FNwkSIntKey.Key,
+				dev.Session.FNwkSIntKey.Key,
 				pld.DevAddr,
 				dev.fCnt,
 				b,
@@ -1219,8 +1219,8 @@ outer:
 			}
 
 			computedMIC, err = crypto.ComputeUplinkMIC(
-				*dev.Session.SNwkSIntKey.Key,
-				*dev.Session.FNwkSIntKey.Key,
+				dev.Session.SNwkSIntKey.Key,
+				dev.Session.FNwkSIntKey.Key,
 				confFCnt,
 				uint8(msg.Settings.DataRateIndex),
 				uint8(msg.Settings.ChannelIndex),
@@ -1361,7 +1361,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			return errMissingNwkSEncKey
 		}
 
-		mac, err = crypto.DecryptUplink(*dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
+		mac, err = crypto.DecryptUplink(dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
 		if err != nil {
 			return errDecryptionFailed.WithCause(err)
 		}

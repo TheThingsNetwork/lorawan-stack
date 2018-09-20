@@ -34,8 +34,6 @@ var (
 	ErrNoSession            = errNoSession
 )
 
-func KeyPointer(key types.AES128Key) *types.AES128Key { return keyPointer(key) }
-
 func TestMICCheck(t *testing.T) {
 	a := assertions.New(t)
 
