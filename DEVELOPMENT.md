@@ -91,10 +91,11 @@ All development is done in this directory.
 cd $GOPATH/src/go.thethings.network/lorawan-stack
 ```
 
-As most of the tasks will be managed by `make` we will first initialize the tooling. You might want to run this command from time to time:
+As most of the tasks will be managed by `make` we will first initialize the tooling. You might want to run these commands from time to time:
 
 ```sh
 make init
+make deps
 ```
 
 #### Folder Structure
@@ -134,7 +135,7 @@ make init
 #### Testing
 
 ```sh
-make go.test
+make test
 ```
 
 #### Building
