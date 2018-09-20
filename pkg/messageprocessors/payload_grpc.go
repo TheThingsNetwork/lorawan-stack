@@ -20,20 +20,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// PayloadDecoderRPC implements the UplinkMessageProcessorServer using a payload decoder.
-type PayloadDecoderRPC struct {
-	PayloadDecoder
-}
-
-// Process implements the UplinkMessageProcessorServer interface.
-func (r *PayloadDecoderRPC) Process(ctx context.Context, req *ttnpb.ProcessUplinkMessageRequest) (*ttnpb.ApplicationUplink, error) {
-	msg := &req.Message
-	if err := r.Decode(ctx, msg, &req.EndDeviceVersionIDs, req.Parameter); err != nil {
-		return nil, err
-	}
-	return msg, nil
-}
-
 // PayloadEncoderRPC implements the DownlinkMessageProcessorServer using a payload encoder.
 type PayloadEncoderRPC struct {
 	PayloadEncoder
@@ -43,6 +29,20 @@ type PayloadEncoderRPC struct {
 func (r *PayloadEncoderRPC) Process(ctx context.Context, req *ttnpb.ProcessDownlinkMessageRequest) (*ttnpb.ApplicationDownlink, error) {
 	msg := &req.Message
 	if err := r.Encode(ctx, msg, &req.EndDeviceVersionIDs, req.Parameter); err != nil {
+		return nil, err
+	}
+	return msg, nil
+}
+
+// PayloadDecoderRPC implements the UplinkMessageProcessorServer using a payload decoder.
+type PayloadDecoderRPC struct {
+	PayloadDecoder
+}
+
+// Process implements the UplinkMessageProcessorServer interface.
+func (r *PayloadDecoderRPC) Process(ctx context.Context, req *ttnpb.ProcessUplinkMessageRequest) (*ttnpb.ApplicationUplink, error) {
+	msg := &req.Message
+	if err := r.Decode(ctx, msg, &req.EndDeviceVersionIDs, req.Parameter); err != nil {
 		return nil, err
 	}
 	return msg, nil
