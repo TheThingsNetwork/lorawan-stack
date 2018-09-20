@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SortButton is active is in ascending direction should match snapshot 1`] = `
+<button
+  className="button buttonActive"
+  onClick={[Function]}
+  type="button"
+>
+  <Message
+    content="test-title"
+  />
+  <Icon
+    className="icon"
+    icon="sort"
+  />
+</button>
+`;
+
+exports[`SortButton is active is in descending direction should match snapshot 1`] = `
+<button
+  className="button buttonActive buttonDesc"
+  onClick={[Function]}
+  type="button"
+>
+  <Message
+    content="test-title"
+  />
+  <Icon
+    className="icon"
+    icon="sort"
+  />
+</button>
+`;
+
+exports[`SortButton is not active should match snapshot 1`] = `
+<button
+  className="button"
+  onClick={[Function]}
+  type="button"
+>
+  <Message
+    content="test-title"
+  />
+  <Icon
+    className="icon"
+    icon="sort"
+  />
+</button>
+`;

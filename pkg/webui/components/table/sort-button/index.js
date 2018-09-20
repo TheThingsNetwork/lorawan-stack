@@ -18,7 +18,6 @@ import classnames from 'classnames'
 import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
 import Icon from '../../icon'
-import { TableConsumer } from '../context'
 
 import style from './sort-button.styl'
 
@@ -26,36 +25,26 @@ const SortButton = function ({
   className,
   active,
   title,
+  onSort,
   name,
   direction,
   ...rest
 }) {
   const buttonClassNames = classnames(className, style.button, {
     [style.buttonActive]: active,
-  })
-  const iconClassNames = classnames(style.icon, {
-    [style.iconAsc]: active && direction === 'asc',
+    [style.buttonDesc]: active && direction === 'desc',
   })
 
   return (
-    <TableConsumer>
-      {
-        ({ onRequestSort }) =>
-          (
-            <button
-              className={buttonClassNames}
-              type="button"
-              onClick={function () {
-                onRequestSort(name)
-              }}
-              {...rest}
-            >
-              <Message content={title} />
-              <Icon className={iconClassNames} icon="sort" />
-            </button>
-          )
-      }
-    </TableConsumer>
+    <button
+      className={buttonClassNames}
+      type="button"
+      onClick={onSort}
+      {...rest}
+    >
+      <Message content={title} />
+      <Icon className={style.icon} icon="sort" />
+    </button>
   )
 }
 

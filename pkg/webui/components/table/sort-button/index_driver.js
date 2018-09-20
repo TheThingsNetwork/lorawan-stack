@@ -12,22 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.button
-  reset-button()
-  one-liner()
-  width: 100%
-  padding: 1px
-  text-align: inherit
-  transition: color $ad.s ease-in
+import React from 'react'
+import SortButton from '.'
 
-  &:active,
-  &-active
-    color: $tc-deep-gray
+export default function () {
+  const driver = {
+    component: undefined,
+    when: {
+      created (props) {
+        driver.component = shallow(
+          <SortButton {...props} />
+        )
+      },
+      buttonPressed () {
+        driver.component.simulate('click')
+      },
+    },
+    is: {
+      active () {
+        return driver.component.hasClass('buttonActive')
+      },
+      descending () {
+        return driver.component.hasClass('buttonDesc')
+      },
+    },
+  }
 
-  &-desc
-    .icon
-      transform: rotateX(180deg)
-
-.icon
-  transition: transform $ad.m ease-in-out
-  padding-left: $cs.xxs
+  return driver
+}
