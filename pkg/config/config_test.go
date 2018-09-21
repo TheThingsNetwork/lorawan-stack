@@ -99,8 +99,8 @@ var (
 			"foo": "bar",
 		},
 		BufferMap: map[string][]byte{
-			"foo": []byte{0xb, 0xa, 0xf},
-			"bar": []byte{0xf, 0x0, 0x0},
+			"foo": {0xb, 0xa, 0xf},
+			"bar": {0xf, 0x0, 0x0},
 		},
 		StringMapSlice: map[string][]string{
 			"foo": {"bar", "baz"},
@@ -199,8 +199,8 @@ func TestConfigEnv(t *testing.T) {
 			"s": "t",
 		},
 		BufferMap: map[string][]byte{
-			"a": []byte{0xb, 0xcd},
-			"c": []byte{0xd, 0xef},
+			"a": {0xb, 0xcd},
+			"c": {0xd, 0xef},
 		},
 		StringMapSlice: map[string][]string{
 			"a": {"b", "c"},
@@ -290,8 +290,8 @@ func TestConfigFlags(t *testing.T) {
 			"s": "t",
 		},
 		BufferMap: map[string][]byte{
-			"a": []byte{0xb, 0xcd},
-			"c": []byte{0xd, 0xef},
+			"a": {0xb, 0xcd},
+			"c": {0xd, 0xef},
 		},
 		StringMapSlice: map[string][]string{
 			"a": {"b", "c"},
