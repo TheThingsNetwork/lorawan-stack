@@ -47,17 +47,7 @@ type asImplementation struct {
 	up chan *ttnpb.ApplicationUp
 }
 
-func (as *asImplementation) GetLink(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
-	return nil, errors.New("not implemented")
-}
-func (as *asImplementation) SetLink(context.Context, *ttnpb.SetApplicationLinkRequest) (*types.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (as *asImplementation) DeleteLink(context.Context, *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
+func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_SubscribeServer) error {
 	if err := clusterauth.Authorized(stream.Context()); err != nil {
 		return err
 	}
@@ -71,11 +61,20 @@ func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream t
 	}
 }
 
+func (as *asImplementation) DownlinkQueuePush(context.Context, *ttnpb.DownlinkQueueRequest) (*types.Empty, error) {
+	return nil, errors.New("not implemented")
+}
+func (as *asImplementation) DownlinkQueueReplace(context.Context, *ttnpb.DownlinkQueueRequest) (*types.Empty, error) {
+	return nil, errors.New("not implemented")
+}
+func (as *asImplementation) DownlinkQueueList(context.Context, *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
+	return nil, errors.New("not implemented")
+}
+
 type gsImplementation struct {
 	*component.Component
 }
 
-// GetGatewayConnectionStats implements ttnpb.GsServer
 func (gs *gsImplementation) GetGatewayConnectionStats(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
@@ -83,7 +82,7 @@ func (gs *gsImplementation) GetGatewayConnectionStats(ctx context.Context, _ *tt
 	return &ttnpb.GatewayConnectionStats{}, nil
 }
 
-func TestUnaryHook(t *testing.T) {
+func TestHooks(t *testing.T) {
 	a := assertions.New(t)
 
 	lis, err := net.Listen("tcp", "127.0.0.1:0")
@@ -114,13 +113,13 @@ func TestUnaryHook(t *testing.T) {
 	)
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs", cluster.HookName, c.ClusterAuthUnaryHook())
-	hooks.RegisterStreamHook("/ttn.lorawan.v3.As", cluster.HookName, c.ClusterAuthStreamHook())
+	hooks.RegisterStreamHook("/ttn.lorawan.v3.AppAs", cluster.HookName, c.ClusterAuthStreamHook())
 
 	as := &asImplementation{
 		Component: c,
 		up:        make(chan *ttnpb.ApplicationUp),
 	}
-	ttnpb.RegisterAsServer(s, as)
+	ttnpb.RegisterAppAsServer(s, as)
 	gs := &gsImplementation{Component: c}
 	ttnpb.RegisterGsServer(s, gs)
 	go s.Serve(lis)
@@ -141,7 +140,7 @@ func TestUnaryHook(t *testing.T) {
 		}
 		time.Sleep(time.Millisecond)
 	}
-	asClient := ttnpb.NewAsClient(grpcClient)
+	asClient := ttnpb.NewAppAsClient(grpcClient)
 	gsClient := ttnpb.NewGsClient(grpcClient)
 
 	ctx := test.Context()
