@@ -44,7 +44,7 @@ message Session {
   uint32 next_a_f_cnt_down = 6;
   // FCnt of the last confirmed downlink message sent. Network Server only.
   uint32 last_conf_f_cnt_down = 7;
-  // Time when the session started. Network Server and Application Server.
+  // Time when the session started. Network Server only.
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 

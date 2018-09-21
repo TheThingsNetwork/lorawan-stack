@@ -59,7 +59,7 @@ var PowerState_value = map[string]int32{
 }
 
 func (PowerState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{0}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{0}
 }
 
 type Session struct {
@@ -75,7 +75,7 @@ type Session struct {
 	NextAFCntDown uint32 `protobuf:"varint,6,opt,name=next_a_f_cnt_down,json=nextAFCntDown,proto3" json:"next_a_f_cnt_down,omitempty"`
 	// FCnt of the last confirmed downlink message sent. Network Server only.
 	LastConfFCntDown uint32 `protobuf:"varint,7,opt,name=last_conf_f_cnt_down,json=lastConfFCntDown,proto3" json:"last_conf_f_cnt_down,omitempty"`
-	// Time when the session started. Network Server and Application Server.
+	// Time when the session started. Network Server only.
 	StartedAt            time.Time `protobuf:"bytes,8,opt,name=started_at,json=startedAt,stdtime" json:"started_at"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -84,7 +84,7 @@ type Session struct {
 func (m *Session) Reset()      { *m = Session{} }
 func (*Session) ProtoMessage() {}
 func (*Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{0}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{0}
 }
 func (m *Session) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -196,7 +196,7 @@ type MACParameters struct {
 func (m *MACParameters) Reset()      { *m = MACParameters{} }
 func (*MACParameters) ProtoMessage() {}
 func (*MACParameters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{1}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{1}
 }
 func (m *MACParameters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -376,7 +376,7 @@ type MACParameters_Channel struct {
 func (m *MACParameters_Channel) Reset()      { *m = MACParameters_Channel{} }
 func (*MACParameters_Channel) ProtoMessage() {}
 func (*MACParameters_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{1, 0}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{1, 0}
 }
 func (m *MACParameters_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -453,7 +453,7 @@ type EndDeviceBrand struct {
 func (m *EndDeviceBrand) Reset()      { *m = EndDeviceBrand{} }
 func (*EndDeviceBrand) ProtoMessage() {}
 func (*EndDeviceBrand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{2}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{2}
 }
 func (m *EndDeviceBrand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -521,7 +521,7 @@ type EndDeviceModel struct {
 func (m *EndDeviceModel) Reset()      { *m = EndDeviceModel{} }
 func (*EndDeviceModel) ProtoMessage() {}
 func (*EndDeviceModel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{3}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{3}
 }
 func (m *EndDeviceModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -584,7 +584,7 @@ type EndDeviceVersionIdentifiers struct {
 func (m *EndDeviceVersionIdentifiers) Reset()      { *m = EndDeviceVersionIdentifiers{} }
 func (*EndDeviceVersionIdentifiers) ProtoMessage() {}
 func (*EndDeviceVersionIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{4}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{4}
 }
 func (m *EndDeviceVersionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -676,7 +676,7 @@ type EndDeviceVersion struct {
 func (m *EndDeviceVersion) Reset()      { *m = EndDeviceVersion{} }
 func (*EndDeviceVersion) ProtoMessage() {}
 func (*EndDeviceVersion) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{5}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{5}
 }
 func (m *EndDeviceVersion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -809,7 +809,7 @@ type MACSettings struct {
 func (m *MACSettings) Reset()      { *m = MACSettings{} }
 func (*MACSettings) ProtoMessage() {}
 func (*MACSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{6}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{6}
 }
 func (m *MACSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -914,7 +914,7 @@ type MACState struct {
 func (m *MACState) Reset()      { *m = MACState{} }
 func (*MACState) ProtoMessage() {}
 func (*MACState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{7}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{7}
 }
 func (m *MACState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1123,7 +1123,7 @@ type EndDevice struct {
 func (m *EndDevice) Reset()      { *m = EndDevice{} }
 func (*EndDevice) ProtoMessage() {}
 func (*EndDevice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{8}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{8}
 }
 func (m *EndDevice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1441,7 +1441,7 @@ type EndDevices struct {
 func (m *EndDevices) Reset()      { *m = EndDevices{} }
 func (*EndDevices) ProtoMessage() {}
 func (*EndDevices) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{9}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{9}
 }
 func (m *EndDevices) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1487,7 +1487,7 @@ type GetEndDeviceRequest struct {
 func (m *GetEndDeviceRequest) Reset()      { *m = GetEndDeviceRequest{} }
 func (*GetEndDeviceRequest) ProtoMessage() {}
 func (*GetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{10}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{10}
 }
 func (m *GetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1533,7 +1533,7 @@ type ListEndDevicesRequest struct {
 func (m *ListEndDevicesRequest) Reset()      { *m = ListEndDevicesRequest{} }
 func (*ListEndDevicesRequest) ProtoMessage() {}
 func (*ListEndDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{11}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{11}
 }
 func (m *ListEndDevicesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1579,7 +1579,7 @@ type SetDeviceRequest struct {
 func (m *SetDeviceRequest) Reset()      { *m = SetDeviceRequest{} }
 func (*SetDeviceRequest) ProtoMessage() {}
 func (*SetDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_ef826409cd719703, []int{12}
+	return fileDescriptor_end_device_b78e33e8a924b5c3, []int{12}
 }
 func (m *SetDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -8576,13 +8576,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_ef826409cd719703)
+	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_b78e33e8a924b5c3)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_ef826409cd719703)
+	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_b78e33e8a924b5c3)
 }
 
-var fileDescriptor_end_device_ef826409cd719703 = []byte{
+var fileDescriptor_end_device_b78e33e8a924b5c3 = []byte{
 	// 3008 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x59, 0x4f, 0x70, 0x1b, 0x45,
 	0xba, 0xd7, 0xd8, 0x8e, 0x2d, 0xb5, 0xac, 0x3f, 0x6e, 0xdb, 0xc9, 0xc4, 0x84, 0x91, 0x71, 0x20,
