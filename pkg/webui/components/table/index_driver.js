@@ -26,21 +26,64 @@ export default function () {
 
         return driver
       },
+      updated (props) {
+        driver.component.setProps(props)
+      },
+      rowClicked (index) {
+        driver.get.row(index + 1).dive().simulate('click')
+        driver.component.update()
+      },
+      sortButtonPressed (index) {
+        driver.get.sortButton(index)
+          .dive()
+          .simulate('click')
+        driver.component.update()
+      },
     },
     is: {
-      emptyMessageShown () {
+      empty () {
         return driver.get.emptyMessage().exists()
       },
-      filledWithDataCells (count) {
-        return driver.get.dataCells().length === count
+      paginated () {
+        return driver.get.pagination().exists()
+      },
+      sortButtonActive (index) {
+        return driver.get.sortButton(index).props().active
       },
     },
     get: {
       emptyMessage () {
-        return driver.component.find('[data-hook="empty-message"]')
+        return driver.component.find('Empty').first()
+      },
+      headCellsCount () {
+        return driver.get.headCells().length
+      },
+      headCells () {
+        return driver.component.find('HeadCell')
+      },
+      dataCellsCount () {
+        return driver.get.dataCells().length
       },
       dataCells () {
-        return driver.component.find('[data-hook="data-row"]')
+        return driver.component.find('DataCell')
+      },
+      sortButtonsCount () {
+        return driver.get.sortButtons().length
+      },
+      sortButtons () {
+        return driver.component.find('SortButton')
+      },
+      sortButton (index) {
+        return driver.get.sortButtons().at(index)
+      },
+      pagination () {
+        return driver.component.find('Pagination').first()
+      },
+      rows () {
+        return driver.component.find('Row')
+      },
+      row (index) {
+        return driver.get.rows().at(index)
       },
     },
   }
