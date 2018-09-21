@@ -56,7 +56,7 @@ The component or topic is typically a few characters long and should always be p
 - `ns`: Network Server
 - `as`: Application Server
 - `is`: Identity Server
-- `webui`: Console
+- `console`: Console
 - `util`: utilities
 - `ci`: CI instructions, e.g. Travis file
 - `doc`: documentation
