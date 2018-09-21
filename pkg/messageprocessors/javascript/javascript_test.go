@@ -17,10 +17,11 @@ package javascript
 import (
 	"testing"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -31,6 +32,14 @@ func TestEncode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
+	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: "foo-app",
+		},
+		DeviceID: "foo-device",
+		DevEUI:   &eui,
+	}
 	version := &ttnpb.EndDeviceVersionIdentifiers{
 		BrandID:         "The Things Products",
 		ModelID:         "The Things Uno",
@@ -39,10 +48,10 @@ func TestEncode(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationDownlink{
-		DecodedPayload: &types.Struct{
-			Fields: map[string]*types.Value{
+		DecodedPayload: &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
 				"temperature": {
-					Kind: &types.Value_NumberValue{
+					Kind: &pbtypes.Value_NumberValue{
 						NumberValue: -21.3,
 					},
 				},
@@ -57,7 +66,7 @@ func TestEncode(t *testing.T) {
 			return [1, 2, 3]
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.Resemble, []byte{1, 2, 3})
 	}
@@ -73,7 +82,7 @@ func TestEncode(t *testing.T) {
 			]
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
 	}
@@ -94,12 +103,12 @@ func TestEncode(t *testing.T) {
 			}
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
 
 		version.ModelID = "L-Tek FF1705"
-		err = host.Encode(ctx, message, version, script)
+		err = host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -110,7 +119,7 @@ func TestEncode(t *testing.T) {
 			return [300, 0, 1]
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputRange)
 	}
 
@@ -121,7 +130,7 @@ func TestEncode(t *testing.T) {
 			return ['test']
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 
@@ -132,7 +141,7 @@ func TestEncode(t *testing.T) {
 			return null
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 
@@ -145,7 +154,7 @@ func TestEncode(t *testing.T) {
 			}
 		}
 		`
-		err := host.Encode(ctx, message, version, script)
+		err := host.Encode(ctx, ids, version, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputType)
 	}
 }
@@ -156,6 +165,14 @@ func TestDecode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
+	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: "foo-app",
+		},
+		DeviceID: "foo-device",
+		DevEUI:   &eui,
+	}
 	version := &ttnpb.EndDeviceVersionIdentifiers{
 		BrandID:         "The Things Products",
 		ModelID:         "The Things Uno",
@@ -176,7 +193,7 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, ids, version, message, script)
 		a.So(err, should.BeNil)
 		m, err := gogoproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
@@ -185,22 +202,24 @@ func TestDecode(t *testing.T) {
 		})
 	}
 
-	// Parse and take brand and version into account.
+	// Parse and take DevEUI, brand and version into account.
 	{
 		script := `
 		function Decoder(payload, f_port) {
 			return {
 				temperature: ((payload[0] & 0x80 ? 0xffff : 0x0000) << 16 | payload[0] << 8 | payload[1]) / 100,
+				dev_eui: env.dev_eui,
 				brand: env.brand,
 				model: env.model,
 			}
 		}
 		`
-		err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, ids, version, message, script)
 		a.So(err, should.BeNil)
 		m, err := gogoproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
+			"dev_eui":     "0102030405060708",
 			"brand":       "The Things Products",
 			"model":       "The Things Uno",
 			"temperature": -21.3,
@@ -214,7 +233,7 @@ func TestDecode(t *testing.T) {
 			return 42
 		}
 		`
-		err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, ids, version, message, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -225,7 +244,7 @@ func TestDecode(t *testing.T) {
 			throw Error('unknown error')
 		}
 		`
-		err := host.Decode(ctx, message, version, script)
+		err := host.Decode(ctx, ids, version, message, script)
 		a.So(err, should.NotBeNil)
 	}
 }

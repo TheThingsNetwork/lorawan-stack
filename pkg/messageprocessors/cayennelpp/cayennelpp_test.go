@@ -18,10 +18,11 @@ import (
 	"testing"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -32,6 +33,14 @@ func TestEncode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
+	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: "foo-app",
+		},
+		DeviceID: "foo-device",
+		DevEUI:   &eui,
+	}
 	version := &ttnpb.EndDeviceVersionIdentifiers{
 		BrandID:         "The Things Products",
 		ModelID:         "The Things Uno",
@@ -42,10 +51,10 @@ func TestEncode(t *testing.T) {
 	// Happy flow.
 	{
 		message := &ttnpb.ApplicationDownlink{
-			DecodedPayload: &types.Struct{
-				Fields: map[string]*types.Value{
+			DecodedPayload: &pbtypes.Struct{
+				Fields: map[string]*pbtypes.Value{
 					"value_2": {
-						Kind: &types.Value_NumberValue{
+						Kind: &pbtypes.Value_NumberValue{
 							NumberValue: -50.51,
 						},
 					},
@@ -53,7 +62,7 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		err := host.Encode(ctx, message, version, "")
+		err := host.Encode(ctx, ids, version, message, "")
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.Resemble, []byte{2, 236, 69})
 	}
@@ -61,29 +70,29 @@ func TestEncode(t *testing.T) {
 	// Test resilience against custom fields from the user. Should be fine.
 	{
 		message := &ttnpb.ApplicationDownlink{
-			DecodedPayload: &types.Struct{
-				Fields: map[string]*types.Value{
+			DecodedPayload: &pbtypes.Struct{
+				Fields: map[string]*pbtypes.Value{
 					"custom": {
-						Kind: &types.Value_NumberValue{
+						Kind: &pbtypes.Value_NumberValue{
 							NumberValue: 8,
 						},
 					},
 					"digital_in_8": {
-						Kind: &types.Value_StringValue{
+						Kind: &pbtypes.Value_StringValue{
 							StringValue: "shouldn't be a string",
 						},
 					},
 					"custom_5": {
-						Kind: &types.Value_NumberValue{
+						Kind: &pbtypes.Value_NumberValue{
 							NumberValue: 5,
 						},
 					},
 					"accelerometer_1": {
-						Kind: &types.Value_StructValue{
-							StructValue: &types.Struct{
-								Fields: map[string]*types.Value{
+						Kind: &pbtypes.Value_StructValue{
+							StructValue: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
 									"x": {
-										Kind: &types.Value_StringValue{
+										Kind: &pbtypes.Value_StringValue{
 											StringValue: "test",
 										},
 									},
@@ -95,7 +104,7 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		err := host.Encode(ctx, message, version, "")
+		err := host.Encode(ctx, ids, version, message, "")
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.BeEmpty)
 	}
@@ -107,6 +116,14 @@ func TestDecode(t *testing.T) {
 	ctx := test.Context()
 	host := New()
 
+	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: "foo-app",
+		},
+		DeviceID: "foo-device",
+		DevEUI:   &eui,
+	}
 	version := &ttnpb.EndDeviceVersionIdentifiers{
 		BrandID:         "The Things Products",
 		ModelID:         "The Things Uno",
@@ -131,7 +148,7 @@ func TestDecode(t *testing.T) {
 		},
 	}
 
-	err := host.Decode(ctx, message, version, "")
+	err := host.Decode(ctx, ids, version, message, "")
 	a.So(err, should.BeNil)
 	m, err := gogoproto.Map(message.DecodedPayload)
 	a.So(err, should.BeNil)

@@ -22,12 +22,12 @@ import (
 
 // PayloadEncoder represents a payload encoder message processor.
 type PayloadEncoder interface {
-	Encode(ctx context.Context, message *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, parameter string) error
+	Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
 }
 
 // PayloadDecoder represents a payload decoder message processor.
 type PayloadDecoder interface {
-	Decode(ctx context.Context, message *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, parameter string) error
+	Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, parameter string) error
 }
 
 // PayloadEncodeDecoder is the interface that groups the Encode and Decode methods.

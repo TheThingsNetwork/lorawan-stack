@@ -39,16 +39,18 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
-func (h *host) createEnvironment(version *ttnpb.EndDeviceVersionIdentifiers) (env map[string]interface{}) {
-	env = make(map[string]interface{})
-	if version == nil {
-		return
+func (h *host) createEnvironment(ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) map[string]interface{} {
+	env := make(map[string]interface{})
+	if ids.DevEUI != nil {
+		env["dev_eui"] = ids.DevEUI.String()
 	}
-	env["brand"] = version.BrandID
-	env["model"] = version.ModelID
-	env["hardware_version"] = version.HardwareVersion
-	env["firmware_version"] = version.FirmwareVersion
-	return
+	if version != nil {
+		env["brand"] = version.BrandID
+		env["model"] = version.ModelID
+		env["hardware_version"] = version.HardwareVersion
+		env["firmware_version"] = version.FirmwareVersion
+	}
+	return env
 }
 
 var (
@@ -59,7 +61,7 @@ var (
 )
 
 // Encode encodes the message's DecodedPayload to FRMPayload using the given script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
+func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return nil
@@ -68,7 +70,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, versi
 	if err != nil {
 		return errInput.WithCause(err)
 	}
-	env := h.createEnvironment(version)
+	env := h.createEnvironment(ids, version)
 	env["payload"] = m
 	env["f_port"] = msg.FPort
 	script = fmt.Sprintf(`
@@ -123,8 +125,8 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, versi
 }
 
 // Decode decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
-	env := h.createEnvironment(version)
+func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	env := h.createEnvironment(ids, version)
 	env["payload"] = msg.FRMPayload
 	env["f_port"] = msg.FPort
 	script = fmt.Sprintf(`

@@ -42,7 +42,7 @@ var (
 )
 
 // Encode encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
+func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return nil
@@ -69,7 +69,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.ApplicationDownlink, versi
 }
 
 // Decode decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.ApplicationUplink, version *ttnpb.EndDeviceVersionIdentifiers, script string) error {
+func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {
