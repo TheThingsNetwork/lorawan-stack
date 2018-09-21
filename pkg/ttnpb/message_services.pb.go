@@ -30,9 +30,10 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type ProcessUplinkMessageRequest struct {
-	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,1,opt,name=end_device_version_ids,json=endDeviceVersionIds" json:"end_device_version_ids"`
-	Message              ApplicationUplink           `protobuf:"bytes,2,opt,name=message" json:"message"`
-	Parameter            string                      `protobuf:"bytes,3,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds" json:"end_device_version_ids"`
+	Message              ApplicationUplink           `protobuf:"bytes,3,opt,name=message" json:"message"`
+	Parameter            string                      `protobuf:"bytes,4,opt,name=parameter,proto3" json:"parameter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
 }
@@ -40,7 +41,7 @@ type ProcessUplinkMessageRequest struct {
 func (m *ProcessUplinkMessageRequest) Reset()      { *m = ProcessUplinkMessageRequest{} }
 func (*ProcessUplinkMessageRequest) ProtoMessage() {}
 func (*ProcessUplinkMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_services_c48c4d5418fd066d, []int{0}
+	return fileDescriptor_message_services_d2a8966675d9d5b9, []int{0}
 }
 func (m *ProcessUplinkMessageRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -91,9 +92,10 @@ func (m *ProcessUplinkMessageRequest) GetParameter() string {
 }
 
 type ProcessDownlinkMessageRequest struct {
-	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,1,opt,name=end_device_version_ids,json=endDeviceVersionIds" json:"end_device_version_ids"`
-	Message              ApplicationDownlink         `protobuf:"bytes,2,opt,name=message" json:"message"`
-	Parameter            string                      `protobuf:"bytes,3,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds" json:"end_device_version_ids"`
+	Message              ApplicationDownlink         `protobuf:"bytes,3,opt,name=message" json:"message"`
+	Parameter            string                      `protobuf:"bytes,4,opt,name=parameter,proto3" json:"parameter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
 }
@@ -101,7 +103,7 @@ type ProcessDownlinkMessageRequest struct {
 func (m *ProcessDownlinkMessageRequest) Reset()      { *m = ProcessDownlinkMessageRequest{} }
 func (*ProcessDownlinkMessageRequest) ProtoMessage() {}
 func (*ProcessDownlinkMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_services_c48c4d5418fd066d, []int{1}
+	return fileDescriptor_message_services_d2a8966675d9d5b9, []int{1}
 }
 func (m *ProcessDownlinkMessageRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -176,6 +178,9 @@ func (this *ProcessUplinkMessageRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
+	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
+		return false
+	}
 	if !this.EndDeviceVersionIDs.Equal(&that1.EndDeviceVersionIDs) {
 		return false
 	}
@@ -204,6 +209,9 @@ func (this *ProcessDownlinkMessageRequest) Equal(that interface{}) bool {
 	if that1 == nil {
 		return this == nil
 	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
 		return false
 	}
 	if !this.EndDeviceVersionIDs.Equal(&that1.EndDeviceVersionIDs) {
@@ -371,22 +379,30 @@ func (m *ProcessUplinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceVersionIDs.Size()))
-	n1, err := m.EndDeviceVersionIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
+	n1, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n1
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.Message.Size()))
-	n2, err := m.Message.MarshalTo(dAtA[i:])
+	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceVersionIDs.Size()))
+	n2, err := m.EndDeviceVersionIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n2
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintMessageServices(dAtA, i, uint64(m.Message.Size()))
+	n3, err := m.Message.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n3
 	if len(m.Parameter) > 0 {
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
 		i += copy(dAtA[i:], m.Parameter)
@@ -411,22 +427,30 @@ func (m *ProcessDownlinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceVersionIDs.Size()))
-	n3, err := m.EndDeviceVersionIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.Message.Size()))
-	n4, err := m.Message.MarshalTo(dAtA[i:])
+	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
+	n4, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n4
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceVersionIDs.Size()))
+	n5, err := m.EndDeviceVersionIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n5
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintMessageServices(dAtA, i, uint64(m.Message.Size()))
+	n6, err := m.Message.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n6
 	if len(m.Parameter) > 0 {
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
 		i += copy(dAtA[i:], m.Parameter)
@@ -445,10 +469,12 @@ func encodeVarintMessageServices(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedProcessUplinkMessageRequest(r randyMessageServices, easy bool) *ProcessUplinkMessageRequest {
 	this := &ProcessUplinkMessageRequest{}
-	v1 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
-	this.EndDeviceVersionIDs = *v1
-	v2 := NewPopulatedApplicationUplink(r, easy)
-	this.Message = *v2
+	v1 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v1
+	v2 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	this.EndDeviceVersionIDs = *v2
+	v3 := NewPopulatedApplicationUplink(r, easy)
+	this.Message = *v3
 	this.Parameter = randStringMessageServices(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -457,10 +483,12 @@ func NewPopulatedProcessUplinkMessageRequest(r randyMessageServices, easy bool) 
 
 func NewPopulatedProcessDownlinkMessageRequest(r randyMessageServices, easy bool) *ProcessDownlinkMessageRequest {
 	this := &ProcessDownlinkMessageRequest{}
-	v3 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
-	this.EndDeviceVersionIDs = *v3
-	v4 := NewPopulatedApplicationDownlink(r, easy)
-	this.Message = *v4
+	v4 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v4
+	v5 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	this.EndDeviceVersionIDs = *v5
+	v6 := NewPopulatedApplicationDownlink(r, easy)
+	this.Message = *v6
 	this.Parameter = randStringMessageServices(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -486,9 +514,9 @@ func randUTF8RuneMessageServices(r randyMessageServices) rune {
 	return rune(ru + 61)
 }
 func randStringMessageServices(r randyMessageServices) string {
-	v5 := r.Intn(100)
-	tmps := make([]rune, v5)
-	for i := 0; i < v5; i++ {
+	v7 := r.Intn(100)
+	tmps := make([]rune, v7)
+	for i := 0; i < v7; i++ {
 		tmps[i] = randUTF8RuneMessageServices(r)
 	}
 	return string(tmps)
@@ -510,11 +538,11 @@ func randFieldMessageServices(dAtA []byte, r randyMessageServices, fieldNumber i
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(key))
-		v6 := r.Int63()
+		v8 := r.Int63()
 		if r.Intn(2) == 0 {
-			v6 *= -1
+			v8 *= -1
 		}
-		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(v6))
+		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(v8))
 	case 1:
 		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -542,6 +570,8 @@ func encodeVarintPopulateMessageServices(dAtA []byte, v uint64) []byte {
 func (m *ProcessUplinkMessageRequest) Size() (n int) {
 	var l int
 	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovMessageServices(uint64(l))
 	l = m.EndDeviceVersionIDs.Size()
 	n += 1 + l + sovMessageServices(uint64(l))
 	l = m.Message.Size()
@@ -556,6 +586,8 @@ func (m *ProcessUplinkMessageRequest) Size() (n int) {
 func (m *ProcessDownlinkMessageRequest) Size() (n int) {
 	var l int
 	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovMessageServices(uint64(l))
 	l = m.EndDeviceVersionIDs.Size()
 	n += 1 + l + sovMessageServices(uint64(l))
 	l = m.Message.Size()
@@ -585,6 +617,7 @@ func (this *ProcessUplinkMessageRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ProcessUplinkMessageRequest{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(this.EndDeviceVersionIDs.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Message:` + strings.Replace(strings.Replace(this.Message.String(), "ApplicationUplink", "ApplicationUplink", 1), `&`, ``, 1) + `,`,
 		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
@@ -597,6 +630,7 @@ func (this *ProcessDownlinkMessageRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ProcessDownlinkMessageRequest{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(this.EndDeviceVersionIDs.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Message:` + strings.Replace(strings.Replace(this.Message.String(), "ApplicationDownlink", "ApplicationDownlink", 1), `&`, ``, 1) + `,`,
 		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
@@ -643,6 +677,36 @@ func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceVersionIDs", wireType)
 			}
 			var msglen int
@@ -671,7 +735,7 @@ func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}
@@ -701,7 +765,7 @@ func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
 			}
@@ -782,6 +846,36 @@ func (m *ProcessDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceVersionIDs", wireType)
 			}
 			var msglen int
@@ -810,7 +904,7 @@ func (m *ProcessDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}
@@ -840,7 +934,7 @@ func (m *ProcessDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
 			}
@@ -996,44 +1090,46 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_c48c4d5418fd066d)
+	proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_d2a8966675d9d5b9)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_c48c4d5418fd066d)
+	golang_proto.RegisterFile("lorawan-stack/api/message_services.proto", fileDescriptor_message_services_d2a8966675d9d5b9)
 }
 
-var fileDescriptor_message_services_c48c4d5418fd066d = []byte{
-	// 501 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x93, 0xb1, 0x6b, 0xdb, 0x40,
-	0x14, 0xc6, 0xef, 0xa5, 0xa5, 0x21, 0x2a, 0x74, 0x50, 0x20, 0x18, 0xa7, 0x79, 0x71, 0xdd, 0xc5,
-	0xd0, 0x5a, 0x02, 0xe7, 0x2f, 0x88, 0xeb, 0x0e, 0x1d, 0x0a, 0xc5, 0x90, 0x42, 0xbb, 0x18, 0x59,
-	0xba, 0xc8, 0x87, 0xed, 0x3b, 0xf5, 0xee, 0x6c, 0x4f, 0x85, 0x74, 0xcb, 0xd8, 0xb1, 0x63, 0xe9,
-	0x94, 0x31, 0x63, 0xc6, 0x8c, 0x1e, 0x33, 0x66, 0x0a, 0xd1, 0xdd, 0x92, 0x31, 0x63, 0x96, 0x42,
-	0x89, 0xac, 0x60, 0x2c, 0x37, 0x81, 0x6e, 0xdd, 0xf4, 0xa4, 0xdf, 0xd3, 0xf7, 0xbe, 0xef, 0xee,
-	0x39, 0xb5, 0x81, 0x90, 0xc1, 0x24, 0xe0, 0x75, 0xa5, 0x83, 0xb0, 0xef, 0x07, 0x09, 0xf3, 0x87,
-	0x54, 0xa9, 0x20, 0xa6, 0x1d, 0x45, 0xe5, 0x98, 0x85, 0x54, 0x79, 0x89, 0x14, 0x5a, 0xb8, 0xcf,
-	0xb4, 0xe6, 0x5e, 0x4e, 0x7b, 0xe3, 0x9d, 0x72, 0x3d, 0x66, 0xba, 0x37, 0xea, 0x7a, 0xa1, 0x18,
-	0xfa, 0xb1, 0x88, 0x85, 0x9f, 0x61, 0xdd, 0xd1, 0x7e, 0x56, 0x65, 0x45, 0xf6, 0x34, 0x6b, 0x2f,
-	0x57, 0x97, 0x85, 0x28, 0x8f, 0x3a, 0x11, 0xbd, 0xd5, 0xc8, 0x99, 0xca, 0xbd, 0xc3, 0xe4, 0x43,
-	0x54, 0x7f, 0x83, 0xb3, 0xf9, 0x41, 0x8a, 0x90, 0x2a, 0xb5, 0x97, 0x0c, 0x18, 0xef, 0xbf, 0x9f,
-	0x7d, 0x6f, 0xd3, 0x2f, 0x23, 0xaa, 0xb4, 0xfb, 0xd5, 0xd9, 0x98, 0xff, 0xb5, 0x33, 0xa6, 0x52,
-	0x31, 0xc1, 0x3b, 0x2c, 0x52, 0x25, 0xa8, 0x40, 0xed, 0x69, 0xe3, 0x95, 0xb7, 0xe8, 0xc2, 0x7b,
-	0xcb, 0xa3, 0x56, 0x06, 0x7f, 0x9c, 0xb1, 0xef, 0x22, 0xca, 0x35, 0xdb, 0x67, 0x54, 0xaa, 0xe6,
-	0xe6, 0xf4, 0x62, 0x9b, 0x98, 0x8b, 0xed, 0xf5, 0x25, 0xa8, 0xa5, 0xda, 0xeb, 0x74, 0xa9, 0x53,
-	0xb9, 0xbb, 0xce, 0x6a, 0x3e, 0x70, 0x69, 0x25, 0xd3, 0x7b, 0x51, 0xd4, 0xdb, 0x4d, 0x92, 0x01,
-	0x0b, 0x03, 0xcd, 0x04, 0x9f, 0x19, 0x68, 0x3e, 0xbe, 0x55, 0x69, 0xdf, 0xf5, 0xb9, 0xcf, 0x9d,
-	0xb5, 0x24, 0x90, 0xc1, 0x90, 0x6a, 0x2a, 0x4b, 0x8f, 0x2a, 0x50, 0x5b, 0x6b, 0xcf, 0x5f, 0x54,
-	0xbf, 0xad, 0x38, 0x5b, 0xb9, 0xff, 0x96, 0x98, 0xf0, 0xff, 0x2f, 0x81, 0x37, 0xc5, 0x04, 0x5e,
-	0x3e, 0x90, 0xc0, 0x9d, 0x85, 0x7f, 0xca, 0xa0, 0x21, 0x9c, 0x8d, 0x85, 0xb3, 0xcf, 0xf3, 0x10,
-	0xd2, 0xdd, 0x73, 0x56, 0xf3, 0xc2, 0x5d, 0xb2, 0xf9, 0xc0, 0xad, 0x29, 0x6f, 0x15, 0xe1, 0x05,
-	0xaa, 0x31, 0x72, 0x4a, 0x85, 0xb0, 0xe7, 0x92, 0x9f, 0xe6, 0x92, 0xf5, 0x7b, 0x24, 0xff, 0x7e,
-	0x50, 0xe5, 0xed, 0x22, 0x5e, 0xe0, 0x9a, 0xbf, 0x60, 0x9a, 0x22, 0x9c, 0xa5, 0x08, 0xe7, 0x29,
-	0x92, 0xcb, 0x14, 0xc9, 0x55, 0x8a, 0xe4, 0x3a, 0x45, 0x72, 0x93, 0x22, 0x1c, 0x18, 0x84, 0x43,
-	0x83, 0xe4, 0xc8, 0x20, 0x1c, 0x1b, 0x24, 0x27, 0x06, 0xc9, 0xa9, 0x41, 0x32, 0x35, 0x08, 0x67,
-	0x06, 0xe1, 0xdc, 0x20, 0xb9, 0x34, 0x08, 0x57, 0x06, 0xc9, 0xb5, 0x41, 0xb8, 0x31, 0x48, 0x0e,
-	0x2c, 0x92, 0x43, 0x8b, 0xf0, 0xdd, 0x22, 0xf9, 0x61, 0x11, 0x7e, 0x5a, 0x24, 0x47, 0x16, 0xc9,
-	0xb1, 0x45, 0x38, 0xb1, 0x08, 0xa7, 0x16, 0xe1, 0xf3, 0xeb, 0x58, 0x78, 0xba, 0x47, 0x75, 0x8f,
-	0xf1, 0x58, 0x79, 0x9c, 0xea, 0x89, 0x90, 0x7d, 0x7f, 0x71, 0x33, 0x93, 0x7e, 0xec, 0x6b, 0xcd,
-	0x93, 0x6e, 0xf7, 0x49, 0xb6, 0x97, 0x3b, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0xe0, 0x83, 0xfc,
-	0x4c, 0x48, 0x04, 0x00, 0x00,
+var fileDescriptor_message_services_d2a8966675d9d5b9 = []byte{
+	// 535 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x94, 0xb1, 0x6f, 0x1a, 0x31,
+	0x14, 0xc6, 0x6d, 0x12, 0x35, 0x8d, 0x2b, 0x75, 0xb8, 0x48, 0x11, 0x22, 0xcd, 0x83, 0x92, 0x0e,
+	0x48, 0x2d, 0x77, 0x12, 0xf9, 0x07, 0x1a, 0x4a, 0x87, 0x0e, 0x95, 0x2a, 0xa4, 0x54, 0x6a, 0x17,
+	0x74, 0x80, 0x73, 0x58, 0x80, 0x7d, 0xb5, 0x0d, 0x4c, 0x95, 0x32, 0x66, 0xec, 0xd8, 0xb1, 0xea,
+	0x94, 0x31, 0x63, 0xb6, 0x46, 0xea, 0xc2, 0xc8, 0x98, 0x09, 0xe5, 0x7c, 0x4b, 0xc6, 0x8c, 0x19,
+	0x2b, 0x8e, 0x8b, 0x28, 0x77, 0x25, 0x52, 0xd7, 0x6c, 0x3c, 0xee, 0xf7, 0xbe, 0xef, 0xbd, 0xcf,
+	0x96, 0x49, 0xa9, 0x27, 0xa4, 0x3b, 0x72, 0x79, 0x59, 0x69, 0xb7, 0xd5, 0x75, 0x5c, 0x9f, 0x39,
+	0x7d, 0xaa, 0x94, 0xeb, 0xd1, 0x86, 0xa2, 0x72, 0xc8, 0x5a, 0x54, 0xd9, 0xbe, 0x14, 0x5a, 0x58,
+	0x4f, 0xb5, 0xe6, 0x76, 0x4c, 0xdb, 0xc3, 0xfd, 0x5c, 0xd9, 0x63, 0xba, 0x33, 0x68, 0xda, 0x2d,
+	0xd1, 0x77, 0x3c, 0xe1, 0x09, 0x27, 0xc2, 0x9a, 0x83, 0xa3, 0xa8, 0x8a, 0x8a, 0xe8, 0xd7, 0xbc,
+	0x3d, 0x57, 0x4c, 0x1b, 0x51, 0xde, 0x6e, 0xb4, 0xe9, 0xcc, 0x23, 0x66, 0xf6, 0xd2, 0x0c, 0x6b,
+	0x53, 0xae, 0xd9, 0x11, 0xa3, 0x32, 0x9e, 0x23, 0x57, 0x58, 0x39, 0x71, 0x4c, 0x14, 0x7f, 0x65,
+	0xc8, 0xce, 0x07, 0x29, 0x5a, 0x54, 0xa9, 0x43, 0xbf, 0xc7, 0x78, 0xf7, 0xfd, 0xfc, 0x7b, 0x9d,
+	0x7e, 0x19, 0x50, 0xa5, 0xad, 0xd7, 0x64, 0x8d, 0xb5, 0x55, 0x16, 0x17, 0x70, 0xe9, 0x49, 0xe5,
+	0x85, 0xbd, 0xbc, 0x97, 0xfd, 0x96, 0xb7, 0x6b, 0xd1, 0x50, 0xef, 0x16, 0xd6, 0xd5, 0xc7, 0xe3,
+	0x69, 0x1e, 0x4d, 0xa6, 0x79, 0x5c, 0x9f, 0xb5, 0x5a, 0x5f, 0xc9, 0xf6, 0x62, 0xf8, 0xc6, 0x90,
+	0x4a, 0xc5, 0x04, 0x6f, 0xcc, 0x44, 0x33, 0x91, 0xe8, 0xcb, 0x95, 0xa2, 0x1f, 0xe7, 0xec, 0xdf,
+	0xda, 0x3b, 0x33, 0x6d, 0x33, 0xcd, 0x6f, 0xa5, 0xa0, 0x9a, 0xaa, 0x6f, 0xd1, 0x54, 0xa7, 0xb2,
+	0x0e, 0xc8, 0x46, 0xbc, 0x72, 0x76, 0x2d, 0xf2, 0x7b, 0x9e, 0xf4, 0x3b, 0xf0, 0xfd, 0x1e, 0x6b,
+	0xb9, 0x9a, 0x09, 0x3e, 0x8f, 0xa0, 0xba, 0x3e, 0x73, 0xa9, 0xdf, 0xf5, 0x59, 0xcf, 0xc8, 0xa6,
+	0xef, 0x4a, 0xb7, 0x4f, 0x35, 0x95, 0xd9, 0xf5, 0x02, 0x2e, 0x6d, 0xd6, 0x17, 0x7f, 0x14, 0x7f,
+	0x67, 0xc8, 0x6e, 0x9c, 0x60, 0x4d, 0x8c, 0xf8, 0x43, 0xcc, 0xf0, 0x4d, 0x32, 0xc3, 0xbd, 0x7b,
+	0x32, 0xbc, 0x0b, 0xe1, 0xbf, 0x52, 0xac, 0x08, 0xb2, 0xbd, 0x74, 0xff, 0xe2, 0x44, 0x85, 0xb4,
+	0x0e, 0xc9, 0x46, 0x5c, 0x58, 0xa9, 0x35, 0xef, 0xb9, 0xb9, 0xb9, 0xdd, 0x24, 0xbc, 0x44, 0x55,
+	0x06, 0x24, 0x9b, 0x38, 0xae, 0x85, 0xe5, 0xa7, 0x85, 0x65, 0x79, 0x85, 0xe5, 0xbf, 0x8f, 0x3a,
+	0x97, 0x4f, 0xe2, 0x09, 0xae, 0xfa, 0x13, 0x8f, 0x03, 0xc0, 0x93, 0x00, 0xf0, 0x65, 0x00, 0xe8,
+	0x2a, 0x00, 0x74, 0x1d, 0x00, 0xba, 0x09, 0x00, 0xdd, 0x06, 0x80, 0x8f, 0x0d, 0xe0, 0x13, 0x03,
+	0xe8, 0xd4, 0x00, 0x3e, 0x33, 0x80, 0xce, 0x0d, 0xa0, 0x0b, 0x03, 0x68, 0x6c, 0x00, 0x4f, 0x0c,
+	0xe0, 0x4b, 0x03, 0xe8, 0xca, 0x00, 0xbe, 0x36, 0x80, 0x6e, 0x0c, 0xe0, 0x5b, 0x03, 0xe8, 0x38,
+	0x04, 0x74, 0x12, 0x02, 0xfe, 0x16, 0x02, 0xfa, 0x1e, 0x02, 0xfe, 0x11, 0x02, 0x3a, 0x0d, 0x01,
+	0x9d, 0x85, 0x80, 0xcf, 0x43, 0xc0, 0x17, 0x21, 0xe0, 0xcf, 0xaf, 0x3c, 0x61, 0xeb, 0x0e, 0xd5,
+	0x1d, 0xc6, 0x3d, 0x65, 0x73, 0xaa, 0x47, 0x42, 0x76, 0x9d, 0xe5, 0xd7, 0xc1, 0xef, 0x7a, 0x8e,
+	0xd6, 0xdc, 0x6f, 0x36, 0x1f, 0x45, 0x6f, 0xc3, 0xfe, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x55,
+	0x01, 0x81, 0x77, 0xf1, 0x04, 0x00, 0x00,
 }

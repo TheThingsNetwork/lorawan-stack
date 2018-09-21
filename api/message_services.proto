@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
 
 package ttn.lorawan.v3;
@@ -23,15 +24,17 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ProcessUplinkMessageRequest {
-  EndDeviceVersionIdentifiers end_device_version_ids = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs"];
-  ApplicationUplink message = 2 [(gogoproto.nullable) = false];
-  string parameter = 3;
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs"];
+  ApplicationUplink message = 3 [(gogoproto.nullable) = false];
+  string parameter = 4;
 }
 
 message ProcessDownlinkMessageRequest {
-  EndDeviceVersionIdentifiers end_device_version_ids = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs"];
-  ApplicationDownlink message = 2 [(gogoproto.nullable) = false];
-  string parameter = 3;
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs"];
+  ApplicationDownlink message = 3 [(gogoproto.nullable) = false];
+  string parameter = 4;
 }
 
 // The UplinkMessageProcessor service processes uplink messages.
