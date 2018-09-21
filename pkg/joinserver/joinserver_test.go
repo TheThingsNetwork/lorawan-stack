@@ -1190,10 +1190,8 @@ func TestHandleJoin(t *testing.T) {
 				return
 			}
 
-			a.So(err, should.BeNil)
-			if !a.So(resp, should.Resemble, tc.JoinResponse) {
-				pretty.Ldiff(t, resp, tc.JoinResponse)
-				return
+			if !a.So(err, should.BeNil) || !a.So(resp, should.Resemble, tc.JoinResponse) {
+				t.FailNow()
 			}
 
 			// ensure the stored device nonces are updated
