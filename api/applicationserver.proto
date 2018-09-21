@@ -64,5 +64,4 @@ service AppAs {
   rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
-  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
 }

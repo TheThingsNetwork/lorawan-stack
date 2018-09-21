@@ -41,8 +41,3 @@ func (as *ApplicationServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.D
 func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
-
-// DownlinkQueueClear is called by the Application Server to clear the downlink queue for a device.
-func (as *ApplicationServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ptypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
-}
