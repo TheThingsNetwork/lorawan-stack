@@ -26,8 +26,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
+	nsredis "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/store/redis"
+	oldredis "go.thethings.network/lorawan-stack/pkg/store/redis"
 )
 
 var (
@@ -40,13 +42,10 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
-			// TODO: Replace by new registry (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
-			nsRedis := redis.New(&redis.Config{
+			config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"ns", "devices"},
-				IndexKeys: deviceregistry.Identifiers,
-			})
-			config.NS.Registry = deviceregistry.New(store.NewByteMapStoreClient(nsRedis))
+			})}
 
 			config.AS.Links = applicationserver.NewRedisLinkRegistry(redis.New(&redis.Config{
 				Redis:     config.Redis,
@@ -58,7 +57,7 @@ var (
 			}))
 
 			// TODO: Replace by new registry (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
-			jsRedis := redis.New(&redis.Config{
+			jsRedis := oldredis.New(&oldredis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"js", "devices"},
 				IndexKeys: deviceregistry.Identifiers,

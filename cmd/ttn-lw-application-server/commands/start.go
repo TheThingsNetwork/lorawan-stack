@@ -19,7 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/store/redis"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 )
 
 var (
