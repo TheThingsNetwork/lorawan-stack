@@ -46,6 +46,14 @@ const (
 )
 
 var gsMetrics = &messageMetrics{
+	gatewaysConnected: metrics.NewContextualGaugeVec(
+		prometheus.GaugeOpts{
+			Subsystem: subsystem,
+			Name:      "connected_gateways",
+			Help:      "Number of currently connected gateways",
+		},
+		[]string{gatewayID},
+	),
 	statusReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -96,11 +104,12 @@ func init() {
 }
 
 type messageMetrics struct {
-	statusReceived  *metrics.ContextualCounterVec
-	uplinkReceived  *metrics.ContextualCounterVec
-	uplinkForwarded *metrics.ContextualCounterVec
-	uplinkDropped   *metrics.ContextualCounterVec
-	downlinkSent    *metrics.ContextualCounterVec
+	gatewaysConnected *metrics.ContextualGaugeVec
+	statusReceived    *metrics.ContextualCounterVec
+	uplinkReceived    *metrics.ContextualCounterVec
+	uplinkForwarded   *metrics.ContextualCounterVec
+	uplinkDropped     *metrics.ContextualCounterVec
+	downlinkSent      *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -117,6 +126,16 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.downlinkSent.Collect(ch)
+}
+
+func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers) {
+	events.Publish(evtGatewayConnect(ctx, ids, nil))
+	gsMetrics.gatewaysConnected.WithLabelValues(ctx, ids.GatewayID).Inc()
+}
+
+func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers) {
+	events.Publish(evtGatewayDisconnect(ctx, ids, nil))
+	gsMetrics.gatewaysConnected.WithLabelValues(ctx, ids.GatewayID).Dec()
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus) {

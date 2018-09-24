@@ -617,6 +617,9 @@ func TestGatewayServer(t *testing.T) {
 						}
 						a.So(stats.UplinkCount, should.Equal, uplinkCount)
 						if tc.Up.GatewayStatus != nil {
+							if !a.So(stats.LastStatus, should.NotBeNil) {
+								t.FailNow()
+							}
 							a.So(stats.LastStatus.Time, should.Equal, tc.Up.GatewayStatus.Time)
 						}
 					})

@@ -238,7 +238,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 
 	conn := io.NewConnection(ctx, protocol, gtw, scheduler)
 	gs.connections.Store(uid, conn)
-	events.Publish(evtGatewayConnect(ctx, ids, nil))
+	registerGatewayConnect(ctx, ids)
 	logger.Info("Gateway connected")
 	go gs.handleUpstream(conn)
 	return conn, nil
@@ -255,7 +255,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		ids := conn.Gateway().GatewayIdentifiers
 		gs.connections.Delete(unique.ID(ctx, ids))
 		gs.UnclaimDownlink(ctx, ids)
-		events.Publish(evtGatewayDisconnect(ctx, ids, nil))
+		registerGatewayDisconnect(ctx, ids)
 		logger.Info("Gateway disconnected")
 	}()
 	for {
