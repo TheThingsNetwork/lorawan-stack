@@ -215,6 +215,69 @@
       "file": "i18n.go"
     }
   },
+  "enum:CONTACT_METHOD_EMAIL": {
+    "translations": {
+      "en": "email"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTACT_METHOD_OTHER": {
+    "translations": {
+      "en": "other"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTACT_METHOD_PHONE": {
+    "translations": {
+      "en": "phone"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTACT_TYPE_ABUSE": {
+    "translations": {
+      "en": "abuse"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTACT_TYPE_BILLING": {
+    "translations": {
+      "en": "billing"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTACT_TYPE_OTHER": {
+    "translations": {
+      "en": "other"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CONTACT_TYPE_TECHNICAL": {
+    "translations": {
+      "en": "technical"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:CONTEXT": {
     "translations": {
       "en": "renew context"
@@ -332,24 +395,6 @@
       "file": "i18n.go"
     }
   },
-  "enum:PLACEMENT_INDOOR": {
-    "translations": {
-      "en": "indoor"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "i18n.go"
-    }
-  },
-  "enum:PLACEMENT_OUTDOOR": {
-    "translations": {
-      "en": "outdoor"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "i18n.go"
-    }
-  },
   "enum:PROPRIETARY": {
     "translations": {
       "en": "proprietary"
@@ -362,6 +407,24 @@
   "enum:REJOIN_REQUEST": {
     "translations": {
       "en": "rejoin request"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ALL": {
+    "translations": {
+      "en": "all possible rights"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_ALL": {
+    "translations": {
+      "en": "all application rights"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -388,7 +451,7 @@
   },
   "enum:RIGHT_APPLICATION_DEVICES_WRITE": {
     "translations": {
-      "en": "register devices in application"
+      "en": "create devices in application"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -406,7 +469,7 @@
   },
   "enum:RIGHT_APPLICATION_LINK": {
     "translations": {
-      "en": "link to an Application Server for traffic exchange, i.e. read uplink and write downlink (API keys only)"
+      "en": "link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -467,6 +530,24 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_CLIENT_ALL": {
+    "translations": {
+      "en": "all OAuth client rights"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_ALL": {
+    "translations": {
+      "en": "all gateway rights"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_GATEWAY_DELETE": {
     "translations": {
       "en": "delete gateway"
@@ -487,7 +568,7 @@
   },
   "enum:RIGHT_GATEWAY_LINK": {
     "translations": {
-      "en": "link to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only)"
+      "en": "link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -557,9 +638,18 @@
       "file": "i18n.go"
     }
   },
-  "enum:RIGHT_INVALID": {
+  "enum:RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR": {
     "translations": {
-      "en": "invalid"
+      "en": "add the organization as a collaborator on an existing entity"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_ALL": {
+    "translations": {
+      "en": "all organization rights"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -568,7 +658,7 @@
   },
   "enum:RIGHT_ORGANIZATION_APPLICATIONS_CREATE": {
     "translations": {
-      "en": "register an application under the organization"
+      "en": "create an application under the organization"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -577,7 +667,25 @@
   },
   "enum:RIGHT_ORGANIZATION_APPLICATIONS_LIST": {
     "translations": {
-      "en": "list the applications the organization is collaborator of"
+      "en": "list the applications the organization is a collaborator of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_CLIENTS_CREATE": {
+    "translations": {
+      "en": "create an OAuth client under the organization"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_ORGANIZATION_CLIENTS_LIST": {
+    "translations": {
+      "en": "list the OAuth clients the organization is a collaborator of"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -595,7 +703,7 @@
   },
   "enum:RIGHT_ORGANIZATION_GATEWAYS_CREATE": {
     "translations": {
-      "en": "register a gateway under the organization"
+      "en": "create a gateway under the organization"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -604,7 +712,7 @@
   },
   "enum:RIGHT_ORGANIZATION_GATEWAYS_LIST": {
     "translations": {
-      "en": "list the gateways the organization is collaborator of"
+      "en": "list the gateways the organization is a collaborator of"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -647,9 +755,18 @@
       "file": "i18n.go"
     }
   },
-  "enum:RIGHT_USER_ADMIN": {
+  "enum:RIGHT_SEND_INVITES": {
     "translations": {
-      "en": "perform administrative actions on behalf of the user"
+      "en": "send user invites"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_ALL": {
+    "translations": {
+      "en": "all user rights"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -658,7 +775,7 @@
   },
   "enum:RIGHT_USER_APPLICATIONS_CREATE": {
     "translations": {
-      "en": "register an application under the user account"
+      "en": "create an application under the user account"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -676,16 +793,25 @@
   },
   "enum:RIGHT_USER_AUTHORIZED_CLIENTS": {
     "translations": {
-      "en": "view authorized, authorize and de-authorize OAuth clients of the user"
+      "en": "view and edit authorized OAuth clients of the user"
     },
     "description": {
       "package": "pkg/ttnpb",
       "file": "i18n.go"
     }
   },
-  "enum:RIGHT_USER_CLIENTS": {
+  "enum:RIGHT_USER_CLIENTS_CREATE": {
     "translations": {
-      "en": "create, list, view, update and delete OAuth clients under the user account"
+      "en": "create an OAuth client under the user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_CLIENTS_LIST": {
+    "translations": {
+      "en": "list OAuth clients the user is a collaborator of"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -703,7 +829,7 @@
   },
   "enum:RIGHT_USER_GATEWAYS_CREATE": {
     "translations": {
-      "en": "register a gateway under the user account"
+      "en": "create a gateway under the user account"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -712,7 +838,7 @@
   },
   "enum:RIGHT_USER_GATEWAYS_LIST": {
     "translations": {
-      "en": "list gateways the user is collaborator of"
+      "en": "list gateways the user is a collaborator of"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -863,9 +989,9 @@
       "file": "i18n.go"
     }
   },
-  "enum:STATE_PENDING": {
+  "enum:STATE_FLAGGED": {
     "translations": {
-      "en": "pending review"
+      "en": "flagged and pending review"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -875,6 +1001,24 @@
   "enum:STATE_REJECTED": {
     "translations": {
       "en": "reviewed and rejected"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:STATE_REQUESTED": {
+    "translations": {
+      "en": "requested and pending review"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:STATE_SUSPENDED": {
+    "translations": {
+      "en": "reviewed and suspended"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -962,60 +1106,6 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/ttn-lw-identity-server/commands:identity_server_load_data": {
-    "translations": {
-      "en": "could not load Identity Server data"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-identity-server/commands",
-      "file": "init.go"
-    }
-  },
-  "error:pkg/applicationregistry:application_not_found": {
-    "translations": {
-      "en": "application not found"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/applicationregistry:nil_application": {
-    "translations": {
-      "en": "application specified is nil"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/applicationregistry:nil_identifiers": {
-    "translations": {
-      "en": "identifiers specified are nil"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/applicationregistry:processor_failed": {
-    "translations": {
-      "en": "failed to process arguments"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/applicationregistry:too_many_applications": {
-    "translations": {
-      "en": "too many applications found"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/assets:http": {
     "translations": {
       "en": "HTTP error: {message}"
@@ -1079,54 +1169,18 @@
       "file": "cluster.go"
     }
   },
-  "error:pkg/auth/pbkdf2:invalid_pbkdf2_format": {
-    "translations": {
-      "en": "password hash has invalid PBKDF2 format"
-    },
-    "description": {
-      "package": "pkg/auth/pbkdf2",
-      "file": "pbkdf2.go"
-    }
-  },
-  "error:pkg/auth/pbkdf2:pbkdf2_iterations": {
-    "translations": {
-      "en": "could not determine number of iterations from `{iterations}`"
-    },
-    "description": {
-      "package": "pkg/auth/pbkdf2",
-      "file": "pbkdf2.go"
-    }
-  },
-  "error:pkg/auth/pbkdf2:pbkdf2_key_length": {
-    "translations": {
-      "en": "could not determine key length"
-    },
-    "description": {
-      "package": "pkg/auth/pbkdf2",
-      "file": "pbkdf2.go"
-    }
-  },
-  "error:pkg/auth/pbkdf2:unknown_algorithm": {
-    "translations": {
-      "en": "algorithm `{alg}` unknown"
-    },
-    "description": {
-      "package": "pkg/auth/pbkdf2",
-      "file": "algorithm.go"
-    }
-  },
-  "error:pkg/auth/pbkdf2:zero_length_salt": {
-    "translations": {
-      "en": "password salt can not have zero length"
-    },
-    "description": {
-      "package": "pkg/auth/pbkdf2",
-      "file": "pbkdf2.go"
-    }
-  },
   "error:pkg/auth/rights:missing_application_rights": {
     "translations": {
       "en": "missing rights for application `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:missing_client_rights": {
+    "translations": {
+      "en": "missing rights for client `{uid}`"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -1160,6 +1214,15 @@
       "file": "require.go"
     }
   },
+  "error:pkg/auth/rights:missing_user_rights": {
+    "translations": {
+      "en": "missing rights for user `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
   "error:pkg/auth/rights:no_identity_server_conn": {
     "translations": {
       "en": "no connection to Identity Server"
@@ -1176,33 +1239,6 @@
     "description": {
       "package": "pkg/auth/rights",
       "file": "fetcher.go"
-    }
-  },
-  "error:pkg/auth:invalid_hash": {
-    "translations": {
-      "en": "invalid password hash"
-    },
-    "description": {
-      "package": "pkg/auth",
-      "file": "password.go"
-    }
-  },
-  "error:pkg/auth:invalid_token_key_segmentation": {
-    "translations": {
-      "en": "invalid segmentation of API Key or Access Token"
-    },
-    "description": {
-      "package": "pkg/auth",
-      "file": "jose.go"
-    }
-  },
-  "error:pkg/auth:unknown_hashing_method": {
-    "translations": {
-      "en": "password hashing method `{method}` unknown"
-    },
-    "description": {
-      "package": "pkg/auth",
-      "file": "password.go"
     }
   },
   "error:pkg/band:band_not_found": {
@@ -1302,6 +1338,24 @@
     "description": {
       "package": "pkg/console",
       "file": "console.go"
+    }
+  },
+  "error:pkg/crypto/cryptoutil:invalid_length": {
+    "translations": {
+      "en": "invalid slice length"
+    },
+    "description": {
+      "package": "pkg/crypto/cryptoutil",
+      "file": "cryptoutil.go"
+    }
+  },
+  "error:pkg/crypto/cryptoutil:kek_not_found": {
+    "translations": {
+      "en": "KEK with label `{label}` not found"
+    },
+    "description": {
+      "package": "pkg/crypto/cryptoutil",
+      "file": "keyvault_mem.go"
     }
   },
   "error:pkg/crypto:corrupt_key": {
@@ -1457,6 +1511,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/frequencyplans:channel": {
+    "translations": {
+      "en": "invalid frequency plan channel `{index}`"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
   "error:pkg/frequencyplans:fetch": {
     "translations": {
       "en": "fetching failed"
@@ -1466,25 +1529,7 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/frequencyplans:frequency_plan_not_found": {
-    "translations": {
-      "en": "frequency plan `{id}` not found"
-    },
-    "description": {
-      "package": "pkg/frequencyplans",
-      "file": "frequencyplans.go"
-    }
-  },
-  "error:pkg/frequencyplans:id_not_specified": {
-    "translations": {
-      "en": "ID of the frequency plan not specified"
-    },
-    "description": {
-      "package": "pkg/frequencyplans",
-      "file": "frequencyplans.go"
-    }
-  },
-  "error:pkg/frequencyplans:invalid_frequency_plan": {
+  "error:pkg/frequencyplans:invalid": {
     "translations": {
       "en": "invalid frequency plan"
     },
@@ -1493,18 +1538,45 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/frequencyplans:read_base_frequency_plan": {
+  "error:pkg/frequencyplans:no_dwell_time_duration": {
     "translations": {
-      "en": "could not read the base `{base_id}` of frequency plan `{id}`"
+      "en": "no dwell time duration specified"
     },
     "description": {
       "package": "pkg/frequencyplans",
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/frequencyplans:read_frequency_plan": {
+  "error:pkg/frequencyplans:not_found": {
     "translations": {
-      "en": "could not read the frequency plan `{id}`"
+      "en": "frequency plan `{id}` not found"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:parse_file": {
+    "translations": {
+      "en": "could not parse file"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:read": {
+    "translations": {
+      "en": "could not read frequency plan `{id}`"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:read_base": {
+    "translations": {
+      "en": "could not read the base `{base_id}` of frequency plan `{id}`"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -1514,15 +1586,6 @@
   "error:pkg/frequencyplans:read_list": {
     "translations": {
       "en": "could not read the list of frequency plans"
-    },
-    "description": {
-      "package": "pkg/frequencyplans",
-      "file": "frequencyplans.go"
-    }
-  },
-  "error:pkg/frequencyplans:unmarshal_file": {
-    "translations": {
-      "en": "could not unmarshal file"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -1673,18 +1736,18 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:gateway_not_registered": {
+  "error:pkg/gatewayserver:entity_registry_not_found": {
     "translations": {
-      "en": "gateway `{gateway_uid}` is not registered"
+      "en": "Entity Registry not found"
     },
     "description": {
       "package": "pkg/gatewayserver",
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:identity_server_not_found": {
+  "error:pkg/gatewayserver:gateway_not_registered": {
     "translations": {
-      "en": "Identity Server not found"
+      "en": "gateway `{gateway_uid}` is not registered"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -1725,33 +1788,6 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "gatewayserver.go"
-    }
-  },
-  "error:pkg/identityserver:other_pull_configuration_stream_opened": {
-    "translations": {
-      "en": "another `PullConfiguration` stream opened"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/identityserver:update_mask": {
-    "translations": {
-      "en": "invalid update_mask: `{path}` is not a valid path"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/identityserver:wrong_gateway_for_api_key": {
-    "translations": {
-      "en": "api key has no rights for gateway `{gateway_id}`"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "errors.go"
     }
   },
   "error:pkg/joinserver:address_mismatch": {
@@ -2141,6 +2177,24 @@
       "file": "unmarshal.go"
     }
   },
+  "error:pkg/networkserver/redis:duplicate_identifiers": {
+    "translations": {
+      "en": "duplicate identifiers"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:invalid_identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver:channel_index_too_high": {
     "translations": {
       "en": "channel index is too high"
@@ -2225,6 +2279,15 @@
   "error:pkg/networkserver:duplicate_cid_handler": {
     "translations": {
       "en": "a handler for MAC command with CID {cid} is already registered"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:duplicate_identifiers": {
+    "translations": {
+      "en": "a device identified by the identifiers already exists"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2384,6 +2447,15 @@
       "file": "networkserver.go"
     }
   },
+  "error:pkg/networkserver:outdated_data": {
+    "translations": {
+      "en": "data is outdated"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:payload": {
     "translations": {
       "en": "invalid payload"
@@ -2489,6 +2561,24 @@
     },
     "description": {
       "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:not_found": {
+    "translations": {
+      "en": "entity not found"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:store": {
+    "translations": {
+      "en": "store error"
+    },
+    "description": {
+      "package": "pkg/redis",
       "file": "errors.go"
     }
   },
@@ -2771,24 +2861,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:invalid_frequency_plan_channel": {
-    "translations": {
-      "en": "invalid frequency plan channel `{index}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "regional.go"
-    }
-  },
-  "error:pkg/ttnpb:invalid_update_mask": {
-    "translations": {
-      "en": "update path `{path}` is not a valid path"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "identityserver_validators.go"
-    }
-  },
   "error:pkg/ttnpb:max_cflist_frequency": {
     "translations": {
       "en": "expected CFList frequency to be less or equal to MaxUint24"
@@ -2805,24 +2877,6 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:missing_update_mask": {
-    "translations": {
-      "en": "missing update mask"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "identityserver_validators.go"
-    }
-  },
-  "error:pkg/ttnpb:no_dwell_time_duration": {
-    "translations": {
-      "en": "no dwell time duration specified"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "regional.go"
     }
   },
   "error:pkg/ttnpb:parsing": {
@@ -2861,15 +2915,6 @@
       "file": "message_validators.go"
     }
   },
-  "error:pkg/ttnpb:type": {
-    "translations": {
-      "en": "got `{result}` instead of `{expected}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "gateway.go"
-    }
-  },
   "error:pkg/ttnpb:unknown": {
     "translations": {
       "en": "unknown `{lorawan_field}`"
@@ -2877,15 +2922,6 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:unknown_right": {
-    "translations": {
-      "en": "unknown right"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "rights.go"
     }
   },
   "error:pkg/types:data_rate": {
@@ -3131,33 +3167,6 @@
       "file": "lorawan.go"
     }
   },
-  "event:application.create": {
-    "translations": {
-      "en": "Create Application"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "observability.go"
-    }
-  },
-  "event:application.delete": {
-    "translations": {
-      "en": "Delete Application"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "observability.go"
-    }
-  },
-  "event:application.update": {
-    "translations": {
-      "en": "Update Application"
-    },
-    "description": {
-      "package": "pkg/applicationregistry",
-      "file": "observability.go"
-    }
-  },
   "event:device.create": {
     "translations": {
       "en": "Create Device"
@@ -3246,267 +3255,6 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "observability.go"
-    }
-  },
-  "event:is.application.api_key.delete": {
-    "translations": {
-      "en": "delete application API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.application.api_key.generate": {
-    "translations": {
-      "en": "generate application API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.application.api_key.update": {
-    "translations": {
-      "en": "update application API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.application.create": {
-    "translations": {
-      "en": "create application"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.application.delete": {
-    "translations": {
-      "en": "delete application"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.application.update": {
-    "translations": {
-      "en": "update application"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.client.create": {
-    "translations": {
-      "en": "create OAuth client"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.client.delete": {
-    "translations": {
-      "en": "delete OAuth client"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.client.update": {
-    "translations": {
-      "en": "update OAuth client"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.gateway.api_key.delete": {
-    "translations": {
-      "en": "delete gateway API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.gateway.api_key.generate": {
-    "translations": {
-      "en": "generate gateway API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.gateway.api_key.update": {
-    "translations": {
-      "en": "update gateway API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.gateway.create": {
-    "translations": {
-      "en": "create gateway"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.gateway.delete": {
-    "translations": {
-      "en": "delete gateway"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.gateway.update": {
-    "translations": {
-      "en": "update gateway"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.oauth.user.login": {
-    "translations": {
-      "en": "successful user login"
-    },
-    "description": {
-      "package": "pkg/identityserver/oauth",
-      "file": "events.go"
-    }
-  },
-  "event:is.oauth.user.login_failed": {
-    "translations": {
-      "en": "failed user login"
-    },
-    "description": {
-      "package": "pkg/identityserver/oauth",
-      "file": "events.go"
-    }
-  },
-  "event:is.organization.api_key.delete": {
-    "translations": {
-      "en": "delete organization API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.organization.api_key.generate": {
-    "translations": {
-      "en": "generate organization API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.organization.api_key.update": {
-    "translations": {
-      "en": "update organization API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.organization.create": {
-    "translations": {
-      "en": "create organization"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.organization.delete": {
-    "translations": {
-      "en": "delete organization"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.organization.update": {
-    "translations": {
-      "en": "update organization"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.user.api_key.delete": {
-    "translations": {
-      "en": "delete user API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.user.api_key.generate": {
-    "translations": {
-      "en": "generate user API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.user.api_key.update": {
-    "translations": {
-      "en": "update user API key"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.user.create": {
-    "translations": {
-      "en": "create user"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.user.delete": {
-    "translations": {
-      "en": "delete user"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
-    }
-  },
-  "event:is.user.update": {
-    "translations": {
-      "en": "update user"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "events.go"
     }
   },
   "event:js.join.accept": {
