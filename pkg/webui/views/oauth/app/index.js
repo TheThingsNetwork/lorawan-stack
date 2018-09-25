@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route, BrowserRouter } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
+import { ConnectedRouter } from 'connected-react-router'
+import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
 
 import WithLocale from '../../../lib/components/with-locale'
@@ -22,9 +24,11 @@ import { EnvProvider } from '../../../lib/components/env'
 import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
-import store from '../../../store'
+import createStore from '../../../store'
 import Init from '../../../lib/components/init'
 
+const history = createBrowserHistory()
+const store = createStore(history)
 const env = window.ENV || {}
 
 export default class OAuthApp extends React.PureComponent {
@@ -34,13 +38,13 @@ export default class OAuthApp extends React.PureComponent {
         <Provider store={store}>
           <Init>
             <WithLocale>
-              <BrowserRouter>
+              <ConnectedRouter history={history}>
                 <Switch>
                   <Route path="/oauth" exact component={Landing} />
                   <Route path="/oauth/login" component={Login} />
                   <Route path="/oauth/authorize" component={Authorize} />
                 </Switch>
-              </BrowserRouter>
+              </ConnectedRouter>
             </WithLocale>
           </Init>
         </Provider>

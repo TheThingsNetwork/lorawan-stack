@@ -15,20 +15,24 @@
 import React from 'react'
 import DOM from 'react-dom'
 import { ConnectedRouter } from 'connected-react-router'
+import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
 import { BreadcrumbsProvider } from './components/breadcrumbs/context'
 
 import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 
-import store from './store'
+import createStore from './store'
 import App from './views/console/app'
+
+const history = createBrowserHistory()
+const store = createStore(history)
 
 const Console = () => (
   <Provider store={store}>
     <Init>
       <WithLocale>
-        <ConnectedRouter history={store.history}>
+        <ConnectedRouter history={history}>
           <BreadcrumbsProvider>
             <App />
           </BreadcrumbsProvider>
