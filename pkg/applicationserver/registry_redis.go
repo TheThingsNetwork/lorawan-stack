@@ -18,11 +18,11 @@ import (
 	"context"
 
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	"go.thethings.network/lorawan-stack/pkg/store/redis"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func NewRedisDeviceRegistry(store *redis.Store) DeviceRegistry {
+func NewRedisDeviceRegistry(cl *redis.Client) DeviceRegistry {
 	return &redisDeviceRegistry{}
 }
 
@@ -37,7 +37,7 @@ func (r *redisDeviceRegistry) Set(context.Context, ttnpb.EndDeviceIdentifiers, f
 	return errors.New("not implemented")
 }
 
-func NewRedisLinkRegistry(store *redis.Store) LinkRegistry {
+func NewRedisLinkRegistry(cl *redis.Client) LinkRegistry {
 	return &redisLinkRegistry{}
 }
 
