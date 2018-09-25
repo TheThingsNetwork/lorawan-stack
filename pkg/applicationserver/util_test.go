@@ -32,6 +32,40 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+var deviceRepositoryData = map[string][]byte{
+	"brands.yml": []byte(`version: '3'
+brands:
+thethingsproducts:
+  name: The Things Products
+  url: https://www.thethingsnetwork.org`),
+	"thethingsproducts/devices.yml": []byte(`version: '3'
+devices:
+  thethingsnode:
+    name: The Things Node`),
+	"thethingsproducts/thethingsnode/versions.yml": []byte(`version: '3'
+hardware_versions:
+  '1.0':
+    - firmware_version: 1.1
+      payload_format:
+        up:
+          type: javascript
+          parameter: decoder.js
+        down:
+          type: javascript
+          parameter: encoder.js`),
+	"thethingsproducts/thethingsnode/1.0/decoder.js": []byte(`function Decoder(payload, f_port) {
+	var sum = 0;
+	for (i = 0; i < payload.length; i++) {
+		sum += payload[i];
+	}
+	return {
+		sum: sum
+	};
+}`),
+	"thethingsproducts/thethingsnode/1.0/encoder.js": []byte(`function Encoder(payload, f_port) {
+	return [0x01, 0x02, 0x03];
+}`)}
+
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond)

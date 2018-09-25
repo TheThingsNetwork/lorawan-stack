@@ -51,17 +51,15 @@ var (
 			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		},
+		VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
+			BrandID:         "thethingsproducts",
+			ModelID:         "thethingsnode",
+			HardwareVersion: "1.0",
+			FirmwareVersion: "1.1",
+		},
 		Formatters: &ttnpb.MessagePayloadFormatters{
-			UpFormatter: ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-			UpFormatterParameter: `function Decoder(payload, f_port) {
-	var sum = 0;
-	for (i = 0; i < payload.length; i++) {
-		sum += payload[i];
-	}
-	return {
-		sum: sum
-	};
-}`,
+			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 		},
 	}
 
@@ -144,6 +142,9 @@ func TestApplicationServer(t *testing.T) {
 		KeyVault: cryptoutil.NewMemKeyVault(map[string][]byte{
 			"test": []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
 		}),
+		DeviceRepository: applicationserver.DeviceRepositoryConfig{
+			Static: deviceRepositoryData,
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {

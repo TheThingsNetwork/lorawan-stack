@@ -44,11 +44,11 @@ import (
 type ApplicationServer struct {
 	*component.Component
 
-	linkMode          LinkMode
-	linkRegistry      LinkRegistry
-	deviceRegistry    DeviceRegistry
-	keyVault          crypto.KeyVault
-	payloadFormatters map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder
+	linkMode       LinkMode
+	linkRegistry   LinkRegistry
+	deviceRegistry DeviceRegistry
+	keyVault       crypto.KeyVault
+	formatter      payloadFormatter
 
 	links sync.Map
 }
@@ -61,9 +61,16 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
 		keyVault:       conf.KeyVault,
-		payloadFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder{
-			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
-			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
+		formatter: payloadFormatter{
+			repository: conf.DeviceRepository.Client(),
+			upFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder{
+				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
+				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
+			},
+			downFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncoder{
+				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
+				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
+			},
 		},
 	}
 
@@ -220,18 +227,16 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 				return nil, err
 			}
 			p.UplinkMessage.FRMPayload = frmPayload
-			formatters := ed.Formatters
-			if formatters == nil {
-				formatters = link.DefaultFormatters
+			var formatter ttnpb.PayloadFormatter
+			var parameter string
+			if ed.Formatters != nil {
+				formatter, parameter = ed.Formatters.UpFormatter, ed.Formatters.UpFormatterParameter
+			} else if link.DefaultFormatters != nil {
+				formatter, parameter = link.DefaultFormatters.UpFormatter, link.DefaultFormatters.UpFormatterParameter
 			}
-			if formatters.GetUpFormatter() != ttnpb.PayloadFormatter_FORMATTER_NONE {
-				logger := logger.WithField("formatter", formatters.UpFormatter)
-				if formatter, ok := as.payloadFormatters[formatters.UpFormatter]; ok {
-					if err := formatter.Decode(ctx, p.UplinkMessage, ed.VersionIDs, formatters.UpFormatterParameter); err != nil {
-						logger.WithError(err).Warn("Failed to decode payload")
-					}
-				} else {
-					logger.Warn("Payload formatter not supported")
+			if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
+				if err := as.formatter.Decode(ctx, up.EndDeviceIdentifiers, ed.VersionIDs, p.UplinkMessage, formatter, parameter); err != nil {
+					logger.WithError(err).Warn("Payload decoding failed")
 				}
 			}
 			// TODO:

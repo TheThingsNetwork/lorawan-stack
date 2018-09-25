@@ -14,7 +14,11 @@
 
 package applicationserver
 
-import "go.thethings.network/lorawan-stack/pkg/crypto"
+import (
+	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/devicerepository"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
+)
 
 // LinkMode defines how applications are linked to their Network Server.
 type LinkMode int
@@ -28,8 +32,36 @@ const (
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode LinkMode `name:"link-mode" description:"Mode used to link applications to their Network Server"`
-	Devices  DeviceRegistry
-	Links    LinkRegistry
-	KeyVault crypto.KeyVault
+	LinkMode         LinkMode
+	Devices          DeviceRegistry
+	Links            LinkRegistry
+	KeyVault         crypto.KeyVault
+	DeviceRepository DeviceRepositoryConfig
+}
+
+// DeviceRepositoryConfig defines the source of the device repository.
+type DeviceRepositoryConfig struct {
+	Static    map[string][]byte `name:"-"`
+	Directory string            `name:"directory" description:"Retrieve the device repository from the filesystem"`
+	URL       string            `name:"url" description:"Retrieve the device repository from a web server"`
+}
+
+// Client instantiates a new devicerepository.Client with a fetcher based on the configuration.
+// The order of precedence is Static, Directory and URL.
+// If neither Static, Directory nor a URL is set, this function returns nil.
+func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
+	var fetcher fetch.Interface
+	switch {
+	case c.Static != nil:
+		fetcher = fetch.NewMemFetcher(c.Static)
+	case c.Directory != "":
+		fetcher = fetch.FromFilesystem(c.Directory)
+	case c.URL != "":
+		fetcher = fetch.FromHTTP(c.URL, true)
+	default:
+		return nil
+	}
+	return &devicerepository.Client{
+		Fetcher: fetcher,
+	}
 }
