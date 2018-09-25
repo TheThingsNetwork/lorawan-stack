@@ -17,20 +17,20 @@
 import React from 'react'
 import { configure, addDecorator } from '@storybook/react'
 import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'react-router-redux'
+import { ConnectedRouter } from 'connected-react-router'
 import { IntlProvider } from 'react-intl'
 import createHistory from 'history/createMemoryHistory'
 
 import '../../pkg/webui/styles/main.styl'
 import 'focus-visible/dist/focus-visible'
-import store from '../../pkg/webui/store'
+import createStore from '../../pkg/webui/store'
 
 import Center from './center'
 
+const history = createHistory()
+const store = createStore(history)
 const req = require.context('../../pkg/webui/', true, /story\.js$/)
 const load = () => req.keys().forEach(req)
-
-const history = createHistory()
 
 addDecorator(function (story) {
   return (
