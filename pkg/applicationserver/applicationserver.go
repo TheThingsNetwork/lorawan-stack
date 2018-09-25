@@ -125,12 +125,12 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	return conn, nil
 }
 
-var errJSNotFound = errors.DefineNotFound("join_server_not_found", "Join Server not found for JoinEUI `{join_eui}`")
+var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
 func (as *ApplicationServer) getAppSKey(ctx context.Context, sessionKeyID string, ids ttnpb.EndDeviceIdentifiers) (ttnpb.KeyEnvelope, error) {
 	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
 	if js == nil {
-		return ttnpb.KeyEnvelope{}, errJSNotFound.WithAttributes("join_eui", *ids.JoinEUI)
+		return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
 	}
 	client := ttnpb.NewAsJsClient(js.Conn())
 	req := &ttnpb.SessionKeyRequest{
@@ -147,7 +147,7 @@ func (as *ApplicationServer) getAppSKey(ctx context.Context, sessionKeyID string
 var (
 	errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
 	errGetAppSKey     = errors.Define("app_s_key", "failed to get AppSKey")
-	errMissingAppSKey = errors.DefineCorruption("missing_app_s_key", "AppSKey is unknown")
+	errNoAppSKey      = errors.DefineCorruption("no_app_s_key", "no AppSKey")
 )
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
@@ -216,7 +216,7 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 				}
 				logger.Debug("Session restored")
 			} else if ed.Session.AppSKey == nil {
-				return nil, errMissingAppSKey
+				return nil, errNoAppSKey
 			}
 			appSKey, err := cryptoutil.UnwrapAES128Key(*ed.Session.AppSKey, as.keyVault)
 			if err != nil {
