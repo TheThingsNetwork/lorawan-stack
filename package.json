@@ -111,7 +111,6 @@
     "react-paginate": "^5.2.3",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
-    "react-router-redux": "5.0.0-alpha.6",
     "react-text-mask": "^5.0.2",
     "redux": "^3.7.2",
     "redux-logic": "^0.15.0",
