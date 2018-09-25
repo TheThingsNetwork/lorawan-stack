@@ -346,3 +346,9 @@ func (eui EUI64) HasPrefix(prefix EUI64Prefix) bool { return prefix.Matches(eui)
 func (prefix EUI64Prefix) Matches(eui EUI64) bool {
 	return eui.Mask(prefix.Length) == prefix.EUI64.Mask(prefix.Length)
 }
+
+// Copy stores a copy of eui in x and returns it.
+func (eui EUI64) Copy(x *EUI64) *EUI64 {
+	copy(x[:], eui[:])
+	return x
+}

@@ -20,7 +20,6 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/gogo/protobuf/proto"
-	"github.com/mohae/deepcopy"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -87,7 +86,7 @@ func getDevAddrsAndIDs(dev *ttnpb.EndDevice) (addrs struct{ current, fallback *t
 		copy(addr[:], dev.SessionFallback.DevAddr[:])
 		addrs.fallback = &addr
 	}
-	return addrs, deepcopy.Copy(dev.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers)
+	return addrs, *dev.EndDeviceIdentifiers.Copy(&ttnpb.EndDeviceIdentifiers{})
 }
 
 func equalAddr(x, y *types.DevAddr) bool {

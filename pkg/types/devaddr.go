@@ -477,3 +477,9 @@ func (addr DevAddr) HasPrefix(prefix DevAddrPrefix) bool { return prefix.Matches
 func (prefix DevAddrPrefix) Matches(addr DevAddr) bool {
 	return addr.Mask(prefix.Length) == prefix.DevAddr.Mask(prefix.Length)
 }
+
+// Copy stores a copy of addr in x and returns it.
+func (addr DevAddr) Copy(x *DevAddr) *DevAddr {
+	copy(x[:], addr[:])
+	return x
+}

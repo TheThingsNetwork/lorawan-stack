@@ -156,3 +156,24 @@ func CombineIdentifiers(ids ...Identifiers) *CombinedIdentifiers {
 func (ids *CombinedIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return ids
 }
+
+// Copy stores a copy of ids in x and returns it.
+func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifiers {
+	*x = EndDeviceIdentifiers{
+		DeviceID: ids.DeviceID,
+		ApplicationIdentifiers: ApplicationIdentifiers{
+			ApplicationID: ids.ApplicationID,
+		},
+		XXX_sizecache: ids.XXX_sizecache,
+	}
+	if ids.DevEUI != nil {
+		x.DevEUI = ids.DevEUI.Copy(&types.EUI64{})
+	}
+	if ids.JoinEUI != nil {
+		x.JoinEUI = ids.JoinEUI.Copy(&types.EUI64{})
+	}
+	if ids.DevAddr != nil {
+		x.DevAddr = ids.DevAddr.Copy(&types.DevAddr{})
+	}
+	return x
+}
