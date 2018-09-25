@@ -73,6 +73,7 @@ func (c *Component) tlsConfig() (*tls.Config, error) {
 			tlsConfig := &tls.Config{
 				Certificates:             cv.Load().([]tls.Certificate),
 				PreferServerCipherSuites: true,
+				MinVersion:               tls.VersionTLS12,
 			}
 			for _, proto := range info.SupportedProtos {
 				if proto == "h2" {
