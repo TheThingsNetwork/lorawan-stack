@@ -22,7 +22,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Client allows retrieval of device data.
+// Client provides a device repository through a fetcher.
 type Client struct {
 	Fetcher fetch.Interface
 }
