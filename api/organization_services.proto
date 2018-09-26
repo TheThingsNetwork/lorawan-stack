@@ -89,7 +89,7 @@ service OrganizationAccess {
   };
 
   // Update the rights of an existing organization API key. To generate an API key,
-  // the CreateOrganizationAPIKey should be used. To delete an API key, update it
+  // the CreateAPIKey should be used. To delete an API key, update it
   // with zero rights.
   rpc UpdateAPIKey(UpdateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {

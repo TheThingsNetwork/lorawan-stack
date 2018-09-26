@@ -245,7 +245,7 @@ type UserAccessClient interface {
 	CreateAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	ListAPIKeys(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
 	// Update the rights of an existing user API key. To generate an API key,
-	// the CreateUserAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 }
@@ -301,7 +301,7 @@ type UserAccessServer interface {
 	CreateAPIKey(context.Context, *CreateUserAPIKeyRequest) (*APIKey, error)
 	ListAPIKeys(context.Context, *UserIdentifiers) (*APIKeys, error)
 	// Update the rights of an existing user API key. To generate an API key,
-	// the CreateUserAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(context.Context, *UpdateUserAPIKeyRequest) (*APIKey, error)
 }
@@ -538,13 +538,13 @@ var _UserInvitationRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_1732412f65d99497)
+	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_b9f8a70c707cc31e)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_1732412f65d99497)
+	golang_proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_b9f8a70c707cc31e)
 }
 
-var fileDescriptor_user_services_1732412f65d99497 = []byte{
+var fileDescriptor_user_services_b9f8a70c707cc31e = []byte{
 	// 722 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0x3f, 0x4c, 0xdb, 0x4c,
 	0x18, 0xc6, 0x7d, 0x80, 0x32, 0x1c, 0x11, 0xfa, 0x38, 0x21, 0xf8, 0x30, 0xe8, 0x45, 0xf8, 0xfb,

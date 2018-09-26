@@ -249,7 +249,7 @@ type OrganizationAccessClient interface {
 	CreateAPIKey(ctx context.Context, in *CreateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	ListAPIKeys(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
 	// Update the rights of an existing organization API key. To generate an API key,
-	// the CreateOrganizationAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Set the rights of a collaborator (member) on the organization. Users
@@ -329,7 +329,7 @@ type OrganizationAccessServer interface {
 	CreateAPIKey(context.Context, *CreateOrganizationAPIKeyRequest) (*APIKey, error)
 	ListAPIKeys(context.Context, *OrganizationIdentifiers) (*APIKeys, error)
 	// Update the rights of an existing organization API key. To generate an API key,
-	// the CreateOrganizationAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*APIKey, error)
 	// Set the rights of a collaborator (member) on the organization. Users
@@ -486,13 +486,13 @@ var _OrganizationAccess_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_bd27b88df800c491)
+	proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_001e6f3a8a224efd)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_bd27b88df800c491)
+	golang_proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_001e6f3a8a224efd)
 }
 
-var fileDescriptor_organization_services_bd27b88df800c491 = []byte{
+var fileDescriptor_organization_services_001e6f3a8a224efd = []byte{
 	// 766 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0x4d, 0x4c, 0xd4, 0x5a,
 	0x14, 0xc7, 0x7b, 0xdf, 0xc7, 0xbc, 0xa4, 0x8f, 0xf0, 0xf2, 0x6e, 0x5e, 0xde, 0x4b, 0xfa, 0xf0,

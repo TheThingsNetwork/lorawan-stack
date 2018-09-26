@@ -22,7 +22,7 @@ import (
 )
 
 func ExampleRequireApplication() {
-	var ( // Assume these come from a hypothetical SetDevice RPC call.
+	var ( // Assume these come from a hypothetical Set RPC call.
 		ctx context.Context
 		dev ttnpb.EndDevice
 	)

@@ -292,12 +292,12 @@ var _AsNs_serviceDesc = grpc.ServiceDesc{
 // Client API for NsDeviceRegistry service
 
 type NsDeviceRegistryClient interface {
-	// GetDevice returns the device that matches the given identifiers.
+	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Get(ctx context.Context, in *GetEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// SetDevice creates or updates the device.
+	// Set creates or updates the device.
 	Set(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// DeleteDevice deletes the device that matches the given identifiers.
+	// Delete deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Delete(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
@@ -340,12 +340,12 @@ func (c *nsDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIdenti
 // Server API for NsDeviceRegistry service
 
 type NsDeviceRegistryServer interface {
-	// GetDevice returns the device that matches the given identifiers.
+	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Get(context.Context, *GetEndDeviceRequest) (*EndDevice, error)
-	// SetDevice creates or updates the device.
+	// Set creates or updates the device.
 	Set(context.Context, *SetDeviceRequest) (*EndDevice, error)
-	// DeleteDevice deletes the device that matches the given identifiers.
+	// Delete deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
@@ -430,13 +430,13 @@ var _NsDeviceRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_22deb8101de6dff3)
+	proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_739436c864852a55)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_22deb8101de6dff3)
+	golang_proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_739436c864852a55)
 }
 
-var fileDescriptor_networkserver_22deb8101de6dff3 = []byte{
+var fileDescriptor_networkserver_739436c864852a55 = []byte{
 	// 632 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x3f, 0x48, 0x1c, 0x41,
 	0x14, 0xc6, 0x67, 0x54, 0x2c, 0x96, 0x90, 0x3f, 0x4b, 0x08, 0xe4, 0x12, 0x1f, 0x72, 0x9a, 0x14,

@@ -41,7 +41,7 @@ type PullGatewayConfigurationRequest struct {
 func (m *PullGatewayConfigurationRequest) Reset()      { *m = PullGatewayConfigurationRequest{} }
 func (*PullGatewayConfigurationRequest) ProtoMessage() {}
 func (*PullGatewayConfigurationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_services_ec773ed0747ed4c5, []int{0}
+	return fileDescriptor_gateway_services_a2cefc68e8cfbc9e, []int{0}
 }
 func (m *PullGatewayConfigurationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -332,7 +332,7 @@ type GatewayAccessClient interface {
 	CreateAPIKey(ctx context.Context, in *CreateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	ListAPIKeys(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
 	// Update the rights of an existing gateway API key. To generate an API key,
-	// the CreateGatewayAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Set the rights of a collaborator on the gateway. Users or organizations
@@ -411,7 +411,7 @@ type GatewayAccessServer interface {
 	CreateAPIKey(context.Context, *CreateGatewayAPIKeyRequest) (*APIKey, error)
 	ListAPIKeys(context.Context, *GatewayIdentifiers) (*APIKeys, error)
 	// Update the rights of an existing gateway API key. To generate an API key,
-	// the CreateGatewayAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(context.Context, *UpdateGatewayAPIKeyRequest) (*APIKey, error)
 	// Set the rights of a collaborator on the gateway. Users or organizations
@@ -1041,13 +1041,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_ec773ed0747ed4c5)
+	proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_a2cefc68e8cfbc9e)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_ec773ed0747ed4c5)
+	golang_proto.RegisterFile("lorawan-stack/api/gateway_services.proto", fileDescriptor_gateway_services_a2cefc68e8cfbc9e)
 }
 
-var fileDescriptor_gateway_services_ec773ed0747ed4c5 = []byte{
+var fileDescriptor_gateway_services_a2cefc68e8cfbc9e = []byte{
 	// 911 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x3d, 0x8c, 0x1b, 0x45,
 	0x14, 0x9e, 0x09, 0x91, 0x45, 0xe6, 0x02, 0x51, 0x06, 0x29, 0xb1, 0x16, 0x32, 0x4e, 0x36, 0x07,

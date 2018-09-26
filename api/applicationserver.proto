@@ -68,7 +68,7 @@ service AppAs {
 
 // The AsDeviceRegistry service allows clients to manage their end devices on the Application Server.
 service AsDeviceRegistry {
-  // GetDevice returns the device that matches the given identifiers.
+  // Get returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
@@ -76,7 +76,7 @@ service AsDeviceRegistry {
     };
   };
 
-  // SetDevice creates or updates the device.
+  // Set creates or updates the device.
   rpc Set(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
@@ -88,7 +88,7 @@ service AsDeviceRegistry {
     };
   };
 
-  // DeleteDevice deletes the device that matches the given identifiers.
+  // Delete deletes the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {

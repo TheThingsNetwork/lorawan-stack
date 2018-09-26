@@ -42,7 +42,7 @@ type ApplicationLink struct {
 func (m *ApplicationLink) Reset()      { *m = ApplicationLink{} }
 func (*ApplicationLink) ProtoMessage() {}
 func (*ApplicationLink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_46397c45c8f23929, []int{0}
+	return fileDescriptor_applicationserver_79a545d84e9612b5, []int{0}
 }
 func (m *ApplicationLink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -102,7 +102,7 @@ type SetApplicationLinkRequest struct {
 func (m *SetApplicationLinkRequest) Reset()      { *m = SetApplicationLinkRequest{} }
 func (*SetApplicationLinkRequest) ProtoMessage() {}
 func (*SetApplicationLinkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_46397c45c8f23929, []int{1}
+	return fileDescriptor_applicationserver_79a545d84e9612b5, []int{1}
 }
 func (m *SetApplicationLinkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -527,12 +527,12 @@ var _AppAs_serviceDesc = grpc.ServiceDesc{
 // Client API for AsDeviceRegistry service
 
 type AsDeviceRegistryClient interface {
-	// GetDevice returns the device that matches the given identifiers.
+	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Get(ctx context.Context, in *GetEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// SetDevice creates or updates the device.
+	// Set creates or updates the device.
 	Set(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// DeleteDevice deletes the device that matches the given identifiers.
+	// Delete deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Delete(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
@@ -575,12 +575,12 @@ func (c *asDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIdenti
 // Server API for AsDeviceRegistry service
 
 type AsDeviceRegistryServer interface {
-	// GetDevice returns the device that matches the given identifiers.
+	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Get(context.Context, *GetEndDeviceRequest) (*EndDevice, error)
-	// SetDevice creates or updates the device.
+	// Set creates or updates the device.
 	Set(context.Context, *SetDeviceRequest) (*EndDevice, error)
-	// DeleteDevice deletes the device that matches the given identifiers.
+	// Delete deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
@@ -1271,13 +1271,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_46397c45c8f23929)
+	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_79a545d84e9612b5)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_46397c45c8f23929)
+	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_79a545d84e9612b5)
 }
 
-var fileDescriptor_applicationserver_46397c45c8f23929 = []byte{
+var fileDescriptor_applicationserver_79a545d84e9612b5 = []byte{
 	// 866 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0x4d, 0x68, 0xdc, 0x46,
 	0x18, 0x9d, 0xb1, 0x53, 0xbb, 0x19, 0x43, 0xd2, 0x0c, 0x21, 0x38, 0xdb, 0x76, 0x6c, 0xd6, 0x21,

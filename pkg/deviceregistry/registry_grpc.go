@@ -54,11 +54,11 @@ func ForComponents(components ...ttnpb.PeerInfo_Role) RPCOption {
 }
 
 // WithSetDeviceProcessor sets a function, which checks and processes the device and fields,
-// which are about to be passed to SetDevice method of RegistryRPC instance.
-// After a successful search, SetDevice passes request context, bool, indicating whether the request will trigger a 'Create' or an 'Update',
+// which are about to be passed to Set method of RegistryRPC instance.
+// After a successful search, Set passes request context, bool, indicating whether the request will trigger a 'Create' or an 'Update',
 // device, which is about to be passed to the underlying registry and converted field paths(if such are specified in the request).
-// If nil error is returned by fn, SetDevice passes the device and fields returned to the underlying registry,
-// otherwise SetDevice returns the error without modifying the registry.
+// If nil error is returned by fn, Set passes the device and fields returned to the underlying registry,
+// otherwise Set returns the error without modifying the registry.
 func WithSetDeviceProcessor(fn func(ctx context.Context, create bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error)) RPCOption {
 	return func(r *RegistryRPC) { r.setDeviceProcessor = fn }
 }
@@ -110,7 +110,7 @@ func setPaginationHeaders(ctx context.Context, url string, limit, page, total ui
 	return grpc.SetHeader(ctx, md)
 }
 
-// ListDevices lists devices matching filter in underlying registry.
+// List lists devices matching filter in underlying registry.
 func (r *RegistryRPC) List(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (*ttnpb.EndDevices, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func (r *RegistryRPC) List(ctx context.Context, req *ttnpb.ListEndDevicesRequest
 	return &ttnpb.EndDevices{EndDevices: eds}, setPaginationHeaders(ctx, path.Join(md.Host, md.URI), count, page, total)
 }
 
-// GetDevice returns the device associated with req.EndDeviceIdentifiers in underlying registry, if found.
+// Get returns the device associated with req.EndDeviceIdentifiers in underlying registry, if found.
 func (r *RegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
@@ -160,7 +160,7 @@ func (r *RegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (
 	return dev.EndDevice, nil
 }
 
-// SetDevice sets the device fields to match those of req.Device in underlying registry.
+// Set sets the device fields to match those of req.Device in underlying registry.
 func (r *RegistryRPC) Set(ctx context.Context, req *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
@@ -200,7 +200,7 @@ func (r *RegistryRPC) Set(ctx context.Context, req *ttnpb.SetDeviceRequest) (*tt
 	return dev.EndDevice, nil
 }
 
-// DeleteDevice deletes the device associated with id from underlying registry.
+// Delete deletes the device associated with id from underlying registry.
 func (r *RegistryRPC) Delete(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, id.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err

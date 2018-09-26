@@ -249,7 +249,7 @@ type ApplicationAccessClient interface {
 	CreateAPIKey(ctx context.Context, in *CreateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	ListAPIKeys(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
 	// Update the rights of an existing application API key. To generate an API key,
-	// the CreateApplicationAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Setting a collaborator without rights, removes them.
@@ -326,7 +326,7 @@ type ApplicationAccessServer interface {
 	CreateAPIKey(context.Context, *CreateApplicationAPIKeyRequest) (*APIKey, error)
 	ListAPIKeys(context.Context, *ApplicationIdentifiers) (*APIKeys, error)
 	// Update the rights of an existing application API key. To generate an API key,
-	// the CreateApplicationAPIKey should be used. To delete an API key, update it
+	// the CreateAPIKey should be used. To delete an API key, update it
 	// with zero rights.
 	UpdateAPIKey(context.Context, *UpdateApplicationAPIKeyRequest) (*APIKey, error)
 	// Setting a collaborator without rights, removes them.
@@ -480,13 +480,13 @@ var _ApplicationAccess_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_f63fe49f939f0932)
+	proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_0a79a7705a1b0efd)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_f63fe49f939f0932)
+	golang_proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_application_services_0a79a7705a1b0efd)
 }
 
-var fileDescriptor_application_services_f63fe49f939f0932 = []byte{
+var fileDescriptor_application_services_0a79a7705a1b0efd = []byte{
 	// 802 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x95, 0x4d, 0x48, 0x24, 0x47,
 	0x14, 0xc7, 0xbb, 0x92, 0x30, 0x81, 0x8e, 0x49, 0xb0, 0x02, 0x09, 0xb4, 0xe6, 0x21, 0x1d, 0xd4,

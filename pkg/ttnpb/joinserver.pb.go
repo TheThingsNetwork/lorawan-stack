@@ -45,7 +45,7 @@ type SessionKeyRequest struct {
 func (m *SessionKeyRequest) Reset()      { *m = SessionKeyRequest{} }
 func (*SessionKeyRequest) ProtoMessage() {}
 func (*SessionKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_8d3a491e867f3153, []int{0}
+	return fileDescriptor_joinserver_c2786d789781d776, []int{0}
 }
 func (m *SessionKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -95,7 +95,7 @@ type NwkSKeysResponse struct {
 func (m *NwkSKeysResponse) Reset()      { *m = NwkSKeysResponse{} }
 func (*NwkSKeysResponse) ProtoMessage() {}
 func (*NwkSKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_8d3a491e867f3153, []int{1}
+	return fileDescriptor_joinserver_c2786d789781d776, []int{1}
 }
 func (m *NwkSKeysResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -155,7 +155,7 @@ type AppSKeyResponse struct {
 func (m *AppSKeyResponse) Reset()      { *m = AppSKeyResponse{} }
 func (*AppSKeyResponse) ProtoMessage() {}
 func (*AppSKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_8d3a491e867f3153, []int{2}
+	return fileDescriptor_joinserver_c2786d789781d776, []int{2}
 }
 func (m *AppSKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -453,12 +453,12 @@ var _AsJs_serviceDesc = grpc.ServiceDesc{
 // Client API for JsDeviceRegistry service
 
 type JsDeviceRegistryClient interface {
-	// GetDevice returns the device that matches the given identifiers.
+	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Get(ctx context.Context, in *GetEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// SetDevice creates or updates the device.
+	// Set creates or updates the device.
 	Set(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// DeleteDevice deletes the device that matches the given identifiers.
+	// Delete deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Delete(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
@@ -501,12 +501,12 @@ func (c *jsDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIdenti
 // Server API for JsDeviceRegistry service
 
 type JsDeviceRegistryServer interface {
-	// GetDevice returns the device that matches the given identifiers.
+	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Get(context.Context, *GetEndDeviceRequest) (*EndDevice, error)
-	// SetDevice creates or updates the device.
+	// Set creates or updates the device.
 	Set(context.Context, *SetDeviceRequest) (*EndDevice, error)
-	// DeleteDevice deletes the device that matches the given identifiers.
+	// Delete deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
@@ -1324,13 +1324,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_8d3a491e867f3153)
+	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_c2786d789781d776)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_8d3a491e867f3153)
+	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_c2786d789781d776)
 }
 
-var fileDescriptor_joinserver_8d3a491e867f3153 = []byte{
+var fileDescriptor_joinserver_c2786d789781d776 = []byte{
 	// 811 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x3d, 0x88, 0x1b, 0x47,
 	0x14, 0x9e, 0xb9, 0x3b, 0x64, 0x3c, 0x77, 0xb1, 0x2f, 0x5b, 0x04, 0x47, 0x3e, 0x46, 0x8a, 0x9c,
