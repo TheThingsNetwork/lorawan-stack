@@ -15,6 +15,7 @@
 package networkserver_test
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"math"
@@ -25,18 +26,15 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
+	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -48,9 +46,22 @@ import (
 var (
 	DuplicateCount = 6
 	DeviceCount    = 100
-	Timeout        = (2 << 10) * test.Delay
+	Timeout        = (2 << 16) * test.Delay
 
 	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
+
+	Downlinks = [...]*ttnpb.ApplicationDownlink{
+		{FCnt: 0},
+		{FCnt: 1},
+		{FCnt: 2},
+		{FCnt: 3},
+		{FCnt: 4},
+		{FCnt: 5},
+		{FCnt: 6},
+		{FCnt: 7},
+		{FCnt: 8},
+		{FCnt: 9},
+	}
 )
 
 func init() {
@@ -85,222 +96,418 @@ func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
 }
 
 func TestDownlinkQueueReplace(t *testing.T) {
-	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Registry:            reg,
-			JoinServers:         nil,
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-		})).(*NetworkServer)
-	test.Must(nil, ns.Start())
+	t.Parallel()
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	ed.QueuedApplicationDownlinks = nil
-
-	dev, err := reg.Create(ed)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: ApplicationID,
+		},
+		DeviceID: DeviceID,
+		JoinEUI:  &JoinEUI,
+		DevEUI:   &DevEUI,
 	}
 
-	_, err = ns.DownlinkQueueReplace(test.Context(), &ttnpb.DownlinkQueueRequest{})
-	a.So(err, should.NotBeNil)
+	for _, tc := range []struct {
+		Name    string
+		Context context.Context
+		Device  *ttnpb.EndDevice
+		Request *ttnpb.DownlinkQueueRequest
+		Error   error
+	}{
+		{
+			Name:    "no device",
+			Context: test.Context(),
+			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
+			Error:   ErrDeviceNotFound,
+		},
+		{
+			Name:    "empty queue/empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers:       ids,
+				QueuedApplicationDownlinks: nil,
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks:            nil,
+			},
+		},
+		{
+			Name:    "empty queue/non-empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers:       ids,
+				QueuedApplicationDownlinks: nil,
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[0],
+					Downlinks[2],
+					Downlinks[1],
+				},
+			},
+		},
+		{
+			Name:    "non-empty queue/empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[2],
+					Downlinks[1],
+					Downlinks[0],
+					Downlinks[4],
+				},
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+			},
+		},
+		{
+			Name:    "non-empty queue/non-empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[2],
+					Downlinks[1],
+					Downlinks[0],
+					Downlinks[4],
+				},
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[0],
+					Downlinks[2],
+					Downlinks[1],
+				},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 
-	req := ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
-	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
+			a := assertions.New(t)
 
-	_, err = ns.DownlinkQueueReplace(test.Context(), req)
-	a.So(err, should.BeNil)
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
 
-	dev, err = dev.Load()
-	if !a.So(err, should.BeNil) ||
-		!a.So(dev.EndDevice, should.NotBeNil) {
-		t.FailNow()
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					JoinServers:         nil,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+				})).(*NetworkServer)
+			test.Must(nil, ns.Start())
+
+			pb := CopyEndDevice(tc.Device)
+
+			if tc.Device != nil {
+				start := time.Now()
+				ret, err := devReg.SetByID(tc.Context, tc.Device.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+					if !a.So(stored, should.BeNil) {
+						t.FailNow()
+					}
+					return CopyEndDevice(tc.Device), nil
+				})
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(ret.CreatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+				pb.CreatedAt = ret.CreatedAt
+				pb.UpdatedAt = ret.UpdatedAt
+				a.So(ret, should.Resemble, pb)
+			}
+
+			_, err := ns.DownlinkQueueReplace(tc.Context, tc.Request)
+			if tc.Error != nil {
+				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+				return
+			}
+			a.So(tc.Error, should.BeNil)
+
+			pb.QueuedApplicationDownlinks = tc.Request.Downlinks
+
+			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(pretty.Diff(ret, pb), should.BeEmpty)
+		})
 	}
-
-	a.So(pretty.Diff(dev.QueuedApplicationDownlinks, req.Downlinks), should.BeEmpty)
-
-	req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
-	for len(req.Downlinks) == 0 {
-		req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
-	}
-	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
-
-	_, err = ns.DownlinkQueueReplace(test.Context(), req)
-	a.So(err, should.BeNil)
-
-	dev, err = dev.Load()
-	if !a.So(err, should.BeNil) ||
-		!a.So(dev.EndDevice, should.NotBeNil) {
-		t.FailNow()
-	}
-
-	a.So(pretty.Diff(dev.QueuedApplicationDownlinks, req.Downlinks), should.BeEmpty)
 }
 
 func TestDownlinkQueuePush(t *testing.T) {
-	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Registry:            reg,
-			JoinServers:         nil,
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-		})).(*NetworkServer)
-	test.Must(nil, ns.Start())
+	t.Parallel()
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	ed.QueuedApplicationDownlinks = nil
-
-	dev, err := reg.Create(ed)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: ApplicationID,
+		},
+		DeviceID: DeviceID,
+		JoinEUI:  &JoinEUI,
+		DevEUI:   &DevEUI,
 	}
 
-	_, err = ns.DownlinkQueuePush(test.Context(), &ttnpb.DownlinkQueueRequest{})
-	a.So(err, should.NotBeNil)
+	for _, tc := range []struct {
+		Name    string
+		Context context.Context
+		Device  *ttnpb.EndDevice
+		Request *ttnpb.DownlinkQueueRequest
+		Error   error
+	}{
+		{
+			Name:    "no device",
+			Context: test.Context(),
+			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
+			Error:   ErrDeviceNotFound,
+		},
+		{
+			Name:    "empty queue/empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers:       ids,
+				QueuedApplicationDownlinks: nil,
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks:            nil,
+			},
+		},
+		{
+			Name:    "empty queue/non-empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers:       ids,
+				QueuedApplicationDownlinks: nil,
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[0],
+					Downlinks[2],
+					Downlinks[1],
+				},
+			},
+		},
+		{
+			Name:    "non-empty queue/empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[2],
+					Downlinks[1],
+					Downlinks[0],
+					Downlinks[4],
+				},
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+			},
+		},
+		{
+			Name:    "non-empty queue/non-empty request",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[2],
+					Downlinks[1],
+					Downlinks[0],
+					Downlinks[4],
+				},
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[0],
+					Downlinks[2],
+					Downlinks[1],
+				},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 
-	req := ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
-	for len(req.Downlinks) == 0 {
-		req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
+			a := assertions.New(t)
+
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					JoinServers:         nil,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+				})).(*NetworkServer)
+			test.Must(nil, ns.Start())
+
+			pb := CopyEndDevice(tc.Device)
+
+			if tc.Device != nil {
+				start := time.Now()
+				ret, err := devReg.SetByID(tc.Context, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+					if !a.So(stored, should.BeNil) {
+						t.FailNow()
+					}
+					return CopyEndDevice(tc.Device), nil
+				})
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(ret.CreatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+				pb.CreatedAt = ret.CreatedAt
+				pb.UpdatedAt = ret.UpdatedAt
+				a.So(ret, should.Resemble, pb)
+			}
+
+			_, err := ns.DownlinkQueuePush(tc.Context, tc.Request)
+			if tc.Error != nil {
+				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+				return
+			}
+			a.So(tc.Error, should.BeNil)
+
+			pb.QueuedApplicationDownlinks = append(pb.QueuedApplicationDownlinks, tc.Request.Downlinks...)
+
+			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(pretty.Diff(ret, pb), should.BeEmpty)
+		})
 	}
-	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
-
-	downlinks := append(ed.QueuedApplicationDownlinks, req.Downlinks...)
-
-	_, err = ns.DownlinkQueuePush(test.Context(), req)
-	a.So(err, should.BeNil)
-
-	dev, err = dev.Load()
-	if !a.So(err, should.BeNil) ||
-		!a.So(dev.EndDevice, should.NotBeNil) {
-		t.FailNow()
-	}
-
-	a.So(pretty.Diff(dev.QueuedApplicationDownlinks, downlinks), should.BeEmpty)
-
-	req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
-	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
-	downlinks = append(downlinks, req.Downlinks...)
-
-	_, err = ns.DownlinkQueuePush(test.Context(), req)
-	a.So(err, should.BeNil)
-
-	dev, err = dev.Load()
-	if !a.So(err, should.BeNil) ||
-		!a.So(dev.EndDevice, should.NotBeNil) {
-		t.FailNow()
-	}
-	a.So(pretty.Diff(dev.QueuedApplicationDownlinks, downlinks), should.BeEmpty)
 }
 
 func TestDownlinkQueueList(t *testing.T) {
-	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Registry:            reg,
-			JoinServers:         nil,
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-		})).(*NetworkServer)
-	test.Must(nil, ns.Start())
+	t.Parallel()
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	ed.QueuedApplicationDownlinks = nil
-
-	dev, err := reg.Create(ed)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: ApplicationID,
+		},
+		DeviceID: DeviceID,
+		JoinEUI:  &JoinEUI,
+		DevEUI:   &DevEUI,
 	}
 
-	_, err = ns.DownlinkQueueList(test.Context(), &ttnpb.EndDeviceIdentifiers{})
-	a.So(err, should.NotBeNil)
+	for _, tc := range []struct {
+		Name    string
+		Context context.Context
+		Device  *ttnpb.EndDevice
+		Request *ttnpb.EndDeviceIdentifiers
+		Error   error
+	}{
+		{
+			Name:    "no device",
+			Context: test.Context(),
+			Request: ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
+			Error:   ErrDeviceNotFound,
+		},
+		{
+			Name:    "empty identifiers",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers:       ids,
+				QueuedApplicationDownlinks: nil,
+			},
+			Request: &ttnpb.EndDeviceIdentifiers{},
+		},
+		{
+			Name:    "empty queue",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers:       ids,
+				QueuedApplicationDownlinks: nil,
+			},
+			Request: &ids,
+		},
+		{
+			Name:    "non-empty queue",
+			Context: test.Context(),
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+					Downlinks[2],
+					Downlinks[1],
+					Downlinks[0],
+					Downlinks[4],
+				},
+			},
+			Request: &ids,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 
-	downlinks, err := ns.DownlinkQueueList(test.Context(), &dev.EndDeviceIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
+			a := assertions.New(t)
 
-	ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for len(ed.QueuedApplicationDownlinks) == 0 {
-		ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					JoinServers:         nil,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+				})).(*NetworkServer)
+			test.Must(nil, ns.Start())
+
+			pb := CopyEndDevice(tc.Device)
+
+			if tc.Device != nil {
+				start := time.Now()
+				ret, err := devReg.SetByID(tc.Context, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+					if !a.So(stored, should.BeNil) {
+						t.FailNow()
+					}
+					return CopyEndDevice(tc.Device), nil
+				})
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(ret.CreatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+				pb.CreatedAt = ret.CreatedAt
+				pb.UpdatedAt = ret.UpdatedAt
+				a.So(ret, should.Resemble, pb)
+			}
+
+			resp, err := ns.DownlinkQueueList(tc.Context, tc.Request)
+			if tc.Error != nil {
+				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+				a.So(resp, should.BeNil)
+				return
+			}
+			a.So(tc.Error, should.BeNil)
+			a.So(pretty.Diff(resp, &ttnpb.ApplicationDownlinks{Downlinks: pb.QueuedApplicationDownlinks}), should.BeEmpty)
+		})
 	}
-	ed.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
-	dev.EndDevice = ed
-
-	err = dev.Store()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	downlinks, err = ns.DownlinkQueueList(test.Context(), &dev.EndDeviceIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
-}
-
-func TestDownlinkQueueClear(t *testing.T) {
-	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Registry:            reg,
-			JoinServers:         nil,
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-		})).(*NetworkServer)
-	test.Must(nil, ns.Start())
-
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	ed.QueuedApplicationDownlinks = nil
-
-	dev, err := reg.Create(ed)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	e, err := ns.DownlinkQueueClear(test.Context(), &ttnpb.EndDeviceIdentifiers{})
-	a.So(err, should.NotBeNil)
-	a.So(e, should.BeNil)
-
-	e, err = ns.DownlinkQueueClear(test.Context(), &dev.EndDeviceIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(e, should.NotBeNil)
-
-	dev, err = dev.Load()
-	if !a.So(err, should.BeNil) ||
-		!a.So(dev.EndDevice, should.NotBeNil) {
-		t.FailNow()
-	}
-	a.So(dev.QueuedApplicationDownlinks, should.BeEmpty)
-
-	ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for len(ed.QueuedApplicationDownlinks) == 0 {
-		ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	}
-	ed.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
-	dev.EndDevice = ed
-
-	err = dev.Store()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	e, err = ns.DownlinkQueueClear(test.Context(), &dev.EndDeviceIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(e, should.NotBeNil)
-
-	dev, err = dev.Load()
-	if !a.So(err, should.BeNil) ||
-		!a.So(dev.EndDevice, should.NotBeNil) {
-		t.FailNow()
-	}
-	a.So(dev.QueuedApplicationDownlinks, should.BeEmpty)
 }
 
 type UplinkHandler interface {
@@ -315,7 +522,7 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 	var weCh chan<- time.Time
 	select {
 	case we := <-windowEndCh:
-		msg := deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
+		msg := CopyUplinkMessage(msg)
 
 		a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
 		msg.ReceivedAt = we.msg.ReceivedAt
@@ -344,7 +551,7 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 			go func() {
 				defer wg.Done()
 
-				msg := deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
+				msg := CopyUplinkMessage(msg)
 
 				msg.RxMetadata = nil
 				n := rand.Intn(10)
@@ -397,13 +604,18 @@ func (s *MockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
 
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+
+	redisClient, flush := test.NewRedis(t, "networkserver_test")
+	defer flush()
+	defer redisClient.Close()
+	devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{
 			ServiceBase: config.ServiceBase{Cluster: config.Cluster{Keys: Keys}},
 		}),
 		&Config{
-			Registry:            reg,
+			Devices:             devReg,
 			JoinServers:         nil,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
@@ -462,11 +674,15 @@ func HandleUplinkTest() func(t *testing.T) {
 
 		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
 
-		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+		redisClient, flush := test.NewRedis(t, "networkserver_test")
+		defer flush()
+		defer redisClient.Close()
+		devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
-				Registry:            reg,
+				Devices:             devReg,
 				JoinServers:         nil,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
@@ -474,24 +690,42 @@ func HandleUplinkTest() func(t *testing.T) {
 		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 		test.Must(nil, ns.Start())
 
-		_, err := reg.Create(&ttnpb.EndDevice{
+		pb := &ttnpb.EndDevice{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+				DeviceID:               DeviceID,
+				DevAddr:                &DevAddr,
+				JoinEUI:                &JoinEUI,
+				DevEUI:                 &DevEUI,
+			},
 			LoRaWANVersion: ttnpb.MAC_V1_1,
 			Session: &ttnpb.Session{
 				DevAddr: DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: FNwkSIntKey,
+						Key: FNwkSIntKey[:],
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: SNwkSIntKey,
+						Key: SNwkSIntKey[:],
 					},
 				},
 			},
 			FrequencyPlanID: test.EUFrequencyPlanID,
+		}
+
+		ret, err := devReg.SetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+			if !a.So(stored, should.BeNil) {
+				t.FailNow()
+			}
+			return pb, nil
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
+
+		pb.CreatedAt = ret.CreatedAt
+		pb.UpdatedAt = ret.UpdatedAt
+		a.So(ret, should.Resemble, pb)
 
 		t.Run("Empty DevAddr", func(t *testing.T) {
 			a := assertions.New(t)
@@ -567,6 +801,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -574,10 +810,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -629,6 +865,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -636,10 +874,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -691,6 +929,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -698,10 +938,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -759,6 +999,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -766,10 +1008,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -825,6 +1067,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -832,13 +1076,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey,
+								Key: SNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -892,6 +1136,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -900,13 +1146,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey,
+								Key: SNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -970,6 +1216,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -977,13 +1225,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						NextFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey,
+								Key: SNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -1038,6 +1286,8 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DeviceID: DeviceID,
 						DevAddr:  &DevAddr,
+						JoinEUI:  &JoinEUI,
+						DevEUI:   &DevEUI,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -1046,13 +1296,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey,
+								Key: FNwkSIntKey[:],
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey,
+								Key: SNwkSIntKey[:],
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey,
+								Key: NwkSEncKey[:],
 							},
 						},
 					},
@@ -1091,51 +1341,60 @@ func HandleUplinkTest() func(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+				redisClient, flush := test.NewRedis(t, "networkserver_test")
+				defer flush()
+				defer redisClient.Close()
+				devReg := &redis.DeviceRegistry{Redis: redisClient}
 
 				populateSessionKeys := func(s *ttnpb.Session) {
 					for s.SessionKeys.FNwkSIntKey == nil ||
-						s.SessionKeys.FNwkSIntKey.Key.IsZero() ||
-						s.SessionKeys.FNwkSIntKey.Key.Equal(FNwkSIntKey) {
+						len(s.SessionKeys.FNwkSIntKey.Key) == 0 ||
+						s.SessionKeys.FNwkSIntKey.KEKLabel == "" && bytes.Equal(s.SessionKeys.FNwkSIntKey.Key, FNwkSIntKey[:]) {
 
 						s.SessionKeys.FNwkSIntKey = ttnpb.NewPopulatedKeyEnvelope(test.Randy, false)
 					}
 
 					for s.SessionKeys.SNwkSIntKey == nil ||
-						s.SessionKeys.SNwkSIntKey.Key.IsZero() ||
-						s.SessionKeys.SNwkSIntKey.Key.Equal(SNwkSIntKey) {
+						len(s.SessionKeys.SNwkSIntKey.Key) == 0 ||
+						s.SessionKeys.SNwkSIntKey.KEKLabel == "" && bytes.Equal(s.SessionKeys.SNwkSIntKey.Key, SNwkSIntKey[:]) {
 
 						s.SessionKeys.SNwkSIntKey = ttnpb.NewPopulatedKeyEnvelope(test.Randy, false)
 					}
 				}
 
-				// Fill Registry with devices
+				ctx := context.WithValue(authorizedCtx, "answer", 42)
+				ctx = log.NewContext(ctx, test.GetLogger(t))
+
+				// Fill DeviceRegistry with devices
 				for i := 0; i < DeviceCount; i++ {
-					ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-					for ed.Equal(tc.Device) {
-						ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					for pb.Equal(tc.Device) {
+						pb = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 					}
 
-					if s := ed.Session; s != nil {
+					if s := pb.Session; s != nil {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
-						for ed.SessionFallback != nil && ed.SessionFallback.DevAddr.Equal(s.DevAddr) {
-							ed.SessionFallback.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
+						for pb.SessionFallback != nil && pb.SessionFallback.DevAddr.Equal(s.DevAddr) {
+							pb.SessionFallback.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
 						}
-					} else if s := ed.SessionFallback; s != nil {
+					} else if s := pb.SessionFallback; s != nil {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
-						for ed.Session != nil && ed.Session.DevAddr.Equal(s.DevAddr) {
-							ed.Session.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
+						for pb.Session != nil && pb.Session.DevAddr.Equal(s.DevAddr) {
+							pb.Session.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
 						}
 					}
 
-					_, err := reg.Create(ed)
+					ret, err := devReg.SetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error) { return pb, nil })
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
+					pb.CreatedAt = ret.CreatedAt
+					pb.UpdatedAt = ret.UpdatedAt
+					a.So(ret, should.Resemble, pb)
 				}
 
 				deduplicationDoneCh := make(chan windowEnd, 1)
@@ -1144,7 +1403,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
-						Registry:            reg,
+						Devices:             devReg,
 						DeduplicationWindow: 42,
 						CooldownWindow:      42,
 					},
@@ -1162,7 +1421,11 @@ func HandleUplinkTest() func(t *testing.T) {
 				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 				test.Must(nil, ns.Start())
 
-				asSendCh := make(chan *ttnpb.ApplicationUp)
+				type asSendReq struct {
+					up    *ttnpb.ApplicationUp
+					errch chan error
+				}
+				asSendCh := make(chan asSendReq)
 
 				go func() {
 					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
@@ -1175,38 +1438,48 @@ func HandleUplinkTest() func(t *testing.T) {
 							},
 						},
 						SendFunc: func(up *ttnpb.ApplicationUp) error {
-							asSendCh <- up
-							return nil
+							req := asSendReq{
+								up:    up,
+								errch: make(chan error),
+							}
+							asSendCh <- req
+							return <-req.errch
 						},
 					})
 					// LinkApplication should not return
 					t.Errorf("LinkApplication should not return, returned with error: %s", err)
 				}()
 
-				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-
-				ctx := context.WithValue(authorizedCtx, "answer", 42)
-				ctx = log.NewContext(ctx, test.GetLogger(t))
+				pb := CopyEndDevice(tc.Device)
 
 				start := time.Now()
 
+				ret, err := devReg.SetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+					return CopyEndDevice(tc.Device), nil
+				})
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				pb.CreatedAt = ret.CreatedAt
+				a.So(ret.UpdatedAt, should.HappenAfter, start)
+				pb.UpdatedAt = ret.UpdatedAt
+				a.So(pretty.Diff(ret, pb), should.BeEmpty)
+
 				errch := make(chan error, 1)
 				go func() {
-					_, err := ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+					_, err := ns.HandleUplink(ctx, CopyUplinkMessage(tc.UplinkMessage))
 					errch <- err
 				}()
 
-				if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
+				if pb.MACState != nil && pb.MACState.PendingApplicationDownlink != nil {
 					select {
-					case up := <-asSendCh:
+					case req := <-asSendCh:
 						if tc.UplinkMessage.Payload.GetMACPayload().Ack {
-							a.So(up.GetDownlinkAck(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+							a.So(req.up.GetDownlinkAck(), should.Resemble, pb.MACState.PendingApplicationDownlink)
 						} else {
-							a.So(up.GetDownlinkNack(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+							a.So(req.up.GetDownlinkNack(), should.Resemble, pb.MACState.PendingApplicationDownlink)
 						}
+						close(req.errch)
 
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
@@ -1215,22 +1488,23 @@ func HandleUplinkTest() func(t *testing.T) {
 
 				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 
+				var asUpReq asSendReq
 				select {
-				case up := <-asSendCh:
-					if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
-						metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
+				case asUpReq = <-asSendCh:
+					if !a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata) {
+						metadataLdiff(t, asUpReq.up.GetUplinkMessage().RxMetadata, md)
 					}
-					a.So(up.CorrelationIDs, should.NotBeEmpty)
+					a.So(asUpReq.up.CorrelationIDs, should.NotBeEmpty)
 
-					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       up.CorrelationIDs,
+					a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
+						CorrelationIDs:       asUpReq.up.CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 							FCnt:         tc.NextNextFCntUp - 1,
 							FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
 							FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
-							RxMetadata:   up.GetUplinkMessage().RxMetadata,
-							SessionKeyID: dev.Session.SessionKeys.SessionKeyID,
+							RxMetadata:   asUpReq.up.GetUplinkMessage().RxMetadata,
+							SessionKeyID: pb.Session.SessionKeys.SessionKeyID,
 						}},
 					})
 
@@ -1242,71 +1516,64 @@ func HandleUplinkTest() func(t *testing.T) {
 					t.Fatal("Timed out while waiting for uplink to be sent to AS")
 				}
 
-				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-				close(collectionDoneCh)
-
-				select {
-				case err := <-errch:
-					a.So(err, should.BeNil)
-
-				case <-time.After(Timeout):
-					t.Fatal("Timed out while waiting for HandleUplink to return")
-				}
-
 				if !t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
 
-					dev, err = dev.Load()
+					ret, err := devReg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
 					if !a.So(err, should.BeNil) ||
-						!a.So(dev.EndDevice, should.NotBeNil) {
+						!a.So(ret, should.NotBeNil) {
 						t.FailNow()
 					}
 
-					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+					if !a.So(ret.RecentUplinks, should.NotBeEmpty) {
 						t.FailNow()
 					}
 
-					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-					msg.RxMetadata = md
-
-					expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-					expected.Session.NextFCntUp = tc.NextNextFCntUp
-					expected.SessionFallback = nil
-					expected.CreatedAt = dev.CreatedAt
-					expected.UpdatedAt = dev.UpdatedAt
-					if expected.MACState == nil {
-						err := ResetMACState(ns.Component.FrequencyPlans, expected)
+					pb.Session.NextFCntUp = tc.NextNextFCntUp
+					pb.SessionFallback = nil
+					pb.CreatedAt = ret.CreatedAt
+					pb.UpdatedAt = ret.UpdatedAt
+					if pb.MACState == nil {
+						err := ResetMACState(ns.Component.FrequencyPlans, pb)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
 					}
-					expected.MACState.PendingApplicationDownlink = nil
+					pb.MACState.PendingApplicationDownlink = nil
 
-					expected.RecentUplinks = append(expected.RecentUplinks, msg)
-					if len(expected.RecentUplinks) > RecentUplinkCount {
-						expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
+					msg := CopyUplinkMessage(tc.UplinkMessage)
+					msg.RxMetadata = md
+
+					pb.RecentUplinks = append(pb.RecentUplinks, msg)
+					if len(pb.RecentUplinks) > RecentUplinkCount {
+						pb.RecentUplinks = pb.RecentUplinks[len(pb.RecentUplinks)-RecentUplinkCount:]
 					}
 
-					storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
+					retUp := ret.RecentUplinks[len(ret.RecentUplinks)-1]
+					pbUp := pb.RecentUplinks[len(pb.RecentUplinks)-1]
 
-					a.So(storedUp.ReceivedAt, should.HappenBetween, start, time.Now())
-					expectedUp.ReceivedAt = storedUp.ReceivedAt
+					a.So(retUp.ReceivedAt, should.HappenBetween, start, time.Now())
+					pbUp.ReceivedAt = retUp.ReceivedAt
 
-					a.So(storedUp.CorrelationIDs, should.NotBeEmpty)
-					expectedUp.CorrelationIDs = storedUp.CorrelationIDs
+					a.So(retUp.CorrelationIDs, should.NotBeEmpty)
+					pbUp.CorrelationIDs = retUp.CorrelationIDs
 
-					if !a.So(storedUp.RxMetadata, should.HaveSameElementsDiff, expectedUp.RxMetadata) {
-						metadataLdiff(t, storedUp.RxMetadata, expectedUp.RxMetadata)
+					if !a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata) {
+						metadataLdiff(t, retUp.RxMetadata, pbUp.RxMetadata)
 					}
-					expectedUp.RxMetadata = storedUp.RxMetadata
+					pbUp.RxMetadata = retUp.RxMetadata
 
-					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
+					a.So(pretty.Diff(ret, pb), should.BeEmpty)
 				}) {
 					t.FailNow()
 				}
 
-				_, err = GenerateDownlink(test.Context(), deepcopy.Copy(dev.EndDevice).(*ttnpb.EndDevice), tc.UplinkMessage.Payload.MType == ttnpb.MType_CONFIRMED_UP, 0)
+				close(asUpReq.errch)
+
+				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(collectionDoneCh)
+
+				_, err = GenerateDownlink(ctx, pb, tc.UplinkMessage.Payload.MType == ttnpb.MType_CONFIRMED_UP, 0)
 				if err != nil {
 					a.So(err, should.Equal, ErrNoDownlink)
 				}
@@ -1324,7 +1591,7 @@ func HandleUplinkTest() func(t *testing.T) {
 
 							close(deduplicationDoneCh)
 
-							msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+							msg := CopyUplinkMessage(tc.UplinkMessage)
 
 							msg.RxMetadata = we.msg.RxMetadata
 
@@ -1345,6 +1612,14 @@ func HandleUplinkTest() func(t *testing.T) {
 					})
 				}
 
+				select {
+				case err := <-errch:
+					a.So(err, should.BeNil)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for HandleUplink to return")
+				}
+
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
@@ -1353,11 +1628,11 @@ func HandleUplinkTest() func(t *testing.T) {
 
 					errch := make(chan error, 1)
 					go func() {
-						_, err = ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+						_, err = ns.HandleUplink(ctx, CopyUplinkMessage(tc.UplinkMessage))
 						errch <- err
 					}()
 
-					if !dev.ResetsFCnt {
+					if !pb.ResetsFCnt {
 						close(deduplicationDoneCh)
 						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 						close(collectionDoneCh)
@@ -1373,14 +1648,15 @@ func HandleUplinkTest() func(t *testing.T) {
 						return
 					}
 
-					if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
+					if pb.MACState != nil && pb.MACState.PendingApplicationDownlink != nil {
 						select {
-						case up := <-asSendCh:
+						case req := <-asSendCh:
 							if tc.UplinkMessage.Payload.GetMACPayload().Ack {
-								a.So(up.GetDownlinkAck(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+								a.So(req.up.GetDownlinkAck(), should.Resemble, pb.MACState.PendingApplicationDownlink)
 							} else {
-								a.So(up.GetDownlinkNack(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+								a.So(req.up.GetDownlinkNack(), should.Resemble, pb.MACState.PendingApplicationDownlink)
 							}
+							close(req.errch)
 
 						case <-time.After(Timeout):
 							t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
@@ -1390,21 +1666,21 @@ func HandleUplinkTest() func(t *testing.T) {
 					md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 
 					select {
-					case up := <-asSendCh:
-						if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
-							metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
+					case asUpReq = <-asSendCh:
+						if !a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata) {
+							metadataLdiff(t, asUpReq.up.GetUplinkMessage().RxMetadata, md)
 						}
-						a.So(up.CorrelationIDs, should.NotBeEmpty)
+						a.So(asUpReq.up.CorrelationIDs, should.NotBeEmpty)
 
-						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-							CorrelationIDs:       up.CorrelationIDs,
+						a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
+							CorrelationIDs:       asUpReq.up.CorrelationIDs,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 								FCnt:         tc.NextNextFCntUp - 1,
 								FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
 								FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
-								RxMetadata:   up.GetUplinkMessage().RxMetadata,
-								SessionKeyID: dev.Session.SessionKeys.SessionKeyID,
+								RxMetadata:   asUpReq.up.GetUplinkMessage().RxMetadata,
+								SessionKeyID: pb.Session.SessionKeys.SessionKeyID,
 							}},
 						})
 
@@ -1415,6 +1691,8 @@ func HandleUplinkTest() func(t *testing.T) {
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for uplink to be sent to AS")
 					}
+
+					close(asUpReq.errch)
 
 					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 					close(collectionDoneCh)
@@ -1443,7 +1721,7 @@ func HandleUplinkTest() func(t *testing.T) {
 								metadataLdiff(t, md, we.msg.RxMetadata)
 							}
 
-							msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+							msg := CopyUplinkMessage(tc.UplinkMessage)
 
 							msg.RxMetadata = we.msg.RxMetadata
 
@@ -1489,11 +1767,15 @@ func HandleJoinTest() func(t *testing.T) {
 
 		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
 
-		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+		redisClient, flush := test.NewRedis(t, "networkserver_test")
+		defer flush()
+		defer redisClient.Close()
+		devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
-				Registry:            reg,
+				Devices:             devReg,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
 			},
@@ -1505,14 +1787,19 @@ func HandleJoinTest() func(t *testing.T) {
 		a.So(err, should.NotBeNil)
 
 		req := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+		pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-		ed.EndDeviceIdentifiers.ApplicationID = ApplicationID
-		ed.EndDeviceIdentifiers.DeviceID = DeviceID
-		ed.EndDeviceIdentifiers.DevEUI = &req.Payload.GetJoinRequestPayload().DevEUI
-		ed.EndDeviceIdentifiers.JoinEUI = &req.Payload.GetJoinRequestPayload().JoinEUI
+		pb.EndDeviceIdentifiers.ApplicationID = ApplicationID
+		pb.EndDeviceIdentifiers.DeviceID = DeviceID
+		pb.EndDeviceIdentifiers.DevEUI = &req.Payload.GetJoinRequestPayload().DevEUI
+		pb.EndDeviceIdentifiers.JoinEUI = &req.Payload.GetJoinRequestPayload().JoinEUI
 
-		_, err = reg.Create(ed)
+		_, err = devReg.SetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+			if !a.So(stored, should.BeNil) {
+				t.FailNow()
+			}
+			return pb, nil
+		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
@@ -1660,16 +1947,19 @@ func HandleJoinTest() func(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+				redisClient, flush := test.NewRedis(t, "networkserver_test")
+				defer flush()
+				defer redisClient.Close()
+				devReg := &redis.DeviceRegistry{Redis: redisClient}
 
-				// Fill Registry with devices
+				// Fill DeviceRegistry with devices
 				for i := 0; i < DeviceCount; i++ {
-					ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-					for ed.Equal(tc.Device) {
-						ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					for pb.Equal(tc.Device) {
+						pb = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 					}
 
-					_, err := reg.Create(ed)
+					_, err = devReg.SetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error) { return pb, nil })
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
@@ -1698,7 +1988,7 @@ func HandleJoinTest() func(t *testing.T) {
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
-						Registry: reg,
+						Devices: devReg,
 						JoinServers: []ttnpb.NsJsClient{&MockNsJsClient{
 							HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
 								return nil, errors.New("test")
@@ -1755,10 +2045,14 @@ func HandleJoinTest() func(t *testing.T) {
 					t.Errorf("LinkApplication should not return, returned with error: %s", err)
 				}()
 
-				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
+				pb := CopyEndDevice(tc.Device)
+
+				ret, err := CreateDevice(authorizedCtx, devReg, CopyEndDevice(pb))
+				a.So(err, should.BeNil)
+				a.So(ret.CreatedAt, should.Equal, ret.UpdatedAt)
+				pb.CreatedAt = ret.CreatedAt
+				pb.UpdatedAt = ret.UpdatedAt
+				a.So(ret, should.Resemble, pb)
 
 				expectedRequest := &ttnpb.JoinRequest{
 					RawPayload: tc.UplinkMessage.RawPayload,
@@ -1788,7 +2082,7 @@ func HandleJoinTest() func(t *testing.T) {
 
 				errch := make(chan error, 1)
 				go func() {
-					_, err := ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+					_, err := ns.HandleUplink(ctx, CopyUplinkMessage(tc.UplinkMessage))
 					errch <- err
 				}()
 
@@ -1815,6 +2109,17 @@ func HandleJoinTest() func(t *testing.T) {
 				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 				close(deduplicationDoneCh)
 
+				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(collectionDoneCh)
+
+				select {
+				case err := <-errch:
+					a.So(err, should.BeNil)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for HandleUplink to return")
+				}
+
 				select {
 				case up := <-asSendCh:
 					a.So(up.CorrelationIDs, should.NotBeEmpty)
@@ -1830,7 +2135,7 @@ func HandleJoinTest() func(t *testing.T) {
 						},
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:      resp.SessionKeys.AppSKey,
-							SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
+							SessionKeyID: test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
 						}},
 					})
 
@@ -1838,93 +2143,80 @@ func HandleJoinTest() func(t *testing.T) {
 					t.Fatal("Timed out while waiting for join to be sent to AS")
 				}
 
-				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-				close(collectionDoneCh)
-
-				select {
-				case err := <-errch:
-					a.So(err, should.BeNil)
-
-				case <-time.After(Timeout):
-					t.Fatal("Timed out while waiting for HandleUplink to return")
-				}
-
 				t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
 
-					dev, err = dev.Load()
+					ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
 					if !a.So(err, should.BeNil) ||
-						!a.So(dev.EndDevice, should.NotBeNil) {
+						!a.So(ret, should.NotBeNil) {
 						t.FailNow()
 					}
-					if a.So(dev.Session, should.NotBeNil) {
-						ses := dev.Session
+					if a.So(ret.Session, should.NotBeNil) {
+						ses := ret.Session
 						a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
-						a.So(dev.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
+						a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
 						if tc.Device.Session != nil {
 							a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
 						}
 					}
 
-					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+					if !a.So(ret.RecentUplinks, should.NotBeEmpty) {
 						t.FailNow()
 					}
 
-					if !a.So(dev.RecentDownlinks, should.NotBeEmpty) {
+					if !a.So(ret.RecentDownlinks, should.NotBeEmpty) {
 						t.FailNow()
 					}
 
-					a.So(pretty.Diff(dev.RecentDownlinks[len(dev.RecentDownlinks)-1].RawPayload, resp.RawPayload), should.BeEmpty)
+					a.So(pretty.Diff(ret.RecentDownlinks[len(ret.RecentDownlinks)-1].RawPayload, resp.RawPayload), should.BeEmpty)
 
-					expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-					err := ResetMACState(ns.Component.FrequencyPlans, expected)
+					err = ResetMACState(ns.Component.FrequencyPlans, pb)
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
 
-					expected.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
-					expected.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
-					expected.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
+					pb.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
+					pb.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
+					pb.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
 
-					expected.MACState.DesiredParameters.Rx1Delay = expected.MACState.CurrentParameters.Rx1Delay
-					expected.MACState.DesiredParameters.Rx1DataRateOffset = expected.MACState.CurrentParameters.Rx1DataRateOffset
-					expected.MACState.DesiredParameters.Rx2DataRateIndex = expected.MACState.CurrentParameters.Rx2DataRateIndex
+					pb.MACState.DesiredParameters.Rx1Delay = pb.MACState.CurrentParameters.Rx1Delay
+					pb.MACState.DesiredParameters.Rx1DataRateOffset = pb.MACState.CurrentParameters.Rx1DataRateOffset
+					pb.MACState.DesiredParameters.Rx2DataRateIndex = pb.MACState.CurrentParameters.Rx2DataRateIndex
 
-					expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
-					expected.Session = &ttnpb.Session{
+					pb.EndDeviceIdentifiers.DevAddr = ret.EndDeviceIdentifiers.DevAddr
+					pb.Session = &ttnpb.Session{
 						SessionKeys: *keys,
-						StartedAt:   dev.Session.StartedAt,
-						DevAddr:     *dev.EndDeviceIdentifiers.DevAddr,
+						StartedAt:   ret.Session.StartedAt,
+						DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
 					}
-					expected.SessionFallback = tc.Device.Session
-					expected.CreatedAt = dev.CreatedAt
-					expected.UpdatedAt = dev.UpdatedAt
-					expected.RecentDownlinks = dev.RecentDownlinks
+					pb.SessionFallback = tc.Device.Session
+					pb.CreatedAt = ret.CreatedAt
+					pb.UpdatedAt = ret.UpdatedAt
+					pb.RecentDownlinks = ret.RecentDownlinks
 
-					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+					msg := CopyUplinkMessage(tc.UplinkMessage)
 					msg.RxMetadata = md
 
-					expected.RecentUplinks = append(expected.RecentUplinks, msg)
-					if len(expected.RecentUplinks) > RecentUplinkCount {
-						expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
+					pb.RecentUplinks = append(pb.RecentUplinks, msg)
+					if len(pb.RecentUplinks) > RecentUplinkCount {
+						pb.RecentUplinks = pb.RecentUplinks[len(pb.RecentUplinks)-RecentUplinkCount:]
 					}
 
-					storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
+					retUp := ret.RecentUplinks[len(ret.RecentUplinks)-1]
+					pbUp := pb.RecentUplinks[len(pb.RecentUplinks)-1]
 
-					a.So(storedUp.ReceivedAt, should.HappenBetween, start, time.Now())
-					expectedUp.ReceivedAt = storedUp.ReceivedAt
+					a.So(retUp.ReceivedAt, should.HappenBetween, start, time.Now())
+					pbUp.ReceivedAt = retUp.ReceivedAt
 
-					a.So(storedUp.CorrelationIDs, should.NotBeEmpty)
-					expectedUp.CorrelationIDs = storedUp.CorrelationIDs
+					a.So(retUp.CorrelationIDs, should.NotBeEmpty)
+					pbUp.CorrelationIDs = retUp.CorrelationIDs
 
-					if !a.So(storedUp.RxMetadata, should.HaveSameElementsDiff, expectedUp.RxMetadata) {
-						metadataLdiff(t, storedUp.RxMetadata, expectedUp.RxMetadata)
+					if !a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata) {
+						metadataLdiff(t, retUp.RxMetadata, pbUp.RxMetadata)
 					}
-					expectedUp.RxMetadata = storedUp.RxMetadata
+					pbUp.RxMetadata = retUp.RxMetadata
 
-					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
+					a.So(pretty.Diff(ret, pb), should.BeEmpty)
 				})
 
 				deduplicationDoneCh = make(chan windowEnd, 1)
@@ -1935,13 +2227,13 @@ func HandleJoinTest() func(t *testing.T) {
 
 					errch := make(chan error, 1)
 					go func() {
-						_, err = ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+						_, err = ns.HandleUplink(ctx, CopyUplinkMessage(tc.UplinkMessage))
 						errch <- err
 					}()
 
 					select {
 					case req := <-handleJoinCh:
-						a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.Session.DevAddr)
+						a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, pb.Session.DevAddr)
 
 						expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
 						a.So(req.req, should.Resemble, expectedRequest)
@@ -1977,7 +2269,7 @@ func HandleJoinTest() func(t *testing.T) {
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:      resp.SessionKeys.AppSKey,
-								SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
+								SessionKeyID: test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
 							}},
 						})
 
@@ -2014,11 +2306,15 @@ func TestHandleUplink(t *testing.T) {
 
 	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
 
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+	redisClient, flush := test.NewRedis(t, "networkserver_test")
+	defer flush()
+	defer redisClient.Close()
+	devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:            reg,
+			Devices:             devReg,
 			JoinServers:         nil,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,

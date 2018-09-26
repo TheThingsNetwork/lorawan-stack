@@ -27,10 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -39,9 +36,27 @@ import (
 	"google.golang.org/grpc"
 )
 
-func timePtr(t time.Time) *time.Time {
-	return &t
-}
+const (
+	RecentUplinkCount = recentUplinkCount
+)
+
+var (
+	ResetMACState     = resetMACState
+	GenerateDownlink  = generateDownlink
+	ErrNoDownlink     = errNoDownlink
+	ErrDeviceNotFound = errDeviceNotFound
+
+	FNwkSIntKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	SNwkSIntKey = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	NwkSEncKey  = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	AppSKey     = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
+	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	DeviceID      = "test-dev"
+	ApplicationID = "test-app"
+)
 
 // TODO(#1008) Move eventCollector to the test package
 type eventCollector events.Channel
@@ -65,26 +80,17 @@ func (ch eventCollector) expect(t *testing.T, n int) []events.Event {
 	return collected
 }
 
-const (
-	RecentUplinkCount = recentUplinkCount
-)
+func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
+	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
+}
 
-var (
-	ResetMACState    = resetMACState
-	GenerateDownlink = generateDownlink
-	ErrNoDownlink    = errNoDownlink
+func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
+}
 
-	FNwkSIntKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	SNwkSIntKey = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	NwkSEncKey  = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	AppSKey     = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-
-	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
-	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	DeviceID      = "test"
-	ApplicationID = "test"
-)
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
 
 func SetAppQueueUpdateTimeout(d time.Duration) {
 	appQueueUpdateTimeout = d
@@ -519,7 +525,6 @@ func TestScheduleDownlink(t *testing.T) {
 					&component.Config{},
 				),
 				&Config{
-					Registry:            deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New())),
 					JoinServers:         nil,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
@@ -532,17 +537,17 @@ func TestScheduleDownlink(t *testing.T) {
 
 			ctx = context.WithValue(ctx, nsKey{}, ns)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-			up := deepcopy.Copy(tc.Uplink).(*ttnpb.UplinkMessage)
+			dev := CopyEndDevice(tc.Device)
+			up := CopyUplinkMessage(tc.Uplink)
 			b := deepcopy.Copy(tc.Bytes).([]byte)
 
-			err := ns.scheduleDownlink(ctx, dev, up, tc.Accumulator, b, tc.IsJoinAccept)
+			_, err := ns.scheduleDownlink(ctx, dev, up, tc.Accumulator, b, tc.IsJoinAccept)
 			if tc.Error == nil && !a.So(err, should.BeNil) ||
 				tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) {
 				t.FailNow()
 			}
 
-			expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			expected := CopyEndDevice(tc.Device)
 			if tc.DeviceDiff != nil {
 				tc.DeviceDiff(expected)
 			}
@@ -691,10 +696,10 @@ func TestGenerateDownlink(t *testing.T) {
 					NextNFCntDown: 42,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -739,10 +744,10 @@ func TestGenerateDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -797,10 +802,10 @@ func TestGenerateDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -855,10 +860,10 @@ func TestGenerateDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -914,10 +919,10 @@ func TestGenerateDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -976,10 +981,10 @@ func TestGenerateDownlink(t *testing.T) {
 					NextNFCntDown: 42,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -1034,10 +1039,10 @@ func TestGenerateDownlink(t *testing.T) {
 					NextNFCntDown: 42,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey,
+							Key: NwkSEncKey[:],
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey,
+							Key: SNwkSIntKey[:],
 						},
 					},
 				},
@@ -1077,7 +1082,7 @@ func TestGenerateDownlink(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			dev := CopyEndDevice(tc.Device)
 
 			b, err := generateDownlink(tc.Context, dev, tc.Ack, tc.ConfFCnt)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
@@ -1087,7 +1092,7 @@ func TestGenerateDownlink(t *testing.T) {
 
 			a.So(b, should.Resemble, tc.Bytes)
 
-			expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			expected := CopyEndDevice(tc.Device)
 			if tc.DeviceDiff != nil {
 				tc.DeviceDiff(expected)
 			}
