@@ -54,7 +54,7 @@ export default class UserLocale extends React.PureComponent {
     this.setState(state => ({ xx: !state.xx }))
   }
 
-  componentWillReceiveProps (props) {
+  componentDidUpdate (props) {
     this.check(this.props, props)
   }
 
