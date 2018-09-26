@@ -35,11 +35,10 @@ export default class Spinner extends React.PureComponent {
     after: 350,
   }
 
-  state = {
-    visible: false,
-  }
+  constructor (props) {
+    super(props)
 
-  componentWillMount () {
+    this.state = { visible: false }
     this.id = id()
   }
 
