@@ -28,7 +28,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-func request_OrganizationRegistry_CreateOrganization_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationRegistry_Create_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateOrganizationRequest
 	var metadata runtime.ServerMetadata
 
@@ -54,16 +54,16 @@ func request_OrganizationRegistry_CreateOrganization_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collaborator.user_ids.user_id", err)
 	}
 
-	msg, err := client.CreateOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Create(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_OrganizationRegistry_GetOrganization_0 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_OrganizationRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
-func request_OrganizationRegistry_GetOrganization_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetOrganizationRequest
 	var metadata runtime.ServerMetadata
 
@@ -85,37 +85,37 @@ func request_OrganizationRegistry_GetOrganization_0(ctx context.Context, marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationRegistry_GetOrganization_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationRegistry_Get_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Get(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_OrganizationRegistry_ListOrganizations_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_OrganizationRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_OrganizationRegistry_ListOrganizations_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListOrganizationsRequest
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationRegistry_ListOrganizations_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationRegistry_List_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListOrganizations(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_OrganizationRegistry_ListOrganizations_1 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "user_ids": 1, "user_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
+	filter_OrganizationRegistry_List_1 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "user_ids": 1, "user_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
 )
 
-func request_OrganizationRegistry_ListOrganizations_1(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationRegistry_List_1(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListOrganizationsRequest
 	var metadata runtime.ServerMetadata
 
@@ -137,16 +137,16 @@ func request_OrganizationRegistry_ListOrganizations_1(ctx context.Context, marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collaborator.user_ids.user_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationRegistry_ListOrganizations_1); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationRegistry_List_1); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListOrganizations(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationRegistry_UpdateOrganization_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationRegistry_Update_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateOrganizationRequest
 	var metadata runtime.ServerMetadata
 
@@ -172,12 +172,12 @@ func request_OrganizationRegistry_UpdateOrganization_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization.ids.organization_id", err)
 	}
 
-	msg, err := client.UpdateOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Update(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationRegistry_DeleteOrganization_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -199,12 +199,12 @@ func request_OrganizationRegistry_DeleteOrganization_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
 	}
 
-	msg, err := client.DeleteOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationAccess_ListOrganizationRights_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationAccess_ListRights_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -226,12 +226,12 @@ func request_OrganizationAccess_ListOrganizationRights_0(ctx context.Context, ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
 	}
 
-	msg, err := client.ListOrganizationRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationAccess_CreateOrganizationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationAccess_CreateAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateOrganizationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
@@ -257,12 +257,12 @@ func request_OrganizationAccess_CreateOrganizationAPIKey_0(ctx context.Context, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
-	msg, err := client.CreateOrganizationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationAccess_ListOrganizationAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationAccess_ListAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -284,12 +284,12 @@ func request_OrganizationAccess_ListOrganizationAPIKeys_0(ctx context.Context, m
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
 	}
 
-	msg, err := client.ListOrganizationAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationAccess_UpdateOrganizationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationAccess_UpdateAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateOrganizationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
@@ -326,12 +326,12 @@ func request_OrganizationAccess_UpdateOrganizationAPIKey_0(ctx context.Context, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "api_key.id", err)
 	}
 
-	msg, err := client.UpdateOrganizationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationAccess_SetOrganizationCollaborator_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationAccess_SetCollaborator_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SetOrganizationCollaboratorRequest
 	var metadata runtime.ServerMetadata
 
@@ -357,12 +357,12 @@ func request_OrganizationAccess_SetOrganizationCollaborator_0(ctx context.Contex
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
-	msg, err := client.SetOrganizationCollaborator(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.SetCollaborator(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_OrganizationAccess_ListOrganizationCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_OrganizationAccess_ListCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -384,7 +384,7 @@ func request_OrganizationAccess_ListOrganizationCollaborators_0(ctx context.Cont
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
 	}
 
-	msg, err := client.ListOrganizationCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -427,7 +427,7 @@ func RegisterOrganizationRegistryHandler(ctx context.Context, mux *runtime.Serve
 // "OrganizationRegistryClient" to call the correct interceptors.
 func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client OrganizationRegistryClient) error {
 
-	mux.Handle("POST", pattern_OrganizationRegistry_CreateOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_OrganizationRegistry_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -445,18 +445,18 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationRegistry_CreateOrganization_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationRegistry_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationRegistry_CreateOrganization_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationRegistry_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_OrganizationRegistry_GetOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrganizationRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -474,18 +474,18 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationRegistry_GetOrganization_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationRegistry_GetOrganization_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_OrganizationRegistry_ListOrganizations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrganizationRegistry_List_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -503,18 +503,18 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationRegistry_ListOrganizations_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationRegistry_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationRegistry_ListOrganizations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_OrganizationRegistry_ListOrganizations_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrganizationRegistry_List_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -532,18 +532,18 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationRegistry_ListOrganizations_1(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationRegistry_List_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationRegistry_ListOrganizations_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationRegistry_List_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_OrganizationRegistry_UpdateOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_OrganizationRegistry_Update_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -561,18 +561,18 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationRegistry_UpdateOrganization_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationRegistry_Update_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationRegistry_UpdateOrganization_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationRegistry_Update_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_OrganizationRegistry_DeleteOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_OrganizationRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -590,14 +590,14 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationRegistry_DeleteOrganization_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationRegistry_DeleteOrganization_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -605,31 +605,31 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_OrganizationRegistry_CreateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, ""))
+	pattern_OrganizationRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, ""))
 
-	pattern_OrganizationRegistry_GetOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_ids.organization_id"}, ""))
+	pattern_OrganizationRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_ids.organization_id"}, ""))
 
-	pattern_OrganizationRegistry_ListOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, ""))
+	pattern_OrganizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, ""))
 
-	pattern_OrganizationRegistry_ListOrganizations_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, ""))
+	pattern_OrganizationRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, ""))
 
-	pattern_OrganizationRegistry_UpdateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.ids.organization_id"}, ""))
+	pattern_OrganizationRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.ids.organization_id"}, ""))
 
-	pattern_OrganizationRegistry_DeleteOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, ""))
+	pattern_OrganizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, ""))
 )
 
 var (
-	forward_OrganizationRegistry_CreateOrganization_0 = runtime.ForwardResponseMessage
+	forward_OrganizationRegistry_Create_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationRegistry_GetOrganization_0 = runtime.ForwardResponseMessage
+	forward_OrganizationRegistry_Get_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationRegistry_ListOrganizations_0 = runtime.ForwardResponseMessage
+	forward_OrganizationRegistry_List_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationRegistry_ListOrganizations_1 = runtime.ForwardResponseMessage
+	forward_OrganizationRegistry_List_1 = runtime.ForwardResponseMessage
 
-	forward_OrganizationRegistry_UpdateOrganization_0 = runtime.ForwardResponseMessage
+	forward_OrganizationRegistry_Update_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationRegistry_DeleteOrganization_0 = runtime.ForwardResponseMessage
+	forward_OrganizationRegistry_Delete_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterOrganizationAccessHandlerFromEndpoint is same as RegisterOrganizationAccessHandler but
@@ -670,7 +670,7 @@ func RegisterOrganizationAccessHandler(ctx context.Context, mux *runtime.ServeMu
 // "OrganizationAccessClient" to call the correct interceptors.
 func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux, client OrganizationAccessClient) error {
 
-	mux.Handle("GET", pattern_OrganizationAccess_ListOrganizationRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrganizationAccess_ListRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -688,18 +688,18 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationAccess_ListOrganizationRights_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationAccess_ListRights_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationAccess_ListOrganizationRights_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationAccess_ListRights_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_OrganizationAccess_CreateOrganizationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_OrganizationAccess_CreateAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -717,18 +717,18 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationAccess_CreateOrganizationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationAccess_CreateAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationAccess_CreateOrganizationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationAccess_CreateAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_OrganizationAccess_ListOrganizationAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrganizationAccess_ListAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -746,18 +746,18 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationAccess_ListOrganizationAPIKeys_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationAccess_ListAPIKeys_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationAccess_ListOrganizationAPIKeys_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationAccess_ListAPIKeys_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_OrganizationAccess_UpdateOrganizationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_OrganizationAccess_UpdateAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -775,18 +775,18 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationAccess_UpdateOrganizationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationAccess_UpdateAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationAccess_UpdateOrganizationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationAccess_UpdateAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_OrganizationAccess_SetOrganizationCollaborator_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_OrganizationAccess_SetCollaborator_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -804,18 +804,18 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationAccess_SetOrganizationCollaborator_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationAccess_SetCollaborator_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationAccess_SetOrganizationCollaborator_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationAccess_SetCollaborator_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_OrganizationAccess_ListOrganizationCollaborators_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrganizationAccess_ListCollaborators_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -833,14 +833,14 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OrganizationAccess_ListOrganizationCollaborators_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_OrganizationAccess_ListCollaborators_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OrganizationAccess_ListOrganizationCollaborators_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OrganizationAccess_ListCollaborators_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -848,29 +848,29 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_OrganizationAccess_ListOrganizationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "rights"}, ""))
+	pattern_OrganizationAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "rights"}, ""))
 
-	pattern_OrganizationAccess_CreateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
+	pattern_OrganizationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
 
-	pattern_OrganizationAccess_ListOrganizationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "api-keys"}, ""))
+	pattern_OrganizationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "api-keys"}, ""))
 
-	pattern_OrganizationAccess_UpdateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "api_key.id"}, ""))
+	pattern_OrganizationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "api_key.id"}, ""))
 
-	pattern_OrganizationAccess_SetOrganizationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, ""))
+	pattern_OrganizationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, ""))
 
-	pattern_OrganizationAccess_ListOrganizationCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "collaborators"}, ""))
+	pattern_OrganizationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "collaborators"}, ""))
 )
 
 var (
-	forward_OrganizationAccess_ListOrganizationRights_0 = runtime.ForwardResponseMessage
+	forward_OrganizationAccess_ListRights_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationAccess_CreateOrganizationAPIKey_0 = runtime.ForwardResponseMessage
+	forward_OrganizationAccess_CreateAPIKey_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationAccess_ListOrganizationAPIKeys_0 = runtime.ForwardResponseMessage
+	forward_OrganizationAccess_ListAPIKeys_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationAccess_UpdateOrganizationAPIKey_0 = runtime.ForwardResponseMessage
+	forward_OrganizationAccess_UpdateAPIKey_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationAccess_SetOrganizationCollaborator_0 = runtime.ForwardResponseMessage
+	forward_OrganizationAccess_SetCollaborator_0 = runtime.ForwardResponseMessage
 
-	forward_OrganizationAccess_ListOrganizationCollaborators_0 = runtime.ForwardResponseMessage
+	forward_OrganizationAccess_ListCollaborators_0 = runtime.ForwardResponseMessage
 )

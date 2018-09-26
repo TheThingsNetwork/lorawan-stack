@@ -28,7 +28,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-func request_ApplicationRegistry_CreateApplication_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_Create_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateApplicationRequest
 	var metadata runtime.ServerMetadata
 
@@ -54,12 +54,12 @@ func request_ApplicationRegistry_CreateApplication_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collaborator.user_ids.user_id", err)
 	}
 
-	msg, err := client.CreateApplication(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Create(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationRegistry_CreateApplication_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_Create_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateApplicationRequest
 	var metadata runtime.ServerMetadata
 
@@ -85,16 +85,16 @@ func request_ApplicationRegistry_CreateApplication_1(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collaborator.organization_ids.organization_id", err)
 	}
 
-	msg, err := client.CreateApplication(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Create(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_ApplicationRegistry_GetApplication_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_ApplicationRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
-func request_ApplicationRegistry_GetApplication_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetApplicationRequest
 	var metadata runtime.ServerMetadata
 
@@ -116,37 +116,37 @@ func request_ApplicationRegistry_GetApplication_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_GetApplication_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_Get_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetApplication(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Get(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_ApplicationRegistry_ListApplications_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_ApplicationRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_ApplicationRegistry_ListApplications_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListApplicationsRequest
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_ListApplications_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_List_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListApplications(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_ApplicationRegistry_ListApplications_1 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "user_ids": 1, "user_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
+	filter_ApplicationRegistry_List_1 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "user_ids": 1, "user_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
 )
 
-func request_ApplicationRegistry_ListApplications_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_List_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListApplicationsRequest
 	var metadata runtime.ServerMetadata
 
@@ -168,20 +168,20 @@ func request_ApplicationRegistry_ListApplications_1(ctx context.Context, marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collaborator.user_ids.user_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_ListApplications_1); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_List_1); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListApplications(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_ApplicationRegistry_ListApplications_2 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "organization_ids": 1, "organization_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
+	filter_ApplicationRegistry_List_2 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "organization_ids": 1, "organization_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
 )
 
-func request_ApplicationRegistry_ListApplications_2(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_List_2(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListApplicationsRequest
 	var metadata runtime.ServerMetadata
 
@@ -203,16 +203,16 @@ func request_ApplicationRegistry_ListApplications_2(ctx context.Context, marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collaborator.organization_ids.organization_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_ListApplications_2); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationRegistry_List_2); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListApplications(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationRegistry_UpdateApplication_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_Update_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateApplicationRequest
 	var metadata runtime.ServerMetadata
 
@@ -238,12 +238,12 @@ func request_ApplicationRegistry_UpdateApplication_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application.ids.application_id", err)
 	}
 
-	msg, err := client.UpdateApplication(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Update(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationRegistry_DeleteApplication_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -265,12 +265,12 @@ func request_ApplicationRegistry_DeleteApplication_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
 	}
 
-	msg, err := client.DeleteApplication(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationAccess_ListApplicationRights_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationAccess_ListRights_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -292,12 +292,12 @@ func request_ApplicationAccess_ListApplicationRights_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
 	}
 
-	msg, err := client.ListApplicationRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationAccess_CreateApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationAccess_CreateAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateApplicationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
@@ -323,12 +323,12 @@ func request_ApplicationAccess_CreateApplicationAPIKey_0(ctx context.Context, ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	msg, err := client.CreateApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationAccess_ListApplicationAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationAccess_ListAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -350,12 +350,12 @@ func request_ApplicationAccess_ListApplicationAPIKeys_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
 	}
 
-	msg, err := client.ListApplicationAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationAccess_UpdateApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationAccess_UpdateAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateApplicationAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
@@ -392,12 +392,12 @@ func request_ApplicationAccess_UpdateApplicationAPIKey_0(ctx context.Context, ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "api_key.id", err)
 	}
 
-	msg, err := client.UpdateApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationAccess_SetApplicationCollaborator_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationAccess_SetCollaborator_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SetApplicationCollaboratorRequest
 	var metadata runtime.ServerMetadata
 
@@ -423,12 +423,12 @@ func request_ApplicationAccess_SetApplicationCollaborator_0(ctx context.Context,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	msg, err := client.SetApplicationCollaborator(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.SetCollaborator(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_ApplicationAccess_ListApplicationCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApplicationAccess_ListCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -450,7 +450,7 @@ func request_ApplicationAccess_ListApplicationCollaborators_0(ctx context.Contex
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
 	}
 
-	msg, err := client.ListApplicationCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -493,7 +493,7 @@ func RegisterApplicationRegistryHandler(ctx context.Context, mux *runtime.ServeM
 // "ApplicationRegistryClient" to call the correct interceptors.
 func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ApplicationRegistryClient) error {
 
-	mux.Handle("POST", pattern_ApplicationRegistry_CreateApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ApplicationRegistry_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -511,18 +511,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_CreateApplication_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_CreateApplication_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ApplicationRegistry_CreateApplication_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ApplicationRegistry_Create_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -540,18 +540,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_CreateApplication_1(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_Create_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_CreateApplication_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_Create_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ApplicationRegistry_GetApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -569,18 +569,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_GetApplication_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_GetApplication_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ApplicationRegistry_ListApplications_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationRegistry_List_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -598,18 +598,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_ListApplications_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_ListApplications_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ApplicationRegistry_ListApplications_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationRegistry_List_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -627,18 +627,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_ListApplications_1(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_List_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_ListApplications_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_List_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ApplicationRegistry_ListApplications_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationRegistry_List_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -656,18 +656,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_ListApplications_2(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_List_2(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_ListApplications_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_List_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_ApplicationRegistry_UpdateApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ApplicationRegistry_Update_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -685,18 +685,18 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_UpdateApplication_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_Update_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_UpdateApplication_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_Update_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_ApplicationRegistry_DeleteApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_ApplicationRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -714,14 +714,14 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationRegistry_DeleteApplication_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationRegistry_DeleteApplication_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -729,39 +729,39 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_ApplicationRegistry_CreateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, ""))
+	pattern_ApplicationRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, ""))
 
-	pattern_ApplicationRegistry_CreateApplication_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, ""))
+	pattern_ApplicationRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, ""))
 
-	pattern_ApplicationRegistry_GetApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_ids.application_id"}, ""))
+	pattern_ApplicationRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_ids.application_id"}, ""))
 
-	pattern_ApplicationRegistry_ListApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
+	pattern_ApplicationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
 
-	pattern_ApplicationRegistry_ListApplications_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, ""))
+	pattern_ApplicationRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, ""))
 
-	pattern_ApplicationRegistry_ListApplications_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, ""))
+	pattern_ApplicationRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, ""))
 
-	pattern_ApplicationRegistry_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.ids.application_id"}, ""))
+	pattern_ApplicationRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.ids.application_id"}, ""))
 
-	pattern_ApplicationRegistry_DeleteApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
+	pattern_ApplicationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
 )
 
 var (
-	forward_ApplicationRegistry_CreateApplication_0 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_Create_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_CreateApplication_1 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_Create_1 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_GetApplication_0 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_Get_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_ListApplications_0 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_List_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_ListApplications_1 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_List_1 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_ListApplications_2 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_List_2 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_UpdateApplication_0 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_Update_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationRegistry_DeleteApplication_0 = runtime.ForwardResponseMessage
+	forward_ApplicationRegistry_Delete_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterApplicationAccessHandlerFromEndpoint is same as RegisterApplicationAccessHandler but
@@ -802,7 +802,7 @@ func RegisterApplicationAccessHandler(ctx context.Context, mux *runtime.ServeMux
 // "ApplicationAccessClient" to call the correct interceptors.
 func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ApplicationAccessClient) error {
 
-	mux.Handle("GET", pattern_ApplicationAccess_ListApplicationRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationAccess_ListRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -820,18 +820,18 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_ListApplicationRights_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_ListRights_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_ListApplicationRights_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_ListRights_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ApplicationAccess_CreateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ApplicationAccess_CreateAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -849,18 +849,18 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_CreateApplicationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_CreateAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_CreateApplicationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_CreateAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ApplicationAccess_ListApplicationAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationAccess_ListAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -878,18 +878,18 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_ListApplicationAPIKeys_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_ListAPIKeys_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_ListApplicationAPIKeys_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_ListAPIKeys_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_ApplicationAccess_UpdateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ApplicationAccess_UpdateAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -907,18 +907,18 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_UpdateApplicationAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_UpdateAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_UpdateApplicationAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_UpdateAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_ApplicationAccess_SetApplicationCollaborator_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ApplicationAccess_SetCollaborator_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -936,18 +936,18 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_SetApplicationCollaborator_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_SetCollaborator_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_SetApplicationCollaborator_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_SetCollaborator_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ApplicationAccess_ListApplicationCollaborators_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApplicationAccess_ListCollaborators_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -965,14 +965,14 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationAccess_ListApplicationCollaborators_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApplicationAccess_ListCollaborators_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationAccess_ListApplicationCollaborators_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationAccess_ListCollaborators_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -980,29 +980,29 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_ApplicationAccess_ListApplicationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "rights"}, ""))
+	pattern_ApplicationAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "rights"}, ""))
 
-	pattern_ApplicationAccess_CreateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
+	pattern_ApplicationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
 
-	pattern_ApplicationAccess_ListApplicationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "api-keys"}, ""))
+	pattern_ApplicationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "api-keys"}, ""))
 
-	pattern_ApplicationAccess_UpdateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "api_key.id"}, ""))
+	pattern_ApplicationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "api_key.id"}, ""))
 
-	pattern_ApplicationAccess_SetApplicationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
+	pattern_ApplicationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
 
-	pattern_ApplicationAccess_ListApplicationCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "collaborators"}, ""))
+	pattern_ApplicationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "collaborators"}, ""))
 )
 
 var (
-	forward_ApplicationAccess_ListApplicationRights_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_ListRights_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_CreateApplicationAPIKey_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_CreateAPIKey_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_ListApplicationAPIKeys_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_ListAPIKeys_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_UpdateApplicationAPIKey_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_UpdateAPIKey_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_SetApplicationCollaborator_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_SetCollaborator_0 = runtime.ForwardResponseMessage
 
-	forward_ApplicationAccess_ListApplicationCollaborators_0 = runtime.ForwardResponseMessage
+	forward_ApplicationAccess_ListCollaborators_0 = runtime.ForwardResponseMessage
 )

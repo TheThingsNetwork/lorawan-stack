@@ -28,7 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 service ClientRegistry {
   // Create a new OAuth client. This also sets the given organization or user as
   // first collaborator with all possible rights.
-  rpc CreateClient(CreateClientRequest) returns (Client) {
+  rpc Create(CreateClientRequest) returns (Client) {
     option (google.api.http) = {
       post: "/users/{collaborator.user_ids.user_id}/clients"
       body: "*"
@@ -42,14 +42,14 @@ service ClientRegistry {
   // Get the OAuth client with the given identifiers, selecting the fields given
   // by the field mask. The method may return more or less fields, depending on
   // the rights of the caller.
-  rpc GetClient(GetClientRequest) returns (Client) {
+  rpc Get(GetClientRequest) returns (Client) {
     option (google.api.http) = {
       get: "/clients/{client_ids.client_id}"
     };
   };
 
   // List OAuth clients. See request message for details.
-  rpc ListClients(ListClientsRequest) returns (Clients) {
+  rpc List(ListClientsRequest) returns (Clients) {
     option (google.api.http) = {
       get: "/clients"
       additional_bindings {
@@ -61,14 +61,14 @@ service ClientRegistry {
     };
   };
 
-  rpc UpdateClient(UpdateClientRequest) returns (Client) {
+  rpc Update(UpdateClientRequest) returns (Client) {
     option (google.api.http) = {
       put: "/clients/{client.ids.client_id}"
       body: "*"
     };
   };
 
-  rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(ClientIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/clients/{client_id}"
     };
@@ -76,7 +76,7 @@ service ClientRegistry {
 }
 
 service ClientAccess {
-  rpc ListClientRights(ClientIdentifiers) returns (Rights) {
+  rpc ListRights(ClientIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/clients/{client_id}/rights"
     };
@@ -85,14 +85,14 @@ service ClientAccess {
   // Set the rights of a collaborator on the OAuth client. Users or organizations
   // are considered to be a collaborator if they have at least one right on the
   // OAuth client.
-  rpc SetClientCollaborator(SetClientCollaboratorRequest) returns (google.protobuf.Empty) {
+  rpc SetCollaborator(SetClientCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/clients/{client_ids.client_id}/collaborators"
       body: "*"
     };
   };
 
-  rpc ListClientCollaborators(ClientIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(ClientIdentifiers) returns (Collaborators) {
     option (google.api.http) = {
       get: "/clients/{client_id}/collaborators"
     };

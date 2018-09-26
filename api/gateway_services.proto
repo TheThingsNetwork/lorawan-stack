@@ -29,7 +29,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 service GatewayRegistry {
   // Create a new gateway. This also sets the given organization or user as
   // first collaborator with all possible rights.
-  rpc CreateGateway(CreateGatewayRequest) returns (Gateway) {
+  rpc Create(CreateGatewayRequest) returns (Gateway) {
     option (google.api.http) = {
       post: "/users/{collaborator.user_ids.user_id}/gateways"
       body: "*"
@@ -43,14 +43,14 @@ service GatewayRegistry {
   // Get the gateway with the given identifiers, selecting the fields given
   // by the field mask. The method may return more or less fields, depending on
   // the rights of the caller.
-  rpc GetGateway(GetGatewayRequest) returns (Gateway) {
+  rpc Get(GetGatewayRequest) returns (Gateway) {
     option (google.api.http) = {
       get: "/gateways/{gateway_ids.gateway_id}"
     };
   };
 
   // List gateways. See request message for details.
-  rpc ListGateways(ListGatewaysRequest) returns (Gateways) {
+  rpc List(ListGatewaysRequest) returns (Gateways) {
     option (google.api.http) = {
       get: "/gateways"
       additional_bindings {
@@ -62,14 +62,14 @@ service GatewayRegistry {
     };
   };
 
-  rpc UpdateGateway(UpdateGatewayRequest) returns (Gateway) {
+  rpc Update(UpdateGatewayRequest) returns (Gateway) {
     option (google.api.http) = {
       put: "/gateways/{gateway.ids.gateway_id}"
       body: "*"
     };
   };
 
-  rpc DeleteGateway(GatewayIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(GatewayIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/gateways/{gateway_id}"
     };
@@ -77,20 +77,20 @@ service GatewayRegistry {
 }
 
 service GatewayAccess {
-  rpc ListGatewayRights(GatewayIdentifiers) returns (Rights) {
+  rpc ListRights(GatewayIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/gateways/{gateway_id}/rights"
     };
   };
 
-  rpc CreateGatewayAPIKey(CreateGatewayAPIKeyRequest) returns (APIKey) {
+  rpc CreateAPIKey(CreateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/gateways/{gateway_ids.gateway_id}/api-keys"
       body: "*"
     };
   };
 
-  rpc ListGatewayAPIKeys(GatewayIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(GatewayIdentifiers) returns (APIKeys) {
     option (google.api.http) = {
       get: "/gateways/{gateway_id}/api-keys"
     };
@@ -99,7 +99,7 @@ service GatewayAccess {
   // Update the rights of an existing gateway API key. To generate an API key,
   // the CreateGatewayAPIKey should be used. To delete an API key, update it
   // with zero rights.
-  rpc UpdateGatewayAPIKey(UpdateGatewayAPIKeyRequest) returns (APIKey) {
+  rpc UpdateAPIKey(UpdateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}"
       body: "*"
@@ -109,14 +109,14 @@ service GatewayAccess {
   // Set the rights of a collaborator on the gateway. Users or organizations
   // are considered to be a collaborator if they have at least one right on the
   // gateway.
-  rpc SetGatewayCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty) {
+  rpc SetCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/gateways/{gateway_ids.gateway_id}/collaborators"
       body: "*"
     };
   };
 
-  rpc ListGatewayCollaborators(GatewayIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(GatewayIdentifiers) returns (Collaborators) {
     option (google.api.http) = {
       get: "/gateways/{gateway_id}/collaborators"
     };

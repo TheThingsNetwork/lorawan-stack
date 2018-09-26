@@ -39,15 +39,15 @@ const _ = grpc.SupportPackageIsVersion4
 type OrganizationRegistryClient interface {
 	// Create a new organization. This also sets the given user as
 	// first collaborator with all possible rights.
-	CreateOrganization(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error)
+	Create(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error)
 	// Get the organization with the given identifiers, selecting the fields given
 	// by the field mask. The method may return more or less fields, depending on
 	// the rights of the caller.
-	GetOrganization(ctx context.Context, in *GetOrganizationRequest, opts ...grpc.CallOption) (*Organization, error)
+	Get(ctx context.Context, in *GetOrganizationRequest, opts ...grpc.CallOption) (*Organization, error)
 	// List organizations. See request message for details.
-	ListOrganizations(ctx context.Context, in *ListOrganizationsRequest, opts ...grpc.CallOption) (*Organizations, error)
-	UpdateOrganization(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error)
-	DeleteOrganization(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
+	List(ctx context.Context, in *ListOrganizationsRequest, opts ...grpc.CallOption) (*Organizations, error)
+	Update(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error)
+	Delete(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
 type organizationRegistryClient struct {
@@ -58,45 +58,45 @@ func NewOrganizationRegistryClient(cc *grpc.ClientConn) OrganizationRegistryClie
 	return &organizationRegistryClient{cc}
 }
 
-func (c *organizationRegistryClient) CreateOrganization(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error) {
+func (c *organizationRegistryClient) Create(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error) {
 	out := new(Organization)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/CreateOrganization", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationRegistryClient) GetOrganization(ctx context.Context, in *GetOrganizationRequest, opts ...grpc.CallOption) (*Organization, error) {
+func (c *organizationRegistryClient) Get(ctx context.Context, in *GetOrganizationRequest, opts ...grpc.CallOption) (*Organization, error) {
 	out := new(Organization)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/GetOrganization", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationRegistryClient) ListOrganizations(ctx context.Context, in *ListOrganizationsRequest, opts ...grpc.CallOption) (*Organizations, error) {
+func (c *organizationRegistryClient) List(ctx context.Context, in *ListOrganizationsRequest, opts ...grpc.CallOption) (*Organizations, error) {
 	out := new(Organizations)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/ListOrganizations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationRegistryClient) UpdateOrganization(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error) {
+func (c *organizationRegistryClient) Update(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*Organization, error) {
 	out := new(Organization)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/UpdateOrganization", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationRegistryClient) DeleteOrganization(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *organizationRegistryClient) Delete(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/DeleteOrganization", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationRegistry/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,107 +108,107 @@ func (c *organizationRegistryClient) DeleteOrganization(ctx context.Context, in 
 type OrganizationRegistryServer interface {
 	// Create a new organization. This also sets the given user as
 	// first collaborator with all possible rights.
-	CreateOrganization(context.Context, *CreateOrganizationRequest) (*Organization, error)
+	Create(context.Context, *CreateOrganizationRequest) (*Organization, error)
 	// Get the organization with the given identifiers, selecting the fields given
 	// by the field mask. The method may return more or less fields, depending on
 	// the rights of the caller.
-	GetOrganization(context.Context, *GetOrganizationRequest) (*Organization, error)
+	Get(context.Context, *GetOrganizationRequest) (*Organization, error)
 	// List organizations. See request message for details.
-	ListOrganizations(context.Context, *ListOrganizationsRequest) (*Organizations, error)
-	UpdateOrganization(context.Context, *UpdateOrganizationRequest) (*Organization, error)
-	DeleteOrganization(context.Context, *OrganizationIdentifiers) (*types.Empty, error)
+	List(context.Context, *ListOrganizationsRequest) (*Organizations, error)
+	Update(context.Context, *UpdateOrganizationRequest) (*Organization, error)
+	Delete(context.Context, *OrganizationIdentifiers) (*types.Empty, error)
 }
 
 func RegisterOrganizationRegistryServer(s *grpc.Server, srv OrganizationRegistryServer) {
 	s.RegisterService(&_OrganizationRegistry_serviceDesc, srv)
 }
 
-func _OrganizationRegistry_CreateOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationRegistry_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateOrganizationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationRegistryServer).CreateOrganization(ctx, in)
+		return srv.(OrganizationRegistryServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/CreateOrganization",
+		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationRegistryServer).CreateOrganization(ctx, req.(*CreateOrganizationRequest))
+		return srv.(OrganizationRegistryServer).Create(ctx, req.(*CreateOrganizationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationRegistry_GetOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationRegistry_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrganizationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationRegistryServer).GetOrganization(ctx, in)
+		return srv.(OrganizationRegistryServer).Get(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/GetOrganization",
+		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationRegistryServer).GetOrganization(ctx, req.(*GetOrganizationRequest))
+		return srv.(OrganizationRegistryServer).Get(ctx, req.(*GetOrganizationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationRegistry_ListOrganizations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationRegistry_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListOrganizationsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationRegistryServer).ListOrganizations(ctx, in)
+		return srv.(OrganizationRegistryServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/ListOrganizations",
+		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationRegistryServer).ListOrganizations(ctx, req.(*ListOrganizationsRequest))
+		return srv.(OrganizationRegistryServer).List(ctx, req.(*ListOrganizationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationRegistry_UpdateOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationRegistry_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateOrganizationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationRegistryServer).UpdateOrganization(ctx, in)
+		return srv.(OrganizationRegistryServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/UpdateOrganization",
+		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationRegistryServer).UpdateOrganization(ctx, req.(*UpdateOrganizationRequest))
+		return srv.(OrganizationRegistryServer).Update(ctx, req.(*UpdateOrganizationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationRegistry_DeleteOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OrganizationIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationRegistryServer).DeleteOrganization(ctx, in)
+		return srv.(OrganizationRegistryServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/DeleteOrganization",
+		FullMethod: "/ttn.lorawan.v3.OrganizationRegistry/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationRegistryServer).DeleteOrganization(ctx, req.(*OrganizationIdentifiers))
+		return srv.(OrganizationRegistryServer).Delete(ctx, req.(*OrganizationIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -218,24 +218,24 @@ var _OrganizationRegistry_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*OrganizationRegistryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateOrganization",
-			Handler:    _OrganizationRegistry_CreateOrganization_Handler,
+			MethodName: "Create",
+			Handler:    _OrganizationRegistry_Create_Handler,
 		},
 		{
-			MethodName: "GetOrganization",
-			Handler:    _OrganizationRegistry_GetOrganization_Handler,
+			MethodName: "Get",
+			Handler:    _OrganizationRegistry_Get_Handler,
 		},
 		{
-			MethodName: "ListOrganizations",
-			Handler:    _OrganizationRegistry_ListOrganizations_Handler,
+			MethodName: "List",
+			Handler:    _OrganizationRegistry_List_Handler,
 		},
 		{
-			MethodName: "UpdateOrganization",
-			Handler:    _OrganizationRegistry_UpdateOrganization_Handler,
+			MethodName: "Update",
+			Handler:    _OrganizationRegistry_Update_Handler,
 		},
 		{
-			MethodName: "DeleteOrganization",
-			Handler:    _OrganizationRegistry_DeleteOrganization_Handler,
+			MethodName: "Delete",
+			Handler:    _OrganizationRegistry_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -245,19 +245,19 @@ var _OrganizationRegistry_serviceDesc = grpc.ServiceDesc{
 // Client API for OrganizationAccess service
 
 type OrganizationAccessClient interface {
-	ListOrganizationRights(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Rights, error)
-	CreateOrganizationAPIKey(ctx context.Context, in *CreateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
-	ListOrganizationAPIKeys(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
+	ListRights(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Rights, error)
+	CreateAPIKey(ctx context.Context, in *CreateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	ListAPIKeys(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
 	// Update the rights of an existing organization API key. To generate an API key,
 	// the CreateOrganizationAPIKey should be used. To delete an API key, update it
 	// with zero rights.
-	UpdateOrganizationAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	UpdateAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Set the rights of a collaborator (member) on the organization. Users
 	// are considered to be a collaborator if they have at least one right on the
 	// organization.
 	// Note that only users can collaborate (be member of) an organization.
-	SetOrganizationCollaborator(ctx context.Context, in *SetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error)
-	ListOrganizationCollaborators(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Collaborators, error)
+	SetCollaborator(ctx context.Context, in *SetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	ListCollaborators(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Collaborators, error)
 }
 
 type organizationAccessClient struct {
@@ -268,54 +268,54 @@ func NewOrganizationAccessClient(cc *grpc.ClientConn) OrganizationAccessClient {
 	return &organizationAccessClient{cc}
 }
 
-func (c *organizationAccessClient) ListOrganizationRights(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Rights, error) {
+func (c *organizationAccessClient) ListRights(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Rights, error) {
 	out := new(Rights)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/ListOrganizationRights", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/ListRights", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationAccessClient) CreateOrganizationAPIKey(ctx context.Context, in *CreateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
+func (c *organizationAccessClient) CreateAPIKey(ctx context.Context, in *CreateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
 	out := new(APIKey)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/CreateOrganizationAPIKey", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/CreateAPIKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationAccessClient) ListOrganizationAPIKeys(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*APIKeys, error) {
+func (c *organizationAccessClient) ListAPIKeys(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*APIKeys, error) {
 	out := new(APIKeys)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/ListOrganizationAPIKeys", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/ListAPIKeys", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationAccessClient) UpdateOrganizationAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
+func (c *organizationAccessClient) UpdateAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
 	out := new(APIKey)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/UpdateOrganizationAPIKey", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationAccessClient) SetOrganizationCollaborator(ctx context.Context, in *SetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *organizationAccessClient) SetCollaborator(ctx context.Context, in *SetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/SetOrganizationCollaborator", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/SetCollaborator", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *organizationAccessClient) ListOrganizationCollaborators(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Collaborators, error) {
+func (c *organizationAccessClient) ListCollaborators(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Collaborators, error) {
 	out := new(Collaborators)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/ListOrganizationCollaborators", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.OrganizationAccess/ListCollaborators", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -325,129 +325,129 @@ func (c *organizationAccessClient) ListOrganizationCollaborators(ctx context.Con
 // Server API for OrganizationAccess service
 
 type OrganizationAccessServer interface {
-	ListOrganizationRights(context.Context, *OrganizationIdentifiers) (*Rights, error)
-	CreateOrganizationAPIKey(context.Context, *CreateOrganizationAPIKeyRequest) (*APIKey, error)
-	ListOrganizationAPIKeys(context.Context, *OrganizationIdentifiers) (*APIKeys, error)
+	ListRights(context.Context, *OrganizationIdentifiers) (*Rights, error)
+	CreateAPIKey(context.Context, *CreateOrganizationAPIKeyRequest) (*APIKey, error)
+	ListAPIKeys(context.Context, *OrganizationIdentifiers) (*APIKeys, error)
 	// Update the rights of an existing organization API key. To generate an API key,
 	// the CreateOrganizationAPIKey should be used. To delete an API key, update it
 	// with zero rights.
-	UpdateOrganizationAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*APIKey, error)
+	UpdateAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*APIKey, error)
 	// Set the rights of a collaborator (member) on the organization. Users
 	// are considered to be a collaborator if they have at least one right on the
 	// organization.
 	// Note that only users can collaborate (be member of) an organization.
-	SetOrganizationCollaborator(context.Context, *SetOrganizationCollaboratorRequest) (*types.Empty, error)
-	ListOrganizationCollaborators(context.Context, *OrganizationIdentifiers) (*Collaborators, error)
+	SetCollaborator(context.Context, *SetOrganizationCollaboratorRequest) (*types.Empty, error)
+	ListCollaborators(context.Context, *OrganizationIdentifiers) (*Collaborators, error)
 }
 
 func RegisterOrganizationAccessServer(s *grpc.Server, srv OrganizationAccessServer) {
 	s.RegisterService(&_OrganizationAccess_serviceDesc, srv)
 }
 
-func _OrganizationAccess_ListOrganizationRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationAccess_ListRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OrganizationIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationAccessServer).ListOrganizationRights(ctx, in)
+		return srv.(OrganizationAccessServer).ListRights(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/ListOrganizationRights",
+		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/ListRights",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationAccessServer).ListOrganizationRights(ctx, req.(*OrganizationIdentifiers))
+		return srv.(OrganizationAccessServer).ListRights(ctx, req.(*OrganizationIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationAccess_CreateOrganizationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationAccess_CreateAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateOrganizationAPIKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationAccessServer).CreateOrganizationAPIKey(ctx, in)
+		return srv.(OrganizationAccessServer).CreateAPIKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/CreateOrganizationAPIKey",
+		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/CreateAPIKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationAccessServer).CreateOrganizationAPIKey(ctx, req.(*CreateOrganizationAPIKeyRequest))
+		return srv.(OrganizationAccessServer).CreateAPIKey(ctx, req.(*CreateOrganizationAPIKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationAccess_ListOrganizationAPIKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationAccess_ListAPIKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OrganizationIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationAccessServer).ListOrganizationAPIKeys(ctx, in)
+		return srv.(OrganizationAccessServer).ListAPIKeys(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/ListOrganizationAPIKeys",
+		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/ListAPIKeys",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationAccessServer).ListOrganizationAPIKeys(ctx, req.(*OrganizationIdentifiers))
+		return srv.(OrganizationAccessServer).ListAPIKeys(ctx, req.(*OrganizationIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationAccess_UpdateOrganizationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationAccess_UpdateAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateOrganizationAPIKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationAccessServer).UpdateOrganizationAPIKey(ctx, in)
+		return srv.(OrganizationAccessServer).UpdateAPIKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/UpdateOrganizationAPIKey",
+		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationAccessServer).UpdateOrganizationAPIKey(ctx, req.(*UpdateOrganizationAPIKeyRequest))
+		return srv.(OrganizationAccessServer).UpdateAPIKey(ctx, req.(*UpdateOrganizationAPIKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationAccess_SetOrganizationCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationAccess_SetCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetOrganizationCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationAccessServer).SetOrganizationCollaborator(ctx, in)
+		return srv.(OrganizationAccessServer).SetCollaborator(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/SetOrganizationCollaborator",
+		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/SetCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationAccessServer).SetOrganizationCollaborator(ctx, req.(*SetOrganizationCollaboratorRequest))
+		return srv.(OrganizationAccessServer).SetCollaborator(ctx, req.(*SetOrganizationCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrganizationAccess_ListOrganizationCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrganizationAccess_ListCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OrganizationIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationAccessServer).ListOrganizationCollaborators(ctx, in)
+		return srv.(OrganizationAccessServer).ListCollaborators(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/ListOrganizationCollaborators",
+		FullMethod: "/ttn.lorawan.v3.OrganizationAccess/ListCollaborators",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationAccessServer).ListOrganizationCollaborators(ctx, req.(*OrganizationIdentifiers))
+		return srv.(OrganizationAccessServer).ListCollaborators(ctx, req.(*OrganizationIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -457,28 +457,28 @@ var _OrganizationAccess_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*OrganizationAccessServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListOrganizationRights",
-			Handler:    _OrganizationAccess_ListOrganizationRights_Handler,
+			MethodName: "ListRights",
+			Handler:    _OrganizationAccess_ListRights_Handler,
 		},
 		{
-			MethodName: "CreateOrganizationAPIKey",
-			Handler:    _OrganizationAccess_CreateOrganizationAPIKey_Handler,
+			MethodName: "CreateAPIKey",
+			Handler:    _OrganizationAccess_CreateAPIKey_Handler,
 		},
 		{
-			MethodName: "ListOrganizationAPIKeys",
-			Handler:    _OrganizationAccess_ListOrganizationAPIKeys_Handler,
+			MethodName: "ListAPIKeys",
+			Handler:    _OrganizationAccess_ListAPIKeys_Handler,
 		},
 		{
-			MethodName: "UpdateOrganizationAPIKey",
-			Handler:    _OrganizationAccess_UpdateOrganizationAPIKey_Handler,
+			MethodName: "UpdateAPIKey",
+			Handler:    _OrganizationAccess_UpdateAPIKey_Handler,
 		},
 		{
-			MethodName: "SetOrganizationCollaborator",
-			Handler:    _OrganizationAccess_SetOrganizationCollaborator_Handler,
+			MethodName: "SetCollaborator",
+			Handler:    _OrganizationAccess_SetCollaborator_Handler,
 		},
 		{
-			MethodName: "ListOrganizationCollaborators",
-			Handler:    _OrganizationAccess_ListOrganizationCollaborators_Handler,
+			MethodName: "ListCollaborators",
+			Handler:    _OrganizationAccess_ListCollaborators_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -486,60 +486,60 @@ var _OrganizationAccess_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_7732621200b1df7f)
+	proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_bd27b88df800c491)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_7732621200b1df7f)
+	golang_proto.RegisterFile("lorawan-stack/api/organization_services.proto", fileDescriptor_organization_services_bd27b88df800c491)
 }
 
-var fileDescriptor_organization_services_7732621200b1df7f = []byte{
+var fileDescriptor_organization_services_bd27b88df800c491 = []byte{
 	// 766 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0x3f, 0x4c, 0x14, 0x4d,
-	0x18, 0xc6, 0x77, 0xbe, 0x82, 0x2f, 0xd9, 0x82, 0x2f, 0xdf, 0xc4, 0x00, 0x59, 0xe0, 0x8d, 0x59,
-	0x8d, 0xfc, 0xd1, 0x9b, 0x15, 0x30, 0x24, 0x10, 0x13, 0x82, 0x40, 0x10, 0x25, 0x6a, 0xce, 0xd8,
-	0xd0, 0x90, 0xbd, 0x63, 0xd8, 0xdb, 0xdc, 0xb1, 0x73, 0xee, 0xcc, 0x41, 0x4e, 0x42, 0x24, 0x56,
-	0xc4, 0xc2, 0x18, 0x6d, 0x8c, 0x26, 0x6a, 0xac, 0x88, 0xb1, 0xa0, 0x31, 0x52, 0x52, 0x52, 0x92,
-	0xd8, 0x50, 0x72, 0xbb, 0x16, 0x94, 0x24, 0x36, 0x94, 0xe6, 0xe6, 0xf6, 0xe4, 0x76, 0x17, 0xee,
-	0x38, 0xba, 0xdb, 0x9d, 0x67, 0xde, 0xf7, 0xb7, 0xcf, 0xbc, 0xcf, 0x9c, 0x9a, 0xc8, 0x31, 0xd7,
-	0x5c, 0x31, 0x9d, 0x04, 0x17, 0x66, 0x3a, 0x6b, 0x98, 0x79, 0xdb, 0x60, 0xae, 0x65, 0x3a, 0xf6,
-	0x33, 0x53, 0xd8, 0xcc, 0x99, 0xe7, 0xd4, 0x5d, 0xb6, 0xd3, 0x94, 0x93, 0xbc, 0xcb, 0x04, 0xc3,
-	0xad, 0x42, 0x38, 0x24, 0xd8, 0x42, 0x96, 0x87, 0xb4, 0x84, 0x65, 0x8b, 0x4c, 0x21, 0x45, 0xd2,
-	0x6c, 0xc9, 0xb0, 0x98, 0xc5, 0x0c, 0x29, 0x4b, 0x15, 0x16, 0xe5, 0x93, 0x7c, 0x90, 0xbf, 0x2a,
-	0xdb, 0xb5, 0x2e, 0x8b, 0x31, 0x2b, 0x47, 0x65, 0x1b, 0xd3, 0x71, 0x98, 0x90, 0x4d, 0x82, 0xe2,
-	0x5a, 0x67, 0xb0, 0xfa, 0xb7, 0x06, 0x5d, 0xca, 0x8b, 0x62, 0xb0, 0x78, 0x25, 0x0e, 0x6a, 0x2f,
-	0x50, 0x47, 0xd8, 0x8b, 0x36, 0x75, 0xab, 0x15, 0xae, 0xd6, 0xff, 0x9a, 0x40, 0x05, 0x71, 0x95,
-	0x6b, 0x5b, 0x19, 0x11, 0x54, 0x19, 0x7c, 0xdf, 0xa2, 0x5e, 0x7a, 0x58, 0xb3, 0x2d, 0x49, 0x2d,
-	0x9b, 0x0b, 0xb7, 0x88, 0x3f, 0x22, 0x15, 0x4f, 0xb8, 0xd4, 0x14, 0xb4, 0x76, 0x19, 0xf7, 0x91,
-	0xb0, 0x2b, 0x24, 0xae, 0x49, 0xd2, 0xa7, 0x05, 0xca, 0x85, 0xd6, 0x15, 0x95, 0xd6, 0x8a, 0xf4,
-	0xb1, 0x17, 0x3f, 0x7f, 0xbd, 0xfd, 0x67, 0x44, 0xbf, 0x65, 0x14, 0x38, 0x75, 0xb9, 0xb1, 0x9a,
-	0x66, 0xb9, 0x9c, 0x99, 0x62, 0xae, 0x29, 0x98, 0x4b, 0xca, 0xef, 0xe6, 0xed, 0x05, 0x5e, 0xfd,
-	0xb1, 0x16, 0xfa, 0x36, 0x3e, 0x8a, 0xfa, 0xf1, 0x1b, 0xa4, 0xfe, 0x37, 0x4d, 0x45, 0x88, 0xee,
-	0x5a, 0xb4, 0x65, 0x44, 0x70, 0x3e, 0xb4, 0x11, 0x89, 0x36, 0x84, 0x07, 0xc2, 0x4d, 0x8d, 0xd5,
-	0xd0, 0xb4, 0x94, 0xe9, 0x22, 0x2f, 0xd6, 0xf0, 0x37, 0xa4, 0xfe, 0x3f, 0x6b, 0xf3, 0x50, 0x53,
-	0x8e, 0x7b, 0xa3, 0xed, 0x62, 0x92, 0x2a, 0x58, 0x77, 0x3d, 0x30, 0xae, 0x3f, 0x90, 0x64, 0x77,
-	0x71, 0x6b, 0x98, 0x6c, 0x6e, 0x18, 0x5f, 0xc8, 0x46, 0xfc, 0x01, 0xa9, 0xf8, 0x49, 0x7e, 0xa1,
-	0xe1, 0x21, 0xc7, 0x35, 0xe7, 0x73, 0xf2, 0xb6, 0xe4, 0x1d, 0xd6, 0xea, 0x3a, 0x49, 0x4e, 0x73,
-	0xb2, 0x7c, 0xc2, 0xcf, 0x55, 0x3c, 0x49, 0x73, 0x34, 0x02, 0xd7, 0x53, 0xaf, 0xe3, 0xcc, 0x49,
-	0x4c, 0xb4, 0x36, 0x52, 0xc9, 0x18, 0xa9, 0x66, 0x8c, 0x4c, 0x95, 0x33, 0xa6, 0xf7, 0x4a, 0x28,
-	0xbd, 0xff, 0x72, 0x83, 0xe3, 0x5d, 0x1b, 0xfc, 0xfd, 0xaf, 0x8a, 0x6b, 0xab, 0x8f, 0xa7, 0xd3,
-	0x94, 0x73, 0xfc, 0x12, 0xa9, 0x6d, 0xd1, 0x13, 0x4c, 0xca, 0x50, 0x35, 0x03, 0x17, 0x11, 0x56,
-	0x0a, 0xe8, 0x86, 0x84, 0xeb, 0xc3, 0x3d, 0x8d, 0xe0, 0x82, 0x18, 0xe3, 0xaf, 0x48, 0xed, 0x88,
-	0x67, 0x70, 0xfc, 0xd1, 0xcc, 0x7d, 0x5a, 0xc4, 0x46, 0xe3, 0xb4, 0x56, 0x94, 0xd5, 0xe3, 0x8c,
-	0x61, 0x55, 0x96, 0xf5, 0x29, 0x89, 0x35, 0xa6, 0x8f, 0x36, 0x1d, 0x89, 0xf2, 0x95, 0x93, 0xc8,
-	0xd2, 0xa2, 0xcc, 0xec, 0x2b, 0xa4, 0xb6, 0x47, 0x9d, 0xab, 0x74, 0x68, 0xc2, 0xba, 0xf6, 0xd3,
-	0x19, 0xb9, 0x3e, 0x20, 0x21, 0xaf, 0xe3, 0xbe, 0x86, 0xde, 0x55, 0x99, 0xf0, 0x0f, 0xa4, 0x76,
-	0xc4, 0x87, 0xfb, 0x2c, 0xf7, 0xce, 0x52, 0x36, 0x72, 0x2f, 0x29, 0xc1, 0x66, 0xb5, 0xe9, 0x8b,
-	0xbb, 0x67, 0xac, 0x9a, 0x79, 0x7b, 0x3e, 0x4b, 0x8b, 0x24, 0x08, 0xc7, 0x77, 0xa4, 0x76, 0x3e,
-	0x0e, 0xdf, 0x6e, 0x13, 0x35, 0xd1, 0xc7, 0x83, 0x51, 0x96, 0x3a, 0xe2, 0x13, 0xfe, 0xd3, 0x13,
-	0x73, 0x4f, 0xf2, 0x4f, 0x6a, 0x63, 0xcd, 0xf3, 0xd7, 0x5e, 0x47, 0x72, 0x04, 0x3e, 0x21, 0xb5,
-	0x3b, 0x3a, 0x02, 0xb5, 0x2c, 0x4d, 0x0c, 0x42, 0xec, 0xb2, 0x0c, 0xd5, 0xd1, 0x87, 0x25, 0xf5,
-	0x4d, 0x4c, 0x1a, 0x8e, 0x43, 0x08, 0xf2, 0xce, 0x17, 0xb4, 0x5b, 0x02, 0xb4, 0x57, 0x02, 0xb4,
-	0x5f, 0x02, 0xe5, 0xa0, 0x04, 0xca, 0x61, 0x09, 0x94, 0xa3, 0x12, 0x28, 0xc7, 0x25, 0x40, 0xeb,
-	0x1e, 0xa0, 0x0d, 0x0f, 0x94, 0x4d, 0x0f, 0xd0, 0x96, 0x07, 0xca, 0xb6, 0x07, 0xca, 0x8e, 0x07,
-	0xca, 0xae, 0x07, 0x68, 0xcf, 0x03, 0xb4, 0xef, 0x81, 0x72, 0xe0, 0x01, 0x3a, 0xf4, 0x40, 0x39,
-	0xf2, 0x00, 0x1d, 0x7b, 0xa0, 0xac, 0xfb, 0xa0, 0x6c, 0xf8, 0x80, 0x5e, 0xfb, 0xa0, 0xbc, 0xf3,
-	0x01, 0x7d, 0xf6, 0x41, 0xd9, 0xf4, 0x41, 0xd9, 0xf2, 0x01, 0x6d, 0xfb, 0x80, 0x76, 0x7c, 0x40,
-	0x73, 0x37, 0x2c, 0x46, 0x44, 0x86, 0x8a, 0x8c, 0xed, 0x58, 0x9c, 0x38, 0x54, 0xac, 0x30, 0x37,
-	0x6b, 0x84, 0xff, 0xbe, 0xf3, 0x59, 0xcb, 0x10, 0xc2, 0xc9, 0xa7, 0x52, 0x2d, 0xf2, 0x88, 0x86,
-	0xfe, 0x04, 0x00, 0x00, 0xff, 0xff, 0x25, 0xee, 0x2b, 0xc4, 0xd4, 0x08, 0x00, 0x00,
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0x4d, 0x4c, 0xd4, 0x5a,
+	0x14, 0xc7, 0x7b, 0xdf, 0xc7, 0xbc, 0xa4, 0x8f, 0xf0, 0xf2, 0x6e, 0x5e, 0xde, 0x4b, 0xfa, 0xf0,
+	0xc4, 0x54, 0x23, 0x1f, 0x3a, 0xb7, 0x02, 0x86, 0x04, 0x62, 0x42, 0x10, 0x08, 0xa2, 0x44, 0x0d,
+	0xc4, 0x0d, 0x1b, 0xd2, 0x19, 0x2e, 0x9d, 0x66, 0x86, 0xde, 0xb1, 0xf7, 0x0e, 0x64, 0x24, 0x18,
+	0xc2, 0xc2, 0xb0, 0xd3, 0xc8, 0xc6, 0x95, 0x1a, 0x57, 0xa8, 0x1b, 0x96, 0x2c, 0x59, 0xb2, 0x24,
+	0x71, 0xc3, 0xc6, 0x84, 0x69, 0x5d, 0xb0, 0x64, 0xc9, 0xd2, 0xf4, 0xb6, 0x23, 0xed, 0xcc, 0x38,
+	0xe3, 0xb0, 0x6b, 0xef, 0x3d, 0xf7, 0x9c, 0x5f, 0xff, 0xff, 0x73, 0x6e, 0xd5, 0x74, 0x81, 0xb9,
+	0xe6, 0xaa, 0xe9, 0xa4, 0xb9, 0x30, 0xb3, 0x79, 0xc3, 0x2c, 0xda, 0x06, 0x73, 0x2d, 0xd3, 0xb1,
+	0x9f, 0x9a, 0xc2, 0x66, 0xce, 0x02, 0xa7, 0xee, 0x8a, 0x9d, 0xa5, 0x9c, 0x14, 0x5d, 0x26, 0x18,
+	0xee, 0x14, 0xc2, 0x21, 0xd1, 0x11, 0xb2, 0x32, 0xa8, 0xa5, 0x2d, 0x5b, 0xe4, 0x4a, 0x19, 0x92,
+	0x65, 0xcb, 0x86, 0xc5, 0x2c, 0x66, 0xc8, 0xb0, 0x4c, 0x69, 0x49, 0xbe, 0xc9, 0x17, 0xf9, 0x14,
+	0x1e, 0xd7, 0xba, 0x2c, 0xc6, 0xac, 0x02, 0x95, 0x65, 0x4c, 0xc7, 0x61, 0x42, 0x16, 0x89, 0x92,
+	0x6b, 0xff, 0x47, 0xbb, 0xdf, 0x73, 0xd0, 0xe5, 0xa2, 0x28, 0x47, 0x9b, 0x57, 0xea, 0x41, 0xed,
+	0x45, 0xea, 0x08, 0x7b, 0xc9, 0xa6, 0x6e, 0x35, 0xc3, 0xd5, 0xe6, 0x5f, 0x13, 0x45, 0x41, 0x7d,
+	0x94, 0x6b, 0x5b, 0x39, 0x11, 0x65, 0x19, 0xf8, 0xf2, 0xbb, 0xfa, 0xcf, 0xc3, 0xd8, 0xb1, 0x59,
+	0x6a, 0xd9, 0x5c, 0xb8, 0x65, 0xfc, 0x0a, 0xa9, 0xa9, 0x71, 0x97, 0x9a, 0x82, 0xe2, 0x5e, 0x92,
+	0x54, 0x82, 0x84, 0xeb, 0xc9, 0x63, 0x4f, 0x4a, 0x94, 0x0b, 0xad, 0xab, 0x36, 0x34, 0x1e, 0xa4,
+	0x8f, 0x6e, 0x7e, 0xfe, 0xba, 0xfd, 0xcb, 0xb0, 0x7e, 0xcb, 0x28, 0x71, 0xea, 0x72, 0x63, 0x2d,
+	0xcb, 0x0a, 0x05, 0x33, 0xc3, 0x5c, 0x53, 0x30, 0x97, 0x04, 0x6b, 0x0b, 0xf6, 0x22, 0xaf, 0x3e,
+	0xac, 0x27, 0xbe, 0x87, 0x8f, 0xa0, 0x3e, 0xfc, 0x1c, 0xa9, 0xbf, 0x4e, 0x51, 0x81, 0xaf, 0xd5,
+	0x96, 0x99, 0xa2, 0xa2, 0x7d, 0x9c, 0x61, 0x89, 0x33, 0x88, 0xfb, 0x93, 0x85, 0x8c, 0xb5, 0x44,
+	0x57, 0x04, 0x44, 0x35, 0x0b, 0xeb, 0xf8, 0x2d, 0x52, 0x7f, 0x9b, 0xb1, 0xb9, 0xc0, 0x3d, 0xb5,
+	0x15, 0x82, 0xd5, 0x78, 0x15, 0x5e, 0x65, 0xb9, 0xd4, 0x8c, 0x85, 0xeb, 0x0f, 0x24, 0xcc, 0x5d,
+	0xdc, 0x99, 0x84, 0x99, 0x1f, 0xc2, 0x17, 0x52, 0x0b, 0xbf, 0x40, 0x6a, 0xea, 0x71, 0x71, 0xb1,
+	0xa1, 0x7f, 0xe1, 0x7a, 0xfb, 0x82, 0xdd, 0x96, 0x8c, 0x43, 0x5a, 0x53, 0xc1, 0x48, 0x23, 0xc1,
+	0x02, 0xf3, 0xb8, 0x9a, 0x9a, 0xa0, 0x05, 0x2a, 0x28, 0xee, 0x6e, 0x56, 0x65, 0xfa, 0xbc, 0xd3,
+	0xb5, 0x7f, 0x49, 0x38, 0x26, 0xa4, 0x3a, 0x26, 0x64, 0x32, 0x18, 0x13, 0xbd, 0x47, 0x82, 0xe8,
+	0x7d, 0x97, 0x5b, 0x38, 0xb7, 0x3e, 0xf0, 0xf1, 0x0f, 0x15, 0xc7, 0xb3, 0x8f, 0x65, 0xb3, 0x94,
+	0x73, 0xfc, 0x4c, 0x55, 0x03, 0xa3, 0x66, 0xe5, 0x28, 0xb4, 0xc3, 0x53, 0x13, 0x18, 0x26, 0xd0,
+	0x0d, 0xc9, 0xd3, 0x8b, 0xbb, 0x5b, 0xf1, 0x44, 0xc3, 0x87, 0xdf, 0x20, 0xb5, 0x23, 0x9c, 0xa2,
+	0xb1, 0x47, 0xd3, 0xf7, 0x69, 0x19, 0x1b, 0xad, 0x67, 0x2c, 0x8c, 0xac, 0x3a, 0x55, 0x87, 0x12,
+	0x6e, 0xeb, 0x93, 0x12, 0x65, 0x54, 0x1f, 0x69, 0xbb, 0xa9, 0x83, 0xcb, 0x21, 0x9d, 0xa7, 0x65,
+	0x39, 0x69, 0x9b, 0x48, 0xfd, 0x33, 0x50, 0x28, 0xcc, 0xda, 0x86, 0x44, 0xff, 0x35, 0xe6, 0xe2,
+	0x7a, 0xbf, 0x04, 0xbb, 0x8e, 0x7b, 0x5b, 0x6a, 0x54, 0xe5, 0xc0, 0x9f, 0x90, 0xda, 0x11, 0xf6,
+	0xea, 0x8f, 0x54, 0xaa, 0xef, 0xe4, 0x9f, 0x53, 0x69, 0x56, 0xc2, 0xcc, 0x68, 0x53, 0x17, 0x57,
+	0xc9, 0x58, 0x33, 0x8b, 0xf6, 0x42, 0x9e, 0x96, 0x49, 0xd4, 0xdf, 0x1f, 0x90, 0xfa, 0xd7, 0x1c,
+	0x15, 0xe3, 0xb1, 0x29, 0xc5, 0x03, 0xb5, 0xf5, 0xe7, 0x92, 0x17, 0x55, 0x3c, 0xf8, 0x9c, 0xb9,
+	0x71, 0xd3, 0xdf, 0x93, 0xcc, 0x13, 0xda, 0x68, 0xfb, 0xcc, 0xf1, 0x9b, 0x43, 0xda, 0xbb, 0x8d,
+	0xd4, 0xbf, 0x03, 0x7b, 0xe3, 0xf5, 0xdb, 0x30, 0xb9, 0xee, 0x2e, 0x4b, 0xe4, 0xd1, 0x87, 0x24,
+	0xe9, 0x4d, 0x4c, 0x5a, 0x5a, 0x9d, 0x00, 0xbb, 0xf3, 0x1e, 0x1d, 0x54, 0x00, 0x1d, 0x56, 0x00,
+	0x1d, 0x55, 0x40, 0x39, 0xae, 0x80, 0x72, 0x52, 0x01, 0xe5, 0xb4, 0x02, 0xca, 0x59, 0x05, 0xd0,
+	0x86, 0x07, 0x68, 0xcb, 0x03, 0x65, 0xc7, 0x03, 0xb4, 0xeb, 0x81, 0xb2, 0xe7, 0x81, 0xb2, 0xef,
+	0x81, 0x72, 0xe0, 0x01, 0x3a, 0xf4, 0x00, 0x1d, 0x79, 0xa0, 0x1c, 0x7b, 0x80, 0x4e, 0x3c, 0x50,
+	0x4e, 0x3d, 0x40, 0x67, 0x1e, 0x28, 0x1b, 0x3e, 0x28, 0x5b, 0x3e, 0xa0, 0x97, 0x3e, 0x28, 0xaf,
+	0x7d, 0x40, 0xef, 0x7c, 0x50, 0x76, 0x7c, 0x50, 0x76, 0x7d, 0x40, 0x7b, 0x3e, 0xa0, 0x7d, 0x1f,
+	0xd0, 0xfc, 0x0d, 0x8b, 0x11, 0x91, 0xa3, 0x22, 0x67, 0x3b, 0x16, 0x27, 0x0e, 0x15, 0xab, 0xcc,
+	0xcd, 0x1b, 0xc9, 0x1f, 0x67, 0x31, 0x6f, 0x19, 0x42, 0x38, 0xc5, 0x4c, 0x26, 0x25, 0x6d, 0x19,
+	0xfc, 0x16, 0x00, 0x00, 0xff, 0xff, 0x21, 0x61, 0xb1, 0x9b, 0x4e, 0x08, 0x00, 0x00,
 }

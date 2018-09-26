@@ -38,14 +38,14 @@ const _ = grpc.SupportPackageIsVersion4
 
 type UserRegistryClient interface {
 	// Register a new user. This method may be restricted by network settings.
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
+	Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
 	// Get the user with the given identifiers, selecting the fields given by the
 	// field mask. The method may return more or less fields, depending on the rights
 	// of the caller.
-	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
-	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
-	UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*types.Empty, error)
-	DeleteUser(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
+	Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
+	UpdatePassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	Delete(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
 type userRegistryClient struct {
@@ -56,45 +56,45 @@ func NewUserRegistryClient(cc *grpc.ClientConn) UserRegistryClient {
 	return &userRegistryClient{cc}
 }
 
-func (c *userRegistryClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error) {
+func (c *userRegistryClient) Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/CreateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userRegistryClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error) {
+func (c *userRegistryClient) Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/GetUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userRegistryClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error) {
+func (c *userRegistryClient) Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/UpdateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userRegistryClient) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *userRegistryClient) UpdatePassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/UpdateUserPassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/UpdatePassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userRegistryClient) DeleteUser(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *userRegistryClient) Delete(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/DeleteUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserRegistry/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -105,106 +105,106 @@ func (c *userRegistryClient) DeleteUser(ctx context.Context, in *UserIdentifiers
 
 type UserRegistryServer interface {
 	// Register a new user. This method may be restricted by network settings.
-	CreateUser(context.Context, *CreateUserRequest) (*User, error)
+	Create(context.Context, *CreateUserRequest) (*User, error)
 	// Get the user with the given identifiers, selecting the fields given by the
 	// field mask. The method may return more or less fields, depending on the rights
 	// of the caller.
-	GetUser(context.Context, *GetUserRequest) (*User, error)
-	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
-	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*types.Empty, error)
-	DeleteUser(context.Context, *UserIdentifiers) (*types.Empty, error)
+	Get(context.Context, *GetUserRequest) (*User, error)
+	Update(context.Context, *UpdateUserRequest) (*User, error)
+	UpdatePassword(context.Context, *UpdateUserPasswordRequest) (*types.Empty, error)
+	Delete(context.Context, *UserIdentifiers) (*types.Empty, error)
 }
 
 func RegisterUserRegistryServer(s *grpc.Server, srv UserRegistryServer) {
 	s.RegisterService(&_UserRegistry_serviceDesc, srv)
 }
 
-func _UserRegistry_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserRegistry_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserRegistryServer).CreateUser(ctx, in)
+		return srv.(UserRegistryServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserRegistry/CreateUser",
+		FullMethod: "/ttn.lorawan.v3.UserRegistry/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserRegistryServer).CreateUser(ctx, req.(*CreateUserRequest))
+		return srv.(UserRegistryServer).Create(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserRegistry_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserRegistry_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserRegistryServer).GetUser(ctx, in)
+		return srv.(UserRegistryServer).Get(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserRegistry/GetUser",
+		FullMethod: "/ttn.lorawan.v3.UserRegistry/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserRegistryServer).GetUser(ctx, req.(*GetUserRequest))
+		return srv.(UserRegistryServer).Get(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserRegistry_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserRegistry_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserRegistryServer).UpdateUser(ctx, in)
+		return srv.(UserRegistryServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserRegistry/UpdateUser",
+		FullMethod: "/ttn.lorawan.v3.UserRegistry/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserRegistryServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+		return srv.(UserRegistryServer).Update(ctx, req.(*UpdateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserRegistry_UpdateUserPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserRegistry_UpdatePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserPasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserRegistryServer).UpdateUserPassword(ctx, in)
+		return srv.(UserRegistryServer).UpdatePassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserRegistry/UpdateUserPassword",
+		FullMethod: "/ttn.lorawan.v3.UserRegistry/UpdatePassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserRegistryServer).UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
+		return srv.(UserRegistryServer).UpdatePassword(ctx, req.(*UpdateUserPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserRegistry_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserRegistryServer).DeleteUser(ctx, in)
+		return srv.(UserRegistryServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserRegistry/DeleteUser",
+		FullMethod: "/ttn.lorawan.v3.UserRegistry/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserRegistryServer).DeleteUser(ctx, req.(*UserIdentifiers))
+		return srv.(UserRegistryServer).Delete(ctx, req.(*UserIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -214,24 +214,24 @@ var _UserRegistry_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserRegistryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateUser",
-			Handler:    _UserRegistry_CreateUser_Handler,
+			MethodName: "Create",
+			Handler:    _UserRegistry_Create_Handler,
 		},
 		{
-			MethodName: "GetUser",
-			Handler:    _UserRegistry_GetUser_Handler,
+			MethodName: "Get",
+			Handler:    _UserRegistry_Get_Handler,
 		},
 		{
-			MethodName: "UpdateUser",
-			Handler:    _UserRegistry_UpdateUser_Handler,
+			MethodName: "Update",
+			Handler:    _UserRegistry_Update_Handler,
 		},
 		{
-			MethodName: "UpdateUserPassword",
-			Handler:    _UserRegistry_UpdateUserPassword_Handler,
+			MethodName: "UpdatePassword",
+			Handler:    _UserRegistry_UpdatePassword_Handler,
 		},
 		{
-			MethodName: "DeleteUser",
-			Handler:    _UserRegistry_DeleteUser_Handler,
+			MethodName: "Delete",
+			Handler:    _UserRegistry_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -241,13 +241,13 @@ var _UserRegistry_serviceDesc = grpc.ServiceDesc{
 // Client API for UserAccess service
 
 type UserAccessClient interface {
-	ListUserRights(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*Rights, error)
-	CreateUserAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
-	ListUserAPIKeys(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
+	ListRights(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*Rights, error)
+	CreateAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	ListAPIKeys(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*APIKeys, error)
 	// Update the rights of an existing user API key. To generate an API key,
 	// the CreateUserAPIKey should be used. To delete an API key, update it
 	// with zero rights.
-	UpdateUserAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 }
 
 type userAccessClient struct {
@@ -258,36 +258,36 @@ func NewUserAccessClient(cc *grpc.ClientConn) UserAccessClient {
 	return &userAccessClient{cc}
 }
 
-func (c *userAccessClient) ListUserRights(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*Rights, error) {
+func (c *userAccessClient) ListRights(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*Rights, error) {
 	out := new(Rights)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/ListUserRights", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/ListRights", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userAccessClient) CreateUserAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
+func (c *userAccessClient) CreateAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
 	out := new(APIKey)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/CreateUserAPIKey", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/CreateAPIKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userAccessClient) ListUserAPIKeys(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*APIKeys, error) {
+func (c *userAccessClient) ListAPIKeys(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*APIKeys, error) {
 	out := new(APIKeys)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/ListUserAPIKeys", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/ListAPIKeys", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userAccessClient) UpdateUserAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
+func (c *userAccessClient) UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
 	out := new(APIKey)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/UpdateUserAPIKey", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserAccess/UpdateAPIKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,87 +297,87 @@ func (c *userAccessClient) UpdateUserAPIKey(ctx context.Context, in *UpdateUserA
 // Server API for UserAccess service
 
 type UserAccessServer interface {
-	ListUserRights(context.Context, *UserIdentifiers) (*Rights, error)
-	CreateUserAPIKey(context.Context, *CreateUserAPIKeyRequest) (*APIKey, error)
-	ListUserAPIKeys(context.Context, *UserIdentifiers) (*APIKeys, error)
+	ListRights(context.Context, *UserIdentifiers) (*Rights, error)
+	CreateAPIKey(context.Context, *CreateUserAPIKeyRequest) (*APIKey, error)
+	ListAPIKeys(context.Context, *UserIdentifiers) (*APIKeys, error)
 	// Update the rights of an existing user API key. To generate an API key,
 	// the CreateUserAPIKey should be used. To delete an API key, update it
 	// with zero rights.
-	UpdateUserAPIKey(context.Context, *UpdateUserAPIKeyRequest) (*APIKey, error)
+	UpdateAPIKey(context.Context, *UpdateUserAPIKeyRequest) (*APIKey, error)
 }
 
 func RegisterUserAccessServer(s *grpc.Server, srv UserAccessServer) {
 	s.RegisterService(&_UserAccess_serviceDesc, srv)
 }
 
-func _UserAccess_ListUserRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserAccess_ListRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserAccessServer).ListUserRights(ctx, in)
+		return srv.(UserAccessServer).ListRights(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserAccess/ListUserRights",
+		FullMethod: "/ttn.lorawan.v3.UserAccess/ListRights",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserAccessServer).ListUserRights(ctx, req.(*UserIdentifiers))
+		return srv.(UserAccessServer).ListRights(ctx, req.(*UserIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserAccess_CreateUserAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserAccess_CreateAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUserAPIKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserAccessServer).CreateUserAPIKey(ctx, in)
+		return srv.(UserAccessServer).CreateAPIKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserAccess/CreateUserAPIKey",
+		FullMethod: "/ttn.lorawan.v3.UserAccess/CreateAPIKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserAccessServer).CreateUserAPIKey(ctx, req.(*CreateUserAPIKeyRequest))
+		return srv.(UserAccessServer).CreateAPIKey(ctx, req.(*CreateUserAPIKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserAccess_ListUserAPIKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserAccess_ListAPIKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserIdentifiers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserAccessServer).ListUserAPIKeys(ctx, in)
+		return srv.(UserAccessServer).ListAPIKeys(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserAccess/ListUserAPIKeys",
+		FullMethod: "/ttn.lorawan.v3.UserAccess/ListAPIKeys",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserAccessServer).ListUserAPIKeys(ctx, req.(*UserIdentifiers))
+		return srv.(UserAccessServer).ListAPIKeys(ctx, req.(*UserIdentifiers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserAccess_UpdateUserAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserAccess_UpdateAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserAPIKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserAccessServer).UpdateUserAPIKey(ctx, in)
+		return srv.(UserAccessServer).UpdateAPIKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserAccess/UpdateUserAPIKey",
+		FullMethod: "/ttn.lorawan.v3.UserAccess/UpdateAPIKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserAccessServer).UpdateUserAPIKey(ctx, req.(*UpdateUserAPIKeyRequest))
+		return srv.(UserAccessServer).UpdateAPIKey(ctx, req.(*UpdateUserAPIKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -387,20 +387,20 @@ var _UserAccess_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserAccessServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListUserRights",
-			Handler:    _UserAccess_ListUserRights_Handler,
+			MethodName: "ListRights",
+			Handler:    _UserAccess_ListRights_Handler,
 		},
 		{
-			MethodName: "CreateUserAPIKey",
-			Handler:    _UserAccess_CreateUserAPIKey_Handler,
+			MethodName: "CreateAPIKey",
+			Handler:    _UserAccess_CreateAPIKey_Handler,
 		},
 		{
-			MethodName: "ListUserAPIKeys",
-			Handler:    _UserAccess_ListUserAPIKeys_Handler,
+			MethodName: "ListAPIKeys",
+			Handler:    _UserAccess_ListAPIKeys_Handler,
 		},
 		{
-			MethodName: "UpdateUserAPIKey",
-			Handler:    _UserAccess_UpdateUserAPIKey_Handler,
+			MethodName: "UpdateAPIKey",
+			Handler:    _UserAccess_UpdateAPIKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -410,9 +410,9 @@ var _UserAccess_serviceDesc = grpc.ServiceDesc{
 // Client API for UserInvitationRegistry service
 
 type UserInvitationRegistryClient interface {
-	SendInvitation(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error)
-	ListInvitations(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*Invitations, error)
-	DeleteInvitation(ctx context.Context, in *DeleteInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	Send(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	List(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*Invitations, error)
+	Delete(ctx context.Context, in *DeleteInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
 type userInvitationRegistryClient struct {
@@ -423,27 +423,27 @@ func NewUserInvitationRegistryClient(cc *grpc.ClientConn) UserInvitationRegistry
 	return &userInvitationRegistryClient{cc}
 }
 
-func (c *userInvitationRegistryClient) SendInvitation(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *userInvitationRegistryClient) Send(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserInvitationRegistry/SendInvitation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserInvitationRegistry/Send", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userInvitationRegistryClient) ListInvitations(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*Invitations, error) {
+func (c *userInvitationRegistryClient) List(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*Invitations, error) {
 	out := new(Invitations)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserInvitationRegistry/ListInvitations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserInvitationRegistry/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userInvitationRegistryClient) DeleteInvitation(ctx context.Context, in *DeleteInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *userInvitationRegistryClient) Delete(ctx context.Context, in *DeleteInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserInvitationRegistry/DeleteInvitation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UserInvitationRegistry/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -453,65 +453,65 @@ func (c *userInvitationRegistryClient) DeleteInvitation(ctx context.Context, in 
 // Server API for UserInvitationRegistry service
 
 type UserInvitationRegistryServer interface {
-	SendInvitation(context.Context, *SendInvitationRequest) (*types.Empty, error)
-	ListInvitations(context.Context, *types.Empty) (*Invitations, error)
-	DeleteInvitation(context.Context, *DeleteInvitationRequest) (*types.Empty, error)
+	Send(context.Context, *SendInvitationRequest) (*types.Empty, error)
+	List(context.Context, *types.Empty) (*Invitations, error)
+	Delete(context.Context, *DeleteInvitationRequest) (*types.Empty, error)
 }
 
 func RegisterUserInvitationRegistryServer(s *grpc.Server, srv UserInvitationRegistryServer) {
 	s.RegisterService(&_UserInvitationRegistry_serviceDesc, srv)
 }
 
-func _UserInvitationRegistry_SendInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserInvitationRegistry_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendInvitationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserInvitationRegistryServer).SendInvitation(ctx, in)
+		return srv.(UserInvitationRegistryServer).Send(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserInvitationRegistry/SendInvitation",
+		FullMethod: "/ttn.lorawan.v3.UserInvitationRegistry/Send",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserInvitationRegistryServer).SendInvitation(ctx, req.(*SendInvitationRequest))
+		return srv.(UserInvitationRegistryServer).Send(ctx, req.(*SendInvitationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserInvitationRegistry_ListInvitations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserInvitationRegistry_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(types.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserInvitationRegistryServer).ListInvitations(ctx, in)
+		return srv.(UserInvitationRegistryServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserInvitationRegistry/ListInvitations",
+		FullMethod: "/ttn.lorawan.v3.UserInvitationRegistry/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserInvitationRegistryServer).ListInvitations(ctx, req.(*types.Empty))
+		return srv.(UserInvitationRegistryServer).List(ctx, req.(*types.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserInvitationRegistry_DeleteInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserInvitationRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteInvitationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserInvitationRegistryServer).DeleteInvitation(ctx, in)
+		return srv.(UserInvitationRegistryServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UserInvitationRegistry/DeleteInvitation",
+		FullMethod: "/ttn.lorawan.v3.UserInvitationRegistry/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserInvitationRegistryServer).DeleteInvitation(ctx, req.(*DeleteInvitationRequest))
+		return srv.(UserInvitationRegistryServer).Delete(ctx, req.(*DeleteInvitationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -521,16 +521,16 @@ var _UserInvitationRegistry_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserInvitationRegistryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SendInvitation",
-			Handler:    _UserInvitationRegistry_SendInvitation_Handler,
+			MethodName: "Send",
+			Handler:    _UserInvitationRegistry_Send_Handler,
 		},
 		{
-			MethodName: "ListInvitations",
-			Handler:    _UserInvitationRegistry_ListInvitations_Handler,
+			MethodName: "List",
+			Handler:    _UserInvitationRegistry_List_Handler,
 		},
 		{
-			MethodName: "DeleteInvitation",
-			Handler:    _UserInvitationRegistry_DeleteInvitation_Handler,
+			MethodName: "Delete",
+			Handler:    _UserInvitationRegistry_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -538,58 +538,58 @@ var _UserInvitationRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_c793b6fcb2d020ac)
+	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_1732412f65d99497)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_c793b6fcb2d020ac)
+	golang_proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_user_services_1732412f65d99497)
 }
 
-var fileDescriptor_user_services_c793b6fcb2d020ac = []byte{
-	// 727 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x95, 0x4f, 0x48, 0xdc, 0x4c,
-	0x18, 0xc6, 0x67, 0xfc, 0x3e, 0xfc, 0x60, 0x3e, 0xd9, 0x6f, 0x1d, 0x44, 0x3f, 0xa3, 0xbc, 0x62,
-	0x5a, 0x91, 0x4a, 0x37, 0x01, 0xed, 0xc9, 0x9b, 0xfd, 0x43, 0x91, 0xf6, 0x20, 0x16, 0xa1, 0x94,
-	0x82, 0x64, 0x77, 0xc7, 0xec, 0x74, 0x35, 0x49, 0x33, 0xb3, 0xca, 0x22, 0x82, 0x78, 0x28, 0xde,
-	0x5a, 0xe8, 0xa5, 0xc7, 0xd2, 0x5e, 0x3c, 0x7a, 0xf4, 0xe8, 0x51, 0xe8, 0x45, 0xe8, 0xc5, 0xa3,
-	0x9b, 0xf4, 0xe0, 0xd1, 0xa3, 0xb7, 0x96, 0x9d, 0x24, 0xc6, 0x8d, 0xc6, 0xf5, 0x96, 0xf8, 0xbc,
-	0xf3, 0xfc, 0xde, 0x67, 0xde, 0xd7, 0x2c, 0x99, 0x58, 0x75, 0x7d, 0x6b, 0xc3, 0x72, 0x4a, 0x42,
-	0x5a, 0x95, 0xba, 0x69, 0x79, 0xdc, 0x6c, 0x08, 0xe6, 0x2f, 0x0b, 0xe6, 0xaf, 0xf3, 0x0a, 0x13,
-	0x86, 0xe7, 0xbb, 0xd2, 0xa5, 0x05, 0x29, 0x1d, 0x23, 0x2e, 0x35, 0xd6, 0x67, 0xb4, 0x92, 0xcd,
-	0x65, 0xad, 0x51, 0x36, 0x2a, 0xee, 0x9a, 0x69, 0xbb, 0xb6, 0x6b, 0xaa, 0xb2, 0x72, 0x63, 0x45,
-	0xbd, 0xa9, 0x17, 0xf5, 0x14, 0x1d, 0xd7, 0x46, 0x6d, 0xd7, 0xb5, 0x57, 0x99, 0xb2, 0xb7, 0x1c,
-	0xc7, 0x95, 0x96, 0xe4, 0xae, 0x13, 0x9b, 0x6b, 0x23, 0xb1, 0x7a, 0xe9, 0xc1, 0xd6, 0x3c, 0xd9,
-	0x8c, 0xc5, 0x7b, 0xd7, 0x1b, 0xe4, 0x55, 0xe6, 0x48, 0xbe, 0xc2, 0x99, 0x9f, 0x38, 0xc0, 0xf5,
-	0x22, 0x9f, 0xdb, 0x35, 0x99, 0xe8, 0xa3, 0x37, 0xa7, 0x8c, 0xd4, 0xe9, 0xef, 0x7f, 0x93, 0xbe,
-	0x25, 0xc1, 0xfc, 0x45, 0x66, 0x73, 0x21, 0xfd, 0x26, 0x7d, 0x4d, 0xc8, 0x13, 0x9f, 0x59, 0x92,
-	0xb5, 0xff, 0x4a, 0xc7, 0x8d, 0xce, 0xf0, 0x46, 0xaa, 0x2d, 0xb2, 0xf7, 0x0d, 0x26, 0xa4, 0x36,
-	0x90, 0x2d, 0x69, 0x8b, 0x7a, 0xff, 0xce, 0xcf, 0x5f, 0x9f, 0x7b, 0xfe, 0xd5, 0x7b, 0x15, 0x4c,
-	0xcc, 0xe2, 0x29, 0x5a, 0x26, 0xff, 0x3c, 0x67, 0x52, 0xd9, 0x42, 0xf6, 0x4c, 0x2c, 0xdc, 0xee,
-	0x39, 0xae, 0x3c, 0x47, 0xe8, 0x70, 0xe4, 0x69, 0x6e, 0xaa, 0x69, 0xf1, 0xaa, 0x30, 0xe2, 0x87,
-	0x2d, 0x5a, 0x27, 0x64, 0xc9, 0xab, 0xe6, 0x76, 0x9f, 0x6a, 0xb7, 0x93, 0xee, 0x2b, 0x12, 0x68,
-	0x1d, 0x24, 0xe3, 0x2a, 0xa9, 0x1d, 0xe8, 0x03, 0x26, 0x34, 0x75, 0x5c, 0xb0, 0x84, 0xd8, 0x70,
-	0xfd, 0x2a, 0x7d, 0x90, 0x4f, 0x4d, 0x6a, 0x12, 0xfa, 0xa0, 0x11, 0x8d, 0xdf, 0x48, 0xc6, 0x6f,
-	0x3c, 0x6b, 0x8f, 0x5f, 0x2f, 0x29, 0xfe, 0xa4, 0xa6, 0xe7, 0x26, 0x35, 0xbd, 0xd8, 0xaa, 0xdd,
-	0xc8, 0x32, 0x21, 0x4f, 0xd9, 0x2a, 0x8b, 0x53, 0x8f, 0xdd, 0x14, 0x69, 0x3e, 0xdd, 0x9b, 0x5c,
-	0xea, 0xff, 0x8a, 0x4a, 0xa7, 0x8a, 0x19, 0xea, 0xd6, 0xf4, 0xef, 0xbf, 0x08, 0x69, 0xbb, 0xcc,
-	0x55, 0x2a, 0x4c, 0x08, 0xfa, 0x8e, 0x14, 0x5e, 0x72, 0x11, 0x4d, 0x4c, 0xad, 0xda, 0x5d, 0x98,
-	0x99, 0x82, 0xe8, 0xa0, 0x3e, 0xa6, 0x98, 0xc3, 0x74, 0x28, 0xcb, 0x8c, 0x97, 0x98, 0xee, 0x60,
-	0x52, 0x4c, 0x97, 0x6e, 0x6e, 0x61, 0xfe, 0x05, 0x6b, 0xd2, 0xc9, 0xfc, 0xb5, 0x8c, 0x2a, 0xd2,
-	0x0b, 0xce, 0x14, 0x46, 0x72, 0x72, 0xc1, 0xfa, 0x2d, 0x17, 0x6c, 0x79, 0xbc, 0x54, 0x67, 0x4d,
-	0xb5, 0xba, 0x0e, 0xf9, 0x2f, 0x09, 0x1c, 0x19, 0xdc, 0x21, 0xf1, 0xd0, 0xcd, 0x68, 0x91, 0xbb,
-	0xc6, 0x29, 0x92, 0x7e, 0xc4, 0xa4, 0x98, 0x6e, 0x4d, 0x5e, 0xe8, 0x6c, 0x45, 0xb7, 0xd0, 0xb3,
-	0x0a, 0xfc, 0x48, 0x33, 0xbb, 0x87, 0x36, 0x37, 0x2d, 0x8f, 0x2f, 0xd7, 0x59, 0xd3, 0x88, 0x76,
-	0x7d, 0xfa, 0x47, 0x0f, 0x19, 0x54, 0x09, 0x9d, 0x75, 0x1e, 0x7d, 0xc1, 0x2e, 0xbf, 0x18, 0x35,
-	0x52, 0x78, 0xc5, 0x9c, 0x6a, 0xaa, 0xd0, 0x89, 0x6c, 0x03, 0x9d, 0x7a, 0xb7, 0xed, 0x1f, 0x52,
-	0x7d, 0xf6, 0xeb, 0x7d, 0x26, 0xbf, 0x3c, 0xa3, 0xc6, 0xf0, 0x36, 0x1a, 0x43, 0xea, 0x24, 0x68,
-	0x8e, 0x87, 0x36, 0x92, 0x6d, 0xe1, 0xca, 0x21, 0x7d, 0x40, 0x01, 0x0a, 0xb4, 0x03, 0x40, 0x39,
-	0x29, 0x46, 0xff, 0x45, 0x57, 0x92, 0x5c, 0xbb, 0xf3, 0x6c, 0x45, 0xb7, 0x2c, 0x31, 0x6a, 0xaa,
-	0x03, 0xf5, 0xf8, 0x1b, 0x3e, 0x6a, 0x01, 0x3e, 0x6e, 0x01, 0x3e, 0x69, 0x01, 0x3a, 0x6d, 0x01,
-	0x3a, 0x6b, 0x01, 0x3a, 0x6f, 0x01, 0xba, 0x68, 0x01, 0xde, 0x0e, 0x00, 0xef, 0x06, 0x80, 0xf6,
-	0x02, 0xc0, 0xfb, 0x01, 0xa0, 0x83, 0x00, 0xd0, 0x61, 0x00, 0xe8, 0x28, 0x00, 0x7c, 0x1c, 0x00,
-	0x3e, 0x09, 0x00, 0x9d, 0x06, 0x80, 0xcf, 0x02, 0x40, 0xe7, 0x01, 0xe0, 0x8b, 0x00, 0xd0, 0x76,
-	0x08, 0x68, 0x37, 0x04, 0xfc, 0x29, 0x04, 0xf4, 0x25, 0x04, 0xfc, 0x35, 0x04, 0xb4, 0x17, 0x02,
-	0xda, 0x0f, 0x01, 0x1f, 0x84, 0x80, 0x0f, 0x43, 0xc0, 0x6f, 0x1e, 0xda, 0xae, 0x21, 0x6b, 0x4c,
-	0xd6, 0xb8, 0x63, 0x0b, 0xc3, 0x61, 0x72, 0xc3, 0xf5, 0xeb, 0x66, 0xe7, 0xef, 0x83, 0x57, 0xb7,
-	0x4d, 0x29, 0x1d, 0xaf, 0x5c, 0xee, 0x55, 0x51, 0x66, 0xfe, 0x04, 0x00, 0x00, 0xff, 0xff, 0x42,
-	0x31, 0xcb, 0x9a, 0x27, 0x07, 0x00, 0x00,
+var fileDescriptor_user_services_1732412f65d99497 = []byte{
+	// 722 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0x3f, 0x4c, 0xdb, 0x4c,
+	0x18, 0xc6, 0x7d, 0x80, 0x32, 0x1c, 0x11, 0xfa, 0x38, 0x21, 0xf8, 0x30, 0xe8, 0x45, 0xf8, 0xfb,
+	0x10, 0xfa, 0xd0, 0x17, 0x5b, 0x82, 0x4e, 0x6c, 0xf4, 0x8f, 0x10, 0x6a, 0x07, 0x4a, 0xcb, 0xd2,
+	0x4a, 0x20, 0x27, 0x39, 0x9c, 0x6b, 0xc0, 0x76, 0x7d, 0x17, 0x50, 0x84, 0xa8, 0x10, 0x13, 0x52,
+	0x87, 0x56, 0xea, 0xd2, 0xb1, 0xea, 0xc4, 0xd0, 0x81, 0x91, 0x91, 0x91, 0x11, 0xa9, 0x0b, 0x23,
+	0xb1, 0x3b, 0x30, 0x55, 0x8c, 0x8c, 0x95, 0xef, 0x9c, 0x84, 0x98, 0x04, 0xb2, 0xc5, 0xf7, 0xbe,
+	0xf7, 0xfc, 0xee, 0x79, 0xef, 0xc9, 0xe1, 0xa9, 0x4d, 0x2f, 0xb0, 0x77, 0x6c, 0x37, 0xc7, 0x85,
+	0x5d, 0x28, 0x5b, 0xb6, 0xcf, 0xac, 0x0a, 0xa7, 0xc1, 0x3a, 0xa7, 0xc1, 0x36, 0x2b, 0x50, 0x6e,
+	0xfa, 0x81, 0x27, 0x3c, 0x32, 0x20, 0x84, 0x6b, 0x26, 0xad, 0xe6, 0xf6, 0x9c, 0x9e, 0x73, 0x98,
+	0x28, 0x55, 0xf2, 0x66, 0xc1, 0xdb, 0xb2, 0x1c, 0xcf, 0xf1, 0x2c, 0xd9, 0x96, 0xaf, 0x6c, 0xc8,
+	0x2f, 0xf9, 0x21, 0x7f, 0xa9, 0xed, 0xfa, 0xb8, 0xe3, 0x79, 0xce, 0x26, 0x95, 0xf2, 0xb6, 0xeb,
+	0x7a, 0xc2, 0x16, 0xcc, 0x73, 0x13, 0x71, 0x7d, 0x2c, 0xa9, 0x36, 0x34, 0xe8, 0x96, 0x2f, 0xaa,
+	0x49, 0xf1, 0x9f, 0xbb, 0x07, 0x64, 0x45, 0xea, 0x0a, 0xb6, 0xc1, 0x68, 0x50, 0x57, 0x80, 0xbb,
+	0x4d, 0x01, 0x73, 0x4a, 0xa2, 0x5e, 0x1f, 0x6f, 0xef, 0x52, 0x55, 0x67, 0x3f, 0xf5, 0xe1, 0xec,
+	0x2a, 0xa7, 0xc1, 0x0a, 0x75, 0x18, 0x17, 0x41, 0x95, 0xbc, 0xc6, 0x99, 0x27, 0x01, 0xb5, 0x05,
+	0x25, 0x93, 0x66, 0xab, 0x71, 0x53, 0xad, 0xab, 0xee, 0xf7, 0x15, 0xca, 0x85, 0x3e, 0x94, 0x6e,
+	0x89, 0x8b, 0xc6, 0xe0, 0xc1, 0xcf, 0x5f, 0x5f, 0x7a, 0xfa, 0x8d, 0x8c, 0x04, 0xf1, 0x79, 0x34,
+	0x43, 0xd6, 0x70, 0xef, 0x22, 0x15, 0x04, 0xd2, 0xfd, 0x8b, 0x54, 0x3c, 0xac, 0x37, 0x29, 0xf5,
+	0xc6, 0xc8, 0xa8, 0xd2, 0xb3, 0x76, 0xe5, 0x2d, 0xb1, 0x22, 0x37, 0x93, 0x1f, 0x7b, 0xc4, 0xc1,
+	0x99, 0x55, 0xbf, 0xd8, 0xf6, 0xd4, 0x6a, 0xfd, 0x61, 0xca, 0xbf, 0x92, 0x02, 0x7a, 0x0b, 0xc5,
+	0xbc, 0x4d, 0x89, 0x8d, 0x1c, 0x20, 0x3c, 0xa0, 0x14, 0x97, 0x6d, 0xce, 0x77, 0xbc, 0xa0, 0x48,
+	0xfe, 0xeb, 0x4c, 0xac, 0xf7, 0xd4, 0xc9, 0xc3, 0xa6, 0xba, 0x6e, 0xb3, 0x7e, 0xdd, 0xe6, 0xb3,
+	0xf8, 0xba, 0x8d, 0x9c, 0x64, 0x4f, 0xeb, 0x46, 0x47, 0x87, 0x96, 0x9f, 0x48, 0xc5, 0x87, 0x78,
+	0x8b, 0x33, 0x4f, 0xe9, 0x26, 0x15, 0x94, 0x4c, 0xb4, 0xb3, 0xb2, 0xd4, 0xcc, 0x48, 0x47, 0xe2,
+	0xdf, 0x92, 0x48, 0x66, 0xfe, 0x4a, 0x11, 0xf7, 0x66, 0x7f, 0xf7, 0x62, 0x1c, 0xab, 0x2c, 0x14,
+	0x0a, 0x94, 0x73, 0xb2, 0x81, 0xf1, 0x0b, 0xc6, 0xc5, 0x8a, 0x8c, 0x54, 0x37, 0xbc, 0x54, 0x83,
+	0xda, 0x68, 0x4c, 0x48, 0xde, 0x28, 0x19, 0x49, 0xf3, 0x92, 0xb0, 0x92, 0x0f, 0x38, 0xab, 0xf2,
+	0xb5, 0xb0, 0xbc, 0xf4, 0x9c, 0x56, 0xc9, 0x74, 0xe7, 0xf4, 0xa9, 0x8e, 0xe6, 0x4c, 0x53, 0x8d,
+	0xaa, 0x5c, 0x9f, 0xa9, 0x71, 0xcf, 0x4c, 0x6d, 0x9f, 0xe5, 0xca, 0xb4, 0x2a, 0x13, 0xfa, 0x0e,
+	0xf7, 0xc7, 0x3e, 0xd5, 0xe6, 0x2e, 0x8c, 0x8e, 0xb4, 0xc7, 0xf2, 0x8e, 0x69, 0x6d, 0xe2, 0xc8,
+	0x47, 0x84, 0xb3, 0x2a, 0x24, 0x9d, 0xcc, 0x36, 0x23, 0xd4, 0x9d, 0xd9, 0x79, 0x09, 0x7d, 0xa4,
+	0x5b, 0x0f, 0x9b, 0xb5, 0x76, 0x6d, 0x9f, 0xad, 0x97, 0x69, 0xd5, 0x54, 0x91, 0x9e, 0xfd, 0xd1,
+	0x83, 0x87, 0xa5, 0x3b, 0x77, 0x9b, 0xa9, 0xc7, 0xa9, 0xf1, 0x18, 0xac, 0xe1, 0xbe, 0x57, 0xd4,
+	0x2d, 0x92, 0xa9, 0x34, 0x36, 0x5e, 0xbd, 0xdd, 0x7f, 0x7f, 0xbc, 0x47, 0xe4, 0xe9, 0x06, 0x8d,
+	0xac, 0xc5, 0x1a, 0x7b, 0xe4, 0xd0, 0x5f, 0xe2, 0xbe, 0x78, 0xe8, 0xa4, 0xc3, 0x46, 0x7d, 0x2c,
+	0xcd, 0x6d, 0x32, 0xb9, 0x31, 0x24, 0x55, 0x07, 0x48, 0x8b, 0x2a, 0x59, 0x6f, 0xfc, 0x37, 0xee,
+	0x0c, 0x55, 0xad, 0x77, 0x7f, 0xec, 0x04, 0x30, 0xd3, 0x02, 0x78, 0xfc, 0x1d, 0x9d, 0xd5, 0x00,
+	0x9d, 0xd7, 0x00, 0x5d, 0xd4, 0x40, 0xbb, 0xac, 0x81, 0x76, 0x55, 0x03, 0xed, 0xba, 0x06, 0xda,
+	0x4d, 0x0d, 0xd0, 0x7e, 0x08, 0xe8, 0x30, 0x04, 0xed, 0x28, 0x04, 0x74, 0x1c, 0x82, 0x76, 0x12,
+	0x82, 0x76, 0x1a, 0x82, 0x76, 0x16, 0x02, 0x3a, 0x0f, 0x01, 0x5d, 0x84, 0xa0, 0x5d, 0x86, 0x80,
+	0xae, 0x42, 0xd0, 0xae, 0x43, 0x40, 0x37, 0x21, 0x68, 0xfb, 0x11, 0x68, 0x87, 0x11, 0xa0, 0xcf,
+	0x11, 0x68, 0x5f, 0x23, 0x40, 0xdf, 0x22, 0xd0, 0x8e, 0x22, 0xd0, 0x8e, 0x23, 0x40, 0x27, 0x11,
+	0xa0, 0xd3, 0x08, 0xd0, 0x9b, 0xff, 0x1d, 0xcf, 0x14, 0x25, 0x2a, 0x4a, 0xcc, 0x75, 0xb8, 0xe9,
+	0x52, 0xb1, 0xe3, 0x05, 0x65, 0xab, 0xf5, 0x6d, 0xf7, 0xcb, 0x8e, 0x25, 0x84, 0xeb, 0xe7, 0xf3,
+	0x19, 0x69, 0x65, 0xee, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x92, 0x5d, 0x03, 0x9a, 0xe3, 0x06,
+	0x00, 0x00,
 }

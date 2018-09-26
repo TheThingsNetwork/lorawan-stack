@@ -29,7 +29,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 service ApplicationRegistry {
   // Create a new application. This also sets the given organization or user as
   // first collaborator with all possible rights.
-  rpc CreateApplication(CreateApplicationRequest) returns (Application) {
+  rpc Create(CreateApplicationRequest) returns (Application) {
     option (google.api.http) = {
       post: "/users/{collaborator.user_ids.user_id}/applications"
       body: "*"
@@ -43,14 +43,14 @@ service ApplicationRegistry {
   // Get the application with the given identifiers, selecting the fields given
   // by the field mask. The method may return more or less fields, depending on
   // the rights of the caller.
-  rpc GetApplication(GetApplicationRequest) returns (Application) {
+  rpc Get(GetApplicationRequest) returns (Application) {
     option (google.api.http) = {
       get: "/applications/{application_ids.application_id}"
     };
   };
 
   // List applications. See request message for details.
-  rpc ListApplications(ListApplicationsRequest) returns (Applications) {
+  rpc List(ListApplicationsRequest) returns (Applications) {
     option (google.api.http) = {
       get: "/applications"
       additional_bindings {
@@ -62,14 +62,14 @@ service ApplicationRegistry {
     };
   };
 
-  rpc UpdateApplication(UpdateApplicationRequest) returns (Application) {
+  rpc Update(UpdateApplicationRequest) returns (Application) {
     option (google.api.http) = {
       put: "/applications/{application.ids.application_id}"
       body: "*"
     };
   };
 
-  rpc DeleteApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/applications/{application_id}"
     };
@@ -77,20 +77,20 @@ service ApplicationRegistry {
 }
 
 service ApplicationAccess {
-  rpc ListApplicationRights(ApplicationIdentifiers) returns (Rights) {
+  rpc ListRights(ApplicationIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/applications/{application_id}/rights"
     };
   };
 
-  rpc CreateApplicationAPIKey(CreateApplicationAPIKeyRequest) returns (APIKey) {
+  rpc CreateAPIKey(CreateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/applications/{application_ids.application_id}/api-keys"
       body: "*"
     };
   };
 
-  rpc ListApplicationAPIKeys(ApplicationIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(ApplicationIdentifiers) returns (APIKeys) {
     option (google.api.http) = {
       get: "/applications/{application_id}/api-keys"
     };
@@ -99,7 +99,7 @@ service ApplicationAccess {
   // Update the rights of an existing application API key. To generate an API key,
   // the CreateApplicationAPIKey should be used. To delete an API key, update it
   // with zero rights.
-  rpc UpdateApplicationAPIKey(UpdateApplicationAPIKeyRequest) returns (APIKey) {
+  rpc UpdateAPIKey(UpdateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/applications/{application_ids.application_id}/api-keys/{api_key.id}"
       body: "*"
@@ -107,14 +107,14 @@ service ApplicationAccess {
   };
 
   // Setting a collaborator without rights, removes them.
-  rpc SetApplicationCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
+  rpc SetCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/applications/{application_ids.application_id}/collaborators"
       body: "*"
     };
   };
 
-  rpc ListApplicationCollaborators(ApplicationIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(ApplicationIdentifiers) returns (Collaborators) {
     option (google.api.http) = {
       get: "/applications/{application_id}/collaborators"
     };

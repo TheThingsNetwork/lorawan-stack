@@ -27,7 +27,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 service UserRegistry {
   // Register a new user. This method may be restricted by network settings.
-  rpc CreateUser(CreateUserRequest) returns (User) {
+  rpc Create(CreateUserRequest) returns (User) {
     option (google.api.http) = {
       post: "/users"
       body: "*"
@@ -37,27 +37,27 @@ service UserRegistry {
   // Get the user with the given identifiers, selecting the fields given by the
   // field mask. The method may return more or less fields, depending on the rights
   // of the caller.
-  rpc GetUser(GetUserRequest) returns (User) {
+  rpc Get(GetUserRequest) returns (User) {
     option (google.api.http) = {
       get: "/users/{user_ids.user_id}"
     };
   };
 
-  rpc UpdateUser(UpdateUserRequest) returns (User) {
+  rpc Update(UpdateUserRequest) returns (User) {
     option (google.api.http) = {
       put: "/users/{user.ids.user_id}"
       body: "*"
     };
   };
 
-  rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty) {
+  rpc UpdatePassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{user_ids.user_id}/password"
       body: "*"
     };
   }
 
-  rpc DeleteUser(UserIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(UserIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/{user_id}"
     };
@@ -65,20 +65,20 @@ service UserRegistry {
 }
 
 service UserAccess {
-  rpc ListUserRights(UserIdentifiers) returns (Rights) {
+  rpc ListRights(UserIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/users/{user_id}/rights"
     };
   };
 
-  rpc CreateUserAPIKey(CreateUserAPIKeyRequest) returns (APIKey) {
+  rpc CreateAPIKey(CreateUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/users/{user_ids.user_id}/api-keys"
       body: "*"
     };
   };
 
-  rpc ListUserAPIKeys(UserIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(UserIdentifiers) returns (APIKeys) {
     option (google.api.http) = {
       get: "/users/{user_id}/api-keys"
     };
@@ -87,7 +87,7 @@ service UserAccess {
   // Update the rights of an existing user API key. To generate an API key,
   // the CreateUserAPIKey should be used. To delete an API key, update it
   // with zero rights.
-  rpc UpdateUserAPIKey(UpdateUserAPIKeyRequest) returns (APIKey) {
+  rpc UpdateAPIKey(UpdateUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/users/{user_ids.user_id}/api-keys/{api_key.id}"
       body: "*"
@@ -96,20 +96,20 @@ service UserAccess {
 }
 
 service UserInvitationRegistry {
-  rpc SendInvitation(SendInvitationRequest) returns (google.protobuf.Empty) {
+  rpc Send(SendInvitationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/invitations"
       body: "*"
     };
   };
 
-  rpc ListInvitations(google.protobuf.Empty) returns (Invitations) {
+  rpc List(google.protobuf.Empty) returns (Invitations) {
     option (google.api.http) = {
       get: "/invitations"
     };
   };
 
-  rpc DeleteInvitation(DeleteInvitationRequest) returns (google.protobuf.Empty) {
+  rpc Delete(DeleteInvitationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/invitations"
     };

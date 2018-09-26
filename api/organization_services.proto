@@ -28,7 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 service OrganizationRegistry {
   // Create a new organization. This also sets the given user as
   // first collaborator with all possible rights.
-  rpc CreateOrganization(CreateOrganizationRequest) returns (Organization) {
+  rpc Create(CreateOrganizationRequest) returns (Organization) {
     option (google.api.http) = {
       post: "/users/{collaborator.user_ids.user_id}/organizations"
       body: "*"
@@ -38,14 +38,14 @@ service OrganizationRegistry {
   // Get the organization with the given identifiers, selecting the fields given
   // by the field mask. The method may return more or less fields, depending on
   // the rights of the caller.
-  rpc GetOrganization(GetOrganizationRequest) returns (Organization) {
+  rpc Get(GetOrganizationRequest) returns (Organization) {
     option (google.api.http) = {
       get: "/organizations/{organization_ids.organization_id}"
     };
   };
 
   // List organizations. See request message for details.
-  rpc ListOrganizations(ListOrganizationsRequest) returns (Organizations) {
+  rpc List(ListOrganizationsRequest) returns (Organizations) {
     option (google.api.http) = {
       get: "/organizations"
       additional_bindings {
@@ -54,14 +54,14 @@ service OrganizationRegistry {
     };
   };
 
-  rpc UpdateOrganization(UpdateOrganizationRequest) returns (Organization) {
+  rpc Update(UpdateOrganizationRequest) returns (Organization) {
     option (google.api.http) = {
       put: "/organizations/{organization.ids.organization_id}"
       body: "*"
     };
   };
 
-  rpc DeleteOrganization(OrganizationIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(OrganizationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/organizations/{organization_id}"
     };
@@ -69,20 +69,20 @@ service OrganizationRegistry {
 }
 
 service OrganizationAccess {
-  rpc ListOrganizationRights(OrganizationIdentifiers) returns (Rights) {
+  rpc ListRights(OrganizationIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/organizations/{organization_id}/rights"
     };
   };
 
-  rpc CreateOrganizationAPIKey(CreateOrganizationAPIKeyRequest) returns (APIKey) {
+  rpc CreateAPIKey(CreateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/organizations/{organization_ids.organization_id}/api-keys"
       body: "*"
     };
   };
 
-  rpc ListOrganizationAPIKeys(OrganizationIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(OrganizationIdentifiers) returns (APIKeys) {
     option (google.api.http) = {
       get: "/organizations/{organization_id}/api-keys"
     };
@@ -91,7 +91,7 @@ service OrganizationAccess {
   // Update the rights of an existing organization API key. To generate an API key,
   // the CreateOrganizationAPIKey should be used. To delete an API key, update it
   // with zero rights.
-  rpc UpdateOrganizationAPIKey(UpdateOrganizationAPIKeyRequest) returns (APIKey) {
+  rpc UpdateAPIKey(UpdateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}"
       body: "*"
@@ -102,14 +102,14 @@ service OrganizationAccess {
   // are considered to be a collaborator if they have at least one right on the
   // organization.
   // Note that only users can collaborate (be member of) an organization.
-  rpc SetOrganizationCollaborator(SetOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
+  rpc SetCollaborator(SetOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/organizations/{organization_ids.organization_id}/collaborators"
       body: "*"
     };
   };
 
-  rpc ListOrganizationCollaborators(OrganizationIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(OrganizationIdentifiers) returns (Collaborators) {
     option (google.api.http) = {
       get: "/organizations/{organization_id}/collaborators"
     };

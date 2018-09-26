@@ -29,7 +29,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-func request_UserRegistry_CreateUser_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserRegistry_Create_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateUserRequest
 	var metadata runtime.ServerMetadata
 
@@ -37,16 +37,16 @@ func request_UserRegistry_CreateUser_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.CreateUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Create(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_UserRegistry_GetUser_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_UserRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
-func request_UserRegistry_GetUser_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetUserRequest
 	var metadata runtime.ServerMetadata
 
@@ -68,16 +68,16 @@ func request_UserRegistry_GetUser_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserRegistry_GetUser_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserRegistry_Get_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Get(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_UserRegistry_UpdateUser_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserRegistry_Update_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateUserRequest
 	var metadata runtime.ServerMetadata
 
@@ -103,12 +103,12 @@ func request_UserRegistry_UpdateUser_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user.ids.user_id", err)
 	}
 
-	msg, err := client.UpdateUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Update(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_UserRegistry_UpdateUserPassword_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserRegistry_UpdatePassword_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateUserPasswordRequest
 	var metadata runtime.ServerMetadata
 
@@ -134,16 +134,16 @@ func request_UserRegistry_UpdateUserPassword_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
 
-	msg, err := client.UpdateUserPassword(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdatePassword(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_UserRegistry_DeleteUser_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_UserRegistry_DeleteUser_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UserIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -165,20 +165,20 @@ func request_UserRegistry_DeleteUser_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserRegistry_DeleteUser_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserRegistry_Delete_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.DeleteUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_UserAccess_ListUserRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserAccess_ListRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_UserAccess_ListUserRights_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserAccess_ListRights_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UserIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -200,16 +200,16 @@ func request_UserAccess_ListUserRights_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserAccess_ListUserRights_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserAccess_ListRights_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListUserRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_UserAccess_CreateUserAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserAccess_CreateAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateUserAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
@@ -235,16 +235,16 @@ func request_UserAccess_CreateUserAPIKey_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
 
-	msg, err := client.CreateUserAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_UserAccess_ListUserAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserAccess_ListAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_UserAccess_ListUserAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserAccess_ListAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UserIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -266,16 +266,16 @@ func request_UserAccess_ListUserAPIKeys_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserAccess_ListUserAPIKeys_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserAccess_ListAPIKeys_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListUserAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_UserAccess_UpdateUserAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserAccess_UpdateAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateUserAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
@@ -312,12 +312,12 @@ func request_UserAccess_UpdateUserAPIKey_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "api_key.id", err)
 	}
 
-	msg, err := client.UpdateUserAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_UserInvitationRegistry_SendInvitation_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserInvitationRegistry_Send_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SendInvitationRequest
 	var metadata runtime.ServerMetadata
 
@@ -325,33 +325,33 @@ func request_UserInvitationRegistry_SendInvitation_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.SendInvitation(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Send(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func request_UserInvitationRegistry_ListInvitations_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserInvitationRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq types.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.ListInvitations(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
 var (
-	filter_UserInvitationRegistry_DeleteInvitation_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_UserInvitationRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_UserInvitationRegistry_DeleteInvitation_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserInvitationRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq DeleteInvitationRequest
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserInvitationRegistry_DeleteInvitation_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_UserInvitationRegistry_Delete_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.DeleteInvitation(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -394,7 +394,7 @@ func RegisterUserRegistryHandler(ctx context.Context, mux *runtime.ServeMux, con
 // "UserRegistryClient" to call the correct interceptors.
 func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client UserRegistryClient) error {
 
-	mux.Handle("POST", pattern_UserRegistry_CreateUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_UserRegistry_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -412,18 +412,18 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserRegistry_CreateUser_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserRegistry_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserRegistry_CreateUser_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserRegistry_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_UserRegistry_GetUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_UserRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -441,18 +441,18 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserRegistry_GetUser_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserRegistry_GetUser_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_UserRegistry_UpdateUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_UserRegistry_Update_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -470,18 +470,18 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserRegistry_UpdateUser_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserRegistry_Update_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserRegistry_UpdateUser_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserRegistry_Update_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_UserRegistry_UpdateUserPassword_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_UserRegistry_UpdatePassword_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -499,18 +499,18 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserRegistry_UpdateUserPassword_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserRegistry_UpdatePassword_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserRegistry_UpdateUserPassword_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserRegistry_UpdatePassword_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_UserRegistry_DeleteUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_UserRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -528,14 +528,14 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserRegistry_DeleteUser_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserRegistry_DeleteUser_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -543,27 +543,27 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_UserRegistry_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, ""))
+	pattern_UserRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, ""))
 
-	pattern_UserRegistry_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_ids.user_id"}, ""))
+	pattern_UserRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_ids.user_id"}, ""))
 
-	pattern_UserRegistry_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user.ids.user_id"}, ""))
+	pattern_UserRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user.ids.user_id"}, ""))
 
-	pattern_UserRegistry_UpdateUserPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "password"}, ""))
+	pattern_UserRegistry_UpdatePassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "password"}, ""))
 
-	pattern_UserRegistry_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, ""))
+	pattern_UserRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, ""))
 )
 
 var (
-	forward_UserRegistry_CreateUser_0 = runtime.ForwardResponseMessage
+	forward_UserRegistry_Create_0 = runtime.ForwardResponseMessage
 
-	forward_UserRegistry_GetUser_0 = runtime.ForwardResponseMessage
+	forward_UserRegistry_Get_0 = runtime.ForwardResponseMessage
 
-	forward_UserRegistry_UpdateUser_0 = runtime.ForwardResponseMessage
+	forward_UserRegistry_Update_0 = runtime.ForwardResponseMessage
 
-	forward_UserRegistry_UpdateUserPassword_0 = runtime.ForwardResponseMessage
+	forward_UserRegistry_UpdatePassword_0 = runtime.ForwardResponseMessage
 
-	forward_UserRegistry_DeleteUser_0 = runtime.ForwardResponseMessage
+	forward_UserRegistry_Delete_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterUserAccessHandlerFromEndpoint is same as RegisterUserAccessHandler but
@@ -604,7 +604,7 @@ func RegisterUserAccessHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 // "UserAccessClient" to call the correct interceptors.
 func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux, client UserAccessClient) error {
 
-	mux.Handle("GET", pattern_UserAccess_ListUserRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_UserAccess_ListRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -622,18 +622,18 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserAccess_ListUserRights_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserAccess_ListRights_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserAccess_ListUserRights_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserAccess_ListRights_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_UserAccess_CreateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_UserAccess_CreateAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -651,18 +651,18 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserAccess_CreateUserAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserAccess_CreateAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserAccess_CreateUserAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserAccess_CreateAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_UserAccess_ListUserAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_UserAccess_ListAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -680,18 +680,18 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserAccess_ListUserAPIKeys_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserAccess_ListAPIKeys_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserAccess_ListUserAPIKeys_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserAccess_ListAPIKeys_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_UserAccess_UpdateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_UserAccess_UpdateAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -709,14 +709,14 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserAccess_UpdateUserAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserAccess_UpdateAPIKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserAccess_UpdateUserAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserAccess_UpdateAPIKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -724,23 +724,23 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_UserAccess_ListUserRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "rights"}, ""))
+	pattern_UserAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "rights"}, ""))
 
-	pattern_UserAccess_CreateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, ""))
+	pattern_UserAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, ""))
 
-	pattern_UserAccess_ListUserAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "api-keys"}, ""))
+	pattern_UserAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "api-keys"}, ""))
 
-	pattern_UserAccess_UpdateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "api_key.id"}, ""))
+	pattern_UserAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "api_key.id"}, ""))
 )
 
 var (
-	forward_UserAccess_ListUserRights_0 = runtime.ForwardResponseMessage
+	forward_UserAccess_ListRights_0 = runtime.ForwardResponseMessage
 
-	forward_UserAccess_CreateUserAPIKey_0 = runtime.ForwardResponseMessage
+	forward_UserAccess_CreateAPIKey_0 = runtime.ForwardResponseMessage
 
-	forward_UserAccess_ListUserAPIKeys_0 = runtime.ForwardResponseMessage
+	forward_UserAccess_ListAPIKeys_0 = runtime.ForwardResponseMessage
 
-	forward_UserAccess_UpdateUserAPIKey_0 = runtime.ForwardResponseMessage
+	forward_UserAccess_UpdateAPIKey_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterUserInvitationRegistryHandlerFromEndpoint is same as RegisterUserInvitationRegistryHandler but
@@ -781,7 +781,7 @@ func RegisterUserInvitationRegistryHandler(ctx context.Context, mux *runtime.Ser
 // "UserInvitationRegistryClient" to call the correct interceptors.
 func RegisterUserInvitationRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client UserInvitationRegistryClient) error {
 
-	mux.Handle("POST", pattern_UserInvitationRegistry_SendInvitation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_UserInvitationRegistry_Send_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -799,18 +799,18 @@ func RegisterUserInvitationRegistryHandlerClient(ctx context.Context, mux *runti
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserInvitationRegistry_SendInvitation_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserInvitationRegistry_Send_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserInvitationRegistry_SendInvitation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserInvitationRegistry_Send_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_UserInvitationRegistry_ListInvitations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_UserInvitationRegistry_List_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -828,18 +828,18 @@ func RegisterUserInvitationRegistryHandlerClient(ctx context.Context, mux *runti
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserInvitationRegistry_ListInvitations_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserInvitationRegistry_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserInvitationRegistry_ListInvitations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserInvitationRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_UserInvitationRegistry_DeleteInvitation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_UserInvitationRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -857,14 +857,14 @@ func RegisterUserInvitationRegistryHandlerClient(ctx context.Context, mux *runti
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserInvitationRegistry_DeleteInvitation_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserInvitationRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserInvitationRegistry_DeleteInvitation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserInvitationRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -872,17 +872,17 @@ func RegisterUserInvitationRegistryHandlerClient(ctx context.Context, mux *runti
 }
 
 var (
-	pattern_UserInvitationRegistry_SendInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
+	pattern_UserInvitationRegistry_Send_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
 
-	pattern_UserInvitationRegistry_ListInvitations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
+	pattern_UserInvitationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
 
-	pattern_UserInvitationRegistry_DeleteInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
+	pattern_UserInvitationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
 )
 
 var (
-	forward_UserInvitationRegistry_SendInvitation_0 = runtime.ForwardResponseMessage
+	forward_UserInvitationRegistry_Send_0 = runtime.ForwardResponseMessage
 
-	forward_UserInvitationRegistry_ListInvitations_0 = runtime.ForwardResponseMessage
+	forward_UserInvitationRegistry_List_0 = runtime.ForwardResponseMessage
 
-	forward_UserInvitationRegistry_DeleteInvitation_0 = runtime.ForwardResponseMessage
+	forward_UserInvitationRegistry_Delete_0 = runtime.ForwardResponseMessage
 )

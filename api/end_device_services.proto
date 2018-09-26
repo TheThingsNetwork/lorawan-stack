@@ -27,7 +27,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 // The NsDeviceRegistry service allows clients to manage their end devices on the Network Server.
 service NsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers.
-  rpc ListDevices(ListEndDevicesRequest) returns (EndDevices) {
+  rpc List(ListEndDevicesRequest) returns (EndDevices) {
     option (google.api.http) = {
       get: "/ns/applications/{application_ids.application_id}/devices"
     };
@@ -35,14 +35,14 @@ service NsDeviceRegistry {
 
   // GetDevice returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
-  rpc GetDevice(GetEndDeviceRequest) returns (EndDevice) {
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       get: "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
     };
   };
 
   // SetDevice creates or updates the device.
-  rpc SetDevice(SetDeviceRequest) returns (EndDevice) {
+  rpc Set(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/ns/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
@@ -55,7 +55,7 @@ service NsDeviceRegistry {
 
   // DeleteDevice deletes the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
-  rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/ns/applications/{application_ids.application_id}/devices/{device_id}"
     };
@@ -65,7 +65,7 @@ service NsDeviceRegistry {
 // The AsDeviceRegistry service allows clients to manage their end devices on the Application Server.
 service AsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers.
-  rpc ListDevices(ListEndDevicesRequest) returns (EndDevices) {
+  rpc List(ListEndDevicesRequest) returns (EndDevices) {
     option (google.api.http) = {
       get: "/as/applications/{application_ids.application_id}/devices"
     };
@@ -73,14 +73,14 @@ service AsDeviceRegistry {
 
   // GetDevice returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
-  rpc GetDevice(GetEndDeviceRequest) returns (EndDevice) {
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       get: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
     };
   };
 
   // SetDevice creates or updates the device.
-  rpc SetDevice(SetDeviceRequest) returns (EndDevice) {
+  rpc Set(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
@@ -93,7 +93,7 @@ service AsDeviceRegistry {
 
   // DeleteDevice deletes the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
-  rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/as/applications/{application_ids.application_id}/devices/{device_id}"
     };
@@ -103,7 +103,7 @@ service AsDeviceRegistry {
 // The JsDeviceRegistry service allows clients to manage their end devices on the Join Server.
 service JsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers.
-  rpc ListDevices(ListEndDevicesRequest) returns (EndDevices) {
+  rpc List(ListEndDevicesRequest) returns (EndDevices) {
     option (google.api.http) = {
       get: "/js/applications/{application_ids.application_id}/devices"
     };
@@ -111,14 +111,14 @@ service JsDeviceRegistry {
 
   // GetDevice returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
-  rpc GetDevice(GetEndDeviceRequest) returns (EndDevice) {
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       get: "/js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
     };
   };
 
   // SetDevice creates or updates the device.
-  rpc SetDevice(SetDeviceRequest) returns (EndDevice) {
+  rpc Set(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/js/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
@@ -131,7 +131,7 @@ service JsDeviceRegistry {
 
   // DeleteDevice deletes the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
-  rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/js/applications/{application_ids.application_id}/devices/{device_id}"
     };
