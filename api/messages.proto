@@ -222,3 +222,8 @@ message MessagePayloadFormatters {
   // Parameter for the down_formatter, must be set together.
   string down_formatter_parameter = 4;
 }
+
+message DownlinkQueueRequest {
+  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  repeated ApplicationDownlink downlinks = 2;
+}

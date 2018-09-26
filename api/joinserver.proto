@@ -15,6 +15,10 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/join.proto";
 import "lorawan-stack/api/keys.proto";
 
@@ -52,4 +56,35 @@ message AppSKeyResponse {
 // The AsJs service connects an Application Server to a Join Server.
 service AsJs {
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
+}
+
+// The JsDeviceRegistry service allows clients to manage their end devices on the Join Server.
+service JsDeviceRegistry {
+  // GetDevice returns the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      get: "/js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
+    };
+  };
+
+  // SetDevice creates or updates the device.
+  rpc Set(SetDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      put: "/js/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
+      body: "*"
+      additional_bindings {
+        post: "/js/applications/{device.ids.application_ids.application_id}/devices"
+        body: "*"
+      };
+    };
+  };
+
+  // DeleteDevice deletes the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/js/applications/{application_ids.application_id}/devices/{device_id}"
+    };
+  };
 }

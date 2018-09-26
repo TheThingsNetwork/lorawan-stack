@@ -17,7 +17,7 @@ syntax = "proto3";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-import "lorawan-stack/api/application_services.proto";
+import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
 
@@ -65,3 +65,35 @@ service AppAs {
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
 }
+
+// The AsDeviceRegistry service allows clients to manage their end devices on the Application Server.
+service AsDeviceRegistry {
+  // GetDevice returns the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      get: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
+    };
+  };
+
+  // SetDevice creates or updates the device.
+  rpc Set(SetDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      put: "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
+      body: "*"
+      additional_bindings {
+        post: "/as/applications/{device.ids.application_ids.application_id}/devices"
+        body: "*"
+      };
+    };
+  };
+
+  // DeleteDevice deletes the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/as/applications/{application_ids.application_id}/devices/{device_id}"
+    };
+  };
+}
+

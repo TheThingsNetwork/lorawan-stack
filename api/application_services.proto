@@ -120,8 +120,3 @@ service ApplicationAccess {
     };
   };
 }
-
-message DownlinkQueueRequest {
-  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  repeated ApplicationDownlink downlinks = 2;
-}
