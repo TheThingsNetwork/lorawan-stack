@@ -26,7 +26,8 @@ import '../../styles/main.styl'
   }
 ))
 export default class Init extends React.PureComponent {
-  componentWillMount () {
+
+  componentDidMount () {
     this.props.dispatch({ type: 'INITIALIZE' })
   }
 
