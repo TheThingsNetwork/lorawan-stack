@@ -136,17 +136,15 @@ func (r *RegistryRPC) List(ctx context.Context, req *ttnpb.ListEndDevicesRequest
 
 	eds := make([]*ttnpb.EndDevice, 0, defaultListCount)
 
-	_ = offset
-	// TODO: Range
-	//total, err := RangeByIdentifiers(r.Interface, req.ApplicationIdentifiers, "", count, offset, func(dev *Device) bool {
-	//eds = append(eds, dev.EndDevice)
-	//return count == 0 || uint64(len(eds)) < count
-	//})
-	//if err != nil {
-	//return nil, err
-	//}
+	total, err := RangeByIdentifiers(r.Interface, &ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: req.ApplicationIdentifiers}, "", count, offset, func(dev *Device) bool {
+		eds = append(eds, dev.EndDevice)
+		return count == 0 || uint64(len(eds)) < count
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	return &ttnpb.EndDevices{EndDevices: eds}, setPaginationHeaders(ctx, path.Join(md.Host, md.URI), count, page, 0)
+	return &ttnpb.EndDevices{EndDevices: eds}, setPaginationHeaders(ctx, path.Join(md.Host, md.URI), count, page, total)
 }
 
 // GetDevice returns the device associated with req.EndDeviceIdentifiers in underlying registry, if found.

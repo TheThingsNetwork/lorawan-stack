@@ -104,11 +104,11 @@ func TestRegistryRPC(t *testing.T) {
 		pretty.Ldiff(t, dev, pb)
 	}
 
-	devs, err := dr.List(newContext(nil, nil), &pb.EndDeviceIdentifiers)
+	devs, err := dr.List(newContext(nil, nil), &ttnpb.ListEndDevicesRequest{ApplicationIdentifiers: pb.EndDeviceIdentifiers.ApplicationIdentifiers})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(devs, should.BeNil)
 
-	devs, err = dr.List(ctx, &pb.EndDeviceIdentifiers)
+	devs, err = dr.List(ctx, &ttnpb.ListEndDevicesRequest{ApplicationIdentifiers: pb.EndDeviceIdentifiers.ApplicationIdentifiers})
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 		devs.EndDevices[0].CreatedAt = pb.GetCreatedAt()
 		devs.EndDevices[0].UpdatedAt = pb.GetUpdatedAt()
@@ -124,10 +124,10 @@ func TestRegistryRPC(t *testing.T) {
 	}
 	a.So(v, should.Equal, ttnpb.Empty)
 
-	_, err = dr.List(newContext(nil, nil), &pb.EndDeviceIdentifiers)
+	_, err = dr.List(newContext(nil, nil), &ttnpb.ListEndDevicesRequest{ApplicationIdentifiers: pb.EndDeviceIdentifiers.ApplicationIdentifiers})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	devs, err = dr.List(ctx, &pb.EndDeviceIdentifiers)
+	devs, err = dr.List(ctx, &ttnpb.ListEndDevicesRequest{ApplicationIdentifiers: pb.EndDeviceIdentifiers.ApplicationIdentifiers})
 	if a.So(err, should.BeNil) && a.So(devs, should.NotBeNil) {
 		a.So(devs.EndDevices, should.BeEmpty)
 	}
@@ -401,7 +401,7 @@ func TestListDevices(t *testing.T) {
 				t.Fatal("Timed out waiting for error to be consumed by SetHeader")
 			}
 
-			devs, err := dr.List(ctx, &dev.EndDeviceIdentifiers)
+			devs, err := dr.List(ctx, &ttnpb.ListEndDevicesRequest{ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers})
 			a.So(err, should.BeNil)
 			if tc.ShouldList && a.So(devs.EndDevices, should.HaveLength, 1) {
 				a.So(pretty.Diff(devs.EndDevices[0], dev.EndDevice), should.BeEmpty)
@@ -426,7 +426,7 @@ func TestGetDevice(t *testing.T) {
 
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.Get(ctx, &pb.EndDeviceIdentifiers)
+	v, err := dr.Get(ctx, &ttnpb.GetEndDeviceRequest{EndDeviceIdentifiers: pb.EndDeviceIdentifiers})
 	a.So(err, should.EqualErrorOrDefinition, ErrDeviceNotFound)
 	a.So(v, should.BeNil)
 
@@ -435,7 +435,7 @@ func TestGetDevice(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.Get(ctx, &pb.EndDeviceIdentifiers)
+	v, err = dr.Get(ctx, &ttnpb.GetEndDeviceRequest{EndDeviceIdentifiers: pb.EndDeviceIdentifiers})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -446,7 +446,7 @@ func TestGetDevice(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.Get(ctx, &pb.EndDeviceIdentifiers)
+	v, err = dr.Get(ctx, &ttnpb.GetEndDeviceRequest{EndDeviceIdentifiers: pb.EndDeviceIdentifiers})
 	a.So(err, should.EqualErrorOrDefinition, ErrTooManyDevices)
 	a.So(v, should.BeNil)
 }
