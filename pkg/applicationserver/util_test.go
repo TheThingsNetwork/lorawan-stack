@@ -181,6 +181,7 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerIn
 }
 
 type mockNS struct {
+	ttnpb.AsNsServer
 	linkCh chan ttnpb.ApplicationIdentifiers
 	upCh   chan *ttnpb.ApplicationUp
 }
