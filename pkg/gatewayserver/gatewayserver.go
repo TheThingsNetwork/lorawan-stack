@@ -197,7 +197,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	if er == nil {
 		return nil, errEntityRegistryNotFound
 	}
-	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetGateway(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask: types.FieldMask{
 			Paths: []string{
@@ -298,7 +298,7 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	if er == nil {
 		return nil, errEntityRegistryNotFound
 	}
-	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetGateway(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          types.FieldMask{Paths: []string{"frequency_plan_id"}},
 	}, rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()))

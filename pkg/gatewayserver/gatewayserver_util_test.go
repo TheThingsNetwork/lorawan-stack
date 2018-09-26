@@ -100,7 +100,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
-func (is *mockIS) GetGateway(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
 	uid := unique.ID(ctx, req.GatewayIdentifiers)
 	gtw, ok := is.gateways[uid]
 	if !ok {
@@ -109,7 +109,7 @@ func (is *mockIS) GetGateway(ctx context.Context, req *ttnpb.GetGatewayRequest) 
 	return gtw, nil
 }
 
-func (is *mockIS) ListGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {
+func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {
 	res = &ttnpb.Rights{}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -131,31 +131,31 @@ func (is *mockIS) ListGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdent
 	return
 }
 
-func (is *mockIS) CreateGateway(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+func (is *mockIS) Create(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) ListGateways(context.Context, *ttnpb.ListGatewaysRequest) (*ttnpb.Gateways, error) {
+func (is *mockIS) List(context.Context, *ttnpb.ListGatewaysRequest) (*ttnpb.Gateways, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) UpdateGateway(context.Context, *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+func (is *mockIS) Update(context.Context, *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) DeleteGateway(context.Context, *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (is *mockIS) Delete(context.Context, *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) CreateGatewayAPIKey(context.Context, *ttnpb.CreateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (is *mockIS) CreateAPIKey(context.Context, *ttnpb.CreateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) ListGatewayAPIKeys(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.APIKeys, error) {
+func (is *mockIS) ListAPIKeys(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.APIKeys, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) UpdateGatewayAPIKey(context.Context, *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (is *mockIS) UpdateAPIKey(context.Context, *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) SetGatewayCollaborator(context.Context, *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
+func (is *mockIS) SetCollaborator(context.Context, *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
 	return nil, errors.New("not implemented")
 }
-func (is *mockIS) ListGatewayCollaborators(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.Collaborators, error) {
+func (is *mockIS) ListCollaborators(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.Collaborators, error) {
 	return nil, errors.New("not implemented")
 }
 
