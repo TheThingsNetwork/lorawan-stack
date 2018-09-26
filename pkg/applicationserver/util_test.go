@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	ptypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -298,6 +297,8 @@ func (ns *mockNS) LinkApplication(ids *ttnpb.ApplicationIdentifiers, stream ttnp
 }
 
 type mockIS struct {
+	ttnpb.ApplicationRegistryServer
+	ttnpb.ApplicationAccessServer
 	applications     map[string]*ttnpb.Application
 	applicationAuths map[string][]string
 }
@@ -328,7 +329,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key
 	}
 }
 
-func (is *mockIS) GetApplication(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
+func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
 	uid := unique.ID(ctx, req.ApplicationIdentifiers)
 	app, ok := is.applications[uid]
 	if !ok {
@@ -337,7 +338,7 @@ func (is *mockIS) GetApplication(ctx context.Context, req *ttnpb.GetApplicationR
 	return app, nil
 }
 
-func (is *mockIS) ListApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (res *ttnpb.Rights, err error) {
+func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (res *ttnpb.Rights, err error) {
 	res = &ttnpb.Rights{}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -357,34 +358,6 @@ func (is *mockIS) ListApplicationRights(ctx context.Context, ids *ttnpb.Applicat
 		}
 	}
 	return
-}
-
-func (is *mockIS) CreateApplication(context.Context, *ttnpb.CreateApplicationRequest) (*ttnpb.Application, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) ListApplications(context.Context, *ttnpb.ListApplicationsRequest) (*ttnpb.Applications, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) UpdateApplication(context.Context, *ttnpb.UpdateApplicationRequest) (*ttnpb.Application, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) DeleteApplication(context.Context, *ttnpb.ApplicationIdentifiers) (*ptypes.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) CreateApplicationAPIKey(context.Context, *ttnpb.CreateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) ListApplicationAPIKeys(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.APIKeys, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) UpdateApplicationAPIKey(context.Context, *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) SetApplicationCollaborator(context.Context, *ttnpb.SetApplicationCollaboratorRequest) (*ptypes.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) ListApplicationCollaborators(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.Collaborators, error) {
-	return nil, errors.New("not implemented")
 }
 
 type mockJS struct {
