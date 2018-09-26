@@ -15,14 +15,122 @@
 package assertions
 
 import (
+	"fmt"
+	"io"
 	"reflect"
 	"strconv"
+	"sync"
 	"testing"
 
-	ssassertions "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
+
+func TestSameElements(t *testing.T) {
+	for _, tc := range []struct {
+		A    interface{}
+		B    interface{}
+		Same bool
+	}{
+		{
+			[][]byte{{42}, {43}},
+			[][]byte{{43}, {44}},
+			false,
+		},
+		{
+			[][]byte{{43}, {43}},
+			[][]byte{{43}, {44}},
+			false,
+		},
+		{
+			[][]byte{{43}, {43}, {43}},
+			[][]byte{{43}, {44}},
+			false,
+		},
+		{
+			[][]byte{{42}, {43}, {43}},
+			[][]byte{{43}, {42}, {43}},
+			true,
+		},
+		{
+			[][]byte{},
+			[][]byte{{43}, {42}, {43}},
+			false,
+		},
+		{
+			[][]byte{{43}, {42}, {43}},
+			[][]byte{},
+			false,
+		},
+		{
+			[]string{"a", "b"},
+			[][]byte{{'a'}, {'b'}},
+			false,
+		},
+		{
+			map[string]interface{}{"a": 42, "b": 77},
+			map[string]int{"a": 42, "b": 77},
+			true,
+		},
+		{
+			map[string]io.Writer{},
+			[0]int{},
+			true,
+		},
+		{
+			func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
+			map[string]interface{}{"42": 42, "77": "b"},
+			true,
+		},
+		{
+			func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
+			map[string]interface{}{"42": 42.2, "77": "b"},
+			false,
+		},
+		{
+			[]int{42},
+			[]int{42},
+			true,
+		},
+		{
+			[]byte("ttn"),
+			"ttn",
+			true,
+		},
+		{
+			[]byte("foo"),
+			"bar",
+			false,
+		},
+		{
+			[2]int{42, 43},
+			[]int{43, 42},
+			true,
+		},
+		{
+			[3]int{42, 43, 43},
+			[]int{43, 42},
+			false,
+		},
+		{
+			"hello",
+			"olleh",
+			true,
+		},
+		{
+			"foo",
+			"fof",
+			false,
+		},
+	} {
+		t.Run(fmt.Sprintf("%v/%v", tc.A, tc.B), func(t *testing.T) {
+			a := assertions.New(t)
+
+			a.So(sameElementsDeep(tc.A, tc.B), should.Equal, tc.Same)
+			a.So(sameElementsDiff(tc.A, tc.B), should.Equal, tc.Same)
+		})
+	}
+}
 
 func TestShouldHaveSameElements(t *testing.T) {
 	for i, tc := range []struct {
@@ -75,12 +183,12 @@ func TestShouldHaveSameElements(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := ssassertions.New(t)
+			a := assertions.New(t)
 
 			a.So(ShouldHaveSameElements(tc.A, tc.B, reflect.DeepEqual), tc.ShouldFunc)
 			a.So(ShouldNotHaveSameElements(tc.A, tc.B, reflect.DeepEqual), tc.ShouldNotFunc)
-			a.So(ShouldHaveSameElements(tc.A, tc.B, test.DiffEqual), tc.ShouldFunc)
-			a.So(ShouldNotHaveSameElements(tc.A, tc.B, test.DiffEqual), tc.ShouldNotFunc)
+			a.So(ShouldHaveSameElements(tc.A, tc.B, diffEqual), tc.ShouldFunc)
+			a.So(ShouldNotHaveSameElements(tc.A, tc.B, diffEqual), tc.ShouldNotFunc)
 			a.So(ShouldHaveSameElementsDeep(tc.A, tc.B), tc.ShouldFunc)
 			a.So(ShouldNotHaveSameElementsDeep(tc.A, tc.B), tc.ShouldNotFunc)
 			a.So(ShouldHaveSameElementsDiff(tc.A, tc.B), tc.ShouldFunc)

@@ -409,7 +409,7 @@ func TestListDevices(t *testing.T) {
 
 			select {
 			case md := <-setHeaderMD:
-				a.So(md, should.HaveSameElements, tc.Headers, test.SameElementsDeep)
+				a.So(md, should.HaveSameElementsDeep, tc.Headers)
 
 			case <-time.After(test.Delay):
 				t.Fatal("Timed out waiting for SetHeader to be called")

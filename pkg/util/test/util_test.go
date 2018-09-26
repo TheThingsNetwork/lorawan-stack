@@ -17,121 +17,13 @@ package test
 import (
 	"errors"
 	"fmt"
-	"io"
 	"strconv"
-	"sync"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
-
-func TestSameElements(t *testing.T) {
-	for _, tc := range []struct {
-		A    interface{}
-		B    interface{}
-		Same bool
-	}{
-		{
-			[][]byte{{42}, {43}},
-			[][]byte{{43}, {44}},
-			false,
-		},
-		{
-			[][]byte{{43}, {43}},
-			[][]byte{{43}, {44}},
-			false,
-		},
-		{
-			[][]byte{{43}, {43}, {43}},
-			[][]byte{{43}, {44}},
-			false,
-		},
-		{
-			[][]byte{{42}, {43}, {43}},
-			[][]byte{{43}, {42}, {43}},
-			true,
-		},
-		{
-			[][]byte{},
-			[][]byte{{43}, {42}, {43}},
-			false,
-		},
-		{
-			[][]byte{{43}, {42}, {43}},
-			[][]byte{},
-			false,
-		},
-		{
-			[]string{"a", "b"},
-			[][]byte{{'a'}, {'b'}},
-			false,
-		},
-		{
-			map[string]interface{}{"a": 42, "b": 77},
-			map[string]int{"a": 42, "b": 77},
-			true,
-		},
-		{
-			map[string]io.Writer{},
-			[0]int{},
-			true,
-		},
-		{
-			func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
-			map[string]interface{}{"42": 42, "77": "b"},
-			true,
-		},
-		{
-			func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
-			map[string]interface{}{"42": 42.2, "77": "b"},
-			false,
-		},
-		{
-			[]int{42},
-			[]int{42},
-			true,
-		},
-		{
-			[]byte("ttn"),
-			"ttn",
-			true,
-		},
-		{
-			[]byte("foo"),
-			"bar",
-			false,
-		},
-		{
-			[2]int{42, 43},
-			[]int{43, 42},
-			true,
-		},
-		{
-			[3]int{42, 43, 43},
-			[]int{43, 42},
-			false,
-		},
-		{
-			"hello",
-			"olleh",
-			true,
-		},
-		{
-			"foo",
-			"fof",
-			false,
-		},
-	} {
-		t.Run(fmt.Sprintf("%v/%v", tc.A, tc.B), func(t *testing.T) {
-			a := assertions.New(t)
-
-			a.So(SameElementsDeep(tc.A, tc.B), should.Equal, tc.Same)
-			a.So(SameElementsDiff(tc.A, tc.B), should.Equal, tc.Same)
-		})
-	}
-}
 
 func TestMust(t *testing.T) {
 	for i, tc := range []struct {

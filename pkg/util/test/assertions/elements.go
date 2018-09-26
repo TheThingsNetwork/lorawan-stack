@@ -16,9 +16,9 @@ package assertions
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/kr/pretty"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 const (
@@ -28,6 +28,160 @@ const (
 	shouldNotHaveBeenEqual    = "Expected: '%v'\nActual:   '%v'\n(Should not be equal, but they were)!"
 	shouldNotHaveBeenEqualErr = "Expected: '%v'\nActual:   '%v'\n(Should not be equal but equality check errored with '%v')!"
 )
+
+// diffEqual reports if pretty.Diff of x and y is empty.
+func diffEqual(x, y interface{}) bool {
+	return len(pretty.Diff(x, y)) == 0
+}
+
+// ranger represents an entity, which can be ranged over(e.g. sync.Map).
+type ranger interface {
+	Range(f func(k, v interface{}) bool)
+}
+
+type indexRanger struct {
+	reflect.Value
+}
+
+func (rv indexRanger) Range(f func(k, v interface{}) bool) {
+	for i := 0; i < rv.Len(); i++ {
+		if !f(nil, rv.Index(i).Interface()) {
+			return
+		}
+	}
+}
+
+type mapRanger struct {
+	reflect.Value
+}
+
+func (rv mapRanger) Range(f func(k, v interface{}) bool) {
+	for _, k := range rv.MapKeys() {
+		if !f(k.Interface(), rv.MapIndex(k).Interface()) {
+			return
+		}
+	}
+}
+
+func wrapRanger(v interface{}) (ranger, bool) {
+	r, ok := v.(ranger)
+	if ok {
+		return r, ok
+	}
+
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.String, reflect.Slice, reflect.Array:
+		return indexRanger{rv}, true
+	case reflect.Map:
+		return mapRanger{rv}, true
+	}
+	return nil, false
+}
+
+// sameElements reports whether xs and ys represent the same multiset of elements
+// under equality given by eq.
+// Signature of eq must be func(A, B) bool, where A, B are types, which
+// elements of xs and ys can be assigned to respectively.
+// It panics if either xs or ys is not one of:
+// 1. string, slice, array or map kind
+// 2. value, which implements ranger interface(e.g. sync.Map)
+func sameElements(eq interface{}, xs, ys interface{}) bool {
+	if xs == nil || ys == nil {
+		return xs == ys
+	}
+
+	ev := reflect.ValueOf(eq)
+	if ev.Kind() != reflect.Func {
+		panic(fmt.Errorf("expected kind of eq to be a function, got: %s", ev.Kind()))
+	}
+
+	xr, ok := wrapRanger(xs)
+	if !ok {
+		panic(fmt.Errorf("cannot range over values of type %T", xs))
+	}
+
+	yr, ok := wrapRanger(ys)
+	if !ok {
+		panic(fmt.Errorf("cannot range over values of type %T", ys))
+	}
+
+	// NOTE: A hashmap cannot be used directly here, as []byte is unhashable.
+	type entry struct {
+		key    interface{}
+		values []reflect.Value
+		found  map[int]bool
+	}
+	var entries []*entry
+
+	findEntry := func(k interface{}) *entry {
+		for _, e := range entries {
+			if reflect.DeepEqual(e.key, k) {
+				return e
+			}
+		}
+		return nil
+	}
+
+	xr.Range(func(k, v interface{}) bool {
+		e := findEntry(k)
+		if e == nil {
+			e = &entry{
+				key:   k,
+				found: map[int]bool{},
+			}
+			entries = append(entries, e)
+		}
+		e.values = append(e.values, reflect.ValueOf(v))
+		return true
+	})
+
+	ok = true
+	yr.Range(func(k, yv interface{}) bool {
+		e := findEntry(k)
+		if e == nil {
+			ok = false
+			return false
+		}
+
+		for i, v := range e.values {
+			if e.found[i] {
+				continue
+			}
+
+			if ev.Call([]reflect.Value{v, reflect.ValueOf(yv)})[0].Bool() {
+				ok = true
+				e.found[i] = true
+				return true
+			}
+		}
+		ok = false
+		return false
+	})
+
+	if !ok {
+		return false
+	}
+
+	for _, e := range entries {
+		for i := range e.values {
+			if !e.found[i] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// sameElementsDeep is like sameElements, but uses reflect.DeepEqual as eq.
+func sameElementsDeep(xs, ys interface{}) bool {
+	return sameElements(reflect.DeepEqual, xs, ys)
+}
+
+// sameElementsDiff is like sameElements, but uses diffEqual as eq.
+func sameElementsDiff(xs, ys interface{}) bool {
+	return sameElements(diffEqual, xs, ys)
+}
 
 // ShouldHaveSameElements takes as arguments the actual value, the expected value and a
 // comparison function.
@@ -44,7 +198,7 @@ func ShouldHaveSameElements(actual interface{}, expected ...interface{}) (messag
 		return
 	}
 
-	if !test.SameElements(expected[1], actual, expected[0]) {
+	if !sameElements(expected[1], actual, expected[0]) {
 		return fmt.Sprintf(shouldHaveBeenEqual, expected[0], actual)
 	}
 
@@ -67,7 +221,7 @@ func ShouldNotHaveSameElements(actual interface{}, expected ...interface{}) (mes
 		return
 	}
 
-	if test.SameElements(expected[1], actual, expected[0]) {
+	if sameElements(expected[1], actual, expected[0]) {
 		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
 	}
 
@@ -88,7 +242,7 @@ func ShouldHaveSameElementsDeep(actual interface{}, expected ...interface{}) (me
 		return
 	}
 
-	if !test.SameElementsDeep(actual, expected[0]) {
+	if !sameElementsDeep(actual, expected[0]) {
 		return fmt.Sprintf(shouldHaveBeenEqual, expected[0], actual)
 	}
 
@@ -110,7 +264,7 @@ func ShouldNotHaveSameElementsDeep(actual interface{}, expected ...interface{}) 
 		return
 	}
 
-	if test.SameElementsDeep(actual, expected[0]) {
+	if sameElementsDeep(actual, expected[0]) {
 		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
 	}
 
@@ -131,7 +285,7 @@ func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (me
 		return
 	}
 
-	if !test.SameElementsDiff(actual, expected[0]) {
+	if !sameElementsDiff(actual, expected[0]) {
 		return fmt.Sprintf(shouldHaveBeenEqualDiff, expected[0], actual, pretty.Diff(actual, expected[0]))
 	}
 
@@ -153,7 +307,7 @@ func ShouldNotHaveSameElementsDiff(actual interface{}, expected ...interface{}) 
 		return
 	}
 
-	if test.SameElementsDiff(actual, expected[0]) {
+	if sameElementsDiff(actual, expected[0]) {
 		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
 	}
 

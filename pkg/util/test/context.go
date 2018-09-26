@@ -16,77 +16,8 @@ package test
 
 import (
 	"context"
-	"reflect"
 	"testing"
-
-	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 )
-
-var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
-
-// ContextParent returns the parent context of ctx and true if one is found, nil and false otherwise.
-// ContextParent assumes that ctx has a parent iff it's located at field named Context.
-func ContextParent(ctx context.Context) (context.Context, bool) {
-	rv := reflect.ValueOf(ctx)
-	for rv.Kind() == reflect.Ptr {
-		rv = rv.Elem()
-	}
-	if !rv.IsValid() {
-		return nil, false
-	}
-
-	switch ctx := rv.Interface().(type) {
-	case errorcontext.ErrorContext:
-		// ErrorContext wraps the context twice
-		return ContextParent(ctx.Context)
-	}
-
-	rt := rv.Type()
-	if rt.Kind() != reflect.Struct {
-		return nil, false
-	}
-
-	f, ok := rt.FieldByName("Context")
-	if !ok {
-		return nil, false
-	}
-	if !f.Type.Implements(contextType) {
-		return nil, false
-	}
-
-	fv := rv.FieldByName("Context")
-	if (fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface) && fv.IsNil() {
-		return nil, true
-	}
-	return fv.Interface().(context.Context), true
-}
-
-// ContextHasParent reports whether parent is one of ctx's parents.
-// ContextHasParent assumes that ctx has a parent iff it's located at field named Context.
-func ContextHasParent(ctx, parent context.Context) bool {
-	for {
-		p, ok := ContextParent(ctx)
-		if !ok {
-			return false
-		}
-		if p == parent {
-			return true
-		}
-		ctx = p
-	}
-}
-
-// ContextRoot returns the root context of ctx.
-// ContextRoot assumes that ctx has a parent iff it's located at field named Context.
-func ContextRoot(ctx context.Context) context.Context {
-	for {
-		p, ok := ContextParent(ctx)
-		if !ok {
-			return ctx
-		}
-		ctx = p
-	}
-}
 
 type tKey struct{}
 
