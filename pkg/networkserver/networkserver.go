@@ -86,7 +86,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			ADRAckDelay:       uint32(band.ADRAckDelay),
 			ADRAckLimit:       uint32(band.ADRAckLimit),
 			ADRNbTrans:        1,
-			DutyCycle:         ttnpb.DUTY_CYCLE_1,
+			MaxDutyCycle:      ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:           band.DefaultMaxEIRP,
 			Rx1Delay:          ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
 			Rx1DataRateOffset: 0,
@@ -238,9 +238,9 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	// TODO: Queue LinkADRReq(https://github.com/TheThingsIndustries/ttn/issues/837)
 
-	if dev.MACState.DesiredParameters.DutyCycle != dev.MACState.CurrentParameters.DutyCycle {
+	if dev.MACState.DesiredParameters.MaxDutyCycle != dev.MACState.CurrentParameters.MaxDutyCycle {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DutyCycleReq{
-			MaxDutyCycle: dev.MACState.DesiredParameters.DutyCycle,
+			MaxDutyCycle: dev.MACState.DesiredParameters.MaxDutyCycle,
 		}).MACCommand())
 	}
 

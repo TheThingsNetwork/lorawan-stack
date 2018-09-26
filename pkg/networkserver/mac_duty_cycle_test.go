@@ -58,7 +58,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
-						DutyCycle: ttnpb.DUTY_CYCLE_2048,
+						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 					},
 				},
 			},
