@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/empty.proto";
+import "lorawan-stack/api/application_services.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
 
@@ -31,4 +32,7 @@ service GsNs {
 // The AsNs service connects an Application Server to a Network Server.
 service AsNs {
   rpc LinkApplication(ApplicationIdentifiers) returns (stream ApplicationUp);
+  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
 }

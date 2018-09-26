@@ -1528,7 +1528,6 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsNsServer(s, ns)
 	ttnpb.RegisterAsNsServer(s, ns)
-	ttnpb.RegisterNsApplicationDownlinkQueueServer(s, ns)
 	ttnpb.RegisterNsDeviceRegistryServer(s, ns)
 }
 

@@ -125,11 +125,3 @@ message DownlinkQueueRequest {
   EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   repeated ApplicationDownlink downlinks = 2;
 }
-
-// The NsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Network Server.
-// This API is typically used by the Application Server, and is therefore not exposed over HTTP.
-service NsApplicationDownlinkQueue {
-  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
-  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
-  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
-}
