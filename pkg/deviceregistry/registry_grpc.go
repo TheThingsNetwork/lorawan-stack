@@ -111,7 +111,7 @@ func setPaginationHeaders(ctx context.Context, url string, limit, page, total ui
 }
 
 // ListDevices lists devices matching filter in underlying registry.
-func (r *RegistryRPC) ListDevices(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (*ttnpb.EndDevices, error) {
+func (r *RegistryRPC) List(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (*ttnpb.EndDevices, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, req *ttnpb.ListEndDevices
 }
 
 // GetDevice returns the device associated with req.EndDeviceIdentifiers in underlying registry, if found.
-func (r *RegistryRPC) GetDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r *RegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequ
 }
 
 // SetDevice sets the device fields to match those of req.Device in underlying registry.
-func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r *RegistryRPC) Set(ctx context.Context, req *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 }
 
 // DeleteDevice deletes the device associated with id from underlying registry.
-func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (r *RegistryRPC) Delete(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, id.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
