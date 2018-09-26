@@ -32,6 +32,8 @@ var (
 	ErrDevNonceTooSmall     = errDevNonceTooSmall
 	ErrSessionKeyIDMismatch = errSessionKeyIDMismatch
 	ErrNoSession            = errNoSession
+
+	KeyToBytes = keyToBytes
 )
 
 func TestMICCheck(t *testing.T) {

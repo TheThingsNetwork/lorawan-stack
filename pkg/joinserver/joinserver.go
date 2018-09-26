@@ -42,6 +42,10 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_1,
 }
 
+func keyToBytes(k types.AES128Key) []byte {
+	return k[:]
+}
+
 // JoinServer implements the Join Server component.
 //
 // The Join Server exposes the NsJs and DeviceRegistry services.
@@ -249,47 +253,62 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 
-	if dev.RootKeys.AppKey == nil || dev.RootKeys.AppKey.Key.IsZero() {
+	if dev.RootKeys.AppKey == nil || len(dev.RootKeys.AppKey.Key) == 0 {
 		return nil, errMissingAppKey
 	}
 
+	var appKey types.AES128Key
+	if dev.RootKeys.AppKey.KEKLabel != "" {
+		// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+		panic("Unsupported")
+	}
+	copy(appKey[:], dev.RootKeys.AppKey.Key[:])
+
 	switch req.SelectedMacVersion {
 	case ttnpb.MAC_V1_1:
-		if dev.RootKeys.NwkKey == nil || dev.RootKeys.NwkKey.Key.IsZero() {
+		if dev.RootKeys.NwkKey == nil || len(dev.RootKeys.NwkKey.Key) == 0 {
 			return nil, errMissingNwkKey
 		}
 
-		if err := checkMIC(dev.RootKeys.NwkKey.Key, rawPayload); err != nil {
+		var nwkKey types.AES128Key
+		if dev.RootKeys.NwkKey.KEKLabel != "" {
+			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+			panic("Unsupported")
+		}
+		copy(nwkKey[:], dev.RootKeys.NwkKey.Key[:])
+
+		if err := checkMIC(nwkKey, rawPayload); err != nil {
 			return nil, errMICCheckFailed.WithCause(err)
 		}
 
-		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(dev.RootKeys.NwkKey.Key, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
+		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(nwkKey, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
 		if err != nil {
 			return nil, errMICComputeFailed.WithCause(err)
 		}
 
-		enc, err := crypto.EncryptJoinAccept(dev.RootKeys.NwkKey.Key, append(b[1:], mic[:]...))
+		enc, err := crypto.EncryptJoinAccept(nwkKey, append(b[1:], mic[:]...))
 		if err != nil {
 			return nil, errEncryptPayloadFailed.WithCause(err)
 		}
+
 		resp = &ttnpb.JoinResponse{
 			RawPayload: append(b[:1], enc...),
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      crypto.DeriveFNwkSIntKey(dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce),
+					Key:      keyToBytes(crypto.DeriveFNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      crypto.DeriveSNwkSIntKey(dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce),
+					Key:      keyToBytes(crypto.DeriveSNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key:      crypto.DeriveNwkSEncKey(dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce),
+					Key:      keyToBytes(crypto.DeriveNwkSEncKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      crypto.DeriveAppSKey(dev.RootKeys.AppKey.Key, jn, pld.JoinEUI, pld.DevNonce),
+					Key:      keyToBytes(crypto.DeriveAppSKey(appKey, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 			},
@@ -297,16 +316,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-		if err := checkMIC(dev.RootKeys.AppKey.Key, rawPayload); err != nil {
+		if err := checkMIC(appKey, rawPayload); err != nil {
 			return nil, errMICCheckFailed.WithCause(err)
 		}
 
-		mic, err := crypto.ComputeLegacyJoinAcceptMIC(dev.RootKeys.AppKey.Key, b)
+		mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
 		if err != nil {
 			return nil, errMICComputeFailed.WithCause(err)
 		}
 
-		enc, err := crypto.EncryptJoinAccept(dev.RootKeys.AppKey.Key, append(b[1:], mic[:]...))
+		enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
 		if err != nil {
 			return nil, errEncryptPayloadFailed.WithCause(err)
 		}
@@ -314,11 +333,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			RawPayload: append(b[:1], enc...),
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      crypto.DeriveLegacyNwkSKey(dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce),
+					Key:      keyToBytes(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      crypto.DeriveLegacyAppSKey(dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce),
+					Key:      keyToBytes(crypto.DeriveLegacyAppSKey(appKey, jn, req.NetID, pld.DevNonce)),
 					KEKLabel: "",
 				},
 			},
