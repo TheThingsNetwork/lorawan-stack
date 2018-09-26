@@ -12,46 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationserver
+package redis
 
 import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func NewRedisDeviceRegistry(cl *redis.Client) DeviceRegistry {
-	return &redisDeviceRegistry{}
+type DeviceRegistry struct {
 }
 
-type redisDeviceRegistry struct {
-}
-
-func (r *redisDeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (r *redisDeviceRegistry) Set(context.Context, ttnpb.EndDeviceIdentifiers, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error {
+func (r *DeviceRegistry) Set(context.Context, ttnpb.EndDeviceIdentifiers, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error {
 	return errors.New("not implemented")
 }
 
-func NewRedisLinkRegistry(cl *redis.Client) LinkRegistry {
-	return &redisLinkRegistry{}
+type LinkRegistry struct {
 }
 
-type redisLinkRegistry struct {
-}
-
-func (r *redisLinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
+func (r *LinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (r *redisLinkRegistry) Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error {
+func (r *LinkRegistry) Range(context.Context, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	return errors.New("not implemented")
 }
 
-func (r *redisLinkRegistry) Range(context.Context, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+func (r *LinkRegistry) Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error {
 	return errors.New("not implemented")
 }
