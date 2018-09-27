@@ -17,6 +17,8 @@ package config
 import (
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -121,10 +123,20 @@ type Rights struct {
 	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
 }
 
-// KeyVault represents configuration for key vaults and which backend to use.
+// KeyVault represents configuration for key vaults.
 type KeyVault struct {
-	Backend string            `name:"backend" description:"Backend to use as key vault (static)"`
-	Static  map[string][]byte `name:"static" description:"Static labeled key encryption keys"`
+	Static map[string][]byte `name:"static" description:"Static labeled key encryption keys"`
+}
+
+// KeyVault returns an initialized crypto.KeyVault based on the configuration.
+// The order of precedence is Static.
+func (v KeyVault) KeyVault() crypto.KeyVault {
+	switch {
+	case v.Static != nil:
+		return cryptoutil.NewMemKeyVault(v.Static)
+	default:
+		return cryptoutil.NewMemKeyVault(map[string][]byte{})
+	}
 }
 
 // ServiceBase represents base service configuration.

@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -66,6 +67,7 @@ type Component struct {
 	fillers []fillcontext.Filler
 
 	FrequencyPlans *frequencyplans.Store
+	KeyVault       crypto.KeyVault
 
 	rightsFetcher rights.Fetcher
 
@@ -100,6 +102,7 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		tcpListeners: make(map[string]*listener),
 
 		FrequencyPlans: config.FrequencyPlans.Store(),
+		KeyVault:       config.KeyVault.KeyVault(),
 	}
 
 	if config.Sentry.DSN != "" {
