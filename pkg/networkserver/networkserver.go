@@ -384,7 +384,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	for _, cmd := range cmds {
 		cmdBuf, err = cmd.AppendLoRaWAN(cmdBuf)
 		if err != nil {
-			return nil, errMACEncodeFailed.WithCause(err)
+			return nil, errEncodeMAC.WithCause(err)
 		}
 	}
 
@@ -416,7 +416,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
-			return nil, errMissingNwkSEncKey
+			return nil, errUnknownNwkSEncKey
 		}
 
 		var key types.AES128Key
@@ -427,7 +427,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		copy(key[:], dev.Session.NwkSEncKey.Key[:])
 		cmdBuf, err = crypto.EncryptDownlink(key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
-			return nil, errMACEncryptFailed.WithCause(err)
+			return nil, errEncryptMAC.WithCause(err)
 		}
 	}
 
@@ -465,14 +465,14 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		},
 	}).MarshalLoRaWAN()
 	if err != nil {
-		return nil, errMarshalPayloadFailed.WithCause(err)
+		return nil, errEncodePayload.WithCause(err)
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
 	var key types.AES128Key
 	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		if dev.Session.FNwkSIntKey == nil || len(dev.Session.FNwkSIntKey.Key) == 0 {
-			return nil, errMissingFNwkSIntKey
+			return nil, errUnknownFNwkSIntKey
 		}
 
 		if dev.Session.NwkSEncKey.KEKLabel != "" {
@@ -482,7 +482,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		copy(key[:], dev.Session.NwkSEncKey.Key[:])
 	} else {
 		if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
-			return nil, errMissingSNwkSIntKey
+			return nil, errUnknownSNwkSIntKey
 		}
 		if dev.Session.SNwkSIntKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
@@ -910,7 +910,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	pld := up.Payload.GetMACPayload()
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	ns.applicationServersMu.RLock()
@@ -946,7 +946,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
-			return errMissingNwkSEncKey
+			return errUnknownNwkSEncKey
 		}
 
 		var key types.AES128Key
@@ -958,7 +958,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 		mac, err = crypto.DecryptUplink(key, *dev.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
 		if err != nil {
-			return errDecryptionFailed.WithCause(err)
+			return errDecrypt.WithCause(err)
 		}
 	}
 
@@ -1314,7 +1314,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 
 		uid := unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
 		if uid == "" {
-			return errMissingApplicationID
+			return errUnknownApplicationID
 		}
 
 		go func() {
@@ -1349,7 +1349,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("Join failed")
-	return errJoinFailed
+	return errJoin
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
@@ -1521,7 +1521,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("all Gateway Servers failed to schedule the downlink")
-	return nil, errScheduleFailed
+	return nil, errSchedule
 }
 
 // RegisterServices registers services provided by ns at s.

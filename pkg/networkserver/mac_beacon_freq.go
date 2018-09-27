@@ -22,7 +22,7 @@ import (
 
 func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) (err error) {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {

@@ -51,7 +51,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Payload: nil,
-			Error:   errMissingPayload,
+			Error:   errNoPayload,
 		},
 		{
 			Name:     "no request",

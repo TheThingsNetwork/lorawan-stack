@@ -29,7 +29,7 @@ var (
 
 func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, recvAt time.Time) (err error) {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {

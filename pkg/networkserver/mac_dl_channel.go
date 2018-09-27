@@ -28,7 +28,7 @@ var (
 
 func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) (err error) {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {

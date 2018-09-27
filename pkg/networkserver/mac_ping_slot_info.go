@@ -22,7 +22,7 @@ import (
 
 func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) error {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 	// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 	_ = pld.Period

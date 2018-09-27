@@ -29,7 +29,7 @@ var (
 
 func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (err error) {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {

@@ -29,7 +29,7 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	conf := &ttnpb.MACCommand_RekeyConf{

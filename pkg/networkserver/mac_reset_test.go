@@ -58,7 +58,7 @@ func TestHandleResetInd(t *testing.T) {
 				MACState:     &ttnpb.MACState{},
 			},
 			Payload: nil,
-			Error:   errMissingPayload,
+			Error:   errNoPayload,
 		},
 		{
 			Name: "empty queue",

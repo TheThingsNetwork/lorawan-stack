@@ -31,7 +31,7 @@ var (
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (err error) {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	fp, err := fps.GetByID(dev.FrequencyPlanID)

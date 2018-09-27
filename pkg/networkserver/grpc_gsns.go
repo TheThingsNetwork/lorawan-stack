@@ -46,7 +46,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	if up.Payload.Payload == nil {
 		if err := up.Payload.UnmarshalLoRaWAN(up.RawPayload); err != nil {
-			return nil, errUnmarshalPayloadFailed.WithCause(err)
+			return nil, errDecodePayload.WithCause(err)
 		}
 	}
 

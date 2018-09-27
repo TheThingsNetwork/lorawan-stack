@@ -43,7 +43,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				SupportsJoin: true,
 			},
 			Payload: nil,
-			Error:   errMissingPayload,
+			Error:   errNoPayload,
 		},
 		{
 			Name: "empty queue",

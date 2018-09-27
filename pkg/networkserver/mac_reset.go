@@ -30,7 +30,7 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	if err := resetMACState(fps, dev); err != nil {

@@ -43,7 +43,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: nil,
-			Error:   errMissingPayload,
+			Error:   errNoPayload,
 		},
 		{
 			Name: "no request",

@@ -25,7 +25,7 @@ var evtMACDeviceMode = events.Define("ns.mac.device_mode", "handled device mode 
 
 func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) error {
 	if pld == nil {
-		return errMissingPayload
+		return errNoPayload
 	}
 
 	conf := &ttnpb.MACCommand_DeviceModeConf{

@@ -46,7 +46,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			Payload:    nil,
 			ReceivedAt: time.Unix(42, 0),
-			Error:      errMissingPayload,
+			Error:      errNoPayload,
 		},
 		{
 			Name: "no request",
