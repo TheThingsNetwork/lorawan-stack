@@ -79,7 +79,7 @@ var DefaultAssetsConfig = assets.Config{
 
 // DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
 var DefaultFrequencyPlansConfig = config.FrequencyPlans{
-	StoreURL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
+	URL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
 }
 
 // DefaultRightsConfig is the default config to fetch rights from the Identity Server.

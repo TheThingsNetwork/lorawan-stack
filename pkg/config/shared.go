@@ -19,7 +19,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -154,26 +153,22 @@ type ServiceBase struct {
 	KeyVault       KeyVault       `name:"key-vault"`
 }
 
-// FrequencyPlans represents frequency plans fetching configuration.
+// FrequencyPlans contains the source of the frequency plans.
 type FrequencyPlans struct {
-	StoreDirectory string `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
-	StoreURL       string `name:"url" description:"Retrieve the frequency plans from a web server"`
+	Directory string `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
+	URL       string `name:"url" description:"Retrieve the frequency plans from a web server"`
 }
 
-type unconfiguredFetcher struct{}
-
-func (u unconfiguredFetcher) File(path ...string) ([]byte, error) {
-	return nil, errors.New("frequency plans fetcher not configured")
-}
-
-// Store returns the abstraction to retrieve frequency plans from the given configuration.
+// Store returns a frequency plan store from the given configuration.
+// THe order of precedence is Directory and URL.
+// If neither Directory nor URL is set, the returned store is empty.
 func (f FrequencyPlans) Store() *frequencyplans.Store {
 	switch {
-	case f.StoreDirectory != "":
-		return frequencyplans.NewStore(fetch.FromFilesystem(f.StoreDirectory))
-	case f.StoreURL != "":
-		return frequencyplans.NewStore(fetch.FromHTTP(f.StoreURL, true))
+	case f.Directory != "":
+		return frequencyplans.NewStore(fetch.FromFilesystem(f.Directory))
+	case f.URL != "":
+		return frequencyplans.NewStore(fetch.FromHTTP(f.URL, true))
+	default:
+		return frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{}))
 	}
-
-	return frequencyplans.NewStore(unconfiguredFetcher{})
 }
