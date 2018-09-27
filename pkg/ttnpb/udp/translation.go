@@ -31,6 +31,8 @@ const (
 	delta = 0.001 // For GPS comparisons
 	lora  = "LORA"
 	fsk   = "FSK"
+
+	eirpDelta int32 = 2
 )
 
 var (
@@ -277,7 +279,7 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 			CodingRate:         tx.CodR,
 			Frequency:          uint64(tx.Freq * 1000000),
 			InvertPolarization: tx.IPol,
-			TxPower:            int32(tx.Powe),
+			TxPower:            int32(tx.Powe) + eirpDelta,
 		},
 		TxMetadata: ttnpb.TxMetadata{
 			Timestamp: uint64(tx.Tmst * 1000),
@@ -319,7 +321,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		Freq: float64(msg.Settings.Frequency) / 1000000,
 		Imme: msg.TxMetadata.Timestamp == 0,
 		IPol: msg.Settings.InvertPolarization,
-		Powe: uint8(msg.Settings.TxPower),
+		Powe: uint8(msg.Settings.TxPower) - uint8(eirpDelta),
 		Size: uint16(len(payload)),
 		Tmst: uint32(tmst % math.MaxUint32),
 		Data: base64.StdEncoding.EncodeToString(payload),

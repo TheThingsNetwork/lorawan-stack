@@ -655,6 +655,7 @@ func TestGatewayServer(t *testing.T) {
 								Bandwidth:       125000,
 								CodingRate:      "4/5",
 								Frequency:       869525000,
+								TxPower:         10,
 							},
 							TxMetadata: ttnpb.TxMetadata{
 								GatewayIdentifiers: ids,
@@ -672,6 +673,7 @@ func TestGatewayServer(t *testing.T) {
 								Bandwidth:       125000,
 								CodingRate:      "4/5",
 								Frequency:       869525000,
+								TxPower:         10,
 							},
 							TxMetadata: ttnpb.TxMetadata{
 								GatewayIdentifiers: ids,
