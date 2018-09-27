@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	errOAuthNotConfigured = errors.DefineInvalidArgument("oauth_not_configured", "no OAuth client ID and/or secret configured for the Console")
-	errExtractPath        = errors.DefineInvalidArgument("extract_path_from_public_url", "could not extract path from public URL `{url}`")
+	errNoOAuth     = errors.DefineInvalidArgument("no_oauth", "no OAuth client ID and/or secret configured for the Console")
+	errExtractPath = errors.DefineInvalidArgument("extract_path_from_public_url", "could not extract path from public URL `{url}`")
 )
 
 // Config is the configuration for the Console.
@@ -73,7 +73,7 @@ type Console struct {
 // New returns a new Console.
 func New(c *component.Component, assets *assets.Assets, config Config) (*Console, error) {
 	if config.OAuth.isZero() {
-		return nil, errOAuthNotConfigured
+		return nil, errNoOAuth
 	}
 
 	console := &Console{
