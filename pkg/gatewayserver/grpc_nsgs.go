@@ -19,12 +19,15 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
+
+var errInvalidAntennaIndex = errors.DefineNotFound("antenna_not_found", "antenna `{index}` not found")
 
 // ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
 // The Gateway Server may refuse if there are any conflicts in the schedule or
@@ -46,6 +49,11 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		return nil, errNotConnected.WithAttributes("gateway_uid", uid)
 	}
 	conn := val.(*io.Connection)
+	gtw := conn.Gateway()
+	if len(gtw.Antennas) <= int(down.TxMetadata.AntennaIndex) {
+		return nil, errInvalidAntennaIndex.WithAttributes("index", down.TxMetadata.AntennaIndex)
+	}
+	down.Settings.TxPower -= int32(gtw.Antennas[down.TxMetadata.AntennaIndex].Gain)
 
 	if err := conn.SendDown(down); err != nil {
 		return nil, err

@@ -92,6 +92,13 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 	is.gateways[uid] = &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
 		FrequencyPlanID:    test.EUFrequencyPlanID,
+		Antennas: []ttnpb.GatewayAntenna{
+			{
+				Location: ttnpb.Location{
+					Source: ttnpb.SOURCE_REGISTRY,
+				},
+			},
+		},
 	}
 	if key != "" {
 		is.gatewayAuths[uid] = []string{fmt.Sprintf("Key %v", key)}

@@ -664,6 +664,25 @@ func TestGatewayServer(t *testing.T) {
 						},
 					},
 					{
+						Name: "Invalid antenna",
+						Message: &ttnpb.DownlinkMessage{
+							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
+							Settings: ttnpb.TxSettings{
+								Modulation:      ttnpb.Modulation_LORA,
+								SpreadingFactor: 12,
+								Bandwidth:       125000,
+								CodingRate:      "4/5",
+								Frequency:       869525000,
+							},
+							TxMetadata: ttnpb.TxMetadata{
+								AntennaIndex:       130,
+								GatewayIdentifiers: ids,
+								Timestamp:          0,
+							},
+						},
+						ValidError: errors.IsNotFound,
+					},
+					{
 						Name: "Conflict",
 						Message: &ttnpb.DownlinkMessage{
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
