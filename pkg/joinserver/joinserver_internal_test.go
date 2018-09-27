@@ -28,7 +28,7 @@ import (
 
 var (
 	ErrAddressMismatch      = errAddressMismatch
-	ErrDevNonceReused       = errDevNonceReused
+	ErrReuseDevNonce        = errReuseDevNonce
 	ErrDevNonceTooSmall     = errDevNonceTooSmall
 	ErrSessionKeyIDMismatch = errSessionKeyIDMismatch
 	ErrNoSession            = errNoSession

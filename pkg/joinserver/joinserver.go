@@ -89,7 +89,7 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	}
 	computed, err := crypto.ComputeJoinRequestMIC(key, rawPayload[:19])
 	if err != nil {
-		return errMICComputeFailed
+		return errComputeMIC
 	}
 	for i := 0; i < 4; i++ {
 		if computed[i] != rawPayload[19+i] {
@@ -124,18 +124,18 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	if req.EndDeviceIdentifiers.DevAddr == nil {
-		return nil, errMissingDevAddr
+		return nil, errNoDevAddr
 	}
 
 	if req.GetPayload().GetPayload() == nil {
 		if req.RawPayload == nil {
-			return nil, errMissingPayload
+			return nil, errNoPayload
 		}
 		if req.Payload == nil {
 			req.Payload = &ttnpb.Message{}
 		}
 		if err = req.Payload.UnmarshalLoRaWAN(req.RawPayload); err != nil {
-			return nil, errUnmarshalPayloadFailed.WithCause(err)
+			return nil, errDecodePayload.WithCause(err)
 		}
 	}
 
@@ -148,21 +148,21 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, errMissingJoinRequest
+		return nil, errNoJoinRequest
 	}
 
 	if pld.DevEUI.IsZero() {
-		return nil, errMissingDevEUI
+		return nil, errNoDevEUI
 	}
 	if pld.JoinEUI.IsZero() {
-		return nil, errMissingJoinEUI
+		return nil, errNoJoinEUI
 	}
 
 	rawPayload := req.RawPayload
 	if rawPayload == nil {
 		rawPayload, err = req.Payload.MarshalLoRaWAN()
 		if err != nil {
-			return nil, errMarshalPayloadFailed.WithCause(err)
+			return nil, errEncodePayload.WithCause(err)
 		}
 	}
 
@@ -211,7 +211,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		Major: req.Payload.Major,
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		return nil, errMarshalPayloadFailed.WithCause(err)
+		return nil, errDecodePayload.WithCause(err)
 	}
 
 	var jn types.JoinNonce
@@ -228,7 +228,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		RxDelay:    req.RxDelay,
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		return nil, errMarshalPayloadFailed.WithCause(err)
+		return nil, errDecodePayload.WithCause(err)
 	}
 
 	dn := binary.BigEndian.Uint16(pld.DevNonce[:])
@@ -245,7 +245,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 			for _, used := range dev.UsedDevNonces {
 				if dn == uint16(used) {
-					return nil, errDevNonceReused
+					return nil, errReuseDevNonce
 				}
 			}
 		default:
@@ -254,7 +254,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	if dev.RootKeys.AppKey == nil || len(dev.RootKeys.AppKey.Key) == 0 {
-		return nil, errMissingAppKey
+		return nil, errNoAppKey
 	}
 
 	var appKey types.AES128Key
@@ -267,7 +267,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	switch req.SelectedMacVersion {
 	case ttnpb.MAC_V1_1:
 		if dev.RootKeys.NwkKey == nil || len(dev.RootKeys.NwkKey.Key) == 0 {
-			return nil, errMissingNwkKey
+			return nil, errNoNwkKey
 		}
 
 		var nwkKey types.AES128Key
@@ -278,17 +278,17 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		copy(nwkKey[:], dev.RootKeys.NwkKey.Key[:])
 
 		if err := checkMIC(nwkKey, rawPayload); err != nil {
-			return nil, errMICCheckFailed.WithCause(err)
+			return nil, errCheckMIC.WithCause(err)
 		}
 
 		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(nwkKey, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
 		if err != nil {
-			return nil, errMICComputeFailed.WithCause(err)
+			return nil, errComputeMIC.WithCause(err)
 		}
 
 		enc, err := crypto.EncryptJoinAccept(nwkKey, append(b[1:], mic[:]...))
 		if err != nil {
-			return nil, errEncryptPayloadFailed.WithCause(err)
+			return nil, errEncryptPayload.WithCause(err)
 		}
 
 		resp = &ttnpb.JoinResponse{
@@ -317,17 +317,17 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 		if err := checkMIC(appKey, rawPayload); err != nil {
-			return nil, errMICCheckFailed.WithCause(err)
+			return nil, errCheckMIC.WithCause(err)
 		}
 
 		mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
 		if err != nil {
-			return nil, errMICComputeFailed.WithCause(err)
+			return nil, errComputeMIC.WithCause(err)
 		}
 
 		enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
 		if err != nil {
-			return nil, errEncryptPayloadFailed.WithCause(err)
+			return nil, errEncryptPayload.WithCause(err)
 		}
 		resp = &ttnpb.JoinResponse{
 			RawPayload: append(b[:1], enc...),
@@ -370,10 +370,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 // GetAppSKey returns the AppSKey associated with device specified by the supplied request.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, errMissingDevEUI
+		return nil, errNoDevEUI
 	}
 	if req.SessionKeyID == "" {
-		return nil, errMissingSessionKeyID
+		return nil, errNoSessionKeyID
 	}
 
 	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
@@ -398,7 +398,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}
 
 	if dev.Session.AppSKey == nil {
-		return nil, errMissingAppSKey
+		return nil, errNoAppSKey
 	}
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.AppSKeyResponse{
@@ -409,10 +409,10 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 // GetNwkSKeys returns the NwkSKeys associated with device specified by the supplied request.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, errMissingDevEUI
+		return nil, errNoDevEUI
 	}
 	if req.SessionKeyID == "" {
-		return nil, errMissingSessionKeyID
+		return nil, errNoSessionKeyID
 	}
 
 	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
@@ -437,13 +437,13 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	if dev.Session.NwkSEncKey == nil {
-		return nil, errMissingNwkSEncKey
+		return nil, errNoNwkSEncKey
 	}
 	if dev.Session.FNwkSIntKey == nil {
-		return nil, errMissingFNwkSIntKey
+		return nil, errNoFNwkSIntKey
 	}
 	if dev.Session.SNwkSIntKey == nil {
-		return nil, errMissingSNwkSIntKey
+		return nil, errNoSNwkSIntKey
 	}
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.NwkSKeysResponse{
