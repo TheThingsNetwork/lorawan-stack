@@ -18,31 +18,41 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// DeviceRegistry is a Redis device registry.
 type DeviceRegistry struct {
+	Redis *redis.Client
 }
 
+// Get returns the end device by its identifiers.
 func (r *DeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
 	return nil, errors.New("not implemented")
 }
 
+// Set creates, updates or deletes the end device by its identifiers.
 func (r *DeviceRegistry) Set(context.Context, ttnpb.EndDeviceIdentifiers, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error {
 	return errors.New("not implemented")
 }
 
+// LinkRegistry is a store for application links.
 type LinkRegistry struct {
+	Redis *redis.Client
 }
 
+// Get returns the link by the application identifiers.
 func (r *LinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
 	return nil, errors.New("not implemented")
 }
 
+// Range ranges the links and calls the callback function, until false is returned.
 func (r *LinkRegistry) Range(context.Context, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	return errors.New("not implemented")
 }
 
+// Set creates, updates or deletes the link by the application identifiers.
 func (r *LinkRegistry) Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error {
 	return errors.New("not implemented")
 }

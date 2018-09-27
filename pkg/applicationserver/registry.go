@@ -22,13 +22,18 @@ import (
 
 // DeviceRegistry is a store for end devices.
 type DeviceRegistry interface {
+	// Get returns the end device by its identifiers.
 	Get(context.Context, ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error)
+	// Set creates, updates or deletes the end device by its identifiers.
 	Set(context.Context, ttnpb.EndDeviceIdentifiers, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error
 }
 
 // LinkRegistry is a store for application links.
 type LinkRegistry interface {
+	// Get returns the link by the application identifiers.
 	Get(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error)
-	Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error
+	// Range ranges the links and calls the callback function, until false is returned.
 	Range(context.Context, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
+	// Set creates, updates or deletes the link by the application identifiers.
+	Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error
 }
