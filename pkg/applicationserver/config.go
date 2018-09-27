@@ -15,7 +15,6 @@
 package applicationserver
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
@@ -35,7 +34,6 @@ type Config struct {
 	LinkMode         LinkMode
 	Devices          DeviceRegistry
 	Links            LinkRegistry
-	KeyVault         crypto.KeyVault
 	DeviceRepository DeviceRepositoryConfig
 }
 

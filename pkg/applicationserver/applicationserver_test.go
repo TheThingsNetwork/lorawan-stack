@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -133,15 +132,17 @@ func TestApplicationServer(t *testing.T) {
 				JoinServer:     jsAddr,
 				NetworkServer:  nsAddr,
 			},
+			KeyVault: config.KeyVault{
+				Static: map[string][]byte{
+					"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
+				},
+			},
 		},
 	})
 	config := &applicationserver.Config{
 		LinkMode: applicationserver.LinkAll,
 		Devices:  deviceRegistry,
 		Links:    linkRegistry,
-		KeyVault: cryptoutil.NewMemKeyVault(map[string][]byte{
-			"test": []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
-		}),
 		DeviceRepository: applicationserver.DeviceRepositoryConfig{
 			Static: deviceRepositoryData,
 		},

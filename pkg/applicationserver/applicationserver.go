@@ -47,7 +47,6 @@ type ApplicationServer struct {
 	linkMode       LinkMode
 	linkRegistry   LinkRegistry
 	deviceRegistry DeviceRegistry
-	keyVault       crypto.KeyVault
 	formatter      payloadFormatter
 
 	links sync.Map
@@ -60,7 +59,6 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 		linkMode:       conf.LinkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
-		keyVault:       conf.KeyVault,
 		formatter: payloadFormatter{
 			repository: conf.DeviceRepository.Client(),
 			upFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder{
@@ -218,7 +216,7 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 			} else if ed.Session.AppSKey == nil {
 				return nil, errNoAppSKey
 			}
-			appSKey, err := cryptoutil.UnwrapAES128Key(*ed.Session.AppSKey, as.keyVault)
+			appSKey, err := cryptoutil.UnwrapAES128Key(*ed.Session.AppSKey, as.KeyVault)
 			if err != nil {
 				return nil, err
 			}

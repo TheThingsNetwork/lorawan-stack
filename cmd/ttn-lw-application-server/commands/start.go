@@ -41,7 +41,6 @@ var (
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
 			})}
-			config.AS.KeyVault = shared.KeyVault(config.ServiceBase)
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
