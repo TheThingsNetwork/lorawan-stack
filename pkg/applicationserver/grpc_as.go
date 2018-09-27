@@ -23,11 +23,11 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (as *ApplicationServer) GetLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
+func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (as *ApplicationServer) SetLink(ctx context.Context, ids *ttnpb.SetApplicationLinkRequest) (*types.Empty, error) {
+func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
