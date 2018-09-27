@@ -15,9 +15,9 @@
 package deviceregistry
 
 var (
-	ErrDeviceNotFound  = errDeviceNotFound
-	ErrTooManyDevices  = errTooManyDevices
-	ErrProcessorFailed = errProcessorFailed
+	ErrDeviceNotFound = errDeviceNotFound
+	ErrTooManyDevices = errTooManyDevices
+	ErrProcessor      = errProcessor
 )
 
 func SetDefaultListCount(n uint64) {

@@ -517,7 +517,7 @@ func TestSetDeviceProcessor(t *testing.T) {
 
 	procErr = errors.New("err")
 	dev, err = dr.Set(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, should.HaveSameErrorDefinitionAs, ErrProcessorFailed)
+	a.So(err, should.HaveSameErrorDefinitionAs, ErrProcessor)
 	a.So(dev, should.BeNil)
 
 	procErr = errTest.WithAttributes("foo", "bar")

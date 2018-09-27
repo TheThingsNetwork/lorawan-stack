@@ -22,29 +22,29 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-var errMissingApplicationRights = errors.DefinePermissionDenied(
-	"missing_application_rights",
-	"missing rights for application `{uid}`",
+var errNoApplicationRights = errors.DefinePermissionDenied(
+	"no_application_rights",
+	"no rights for application `{uid} specified`",
 )
 
-var errMissingClientRights = errors.DefinePermissionDenied(
-	"missing_client_rights",
-	"missing rights for client `{uid}`",
+var errNoClientRights = errors.DefinePermissionDenied(
+	"no_client_rights",
+	"no rights for client `{uid} specified`",
 )
 
-var errMissingGatewayRights = errors.DefinePermissionDenied(
-	"missing_gateway_rights",
-	"missing rights for gateway `{uid}`",
+var errNoGatewayRights = errors.DefinePermissionDenied(
+	"no_gateway_rights",
+	"no rights for gateway `{uid}` specified",
 )
 
-var errMissingOrganizationRights = errors.DefinePermissionDenied(
-	"missing_organization_rights",
-	"missing rights for organization `{uid}`",
+var errNoOrganizationRights = errors.DefinePermissionDenied(
+	"no_organization_rights",
+	"no rights for organization `{uid}` specified",
 )
 
-var errMissingUserRights = errors.DefinePermissionDenied(
-	"missing_user_rights",
-	"missing rights for user `{uid}`",
+var errNoUserRights = errors.DefinePermissionDenied(
+	"no_user_rights",
+	"no rights for user `{uid}` specified",
 )
 
 // RequireApplication checks that context contains the required rights for the
@@ -67,7 +67,7 @@ func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers,
 		rights.ApplicationRights = map[string]*ttnpb.Rights{appUID: appRights}
 	}
 	if !rights.IncludesApplicationRights(appUID, required...) {
-		return errMissingApplicationRights.WithAttributes("uid", appUID)
+		return errNoApplicationRights.WithAttributes("uid", appUID)
 	}
 	return nil
 }
@@ -92,7 +92,7 @@ func RequireClient(ctx context.Context, cliID ttnpb.ClientIdentifiers, required 
 		rights.ClientRights = map[string]*ttnpb.Rights{cliUID: cliRights}
 	}
 	if !rights.IncludesClientRights(cliUID, required...) {
-		return errMissingClientRights.WithAttributes("uid", cliUID)
+		return errNoClientRights.WithAttributes("uid", cliUID)
 	}
 	return nil
 }
@@ -117,7 +117,7 @@ func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, require
 		rights.GatewayRights = map[string]*ttnpb.Rights{gtwUID: gtwRights}
 	}
 	if !rights.IncludesGatewayRights(gtwUID, required...) {
-		return errMissingGatewayRights.WithAttributes("uid", gtwUID)
+		return errNoGatewayRights.WithAttributes("uid", gtwUID)
 	}
 	return nil
 }
@@ -142,7 +142,7 @@ func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifier
 		rights.OrganizationRights = map[string]*ttnpb.Rights{orgUID: orgRights}
 	}
 	if !rights.IncludesOrganizationRights(orgUID, required...) {
-		return errMissingOrganizationRights.WithAttributes("uid", orgUID)
+		return errNoOrganizationRights.WithAttributes("uid", orgUID)
 	}
 	return nil
 }
@@ -167,7 +167,7 @@ func RequireUser(ctx context.Context, usrID ttnpb.UserIdentifiers, required ...t
 		rights.UserRights = map[string]*ttnpb.Rights{usrUID: usrRights}
 	}
 	if !rights.IncludesUserRights(usrUID, required...) {
-		return errMissingUserRights.WithAttributes("uid", usrUID)
+		return errNoUserRights.WithAttributes("uid", usrUID)
 	}
 	return nil
 }

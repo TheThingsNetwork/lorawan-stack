@@ -36,7 +36,7 @@ var (
 	clusterAuthKey        = clusterAuthKeyType{}
 	clusterAuthFailureKey = clusterAuthKeyFailureType{}
 
-	errMissingClusterKey   = errors.DefineUnauthenticated("missing_cluster_key", "missing cluster key auth")
+	errNoClusterKey        = errors.DefineUnauthenticated("no_cluster_key", "no cluster key auth specified")
 	errUnsupportedAuthType = errors.DefineInvalidArgument("auth_type", "cluster auth type `{auth_type}` is not supported")
 	errInvalidClusterKey   = errors.DefinePermissionDenied("cluster_key", "invalid cluster key")
 )
@@ -60,7 +60,7 @@ func verifySource(ctx context.Context, validKeys [][]byte) error {
 	switch md.AuthType {
 	case AuthType:
 	case "":
-		return errMissingClusterKey
+		return errNoClusterKey
 	default:
 		return errUnsupportedAuthType.WithAttributes("auth_type", md.AuthType)
 	}

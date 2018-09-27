@@ -81,7 +81,7 @@ type MapUnmarshaler interface {
 var (
 	errFieldKind           = errors.DefineInternal("field_kind", "field value `{field}` is of kind `{kind}`, while `{expected}` was expected")
 	errNilPointerValue     = errors.DefineInternal("nil_pointer_value", "pointer value is nil")
-	errMissingField        = errors.DefineInternal("missing_field", "field `{field}` specified, but does not exist on `{type}` structs")
+	errNoField             = errors.DefineInternal("no_field", "field `{field}` specified, but does not exist on `{type}` structs")
 	errUnsupportedMapValue = errors.DefineInternal("unsupported_map_value", "unsupported map value of kind `{kind}`")
 )
 
@@ -121,7 +121,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 
 			ft := fv.Type()
 			if fv = fv.FieldByName(sk); !fv.IsValid() {
-				return errMissingField.WithAttributes("field", sk, "type", ft.String())
+				return errNoField.WithAttributes("field", sk, "type", ft.String())
 			}
 		}
 
@@ -159,13 +159,13 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 }
 
 var (
-	errEmptyByteSlice      = errors.DefineInternal("empty_byte_slice", "empty byte slice specified")
-	errUnsupportedType     = errors.DefineInternal("unsupported_type", "expected `{ev}` or `{pv}` to implement `{type}`")
-	errTypeOverflow        = errors.DefineCorruption("type_overflow", "stored value `{value}` overflows `{type}`")
-	errUnmarshaledDataLeft = errors.DefineCorruption("unmarshaled_data_left", "unmarshaled data left in buffer")
-	errUnmatchedEncoding   = errors.DefineInternal("unmatched_encoding", "unmatched encoding")
-	errUnreadDataLeft      = errors.DefineCorruption("unread_data_left", "unread data left in buffer")
-	errUnsupportedVersion  = errors.DefineInternal("unsupported_version", "unsupported version `{version}`")
+	errEmptyByteSlice     = errors.DefineInternal("empty_byte_slice", "empty byte slice specified")
+	errUnsupportedType    = errors.DefineInternal("unsupported_type", "expected `{ev}` or `{pv}` to implement `{type}`")
+	errTypeOverflow       = errors.DefineCorruption("type_overflow", "stored value `{value}` overflows `{type}`")
+	errDecodedDataLeft    = errors.DefineCorruption("decoded_data_left", "decoded data left in buffer")
+	errUnmatchedEncoding  = errors.DefineInternal("unmatched_encoding", "unmatched encoding")
+	errUnreadDataLeft     = errors.DefineCorruption("unread_data_left", "unread data left in buffer")
+	errUnsupportedVersion = errors.DefineInternal("unsupported_version", "unsupported version `{version}`")
 )
 
 // BytesToType decodes []byte value in b into a new value of type typ.
@@ -302,7 +302,7 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 
 		b, err := rv.Interface().(msgp.Unmarshaler).UnmarshalMsg(buf.Bytes())
 		if len(b) > 0 {
-			return nil, errUnmarshaledDataLeft
+			return nil, errDecodedDataLeft
 		}
 		return pv.Elem().Interface(), err
 

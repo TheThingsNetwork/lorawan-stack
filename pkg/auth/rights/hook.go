@@ -24,7 +24,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var errNoFetcher = errors.DefineInternal("missing_fetcher", "no fetcher found in context")
+var errNoFetcher = errors.DefineInternal("no_fetcher", "no fetcher found in context")
 
 // HookName denotes the unique name that components should use to register this hook.
 //

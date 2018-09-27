@@ -228,7 +228,7 @@ func binaryEncodable(v reflect.Value) (interface{}, bool) {
 	return nil, false
 }
 
-var errMissingCustomMarshaler = errors.DefineInternal("missing_custom_marshaler", "values of type `{type}` (kind `{kind}`), do not implement custom marshaling")
+var errNoCustomDecoder = errors.DefineInternal("no_custom_decoder", "values of type `{type}` (kind `{kind}`), do not implement custom decoder")
 
 // ToBytesValue is like ToBytes, but operates on values of type reflect.Value.
 func ToBytesValue(v reflect.Value) (b []byte, err error) {
@@ -283,7 +283,7 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 		return proto.Marshal(ptr.Interface().(proto.Message))
 
 	case t.Kind() == reflect.Chan, t.Kind() == reflect.Func:
-		return nil, errMissingCustomMarshaler.WithAttributes("type", t.String(), "kind", t.Kind().String())
+		return nil, errNoCustomDecoder.WithAttributes("type", t.String(), "kind", t.Kind().String())
 	}
 
 	enc = GobEncoding

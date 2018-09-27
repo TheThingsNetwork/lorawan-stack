@@ -179,7 +179,7 @@ func (r *RegistryRPC) Set(ctx context.Context, req *ttnpb.SetDeviceRequest) (*tt
 		if err != nil && !errors.IsUnknown(err) {
 			return nil, err
 		} else if err != nil {
-			return nil, errProcessorFailed.WithCause(err)
+			return nil, errProcessor.WithCause(err)
 		}
 	}
 

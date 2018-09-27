@@ -19,9 +19,9 @@ import (
 )
 
 var (
-	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device not found")
-	errTooManyDevices  = errors.Define("too_many_devices", "too many devices found")
-	errProcessorFailed = errors.Define("processor_failed", "failed to process arguments")
-	errNilDevice       = errors.DefineInvalidArgument("nil_device", "device specified is nil")
-	errNilIdentifiers  = errors.DefineInvalidArgument("nil_identifiers", "identifiers specified are nil")
+	errDeviceNotFound = errors.DefineNotFound("device_not_found", "device not found")
+	errTooManyDevices = errors.Define("too_many_devices", "too many devices found")
+	errProcessor      = errors.Define("processor", "failed to process arguments")
+	errNilDevice      = errors.DefineInvalidArgument("nil_device", "device specified is nil")
+	errNilIdentifiers = errors.DefineInvalidArgument("nil_identifiers", "identifiers specified are nil")
 )

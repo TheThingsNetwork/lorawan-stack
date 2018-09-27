@@ -61,8 +61,8 @@ type Assets struct {
 }
 
 var (
-	errMissingLocation = errors.DefineInvalidArgument("missing_location", "missing assets location; specify local search path or CDN")
-	errLocalNotFound   = errors.DefineNotFound("local_not_found", "assets not found in search path `{search_path}` and no CDN specified")
+	errNoLocation    = errors.DefineInvalidArgument("no_location", "no assets location specified; specify local search path or CDN")
+	errLocalNotFound = errors.DefineNotFound("local_not_found", "assets not found in search path `{search_path}` and no CDN specified")
 )
 
 // New creates a new assets instance.
@@ -88,7 +88,7 @@ func New(c *component.Component, config Config) (*Assets, error) {
 			if len(config.SearchPath) > 0 {
 				return nil, errLocalNotFound.WithAttributes("search_path", strings.Join(config.SearchPath, ", "))
 			}
-			return nil, errMissingLocation
+			return nil, errNoLocation
 		}
 		assets.logger = assets.logger.WithField("cdn", config.CDN)
 	}
