@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/redis"
 )
@@ -32,14 +33,14 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
-			config.AS.Links = applicationserver.NewRedisLinkRegistry(redis.New(&redis.Config{
+			config.AS.Links = &asredis.LinkRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
-				Namespace: []string{"as", "applications"},
-			}))
-			config.AS.Devices = applicationserver.NewRedisDeviceRegistry(redis.New(&redis.Config{
+				Namespace: []string{"as", "links"},
+			})}
+			config.AS.Devices = &asredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
-			}))
+			})}
 			config.AS.KeyVault = shared.KeyVault(config.ServiceBase)
 
 			as, err := applicationserver.New(c, &config.AS)
