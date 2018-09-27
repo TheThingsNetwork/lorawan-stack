@@ -1727,6 +1727,15 @@
       "file": "scheduling.go"
     }
   },
+  "error:pkg/gatewayserver:antenna_not_found": {
+    "translations": {
+      "en": "antenna `{index}` not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "grpc_nsgs.go"
+    }
+  },
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
