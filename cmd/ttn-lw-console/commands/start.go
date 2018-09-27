@@ -31,17 +31,17 @@ var (
 				ServiceBase: config.ServiceBase,
 			})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {
-				return shared.ErrConsoleInitialize.WithCause(err)
+				return shared.ErrInitializeConsole.WithCause(err)
 			}
 
 			_, err = console.New(c, assets, config.Console)
 			if err != nil {
-				return shared.ErrConsoleInitialize.WithCause(err)
+				return shared.ErrInitializeConsole.WithCause(err)
 			}
 
 			logger.Info("Starting Console...")

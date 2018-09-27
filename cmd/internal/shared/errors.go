@@ -18,11 +18,11 @@ import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 // Errors returned by component initialization.
 var (
-	ErrBaseComponentInitialize     = errors.Define("base_component_initialize", "could not initialize base component")
-	ErrIdentityServerInitialize    = errors.Define("identity_server_initialize", "could not initialize Identity Server")
-	ErrGatewayServerInitialize     = errors.Define("gateway_server_initialize", "could not initialize Gateway Server")
-	ErrNetworkServerInitialize     = errors.Define("network_server_initialize", "could not initialize Network Server")
-	ErrApplicationServerInitialize = errors.Define("application_server_initialize", "could not initialize Application Server")
-	ErrJoinServerInitialize        = errors.Define("join_server_initialize", "could not initialize Join Server")
-	ErrConsoleInitialize           = errors.Define("console_initialize", "could not initialize Console")
+	ErrInitializeBaseComponent     = errors.Define("initialize_base_component", "could not initialize base component")
+	ErrInitializeIdentityServer    = errors.Define("initialize_identity_server", "could not initialize Identity Server")
+	ErrInitializeGatewayServer     = errors.Define("initialize_gateway_server", "could not initialize Gateway Server")
+	ErrInitializeNetworkServer     = errors.Define("initialize_network_server", "could not initialize Network Server")
+	ErrInitializeApplicationServer = errors.Define("initialize_application_server", "could not initialize Application Server")
+	ErrInitializeJoinServer        = errors.Define("initialize_join_server", "could not initialize Join Server")
+	ErrInitializeConsole           = errors.Define("initialize_console", "could not initialize Console")
 )

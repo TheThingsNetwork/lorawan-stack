@@ -29,17 +29,17 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			_, err = identityserver.New(c, assets, &config.IS)
 			if err != nil {
-				return shared.ErrIdentityServerInitialize.WithCause(err)
+				return shared.ErrInitializeIdentityServer.WithCause(err)
 			}
 
 			logger.Info("Starting Identity Server...")

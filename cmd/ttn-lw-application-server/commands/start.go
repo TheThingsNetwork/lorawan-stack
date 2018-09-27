@@ -29,7 +29,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			config.AS.Links = applicationserver.NewRedisLinkRegistry(redis.New(&redis.Config{
@@ -43,7 +43,7 @@ var (
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
-				return shared.ErrApplicationServerInitialize.WithCause(err)
+				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			_ = as
 

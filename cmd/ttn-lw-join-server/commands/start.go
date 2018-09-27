@@ -31,7 +31,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			redis := redis.New(&redis.Config{
@@ -44,7 +44,7 @@ var (
 
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
-				return shared.ErrJoinServerInitialize.WithCause(err)
+				return shared.ErrInitializeJoinServer.WithCause(err)
 			}
 			_ = js
 

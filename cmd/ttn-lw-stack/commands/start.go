@@ -39,7 +39,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
@@ -66,41 +66,41 @@ var (
 
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			_, err = identityserver.New(c, assets, &config.IS)
 			if err != nil {
-				return shared.ErrIdentityServerInitialize.WithCause(err)
+				return shared.ErrInitializeIdentityServer.WithCause(err)
 			}
 
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
-				return shared.ErrGatewayServerInitialize.WithCause(err)
+				return shared.ErrInitializeGatewayServer.WithCause(err)
 			}
 			_ = gs
 
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
-				return shared.ErrNetworkServerInitialize.WithCause(err)
+				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
 			_ = ns
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
-				return shared.ErrApplicationServerInitialize.WithCause(err)
+				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			_ = as
 
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
-				return shared.ErrJoinServerInitialize.WithCause(err)
+				return shared.ErrInitializeJoinServer.WithCause(err)
 			}
 			_ = js
 
 			console, err := console.New(c, assets, config.Console)
 			if err != nil {
-				return shared.ErrConsoleInitialize.WithCause(err)
+				return shared.ErrInitializeConsole.WithCause(err)
 			}
 			_ = console
 

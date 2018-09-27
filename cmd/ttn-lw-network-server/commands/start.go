@@ -30,7 +30,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
@@ -40,7 +40,7 @@ var (
 
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
-				return shared.ErrNetworkServerInitialize.WithCause(err)
+				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
 			_ = ns
 

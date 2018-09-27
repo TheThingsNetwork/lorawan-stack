@@ -28,12 +28,12 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return shared.ErrBaseComponentInitialize.WithCause(err)
+				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
-				return shared.ErrGatewayServerInitialize.WithCause(err)
+				return shared.ErrInitializeGatewayServer.WithCause(err)
 			}
 			_ = gs
 
