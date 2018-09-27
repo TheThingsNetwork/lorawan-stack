@@ -1043,7 +1043,7 @@
       "file": "i18n.go"
     }
   },
-  "error:cmd/internal/shared:application_server_initialize": {
+  "error:cmd/internal/shared:initialize_application_server": {
     "translations": {
       "en": "could not initialize Application Server"
     },
@@ -1052,7 +1052,7 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/internal/shared:base_component_initialize": {
+  "error:cmd/internal/shared:initialize_base_component": {
     "translations": {
       "en": "could not initialize base component"
     },
@@ -1061,7 +1061,7 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/internal/shared:console_initialize": {
+  "error:cmd/internal/shared:initialize_console": {
     "translations": {
       "en": "could not initialize Console"
     },
@@ -1070,7 +1070,7 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/internal/shared:gateway_server_initialize": {
+  "error:cmd/internal/shared:initialize_gateway_server": {
     "translations": {
       "en": "could not initialize Gateway Server"
     },
@@ -1079,7 +1079,7 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/internal/shared:identity_server_initialize": {
+  "error:cmd/internal/shared:initialize_identity_server": {
     "translations": {
       "en": "could not initialize Identity Server"
     },
@@ -1088,7 +1088,7 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/internal/shared:join_server_initialize": {
+  "error:cmd/internal/shared:initialize_join_server": {
     "translations": {
       "en": "could not initialize Join Server"
     },
@@ -1097,7 +1097,7 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/internal/shared:network_server_initialize": {
+  "error:cmd/internal/shared:initialize_network_server": {
     "translations": {
       "en": "could not initialize Network Server"
     },
@@ -1124,9 +1124,9 @@
       "file": "assets.go"
     }
   },
-  "error:pkg/assets:missing_location": {
+  "error:pkg/assets:no_location": {
     "translations": {
-      "en": "missing assets location; specify local search path or CDN"
+      "en": "no assets location specified; specify local search path or CDN"
     },
     "description": {
       "package": "pkg/assets",
@@ -1160,34 +1160,34 @@
       "file": "cluster.go"
     }
   },
-  "error:pkg/auth/cluster:missing_cluster_key": {
+  "error:pkg/auth/cluster:no_cluster_key": {
     "translations": {
-      "en": "missing cluster key auth"
+      "en": "no cluster key auth specified"
     },
     "description": {
       "package": "pkg/auth/cluster",
       "file": "cluster.go"
     }
   },
-  "error:pkg/auth/rights:missing_application_rights": {
+  "error:pkg/auth/rights:no_application_rights": {
     "translations": {
-      "en": "missing rights for application `{uid}`"
+      "en": "no rights for application `{uid} specified`"
     },
     "description": {
       "package": "pkg/auth/rights",
       "file": "require.go"
     }
   },
-  "error:pkg/auth/rights:missing_client_rights": {
+  "error:pkg/auth/rights:no_client_rights": {
     "translations": {
-      "en": "missing rights for client `{uid}`"
+      "en": "no rights for client `{uid} specified`"
     },
     "description": {
       "package": "pkg/auth/rights",
       "file": "require.go"
     }
   },
-  "error:pkg/auth/rights:missing_fetcher": {
+  "error:pkg/auth/rights:no_fetcher": {
     "translations": {
       "en": "no fetcher found in context"
     },
@@ -1196,27 +1196,9 @@
       "file": "hook.go"
     }
   },
-  "error:pkg/auth/rights:missing_gateway_rights": {
+  "error:pkg/auth/rights:no_gateway_rights": {
     "translations": {
-      "en": "missing rights for gateway `{uid}`"
-    },
-    "description": {
-      "package": "pkg/auth/rights",
-      "file": "require.go"
-    }
-  },
-  "error:pkg/auth/rights:missing_organization_rights": {
-    "translations": {
-      "en": "missing rights for organization `{uid}`"
-    },
-    "description": {
-      "package": "pkg/auth/rights",
-      "file": "require.go"
-    }
-  },
-  "error:pkg/auth/rights:missing_user_rights": {
-    "translations": {
-      "en": "missing rights for user `{uid}`"
+      "en": "no rights for gateway `{uid}` specified"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -1230,6 +1212,24 @@
     "description": {
       "package": "pkg/auth/rights",
       "file": "fetcher.go"
+    }
+  },
+  "error:pkg/auth/rights:no_organization_rights": {
+    "translations": {
+      "en": "no rights for organization `{uid}` specified"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:no_user_rights": {
+    "translations": {
+      "en": "no rights for user `{uid}` specified"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
     }
   },
   "error:pkg/auth/rights:unauthenticated": {
@@ -1331,7 +1331,7 @@
       "file": "console.go"
     }
   },
-  "error:pkg/console:oauth_not_configured": {
+  "error:pkg/console:no_oauth": {
     "translations": {
       "en": "no OAuth client ID and/or secret configured for the Console"
     },
@@ -1457,7 +1457,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/deviceregistry:processor_failed": {
+  "error:pkg/deviceregistry:processor": {
     "translations": {
       "en": "failed to process arguments"
     },
@@ -1799,9 +1799,27 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:dev_nonce_reused": {
+  "error:pkg/joinserver:check_mic": {
     "translations": {
-      "en": "DevNonce has already been used"
+      "en": "MIC check failed"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:compute_mic": {
+    "translations": {
+      "en": "failed to compute MIC"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:decode_payload": {
+    "translations": {
+      "en": "failed to decode payload"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -1820,6 +1838,15 @@
   "error:pkg/joinserver:dev_nonce_too_small": {
     "translations": {
       "en": "DevNonce is too small"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:encode_payload": {
+    "translations": {
+      "en": "failed to encode payload"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -1862,33 +1889,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:marshal_payload": {
-    "translations": {
-      "en": "failed to marshal payload"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:mic_check": {
-    "translations": {
-      "en": "MIC check failed"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:mic_compute": {
-    "translations": {
-      "en": "failed to compute MIC"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:mic_mismatch": {
     "translations": {
       "en": "MIC mismatch"
@@ -1898,117 +1898,117 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_app_key": {
+  "error:pkg/joinserver:no_app_key": {
     "translations": {
-      "en": "AppKey is missing"
+      "en": "no AppKey specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_app_s_key": {
+  "error:pkg/joinserver:no_app_s_key": {
     "translations": {
-      "en": "AppSKey is missing"
+      "en": "no AppSKey specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_dev_addr": {
+  "error:pkg/joinserver:no_dev_addr": {
     "translations": {
-      "en": "DevAddr is missing"
+      "en": "no DevAddr specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_dev_eui": {
+  "error:pkg/joinserver:no_dev_eui": {
     "translations": {
-      "en": "DevEUI is missing"
+      "en": "no DevEUI specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_f_nwk_s_int_key": {
+  "error:pkg/joinserver:no_f_nwk_s_int_key": {
     "translations": {
-      "en": "FNwkSIntKey is missing"
+      "en": "no FNwkSIntKey specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_join_eui": {
+  "error:pkg/joinserver:no_join_eui": {
     "translations": {
-      "en": "JoinEUI is missing"
+      "en": "no JoinEUI specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_join_request": {
+  "error:pkg/joinserver:no_join_request": {
     "translations": {
-      "en": "JoinRequest is missing"
+      "en": "no JoinRequest specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_nwk_key": {
+  "error:pkg/joinserver:no_nwk_key": {
     "translations": {
-      "en": "NwkKey is missing"
+      "en": "no NwkKey specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_nwk_s_enc_key": {
+  "error:pkg/joinserver:no_nwk_s_enc_key": {
     "translations": {
-      "en": "NwkSEncKey is missing"
+      "en": "no NwkSEncKey specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_payload": {
+  "error:pkg/joinserver:no_payload": {
     "translations": {
-      "en": "message payload is missing"
+      "en": "no message payload specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_s_nwk_s_int_key": {
+  "error:pkg/joinserver:no_s_nwk_s_int_key": {
     "translations": {
-      "en": "SNwkSIntKey is missing"
+      "en": "no SNwkSIntKey specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_session": {
+  "error:pkg/joinserver:no_session": {
     "translations": {
-      "en": "Session is missing"
+      "en": "no Session specified"
     },
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:missing_session_key_id": {
+  "error:pkg/joinserver:no_session_key_id": {
     "translations": {
-      "en": "SessionKeyID is missing"
+      "en": "no SessionKeyID specified"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -2033,6 +2033,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:reuse_dev_nonce": {
+    "translations": {
+      "en": "DevNonce has already been used"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:session_key_id_mismatch": {
     "translations": {
       "en": "SessionKeyID mismatch"
@@ -2051,13 +2060,13 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:unmarshal_payload": {
+  "error:pkg/marshaling:decoded_data_left": {
     "translations": {
-      "en": "failed to unmarshal payload"
+      "en": "decoded data left in buffer"
     },
     "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
+      "package": "pkg/marshaling",
+      "file": "unmarshal.go"
     }
   },
   "error:pkg/marshaling:empty_byte_slice": {
@@ -2087,24 +2096,6 @@
       "file": "unmarshal.go"
     }
   },
-  "error:pkg/marshaling:missing_custom_marshaler": {
-    "translations": {
-      "en": "values of type `{type}` (kind `{kind}`), do not implement custom marshaling"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "marshal.go"
-    }
-  },
-  "error:pkg/marshaling:missing_field": {
-    "translations": {
-      "en": "field `{field}` specified, but does not exist on `{type}` structs"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
   "error:pkg/marshaling:nil_pointer_value": {
     "translations": {
       "en": "pointer value is nil"
@@ -2114,18 +2105,27 @@
       "file": "unmarshal.go"
     }
   },
-  "error:pkg/marshaling:type_overflow": {
+  "error:pkg/marshaling:no_custom_decoder": {
     "translations": {
-      "en": "stored value `{value}` overflows `{type}`"
+      "en": "values of type `{type}` (kind `{kind}`), do not implement custom decoder"
+    },
+    "description": {
+      "package": "pkg/marshaling",
+      "file": "marshal.go"
+    }
+  },
+  "error:pkg/marshaling:no_field": {
+    "translations": {
+      "en": "field `{field}` specified, but does not exist on `{type}` structs"
     },
     "description": {
       "package": "pkg/marshaling",
       "file": "unmarshal.go"
     }
   },
-  "error:pkg/marshaling:unmarshaled_data_left": {
+  "error:pkg/marshaling:type_overflow": {
     "translations": {
-      "en": "unmarshaled data left in buffer"
+      "en": "stored value `{value}` overflows `{type}`"
     },
     "description": {
       "package": "pkg/marshaling",
@@ -2249,9 +2249,18 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:decryption": {
+  "error:pkg/networkserver:decode_payload": {
     "translations": {
-      "en": "decryption failed"
+      "en": "failed to decode payload"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:decrypt": {
+    "translations": {
+      "en": "failed to decrypt"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2261,15 +2270,6 @@
   "error:pkg/networkserver:device_not_found": {
     "translations": {
       "en": "device not found"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:device_registry_initialization": {
-    "translations": {
-      "en": "Device Registry initialization failed"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2306,6 +2306,33 @@
   "error:pkg/networkserver:empty_session": {
     "translations": {
       "en": "session in empty"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:encode_mac": {
+    "translations": {
+      "en": "failed to encode MAC commands"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:encode_payload": {
+    "translations": {
+      "en": "failed to encode payload"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:encrypt_mac": {
+    "translations": {
+      "en": "failed to encrypt MAC commands"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2357,81 +2384,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:mac_encode": {
-    "translations": {
-      "en": "failed to encode MAC commands"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:mac_encrypt": {
-    "translations": {
-      "en": "failed to encrypt MAC commands"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:mac_request_not_found": {
     "translations": {
       "en": "MAC response received, but corresponding request not found"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:marshal_payload": {
-    "translations": {
-      "en": "failed to marshal payload"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:missing_application_id": {
-    "translations": {
-      "en": "application ID is unknown"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:missing_f_nwk_s_int_key": {
-    "translations": {
-      "en": "FNwkSIntKey is unknown"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:missing_nwk_s_enc_key": {
-    "translations": {
-      "en": "NwkSEncKey is unknown"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:missing_payload": {
-    "translations": {
-      "en": "message payload is missing"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:missing_s_nwk_s_int_key": {
-    "translations": {
-      "en": "SNwkSIntKey is unknown"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2445,6 +2400,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "networkserver.go"
+    }
+  },
+  "error:pkg/networkserver:no_payload": {
+    "translations": {
+      "en": "no message payload specified"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
     }
   },
   "error:pkg/networkserver:outdated_data": {
@@ -2501,6 +2465,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:unknown_application_id": {
+    "translations": {
+      "en": "application ID is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:unknown_band": {
     "translations": {
       "en": "band is unknown"
@@ -2513,6 +2486,15 @@
   "error:pkg/networkserver:unknown_chanel": {
     "translations": {
       "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_f_nwk_s_int_key": {
+    "translations": {
+      "en": "FNwkSIntKey is unknown"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2537,9 +2519,18 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:unmarshal_payload": {
+  "error:pkg/networkserver:unknown_nwk_s_enc_key": {
     "translations": {
-      "en": "failed to unmarshal payload"
+      "en": "NwkSEncKey is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_s_nwk_s_int_key": {
+    "translations": {
+      "en": "SNwkSIntKey is unknown"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -2735,7 +2726,7 @@
       "file": "lorawan_encoding.go"
     }
   },
-  "error:pkg/ttnpb:decoding": {
+  "error:pkg/ttnpb:decode": {
     "translations": {
       "en": "could not decode `{lorawan_field}`"
     },
@@ -2753,6 +2744,15 @@
       "file": "lorawan_mac_encoding.go"
     }
   },
+  "error:pkg/ttnpb:encode": {
+    "translations": {
+      "en": "could not encode `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/ttnpb:encoded_field_length_bound": {
     "translations": {
       "en": "`{lorawan_field}` encoded length should between `{min}` and `{max}`"
@@ -2765,15 +2765,6 @@
   "error:pkg/ttnpb:encoded_field_length_multiple_choices": {
     "translations": {
       "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encoding": {
-    "translations": {
-      "en": "could not encode `{lorawan_field}`"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -2870,7 +2861,7 @@
       "file": "lorawan_encoding.go"
     }
   },
-  "error:pkg/ttnpb:missing": {
+  "error:pkg/ttnpb:missing_field": {
     "translations": {
       "en": "missing `{lorawan_field}`"
     },
@@ -2879,7 +2870,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:parsing": {
+  "error:pkg/ttnpb:parse": {
     "translations": {
       "en": "could not parse `{lorawan_field}`"
     },
@@ -2915,7 +2906,7 @@
       "file": "message_validators.go"
     }
   },
-  "error:pkg/ttnpb:unknown": {
+  "error:pkg/ttnpb:unknown_field": {
     "translations": {
       "en": "unknown `{lorawan_field}`"
     },
