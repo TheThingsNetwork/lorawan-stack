@@ -138,21 +138,6 @@ func (v KeyVault) KeyVault() crypto.KeyVault {
 	}
 }
 
-// ServiceBase represents base service configuration.
-type ServiceBase struct {
-	Base           `name:",squash"`
-	Cluster        Cluster        `name:"cluster"`
-	Redis          Redis          `name:"redis"`
-	Events         Events         `name:"events"`
-	GRPC           GRPC           `name:"grpc"`
-	HTTP           HTTP           `name:"http"`
-	TLS            TLS            `name:"tls"`
-	Sentry         Sentry         `name:"sentry"`
-	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
-	Rights         Rights         `name:"rights"`
-	KeyVault       KeyVault       `name:"key-vault"`
-}
-
 // FrequencyPlans contains the source of the frequency plans.
 type FrequencyPlans struct {
 	Directory string `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
@@ -171,4 +156,19 @@ func (f FrequencyPlans) Store() *frequencyplans.Store {
 	default:
 		return frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{}))
 	}
+}
+
+// ServiceBase represents base service configuration.
+type ServiceBase struct {
+	Base           `name:",squash"`
+	Cluster        Cluster        `name:"cluster"`
+	Redis          Redis          `name:"redis"`
+	Events         Events         `name:"events"`
+	GRPC           GRPC           `name:"grpc"`
+	HTTP           HTTP           `name:"http"`
+	TLS            TLS            `name:"tls"`
+	Sentry         Sentry         `name:"sentry"`
+	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
+	Rights         Rights         `name:"rights"`
+	KeyVault       KeyVault       `name:"key-vault"`
 }
