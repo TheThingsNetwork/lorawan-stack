@@ -50,7 +50,6 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 	}
 	conn := val.(*io.Connection)
 	gtw := conn.Gateway()
-	// if len(gtw.Antennas) <= int(down.TxMetadata.AntennaIndex) {
 	if int(down.TxMetadata.AntennaIndex) >= len(gtw.Antennas) {
 		return nil, errAntennaNotFound.WithAttributes("index", down.TxMetadata.AntennaIndex)
 	}
