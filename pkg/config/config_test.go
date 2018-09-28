@@ -220,6 +220,26 @@ func TestConfigEnv(t *testing.T) {
 	})
 }
 
+func TestBadConfigEnv(t *testing.T) {
+	a := assertions.New(t)
+
+	config := InitializeWithDefaults("test", defaults)
+	a.So(config, should.NotBeNil)
+
+	settings := new(example)
+
+	os.Setenv("TEST_STRINGMAP", "q=r ff = f ff s=t")
+	os.Setenv("TEST_BUFFERMAP", "a=0x0b  cd c=0x0=def")
+	os.Setenv("TEST_STRINGMAPSLICE", "a=b= a=c fzef f d=e")
+
+	// parse no command line args
+	config.Parse()
+
+	// unmarshal into struct
+	err := config.Unmarshal(settings)
+	a.So(err, should.NotBeNil)
+}
+
 func TestConfigFlags(t *testing.T) {
 	a := assertions.New(t)
 
@@ -310,6 +330,24 @@ func TestConfigFlags(t *testing.T) {
 		},
 		FileOnly: defaults.FileOnly,
 	})
+}
+
+func TestBadConfigFlags(t *testing.T) {
+	a := assertions.New(t)
+
+	config := InitializeWithDefaults("test", defaults)
+	a.So(config, should.NotBeNil)
+	settings := new(example)
+
+	// parse command line args
+	config.Parse(
+		"--buffermap", "a=0x 0osvpz=bcd",
+		"--stringmap", "q=r fhoez=fff",
+	)
+
+	// unmarshal
+	err := config.Unmarshal(settings)
+	a.So(err, should.NotBeNil)
 }
 
 func TestConfigShorthand(t *testing.T) {

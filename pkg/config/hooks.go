@@ -22,7 +22,10 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
+
+var errFormat = errors.DefineInvalidArgument("format", "invalid format `{input}`")
 
 // stringToTimeHookFunc is a hook for mapstructure that decodes strings to time.Time.
 func stringToTimeHookFunc(layout string) mapstructure.DecodeHookFuncType {
@@ -46,10 +49,13 @@ func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data interfa
 	sl := data.([]string)
 	m := make(map[string]string, len(sl))
 	for _, s := range sl {
-		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
-			m[p[0]] = p[1]
+		p := strings.SplitN(s, "=", 2)
+		if len(p) != 2 {
+			return nil, errFormat.WithAttributes("input", s)
 		}
+		m[p[0]] = p[1]
 	}
+
 	return m, nil
 }
 
@@ -71,14 +77,15 @@ func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, d
 	m := make(map[string][]string, len(slice))
 
 	for _, s := range slice {
-		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
-			v := m[p[0]]
-			if v == nil {
-				v = make([]string, 0, 1)
-			}
-
-			m[p[0]] = append(v, p[1])
+		p := strings.SplitN(s, "=", 2)
+		if len(p) != 2 {
+			return nil, errFormat.WithAttributes("input", s)
 		}
+		v := m[p[0]]
+		if v == nil {
+			v = make([]string, 0, 1)
+		}
+		m[p[0]] = append(v, p[1])
 	}
 
 	return m, nil
@@ -110,9 +117,11 @@ func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 
 	m := make(map[string]string, len(slice))
 	for _, s := range slice {
-		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
-			m[p[0]] = p[1]
+		p := strings.SplitN(s, "=", 2)
+		if len(p) != 2 {
+			return nil, errFormat.WithAttributes("input", s)
 		}
+		m[p[0]] = p[1]
 	}
 
 	return m, nil
@@ -135,14 +144,16 @@ func stringToBufferMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 
 	m := make(map[string][]byte, len(slice))
 	for _, s := range slice {
-		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
-			str := strings.TrimPrefix(p[1], "0x")
-			buf, err := hex.DecodeString(str)
-			if err != nil {
-				return nil, fmt.Errorf("Could not decode hex: %s", err)
-			}
-			m[p[0]] = buf
+		p := strings.SplitN(s, "=", 2)
+		if len(p) != 2 {
+			return nil, errFormat.WithAttributes("input", s)
 		}
+		str := strings.TrimPrefix(p[1], "0x")
+		buf, err := hex.DecodeString(str)
+		if err != nil {
+			return nil, errFormat.WithAttributes("input", s)
+		}
+		m[p[0]] = buf
 	}
 
 	return m, nil

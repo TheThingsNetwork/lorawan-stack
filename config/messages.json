@@ -1367,6 +1367,15 @@
       "file": "listeners.go"
     }
   },
+  "error:pkg/config:format": {
+    "translations": {
+      "en": "invalid format `{input}`"
+    },
+    "description": {
+      "package": "pkg/config",
+      "file": "hooks.go"
+    }
+  },
   "error:pkg/console:extract_path_from_public_url": {
     "translations": {
       "en": "could not extract path from public URL `{url}`"
