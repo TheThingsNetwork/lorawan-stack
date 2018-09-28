@@ -27,7 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
-var errInvalidAntennaIndex = errors.DefineNotFound("antenna_not_found", "antenna `{index}` not found")
+var errAntennaNotFound = errors.DefineNotFound("antenna_not_found", "antenna `{index}` not found")
 
 // ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
 // The Gateway Server may refuse if there are any conflicts in the schedule or
@@ -50,8 +50,9 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 	}
 	conn := val.(*io.Connection)
 	gtw := conn.Gateway()
-	if len(gtw.Antennas) <= int(down.TxMetadata.AntennaIndex) {
-		return nil, errInvalidAntennaIndex.WithAttributes("index", down.TxMetadata.AntennaIndex)
+	// if len(gtw.Antennas) <= int(down.TxMetadata.AntennaIndex) {
+	if int(down.TxMetadata.AntennaIndex) >= len(gtw.Antennas) {
+		return nil, errAntennaNotFound.WithAttributes("index", down.TxMetadata.AntennaIndex)
 	}
 	down.Settings.TxPower -= int32(gtw.Antennas[down.TxMetadata.AntennaIndex].Gain)
 
