@@ -21,6 +21,7 @@ const (
 	topicUplink   = "up"
 	topicDownlink = "down"
 	topicStatus   = "status"
+	topicAck      = "ack"
 )
 
 var (
@@ -34,7 +35,7 @@ func isMessage(topicPath []string, message string) bool {
 	if len(topicPath) > 0 && Version(topicPath[0]) == V3 {
 		topicPath = topicPath[1:]
 	}
-	return len(topicPath) >= 2 && topicPath[1] == message
+	return len(topicPath) == 2 && topicPath[1] == message
 }
 
 func makeTopicPath(uid, message string, v Version) []string {
@@ -72,4 +73,14 @@ func Status(uid string, v Version) []string {
 // IsStatus returns whether the topic is a status topic.
 func IsStatus(topicPath []string) bool {
 	return isMessage(topicPath, topicStatus)
+}
+
+// TxAck returns the ack topic path.
+func TxAck(uid string, v Version) []string {
+	return append(Downlink(uid, v), topicAck)
+}
+
+// IsTxAck returns whether the topic is a Tx acknowledgment topic.
+func IsTxAck(topicPath []string) bool {
+	return len(topicPath) > 2 && isMessage(topicPath[:len(topicPath)-1], topicDownlink) && topicPath[len(topicPath)-1] == topicAck
 }

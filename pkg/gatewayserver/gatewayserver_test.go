@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -224,6 +225,17 @@ func TestGatewayServer(t *testing.T) {
 									return
 								}
 							}
+							if up.TxAcknowledgment != nil {
+								buf, err := up.TxAcknowledgment.Marshal()
+								if err != nil {
+									errCh <- err
+									return
+								}
+								if token := client.Publish(fmt.Sprintf("v3/%v/down/ack", ids.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
+									errCh <- token.Error()
+									return
+								}
+							}
 						}
 					}
 				}()
@@ -282,19 +294,30 @@ func TestGatewayServer(t *testing.T) {
 								PacketType:      encoding.PushData,
 								Data:            &encoding.Data{},
 							}
-							packet.Data.RxPacket, packet.Data.Stat = encoding.FromGatewayUp(up)
+							packet.Data.RxPacket, packet.Data.Stat, packet.Data.TxPacketAck = encoding.FromGatewayUp(up)
+							if packet.Data.TxPacketAck != nil {
+								packet.PacketType = encoding.TxAck
+							}
 							writeBuf, err := packet.MarshalBinary()
 							if err != nil {
 								errCh <- err
 								return
 							}
-							if _, err := upConn.Write(writeBuf); err != nil {
-								errCh <- err
-								return
-							}
-							if _, err := upConn.Read(readBuf[:]); err != nil {
-								errCh <- err
-								return
+							switch packet.PacketType {
+							case encoding.PushData:
+								if _, err := upConn.Write(writeBuf); err != nil {
+									errCh <- err
+									return
+								}
+								if _, err := upConn.Read(readBuf[:]); err != nil {
+									errCh <- err
+									return
+								}
+							case encoding.TxAck:
+								if _, err := downConn.Write(writeBuf); err != nil {
+									errCh <- err
+									return
+								}
 							}
 						}
 					}
@@ -458,6 +481,13 @@ func TestGatewayServer(t *testing.T) {
 
 			t.Run("Upstream", func(t *testing.T) {
 				uplinkCount := 0
+				upEvents := map[string]events.Channel{}
+				for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive"} {
+					ch := make(events.Channel, 5)
+					events.Subscribe(event, ch)
+					defer events.Unsubscribe(event, ch)
+					upEvents[event] = ch
+				}
 				for _, tc := range []struct {
 					Name     string
 					Up       *ttnpb.GatewayUp
@@ -468,6 +498,14 @@ func TestGatewayServer(t *testing.T) {
 						Up: &ttnpb.GatewayUp{
 							GatewayStatus: &ttnpb.GatewayStatus{
 								Time: time.Unix(424242, 0),
+							},
+						},
+					},
+					{
+						Name: "TxAck",
+						Up: &ttnpb.GatewayUp{
+							TxAcknowledgment: &ttnpb.TxAcknowledgment{
+								Result: ttnpb.TxAcknowledgment_SUCCESS,
 							},
 						},
 					},
@@ -605,6 +643,32 @@ func TestGatewayServer(t *testing.T) {
 								a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
 							case <-time.After(timeout):
 								t.Fatal("Expected uplink timeout")
+							}
+							select {
+							case evt := <-upEvents["gs.up.receive"]:
+								a.So(evt.Name(), should.Equal, "gs.up.receive")
+							case <-time.After(timeout):
+								t.Fatal("Expected uplink event timeout")
+							}
+						}
+						if expected := tc.Up.TxAcknowledgment; expected != nil {
+							select {
+							case <-upEvents["gs.down.tx.success"]:
+							case evt := <-upEvents["gs.down.tx.fail"]:
+								received, ok := evt.Data().(ttnpb.TxAcknowledgment_Result)
+								if !ok {
+									t.Fatal("No acknowledgment attached to the downlink emission fail event")
+								}
+								a.So(received, should.Resemble, expected.Result)
+							case <-time.After(timeout):
+								t.Fatal("Expected Tx acknowledgment event timeout")
+							}
+						}
+						if tc.Up.GatewayStatus != nil {
+							select {
+							case <-upEvents["gs.status.receive"]:
+							case <-time.After(timeout):
+								t.Fatal("Expected gateway status event timeout")
 							}
 						}
 

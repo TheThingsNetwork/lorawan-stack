@@ -35,7 +35,9 @@ var (
 	evtDropUp    = events.Define("gs.up.drop", "drop uplink message")
 	evtForwardUp = events.Define("gs.up.forward", "forward uplink message")
 
-	evtSendDown = events.Define("gs.down.send", "send downlink message")
+	evtSendDown      = events.Define("gs.down.send", "send downlink message")
+	evtTxSuccessDown = events.Define("gs.down.tx.success", "downlink message transmit success")
+	evtTxFailureDown = events.Define("gs.down.tx.fail", "downlink message transmit fail")
 )
 
 const (
@@ -97,6 +99,24 @@ var gsMetrics = &messageMetrics{
 		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{gatewayID},
 	),
+	downlinkTxSucceeded: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_tx_success_total",
+			Help:      "Total number of successfully emitted downlinks",
+		},
+		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
+		[]string{gatewayID},
+	),
+	downlinkTxFailed: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_tx_failed_total",
+			Help:      "Total number of unsuccessfully emitted downlinks",
+		},
+		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
+		[]string{gatewayID},
+	),
 }
 
 func init() {
@@ -104,12 +124,14 @@ func init() {
 }
 
 type messageMetrics struct {
-	gatewaysConnected *metrics.ContextualGaugeVec
-	statusReceived    *metrics.ContextualCounterVec
-	uplinkReceived    *metrics.ContextualCounterVec
-	uplinkForwarded   *metrics.ContextualCounterVec
-	uplinkDropped     *metrics.ContextualCounterVec
-	downlinkSent      *metrics.ContextualCounterVec
+	gatewaysConnected   *metrics.ContextualGaugeVec
+	statusReceived      *metrics.ContextualCounterVec
+	uplinkReceived      *metrics.ContextualCounterVec
+	uplinkForwarded     *metrics.ContextualCounterVec
+	uplinkDropped       *metrics.ContextualCounterVec
+	downlinkSent        *metrics.ContextualCounterVec
+	downlinkTxSucceeded *metrics.ContextualCounterVec
+	downlinkTxFailed    *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -119,6 +141,8 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
 	m.downlinkSent.Describe(ch)
+	m.downlinkTxSucceeded.Describe(ch)
+	m.downlinkTxFailed.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -128,6 +152,8 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.downlinkSent.Collect(ch)
+	m.downlinkTxSucceeded.Collect(ch)
+	m.downlinkTxFailed.Collect(ch)
 }
 
 func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers) {
@@ -171,4 +197,14 @@ func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.Upli
 func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage) {
 	events.Publish(evtSendDown(ctx, gtw, nil))
 	gsMetrics.downlinkSent.WithLabelValues(ctx, gtw.GatewayID).Inc()
+}
+
+func registerSuccessDownlink(ctx context.Context, gtw *ttnpb.Gateway) {
+	events.Publish(evtTxSuccessDown(ctx, gtw, nil))
+	gsMetrics.downlinkSent.WithLabelValues(ctx, gtw.GatewayID).Inc()
+}
+
+func registerFailDownlink(ctx context.Context, gtw *ttnpb.Gateway, ack *ttnpb.TxAcknowledgment) {
+	events.Publish(evtTxFailureDown(ctx, gtw, ack.Result))
+	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }

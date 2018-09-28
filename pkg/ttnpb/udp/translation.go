@@ -79,8 +79,40 @@ func ToGatewayUp(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error) {
 	if data.Stat != nil {
 		up.GatewayStatus = convertStatus(*data.Stat, md)
 	}
+	if data.TxPacketAck != nil {
+		result, ok := ttnAckError[data.TxPacketAck.Error]
+		if !ok {
+			result = ttnpb.TxAcknowledgment_UNKNOWN_ERROR
+		}
+		up.TxAcknowledgment = &ttnpb.TxAcknowledgment{
+			Result: result,
+		}
+	}
 	return up, nil
 }
+
+var (
+	ttnAckError = map[TxError]ttnpb.TxAcknowledgment_Result{
+		TxErrNone:            ttnpb.TxAcknowledgment_SUCCESS,
+		TxErrTooLate:         ttnpb.TxAcknowledgment_TOO_LATE,
+		TxErrTooEarly:        ttnpb.TxAcknowledgment_TOO_EARLY,
+		TxErrCollisionBeacon: ttnpb.TxAcknowledgment_COLLISION_BEACON,
+		TxErrCollisionPacket: ttnpb.TxAcknowledgment_COLLISION_PACKET,
+		TxErrTxFreq:          ttnpb.TxAcknowledgment_TX_FREQ,
+		TxErrTxPower:         ttnpb.TxAcknowledgment_TX_POWER,
+		TxErrGPSUnlocked:     ttnpb.TxAcknowledgment_GPS_UNLOCKED,
+	}
+	semtechAckError = map[ttnpb.TxAcknowledgment_Result]TxError{
+		ttnpb.TxAcknowledgment_SUCCESS:          TxErrNone,
+		ttnpb.TxAcknowledgment_TOO_LATE:         TxErrTooLate,
+		ttnpb.TxAcknowledgment_TOO_EARLY:        TxErrTooEarly,
+		ttnpb.TxAcknowledgment_COLLISION_BEACON: TxErrCollisionBeacon,
+		ttnpb.TxAcknowledgment_COLLISION_PACKET: TxErrCollisionPacket,
+		ttnpb.TxAcknowledgment_TX_FREQ:          TxErrTxFreq,
+		ttnpb.TxAcknowledgment_TX_POWER:         TxErrTxPower,
+		ttnpb.TxAcknowledgment_GPS_UNLOCKED:     TxErrGPSUnlocked,
+	}
+)
 
 func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
 	return []*ttnpb.RxMetadata{
@@ -237,7 +269,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 }
 
 // FromGatewayUp converts the upstream message to the UDP format.
-func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat) {
+func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPacketAck) {
 	rxs = make([]*RxPacket, 0, len(up.UplinkMessages))
 
 	for _, msg := range up.UplinkMessages {
@@ -267,6 +299,11 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat) {
 	if up.GatewayStatus != nil {
 		stat = &Stat{
 			Time: ExpandedTime(up.GatewayStatus.Time),
+		}
+	}
+	if up.TxAcknowledgment != nil {
+		ack = &TxPacketAck{
+			Error: semtechAckError[up.TxAcknowledgment.Result],
 		}
 	}
 	return

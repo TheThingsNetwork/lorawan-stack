@@ -169,6 +169,13 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
+				Topic: fmt.Sprintf("v3/%v/down/ack", registeredGatewayID.GatewayID),
+				Message: &ttnpb.TxAcknowledgment{
+					Result: ttnpb.TxAcknowledgment_SUCCESS,
+				},
+				OK: true,
+			},
+			{
 				Topic: fmt.Sprintf("v3/%v/status", "invalid-gateway"),
 				Message: &ttnpb.GatewayStatus{
 					IP: []string{"2.2.2.2"},
@@ -202,6 +209,12 @@ func TestTraffic(t *testing.T) {
 						a.So(status, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Did not expect status message, but have %v", status)
+					}
+				case ack := <-conn.TxAck():
+					if tc.OK {
+						a.So(ack, should.Resemble, tc.Message)
+					} else {
+						t.Fatalf("Did not expect ack message, but have %v", ack)
 					}
 				case <-time.After(timeout):
 					if tc.OK {

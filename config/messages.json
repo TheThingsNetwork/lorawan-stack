@@ -3257,6 +3257,24 @@
       "file": "observability.go"
     }
   },
+  "event:gs.down.tx.fail": {
+    "translations": {
+      "en": "downlink message transmit fail"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.down.tx.success": {
+    "translations": {
+      "en": "downlink message transmit success"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
   "event:gs.gateway.connect": {
     "translations": {
       "en": "gateway connect"

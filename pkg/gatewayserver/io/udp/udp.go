@@ -31,6 +31,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
+const tokenExpiration = 3 * time.Minute
+
 // Config contains configuration settings for the UDP gateway frontend.
 // Use DefaultConfig for recommended settings.
 type Config struct {
@@ -218,6 +220,10 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 
 func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet) error {
 	logger := log.FromContext(ctx)
+	md := encoding.UpstreamMetadata{
+		ID: state.io.Gateway().GatewayIdentifiers,
+		IP: packet.GatewayAddr.IP.String(),
+	}
 
 	switch packet.PacketType {
 	case encoding.PullData:
@@ -244,10 +250,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			}
 			state.syncClock(timestamp)
 		}
-		msg, err := encoding.ToGatewayUp(*packet.Data, encoding.UpstreamMetadata{
-			ID: state.io.Gateway().GatewayIdentifiers,
-			IP: packet.GatewayAddr.IP.String(),
-		})
+		msg, err := encoding.ToGatewayUp(*packet.Data, md)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal packet")
 			return err
@@ -266,9 +269,22 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 	case encoding.TxAck:
 		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
-			logger.Debug("Received TX acknowledgement, JIT queue supported")
+			logger.Debug("Received Tx acknowledgement, JIT queue supported")
 		}
 
+		msg, err := encoding.ToGatewayUp(*packet.Data, md)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to unmarshal packet")
+			return err
+		}
+		v, ok := state.correlations.Load(packet.Token)
+		if ok {
+			sent := v.(downlinkSent)
+			msg.TxAcknowledgment.CorrelationIDs = sent.correlationIDs
+		}
+		if err := state.io.HandleTxAck(msg.TxAcknowledgment); err != nil {
+			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
+		}
 		// TODO: Send event to NS (https://github.com/TheThingsIndustries/lorawan-stack/issues/1017)
 	}
 
@@ -313,6 +329,10 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 					TxPacket: tx,
 				},
 			}
+			state.correlations.Store(packet.Token, downlinkSent{
+				correlationIDs: down.CorrelationIDs,
+				sent:           time.Now(),
+			})
 			write := func() {
 				logger.Debug("Writing downlink message")
 				if err := s.write(packet); err != nil {
@@ -376,13 +396,28 @@ var errConnectionExpired = errors.Define("connection_expired", "connection expir
 
 func (s *srv) gc() {
 	logger := log.FromContext(s.ctx)
-	ticker := time.NewTicker(s.config.ConnectionExpires / 2)
+	connectionsTicker := time.NewTicker(s.config.ConnectionExpires / 2)
+	correlationsTicker := time.NewTicker(tokenExpiration)
 	for {
 		select {
 		case <-s.ctx.Done():
-			ticker.Stop()
+			connectionsTicker.Stop()
+			correlationsTicker.Stop()
 			return
-		case <-ticker.C:
+		case <-correlationsTicker.C:
+			start := time.Now()
+			s.connections.Range(func(_, v interface{}) bool {
+				state := v.(*state)
+				state.correlations.Range(func(k, v interface{}) bool {
+					ds := v.(downlinkSent)
+					if start.Sub(ds.sent) > tokenExpiration {
+						state.correlations.Delete(k)
+					}
+					return true
+				})
+				return true
+			})
+		case <-connectionsTicker.C:
 			s.connections.Range(func(k, v interface{}) bool {
 				state := v.(*state)
 				lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
@@ -424,6 +459,13 @@ type state struct {
 	lastDownlinkPath  atomic.Value // downlinkPath
 	startHandleDown   *sync.Once
 	startHandleDownMu sync.RWMutex
+
+	correlations sync.Map
+}
+
+type downlinkSent struct {
+	correlationIDs []string
+	sent           time.Time
 }
 
 func (s *state) nextToken() [2]byte {

@@ -183,6 +183,7 @@ type gatewayTopics struct {
 	downlinkTopic []string
 	uplinkTopic   []string
 	statusTopic   []string
+	ackTopic      []string
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
@@ -220,6 +221,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		downlinkTopic: topics.Downlink(uid, topics.V3),
 		uplinkTopic:   topics.Uplink(uid, topics.V3),
 		statusTopic:   topics.Status(uid, topics.V3),
+		ackTopic:      topics.TxAck(uid, topics.V3),
 	}
 	info.Interface = c
 	return c.io.Context(), nil
@@ -245,7 +247,7 @@ func (c *connection) CanRead(info *auth.Info, topicParts ...string) bool {
 
 func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 	gt := info.Metadata.(gatewayTopics)
-	return topic.MatchPath(topicParts, gt.uplinkTopic) || topic.MatchPath(topicParts, gt.statusTopic)
+	return topic.MatchPath(topicParts, gt.uplinkTopic) || topic.MatchPath(topicParts, gt.statusTopic) || topic.MatchPath(topicParts, gt.ackTopic)
 }
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
@@ -268,6 +270,15 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		}
 		if err := c.io.HandleStatus(status); err != nil {
 			logger.WithError(err).Warn("Failed to handle status message")
+		}
+	case topics.IsTxAck(pkt.TopicParts):
+		ack := &ttnpb.TxAcknowledgment{}
+		if err := ack.Unmarshal(pkt.Message); err != nil {
+			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
+			return
+		}
+		if err := c.io.HandleTxAck(ack); err != nil {
+			logger.WithError(err).Warn("Failed to handle Tx acknowledgment message")
 		}
 	}
 }

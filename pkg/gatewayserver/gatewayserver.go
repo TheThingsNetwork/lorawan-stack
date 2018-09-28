@@ -288,6 +288,13 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		case status := <-conn.Status():
 			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("status:%s", events.NewCorrelationID()))
 			registerReceiveStatus(ctx, conn.Gateway(), status)
+		case ack := <-conn.TxAck():
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("ack:%s", events.NewCorrelationID()))
+			if ack.Result == ttnpb.TxAcknowledgment_SUCCESS {
+				registerSuccessDownlink(ctx, conn.Gateway())
+			} else {
+				registerFailDownlink(ctx, conn.Gateway(), ack)
+			}
 		}
 	}
 }

@@ -120,27 +120,6 @@ func TestToGatewayUp(t *testing.T) {
 }
 
 func TestToGatewayUpRoundtrip(t *testing.T) {
-	a := assertions.New(t)
-
-	expected := udp.Packet{
-		ProtocolVersion: udp.Version1,
-		Token:           [2]byte{0x11, 0x00},
-		Data: &udp.Data{
-			RxPacket: []*udp.RxPacket{
-				{
-					Freq: 868.0,
-					Chan: 2,
-					Modu: "LORA",
-					DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
-					CodR: "4/7",
-					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
-					Size: 19,
-					Tmst: 1000,
-				},
-			},
-		},
-		PacketType: udp.PushData,
-	}
 	expectedMd := udp.UpstreamMetadata{
 		ID: ttnpb.GatewayIdentifiers{
 			EUI: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -148,17 +127,59 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 		IP: "1.1.1.1",
 	}
 
-	up, err := udp.ToGatewayUp(*expected.Data, expectedMd)
-	a.So(err, should.BeNil)
+	for _, tc := range []struct {
+		Name       string
+		Data       *udp.Data
+		PacketType udp.PacketType
+	}{
+		{
+			Name: "Uplink",
+			Data: &udp.Data{
+				RxPacket: []*udp.RxPacket{
+					{
+						Freq: 868.0,
+						Chan: 2,
+						Modu: "LORA",
+						DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+						CodR: "4/7",
+						Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+						Size: 19,
+						Tmst: 1000,
+					},
+				},
+			},
+			PacketType: udp.PushData,
+		},
+		{
+			Name: "TxAcknowledgment",
+			Data: &udp.Data{
+				TxPacketAck: &udp.TxPacketAck{
+					Error: udp.TxErrNone,
+				},
+			},
+			PacketType: udp.TxAck,
+		},
+	} {
+		a := assertions.New(t)
 
-	actual := udp.Packet{
-		ProtocolVersion: udp.Version1,
-		Token:           [2]byte{0x11, 0x00},
-		Data:            &udp.Data{},
+		expected := udp.Packet{
+			ProtocolVersion: udp.Version1,
+			Token:           [2]byte{0x11, 0x00},
+			Data:            tc.Data,
+			PacketType:      tc.PacketType,
+		}
+		up, err := udp.ToGatewayUp(*expected.Data, expectedMd)
+		a.So(err, should.BeNil)
+
+		actual := udp.Packet{
+			ProtocolVersion: udp.Version1,
+			Token:           [2]byte{0x11, 0x00},
+			Data:            &udp.Data{},
+			PacketType:      tc.PacketType,
+		}
+		actual.Data.RxPacket, actual.Data.Stat, actual.Data.TxPacketAck = udp.FromGatewayUp(up)
+		a.So(pretty.Diff(actual, expected), should.BeEmpty)
 	}
-	actual.Data.RxPacket, actual.Data.Stat = udp.FromGatewayUp(up)
-
-	a.So(pretty.Diff(actual, expected), should.BeEmpty)
 }
 
 func TestToGatewayUpRaw(t *testing.T) {

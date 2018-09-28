@@ -38,7 +38,7 @@ func TestTopics(t *testing.T) {
 			Func:     Uplink,
 			Expected: []string{"v3", "test", "up"},
 			Is:       IsUplink,
-			IsNot:    []func([]string) bool{IsDownlink, IsStatus},
+			IsNot:    []func([]string) bool{IsDownlink, IsStatus, IsTxAck},
 		},
 		{
 			UID:      "test",
@@ -46,7 +46,7 @@ func TestTopics(t *testing.T) {
 			Func:     Downlink,
 			Expected: []string{"v3", "test", "down"},
 			Is:       IsDownlink,
-			IsNot:    []func([]string) bool{IsUplink, IsStatus},
+			IsNot:    []func([]string) bool{IsUplink, IsStatus, IsTxAck},
 		},
 		{
 			UID:      "test",
@@ -54,7 +54,15 @@ func TestTopics(t *testing.T) {
 			Func:     Status,
 			Expected: []string{"v3", "test", "status"},
 			Is:       IsStatus,
-			IsNot:    []func([]string) bool{IsDownlink, IsUplink},
+			IsNot:    []func([]string) bool{IsDownlink, IsUplink, IsTxAck},
+		},
+		{
+			UID:      "test",
+			Version:  V3,
+			Func:     TxAck,
+			Expected: []string{"v3", "test", "down", "ack"},
+			Is:       IsTxAck,
+			IsNot:    []func([]string) bool{IsDownlink, IsUplink, IsStatus},
 		},
 		{
 			UID:      "test",
@@ -62,7 +70,7 @@ func TestTopics(t *testing.T) {
 			Func:     Uplink,
 			Expected: []string{"test", "up"},
 			Is:       IsUplink,
-			IsNot:    []func([]string) bool{IsDownlink, IsStatus},
+			IsNot:    []func([]string) bool{IsDownlink, IsStatus, IsTxAck},
 		},
 		{
 			UID:      "test",
@@ -70,7 +78,7 @@ func TestTopics(t *testing.T) {
 			Func:     Downlink,
 			Expected: []string{"test", "down"},
 			Is:       IsDownlink,
-			IsNot:    []func([]string) bool{IsUplink, IsStatus},
+			IsNot:    []func([]string) bool{IsUplink, IsStatus, IsTxAck},
 		},
 		{
 			UID:      "test",
@@ -78,7 +86,7 @@ func TestTopics(t *testing.T) {
 			Func:     Status,
 			Expected: []string{"test", "status"},
 			Is:       IsStatus,
-			IsNot:    []func([]string) bool{IsDownlink, IsUplink},
+			IsNot:    []func([]string) bool{IsDownlink, IsUplink, IsTxAck},
 		},
 	} {
 		t.Run(topic.Join(tc.Expected), func(t *testing.T) {

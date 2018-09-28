@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -539,6 +540,39 @@ func TestTraffic(t *testing.T) {
 			if !tcok {
 				t.FailNow()
 			}
+		}
+	})
+
+	t.Run("TxAcknowledgment", func(t *testing.T) {
+		a := assertions.New(t)
+
+		udpConn, err := net.Dial("udp", lis.LocalAddr().String())
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		packet := generateTxAck(eui1, encoding.TxErrNone)
+		buf, err := packet.MarshalBinary()
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		token := [2]byte{0x00, 0xae}
+		copy(buf[1:], token[:])
+		_, err = udpConn.Write(buf)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		v, loaded := connections.Load(eui1)
+		if !a.So(loaded, should.BeTrue) {
+			t.FailNow()
+		}
+		conn := v.(*io.Connection)
+		select {
+		case <-conn.TxAck():
+		case <-time.After(timeout):
+			t.Fatal("Receive expected TxAck timeout")
 		}
 	})
 

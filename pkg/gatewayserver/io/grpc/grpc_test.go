@@ -202,6 +202,11 @@ func TestTraffic(t *testing.T) {
 					IP: []string{"3.3.3.3"},
 				},
 			},
+			{
+				TxAcknowledgment: &ttnpb.TxAcknowledgment{
+					Result: ttnpb.TxAcknowledgment_SUCCESS,
+				},
+			},
 		} {
 			t.Run(fmt.Sprintf("%v/%v", len(tc.UplinkMessages), tc.GatewayStatus != nil), func(t *testing.T) {
 				a := assertions.New(t)
@@ -210,7 +215,8 @@ func TestTraffic(t *testing.T) {
 
 				var ups int
 				var needStatus bool = tc.GatewayStatus != nil
-				for ups != len(tc.UplinkMessages) || needStatus {
+				var needTxAck bool = tc.TxAcknowledgment != nil
+				for ups != len(tc.UplinkMessages) || needStatus || needTxAck {
 					select {
 					case up := <-conn.Up():
 						a.So(up, should.Resemble, tc.UplinkMessages[ups])
@@ -219,8 +225,12 @@ func TestTraffic(t *testing.T) {
 						a.So(needStatus, should.BeTrue)
 						a.So(status, should.Resemble, tc.GatewayStatus)
 						needStatus = false
+					case ack := <-conn.TxAck():
+						a.So(needTxAck, should.BeTrue)
+						a.So(ack, should.Resemble, tc.TxAcknowledgment)
+						needTxAck = false
 					case <-time.After(timeout):
-						t.Fatalf("Receive expected upstream timeout; ups = %v, needStatus = %v", ups, needStatus)
+						t.Fatalf("Receive expected upstream timeout; ups = %v, needStatus = %t, needAck = %t", ups, needStatus, needTxAck)
 					}
 				}
 			})

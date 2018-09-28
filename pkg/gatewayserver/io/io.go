@@ -65,6 +65,7 @@ type Connection struct {
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
 	statusCh chan *ttnpb.GatewayStatus
+	txAckCh  chan *ttnpb.TxAcknowledgment
 }
 
 // NewConnection instantiates a new gateway connection.
@@ -79,6 +80,7 @@ func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway,
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
+		txAckCh:     make(chan *ttnpb.TxAcknowledgment, bufferSize),
 		connectTime: time.Now().UnixNano(),
 	}
 }
@@ -127,6 +129,18 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 	return nil
 }
 
+// HandleTxAck sends the acknowledgment to the status channel.
+func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
+	select {
+	case <-c.ctx.Done():
+		return c.ctx.Err()
+	case c.txAckCh <- ack:
+	default:
+		return errBufferFull
+	}
+	return nil
+}
+
 var errComputeTOA = errors.Define("compute_toa", "could not compute the time on air")
 
 // SendDown schedules and sends a downlink message and updates the downlink stats.
@@ -168,6 +182,11 @@ func (c *Connection) Up() <-chan *ttnpb.UplinkMessage {
 // Down returns the downstream channel.
 func (c *Connection) Down() <-chan *ttnpb.DownlinkMessage {
 	return c.downCh
+}
+
+// TxAck returns the downlink acknowledgments channel.
+func (c *Connection) TxAck() <-chan *ttnpb.TxAcknowledgment {
+	return c.txAckCh
 }
 
 // ConnectTime returns the time the gateway connected.
