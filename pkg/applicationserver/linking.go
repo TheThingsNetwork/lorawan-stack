@@ -30,10 +30,18 @@ import (
 )
 
 func (as *ApplicationServer) linkAll(ctx context.Context) error {
-	return as.linkRegistry.Range(ctx, func(ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
-		as.startLinkTask(ctx, ids, target)
-		return true
-	})
+	return as.linkRegistry.Range(
+		ctx,
+		[]string{
+			"network_server_address",
+			"api_key",
+			"default_formatters",
+		},
+		func(ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
+			as.startLinkTask(ctx, ids, target)
+			return true
+		},
+	)
 }
 
 var linkBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}

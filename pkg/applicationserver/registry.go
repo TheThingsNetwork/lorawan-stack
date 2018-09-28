@@ -23,17 +23,17 @@ import (
 // DeviceRegistry is a store for end devices.
 type DeviceRegistry interface {
 	// Get returns the end device by its identifiers.
-	Get(context.Context, ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error)
+	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths ...string) (*ttnpb.EndDevice, error)
 	// Set creates, updates or deletes the end device by its identifiers.
-	Set(context.Context, ttnpb.EndDeviceIdentifiers, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error
+	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
 // LinkRegistry is a store for application links.
 type LinkRegistry interface {
 	// Get returns the link by the application identifiers.
-	Get(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error)
+	Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths ...string) (*ttnpb.ApplicationLink, error)
 	// Range ranges the links and calls the callback function, until false is returned.
-	Range(context.Context, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
+	Range(ctx context.Context, paths []string, f func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
 	// Set creates, updates or deletes the link by the application identifiers.
-	Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error
+	Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
 }

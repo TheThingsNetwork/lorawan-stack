@@ -167,7 +167,7 @@ func newMemDeviceRegistry() *memDeviceRegistry {
 	}
 }
 
-func (r *memDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
+func (r *memDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths ...string) (*ttnpb.EndDevice, error) {
 	v, err := r.store.Get(unique.ID(ctx, ids))
 	if err != nil {
 		return nil, err
@@ -175,20 +175,26 @@ func (r *memDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 	return v.(*ttnpb.EndDevice), nil
 }
 
-func (r *memDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error {
-	return r.store.Set(unique.ID(ctx, ids), func(v proto.Unmarshaler) (proto.Marshaler, error) {
-		var ed *ttnpb.EndDevice
+func (r *memDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	var set *ttnpb.EndDevice
+	err := r.store.Set(unique.ID(ctx, ids), func(v proto.Unmarshaler) (proto.Marshaler, error) {
+		var dev *ttnpb.EndDevice
 		if v != nil {
-			ed = v.(*ttnpb.EndDevice)
+			dev = v.(*ttnpb.EndDevice)
 		}
-		if ed, err := f(ed); err != nil {
+		if dev, _, err := f(dev); err != nil {
 			return nil, err
-		} else if ed == nil {
+		} else if dev == nil {
 			return nil, nil
 		} else {
-			return ed, nil
+			set = dev
+			return dev, nil
 		}
 	})
+	if err != nil {
+		return nil, err
+	}
+	return set, nil
 }
 
 func (r *memDeviceRegistry) Reset() {
@@ -208,7 +214,7 @@ func newMemLinkRegistry() *memLinkRegistry {
 	}
 }
 
-func (r *memLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
+func (r *memLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths ...string) (*ttnpb.ApplicationLink, error) {
 	v, err := r.store.Get(unique.ID(ctx, ids))
 	if err != nil {
 		return nil, err
@@ -216,23 +222,29 @@ func (r *memLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifi
 	return v.(*ttnpb.ApplicationLink), nil
 }
 
-func (r *memLinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error {
-	return r.store.Set(unique.ID(ctx, ids), func(v proto.Unmarshaler) (proto.Marshaler, error) {
+func (r *memLinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
+	var set *ttnpb.ApplicationLink
+	err := r.store.Set(unique.ID(ctx, ids), func(v proto.Unmarshaler) (proto.Marshaler, error) {
 		var l *ttnpb.ApplicationLink
 		if v != nil {
 			l = v.(*ttnpb.ApplicationLink)
 		}
-		if l, err := f(l); err != nil {
+		if l, _, err := f(l); err != nil {
 			return nil, err
 		} else if l == nil {
 			return nil, nil
 		} else {
+			set = l
 			return l, nil
 		}
 	})
+	if err != nil {
+		return nil, err
+	}
+	return set, nil
 }
 
-func (r *memLinkRegistry) Range(ctx context.Context, f func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+func (r *memLinkRegistry) Range(ctx context.Context, paths []string, f func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	var ferr error
 	err := r.store.Range(func(uid string, v proto.Unmarshaler) bool {
 		ids, ferr := unique.ToApplicationID(uid)

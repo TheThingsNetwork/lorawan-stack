@@ -37,17 +37,18 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) {
-		return &req.ApplicationLink, nil
+	link, err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+		return &req.ApplicationLink, req.FieldMask.Paths, nil
 	})
 	if err != nil {
 		return nil, err
 	}
+	// TODO: Restart link only when `network_server_address` is in field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1177)
 	if err := as.cancelLink(ctx, req.ApplicationIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
 	}
 	as.startLinkTask(ctx, req.ApplicationIdentifiers, &req.ApplicationLink)
-	return &req.ApplicationLink, nil
+	return link, nil
 }
 
 // DeleteLink implements ttnpb.AsServer.
@@ -55,7 +56,7 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	err := as.linkRegistry.Set(ctx, *ids, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) { return nil, nil })
+	_, err := as.linkRegistry.Set(ctx, *ids, nil, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) { return nil, nil, nil })
 	if err != nil {
 		return nil, err
 	}

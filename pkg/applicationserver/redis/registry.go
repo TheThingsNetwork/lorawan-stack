@@ -28,13 +28,13 @@ type DeviceRegistry struct {
 }
 
 // Get returns the end device by its identifiers.
-func (r *DeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers, ...string) (*ttnpb.EndDevice, error) {
 	return nil, errors.New("not implemented")
 }
 
 // Set creates, updates or deletes the end device by its identifiers.
-func (r *DeviceRegistry) Set(context.Context, ttnpb.EndDeviceIdentifiers, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) error {
-	return errors.New("not implemented")
+func (r *DeviceRegistry) Set(context.Context, ttnpb.EndDeviceIdentifiers, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	return nil, errors.New("not implemented")
 }
 
 // LinkRegistry is a store for application links.
@@ -43,16 +43,16 @@ type LinkRegistry struct {
 }
 
 // Get returns the link by the application identifiers.
-func (r *LinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLink, error) {
+func (r *LinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers, ...string) (*ttnpb.ApplicationLink, error) {
 	return nil, errors.New("not implemented")
 }
 
 // Range ranges the links and calls the callback function, until false is returned.
-func (r *LinkRegistry) Range(context.Context, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+func (r *LinkRegistry) Range(context.Context, []string, func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	return errors.New("not implemented")
 }
 
 // Set creates, updates or deletes the link by the application identifiers.
-func (r *LinkRegistry) Set(context.Context, ttnpb.ApplicationIdentifiers, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error)) error {
-	return errors.New("not implemented")
+func (r *LinkRegistry) Set(context.Context, ttnpb.ApplicationIdentifiers, []string, func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
+	return nil, errors.New("not implemented")
 }

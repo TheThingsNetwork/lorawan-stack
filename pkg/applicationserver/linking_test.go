@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -36,12 +37,18 @@ func TestLink(t *testing.T) {
 	ctx := test.Context()
 	ns, nsAddr := startMockNS(ctx)
 
+	mask := []string{
+		"network_server_address",
+		"api_key",
+		"default_formatters",
+	}
+
 	// app1 is added to the link registry, app2 will be linked at runtime.
 	app1 := ttnpb.ApplicationIdentifiers{ApplicationID: "app1"}
 	app2 := ttnpb.ApplicationIdentifiers{ApplicationID: "app2"}
 	linkRegistry := newMemLinkRegistry()
-	linkRegistry.Set(ctx, app1, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) {
-		return &ttnpb.ApplicationLink{}, nil
+	linkRegistry.Set(ctx, app1, mask, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+		return &ttnpb.ApplicationLink{}, mask, nil
 	})
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
@@ -81,7 +88,12 @@ func TestLink(t *testing.T) {
 		})
 
 		// Expect no link.
-		_, err := as.GetLink(ctx, &app2)
+		_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+			ApplicationIdentifiers: app2,
+			FieldMask: pbtypes.FieldMask{
+				Paths: mask,
+			},
+		})
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		// Set link, expect link to establish.
@@ -89,6 +101,9 @@ func TestLink(t *testing.T) {
 		_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
 			ApplicationIdentifiers: app2,
 			ApplicationLink:        link,
+			FieldMask: pbtypes.FieldMask{
+				Paths: mask,
+			},
 		})
 		a.So(err, should.BeNil)
 		select {
@@ -97,7 +112,12 @@ func TestLink(t *testing.T) {
 		case <-time.After(timeout):
 			t.Fatal("Expect link timeout")
 		}
-		actual, err := as.GetLink(ctx, &app2)
+		actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+			ApplicationIdentifiers: app2,
+			FieldMask: pbtypes.FieldMask{
+				Paths: mask,
+			},
+		})
 		a.So(err, should.BeNil)
 		a.So(*actual, should.Resemble, link)
 
@@ -110,7 +130,12 @@ func TestLink(t *testing.T) {
 		case <-time.After(timeout):
 			t.Fatal("Expect link timeout")
 		}
-		_, err = as.GetLink(ctx, &app2)
+		_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+			ApplicationIdentifiers: app2,
+			FieldMask: pbtypes.FieldMask{
+				Paths: mask,
+			},
+		})
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 }

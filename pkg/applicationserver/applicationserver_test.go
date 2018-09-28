@@ -107,18 +107,18 @@ func TestApplicationServer(t *testing.T) {
 	deviceRegistry := newMemDeviceRegistry()
 	resetDeviceRegistry := func() {
 		deviceRegistry.Reset()
-		deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			return registeredDevice, nil
+		deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			return registeredDevice, []string{"ids", "version_ids", "formatters"}, nil
 		})
 	}
 	linkRegistry := newMemLinkRegistry()
-	linkRegistry.Set(ctx, registeredApplicationID, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, error) {
+	linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
 				UpFormatter:   registeredApplicationFormatter,
 				DownFormatter: registeredApplicationFormatter,
 			},
-		}, nil
+		}, []string{"default_formatters"}, nil
 	})
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{

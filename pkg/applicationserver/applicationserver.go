@@ -82,14 +82,14 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
-	// TODO: Register AsEndDeviceRegistryServer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
+	ttnpb.RegisterAsEndDeviceRegistryServer(s, as)
 	ttnpb.RegisterAppAsServer(s, iogrpc.New(as))
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
-	// TODO: Register AsEndDeviceRegistryHandler (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
+	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
 }
 
 // Roles returns the roles that the Application Server fulfills.
@@ -149,104 +149,113 @@ var (
 )
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
-	return as.deviceRegistry.Set(ctx, up.EndDeviceIdentifiers, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-		uid := unique.ID(ctx, up.EndDeviceIdentifiers)
-		logger := log.FromContext(ctx).WithField("device_uid", uid)
-		creating := false
-		if ed == nil {
-			logger.Info("Creating new device")
-			ed = &ttnpb.EndDevice{
-				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+	_, err := as.deviceRegistry.Set(
+		ctx,
+		up.EndDeviceIdentifiers,
+		[]string{},
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			var mask []string
+			uid := unique.ID(ctx, up.EndDeviceIdentifiers)
+			logger := log.FromContext(ctx).WithField("device_uid", uid)
+			creating := false
+			if dev == nil {
+				logger.Info("Creating new device")
+				dev = &ttnpb.EndDevice{
+					EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+				}
+				mask = append(mask, "ids")
+				creating = true
 			}
-			creating = true
-		}
-		resetDownlinkQueue := false
+			resetDownlinkQueue := false
 
-		switch p := up.Up.(type) {
-		case *ttnpb.ApplicationUp_JoinAccept:
-			logger := logger.WithFields(log.Fields(
-				"join_eui", up.EndDeviceIdentifiers.JoinEUI,
-				"dev_eui", up.EndDeviceIdentifiers.DevEUI,
-				"session_key_id", p.JoinAccept.SessionKeyID,
-			))
-			logger.Debug("Handling join-accept...")
-			var appSKey ttnpb.KeyEnvelope
-			if p.JoinAccept.AppSKey != nil {
-				logger.Debug("Received AppSKey from Network Server")
-				appSKey = *p.JoinAccept.AppSKey
-			} else {
-				logger.Debug("Getting AppSKey from Join Server...")
-				key, err := as.getAppSKey(ctx, p.JoinAccept.SessionKeyID, up.EndDeviceIdentifiers)
-				if err != nil {
-					return nil, errGetAppSKey.WithCause(err)
+			switch p := up.Up.(type) {
+			case *ttnpb.ApplicationUp_JoinAccept:
+				logger := logger.WithFields(log.Fields(
+					"join_eui", up.EndDeviceIdentifiers.JoinEUI,
+					"dev_eui", up.EndDeviceIdentifiers.DevEUI,
+					"session_key_id", p.JoinAccept.SessionKeyID,
+				))
+				logger.Debug("Handling join-accept...")
+				var appSKey ttnpb.KeyEnvelope
+				if p.JoinAccept.AppSKey != nil {
+					logger.Debug("Received AppSKey from Network Server")
+					appSKey = *p.JoinAccept.AppSKey
+				} else {
+					logger.Debug("Getting AppSKey from Join Server...")
+					key, err := as.getAppSKey(ctx, p.JoinAccept.SessionKeyID, up.EndDeviceIdentifiers)
+					if err != nil {
+						return nil, nil, errGetAppSKey.WithCause(err)
+					}
+					appSKey = key
+					logger.Debug("Received AppSKey from Join Server")
 				}
-				appSKey = key
-				logger.Debug("Received AppSKey from Join Server")
-			}
-			ed.Session = &ttnpb.Session{
-				SessionKeys: ttnpb.SessionKeys{
-					SessionKeyID: p.JoinAccept.SessionKeyID,
-					AppSKey:      &appSKey,
-				},
-				StartedAt: time.Now(),
-			}
-			p.JoinAccept.AppSKey = nil
-			resetDownlinkQueue = true
-			logger.Info("Handled join-accept")
-
-		case *ttnpb.ApplicationUp_UplinkMessage:
-			logger := logger.WithField("session_key_id", p.UplinkMessage.SessionKeyID)
-			logger.Debug("Handling uplink data...")
-			if ed.Session == nil || ed.Session.SessionKeyID != p.UplinkMessage.SessionKeyID {
-				if !creating {
-					logger.Warn("Session mismatch; restoring session...")
-				}
-				appSKey, err := as.getAppSKey(ctx, p.UplinkMessage.SessionKeyID, up.EndDeviceIdentifiers)
-				if err != nil {
-					return nil, errGetAppSKey.WithCause(err)
-				}
-				ed.Session = &ttnpb.Session{
+				dev.Session = &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: p.UplinkMessage.SessionKeyID,
+						SessionKeyID: p.JoinAccept.SessionKeyID,
 						AppSKey:      &appSKey,
 					},
 					StartedAt: time.Now(),
 				}
-				logger.Debug("Session restored")
-			} else if ed.Session.AppSKey == nil {
-				return nil, errNoAppSKey
-			}
-			appSKey, err := cryptoutil.UnwrapAES128Key(*ed.Session.AppSKey, as.KeyVault)
-			if err != nil {
-				return nil, err
-			}
-			frmPayload, err := crypto.DecryptUplink(appSKey, *up.DevAddr, p.UplinkMessage.FCnt, p.UplinkMessage.FRMPayload)
-			if err != nil {
-				return nil, err
-			}
-			p.UplinkMessage.FRMPayload = frmPayload
-			var formatter ttnpb.PayloadFormatter
-			var parameter string
-			if ed.Formatters != nil {
-				formatter, parameter = ed.Formatters.UpFormatter, ed.Formatters.UpFormatterParameter
-			} else if link.DefaultFormatters != nil {
-				formatter, parameter = link.DefaultFormatters.UpFormatter, link.DefaultFormatters.UpFormatterParameter
-			}
-			if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-				if err := as.formatter.Decode(ctx, up.EndDeviceIdentifiers, ed.VersionIDs, p.UplinkMessage, formatter, parameter); err != nil {
-					logger.WithError(err).Warn("Payload decoding failed")
+				p.JoinAccept.AppSKey = nil
+				resetDownlinkQueue = true
+				logger.Info("Handled join-accept")
+
+			case *ttnpb.ApplicationUp_UplinkMessage:
+				logger := logger.WithField("session_key_id", p.UplinkMessage.SessionKeyID)
+				logger.Debug("Handling uplink data...")
+				if dev.Session == nil || dev.Session.SessionKeyID != p.UplinkMessage.SessionKeyID {
+					if !creating {
+						logger.Warn("Session mismatch; restoring session...")
+					}
+					appSKey, err := as.getAppSKey(ctx, p.UplinkMessage.SessionKeyID, up.EndDeviceIdentifiers)
+					if err != nil {
+						return nil, nil, errGetAppSKey.WithCause(err)
+					}
+					dev.Session = &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: p.UplinkMessage.SessionKeyID,
+							AppSKey:      &appSKey,
+						},
+						StartedAt: time.Now(),
+					}
+					logger.Debug("Session restored")
+				} else if dev.Session.AppSKey == nil {
+					return nil, nil, errNoAppSKey
 				}
+				appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+				if err != nil {
+					return nil, nil, err
+				}
+				frmPayload, err := crypto.DecryptUplink(appSKey, *up.DevAddr, p.UplinkMessage.FCnt, p.UplinkMessage.FRMPayload)
+				if err != nil {
+					return nil, nil, err
+				}
+				p.UplinkMessage.FRMPayload = frmPayload
+				var formatter ttnpb.PayloadFormatter
+				var parameter string
+				if dev.Formatters != nil {
+					formatter, parameter = dev.Formatters.UpFormatter, dev.Formatters.UpFormatterParameter
+				} else if link.DefaultFormatters != nil {
+					formatter, parameter = link.DefaultFormatters.UpFormatter, link.DefaultFormatters.UpFormatterParameter
+				}
+				if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
+					if err := as.formatter.Decode(ctx, up.EndDeviceIdentifiers, dev.VersionIDs, p.UplinkMessage, formatter, parameter); err != nil {
+						logger.WithError(err).Warn("Payload decoding failed")
+					}
+				}
+				// TODO:
+				// - Run uplink messages through location solvers async
+				logger.Info("Handled uplink data")
 			}
+
+			_ = resetDownlinkQueue
+
 			// TODO:
-			// - Run uplink messages through location solvers async
-			logger.Info("Handled uplink data")
-		}
+			// - Recompute downlink queue on join accept and invalidation
 
-		_ = resetDownlinkQueue
+			return dev, mask, nil
+		},
+	)
 
-		// TODO:
-		// - Recompute downlink queue on join accept and invalidation
-
-		return ed, nil
-	})
+	return err
 }
