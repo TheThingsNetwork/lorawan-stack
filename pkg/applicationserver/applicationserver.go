@@ -142,120 +142,136 @@ func (as *ApplicationServer) getAppSKey(ctx context.Context, sessionKeyID string
 	return res.AppSKey, nil
 }
 
+func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
+	switch p := up.Up.(type) {
+	case *ttnpb.ApplicationUp_JoinAccept:
+		return as.handleJoinAccept(ctx, up.EndDeviceIdentifiers, p.JoinAccept, link)
+	case *ttnpb.ApplicationUp_UplinkMessage:
+		return as.handleUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
+	default:
+		return nil
+	}
+}
+
 var (
-	errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
-	errGetAppSKey     = errors.Define("app_s_key", "failed to get AppSKey")
-	errNoAppSKey      = errors.DefineCorruption("no_app_s_key", "no AppSKey")
+	errGetAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
+	errNoAppSKey  = errors.DefineCorruption("no_app_s_key", "no AppSKey")
 )
 
-func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
-	_, err := as.deviceRegistry.Set(
-		ctx,
-		up.EndDeviceIdentifiers,
-		[]string{},
+func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"join_eui", ids.JoinEUI,
+		"dev_eui", ids.DevEUI,
+		"session_key_id", joinAccept.SessionKeyID,
+	))
+	_, err := as.deviceRegistry.Set(ctx, ids, nil,
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
-			uid := unique.ID(ctx, up.EndDeviceIdentifiers)
-			logger := log.FromContext(ctx).WithField("device_uid", uid)
-			creating := false
 			if dev == nil {
 				logger.Info("Creating new device")
 				dev = &ttnpb.EndDevice{
-					EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+					EndDeviceIdentifiers: ids,
 				}
 				mask = append(mask, "ids")
-				creating = true
 			}
-			resetDownlinkQueue := false
+			var appSKey ttnpb.KeyEnvelope
+			if joinAccept.AppSKey != nil {
+				logger.Debug("Received AppSKey from Network Server")
+				appSKey = *joinAccept.AppSKey
+			} else {
+				logger.Debug("Getting AppSKey from Join Server...")
+				key, err := as.getAppSKey(ctx, joinAccept.SessionKeyID, ids)
+				if err != nil {
+					return nil, nil, errGetAppSKey.WithCause(err)
+				}
+				appSKey = key
+				logger.Debug("Received AppSKey from Join Server")
+			}
+			dev.Session = &ttnpb.Session{
+				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: joinAccept.SessionKeyID,
+					AppSKey:      &appSKey,
+				},
+				StartedAt: time.Now(),
+			}
+			return dev, append(mask, "session"), nil
+		},
+	)
+	if err != nil {
+		return err
+	}
+	// TODO: Reset downlink queue
+	joinAccept.AppSKey = nil
+	return nil
+}
 
-			switch p := up.Up.(type) {
-			case *ttnpb.ApplicationUp_JoinAccept:
-				logger := logger.WithFields(log.Fields(
-					"join_eui", up.EndDeviceIdentifiers.JoinEUI,
-					"dev_eui", up.EndDeviceIdentifiers.DevEUI,
-					"session_key_id", p.JoinAccept.SessionKeyID,
-				))
-				logger.Debug("Handling join-accept...")
-				var appSKey ttnpb.KeyEnvelope
-				if p.JoinAccept.AppSKey != nil {
-					logger.Debug("Received AppSKey from Network Server")
-					appSKey = *p.JoinAccept.AppSKey
-				} else {
-					logger.Debug("Getting AppSKey from Join Server...")
-					key, err := as.getAppSKey(ctx, p.JoinAccept.SessionKeyID, up.EndDeviceIdentifiers)
-					if err != nil {
-						return nil, nil, errGetAppSKey.WithCause(err)
-					}
-					appSKey = key
-					logger.Debug("Received AppSKey from Join Server")
+func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
+	logger := log.FromContext(ctx).WithField("session_key_id", uplink.SessionKeyID)
+	dev, err := as.deviceRegistry.Set(ctx, ids,
+		[]string{
+			"session",
+			"formatters",
+			"version_ids",
+		},
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			var mask []string
+			if dev == nil {
+				logger.Info("Creating new device")
+				dev = &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+				}
+				mask = append(mask, "ids")
+			}
+			if dev.Session == nil || dev.Session.SessionKeyID != uplink.SessionKeyID {
+				if dev.Session != nil {
+					logger.Warn("Session mismatch; restoring session...")
+				}
+				appSKey, err := as.getAppSKey(ctx, uplink.SessionKeyID, ids)
+				if err != nil {
+					return nil, nil, errGetAppSKey.WithCause(err)
 				}
 				dev.Session = &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: p.JoinAccept.SessionKeyID,
+						SessionKeyID: uplink.SessionKeyID,
 						AppSKey:      &appSKey,
 					},
 					StartedAt: time.Now(),
 				}
-				p.JoinAccept.AppSKey = nil
-				resetDownlinkQueue = true
-				logger.Info("Handled join-accept")
-
-			case *ttnpb.ApplicationUp_UplinkMessage:
-				logger := logger.WithField("session_key_id", p.UplinkMessage.SessionKeyID)
-				logger.Debug("Handling uplink data...")
-				if dev.Session == nil || dev.Session.SessionKeyID != p.UplinkMessage.SessionKeyID {
-					if !creating {
-						logger.Warn("Session mismatch; restoring session...")
-					}
-					appSKey, err := as.getAppSKey(ctx, p.UplinkMessage.SessionKeyID, up.EndDeviceIdentifiers)
-					if err != nil {
-						return nil, nil, errGetAppSKey.WithCause(err)
-					}
-					dev.Session = &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
-							SessionKeyID: p.UplinkMessage.SessionKeyID,
-							AppSKey:      &appSKey,
-						},
-						StartedAt: time.Now(),
-					}
-					logger.Debug("Session restored")
-				} else if dev.Session.AppSKey == nil {
-					return nil, nil, errNoAppSKey
-				}
-				appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
-				if err != nil {
-					return nil, nil, err
-				}
-				frmPayload, err := crypto.DecryptUplink(appSKey, *up.DevAddr, p.UplinkMessage.FCnt, p.UplinkMessage.FRMPayload)
-				if err != nil {
-					return nil, nil, err
-				}
-				p.UplinkMessage.FRMPayload = frmPayload
-				var formatter ttnpb.PayloadFormatter
-				var parameter string
-				if dev.Formatters != nil {
-					formatter, parameter = dev.Formatters.UpFormatter, dev.Formatters.UpFormatterParameter
-				} else if link.DefaultFormatters != nil {
-					formatter, parameter = link.DefaultFormatters.UpFormatter, link.DefaultFormatters.UpFormatterParameter
-				}
-				if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-					if err := as.formatter.Decode(ctx, up.EndDeviceIdentifiers, dev.VersionIDs, p.UplinkMessage, formatter, parameter); err != nil {
-						logger.WithError(err).Warn("Payload decoding failed")
-					}
-				}
-				// TODO:
-				// - Run uplink messages through location solvers async
-				logger.Info("Handled uplink data")
+				mask = append(mask, "session")
+				logger.Debug("Session restored")
+			} else if dev.Session.AppSKey == nil {
+				return nil, nil, errNoAppSKey
 			}
-
-			_ = resetDownlinkQueue
-
-			// TODO:
-			// - Recompute downlink queue on join accept and invalidation
-
 			return dev, mask, nil
 		},
 	)
-
-	return err
+	if err != nil {
+		return err
+	}
+	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	if err != nil {
+		return err
+	}
+	frmPayload, err := crypto.DecryptUplink(appSKey, *ids.DevAddr, uplink.FCnt, uplink.FRMPayload)
+	if err != nil {
+		return err
+	}
+	uplink.FRMPayload = frmPayload
+	var formatter ttnpb.PayloadFormatter
+	var parameter string
+	if dev.Formatters != nil {
+		formatter, parameter = dev.Formatters.UpFormatter, dev.Formatters.UpFormatterParameter
+	} else if link.DefaultFormatters != nil {
+		formatter, parameter = link.DefaultFormatters.UpFormatter, link.DefaultFormatters.UpFormatterParameter
+	}
+	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
+		if err := as.formatter.Decode(ctx, ids, dev.VersionIDs, uplink, formatter, parameter); err != nil {
+			logger.WithError(err).Warn("Payload decoding failed")
+		}
+	}
+	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsIndustries/lorawan-stack/issues/1221)
+	return nil
 }
+
+// var errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
