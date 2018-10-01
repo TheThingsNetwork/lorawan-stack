@@ -16,9 +16,16 @@
 package joinserver
 
 import (
+	"io"
+	"math/rand"
+	"sync"
+	"time"
+
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -35,20 +42,34 @@ type JoinServer struct {
 	keys    KeyRegistry
 
 	euiPrefixes []types.EUI64Prefix
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
 }
 
 // Config represents the JoinServer configuration.
 type Config struct {
 	Devices         DeviceRegistry      `name:"-"`
+	Keys            KeyRegistry         `name:"-"`
 	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
 }
 
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
+	if conf.Keys == nil || conf.Devices == nil {
+		panic(errors.New("One of registries is <nil>"))
+	}
+
 	js := &JoinServer{
-		Component:   c,
-		devices:     conf.Devices,
+		Component: c,
+
+		devices: conf.Devices,
+		keys:    conf.Keys,
+
 		euiPrefixes: conf.JoinEUIPrefixes,
+
+		entropyMu: &sync.Mutex{},
+		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())

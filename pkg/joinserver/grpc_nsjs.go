@@ -21,6 +21,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/oklog/ulid"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -134,7 +135,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		case !match && dev.LoRaWANVersion == ttnpb.MAC_V1_0:
 			return nil, errUnknownAppEUI
 		case !match:
-			// TODO determine the cluster containing the device
+			// TODO: Determine the cluster containing the device.
 			// https://github.com/TheThingsIndustries/ttn/issues/244
 			return nil, errForwardJoinRequest
 		}
@@ -209,6 +210,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 		copy(appKey[:], dev.RootKeys.AppKey.Key[:])
 
+		js.entropyMu.Lock()
+		skID, err := ulid.New(ulid.Timestamp(time.Now()), js.entropy)
+		js.entropyMu.Unlock()
+		if err != nil {
+			return nil, errGenerateSessionKeyID
+		}
+
 		switch req.SelectedMacVersion {
 		case ttnpb.MAC_V1_1:
 			if dev.RootKeys.NwkKey == nil || len(dev.RootKeys.NwkKey.Key) == 0 {
@@ -239,6 +247,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			resp = &ttnpb.JoinResponse{
 				RawPayload: append(b[:1], enc...),
 				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: skID.String(),
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key:      keyToBytes(crypto.DeriveFNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
 						KEKLabel: "",
@@ -277,6 +286,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			resp = &ttnpb.JoinResponse{
 				RawPayload: append(b[:1], enc...),
 				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: skID.String(),
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key:      keyToBytes(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
 						KEKLabel: "",

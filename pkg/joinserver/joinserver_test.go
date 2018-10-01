@@ -64,11 +64,13 @@ func TestHandleJoin(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	devReg := &redis.DeviceRegistry{Redis: redisClient}
+	keyReg := &redis.KeyRegistry{Redis: redisClient}
 
 	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Devices:         devReg,
+			Keys:            keyReg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
 	)).(*JoinServer)
