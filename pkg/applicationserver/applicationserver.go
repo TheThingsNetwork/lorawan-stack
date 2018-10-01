@@ -123,6 +123,21 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	return conn, nil
 }
 
+// DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
+func (as *ApplicationServer) DownlinkQueuePush(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
+	return errors.New("not implemented")
+}
+
+// DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
+func (as *ApplicationServer) DownlinkQueueReplace(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
+	return errors.New("not implemented")
+}
+
+// DownlinkQueueList lists the application downlink queue of the given end device.
+func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error) {
+	return nil, errors.New("not implemented")
+}
+
 var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
 func (as *ApplicationServer) getAppSKey(ctx context.Context, sessionKeyID string, ids ttnpb.EndDeviceIdentifiers) (ttnpb.KeyEnvelope, error) {

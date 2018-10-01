@@ -16,16 +16,21 @@ package testing
 
 import (
 	"context"
+	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 type server struct {
-	connectionsCh chan *io.Connection
+	connectionsCh   chan *io.Connection
+	downlinkQueueMu sync.RWMutex
+	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
 }
 
+// Server represents a testing io.Server.
 type Server interface {
 	io.Server
 
@@ -36,6 +41,7 @@ type Server interface {
 func NewServer() Server {
 	return &server{
 		connectionsCh: make(chan *io.Connection, 10),
+		downlinkQueue: make(map[string][]*ttnpb.ApplicationDownlink),
 	}
 }
 
@@ -50,6 +56,31 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Applica
 	default:
 	}
 	return conn, nil
+}
+
+// DownlinkQueuePush implements io.Server.
+func (s *server) DownlinkQueuePush(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
+	s.downlinkQueueMu.Lock()
+	uid := unique.ID(ctx, ids)
+	s.downlinkQueue[uid] = append(s.downlinkQueue[uid], items...)
+	s.downlinkQueueMu.Unlock()
+	return nil
+}
+
+// DownlinkQueueReplace implements io.Server.
+func (s *server) DownlinkQueueReplace(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
+	s.downlinkQueueMu.Lock()
+	s.downlinkQueue[unique.ID(ctx, ids)] = items
+	s.downlinkQueueMu.Unlock()
+	return nil
+}
+
+// DownlinkQueueList implements io.Server.
+func (s *server) DownlinkQueueList(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error) {
+	s.downlinkQueueMu.RLock()
+	queue := s.downlinkQueue[unique.ID(ctx, ids)]
+	s.downlinkQueueMu.RUnlock()
+	return queue, nil
 }
 
 func (s *server) Connections() <-chan *io.Connection {

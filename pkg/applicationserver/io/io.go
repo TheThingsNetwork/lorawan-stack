@@ -29,6 +29,12 @@ type Server interface {
 	// Connect connects an application or integration by its identifiers to the Application Server, and returns a
 	// Connection for traffic and control.
 	Connect(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Connection, error)
+	// DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
+	DownlinkQueuePush(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
+	// DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
+	DownlinkQueueReplace(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
+	// DownlinkQueueList lists the application downlink queue of the given end device.
+	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
 // Connection is a connection to an application or integration managed by a frontend.
@@ -42,6 +48,7 @@ type Connection struct {
 	upCh chan *ttnpb.ApplicationUp
 }
 
+// NewConnection instantiates a new application or integration connection.
 func NewConnection(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) *Connection {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	return &Connection{
