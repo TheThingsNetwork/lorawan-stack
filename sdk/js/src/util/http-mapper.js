@@ -25,8 +25,10 @@ function map (files) {
 
     for (const service of file.services) {
 
+      result[service.name] = {}
+
       for (const method of service.methods) {
-        result[method.name] = { file: file.name, http: []}
+        result[service.name][method.name] = { file: file.name, http: []}
 
         if (method.options && method.options['google.api.http']) {
           for (const rule of method.options['google.api.http'].rules) {
@@ -37,7 +39,7 @@ function map (files) {
             }
 
             rule.method = rule.method.toLowerCase()
-            result[method.name].http.push(rule)
+            result[service.name][method.name].http.push(rule)
           }
         }
       }
