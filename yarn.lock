@@ -3304,7 +3304,7 @@ connect-history-api-fallback@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/connect-history-api-fallback/-/connect-history-api-fallback-1.5.0.tgz#b06873934bc5e344fef611a196a6faae0aee015a"
 
-connected-react-router@^4.4.1:
+connected-react-router@~4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/connected-react-router/-/connected-react-router-4.5.0.tgz#b6f021cc284a244fbee70e16e5ff0f2a4613e3d3"
   dependencies:
