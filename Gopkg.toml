@@ -1,3 +1,8 @@
+required = ["github.com/golang/dep"]
+
+[[constraint]]
+  name = "github.com/TheThingsNetwork/go-cayenne-lib"
+  version = "1.0.0"
 
 [[constraint]]
   branch = "master"
@@ -28,6 +33,10 @@
   name = "github.com/jacobsa/crypto"
 
 [[constraint]]
+  name = "github.com/robertkrimen/otto"
+  source = "github.com/johanstokking/otto"
+
+[[constraint]]
   branch = "master"
   name = "github.com/smartystreets/assertions"
 
@@ -44,21 +53,17 @@
   name = "github.com/spf13/viper"
 
 [[constraint]]
+  name = "go.opencensus.io"
+  version = "0.14.0"
+
+[[constraint]]
   name = "google.golang.org/grpc"
   version = "1.14.0"
 
 [[override]]
+  name = "github.com/golang/dep"
+  version = "0.5.0"
+
+[[override]]
   branch = "master"
   name = "github.com/prometheus/client_golang"
-
-[[constraint]]
-  name = "github.com/robertkrimen/otto"
-  source = "github.com/johanstokking/otto"
-
-[[constraint]]
-  name = "github.com/TheThingsNetwork/go-cayenne-lib"
-  version = "1.0.0"
-
-[[constraint]]
-  name = "go.opencensus.io"
-  version = "0.14.0"

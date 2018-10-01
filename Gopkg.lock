@@ -2,6 +2,22 @@
 
 
 [[projects]]
+  branch = "2.x"
+  digest = "1:0e612616721a5da1f8597fe67f521aaaaf4decddd63ccd25aa4bff03468278d2"
+  name = "github.com/Masterminds/semver"
+  packages = ["."]
+  pruneopts = ""
+  revision = "3c92f33da7a84de8314f3ff82e5f919b89fd1492"
+
+[[projects]]
+  digest = "1:feba416f3ee4dff9898e111bf1c6e30caba339cf39e9f38e5c395d156ed19302"
+  name = "github.com/Masterminds/vcs"
+  packages = ["."]
+  pruneopts = ""
+  revision = "6f1c6d150500e452704e9863f68c2559f58616bf"
+  version = "v1.12.0"
+
+[[projects]]
   digest = "1:8e47871087b94913898333f37af26732faaab30cdb41571136cf7aec9921dae7"
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
@@ -43,6 +59,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:5680f8c40e48f07cb77aece3165a866aaf8276305258b3b70db8ec7ad6ddb78d"
+  name = "github.com/armon/go-radix"
+  packages = ["."]
+  pruneopts = ""
+  revision = "1a2de0c21c94309923825da3df33a4381872c795"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   digest = "1:c0bec5f9b98d0bc872ff5e834fac186b807b656683bd29cb82fb207a1513fabb"
   name = "github.com/beorn7/perks"
@@ -57,6 +81,14 @@
   pruneopts = ""
   revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
   version = "v3.5.1"
+
+[[projects]]
+  digest = "1:ed112122ed4a920d944cc99b9d00b0441c11685939c28462c719488d36fe29aa"
+  name = "github.com/boltdb/bolt"
+  packages = ["."]
+  pruneopts = ""
+  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
+  version = "v1.3.1"
 
 [[projects]]
   digest = "1:8722889ad027febfced94665914d1e7be8f1b703d31f2ef9461c59e4d40fe974"
@@ -149,6 +181,22 @@
   pruneopts = ""
   revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
   version = "v1.1.1"
+
+[[projects]]
+  digest = "1:86384944152bd08c9e30c8f21447276b8b0e52800e88aefe54ff86ae033bf586"
+  name = "github.com/golang/dep"
+  packages = [
+    ".",
+    "gps",
+    "gps/internal/pb",
+    "gps/paths",
+    "gps/pkgtree",
+    "gps/verify",
+    "internal/fs",
+  ]
+  pruneopts = ""
+  revision = "224a564abe296670b692fe08bb63a3e4c4ad7978"
+  version = "v0.5.0"
 
 [[projects]]
   branch = "master"
@@ -284,6 +332,14 @@
   revision = "c73681c634de898c869684602cf0c0d2ce938c4d"
 
 [[projects]]
+  digest = "1:dc5126f78aa052ba39be47f4854a29683f29ab5064394646458f49b00bb0fc29"
+  name = "github.com/jmank88/nuts"
+  packages = ["."]
+  pruneopts = ""
+  revision = "8b28145dffc87104e66d074f62ea8080edfad7c8"
+  version = "v0.3.0"
+
+[[projects]]
   digest = "1:3108ec0946181c60040ff51b811908f89d03e521e2b4ade5ef5c65b3c0e911ae"
   name = "github.com/kr/pretty"
   packages = ["."]
@@ -370,6 +426,14 @@
   packages = ["."]
   pruneopts = ""
   revision = "c48cc78d482608239f6c4c92a4abd87eb8761c90"
+
+[[projects]]
+  branch = "master"
+  digest = "1:3adc46876d4d0e4d5bbcfcc44c2116b95d7a5c966e2ee92a219488547fd453f2"
+  name = "github.com/nightlyone/lockfile"
+  packages = ["."]
+  pruneopts = ""
+  revision = "0ad87eef1443f64d3d8c50da647e2b1552851124"
 
 [[projects]]
   digest = "1:2bcfb4050b33580be8252e9ffed4c7e5295a1c34e73fe1a930d0c71341f2595d"
@@ -472,6 +536,14 @@
   pruneopts = ""
   revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
   version = "v1.2.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:78c40a73ec84ec6be7665f27464ad8c85248174ce14322335f2f1b5c9a2361dc"
+  name = "github.com/sdboyer/constext"
+  packages = ["."]
+  pruneopts = ""
+  revision = "836a144573533ea4da4e6929c235fd348aed1c80"
 
 [[projects]]
   branch = "master"
@@ -646,6 +718,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:b2ea75de0ccb2db2ac79356407f8a4cd8f798fe15d41b381c00abf3ae8e55ed1"
+  name = "golang.org/x/sync"
+  packages = ["errgroup"]
+  pruneopts = ""
+  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
+
+[[projects]]
+  branch = "master"
   digest = "1:85316553c08142add4a383f8950d9c376ba8bd72456de8840d78af0c37c099c9"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -793,6 +873,7 @@
     "github.com/gogo/protobuf/proto",
     "github.com/gogo/protobuf/sortkeys",
     "github.com/gogo/protobuf/types",
+    "github.com/golang/dep",
     "github.com/golang/gddo/httputil",
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes/empty",
