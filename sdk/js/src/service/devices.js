@@ -27,7 +27,7 @@ class Devices {
   }
 
   async getById (deviceId) {
-    const res = await this._api.GetDevice({
+    const res = await this._api.EndDeviceRegistry.Get({
       ...this.idMask,
       device_id: deviceId,
     })
@@ -36,7 +36,7 @@ class Devices {
   }
 
   async updateById (deviceId) {
-    return this._api.GetDevice({
+    return this._api.EndDeviceRegistry.Get({
       ...this.idMask,
       device_id: deviceId,
     })

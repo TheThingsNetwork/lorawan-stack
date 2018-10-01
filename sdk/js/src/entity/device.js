@@ -32,7 +32,7 @@ class Device extends Entity {
   }
 
   save () {
-    return this.api.SetDevice({ ...this._appIdMask, device_id: this._deviceId }, this.toObject())
+    return this.api.EndDeviceRegistry.Update({ ...this._appIdMask, device_id: this._deviceId }, this.toObject())
   }
 }
 

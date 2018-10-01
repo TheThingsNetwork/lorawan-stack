@@ -31,27 +31,35 @@ class Api {
     }
 
     this._connector = new Http(token, connectionConfig)
+    const connector = this._connector
 
-    for (const rpcName of Object.keys(apiDefinition)) {
-      const rpc = apiDefinition[rpcName]
-      this[rpcName] = function (params = {}, body) {
-        const paramSignature = Object.keys(params).sort().join()
+    for (const serviceName of Object.keys(apiDefinition)) {
+      const service = apiDefinition[serviceName]
 
-        const endpoint = rpc.http.find(function (prospect) {
-          return prospect.parameters.sort().join() === paramSignature
-        })
+      this[serviceName] = {}
 
-        if (!endpoint) {
-          throw new Error('The parameter signature did not match the one of the rpc.')
+      for (const rpcName of Object.keys(service)) {
+        const rpc = service[rpcName]
+
+        this[serviceName][rpcName] = function (params = {}, body) {
+          const paramSignature = Object.keys(params).sort().join()
+
+          const endpoint = rpc.http.find(function (prospect) {
+            return prospect.parameters.sort().join() === paramSignature
+          })
+
+          if (!endpoint) {
+            throw new Error('The parameter signature did not match the one of the rpc.')
+          }
+
+          let route = endpoint.pattern
+
+          for (const parameter of endpoint.parameters) {
+            route = route.replace(`{${parameter}}`, params[parameter])
+          }
+
+          return connector[endpoint.method](route, body)
         }
-
-        let route = endpoint.pattern
-
-        for (const parameter of endpoint.parameters) {
-          route = route.replace(`{${parameter}}`, params[parameter])
-        }
-
-        return this._connector[endpoint.method](route, body)
       }
     }
   }

@@ -30,28 +30,28 @@ class Applications {
   // Retrieval
 
   async getAll () {
-    let applications = await this._api.ListApplications()
+    let applications = await this._api.ApplicationRegistry.List()
     applications = Marshaler.unwrapApplications(applications)
     return applications.map(data => new Application(this, data, false))
   }
 
   async getById (id) {
-    const application = await this._api.GetApplication({ 'application_ids.application_id': id })
+    const application = await this._api.ApplicationRegistry.Get({ 'application_ids.application_id': id })
     return new Application(this, application, false)
   }
 
   async getByOrganization (organizationId) {
-    return this._api.ListApplications({ 'collaborator.organization_ids.organization_id': organizationId })
+    return this._api.ApplicationRegistry.List({ 'collaborator.organization_ids.organization_id': organizationId })
   }
 
   async getByCollaborator (userId) {
-    return this._api.ListApplications({ 'collaborator.user_ids.user_id': userId })
+    return this._api.ApplicationRegistry.List({ 'collaborator.user_ids.user_id': userId })
   }
 
   // Update
 
   async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    return this._api.UpdateApplication({
+    return this._api.ApplicationRegistry.Update({
       'application.ids.application_id': id,
     },
     {
@@ -63,13 +63,13 @@ class Applications {
   // Create
 
   async create (userId = this._defaultUserId, application) {
-    return this._api.CreateApplication({ 'collaborator.user_ids.user_id': userId }, { application })
+    return this._api.ApplicationRegistry.Create({ 'collaborator.user_ids.user_id': userId }, { application })
   }
 
   // Delete
 
   async deleteById (applicationId) {
-    return this._api.DeleteApplication({ application_id: applicationId })
+    return this._api.ApplicationRegistry.Delete({ application_id: applicationId })
   }
 
   // Shorthand to methods of single application
@@ -79,26 +79,26 @@ class Applications {
     const idMask = { 'application_ids.application_id': id }
     return {
       async getDevices () {
-        return api.ListDevices(idMask)
+        return api.EndDeviceRegistry.List(idMask)
       },
       async getDevice (deviceId) {
-        const result = await api.GetDevice({ ...idMask, device_id: deviceId })
+        const result = await api.EndDeviceRegistry.Get({
+          'end_device_ids.application_ids.application_id': id,
+          device_id: deviceId,
+        })
         return new Device(result, api)
       },
       async getApiKeys () {
-        return api.ListApplicationAPIKeys(idMask)
+        return api.ApplicationAccess.ListAPIKeys({ application_id: id })
       },
       async getCollaborators () {
-        return api.ListApplicationCollaborators(idMask)
+        return api.ApplicationAccess.ListCollaborators({ application_id: id })
       },
       async addApiKey (key) {
-        return api.GenerateApplicationAPIKey(idMask, key)
+        return api.ApplicationAccess.CreateAPIKey(idMask, key)
       },
       async addCollaborator (collaborator) {
-        return api.SetApplicationCollaborator(idMask, collaborator)
-      },
-      async updateDevice (device) {
-        return api.GetDevice(idMask, device)
+        return api.ApplicationAccess.SetCollaborator(idMask, collaborator)
       },
     }
   }

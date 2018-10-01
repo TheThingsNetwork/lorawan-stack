@@ -54,7 +54,7 @@ class Http {
       const res = await this.axios[method](endpoint, payload)
       return res.data
     } catch (err) {
-      if ('response' in err && 'data' in err.response) {
+      if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data
       } else {
         throw err
