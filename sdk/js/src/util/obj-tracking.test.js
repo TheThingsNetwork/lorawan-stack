@@ -23,13 +23,12 @@ describe('trackerProxy', function () {
         d: 'e',
       },
       e: 'f',
+      _changed: [],
     }
   })
 
   test('tracks changes properly', function () {
     const proxyObj = new Proxy(obj, trackerProxy(obj))
-
-    expect(proxyObj._changed).not.toBeDefined()
 
     proxyObj.e = 'foo'
 
@@ -43,7 +42,7 @@ describe('trackerProxy', function () {
 
     proxyObj.e = 'foo'
 
-    expect(proxyObj._changed).not.toBeDefined()
+    expect(proxyObj._changed).toHaveLength(0)
 
   })
 

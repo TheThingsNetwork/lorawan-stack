@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable no-invalid-this */
+/* eslint-disable no-invalid-this, no-console */
 
 import traverse from 'traverse'
+import 'proxy-polyfill/src/proxy'
 
 // The tracker proxy which will keep track of changes via setters and stores
 // changed properties in the _changed array
@@ -22,7 +23,10 @@ const trackerProxy = trackedData => ({
   set (obj, prop, value) {
     if (prop in trackedData) {
       if (obj._changed === undefined) {
+        // Warn about missing changed array in
         obj._changed = []
+        console.warn(`The ingested object to be proxied did not contain a
+          _changed array. This will cause problems on polyfilled proxies.`)
       }
       if (obj._changed.indexOf(prop) === -1) {
         obj._changed.push(prop)
@@ -38,14 +42,16 @@ const trackerProxy = trackedData => ({
  * @returns {Object} The tracked object.
  */
 function trackObject (obj) {
+  if (typeof obj !== 'object' || (obj instanceof Array)) {
+    return obj
+  }
+
   let trackedObject = obj
+  trackedObject._changed = []
   trackedObject = new Proxy(obj, trackerProxy(obj))
 
   for (const key in trackedObject) {
-    const leaf = trackedObject[key]
-    if (typeof leaf === 'object' && !(leaf instanceof Array)) {
-      trackedObject[key] = trackObject(trackedObject[key])
-    }
+    trackedObject[key] = trackObject(trackedObject[key])
   }
 
   // Remove unwanted changed markings that have been added by the proxies
