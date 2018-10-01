@@ -58,7 +58,7 @@ func main() {
 
 	sw, err := dep.NewSafeWriter(p.Manifest, nil, p.Lock, dep.VendorNever, gps.CascadingPruneOptions{
 		DefaultOptions: gps.PruneNestedVendorDirs | gps.PruneUnusedPackages | gps.PruneNonGoFiles | gps.PruneGoTestFiles,
-	})
+	}, nil)
 	if err != nil {
 		logger.Fatalf("Failed to initalize dep writer: %s", err)
 	}
