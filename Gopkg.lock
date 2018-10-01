@@ -436,12 +436,12 @@
   revision = "0ad87eef1443f64d3d8c50da647e2b1552851124"
 
 [[projects]]
-  digest = "1:2bcfb4050b33580be8252e9ffed4c7e5295a1c34e73fe1a930d0c71341f2595d"
+  digest = "1:897c63c623dce2d2da94aeeb096c829b63b9feeb7f53f624cadce596e3893e01"
   name = "github.com/oklog/ulid"
   packages = ["."]
   pruneopts = ""
-  revision = "8356aea91ceecc7d00ef87508040d1031adb2953"
-  version = "v1.0.0"
+  revision = "02a8604050d8466dd915307496174adb9be4593a"
+  version = "v1.3.1"
 
 [[projects]]
   digest = "1:894aef961c056b6d85d12bac890bf60c44e99b46292888bfa66caf529f804457"
@@ -450,14 +450,6 @@
   pruneopts = ""
   revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
   version = "v1.2.0"
-
-[[projects]]
-  digest = "1:210286d0cb60ffe28f1ca00b664029e8943009f95d06d8f8c336301b28e1aee5"
-  name = "github.com/philhofer/fwd"
-  packages = ["."]
-  pruneopts = ""
-  revision = "bb6d471dc95d4fe11e432687f8b70ff496cf3136"
-  version = "v1.0.0"
 
 [[projects]]
   digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
@@ -618,14 +610,6 @@
   revision = "0ac2068de99fd349edc4954d0e9b4a600d75da44"
 
 [[projects]]
-  digest = "1:cae65c1f3471b1f456a9d8a160440f4824ad50c718a15da4144490fbc3b12e49"
-  name = "github.com/tinylib/msgp"
-  packages = ["msgp"]
-  pruneopts = ""
-  revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
-  version = "1.0.2"
-
-[[projects]]
   branch = "master"
   digest = "1:857a9ecd5cb13379ecc8f798f6e6b6b574c98b9355657d91e068275f1120aaf7"
   name = "github.com/valyala/bytebufferpool"
@@ -640,17 +624,6 @@
   packages = ["."]
   pruneopts = ""
   revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
-
-[[projects]]
-  digest = "1:6665e5cd6b160bde7792dd364ac53a2689ad226bc11b9c4032701a10439f2ce1"
-  name = "github.com/vmihailenco/msgpack"
-  packages = [
-    ".",
-    "codes",
-  ]
-  pruneopts = ""
-  revision = "935c5b540faab4d4922ae6f1fddcf77a726f259c"
-  version = "v4.0.0"
 
 [[projects]]
   digest = "1:eb3da47361162f0ad991ddf391e6dc03e23889201d76046e2917687b84977aee"
@@ -760,14 +733,10 @@
   digest = "1:c1771ca6060335f9768dff6558108bc5ef6c58506821ad43377ee23ff059e472"
   name = "google.golang.org/appengine"
   packages = [
-    ".",
-    "datastore",
     "internal",
-    "internal/app_identity",
     "internal/base",
     "internal/datastore",
     "internal/log",
-    "internal/modules",
     "internal/remote_api",
     "internal/urlfetch",
     "urlfetch",
@@ -909,8 +878,6 @@
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "github.com/spf13/viper",
-    "github.com/tinylib/msgp/msgp",
-    "github.com/vmihailenco/msgpack",
     "go.opencensus.io/exporter/prometheus",
     "go.opencensus.io/plugin/ocgrpc",
     "go.opencensus.io/stats/view",
