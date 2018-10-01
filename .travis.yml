@@ -23,6 +23,7 @@ script:
 - make go.misspell
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.unconvert; fi # only on pull requests
 - make go.fmt
+- make go.depfmt
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.lint-travis || true; fi # only on pull requests
 - make headers.check
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make messages; fi # only on pull requests
