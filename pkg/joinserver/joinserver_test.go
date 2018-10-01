@@ -26,12 +26,9 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
+	"go.thethings.network/lorawan-stack/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -63,11 +60,15 @@ func TestHandleJoin(t *testing.T) {
 
 	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
 
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+	redisClient, flush := test.NewRedis(t, "joinserver_test")
+	defer flush()
+	defer redisClient.Close()
+	devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:        reg,
+			Devices:         devReg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
 	)).(*JoinServer)
@@ -1162,26 +1163,30 @@ func TestHandleJoin(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+			redisClient, flush := test.NewRedis(t, "joinserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Registry:        reg,
+					Devices:         devReg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
 			)).(*JoinServer)
 
-			dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
-			if !a.So(err, should.BeNil) {
-				return
-			}
+			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			ctx := (rpcmetadata.MD{
-				NetAddress: nsAddr,
-			}).ToIncomingContext(authorizedCtx)
+			ret, err := CreateDevice(authorizedCtx, devReg, deepcopy.Copy(pb).(*ttnpb.EndDevice))
+			a.So(err, should.BeNil)
+			a.So(ret.CreatedAt, should.Equal, ret.UpdatedAt)
+			pb.CreatedAt = ret.CreatedAt
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(ret, should.Resemble, pb)
 
 			start := time.Now()
-			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
+			resp, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			if tc.ValidErr != nil {
 				if !a.So(tc.ValidErr(err), should.BeTrue) {
 					t.Fatalf("Received an unexpected error: %s", err)
@@ -1194,30 +1199,30 @@ func TestHandleJoin(t *testing.T) {
 				t.FailNow()
 			}
 
-			// ensure the stored device nonces are updated
-			time.Sleep(test.Delay)
-
-			dev, err = dev.Load()
-			if !a.So(err, should.BeNil) {
-				return
+			ret, err = devReg.GetByEUI(authorizedCtx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+				t.FailNow()
 			}
 
-			ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-			ed.CreatedAt = dev.EndDevice.GetCreatedAt()
-			ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-			ed.NextDevNonce = tc.NextNextDevNonce
-			ed.NextJoinNonce = tc.NextNextJoinNonce
-			ed.UsedDevNonces = tc.NextUsedDevNonces
-			if tc.ValidErr == nil {
-				a.So([]time.Time{start, dev.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
-				ed.Session = &ttnpb.Session{
+			a.So(ret.CreatedAt, should.Equal, pb.CreatedAt)
+			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+			pb.UpdatedAt = ret.UpdatedAt
+			pb.NextDevNonce = tc.NextNextDevNonce
+			pb.NextJoinNonce = tc.NextNextJoinNonce
+			pb.UsedDevNonces = tc.NextUsedDevNonces
+			if tc.ValidErr != nil {
+				if !a.So(ret.Session, should.NotBeNil) {
+					t.FailNow()
+				}
+				a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
+				pb.Session = &ttnpb.Session{
 					DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
 					SessionKeys: resp.SessionKeys,
-					StartedAt:   dev.GetSession().GetStartedAt(),
+					StartedAt:   ret.GetSession().GetStartedAt(),
 				}
 			}
 
-			a.So(pretty.Diff(ed, dev.EndDevice), should.BeEmpty)
+			a.So(pretty.Diff(pb, ret), should.BeEmpty)
 
 			resp, err = js.HandleJoin(authorizedCtx, tc.JoinRequest)
 			a.So(err, should.BeError)
@@ -1229,11 +1234,15 @@ func TestHandleJoin(t *testing.T) {
 func TestGetAppSKey(t *testing.T) {
 	a := assertions.New(t)
 
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+	redisClient, flush := test.NewRedis(t, "joinserver_test")
+	defer flush()
+	defer redisClient.Close()
+	devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:        reg,
+			Devices:         devReg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
 	)).(*JoinServer)
@@ -1424,31 +1433,19 @@ func TestGetAppSKey(t *testing.T) {
 			nil,
 			errors.IsInvalidArgument,
 		},
-		{
-			"Address mismatch",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: "test",
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsPermissionDenied,
-		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+			redisClient, flush := test.NewRedis(t, "joinserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Registry:        reg,
+					Devices:         devReg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
 			)).(*JoinServer)
@@ -1457,17 +1454,13 @@ func TestGetAppSKey(t *testing.T) {
 			if tc.CustomCreateDevice != nil {
 				err = tc.CustomCreateDevice(ed)
 			} else {
-				_, err = reg.Create(ed)
+				_, err = CreateDevice(authorizedCtx, devReg, ed)
 			}
 			if !a.So(err, should.BeNil) {
 				return
 			}
 
-			ctx := (rpcmetadata.MD{
-				NetAddress: asAddr,
-			}).ToIncomingContext(authorizedCtx)
-
-			resp, err := js.GetAppSKey(ctx, tc.KeyRequest)
+			resp, err := js.GetAppSKey(authorizedCtx, tc.KeyRequest)
 			if tc.ValidErr != nil {
 				a.So(tc.ValidErr(err), should.BeTrue)
 				a.So(resp, should.BeNil)
@@ -1485,11 +1478,15 @@ func TestGetAppSKey(t *testing.T) {
 func TestGetNwkSKeys(t *testing.T) {
 	a := assertions.New(t)
 
-	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+	redisClient, flush := test.NewRedis(t, "joinserver_test")
+	defer flush()
+	defer redisClient.Close()
+	devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:        reg,
+			Devices:         devReg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
 	)).(*JoinServer)
@@ -1820,11 +1817,15 @@ func TestGetNwkSKeys(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
+			redisClient, flush := test.NewRedis(t, "joinserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
 			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Registry:        reg,
+					Devices:         devReg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
 			)).(*JoinServer)
@@ -1833,17 +1834,13 @@ func TestGetNwkSKeys(t *testing.T) {
 			if tc.CustomCreateDevice != nil {
 				err = tc.CustomCreateDevice(ed)
 			} else {
-				_, err = reg.Create(ed)
+				_, err = CreateDevice(authorizedCtx, devReg, ed)
 			}
 			if !a.So(err, should.BeNil) {
 				return
 			}
 
-			ctx := (rpcmetadata.MD{
-				NetAddress: nsAddr,
-			}).ToIncomingContext(authorizedCtx)
-
-			resp, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
+			resp, err := js.GetNwkSKeys(authorizedCtx, tc.KeyRequest)
 			if tc.ValidErr != nil {
 				a.So(tc.ValidErr(err), should.BeTrue)
 				a.So(resp, should.BeNil)
