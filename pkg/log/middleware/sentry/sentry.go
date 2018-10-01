@@ -70,7 +70,7 @@ func (s *Sentry) forward(e log.Entry, wait bool) {
 		}
 	}
 	details["log_level"] = e.Level().String()
-	trace := raven.NewStacktrace(6, 3, []string{"github.com/TheThings"})
+	trace := raven.NewStacktrace(6, 3, []string{"github.com/TheThings", "go.thethings"})
 	if wait {
 		s.Client.CaptureMessageAndWait(err.Error(), details, trace)
 	} else {
