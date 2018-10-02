@@ -1169,9 +1169,54 @@
       "file": "cluster.go"
     }
   },
+  "error:pkg/auth/rights:insufficient_application_rights": {
+    "translations": {
+      "en": "insufficient rights for application `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:insufficient_client_rights": {
+    "translations": {
+      "en": "insufficient rights for client `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:insufficient_gateway_rights": {
+    "translations": {
+      "en": "insufficient rights for gateway `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:insufficient_organization_rights": {
+    "translations": {
+      "en": "insufficient rights for organization `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:insufficient_user_rights": {
+    "translations": {
+      "en": "insufficient rights for user `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
   "error:pkg/auth/rights:no_application_rights": {
     "translations": {
-      "en": "no rights for application `{uid} specified`"
+      "en": "no rights for application `{uid}`"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -1180,7 +1225,7 @@
   },
   "error:pkg/auth/rights:no_client_rights": {
     "translations": {
-      "en": "no rights for client `{uid} specified`"
+      "en": "no rights for client `{uid}`"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -1198,7 +1243,7 @@
   },
   "error:pkg/auth/rights:no_gateway_rights": {
     "translations": {
-      "en": "no rights for gateway `{uid}` specified"
+      "en": "no rights for gateway `{uid}`"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -1216,7 +1261,7 @@
   },
   "error:pkg/auth/rights:no_organization_rights": {
     "translations": {
-      "en": "no rights for organization `{uid}` specified"
+      "en": "no rights for organization `{uid}`"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -1225,7 +1270,7 @@
   },
   "error:pkg/auth/rights:no_user_rights": {
     "translations": {
-      "en": "no rights for user `{uid}` specified"
+      "en": "no rights for user `{uid}`"
     },
     "description": {
       "package": "pkg/auth/rights",
