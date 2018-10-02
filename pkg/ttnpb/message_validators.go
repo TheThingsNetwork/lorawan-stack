@@ -14,98 +14,92 @@
 
 package ttnpb
 
-import (
-	"math"
+// // Validate is used as validator function by the GRPC validator interceptor.
+// func (s TxSettings) Validate() error {
+// 	if s.GetChannelIndex() > math.MaxUint8 {
+// 		return errExpectedLowerOrEqual("TxChIdx", math.MaxUint8)(s.GetChannelIndex())
+// 	}
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-)
+// 	if s.GetDataRateIndex() > math.MaxUint8 {
+// 		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
+// 	}
+// 	return nil
+// }
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (s TxSettings) Validate() error {
-	if s.GetChannelIndex() > math.MaxUint8 {
-		return errExpectedLowerOrEqual("TxChIdx", math.MaxUint8)(s.GetChannelIndex())
-	}
+// // Validate is used as validator function by the GRPC validator interceptor.
+// func (p MACPayload) Validate() error {
+// 	if p.DevAddr.IsZero() {
+// 		return errMissing("DevAddr")
+// 	}
 
-	if s.GetDataRateIndex() > math.MaxUint8 {
-		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
-	}
-	return nil
-}
+// 	if p.GetFCnt() > math.MaxUint16 {
+// 		return errExpectedLowerOrEqual("FCnt", math.MaxUint16)(p.GetFCnt())
+// 	}
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (p MACPayload) Validate() error {
-	if p.DevAddr.IsZero() {
-		return errMissing("DevAddr")
-	}
+// 	if p.FPort > math.MaxUint8 {
+// 		return errExpectedLowerOrEqual("FPort", math.MaxUint8)(p.FPort)
+// 	}
 
-	if p.GetFCnt() > math.MaxUint16 {
-		return errExpectedLowerOrEqual("FCnt", math.MaxUint16)(p.GetFCnt())
-	}
+// 	return nil
+// }
 
-	if p.FPort > math.MaxUint8 {
-		return errExpectedLowerOrEqual("FPort", math.MaxUint8)(p.FPort)
-	}
+// // Validate is used as validator function by the GRPC validator interceptor.
+// func (p JoinRequestPayload) Validate() error {
+// 	if p.DevEUI.IsZero() {
+// 		return errMissing("DevEUI")
+// 	}
+// 	if p.JoinEUI.IsZero() {
+// 		return errMissing("JoinEUI")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (p JoinRequestPayload) Validate() error {
-	if p.DevEUI.IsZero() {
-		return errMissing("DevEUI")
-	}
-	if p.JoinEUI.IsZero() {
-		return errMissing("JoinEUI")
-	}
+// // Validate is used as validator function by the GRPC validator interceptor.
+// func (p RejoinRequestPayload) Validate() error {
+// 	// TODO: implement
+// 	return nil
+// }
 
-	return nil
-}
+// var (
+// 	errExpectedUplinkMType = errors.DefineInvalidArgument("expected_uplink_mtype", "MType `{result}` is not an uplink MType")
+// 	errMissingRawPayload   = errors.DefineInvalidArgument("raw_payload", "missing raw payload")
+// )
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (p RejoinRequestPayload) Validate() error {
-	// TODO: implement
-	return nil
-}
+// // Validate is used as validator function by the GRPC validator interceptor.
+// func (m UplinkMessage) Validate() error {
+// 	if err := m.GetSettings().Validate(); err != nil {
+// 		return err
+// 	}
 
-var (
-	errExpectedUplinkMType = errors.DefineInvalidArgument("expected_uplink_mtype", "MType `{result}` is not an uplink MType")
-	errMissingRawPayload   = errors.DefineInvalidArgument("raw_payload", "missing raw payload")
-)
+// 	if p := m.GetPayload(); p.Payload == nil {
+// 		if len(m.GetRawPayload()) == 0 {
+// 			return errMissingRawPayload
+// 		}
+// 	} else {
+// 		switch p.GetMType() {
+// 		case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+// 			mp := p.GetMACPayload()
+// 			if mp == nil {
+// 				return errMissing("MACPayload")
+// 			}
+// 			return mp.Validate()
+// 		case MType_JOIN_REQUEST:
+// 			jp := p.GetJoinRequestPayload()
+// 			if jp == nil {
+// 				return errMissing("JoinRequestPayload")
+// 			}
+// 			return jp.Validate()
+// 		case MType_REJOIN_REQUEST:
+// 			rp := p.GetRejoinRequestPayload()
+// 			if rp == nil {
+// 				return errMissing("RejoinRequestPayload")
+// 			}
+// 			return rp.Validate()
+// 		default:
+// 			return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
+// 		}
+// 	}
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (m UplinkMessage) Validate() error {
-	if err := m.GetSettings().Validate(); err != nil {
-		return err
-	}
-
-	if p := m.GetPayload(); p.Payload == nil {
-		if len(m.GetRawPayload()) == 0 {
-			return errMissingRawPayload
-		}
-	} else {
-		switch p.GetMType() {
-		case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
-			mp := p.GetMACPayload()
-			if mp == nil {
-				return errMissing("MACPayload")
-			}
-			return mp.Validate()
-		case MType_JOIN_REQUEST:
-			jp := p.GetJoinRequestPayload()
-			if jp == nil {
-				return errMissing("JoinRequestPayload")
-			}
-			return jp.Validate()
-		case MType_REJOIN_REQUEST:
-			rp := p.GetRejoinRequestPayload()
-			if rp == nil {
-				return errMissing("RejoinRequestPayload")
-			}
-			return rp.Validate()
-		default:
-			return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
-		}
-	}
-
-	return nil
-}
+// 	return nil
+// }

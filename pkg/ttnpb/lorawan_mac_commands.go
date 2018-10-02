@@ -341,7 +341,7 @@ func (pld *MACCommand_DeviceModeConf) MACCommand() *MACCommand {
 	}
 }
 
-// Validate reports whether cmd represents a valid *MACCommand.
-func (cmd *MACCommand) Validate() error {
-	return cmd.CID.Validate()
-}
+// // Validate reports whether cmd represents a valid *MACCommand.
+// func (cmd *MACCommand) Validate() error {
+// 	return cmd.CID.Validate()
+// }

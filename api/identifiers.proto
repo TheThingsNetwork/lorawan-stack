@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 
 package ttn.lorawan.v3;
 
@@ -39,11 +40,11 @@ message EndDeviceIdentifiers {
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // The LoRaWAN DevEUI.
-  bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI", (validator.field) = {length_eq: 8}];
   // The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
-  bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI", (validator.field) = {length_eq: 8}];
   // The LoRaWAN DevAddr.
-  bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
+  bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (validator.field) = {length_eq: 4}];
 }
 
 message GatewayIdentifiers {

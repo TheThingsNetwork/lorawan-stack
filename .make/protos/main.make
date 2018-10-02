@@ -22,6 +22,7 @@ PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.20
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
                      --mount type=bind,src=$(PWD)/api,dst=$(PWD)/api \
                      --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_OUT)/go.thethings.network/lorawan-stack/pkg/ttnpb \
+                     --mount type=bind,src=$$GOPATH,dst=$(PROTOC_GO_PATH)\
                      -w $(PWD)
 PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(shell dirname $(PWD))
 
