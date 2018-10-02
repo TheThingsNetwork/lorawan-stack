@@ -6,6 +6,7 @@
   "repository": "https://github.com/TheThingsNetwork/ttn.git",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@babel/core": "~7.0.0",
     "@storybook/addon-actions": "4.0.0-alpha.23",
     "@storybook/addon-console": "^1.0.4",
     "@storybook/addon-info": "4.0.0-alpha.23",
