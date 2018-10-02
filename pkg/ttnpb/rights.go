@@ -159,7 +159,7 @@ func (r *Rights) IncludesAll(search ...Right) bool {
 	if r == nil {
 		return len(search) == 0
 	}
-	return len(r.Intersect(RightsFrom(search...)).GetRights()) == len(search)
+	return len(RightsFrom(search...).Sub(r).GetRights()) == 0
 }
 
 // RightsFrom returns a Rights message from a list of rights.
