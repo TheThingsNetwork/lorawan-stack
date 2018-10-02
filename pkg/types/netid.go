@@ -19,7 +19,7 @@ import (
 	"encoding/hex"
 	"strings"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 const unmatchedNetID = "unmatched NetID type"

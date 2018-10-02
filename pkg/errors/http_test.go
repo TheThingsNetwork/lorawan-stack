@@ -15,21 +15,34 @@
 package errors_test
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestGRPCConversion(t *testing.T) {
+func TestHTTP(t *testing.T) {
 	a := assertions.New(t)
 
-	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error", "foo")
+	errDef := errors.DefineInvalidArgument("test_http_conversion_err_def", "HTTP Conversion Error", "foo")
 	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, should.EqualErrorOrDefinition, errDef)
 
 	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
 	errHelloExpected := errDef.WithAttributes("foo", "bar")
-	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), should.EqualErrorOrDefinition, errHelloExpected)
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		errors.ToHTTP(errHello, w)
+	}
+
+	req := httptest.NewRequest("GET", "http://example.com/err", nil)
+	w := httptest.NewRecorder()
+	handler(w, req)
+
+	resp := w.Result()
+	a.So(w.Result().StatusCode, should.Equal, http.StatusBadRequest)
+	a.So(errors.FromHTTP(resp), should.EqualErrorOrDefinition, errHelloExpected)
 }

@@ -14,7 +14,7 @@
 
 package validate
 
-import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 // ErrInvalidBandwidth indicates an invalid bandwidth.
 var ErrInvalidBandwidth = errors.DefineInvalidArgument("bandwidth", "invalid bandwidth")

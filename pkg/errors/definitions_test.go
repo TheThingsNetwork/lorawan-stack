@@ -12,31 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package validate
+package errors_test
 
 import (
-	"fmt"
-	"regexp"
+	"testing"
 
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var (
-	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+func TestDefinitions(t *testing.T) {
+	a := assertions.New(t)
 
-	errEmail = errors.DefineInvalidArgument("email", "`{email}` is not a valid email.")
-)
-
-// Email checks whether the input value is a valid email or not.
-func Email(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return errNotString.WithAttributes("type", fmt.Sprintf("%T", v))
-	}
-
-	if !emailRegex.MatchString(str) {
-		return errEmail.WithAttributes("email", str)
-	}
-
-	return nil
+	errors.Define("test_definitions_unknown", "")
+	a.So(func() {
+		errors.Define("test_definitions_unknown", "")
+	}, should.Panic)
 }

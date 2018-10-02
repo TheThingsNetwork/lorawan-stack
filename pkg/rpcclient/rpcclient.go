@@ -25,7 +25,7 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.opencensus.io/plugin/ocgrpc"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"

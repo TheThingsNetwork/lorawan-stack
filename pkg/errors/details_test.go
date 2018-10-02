@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 

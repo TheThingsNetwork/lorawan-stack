@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/soheilhy/cmux"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/fs"
 	"go.thethings.network/lorawan-stack/pkg/log"

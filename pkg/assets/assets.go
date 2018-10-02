@@ -27,7 +27,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/assets/templates"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/fs"
 	"go.thethings.network/lorawan-stack/pkg/log"

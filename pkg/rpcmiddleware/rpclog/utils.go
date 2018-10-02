@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"path"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

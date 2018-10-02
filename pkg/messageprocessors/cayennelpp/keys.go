@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 const (

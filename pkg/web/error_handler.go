@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // ErrorHandler is an echo.HTTPErrorHandler.

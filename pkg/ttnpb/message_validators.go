@@ -17,7 +17,7 @@ package ttnpb
 import (
 	"math"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Validate is used as validator function by the GRPC validator interceptor.

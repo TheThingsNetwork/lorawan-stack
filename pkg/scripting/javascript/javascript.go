@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/robertkrimen/otto"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/scripting"
 )
 

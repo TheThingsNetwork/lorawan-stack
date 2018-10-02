@@ -18,7 +18,7 @@ import (
 	"runtime"
 
 	raven "github.com/getsentry/raven-go"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // ErrorAsExceptions converts the error into a raven.Exceptions.

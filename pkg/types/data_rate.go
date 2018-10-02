@@ -18,7 +18,7 @@ import (
 	"regexp"
 	"strconv"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var invalidDataRate = errors.DefineInvalidArgument("data_rate", "invalid data rate")

@@ -14,7 +14,7 @@
 
 package joinserver
 
-import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	errAddressMismatch           = errors.DefinePermissionDenied("address_mismatch", "{component} address mismatch")

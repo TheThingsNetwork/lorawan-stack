@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-join-server/commands"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 func main() {

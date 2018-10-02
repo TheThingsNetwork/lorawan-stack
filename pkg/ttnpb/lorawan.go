@@ -20,7 +20,7 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/gogo/protobuf/jsonpb"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 func init() {

@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/gregjones/httpcache"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 type httpFetcher struct {

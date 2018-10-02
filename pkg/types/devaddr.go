@@ -15,7 +15,7 @@
 package types
 
 import (
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 
 	"database/sql/driver"
 	"encoding/binary"

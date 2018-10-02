@@ -20,7 +20,7 @@ import (
 	"context"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"

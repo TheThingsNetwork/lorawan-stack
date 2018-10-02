@@ -22,7 +22,7 @@ import (
 	"reflect"
 
 	"github.com/gogo/protobuf/proto"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (

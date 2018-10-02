@@ -14,7 +14,7 @@
 
 package store
 
-import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 // ErrEmptyFilter represents an error returned, when filter specified is empty.
 var (

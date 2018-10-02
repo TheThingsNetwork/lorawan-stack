@@ -17,7 +17,7 @@ package errors_test
 import (
 	"fmt"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -53,5 +53,5 @@ func Example() {
 	}
 
 	// Output:
-	// error:pkg/errorsv3_test:could_not_create_device (Could not create Device)
+	// error:pkg/errors_test:could_not_create_device (Could not create Device)
 }

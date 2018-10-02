@@ -18,7 +18,7 @@ import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )

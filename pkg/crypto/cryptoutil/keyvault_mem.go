@@ -16,7 +16,7 @@ package cryptoutil
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // MemKeyVault is a KeyVault that uses KEKs from memory.

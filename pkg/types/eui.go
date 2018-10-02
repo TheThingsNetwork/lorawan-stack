@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // EUI64 is a 64-bit Extended Unique Identifier.

@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 )
 

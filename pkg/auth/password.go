@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // hashingMethod is a method to hash a password.

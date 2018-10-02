@@ -1475,12 +1475,12 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/errorsv3:odd_kv": {
+  "error:pkg/errors:odd_kv": {
     "translations": {
       "en": "Odd number of key-value elements"
     },
     "description": {
-      "package": "pkg/errorsv3",
+      "package": "pkg/errors",
       "file": "attributes.go"
     }
   },

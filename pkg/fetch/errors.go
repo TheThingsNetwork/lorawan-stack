@@ -14,7 +14,7 @@
 
 package fetch
 
-import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	errFileNotFound      = errors.DefineNotFound("file_not_found", "file `{filename}` not found")

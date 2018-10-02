@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 )
 

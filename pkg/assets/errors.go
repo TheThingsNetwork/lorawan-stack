@@ -21,7 +21,7 @@ import (
 	"github.com/golang/gddo/httputil"
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/assets/templates"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var errHTTP = errors.Define("http", "HTTP error: {message}")

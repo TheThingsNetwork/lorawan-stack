@@ -28,7 +28,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/vmihailenco/msgpack"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (

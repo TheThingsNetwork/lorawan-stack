@@ -18,15 +18,18 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestDefinitions(t *testing.T) {
+func TestGRPCConversion(t *testing.T) {
 	a := assertions.New(t)
 
-	errors.Define("test_definitions_unknown", "")
-	a.So(func() {
-		errors.Define("test_definitions_unknown", "")
-	}, should.Panic)
+	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error", "foo")
+	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, should.EqualErrorOrDefinition, errDef)
+
+	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
+	errHelloExpected := errDef.WithAttributes("foo", "bar")
+	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), should.EqualErrorOrDefinition, errHelloExpected)
 }
