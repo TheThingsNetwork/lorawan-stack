@@ -16,7 +16,9 @@ package fetch_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
@@ -57,4 +59,46 @@ func TestHTTP(t *testing.T) {
 		_, err := fetcher.File("fail")
 		a.So(err, should.NotBeNil)
 	}
+}
+
+func TestHTTPCache(t *testing.T) {
+	a := assertions.New(t)
+
+	cachedContent := "cached"
+	nonCachedContent := "non-cached"
+
+	servedContent := cachedContent
+	s := &http.Server{
+		Addr: "localhost:8083",
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			now := time.Now()
+			w.Header().Add("Date", now.Format(time.RFC1123))
+			w.Header().Add("Expires", now.Add(5*time.Minute).Format(time.RFC1123))
+			_, err := w.Write([]byte(servedContent))
+			if err != nil {
+				w.WriteHeader(500)
+			}
+			return
+		}),
+		ReadTimeout:  time.Second,
+		WriteTimeout: time.Second,
+	}
+	go s.ListenAndServe()
+	defer s.Close()
+
+	time.Sleep(10 * time.Millisecond)
+
+	fetcher := fetch.FromHTTP(fmt.Sprintf("http://%s", s.Addr), true)
+
+	receivedContent, err := fetcher.File("cached")
+	a.So(err, should.BeNil)
+	a.So(string(receivedContent), should.Equal, cachedContent)
+
+	servedContent = nonCachedContent
+	receivedContent, err = fetcher.File("cached")
+	a.So(err, should.BeNil)
+	a.So(string(receivedContent), should.Equal, cachedContent)
+	receivedContent, err = fetcher.File("noncached")
+	a.So(err, should.BeNil)
+	a.So(string(receivedContent), should.Equal, nonCachedContent)
 }
