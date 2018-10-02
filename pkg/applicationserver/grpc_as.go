@@ -29,7 +29,7 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers)
+	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
 }
 
 // SetLink implements ttnpb.AsServer.

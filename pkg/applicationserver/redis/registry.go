@@ -28,7 +28,7 @@ type DeviceRegistry struct {
 }
 
 // Get returns the end device by its identifiers.
-func (r *DeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers, ...string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) Get(context.Context, ttnpb.EndDeviceIdentifiers, []string) (*ttnpb.EndDevice, error) {
 	return nil, errors.New("not implemented")
 }
 
@@ -43,7 +43,7 @@ type LinkRegistry struct {
 }
 
 // Get returns the link by the application identifiers.
-func (r *LinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers, ...string) (*ttnpb.ApplicationLink, error) {
+func (r *LinkRegistry) Get(context.Context, ttnpb.ApplicationIdentifiers, []string) (*ttnpb.ApplicationLink, error) {
 	return nil, errors.New("not implemented")
 }
 

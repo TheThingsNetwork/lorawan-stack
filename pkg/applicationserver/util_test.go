@@ -167,7 +167,7 @@ func newMemDeviceRegistry() *memDeviceRegistry {
 	}
 }
 
-func (r *memDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths ...string) (*ttnpb.EndDevice, error) {
+func (r *memDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 	v, err := r.store.Get(unique.ID(ctx, ids))
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ func newMemLinkRegistry() *memLinkRegistry {
 	}
 }
 
-func (r *memLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths ...string) (*ttnpb.ApplicationLink, error) {
+func (r *memLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
 	v, err := r.store.Get(unique.ID(ctx, ids))
 	if err != nil {
 		return nil, err

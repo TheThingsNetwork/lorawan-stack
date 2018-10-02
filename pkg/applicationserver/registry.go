@@ -23,7 +23,7 @@ import (
 // DeviceRegistry is a store for end devices.
 type DeviceRegistry interface {
 	// Get returns the end device by its identifiers.
-	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths ...string) (*ttnpb.EndDevice, error)
+	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
 	// Set creates, updates or deletes the end device by its identifiers.
 	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
@@ -31,7 +31,7 @@ type DeviceRegistry interface {
 // LinkRegistry is a store for application links.
 type LinkRegistry interface {
 	// Get returns the link by the application identifiers.
-	Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths ...string) (*ttnpb.ApplicationLink, error)
+	Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
 	// Range ranges the links and calls the callback function, until false is returned.
 	Range(ctx context.Context, paths []string, f func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
 	// Set creates, updates or deletes the link by the application identifiers.

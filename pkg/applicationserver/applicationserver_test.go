@@ -521,7 +521,7 @@ func TestApplicationServer(t *testing.T) {
 							}
 						}
 						if tc.AssertDevice != nil {
-							dev, err := deviceRegistry.Get(ctx, tc.Message.EndDeviceIdentifiers)
+							dev, err := deviceRegistry.Get(ctx, tc.Message.EndDeviceIdentifiers, []string{"session"})
 							if a.So(err, should.BeNil) {
 								tc.AssertDevice(t, dev)
 							}

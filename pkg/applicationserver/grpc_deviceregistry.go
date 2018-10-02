@@ -27,7 +27,7 @@ func (as *ApplicationServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceReq
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	return as.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers)
+	return as.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
 }
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
