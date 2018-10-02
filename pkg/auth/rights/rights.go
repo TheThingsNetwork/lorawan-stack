@@ -30,29 +30,54 @@ type Rights struct {
 	UserRights         map[string]*ttnpb.Rights
 }
 
+// MissingApplicationRights returns the rights that are missing for the given application.
+func (r Rights) MissingApplicationRights(appUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return ttnpb.RightsFrom(rights...).Sub(r.ApplicationRights[appUID]).GetRights()
+}
+
+// MissingClientRights returns the rights that are missing for the given client.
+func (r Rights) MissingClientRights(cliUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return ttnpb.RightsFrom(rights...).Sub(r.ClientRights[cliUID]).GetRights()
+}
+
+// MissingGatewayRights returns the rights that are missing for the given gateway.
+func (r Rights) MissingGatewayRights(gtwUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return ttnpb.RightsFrom(rights...).Sub(r.GatewayRights[gtwUID]).GetRights()
+}
+
+// MissingOrganizationRights returns the rights that are missing for the given organization.
+func (r Rights) MissingOrganizationRights(orgUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return ttnpb.RightsFrom(rights...).Sub(r.OrganizationRights[orgUID]).GetRights()
+}
+
+// MissingUserRights returns the rights that are missing for the given user.
+func (r Rights) MissingUserRights(usrUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return ttnpb.RightsFrom(rights...).Sub(r.UserRights[usrUID]).GetRights()
+}
+
 // IncludesApplicationRights returns whether the given rights are included for the given application.
 func (r Rights) IncludesApplicationRights(appUID string, rights ...ttnpb.Right) bool {
-	return r.ApplicationRights[appUID].IncludesAll(rights...)
+	return len(r.MissingApplicationRights(appUID, rights...)) == 0
 }
 
 // IncludesClientRights returns whether the given rights are included for the given client.
 func (r Rights) IncludesClientRights(cliUID string, rights ...ttnpb.Right) bool {
-	return r.ClientRights[cliUID].IncludesAll(rights...)
+	return len(r.MissingClientRights(cliUID, rights...)) == 0
 }
 
 // IncludesGatewayRights returns whether the given rights are included for the given gateway.
 func (r Rights) IncludesGatewayRights(gtwUID string, rights ...ttnpb.Right) bool {
-	return r.GatewayRights[gtwUID].IncludesAll(rights...)
+	return len(r.MissingGatewayRights(gtwUID, rights...)) == 0
 }
 
 // IncludesOrganizationRights returns whether the given rights are included for the given organization.
 func (r Rights) IncludesOrganizationRights(orgUID string, rights ...ttnpb.Right) bool {
-	return r.OrganizationRights[orgUID].IncludesAll(rights...)
+	return len(r.MissingOrganizationRights(orgUID, rights...)) == 0
 }
 
 // IncludesUserRights returns whether the given rights are included for the given user.
 func (r Rights) IncludesUserRights(usrUID string, rights ...ttnpb.Right) bool {
-	return r.UserRights[usrUID].IncludesAll(rights...)
+	return len(r.MissingUserRights(usrUID, rights...)) == 0
 }
 
 type rightsKeyType struct{}
