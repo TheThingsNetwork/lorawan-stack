@@ -25,8 +25,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/marshaling"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -682,7 +682,7 @@ func TestByteMapStore(t testingT, newStore func() store.ByteMapStore) {
 
 					var buf bytes.Buffer
 					if err := gob.NewEncoder(&buf).Encode(&v); err != nil {
-						panic(errors.Errorf("failed to gob-encode %s value %s to bytes: %s", k, v, err))
+						panic(fmt.Errorf("failed to gob-encode %s value %s to bytes: %s", k, v, err))
 					}
 					ret[k] = buf.Bytes()
 				}

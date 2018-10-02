@@ -15,39 +15,12 @@
 package assertions
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	removetheseerrors "go.thethings.network/lorawan-stack/pkg/errors"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
-
-var testDescriptor = &removetheseerrors.ErrDescriptor{
-	MessageFormat: "Test error",
-	Code:          42,
-}
-
-func init() {
-	testDescriptor.Register()
-}
-
-func TestShouldDescribeError(t *testing.T) {
-	a := assertions.New(t)
-
-	// Happy flow.
-	a.So(ShouldDescribeError(testDescriptor.New(nil), testDescriptor), should.BeEmpty)
-	a.So(ShouldNotDescribeError(testDescriptor.New(nil), testDescriptor), should.NotBeEmpty)
-
-	// Unknown error.
-	a.So(ShouldDescribeError(fmt.Errorf("unknown error"), testDescriptor), should.NotBeEmpty)
-	a.So(ShouldNotDescribeError(fmt.Errorf("unknown error"), testDescriptor), should.BeEmpty)
-
-	// Wrong namespace or code.
-	a.So(ShouldDescribeError(removetheseerrors.New("test"), testDescriptor), should.NotBeEmpty)
-	a.So(ShouldNotDescribeError(removetheseerrors.New("test"), testDescriptor), should.BeEmpty)
-}
 
 func TestShouldHaveSameErrorDefinition(t *testing.T) {
 	a := assertions.New(t)
@@ -66,5 +39,4 @@ func TestShouldHaveSameErrorDefinition(t *testing.T) {
 	a.So(ShouldEqualErrorOrDefinition(errDef, errDef.WithAttributes("k", "v")), should.NotBeEmpty)
 	a.So(ShouldEqualErrorOrDefinition(errDef.WithAttributes("k", "v"), errDef), should.NotBeEmpty)
 	a.So(ShouldEqualErrorOrDefinition(errDef, errOtherDef), should.NotBeEmpty)
-	a.So(ShouldEqualErrorOrDefinition(errDef, removetheseerrors.New("hello")), should.NotBeEmpty)
 }
