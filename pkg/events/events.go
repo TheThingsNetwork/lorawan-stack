@@ -122,6 +122,9 @@ func New(ctx context.Context, name string, identifiers ttnpb.Identifiers, data i
 			CorrelationIDs: CorrelationIDsFromContext(ctx),
 		},
 	}
+	if data, ok := data.(interface{ GetCorrelationIDs() []string }); ok {
+		evt.innerEvent.CorrelationIDs = append(evt.innerEvent.CorrelationIDs, data.GetCorrelationIDs()...)
+	}
 	if identifiers != nil {
 		evt.innerEvent.Identifiers = identifiers.CombinedIdentifiers()
 	}
