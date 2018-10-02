@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package joinserver provides a LoRaWAN 1.1-compliant Join Server implementation.
 package joinserver
 
 import (
@@ -331,13 +330,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 // GetNwkSKeys returns the NwkSKeys associated with session keys identified by the supplied request.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
-	if req.DevEUI.IsZero() {
-		return nil, errInvalidRequest.WithCause(errNoDevEUI)
-	}
-	if req.SessionKeyID == "" {
-		return nil, errInvalidRequest.WithCause(errNoSessionKeyID)
-	}
-
 	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID)
 	if err != nil {
 		return nil, errRegistryOperation.WithCause(err)

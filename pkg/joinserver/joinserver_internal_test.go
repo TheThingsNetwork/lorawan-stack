@@ -15,6 +15,7 @@
 package joinserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -40,6 +41,44 @@ var (
 
 	KeyToBytes = keyToBytes
 )
+
+type MockDeviceRegistry struct {
+	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64) (*ttnpb.EndDevice, error)
+	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error)
+}
+
+func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error) {
+	if r.GetByEUIFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.GetByEUIFunc(ctx, joinEUI, devEUI)
+}
+
+func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error) {
+	if r.SetByEUIFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.SetByEUIFunc(ctx, joinEUI, devEUI, f)
+}
+
+type MockKeyRegistry struct {
+	GetByIDFunc func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
+	SetByIDFunc func(context.Context, types.EUI64, string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error)
+}
+
+func (r *MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+	if r.GetByIDFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.GetByIDFunc(ctx, devEUI, id)
+}
+
+func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error) {
+	if r.SetByIDFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.SetByIDFunc(ctx, devEUI, id, f)
+}
 
 func TestMICCheck(t *testing.T) {
 	a := assertions.New(t)

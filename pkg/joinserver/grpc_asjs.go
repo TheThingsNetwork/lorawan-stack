@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package joinserver provides a LoRaWAN 1.1-compliant Join Server implementation.
 package joinserver
 
 import (
@@ -23,10 +22,6 @@ import (
 
 // GetAppSKey returns the AppSKey associated with session keys identified by the supplied request.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	if req.SessionKeyID == "" {
-		return nil, errInvalidRequest.WithCause(errNoSessionKeyID)
-	}
-
 	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID)
 	if err != nil {
 		return nil, errRegistryOperation.WithCause(err)

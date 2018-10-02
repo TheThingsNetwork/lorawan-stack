@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"

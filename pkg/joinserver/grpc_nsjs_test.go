@@ -56,44 +56,6 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 	return b
 }
 
-type MockDeviceRegistry struct {
-	getByEUIFunc func(context.Context, types.EUI64, types.EUI64) (*ttnpb.EndDevice, error)
-	setByEUIFunc func(context.Context, types.EUI64, types.EUI64, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error)
-}
-
-func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error) {
-	if r.getByEUIFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.getByEUIFunc(ctx, joinEUI, devEUI)
-}
-
-func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error) {
-	if r.setByEUIFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.setByEUIFunc(ctx, joinEUI, devEUI, f)
-}
-
-type MockKeyRegistry struct {
-	getByIDFunc func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
-	setByIDFunc func(context.Context, types.EUI64, string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error)
-}
-
-func (r *MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
-	if r.getByIDFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.getByIDFunc(ctx, devEUI, id)
-}
-
-func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error) {
-	if r.setByIDFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.setByIDFunc(ctx, devEUI, id, f)
-}
-
 func TestHandleJoin(t *testing.T) {
 	a := assertions.New(t)
 
@@ -1217,133 +1179,6 @@ func TestHandleJoin(t *testing.T) {
 	}
 }
 
-func TestGetAppSKey(t *testing.T) {
-	errTest := errors.New("test")
-
-	for _, tc := range []struct {
-		Name string
-
-		Context func(context.Context) context.Context
-
-		GetByID     func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
-		KeyRequest  *ttnpb.SessionKeyRequest
-		KeyResponse *ttnpb.AppSKeyResponse
-
-		ErrorAssertion func(*testing.T, error) bool
-	}{
-		{
-			Name: "Empty session key ID",
-			GetByID: func(ctx context.Context, _ types.EUI64, _ string) (*ttnpb.SessionKeys, error) {
-				test.MustTFromContext(ctx).Fatal("Must not be called")
-				panic("Unreachable")
-			},
-			KeyRequest: &ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "",
-			},
-			KeyResponse: nil,
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				if !a.So(err, should.EqualErrorOrDefinition, ErrInvalidRequest.WithCause(ErrNoSessionKeyID)) {
-					t.FailNow()
-				}
-				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
-			},
-		},
-		{
-			Name: "Registry error",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
-				return nil, errTest
-			},
-			KeyRequest: &ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
-			},
-			KeyResponse: nil,
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
-					t.FailNow()
-				}
-				return a.So(errors.IsInternal(err), should.BeTrue)
-			},
-		},
-		{
-			Name: "Missing AppSKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
-				return &ttnpb.SessionKeys{}, nil
-			},
-			KeyRequest: &ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
-			},
-			KeyResponse: nil,
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.EqualErrorOrDefinition, ErrNoAppSKey)
-			},
-		},
-		{
-			Name: "Matching request",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
-				return &ttnpb.SessionKeys{
-					SessionKeyID: "test",
-					AppSKey: &ttnpb.KeyEnvelope{
-						Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel: "test-kek",
-					},
-				}, nil
-			},
-			KeyRequest: &ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
-			},
-			KeyResponse: &ttnpb.AppSKeyResponse{
-				AppSKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "test-kek",
-				},
-			},
-		},
-	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			ctx := clusterauth.NewContext(test.ContextWithT(test.Context(), t), nil)
-			if tc.Context != nil {
-				ctx = tc.Context(ctx)
-			}
-
-			resp, err := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
-				&Config{
-					Keys:    &MockKeyRegistry{getByIDFunc: tc.GetByID},
-					Devices: &MockDeviceRegistry{},
-				},
-			)).(*JoinServer).GetAppSKey(ctx, tc.KeyRequest)
-
-			if tc.ErrorAssertion != nil {
-				if !tc.ErrorAssertion(t, err) {
-					t.Errorf("Received unexpected error: %s", err)
-				}
-				a.So(resp, should.BeNil)
-				return
-			}
-
-			a.So(err, should.BeNil)
-			a.So(resp, should.Resemble, tc.KeyResponse)
-		})
-	}
-}
-
 func TestGetNwkSKeys(t *testing.T) {
 	errTest := errors.New("test")
 
@@ -1358,25 +1193,6 @@ func TestGetNwkSKeys(t *testing.T) {
 
 		ErrorAssertion func(*testing.T, error) bool
 	}{
-		{
-			Name: "Empty session key ID",
-			GetByID: func(ctx context.Context, _ types.EUI64, _ string) (*ttnpb.SessionKeys, error) {
-				test.MustTFromContext(ctx).Fatal("Must not be called")
-				panic("Unreachable")
-			},
-			KeyRequest: &ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "",
-			},
-			KeyResponse: nil,
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				if !a.So(err, should.EqualErrorOrDefinition, ErrInvalidRequest.WithCause(ErrNoSessionKeyID)) {
-					t.FailNow()
-				}
-				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
-			},
-		},
 		{
 			Name: "Registry error",
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
@@ -1511,7 +1327,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			resp, err := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Keys:    &MockKeyRegistry{getByIDFunc: tc.GetByID},
+					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
 					Devices: &MockDeviceRegistry{},
 				},
 			)).(*JoinServer).GetNwkSKeys(ctx, tc.KeyRequest)
