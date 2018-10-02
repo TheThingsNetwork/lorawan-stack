@@ -21,15 +21,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
+	jsredis "go.thethings.network/lorawan-stack/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
 	nsredis "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/redis"
-	"go.thethings.network/lorawan-stack/pkg/store"
-	oldredis "go.thethings.network/lorawan-stack/pkg/store/redis"
 )
 
 var (
@@ -51,18 +49,16 @@ var (
 				Redis:     config.Redis,
 				Namespace: []string{"as", "applications"},
 			}))
+
 			config.AS.Devices = applicationserver.NewRedisDeviceRegistry(redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
 			}))
 
-			// TODO: Replace by new registry (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
-			jsRedis := oldredis.New(&oldredis.Config{
+			config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"js", "devices"},
-				IndexKeys: deviceregistry.Identifiers,
-			})
-			config.JS.Registry = deviceregistry.New(store.NewByteMapStoreClient(jsRedis))
+			})}
 
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {

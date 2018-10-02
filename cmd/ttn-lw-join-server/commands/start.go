@@ -18,10 +18,9 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
-	"go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/store/redis"
+	jsredis "go.thethings.network/lorawan-stack/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 )
 
 var (
@@ -34,13 +33,10 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
-			redis := redis.New(&redis.Config{
+			config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"js", "devices"},
-				IndexKeys: deviceregistry.Identifiers,
-			})
-			reg := deviceregistry.New(store.NewByteMapStoreClient(redis))
-			config.JS.Registry = reg
+			})}
 
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
