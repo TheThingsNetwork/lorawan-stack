@@ -1106,6 +1106,123 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/applicationserver/io/grpc:connect": {
+    "translations": {
+      "en": "failed to connect application `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/applicationserver/io:buffer_full": {
+    "translations": {
+      "en": "buffer is full"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/applicationserver:already_linked": {
+    "translations": {
+      "en": "already linked to `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "linking.go"
+    }
+  },
+  "error:pkg/applicationserver:app_s_key": {
+    "translations": {
+      "en": "failed to get AppSKey"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:external_network_server": {
+    "translations": {
+      "en": "link to external Network Server not supported"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "linking.go"
+    }
+  },
+  "error:pkg/applicationserver:formatter_not_configured": {
+    "translations": {
+      "en": "formatter `{formatter}` is not configured"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "payload.go"
+    }
+  },
+  "error:pkg/applicationserver:join_server_unavailable": {
+    "translations": {
+      "en": "Join Server unavailable for JoinEUI `{join_eui}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:link_mode": {
+    "translations": {
+      "en": "invalid link mode `{value}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/applicationserver:network_server_not_found": {
+    "translations": {
+      "en": "Network Server not found for `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "linking.go"
+    }
+  },
+  "error:pkg/applicationserver:no_app_s_key": {
+    "translations": {
+      "en": "no AppSKey"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:no_version": {
+    "translations": {
+      "en": "no end device version"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "payload.go"
+    }
+  },
+  "error:pkg/applicationserver:not_linked": {
+    "translations": {
+      "en": "not linked to `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "linking.go"
+    }
+  },
+  "error:pkg/applicationserver:version_unavailable": {
+    "translations": {
+      "en": "end device version is unavailable in the repository"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "payload.go"
+    }
+  },
   "error:pkg/assets:http": {
     "translations": {
       "en": "HTTP error: {message}"
@@ -1644,6 +1761,33 @@
     "description": {
       "package": "pkg/encoding/lorawan",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/devicerepository:fetch": {
+    "translations": {
+      "en": "failed to fetch file `{filename}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "devicerepository.go"
+    }
+  },
+  "error:pkg/devicerepository:invalid_payload_formatter": {
+    "translations": {
+      "en": "invalid payload formatter `{formatter}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "devicerepository.go"
+    }
+  },
+  "error:pkg/devicerepository:parse": {
+    "translations": {
+      "en": "parse failed"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "devicerepository.go"
     }
   },
   "error:pkg/errors:odd_kv": {
@@ -2294,6 +2438,78 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/messageprocessors/cayennelpp:channel": {
+    "translations": {
+      "en": "invalid channel `{channel}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/cayennelpp",
+      "file": "keys.go"
+    }
+  },
+  "error:pkg/messageprocessors/cayennelpp:input": {
+    "translations": {
+      "en": "invalid input"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/cayennelpp",
+      "file": "cayennelpp.go"
+    }
+  },
+  "error:pkg/messageprocessors/cayennelpp:key_name": {
+    "translations": {
+      "en": "invalid key name `{name}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/cayennelpp",
+      "file": "keys.go"
+    }
+  },
+  "error:pkg/messageprocessors/cayennelpp:output": {
+    "translations": {
+      "en": "invalid output"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/cayennelpp",
+      "file": "cayennelpp.go"
+    }
+  },
+  "error:pkg/messageprocessors/javascript:input": {
+    "translations": {
+      "en": "invalid input"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/messageprocessors/javascript:output": {
+    "translations": {
+      "en": "invalid output"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/messageprocessors/javascript:output_range": {
+    "translations": {
+      "en": "output value `{value}` does not fall between `{low}` and `{high}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/messageprocessors/javascript:output_type": {
+    "translations": {
+      "en": "invalid output of type `{type}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/javascript",
+      "file": "javascript.go"
+    }
+  },
   "error:pkg/networkserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
@@ -2708,6 +2924,15 @@
       "file": "rpcserver.go"
     }
   },
+  "error:pkg/scripting/javascript:runtime": {
+    "translations": {
+      "en": "runtime error"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
   "error:pkg/ttnpb/udp:bandwidth": {
     "translations": {
       "en": "failed to parse bandwidth"
@@ -3093,6 +3318,105 @@
     "description": {
       "package": "pkg/validate",
       "file": "lorawan.go"
+    }
+  },
+  "event:as.application.subscribe": {
+    "translations": {
+      "en": "application subscribe"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.application.unsubscribe": {
+    "translations": {
+      "en": "application unsubscribe"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.drop": {
+    "translations": {
+      "en": "drop downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.forward": {
+    "translations": {
+      "en": "forward downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.receive": {
+    "translations": {
+      "en": "receive downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.data.drop": {
+    "translations": {
+      "en": "drop uplink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.data.forward": {
+    "translations": {
+      "en": "forward uplink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.data.receive": {
+    "translations": {
+      "en": "receive uplink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.join.drop": {
+    "translations": {
+      "en": "drop join-accept message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.join.forward": {
+    "translations": {
+      "en": "forward join-accept message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.join.receive": {
+    "translations": {
+      "en": "receive join-accept message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
     }
   },
   "event:gs.down.send": {
