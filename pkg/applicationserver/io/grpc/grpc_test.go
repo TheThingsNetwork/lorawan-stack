@@ -142,7 +142,8 @@ func TestTraffic(t *testing.T) {
 
 		up := &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceID: "foo-device",
+				ApplicationIdentifiers: registeredApplicationID,
+				DeviceID:               "foo-device",
 			},
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
@@ -159,6 +160,129 @@ func TestTraffic(t *testing.T) {
 			a.So(actual, should.Resemble, up)
 		case <-time.After(timeout):
 			t.Fatal("Receive expected upstream message timeout")
+		}
+	})
+
+	t.Run("Downstream", func(t *testing.T) {
+		a := assertions.New(t)
+		ids := ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: registeredApplicationID,
+			DeviceID:               "foo-device",
+		}
+
+		// List: unauthorized.
+		{
+			_, err := srv.DownlinkQueueList(ctx, &ids)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// List: happy flow; no items.
+		{
+			res, err := srv.DownlinkQueueList(contextWithKey(ctx, registeredApplicationKey)(), &ids)
+			a.So(err, should.BeNil)
+			a.So(res.Downlinks, should.HaveLength, 0)
+		}
+
+		// Push: unauthorized.
+		{
+			_, err := srv.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      1,
+						FRMPayload: []byte{0x01, 0x01, 0x01},
+					},
+				},
+			})
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// Push and assert content: happy flow.
+		{
+			_, err := srv.DownlinkQueuePush(contextWithKey(ctx, registeredApplicationKey)(), &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      1,
+						FRMPayload: []byte{0x01, 0x01, 0x01},
+					},
+					{
+						FPort:      2,
+						FRMPayload: []byte{0x02, 0x02, 0x02},
+					},
+				},
+			})
+			a.So(err, should.BeNil)
+		}
+		{
+			_, err := srv.DownlinkQueuePush(contextWithKey(ctx, registeredApplicationKey)(), &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      3,
+						FRMPayload: []byte{0x03, 0x03, 0x03},
+					},
+				},
+			})
+			a.So(err, should.BeNil)
+		}
+		{
+			res, err := srv.DownlinkQueueList(contextWithKey(ctx, registeredApplicationKey)(), &ids)
+			a.So(err, should.BeNil)
+			a.So(res.Downlinks, should.HaveLength, 3)
+			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
+				{
+					FPort:      1,
+					FRMPayload: []byte{0x01, 0x01, 0x01},
+				},
+				{
+					FPort:      2,
+					FRMPayload: []byte{0x02, 0x02, 0x02},
+				},
+				{
+					FPort:      3,
+					FRMPayload: []byte{0x03, 0x03, 0x03},
+				},
+			})
+		}
+
+		// Replace: unauthorized.
+		{
+			_, err := srv.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      4,
+						FRMPayload: []byte{0x04, 0x04, 0x04},
+					},
+				},
+			})
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// Replace and assert content: happy flow.
+		{
+			_, err := srv.DownlinkQueueReplace(contextWithKey(ctx, registeredApplicationKey)(), &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ids,
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      4,
+						FRMPayload: []byte{0x04, 0x04, 0x04},
+					},
+				},
+			})
+			a.So(err, should.BeNil)
+		}
+		{
+			res, err := srv.DownlinkQueueList(contextWithKey(ctx, registeredApplicationKey)(), &ids)
+			a.So(err, should.BeNil)
+			a.So(res.Downlinks, should.HaveLength, 1)
+			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
+				{
+					FPort:      4,
+					FRMPayload: []byte{0x04, 0x04, 0x04},
+				},
+			})
 		}
 	})
 }

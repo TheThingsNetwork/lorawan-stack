@@ -50,7 +50,10 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 			if md.AuthType != "Key" || md.AuthValue != registeredApplicationKey {
 				return
 			}
-			set = ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
+			set = ttnpb.RightsFrom(
+				ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+				ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+			)
 			return
 		}),
 	)

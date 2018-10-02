@@ -24,9 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
-	"google.golang.org/grpc/status"
 )
 
 type impl struct {
@@ -75,14 +73,35 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 	}
 }
 
-func (s *impl) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
-}
-
 func (s *impl) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
+		return nil, err
+	}
+	if err := s.server.DownlinkQueuePush(ctx, req.EndDeviceIdentifiers, req.Downlinks); err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
 }
 
-func (s *impl) DownlinkQueueList(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+func (s *impl) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
+		return nil, err
+	}
+	if err := s.server.DownlinkQueueReplace(ctx, req.EndDeviceIdentifiers, req.Downlinks); err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
+}
+
+func (s *impl) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
+	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+		return nil, err
+	}
+	items, err := s.server.DownlinkQueueList(ctx, *ids)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.ApplicationDownlinks{
+		Downlinks: items,
+	}, nil
 }
