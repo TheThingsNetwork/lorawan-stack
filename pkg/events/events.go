@@ -80,8 +80,27 @@ func (e *event) withCaller() *event {
 	return e
 }
 
+func (e event) MarshalJSON() ([]byte, error) {
+	var err error
+	e.innerEvent.Context, err = marshalContext(e.innerEvent.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(e.innerEvent)
+}
+
+func (e *event) UnmarshalJSON(data []byte) error {
+	err := json.Unmarshal(data, &e.innerEvent)
+	if err != nil {
+		return err
+	}
+	e.innerEvent.ctx, err = unmarshalContext(e.innerEvent.ctx, e.innerEvent.Context)
+	return err
+}
+
 type innerEvent struct {
 	ctx            context.Context
+	Context        map[string][]byte          `json:"context,omitempty"`
 	Name           string                     `json:"name"`
 	Time           time.Time                  `json:"time"`
 	Identifiers    *ttnpb.CombinedIdentifiers `json:"identifiers,omitempty"`
@@ -138,6 +157,5 @@ func UnmarshalJSON(data []byte) (Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	e.ctx = context.Background()
 	return e, nil
 }
