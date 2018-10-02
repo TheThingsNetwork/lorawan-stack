@@ -26,9 +26,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
+const timeout = 10 * time.Second
+
 type httpFetcher struct {
 	baseFetcher
-	transport *http.Client
+	httpClient *http.Client
 }
 
 func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
@@ -36,7 +38,7 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 	filename := strings.TrimLeft(path.Join(pathElements...), "/")
 	url := fmt.Sprintf("%s/%s", f.base, filename)
 
-	resp, err := f.transport.Get(url)
+	resp, err := f.httpClient.Get(url)
 	if err != nil {
 		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", filename)
 	}
@@ -59,15 +61,19 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 // FromHTTP returns an object to fetch files from a webserver.
 func FromHTTP(baseURL string, cache bool) Interface {
 	baseURL = strings.TrimRight(baseURL, "/")
+	transport := http.DefaultTransport
+	if cache {
+		transport = httpcache.NewMemoryCacheTransport()
+	}
 	f := httpFetcher{
 		baseFetcher: baseFetcher{
 			base:    baseURL,
 			latency: fetchLatency.WithLabelValues("http", baseURL),
 		},
-		transport: http.DefaultClient,
-	}
-	if !cache {
-		f.transport = httpcache.NewMemoryCacheTransport().Client()
+		httpClient: &http.Client{
+			Transport: transport,
+			Timeout:   timeout,
+		},
 	}
 	return f
 }
