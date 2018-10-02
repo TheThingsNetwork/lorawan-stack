@@ -151,14 +151,6 @@ var (
 	HaveSameElementsDiff = testassertions.ShouldHaveSameElementsDiff
 	// NotHaveSameElementsDiff asserts that the actual A and expected B elements are not equal using pretty.Diff.
 	NotHaveSameElementsDiff = testassertions.ShouldNotHaveSameElementsDiff
-	// EqualFields asserts that the actual A and expected B fields are equal.
-	EqualFields = testassertions.ShouldEqualFields
-	// NotEqualFields asserts that the actual A and expected B fields are not equal.
-	NotEqualFields = testassertions.ShouldNotEqualFields
-	// EqualFieldsWithIgnores asserts that the actual A and expected B fields are equal, ignoring fields.
-	EqualFieldsWithIgnores = testassertions.ShouldEqualFieldsWithIgnores
-	// NotEqualFieldsWithIgnores asserts that the actual A and expected B fields are not equal, ignoring fields.
-	NotEqualFieldsWithIgnores = testassertions.ShouldNotEqualFieldsWithIgnores
 	// HaveParentContext asserts that the context.Context is a child of context.Context.
 	HaveParentContext = testassertions.ShouldHaveParentContext
 	// HaveSameErrorDefinitionAs asserts that the error definitions of the actual and expected arguments are the same.
