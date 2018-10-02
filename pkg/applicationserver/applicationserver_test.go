@@ -140,7 +140,7 @@ func TestApplicationServer(t *testing.T) {
 		},
 	})
 	config := &applicationserver.Config{
-		LinkMode: applicationserver.LinkAll,
+		LinkMode: "all",
 		Devices:  deviceRegistry,
 		Links:    linkRegistry,
 		DeviceRepository: applicationserver.DeviceRepositoryConfig{

@@ -54,9 +54,13 @@ type ApplicationServer struct {
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
+	linkMode, err := conf.GetLinkMode()
+	if err != nil {
+		return nil, err
+	}
 	as := &ApplicationServer{
 		Component:      c,
-		linkMode:       conf.LinkMode,
+		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
 		formatter: payloadFormatter{
@@ -73,7 +77,7 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	}
 
 	c.RegisterGRPC(as)
-	if conf.LinkMode == LinkAll {
+	if as.linkMode == LinkAll {
 		c.RegisterTask(as.linkAll, component.TaskRestartOnFailure)
 	}
 	return as, nil

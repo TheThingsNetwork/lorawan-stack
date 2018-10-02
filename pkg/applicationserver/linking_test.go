@@ -59,7 +59,8 @@ func TestLink(t *testing.T) {
 		},
 	})
 	as, err := applicationserver.New(c, &applicationserver.Config{
-		Links: linkRegistry,
+		LinkMode: "all",
+		Links:    linkRegistry,
 	})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()

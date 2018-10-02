@@ -16,6 +16,7 @@ package applicationserver
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/devicerepository"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
 
@@ -31,10 +32,24 @@ const (
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode         LinkMode
-	Devices          DeviceRegistry
-	Links            LinkRegistry
-	DeviceRepository DeviceRepositoryConfig
+	LinkMode         string                 `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
+	Devices          DeviceRegistry         `name:"-"`
+	Links            LinkRegistry           `name:"-"`
+	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
+}
+
+var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
+
+// GetLinkMode returns the converted configuration's link mode to LinkMode.
+func (c Config) GetLinkMode() (LinkMode, error) {
+	switch c.LinkMode {
+	case "all":
+		return LinkAll, nil
+	case "explicit":
+		return LinkExplicit, nil
+	default:
+		return LinkMode(0), errLinkMode.WithAttributes("value", c.LinkMode)
+	}
 }
 
 // DeviceRepositoryConfig defines the source of the device repository.

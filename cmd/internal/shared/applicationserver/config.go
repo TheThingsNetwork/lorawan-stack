@@ -20,5 +20,5 @@ import (
 
 // DefaultApplicationServerConfig is the default configuration for the ApplicationServer
 var DefaultApplicationServerConfig = applicationserver.Config{
-	LinkMode: applicationserver.LinkAll,
+	LinkMode: "all",
 }
