@@ -27,11 +27,16 @@ import (
 )
 
 var (
-	ErrAddressMismatch      = errAddressMismatch
-	ErrReuseDevNonce        = errReuseDevNonce
 	ErrDevNonceTooSmall     = errDevNonceTooSmall
+	ErrInvalidRequest       = errInvalidRequest
+	ErrNoAppSKey            = errNoAppSKey
+	ErrNoFNwkSIntKey        = errNoFNwkSIntKey
+	ErrNoNwkSEncKey         = errNoNwkSEncKey
+	ErrNoSessionKeyID       = errNoSessionKeyID
+	ErrNoSNwkSIntKey        = errNoSNwkSIntKey
+	ErrRegistryOperation    = errRegistryOperation
+	ErrReuseDevNonce        = errReuseDevNonce
 	ErrSessionKeyIDMismatch = errSessionKeyIDMismatch
-	ErrNoSession            = errNoSession
 
 	KeyToBytes = keyToBytes
 )

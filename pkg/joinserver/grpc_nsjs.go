@@ -332,15 +332,15 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 // GetNwkSKeys returns the NwkSKeys associated with session keys identified by the supplied request.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, errNoDevEUI
+		return nil, errInvalidRequest.WithCause(errNoDevEUI)
 	}
 	if req.SessionKeyID == "" {
-		return nil, errNoSessionKeyID
+		return nil, errInvalidRequest.WithCause(errNoSessionKeyID)
 	}
 
 	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID)
 	if err != nil {
-		return nil, err
+		return nil, errRegistryOperation.WithCause(err)
 	}
 
 	if ks.NwkSEncKey == nil {

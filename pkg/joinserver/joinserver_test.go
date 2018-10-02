@@ -15,6 +15,7 @@
 package joinserver_test
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"testing"
@@ -53,6 +54,44 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 		panic(fmt.Sprintf("failed to encrypt join-accept: %s", err))
 	}
 	return b
+}
+
+type MockDeviceRegistry struct {
+	getByEUIFunc func(context.Context, types.EUI64, types.EUI64) (*ttnpb.EndDevice, error)
+	setByEUIFunc func(context.Context, types.EUI64, types.EUI64, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error)
+}
+
+func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error) {
+	if r.getByEUIFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.getByEUIFunc(ctx, joinEUI, devEUI)
+}
+
+func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error) {
+	if r.setByEUIFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.setByEUIFunc(ctx, joinEUI, devEUI, f)
+}
+
+type MockKeyRegistry struct {
+	getByIDFunc func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
+	setByIDFunc func(context.Context, types.EUI64, string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error)
+}
+
+func (r *MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+	if r.getByIDFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.getByIDFunc(ctx, devEUI, id)
+}
+
+func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error) {
+	if r.setByIDFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.setByIDFunc(ctx, devEUI, id, f)
 }
 
 func TestHandleJoin(t *testing.T) {
@@ -409,63 +448,6 @@ func TestHandleJoin(t *testing.T) {
 			},
 			nil,
 			errors.IsInvalidArgument,
-		},
-		{
-			"1.1 address mismatch",
-			&ttnpb.EndDevice{
-				NextDevNonce:  0,
-				NextJoinNonce: 0,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				RootKeys: &ttnpb.RootKeys{
-					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
-						KEKLabel: "",
-					},
-					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      nwkKey[:],
-						KEKLabel: "",
-					},
-				},
-				LoRaWANVersion:       ttnpb.MAC_V1_1,
-				NetworkServerAddress: net.IPv4(0x45, 0x44, 0x43, 0x43).String(),
-			},
-			1,
-			1,
-			[]uint32{0},
-			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
-				RawPayload: []byte{
-					/* MHDR */
-					0x00,
-
-					/* MACPayload */
-					/** JoinEUI **/
-					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
-					/** DevEUI **/
-					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
-					/** DevNonce **/
-					0x00, 0x00,
-
-					/* MIC */
-					0x55, 0x17, 0x54, 0x8e,
-				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
-					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
-				},
-				RxDelay: 0x42,
-				CFList:  nil,
-			},
-			nil,
-			errors.IsPermissionDenied,
 		},
 		{
 			"1.0.2 new device",
@@ -1169,11 +1151,13 @@ func TestHandleJoin(t *testing.T) {
 			defer flush()
 			defer redisClient.Close()
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
+			keyReg := &redis.KeyRegistry{Redis: redisClient}
 
 			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices:         devReg,
+					Keys:            keyReg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
 			)).(*JoinServer)
@@ -1190,43 +1174,43 @@ func TestHandleJoin(t *testing.T) {
 			start := time.Now()
 			resp, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			if tc.ValidErr != nil {
-				if !a.So(tc.ValidErr(err), should.BeTrue) {
+				if !a.So(err, should.BeError) || !a.So(tc.ValidErr(err), should.BeTrue) {
 					t.Fatalf("Received an unexpected error: %s", err)
 				}
 				a.So(resp, should.BeNil)
 				return
 			}
 
-			if !a.So(err, should.BeNil) || !a.So(resp, should.Resemble, tc.JoinResponse) {
+			expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
+			if !a.So(err, should.BeNil) || !a.So(resp, should.NotBeNil) {
 				t.FailNow()
 			}
+			a.So(resp.SessionKeyID, should.NotBeEmpty)
+			expectedResp.SessionKeyID = resp.SessionKeyID
+			a.So(resp, should.Resemble, expectedResp)
 
 			ret, err = devReg.GetByEUI(authorizedCtx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
 			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 				t.FailNow()
 			}
-
 			a.So(ret.CreatedAt, should.Equal, pb.CreatedAt)
 			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
 			pb.UpdatedAt = ret.UpdatedAt
 			pb.NextDevNonce = tc.NextNextDevNonce
 			pb.NextJoinNonce = tc.NextNextJoinNonce
 			pb.UsedDevNonces = tc.NextUsedDevNonces
-			if tc.ValidErr != nil {
-				if !a.So(ret.Session, should.NotBeNil) {
-					t.FailNow()
-				}
-				a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
-				pb.Session = &ttnpb.Session{
-					DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
-					SessionKeys: resp.SessionKeys,
-					StartedAt:   ret.GetSession().GetStartedAt(),
-				}
+			if !a.So(ret.Session, should.NotBeNil) {
+				t.FailNow()
 			}
-
+			a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
+			pb.Session = &ttnpb.Session{
+				DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
+				SessionKeys: resp.SessionKeys,
+				StartedAt:   ret.GetSession().GetStartedAt(),
+			}
 			a.So(pretty.Diff(pb, ret), should.BeEmpty)
 
-			resp, err = js.HandleJoin(authorizedCtx, tc.JoinRequest)
+			resp, err = js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			a.So(err, should.BeError)
 			a.So(resp, should.BeNil)
 		})
@@ -1234,625 +1218,314 @@ func TestHandleJoin(t *testing.T) {
 }
 
 func TestGetAppSKey(t *testing.T) {
-	a := assertions.New(t)
-
-	redisClient, flush := test.NewRedis(t, "joinserver_test")
-	defer flush()
-	defer redisClient.Close()
-	devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-	js := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Devices:         devReg,
-			JoinEUIPrefixes: joinEUIPrefixes,
-		},
-	)).(*JoinServer)
-
-	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
-
-	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
-	req.DevEUI = types.EUI64{}
-	resp, err := js.GetAppSKey(authorizedCtx, req)
-	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
-
-	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
-	req.SessionKeyID = ""
-	resp, err = js.GetAppSKey(authorizedCtx, req)
-	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	errTest := errors.New("test")
 
 	for _, tc := range []struct {
 		Name string
 
-		Device *ttnpb.EndDevice
+		Context func(context.Context) context.Context
 
-		CustomCreateDevice func(*ttnpb.EndDevice) error
-
+		GetByID     func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.AppSKeyResponse
 
-		ValidErr func(error) bool
+		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			"Valid session",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: asAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						AppSKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
+			Name: "Empty session key ID",
+			GetByID: func(ctx context.Context, _ types.EUI64, _ string) (*ttnpb.SessionKeys, error) {
+				test.MustTFromContext(ctx).Fatal("Must not be called")
+				panic("Unreachable")
 			},
-			nil,
-			&ttnpb.SessionKeyRequest{
+			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
+				SessionKeyID: "",
 			},
-			&ttnpb.AppSKeyResponse{
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				if !a.So(err, should.EqualErrorOrDefinition, ErrInvalidRequest.WithCause(ErrNoSessionKeyID)) {
+					t.FailNow()
+				}
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "Registry error",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return nil, errTest
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
+					t.FailNow()
+				}
+				return a.So(errors.IsInternal(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "Missing AppSKey",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return &ttnpb.SessionKeys{}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.EqualErrorOrDefinition, ErrNoAppSKey)
+			},
+		},
+		{
+			Name: "Matching request",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return &ttnpb.SessionKeys{
+					SessionKeyID: "test",
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel: "test-kek",
+					},
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
 					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "test",
+					KEKLabel: "test-kek",
 				},
 			},
-			nil,
-		},
-		{
-			"Valid fallback",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: asAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "zest",
-					},
-				},
-				SessionFallback: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						AppSKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			&ttnpb.AppSKeyResponse{
-				AppSKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "test",
-				},
-			},
-			nil,
-		},
-		{
-			"No device",
-			nil,
-			func(*ttnpb.EndDevice) error { return nil },
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsNotFound,
-		},
-		{
-			"No session",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: asAddr,
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsDataLoss,
-		},
-		{
-			"Corrupt session",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: asAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsDataLoss,
-		},
-		{
-			"ID mismatch",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: asAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "zest",
-					},
-				},
-				SessionFallback: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "fest",
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsInvalidArgument,
-		},
-		{
-			"ID mismatch no fallback",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				ApplicationServerAddress: asAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "zest",
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsInvalidArgument,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			redisClient, flush := test.NewRedis(t, "joinserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
+			ctx := clusterauth.NewContext(test.ContextWithT(test.Context(), t), nil)
+			if tc.Context != nil {
+				ctx = tc.Context(ctx)
+			}
 
-			js := test.Must(New(
+			resp, err := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:         devReg,
-					JoinEUIPrefixes: joinEUIPrefixes,
+					Keys:    &MockKeyRegistry{getByIDFunc: tc.GetByID},
+					Devices: &MockDeviceRegistry{},
 				},
-			)).(*JoinServer)
+			)).(*JoinServer).GetAppSKey(ctx, tc.KeyRequest)
 
-			ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-			if tc.CustomCreateDevice != nil {
-				err = tc.CustomCreateDevice(ed)
-			} else {
-				_, err = CreateDevice(authorizedCtx, devReg, ed)
-			}
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
-			resp, err := js.GetAppSKey(authorizedCtx, tc.KeyRequest)
-			if tc.ValidErr != nil {
-				a.So(tc.ValidErr(err), should.BeTrue)
+			if tc.ErrorAssertion != nil {
+				if !tc.ErrorAssertion(t, err) {
+					t.Errorf("Received unexpected error: %s", err)
+				}
 				a.So(resp, should.BeNil)
 				return
 			}
 
 			a.So(err, should.BeNil)
-			if !a.So(resp, should.Resemble, tc.KeyResponse) {
-				pretty.Ldiff(t, resp, tc.KeyResponse)
-			}
+			a.So(resp, should.Resemble, tc.KeyResponse)
 		})
 	}
 }
 
 func TestGetNwkSKeys(t *testing.T) {
-	a := assertions.New(t)
-
-	redisClient, flush := test.NewRedis(t, "joinserver_test")
-	defer flush()
-	defer redisClient.Close()
-	devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-	js := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Devices:         devReg,
-			JoinEUIPrefixes: joinEUIPrefixes,
-		},
-	)).(*JoinServer)
-
-	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
-
-	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
-	req.DevEUI = types.EUI64{}
-	resp, err := js.GetNwkSKeys(authorizedCtx, req)
-	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
-
-	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
-	req.SessionKeyID = ""
-	resp, err = js.GetNwkSKeys(authorizedCtx, req)
-	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	errTest := errors.New("test")
 
 	for _, tc := range []struct {
 		Name string
 
-		Device *ttnpb.EndDevice
+		Context func(context.Context) context.Context
 
-		CustomCreateDevice func(*ttnpb.EndDevice) error
-
+		GetByID     func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.NwkSKeysResponse
 
-		ValidErr func(error) bool
+		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			"Valid request",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
+			Name: "Empty session key ID",
+			GetByID: func(ctx context.Context, _ types.EUI64, _ string) (*ttnpb.SessionKeys, error) {
+				test.MustTFromContext(ctx).Fatal("Must not be called")
+				panic("Unreachable")
 			},
-			nil,
-			&ttnpb.SessionKeyRequest{
+			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
+				SessionKeyID: "",
 			},
-			&ttnpb.NwkSKeysResponse{
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				if !a.So(err, should.EqualErrorOrDefinition, ErrInvalidRequest.WithCause(ErrNoSessionKeyID)) {
+					t.FailNow()
+				}
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "Registry error",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return nil, errTest
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
+					t.FailNow()
+				}
+				return a.So(errors.IsInternal(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "No SNwkSIntKey",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return &ttnpb.SessionKeys{
+					FNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+					NwkSEncKey:  ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.EqualErrorOrDefinition, ErrNoSNwkSIntKey)
+			},
+		},
+		{
+			Name: "No NwkSEncKey",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return &ttnpb.SessionKeys{
+					FNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+					SNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.EqualErrorOrDefinition, ErrNoNwkSEncKey)
+			},
+		},
+		{
+			Name: "No FNwkSIntKey",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return &ttnpb.SessionKeys{
+					SNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+					NwkSEncKey:  ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.EqualErrorOrDefinition, ErrNoFNwkSIntKey)
+			},
+		},
+		{
+			Name: "Matching request",
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, "test-id")
+				return &ttnpb.SessionKeys{
+					SessionKeyID: "test",
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel: "FNwkSIntKey-kek",
+					},
+					NwkSEncKey: &ttnpb.KeyEnvelope{
+						Key:      KeyToBytes(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel: "NwkSEncKey-kek",
+					},
+					SNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key:      KeyToBytes(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel: "SNwkSIntKey-kek",
+					},
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test-id",
+			},
+			KeyResponse: &ttnpb.NwkSKeysResponse{
 				FNwkSIntKey: ttnpb.KeyEnvelope{
 					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "test",
-				},
-				SNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-					KEKLabel: "test",
+					KEKLabel: "FNwkSIntKey-kek",
 				},
 				NwkSEncKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-					KEKLabel: "test",
-				},
-			},
-			nil,
-		},
-		{
-			"Valid fallback",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "zest",
-					},
-				},
-				SessionFallback: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			&ttnpb.NwkSKeysResponse{
-				FNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "test",
+					Key:      KeyToBytes(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					KEKLabel: "NwkSEncKey-kek",
 				},
 				SNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-					KEKLabel: "test",
-				},
-				NwkSEncKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-					KEKLabel: "test",
+					Key:      KeyToBytes(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					KEKLabel: "SNwkSIntKey-kek",
 				},
 			},
-			nil,
-		},
-		{
-			"No device",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
-			},
-			func(*ttnpb.EndDevice) error { return nil },
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsNotFound,
-		},
-		{
-			"No NwkSEncKey",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsDataLoss,
-		},
-		{
-			"No FNwkSIntKey",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsDataLoss,
-		},
-		{
-			"No SNwkSIntKey",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "test",
-						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff}),
-							KEKLabel: "test",
-						},
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-							KEKLabel: "test",
-						},
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsDataLoss,
-		},
-		{
-			"No session",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsDataLoss,
-		},
-		{
-			"ID mismatch",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "zest",
-					},
-				},
-				SessionFallback: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "fest",
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsInvalidArgument,
-		},
-		{
-			"ID mismatch no fallback",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: nsAddr,
-				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: "zest",
-					},
-				},
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsInvalidArgument,
-		},
-		{
-			"Address mismatch",
-			&ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				},
-				NetworkServerAddress: "test",
-			},
-			nil,
-			&ttnpb.SessionKeyRequest{
-				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test",
-			},
-			nil,
-			errors.IsPermissionDenied,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			redisClient, flush := test.NewRedis(t, "joinserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
+			ctx := clusterauth.NewContext(test.ContextWithT(test.Context(), t), nil)
+			if tc.Context != nil {
+				ctx = tc.Context(ctx)
+			}
 
-			js := test.Must(New(
+			resp, err := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:         devReg,
-					JoinEUIPrefixes: joinEUIPrefixes,
+					Keys:    &MockKeyRegistry{getByIDFunc: tc.GetByID},
+					Devices: &MockDeviceRegistry{},
 				},
-			)).(*JoinServer)
+			)).(*JoinServer).GetNwkSKeys(ctx, tc.KeyRequest)
 
-			ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-			if tc.CustomCreateDevice != nil {
-				err = tc.CustomCreateDevice(ed)
-			} else {
-				_, err = CreateDevice(authorizedCtx, devReg, ed)
-			}
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
-			resp, err := js.GetNwkSKeys(authorizedCtx, tc.KeyRequest)
-			if tc.ValidErr != nil {
-				a.So(tc.ValidErr(err), should.BeTrue)
+			if tc.ErrorAssertion != nil {
+				if !tc.ErrorAssertion(t, err) {
+					t.Errorf("Received unexpected error: %s", err)
+				}
 				a.So(resp, should.BeNil)
 				return
 			}
 
 			a.So(err, should.BeNil)
-			if !a.So(resp, should.Resemble, tc.KeyResponse) {
-				pretty.Ldiff(t, resp, tc.KeyResponse)
-			}
+			a.So(resp, should.Resemble, tc.KeyResponse)
 		})
 	}
 }

@@ -23,16 +23,13 @@ import (
 
 // GetAppSKey returns the AppSKey associated with session keys identified by the supplied request.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	if req.DevEUI.IsZero() {
-		return nil, errNoDevEUI
-	}
 	if req.SessionKeyID == "" {
-		return nil, errNoSessionKeyID
+		return nil, errInvalidRequest.WithCause(errNoSessionKeyID)
 	}
 
 	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID)
 	if err != nil {
-		return nil, err
+		return nil, errRegistryOperation.WithCause(err)
 	}
 	if ks.AppSKey == nil {
 		return nil, errNoAppSKey

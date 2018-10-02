@@ -17,7 +17,6 @@ package joinserver
 import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
-	errAddressMismatch           = errors.DefinePermissionDenied("address_mismatch", "{component} address mismatch")
 	errCheckMIC                  = errors.Define("check_mic", "MIC check failed")
 	errComputeMIC                = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
 	errDecodePayload             = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
@@ -29,6 +28,7 @@ var (
 	errForwardJoinRequest        = errors.Define("forward_join_request", "failed to forward JoinRequest")
 	errGenerateSessionKeyID      = errors.Define("generate_session_key_id", "failed to generate session key ID")
 	errInvalidIdentifiers        = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errInvalidRequest            = errors.DefineInvalidArgument("invalid_request", "invalid request")
 	errMACVersionMismatch        = errors.DefineInternal("mac_version_mismatch", "Device MAC version mismatch, in registry: {registered}, selected: {selected}")
 	errMICMismatch               = errors.DefineInvalidArgument("mic_mismatch", "MIC mismatch")
 	errNoAppKey                  = errors.DefineCorruption("no_app_key", "no AppKey specified")
@@ -41,10 +41,10 @@ var (
 	errNoNwkKey                  = errors.DefineCorruption("no_nwk_key", "no NwkKey specified")
 	errNoNwkSEncKey              = errors.DefineCorruption("no_nwk_s_enc_key", "no NwkSEncKey specified")
 	errNoPayload                 = errors.DefineCorruption("no_payload", "no message payload specified")
-	errNoSNwkSIntKey             = errors.DefineCorruption("no_s_nwk_s_int_key", "no SNwkSIntKey specified")
-	errNoSession                 = errors.DefineCorruption("no_session", "no Session specified")
 	errNoSessionKeyID            = errors.DefineCorruption("no_session_key_id", "no SessionKeyID specified")
+	errNoSNwkSIntKey             = errors.DefineCorruption("no_s_nwk_s_int_key", "no SNwkSIntKey specified")
 	errPayloadLengthMismatch     = errors.DefineInvalidArgument("payload_length", "expected length of payload to be equal to 23 got {length}")
+	errRegistryOperation         = errors.DefineInternal("registry_operation", "registry operation failed")
 	errReuseDevNonce             = errors.DefineInvalidArgument("reuse_dev_nonce", "DevNonce has already been used")
 	errSessionKeyIDMismatch      = errors.DefineInvalidArgument("session_key_id_mismatch", "SessionKeyID mismatch")
 	errUnknownAppEUI             = errors.Define("unknown_app_eui", "AppEUI specified is not known")
