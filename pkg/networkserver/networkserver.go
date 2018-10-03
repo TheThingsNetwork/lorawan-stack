@@ -670,7 +670,9 @@ outer:
 		}
 
 		gap := uint32(math.MaxUint32)
-		if !dev.ResetsFCnt {
+		if fCnt == 0 && dev.Session.LastFCntUp == 0 && len(dev.RecentUplinks) == 0 {
+			gap = 0
+		} else if !dev.ResetsFCnt {
 			if fCnt <= dev.Session.LastFCntUp {
 				continue outer
 			}
