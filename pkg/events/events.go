@@ -26,6 +26,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -165,6 +166,12 @@ func Proto(e Event) (*ttnpb.Event, error) {
 		var err error
 		if protoMessage, ok := evt.data.(proto.Message); ok {
 			pb.Data, err = types.MarshalAny(protoMessage)
+		} else if err, ok := evt.data.(error); ok {
+			if ttnErr, ok := errors.From(err); ok {
+				pb.Data, err = types.MarshalAny(ttnErr.GRPCStatus().Proto())
+			} else {
+				pb.Data, err = types.MarshalAny(&types.StringValue{Value: err.Error()})
+			}
 		} else {
 			value, err := gogoproto.Value(evt.data)
 			if err != nil {
