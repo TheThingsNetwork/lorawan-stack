@@ -15,6 +15,8 @@
 package ttnpb
 
 import (
+	"sort"
+
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -66,18 +68,18 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out := &EndDevice{}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, easy)
 	out.RootKeys = NewPopulatedRootKeys(r, easy)
+
 	out.LastDevNonce = r.Uint32()
-	out.UsedDevNonces = make([]uint32, r.Intn(10))
+	out.LastJoinNonce = r.Uint32()
+	out.LastRJCount0 = r.Uint32()
+	out.LastRJCount1 = r.Uint32()
+
+	out.UsedDevNonces = make([]uint32, r.Intn(100))
 	for i := range out.UsedDevNonces {
 		out.UsedDevNonces[i] = r.Uint32()
 	}
-	out.LastJoinNonce = r.Uint32()
-	out.UsedJoinNonces = make([]uint32, r.Intn(10))
-	for i := range out.UsedJoinNonces {
-		out.UsedJoinNonces[i] = r.Uint32()
-	}
-	out.LastRJCount0 = r.Uint32()
-	out.LastRJCount1 = r.Uint32()
+	sort.Slice(out.UsedDevNonces, func(i, j int) bool { return out.UsedDevNonces[i] < out.UsedDevNonces[j] })
+
 	if r.Intn(10) != 0 {
 		out.Session = NewPopulatedSession(r, easy)
 	}

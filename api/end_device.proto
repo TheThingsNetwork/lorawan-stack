@@ -330,54 +330,53 @@ message EndDevice {
   // Fallback session. Stored in Network Server until RekeyInd is received.
   Session session_fallback = 30;
 
-  // Last DevNonce used (in case of LoRaWAN 1.1).
+  // Last DevNonce used.
+  // This field is only used for devices using LoRaWAN version 1.1 and later.
   // Stored in Join Server.
   uint32 last_dev_nonce = 31;
-  // Used DevNonces (in case of LoRaWAN 1.0).
+  // Used DevNonces sorted in ascending order.
+  // This field is only used for devices using LoRaWAN versions preceding 1.1.
   // Stored in Join Server.
   repeated uint32 used_dev_nonces = 32;
-  // Last JoinNonce/AppNonce used (in case of LoRaWAN 1.1).
+  // Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used.
   // Stored in Join Server.
   uint32 last_join_nonce = 33;
-  // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0).
-  // Stored in Join Server.
-  repeated uint32 used_join_nonces = 34;
   // Last Rejoin counter value used (type 0/2).
   // Stored in Join Server.
-  uint32 last_rj_count_0 = 35 [(gogoproto.customname) = "LastRJCount0"];
+  uint32 last_rj_count_0 = 34 [(gogoproto.customname) = "LastRJCount0"];
   // Last Rejoin counter value used (type 1).
   // Stored in Join Server.
-  uint32 last_rj_count_1 = 36 [(gogoproto.customname) = "LastRJCount1"];
+  uint32 last_rj_count_1 = 35 [(gogoproto.customname) = "LastRJCount1"];
 
   // Time when last DevStatus MAC command was received.
   // Stored in Network Server.
-  google.protobuf.Timestamp last_dev_status_received_at = 38 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_dev_status_received_at = 36 [(gogoproto.stdtime) = true];
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  PowerState power_state = 39;
+  PowerState power_state = 37;
   // Latest-known battery percentage of the device.
   // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
   // Stored in Network Server.
-  float battery_percentage = 40;
+  float battery_percentage = 38;
   // Demodulation signal-to-noise ratio (dB).
   // Received via the DevStatus MAC command at last_dev_status_received_at.
   // Stored in Network Server.
-  int32 downlink_margin = 41;
+  int32 downlink_margin = 39;
 
   // Recent uplink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated UplinkMessage recent_uplinks = 42;
+  repeated UplinkMessage recent_uplinks = 40;
   // Recent downlink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated DownlinkMessage recent_downlinks = 43;
+  repeated DownlinkMessage recent_downlinks = 41;
   // Queued Application downlink messages. Stored in Application Server,
   // which sets them on the Network Server.
-  repeated ApplicationDownlink queued_application_downlinks = 44;
+  repeated ApplicationDownlink queued_application_downlinks = 42;
 
   // The payload formatters for this end device. Stored in Application Server.
   // Copied on creation from template identified by version_ids.
-  MessagePayloadFormatters formatters = 45;
+  MessagePayloadFormatters formatters = 43;
 }
 
 message EndDevices {
