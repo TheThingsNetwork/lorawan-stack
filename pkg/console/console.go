@@ -22,6 +22,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"golang.org/x/oauth2"
 )
@@ -99,6 +101,8 @@ func New(c *component.Component, assets *assets.Assets, config Config) (*Console
 	}
 
 	c.RegisterWeb(console)
+
+	c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub))
 
 	return console, nil
 }
