@@ -30,6 +30,7 @@ include .make/js/main.make
 include .make/dev.make
 include .make/styl/main.make
 include .make/snap/main.make
+include .make/sdk/main.make
 
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
@@ -42,9 +43,9 @@ messages:
 
 dev-deps: go.dev-deps js.dev-deps
 
-deps: go.deps js.deps
+deps: go.deps js.deps sdk.deps
 
-test: go.test js.test
+test: go.test js.test sdk.test
 
 quality: go.quality js.quality styl.quality snap.quality
 
