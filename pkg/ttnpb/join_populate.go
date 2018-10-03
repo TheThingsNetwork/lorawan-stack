@@ -29,7 +29,7 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	}()
 
 	out := &JoinRequest{}
-	out.SelectedMacVersion = MACVersion(r.Intn(5))
+	out.SelectedMACVersion = MACVersion(r.Intn(5))
 	out.NetID = *types.NewPopulatedNetID(r)
 	out.DownlinkSettings = *NewPopulatedDLSettings(r, easy)
 	out.RxDelay = RxDelay(r.Uint32() % 16)

@@ -30,7 +30,7 @@ message JoinRequest {
   bytes raw_payload = 1;
   Message payload = 2;
   EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  MACVersion selected_mac_version = 4;
+  MACVersion selected_mac_version = 4 [(gogoproto.customname) = "SelectedMACVersion"];
   bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
   DLSettings downlink_settings = 6 [(gogoproto.nullable) = false];
   RxDelay rx_delay = 7;
