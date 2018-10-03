@@ -20,7 +20,7 @@ GO_PROTOC_FLAGS ?= \
 	--grpc-gateway_out=$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT)
 
 go.protos: $(wildcard api/*.proto)
-	$(PROTOC) $(GO_PROTOC_FLAGS) $(PWD)/api/*.proto
+	$(PROTOC) $(GO_PROTOC_FLAGS) $(PWD)/api/*.proto |& grep -vE ' protoc-gen-gogo: WARNING: failed finding publicly imported dependency for \.ttn\.lorawan\.v3\..* used in' || true
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh api
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' -or -name '*pb.gw.go' | grep -v 'vendor'`
 	unconvert -apply ./pkg/ttnpb/... ./pkg/util/rpctest/...
