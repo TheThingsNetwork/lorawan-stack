@@ -1484,51 +1484,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/deviceregistry:device_not_found": {
-    "translations": {
-      "en": "device not found"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/deviceregistry:nil_device": {
-    "translations": {
-      "en": "device specified is nil"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/deviceregistry:nil_identifiers": {
-    "translations": {
-      "en": "identifiers specified are nil"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/deviceregistry:processor": {
-    "translations": {
-      "en": "failed to process arguments"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/deviceregistry:too_many_devices": {
-    "translations": {
-      "en": "too many devices found"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/errors:odd_kv": {
     "translations": {
       "en": "Odd number of key-value elements"
@@ -1853,13 +1808,22 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/joinserver:address_mismatch": {
+  "error:pkg/joinserver/redis:duplicate_identifiers": {
     "translations": {
-      "en": "{component} address mismatch"
+      "en": "duplicate identifiers"
     },
     "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/joinserver/redis:invalid_identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
     }
   },
   "error:pkg/joinserver:check_mic": {
@@ -1907,6 +1871,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:duplicate_identifiers": {
+    "translations": {
+      "en": "a device identified by the identifiers already exists"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:encode_payload": {
     "translations": {
       "en": "failed to encode payload"
@@ -1928,6 +1901,33 @@
   "error:pkg/joinserver:forward_join_request": {
     "translations": {
       "en": "failed to forward JoinRequest"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:generate_session_key_id": {
+    "translations": {
+      "en": "failed to generate session key ID"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:invalid_identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:invalid_request": {
+    "translations": {
+      "en": "invalid request"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -2060,15 +2060,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:no_session": {
-    "translations": {
-      "en": "no Session specified"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:no_session_key_id": {
     "translations": {
       "en": "no SessionKeyID specified"
@@ -2090,6 +2081,15 @@
   "error:pkg/joinserver:payload_type": {
     "translations": {
       "en": "wrong payload type: {type}"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:registry_operation": {
+    "translations": {
+      "en": "registry operation failed"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -2121,123 +2121,6 @@
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/marshaling:decoded_data_left": {
-    "translations": {
-      "en": "decoded data left in buffer"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:empty_byte_slice": {
-    "translations": {
-      "en": "empty byte slice specified"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:expected_struct": {
-    "translations": {
-      "en": "expected argument to be a struct, got `{result}` (kind: `{kind}`)"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "marshal.go"
-    }
-  },
-  "error:pkg/marshaling:field_kind": {
-    "translations": {
-      "en": "field value `{field}` is of kind `{kind}`, while `{expected}` was expected"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:nil_pointer_value": {
-    "translations": {
-      "en": "pointer value is nil"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:no_custom_decoder": {
-    "translations": {
-      "en": "values of type `{type}` (kind `{kind}`), do not implement custom decoder"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "marshal.go"
-    }
-  },
-  "error:pkg/marshaling:no_field": {
-    "translations": {
-      "en": "field `{field}` specified, but does not exist on `{type}` structs"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:type_overflow": {
-    "translations": {
-      "en": "stored value `{value}` overflows `{type}`"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:unmatched_encoding": {
-    "translations": {
-      "en": "unmatched encoding"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:unread_data_left": {
-    "translations": {
-      "en": "unread data left in buffer"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:unsupported_map_value": {
-    "translations": {
-      "en": "unsupported map value of kind `{kind}`"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:unsupported_type": {
-    "translations": {
-      "en": "expected `{ev}` or `{pv}` to implement `{type}`"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
-    }
-  },
-  "error:pkg/marshaling:unsupported_version": {
-    "translations": {
-      "en": "unsupported version `{version}`"
-    },
-    "description": {
-      "package": "pkg/marshaling",
-      "file": "unmarshal.go"
     }
   },
   "error:pkg/networkserver/redis:duplicate_identifiers": {
@@ -2643,69 +2526,6 @@
     "description": {
       "package": "pkg/rpcserver",
       "file": "rpcserver.go"
-    }
-  },
-  "error:pkg/store/redis:no_index_keys": {
-    "translations": {
-      "en": "at least one index key must be specified"
-    },
-    "description": {
-      "package": "pkg/store/redis",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/store/redis:offset_too_high": {
-    "translations": {
-      "en": "offset specified is too high"
-    },
-    "description": {
-      "package": "pkg/store/redis",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/store/redis:parse_ulid": {
-    "translations": {
-      "en": "failed to parse `{ulid}` as a valid ULID"
-    },
-    "description": {
-      "package": "pkg/store/redis",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/store:empty_filter": {
-    "translations": {
-      "en": "filter is empty"
-    },
-    "description": {
-      "package": "pkg/store",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/store:inconsistent_store": {
-    "translations": {
-      "en": "store state is inconsistent"
-    },
-    "description": {
-      "package": "pkg/store",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/store:key_exists": {
-    "translations": {
-      "en": "key {key} already exists"
-    },
-    "description": {
-      "package": "pkg/store",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/store:nil_key": {
-    "translations": {
-      "en": "nil key specified"
-    },
-    "description": {
-      "package": "pkg/store",
-      "file": "errors.go"
     }
   },
   "error:pkg/ttnpb/udp:bandwidth": {
@@ -3219,33 +3039,6 @@
     "description": {
       "package": "pkg/validate",
       "file": "lorawan.go"
-    }
-  },
-  "event:device.create": {
-    "translations": {
-      "en": "Create Device"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "observability.go"
-    }
-  },
-  "event:device.delete": {
-    "translations": {
-      "en": "Delete Device"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "observability.go"
-    }
-  },
-  "event:device.update": {
-    "translations": {
-      "en": "Update Device"
-    },
-    "description": {
-      "package": "pkg/deviceregistry",
-      "file": "observability.go"
     }
   },
   "event:gs.down.send": {
