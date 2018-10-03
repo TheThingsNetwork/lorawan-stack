@@ -2062,7 +2062,7 @@ func HandleJoinTest() func(t *testing.T) {
 						JoinEUI: &JoinEUI,
 					},
 					NetID:              ns.NetID,
-					SelectedMacVersion: tc.Device.LoRaWANVersion,
+					SelectedMACVersion: tc.Device.LoRaWANVersion,
 					RxDelay:            tc.Device.MACState.DesiredParameters.Rx1Delay,
 					CFList:             nil,
 					DownlinkSettings: ttnpb.DLSettings{

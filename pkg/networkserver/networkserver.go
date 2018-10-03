@@ -1145,7 +1145,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			DevAddr: &devAddr,
 		},
 		NetID:              ns.NetID,
-		SelectedMacVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
+		SelectedMACVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
 		RxDelay:            dev.MACState.DesiredParameters.Rx1Delay,
 		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
 		DownlinkSettings: ttnpb.DLSettings{

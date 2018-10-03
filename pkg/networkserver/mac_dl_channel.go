@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtMacDLChannelAccept = events.Define("ns.mac.dl_channel.accept", "device accepted downlink channel request")
-	evtMacDLChannelReject = events.Define("ns.mac.dl_channel.reject", "device rejected downlink channel request")
+	evtMACDLChannelAccept = events.Define("ns.mac.dl_channel.accept", "device accepted downlink channel request")
+	evtMACDLChannelReject = events.Define("ns.mac.dl_channel.reject", "device rejected downlink channel request")
 )
 
 func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
@@ -49,7 +49,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		if !pld.ChannelIndexAck && !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtMacDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
+			events.Publish(evtMACDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
 
@@ -60,7 +60,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		}
 		dev.MACState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 
-		events.Publish(evtMacDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
+		events.Publish(evtMACDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

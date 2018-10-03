@@ -70,13 +70,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	supported := false
 	for _, ver := range supportedMACVersions {
-		if req.SelectedMacVersion == ver {
+		if req.SelectedMACVersion == ver {
 			supported = true
 			break
 		}
 	}
 	if !supported {
-		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMacVersion)
+		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMACVersion)
 	}
 
 	if req.EndDeviceIdentifiers.DevAddr == nil {
@@ -140,8 +140,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 
 		// Registered version is lower than selected.
-		if dev.LoRaWANVersion.Compare(req.SelectedMacVersion) == -1 {
-			return nil, errMACVersionMismatch.WithAttributes("registered", dev.LoRaWANVersion, "selected", req.SelectedMacVersion)
+		if dev.LoRaWANVersion.Compare(req.SelectedMACVersion) == -1 {
+			return nil, errMACVersionMismatch.WithAttributes("registered", dev.LoRaWANVersion, "selected", req.SelectedMACVersion)
 		}
 
 		var b []byte
@@ -216,7 +216,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			return nil, errGenerateSessionKeyID
 		}
 
-		switch req.SelectedMacVersion {
+		switch req.SelectedMACVersion {
 		case ttnpb.MAC_V1_1:
 			if dev.RootKeys.NwkKey == nil || len(dev.RootKeys.NwkKey.Key) == 0 {
 				return nil, errNoNwkKey

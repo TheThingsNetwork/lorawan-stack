@@ -268,7 +268,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42ffff,
 			[]uint32{0, 42, 0x2441, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMACVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -380,7 +380,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{0, 42, 0x2441, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMACVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -433,7 +433,7 @@ func TestHandleJoin(t *testing.T) {
 			1,
 			[]uint32{23, 41, 42, 52, 0},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0_2,
+				SelectedMACVersion: ttnpb.MAC_V1_0_2,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -525,7 +525,7 @@ func TestHandleJoin(t *testing.T) {
 			1,
 			[]uint32{23, 41, 42, 52, 0},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0_1,
+				SelectedMACVersion: ttnpb.MAC_V1_0_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -617,7 +617,7 @@ func TestHandleJoin(t *testing.T) {
 			1,
 			[]uint32{23, 41, 42, 52, 0},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -709,7 +709,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42ffff,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -801,7 +801,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -855,7 +855,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -894,7 +894,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -939,7 +939,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -985,7 +985,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -1035,7 +1035,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
 				},
@@ -1077,7 +1077,7 @@ func TestHandleJoin(t *testing.T) {
 			0x42fffe,
 			[]uint32{23, 41, 42, 52, 0x2442},
 			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMACVersion: ttnpb.MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
