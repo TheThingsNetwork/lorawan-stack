@@ -24,6 +24,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -42,22 +46,27 @@ type Event interface {
 func local(evt Event) *event {
 	localEvent, ok := evt.(*event)
 	if !ok {
-		localEvent = &event{innerEvent: innerEvent{
-			ctx:            evt.Context(),
-			Name:           evt.Name(),
-			Time:           evt.Time(),
-			Identifiers:    evt.Identifiers(),
-			Data:           evt.Data(),
-			CorrelationIDs: evt.CorrelationIDs(),
-			Origin:         evt.Origin(),
-			Caller:         evt.Caller(),
-		}}
+		localEvent = &event{
+			ctx: evt.Context(),
+			innerEvent: ttnpb.Event{
+				Name:           evt.Name(),
+				Time:           evt.Time(),
+				Identifiers:    evt.Identifiers(),
+				CorrelationIDs: evt.CorrelationIDs(),
+				Origin:         evt.Origin(),
+			},
+			data:   evt.Data(),
+			caller: evt.Caller(),
+		}
 	}
 	return localEvent
 }
 
 type event struct {
-	innerEvent
+	ctx        context.Context
+	innerEvent ttnpb.Event
+	data       interface{}
+	caller     string
 }
 
 // IncludeCaller indicates whether the caller of Publish should be included in the event
@@ -66,14 +75,14 @@ var IncludeCaller bool
 // withCaller returns an event with the Caller field populated, if configured to do so.
 // If the original event already had a non-empty Caller, the original event is returned.
 func (e *event) withCaller() *event {
-	if IncludeCaller && e.innerEvent.Caller == "" {
+	if IncludeCaller && e.caller == "" {
 		if _, file, line, ok := runtime.Caller(2); ok {
 			split := strings.SplitAfter(file, "lorawan-stack/")
 			if len(split) > 1 {
 				file = split[1]
 			}
 			clone := *e
-			clone.innerEvent.Caller = fmt.Sprintf("%s:%d", file, line)
+			clone.caller = fmt.Sprintf("%s:%d", file, line)
 			return &clone
 		}
 	}
@@ -81,43 +90,36 @@ func (e *event) withCaller() *event {
 }
 
 func (e event) MarshalJSON() ([]byte, error) {
-	var err error
-	e.innerEvent.Context, err = marshalContext(e.innerEvent.ctx)
+	pb, err := Proto(e)
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(e.innerEvent)
+	return jsonpb.TTN().Marshal(pb)
 }
 
 func (e *event) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &e.innerEvent)
+	var pb ttnpb.Event
+	err := jsonpb.TTN().Unmarshal(data, &pb)
 	if err != nil {
 		return err
 	}
-	e.innerEvent.ctx, err = unmarshalContext(e.innerEvent.ctx, e.innerEvent.Context)
-	return err
+	fromProto, err := FromProto(&pb)
+	if err != nil {
+		return err
+	}
+	evt := fromProto.(*event)
+	*e = *evt
+	return nil
 }
 
-type innerEvent struct {
-	ctx            context.Context
-	Context        map[string][]byte          `json:"context,omitempty"`
-	Name           string                     `json:"name"`
-	Time           time.Time                  `json:"time"`
-	Identifiers    *ttnpb.CombinedIdentifiers `json:"identifiers,omitempty"`
-	Data           interface{}                `json:"data,omitempty"`
-	CorrelationIDs []string                   `json:"correlation_ids,omitempty"`
-	Origin         string                     `json:"origin,omitempty"`
-	Caller         string                     `json:"caller,omitempty"` // for debugging
-}
-
-func (e event) Context() context.Context                { return e.innerEvent.ctx }
+func (e event) Context() context.Context                { return e.ctx }
 func (e event) Name() string                            { return e.innerEvent.Name }
 func (e event) Time() time.Time                         { return e.innerEvent.Time }
 func (e event) Identifiers() *ttnpb.CombinedIdentifiers { return e.innerEvent.Identifiers }
-func (e event) Data() interface{}                       { return e.innerEvent.Data }
+func (e event) Data() interface{}                       { return e.data }
 func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIDs }
 func (e event) Origin() string                          { return e.innerEvent.Origin }
-func (e event) Caller() string                          { return e.innerEvent.Caller }
+func (e event) Caller() string                          { return e.caller }
 
 var hostname string
 
@@ -132,14 +134,14 @@ func init() {
 // Event data will in most cases be marshaled to JSON, but ideally is a proto message.
 func New(ctx context.Context, name string, identifiers ttnpb.Identifiers, data interface{}) Event {
 	evt := &event{
-		innerEvent: innerEvent{
-			ctx:            ctx,
+		ctx: ctx,
+		innerEvent: ttnpb.Event{
 			Name:           name,
 			Time:           time.Now().UTC(),
-			Data:           data,
 			Origin:         hostname,
 			CorrelationIDs: CorrelationIDsFromContext(ctx),
 		},
+		data: data,
 	}
 	if data, ok := data.(interface{ GetCorrelationIDs() []string }); ok {
 		evt.innerEvent.CorrelationIDs = append(evt.innerEvent.CorrelationIDs, data.GetCorrelationIDs()...)
@@ -150,10 +152,68 @@ func New(ctx context.Context, name string, identifiers ttnpb.Identifiers, data i
 	return evt
 }
 
+// Proto returns the protobuf representation of the event.
+func Proto(e Event) (*ttnpb.Event, error) {
+	evt := local(e)
+	pb := evt.innerEvent
+	ctx, err := marshalContext(e.Context())
+	if err != nil {
+		return nil, err
+	}
+	pb.Context = ctx
+	if evt.data != nil {
+		var err error
+		if protoMessage, ok := evt.data.(proto.Message); ok {
+			pb.Data, err = types.MarshalAny(protoMessage)
+		} else {
+			value, err := gogoproto.Value(evt.data)
+			if err != nil {
+				return nil, err
+			}
+			pb.Data, err = types.MarshalAny(value)
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &pb, nil
+}
+
+// FromProto returns the event from its protobuf representation.
+func FromProto(pb *ttnpb.Event) (Event, error) {
+	ctx, err := unmarshalContext(context.Background(), pb.Context)
+	if err != nil {
+		return nil, err
+	}
+	evt := &event{
+		ctx:        ctx,
+		innerEvent: *pb,
+	}
+	if evt.innerEvent.Data != nil {
+		any, err := types.EmptyAny(evt.innerEvent.Data)
+		if err != nil {
+			return nil, err
+		}
+		err = types.UnmarshalAny(evt.innerEvent.Data, any)
+		if err != nil {
+			return nil, err
+		}
+		evt.data = any
+		if value, ok := evt.data.(*types.Value); ok {
+			evt.data, err = gogoproto.Interface(value)
+			if err != nil {
+				return nil, err
+			}
+		}
+		evt.innerEvent.Data = nil
+	}
+	return evt, nil
+}
+
 // UnmarshalJSON unmarshals an event as JSON.
 func UnmarshalJSON(data []byte) (Event, error) {
 	e := new(event)
-	err := json.Unmarshal(data, &e)
+	err := json.Unmarshal(data, e)
 	if err != nil {
 		return nil, err
 	}
