@@ -28,14 +28,10 @@ var (
 )
 
 func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice) {
-	if dev.LastStatusReceivedAt == nil ||
-		dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
-		dev.MACSettings.StatusTimePeriodicity > 0 && dev.LastStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).Before(time.Now()) {
+	if dev.LastDevStatusReceivedAt == nil ||
+		dev.MACSettings.StatusCountPeriodicity > 0 && dev.MACState.LastDevStatusFCntUp+dev.MACSettings.StatusCountPeriodicity <= dev.Session.LastFCntUp ||
+		dev.MACSettings.StatusTimePeriodicity > 0 && dev.LastDevStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).Before(time.Now()) {
 		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, ttnpb.CID_DEV_STATUS.MACCommand())
-		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
-
-	} else if dev.NextStatusAfter != 0 {
-		dev.NextStatusAfter--
 	}
 }
 
@@ -57,7 +53,8 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 			dev.BatteryPercentage = float32(pld.Battery-2) / 253
 		}
 		dev.DownlinkMargin = pld.Margin
-		dev.LastStatusReceivedAt = &recvAt
+		dev.LastDevStatusReceivedAt = &recvAt
+		dev.MACState.LastDevStatusFCntUp = dev.Session.LastFCntUp
 
 		events.Publish(evtMACDeviceStatus(ctx, dev.EndDeviceIdentifiers, pld))
 		return nil

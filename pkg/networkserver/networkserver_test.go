@@ -769,9 +769,9 @@ func HandleUplinkTest() func(t *testing.T) {
 		for _, tc := range []struct {
 			Name string
 
-			Device         *ttnpb.EndDevice
-			NextNextFCntUp uint32
-			UplinkMessage  *ttnpb.UplinkMessage
+			Device        *ttnpb.EndDevice
+			NextFCntUp    uint32
+			UplinkMessage *ttnpb.UplinkMessage
 		}{
 			{
 				"1.0/unconfirmed",
@@ -807,7 +807,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
-						NextFCntUp: 0x42,
+						LastFCntUp: 0x41,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: FNwkSIntKey[:],
@@ -818,7 +818,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
@@ -871,7 +871,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
-						NextFCntUp: 0x42424249,
+						LastFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: FNwkSIntKey[:],
@@ -882,7 +882,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
@@ -935,7 +935,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
-						NextFCntUp: 0x42,
+						LastFCntUp: 0x41,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: FNwkSIntKey[:],
@@ -951,7 +951,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						ttnpb.NewPopulatedDownlinkMessage(test.Randy, false),
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
@@ -1005,7 +1005,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
-						NextFCntUp: 0x42424249,
+						LastFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: FNwkSIntKey[:],
@@ -1021,7 +1021,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						ttnpb.NewPopulatedDownlinkMessage(test.Randy, false),
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
@@ -1073,7 +1073,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
-						NextFCntUp: 0x42,
+						LastFCntUp: 0x41,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: FNwkSIntKey[:],
@@ -1087,7 +1087,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
@@ -1142,7 +1142,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:          DevAddr,
-						NextFCntUp:       0x42,
+						LastFCntUp:       0x41,
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -1167,7 +1167,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						}(),
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
@@ -1222,7 +1222,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
-						NextFCntUp: 0x42424249,
+						LastFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: FNwkSIntKey[:],
@@ -1236,7 +1236,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
@@ -1292,7 +1292,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:          DevAddr,
-						NextFCntUp:       0x42424249,
+						LastFCntUp:       0x42424249,
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -1316,7 +1316,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						}(),
 					},
 				},
-				0x43,
+				0x42,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
@@ -1362,7 +1362,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					}
 				}
 
-				ctx := context.WithValue(authorizedCtx, "answer", 42)
+				ctx := context.WithValue(authorizedCtx, struct{}{}, 42)
 				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				// Fill DeviceRegistry with devices
@@ -1500,7 +1500,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 						CorrelationIDs:       asUpReq.up.CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-							FCnt:         tc.NextNextFCntUp - 1,
+							FCnt:         tc.NextFCntUp,
 							FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
 							FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 							RxMetadata:   asUpReq.up.GetUplinkMessage().RxMetadata,
@@ -1529,7 +1529,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						t.FailNow()
 					}
 
-					pb.Session.NextFCntUp = tc.NextNextFCntUp
+					pb.Session.LastFCntUp = tc.NextFCntUp
 					pb.SessionFallback = nil
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
@@ -1676,7 +1676,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 							CorrelationIDs:       asUpReq.up.CorrelationIDs,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-								FCnt:         tc.NextNextFCntUp - 1,
+								FCnt:         tc.NextFCntUp,
 								FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
 								FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 								RxMetadata:   asUpReq.up.GetUplinkMessage().RxMetadata,
@@ -2072,7 +2072,7 @@ func HandleJoinTest() func(t *testing.T) {
 					},
 				}
 
-				ctx := context.WithValue(authorizedCtx, "answer", 42)
+				ctx := context.WithValue(authorizedCtx, struct{}{}, 42)
 				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()

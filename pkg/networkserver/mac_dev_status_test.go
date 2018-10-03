@@ -63,7 +63,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 		{
 			Name: "battery 42/margin 4",
 			Device: &ttnpb.EndDevice{
+				Session: &ttnpb.Session{
+					LastFCntUp: 43,
+				},
 				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
@@ -72,9 +76,13 @@ func TestHandleDevStatusAns(t *testing.T) {
 				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
 			},
 			Expected: &ttnpb.EndDevice{
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				Session: &ttnpb.Session{
+					LastFCntUp: 43,
+				},
 				MACState: &ttnpb.MACState{
-					PendingRequests: []*ttnpb.MACCommand{},
+					LastDevStatusFCntUp: 43,
+					PendingRequests:     []*ttnpb.MACCommand{},
 				},
 				BatteryPercentage: float32(42-2) / float32(253),
 				DownlinkMargin:    4,
@@ -90,7 +98,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 		{
 			Name: "external power/margin 20",
 			Device: &ttnpb.EndDevice{
+				Session: &ttnpb.Session{
+					LastFCntUp: 43,
+				},
 				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
@@ -99,9 +111,13 @@ func TestHandleDevStatusAns(t *testing.T) {
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				Session: &ttnpb.Session{
+					LastFCntUp: 43,
+				},
 				MACState: &ttnpb.MACState{
-					PendingRequests: []*ttnpb.MACCommand{},
+					LastDevStatusFCntUp: 43,
+					PendingRequests:     []*ttnpb.MACCommand{},
 				},
 				BatteryPercentage: -1,
 				DownlinkMargin:    20,
@@ -117,7 +133,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 		{
 			Name: "unknown power/margin -5",
 			Device: &ttnpb.EndDevice{
+				Session: &ttnpb.Session{
+					LastFCntUp: 43,
+				},
 				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
@@ -126,9 +146,13 @@ func TestHandleDevStatusAns(t *testing.T) {
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				Session: &ttnpb.Session{
+					LastFCntUp: 43,
+				},
 				MACState: &ttnpb.MACState{
-					PendingRequests: []*ttnpb.MACCommand{},
+					LastDevStatusFCntUp: 43,
+					PendingRequests:     []*ttnpb.MACCommand{},
 				},
 				BatteryPercentage: -1,
 				DownlinkMargin:    -5,

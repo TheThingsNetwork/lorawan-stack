@@ -41,8 +41,10 @@ const (
 )
 
 var (
-	ResetMACState     = resetMACState
-	GenerateDownlink  = generateDownlink
+	ResetMACState    = resetMACState
+	GenerateDownlink = generateDownlink
+	TimePtr          = timePtr
+
 	ErrNoDownlink     = errNoDownlink
 	ErrDeviceNotFound = errDeviceNotFound
 
@@ -86,10 +88,6 @@ func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
 
 func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
-}
-
-func timePtr(t time.Time) *time.Time {
-	return &t
 }
 
 func SetAppQueueUpdateTimeout(d time.Duration) {
@@ -630,8 +628,8 @@ func TestGenerateDownlink(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				Session:              ttnpb.NewPopulatedSession(test.Randy, false),
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
 			Ack:        false,
 			ConfFCnt:   0,
@@ -648,18 +646,18 @@ func TestGenerateDownlink(t *testing.T) {
 					StatusCountPeriodicity: 3,
 				},
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:      ttnpb.MAC_V1_1,
+					LastDevStatusFCntUp: 2,
 				},
-				NextStatusAfter:      1,
-				Session:              ttnpb.NewPopulatedSession(test.Randy, false),
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				Session: &ttnpb.Session{
+					LastFCntUp: 4,
+				},
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
-			Ack:   false,
-			Bytes: nil,
-			Error: errNoDownlink,
-			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.NextStatusAfter--
-			},
+			Ack:        false,
+			Bytes:      nil,
+			Error:      errNoDownlink,
+			DeviceDiff: nil,
 		},
 		{
 			Name:    "1.1/no app downlink/status after an hour/no ack",
@@ -672,8 +670,8 @@ func TestGenerateDownlink(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				LastStatusReceivedAt: timePtr(time.Now()),
-				Session:              ttnpb.NewPopulatedSession(test.Randy, false),
+				LastDevStatusReceivedAt: TimePtr(time.Now()),
+				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
 			},
 			Ack:        false,
 			ConfFCnt:   0,
@@ -693,7 +691,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
-					NextNFCntDown: 42,
+					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -703,7 +701,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 				},
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
 			Ack:      true,
 			ConfFCnt: 24,
@@ -727,7 +725,7 @@ func TestGenerateDownlink(t *testing.T) {
 			}, ttnpb.MAC_V1_1, 24),
 			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.Session.NextNFCntDown++
+				dev.Session.LastNFCntDown++
 			},
 		},
 		{
@@ -759,7 +757,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
 			Ack:      false,
 			ConfFCnt: 0,
@@ -817,7 +815,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
 			Ack:      true,
 			ConfFCnt: 24,
@@ -875,7 +873,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
 			Ack:      false,
 			ConfFCnt: 0,
@@ -934,7 +932,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 			},
 			Ack:      true,
 			ConfFCnt: 24,
@@ -975,10 +973,12 @@ func TestGenerateDownlink(t *testing.T) {
 					StatusCountPeriodicity: 3,
 				},
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LastDevStatusFCntUp: 4,
+					LoRaWANVersion:      ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
-					NextNFCntDown: 42,
+					LastFCntUp:    99,
+					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -988,7 +988,6 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 				},
-				NextStatusAfter: 0,
 			},
 			Ack:      false,
 			ConfFCnt: 0,
@@ -1018,8 +1017,7 @@ func TestGenerateDownlink(t *testing.T) {
 				dev.MACState.PendingRequests = []*ttnpb.MACCommand{
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				}
-				dev.Session.NextNFCntDown++
-				dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
+				dev.Session.LastNFCntDown++
 			},
 		},
 		{
@@ -1036,7 +1034,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
-					NextNFCntDown: 42,
+					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -1075,7 +1073,7 @@ func TestGenerateDownlink(t *testing.T) {
 				dev.MACState.PendingRequests = []*ttnpb.MACCommand{
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				}
-				dev.Session.NextNFCntDown++
+				dev.Session.LastNFCntDown++
 			},
 		},
 	} {

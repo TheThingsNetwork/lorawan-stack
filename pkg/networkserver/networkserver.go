@@ -69,6 +69,10 @@ var (
 	appQueueUpdateTimeout = 200 * time.Millisecond
 )
 
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
+
 func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	fp, err := fps.GetByID(dev.FrequencyPlanID)
 	if err != nil {
@@ -308,7 +312,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 			FCtrl: ttnpb.FCtrl{
 				Ack: ack,
 			},
-			FCnt: dev.Session.NextNFCntDown,
+			FCnt: dev.Session.LastNFCntDown + 1,
 		},
 	}
 
@@ -347,7 +351,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	if pld.FPort == 0 {
 		pld.FRMPayload = cmdBuf
-		dev.Session.NextNFCntDown++
+		dev.Session.LastNFCntDown++
 	} else {
 		// TODO: Ensure that maxPayloadSize of the data rate is not exceeded. (https://github.com/TheThingsIndustries/lorawan-stack/issues/995)
 		pld.FHDR.FOpts = cmdBuf
@@ -361,12 +365,11 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
 		break
 
-	case dev.MACState.NextConfirmedDownlinkAt.After(time.Now()):
+	case dev.MACState.LastConfirmedDownlinkAt.Add(classCTimeout).After(time.Now()):
 		return nil, errScheduleTooSoon
 
 	default:
-		t := time.Now().Add(classCTimeout).UTC()
-		dev.MACState.NextConfirmedDownlinkAt = &t
+		dev.MACState.LastConfirmedDownlinkAt = timePtr(time.Now().UTC())
 	}
 
 	b, err = (ttnpb.Message{
@@ -624,7 +627,7 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.Uplink
 
 // matchDevice tries to match the uplink message with a device.
 // If the uplink message matches a fallback session, that fallback session is recovered.
-// If successful, the FCnt in the uplink message is set to the full FCnt. The NextFCntUp in the session is updated accordingly.
+// If successful, the FCnt in the uplink message is set to the full FCnt. The LastFCntUp in the session is updated accordingly.
 func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessage) (*ttnpb.EndDevice, error) {
 	pld := up.Payload.GetMACPayload()
 
@@ -659,20 +662,20 @@ outer:
 		fCnt := pld.FCnt
 
 		switch {
-		case !dev.Uses32BitFCnt, fCnt >= dev.Session.NextFCntUp:
-		case fCnt > dev.Session.NextFCntUp&0xffff:
-			fCnt |= dev.Session.NextFCntUp &^ 0xffff
-		case dev.Session.NextFCntUp < 0xffff<<16:
-			fCnt |= (dev.Session.NextFCntUp + 1<<16) &^ 0xffff
+		case !dev.Uses32BitFCnt, fCnt > dev.Session.LastFCntUp:
+		case fCnt > dev.Session.LastFCntUp&0xffff:
+			fCnt |= dev.Session.LastFCntUp &^ 0xffff
+		case dev.Session.LastFCntUp < 0xffff0000:
+			fCnt |= (dev.Session.LastFCntUp + 0x10000) &^ 0xffff
 		}
 
 		gap := uint32(math.MaxUint32)
 		if !dev.ResetsFCnt {
-			if dev.Session.NextFCntUp > fCnt {
+			if fCnt <= dev.Session.LastFCntUp {
 				continue outer
 			}
 
-			gap = fCnt - dev.Session.NextFCntUp
+			gap = fCnt - dev.Session.LastFCntUp
 
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
@@ -797,7 +800,7 @@ outer:
 		if dev.fCnt == math.MaxUint32 {
 			return nil, errFCntTooHigh
 		}
-		dev.Session.NextFCntUp = dev.fCnt + 1
+		dev.Session.LastFCntUp = dev.fCnt
 		return dev.EndDevice, nil
 	}
 	return nil, errDeviceNotFound
@@ -905,10 +908,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			handleErr = true
 			return nil, errOutdatedData
 		}
-		if stored.GetSession().GetNextFCntUp() > dev.Session.NextFCntUp && !stored.ResetsFCnt {
+		if stored.GetSession().GetLastFCntUp() > dev.Session.LastFCntUp && !stored.ResetsFCnt {
 			logger.WithFields(log.Fields(
-				"stored_f_cnt", stored.GetSession().GetNextFCntUp()-1,
-				"got_f_cnt", dev.Session.NextFCntUp-1,
+				"stored_f_cnt", stored.GetSession().GetLastFCntUp(),
+				"got_f_cnt", dev.Session.LastFCntUp,
 			)).Warn("A more recent uplink was received by device during uplink handling, dropping...")
 			handleErr = true
 			return nil, errOutdatedData
@@ -1082,7 +1085,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			FCnt:         dev.Session.NextFCntUp - 1,
+			FCnt:         dev.Session.LastFCntUp,
 			FPort:        pld.FPort,
 			FRMPayload:   pld.FRMPayload,
 			RxMetadata:   up.RxMetadata,
