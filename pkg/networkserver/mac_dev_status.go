@@ -33,9 +33,18 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
-		// TODO: Modify status variables in MACState (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = pld.Battery
-		_ = pld.Margin
+		switch pld.Battery {
+		case 0:
+			dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
+			dev.BatteryPercentage = -1
+		case 255:
+			dev.PowerState = ttnpb.PowerState_POWER_UNKNOWN
+			dev.BatteryPercentage = -1
+		default:
+			dev.PowerState = ttnpb.PowerState_POWER_BATTERY
+			dev.BatteryPercentage = float32(pld.Battery-2) / 253
+		}
+		dev.DownlinkMargin = pld.Margin
 		dev.LastStatusReceivedAt = &recvAt
 
 		events.Publish(evtMACDeviceStatus(ctx, dev.EndDeviceIdentifiers, pld))

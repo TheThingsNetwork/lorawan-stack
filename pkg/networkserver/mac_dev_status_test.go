@@ -61,24 +61,82 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Error:      errMACRequestNotFound,
 		},
 		{
-			Name: "battery 42, margin 4",
+			Name: "battery 42/margin 4",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
 				},
+				BatteryPercentage: 44,
+				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
 			},
 			Expected: &ttnpb.EndDevice{
 				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					// TODO: Modify status variables (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
+				BatteryPercentage: float32(42-2) / float32(253),
+				DownlinkMargin:    4,
+				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Payload: &ttnpb.MACCommand_DevStatusAns{
 				Battery: 42,
 				Margin:  4,
+			},
+			ReceivedAt:     time.Unix(42, 0),
+			ExpectedEvents: 1,
+		},
+		{
+			Name: "external power/margin 20",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						ttnpb.CID_DEV_STATUS.MACCommand(),
+					},
+				},
+				BatteryPercentage: 44,
+				PowerState:        ttnpb.PowerState_POWER_BATTERY,
+			},
+			Expected: &ttnpb.EndDevice{
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+				},
+				BatteryPercentage: -1,
+				DownlinkMargin:    20,
+				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
+			},
+			Payload: &ttnpb.MACCommand_DevStatusAns{
+				Battery: 0,
+				Margin:  20,
+			},
+			ReceivedAt:     time.Unix(42, 0),
+			ExpectedEvents: 1,
+		},
+		{
+			Name: "unknown power/margin -5",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						ttnpb.CID_DEV_STATUS.MACCommand(),
+					},
+				},
+				BatteryPercentage: 44,
+				PowerState:        ttnpb.PowerState_POWER_BATTERY,
+			},
+			Expected: &ttnpb.EndDevice{
+				LastStatusReceivedAt: timePtr(time.Unix(42, 0)),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+				},
+				BatteryPercentage: -1,
+				DownlinkMargin:    -5,
+				PowerState:        ttnpb.PowerState_POWER_UNKNOWN,
+			},
+			Payload: &ttnpb.MACCommand_DevStatusAns{
+				Battery: 255,
+				Margin:  -5,
 			},
 			ReceivedAt:     time.Unix(42, 0),
 			ExpectedEvents: 1,
