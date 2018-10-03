@@ -184,6 +184,7 @@ func (f *identifierFilter) Notify(evt Event) {
 	}
 	for _, id := range ids.DeviceIDs {
 		matched = append(matched, f.deviceIDs[unique.ID(evt.Context(), id)]...)
+		matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), id.ApplicationIdentifiers)]...)
 	}
 	for _, id := range ids.GatewayIDs {
 		matched = append(matched, f.gatewayIDs[unique.ID(evt.Context(), id)]...)
