@@ -121,20 +121,18 @@ func TestHandleJoin(t *testing.T) {
 
 		Device *ttnpb.EndDevice
 
-		NextNextDevNonce  uint32
-		NextNextJoinNonce uint32
+		NextLastDevNonce  uint32
+		NextLastJoinNonce uint32
 		NextUsedDevNonces []uint32
 
 		JoinRequest  *ttnpb.JoinRequest
 		JoinResponse *ttnpb.JoinResponse
 
-		ValidErr func(error) bool
+		ValidError func(error) bool
 	}{
 		{
-			"1.1 new device",
-			&ttnpb.EndDevice{
-				NextDevNonce:  0,
-				NextJoinNonce: 0,
+			Name: "1.1.0/new device",
+			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -152,11 +150,10 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
-			1,
-			1,
-			[]uint32{0},
-			&ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+			NextLastDevNonce:  0,
+			NextLastJoinNonce: 1,
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMACVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -184,13 +181,13 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			&ttnpb.JoinResponse{
+			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
 					0x20},
 					mustEncryptJoinAccept(nwkKey, []byte{
 						/* JoinNonce */
-						0x00, 0x00, 0x00,
+						0x01, 0x00, 0x00,
 						/* NetID */
 						0xff, 0xff, 0x42,
 						/* DevAddr */
@@ -201,13 +198,13 @@ func TestHandleJoin(t *testing.T) {
 						0x42,
 
 						/* MIC */
-						0x16, 0x41, 0x9f, 0x29,
+						0xeb, 0xcd, 0x74, 0x59,
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveAppSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 						KEKLabel: "",
@@ -215,7 +212,7 @@ func TestHandleJoin(t *testing.T) {
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveSNwkSIntKey(
 							nwkKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 						KEKLabel: "",
@@ -223,7 +220,7 @@ func TestHandleJoin(t *testing.T) {
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveFNwkSIntKey(
 							nwkKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 						KEKLabel: "",
@@ -231,7 +228,7 @@ func TestHandleJoin(t *testing.T) {
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveNwkSEncKey(
 							nwkKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 						KEKLabel: "",
@@ -239,14 +236,12 @@ func TestHandleJoin(t *testing.T) {
 				},
 				Lifetime: 0,
 			},
-			nil,
 		},
 		{
-			"1.1 existing device",
-			&ttnpb.EndDevice{
-				NextDevNonce:  0x2442,
-				UsedDevNonces: []uint32{0, 42, 0x2441},
-				NextJoinNonce: 0x42fffe,
+			Name: "1.1.0/existing device",
+			Device: &ttnpb.EndDevice{
+				LastDevNonce:  0x2441,
+				LastJoinNonce: 0x42fffd,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -264,10 +259,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
-			0x2443,
-			0x42ffff,
-			[]uint32{0, 42, 0x2441, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastDevNonce:  0x2442,
+			NextLastJoinNonce: 0x42fffe,
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
@@ -296,7 +290,7 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			&ttnpb.JoinResponse{
+			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
 					0x20},
@@ -351,14 +345,13 @@ func TestHandleJoin(t *testing.T) {
 				},
 				Lifetime: 0,
 			},
-			nil,
+			ValidError: nil,
 		},
 		{
-			"1.1 DevNonce too small",
-			&ttnpb.EndDevice{
-				NextDevNonce:  0x2443,
-				UsedDevNonces: []uint32{0, 42, 0x2441, 0x2442},
-				NextJoinNonce: 0x42fffe,
+			Name: "1.1.0/DevNonce too small",
+			Device: &ttnpb.EndDevice{
+				LastDevNonce:  0x2442,
+				LastJoinNonce: 0x42fffd,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -376,10 +369,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
-			0x2442,
-			0x42fffe,
-			[]uint32{0, 42, 0x2441, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastDevNonce:  0x2442,
+			NextLastJoinNonce: 0x42fffd,
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
@@ -408,14 +400,12 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsInvalidArgument,
+			JoinResponse: nil,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
-			"1.0.2 new device",
-			&ttnpb.EndDevice{
-				UsedDevNonces: []uint32{23, 41, 42, 52},
-				NextJoinNonce: 0,
+			Name: "1.0.2/new device",
+			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -429,10 +419,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			1,
-			[]uint32{23, 41, 42, 52, 0},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 1,
+			NextUsedDevNonces: []uint32{1},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0_2,
 				RawPayload: []byte{
 					/* MHDR */
@@ -444,10 +433,10 @@ func TestHandleJoin(t *testing.T) {
 					/** DevEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
-					0x00, 0x00,
+					0x01, 0x00,
 
 					/* MIC */
-					0xcc, 0x15, 0x6f, 0xa,
+					0xc4, 0x8, 0x50, 0xcf,
 				},
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -462,13 +451,13 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			&ttnpb.JoinResponse{
+			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
 					0x20},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
-						0x00, 0x00, 0x00,
+						0x01, 0x00, 0x00,
 						/* NetID */
 						0xff, 0xff, 0x42,
 						/* DevAddr */
@@ -479,35 +468,33 @@ func TestHandleJoin(t *testing.T) {
 						0x42,
 
 						/* MIC */
-						0xad, 0x48, 0xaf, 0x94,
+						0xc9, 0x7a, 0x61, 0x04,
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
-							types.DevNonce{0x00, 0x00})),
+							types.DevNonce{0x00, 0x01})),
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
-							types.DevNonce{0x00, 0x00})),
+							types.DevNonce{0x00, 0x01})),
 						KEKLabel: "",
 					},
 				},
 				Lifetime: 0,
 			},
-			nil,
+			ValidError: nil,
 		},
 		{
-			"1.0.1 new device",
-			&ttnpb.EndDevice{
-				UsedDevNonces: []uint32{23, 41, 42, 52},
-				NextJoinNonce: 0,
+			Name: "1.0.1/new device",
+			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -521,10 +508,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0_1,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			1,
-			[]uint32{23, 41, 42, 52, 0},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 1,
+			NextUsedDevNonces: []uint32{1},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0_1,
 				RawPayload: []byte{
 					/* MHDR */
@@ -536,10 +522,10 @@ func TestHandleJoin(t *testing.T) {
 					/** DevEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
-					0x00, 0x00,
+					0x01, 0x00,
 
 					/* MIC */
-					0xcc, 0x15, 0x6f, 0xa,
+					0xc4, 0x8, 0x50, 0xcf,
 				},
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -554,13 +540,13 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			&ttnpb.JoinResponse{
+			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
 					0x20},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
-						0x00, 0x00, 0x00,
+						0x01, 0x00, 0x00,
 						/* NetID */
 						0xff, 0xff, 0x42,
 						/* DevAddr */
@@ -571,35 +557,33 @@ func TestHandleJoin(t *testing.T) {
 						0x42,
 
 						/* MIC */
-						0xad, 0x48, 0xaf, 0x94,
+						0xc9, 0x7a, 0x61, 0x04,
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
-							types.DevNonce{0x00, 0x00})),
+							types.DevNonce{0x00, 0x01})),
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
-							types.DevNonce{0x00, 0x00})),
+							types.DevNonce{0x00, 0x01})),
 						KEKLabel: "",
 					},
 				},
 				Lifetime: 0,
 			},
-			nil,
+			ValidError: nil,
 		},
 		{
-			"1.0 new device",
-			&ttnpb.EndDevice{
-				UsedDevNonces: []uint32{23, 41, 42, 52},
-				NextJoinNonce: 0,
+			Name: "1.0.0/new device",
+			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -613,10 +597,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			1,
-			[]uint32{23, 41, 42, 52, 0},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 1,
+			NextUsedDevNonces: []uint32{1},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
@@ -628,10 +611,10 @@ func TestHandleJoin(t *testing.T) {
 					/** DevEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
-					0x00, 0x00,
+					0x01, 0x00,
 
 					/* MIC */
-					0xcc, 0x15, 0x6f, 0xa,
+					0xc4, 0x8, 0x50, 0xcf,
 				},
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -646,13 +629,13 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			&ttnpb.JoinResponse{
+			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
 					0x20},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
-						0x00, 0x00, 0x00,
+						0x01, 0x00, 0x00,
 						/* NetID */
 						0xff, 0xff, 0x42,
 						/* DevAddr */
@@ -663,35 +646,35 @@ func TestHandleJoin(t *testing.T) {
 						0x42,
 
 						/* MIC */
-						0xad, 0x48, 0xaf, 0x94,
+						0xc9, 0x7a, 0x61, 0x04,
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
-							types.DevNonce{0x00, 0x00})),
+							types.DevNonce{0x00, 0x01})),
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
 							appKey,
-							types.JoinNonce{0x00, 0x00, 0x00},
+							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
-							types.DevNonce{0x00, 0x00})),
+							types.DevNonce{0x00, 0x01})),
 						KEKLabel: "",
 					},
 				},
 				Lifetime: 0,
 			},
-			nil,
+			ValidError: nil,
 		},
 		{
-			"1.0 existing device",
-			&ttnpb.EndDevice{
-				UsedDevNonces: []uint32{23, 41, 42, 52},
-				NextJoinNonce: 0x42fffe,
+			Name: "1.0.0/existing device",
+			Device: &ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2444},
+				LastJoinNonce: 0x42fffd,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -705,10 +688,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42ffff,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
@@ -738,7 +720,7 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			&ttnpb.JoinResponse{
+			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
 					0x20},
@@ -777,13 +759,13 @@ func TestHandleJoin(t *testing.T) {
 				},
 				Lifetime: 0,
 			},
-			nil,
+			ValidError: nil,
 		},
 		{
-			"1.0 repeated DevNonce",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/repeated DevNonce",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -797,10 +779,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
@@ -830,14 +811,14 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsInvalidArgument,
+			JoinResponse: nil,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
-			"1.0 no payload",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/no payload",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -851,10 +832,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -869,14 +849,14 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsDataLoss,
+			JoinResponse: nil,
+			ValidError:   errors.IsDataLoss,
 		},
 		{
-			"1.0 not a join request payload",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/not a join request payload",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -890,10 +870,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -914,14 +893,14 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsDataLoss,
+			JoinResponse: nil,
+			ValidError:   errors.IsDataLoss,
 		},
 		{
-			"1.0 unsupported lorawan version",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/unsupported LoRaWAN version",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -935,10 +914,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -960,14 +938,14 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsInvalidArgument,
+			JoinResponse: nil,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
-			"1.0 no joineui",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/no JoinEUI",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -981,10 +959,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1010,14 +987,14 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsDataLoss,
+			JoinResponse: nil,
+			ValidError:   errors.IsDataLoss,
 		},
 		{
-			"1.0 raw payload that can't be unmarshalled",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/raw payload that can't be unmarshalled",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1031,10 +1008,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -1052,14 +1028,14 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsInvalidArgument,
+			JoinResponse: nil,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
-			"1.0 invalid mtype",
-			&ttnpb.EndDevice{
+			Name: "1.0.0/invalid MType",
+			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
-				NextJoinNonce: 0x42fffe,
+				LastJoinNonce: 0x42fffe,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1073,10 +1049,9 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
-			0,
-			0x42fffe,
-			[]uint32{23, 41, 42, 52, 0x2442},
-			&ttnpb.JoinRequest{
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
@@ -1102,8 +1077,8 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 				CFList:  nil,
 			},
-			nil,
-			errors.IsInvalidArgument,
+			JoinResponse: nil,
+			ValidError:   errors.IsInvalidArgument,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1135,18 +1110,18 @@ func TestHandleJoin(t *testing.T) {
 
 			start := time.Now()
 			resp, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
-			if tc.ValidErr != nil {
-				if !a.So(err, should.BeError) || !a.So(tc.ValidErr(err), should.BeTrue) {
+			if tc.ValidError != nil {
+				if !a.So(err, should.BeError) || !a.So(tc.ValidError(err), should.BeTrue) {
 					t.Fatalf("Received an unexpected error: %s", err)
 				}
 				a.So(resp, should.BeNil)
 				return
 			}
 
-			expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
 			if !a.So(err, should.BeNil) || !a.So(resp, should.NotBeNil) {
 				t.FailNow()
 			}
+			expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
 			a.So(resp.SessionKeyID, should.NotBeEmpty)
 			expectedResp.SessionKeyID = resp.SessionKeyID
 			a.So(resp, should.Resemble, expectedResp)
@@ -1158,9 +1133,12 @@ func TestHandleJoin(t *testing.T) {
 			a.So(ret.CreatedAt, should.Equal, pb.CreatedAt)
 			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
 			pb.UpdatedAt = ret.UpdatedAt
-			pb.NextDevNonce = tc.NextNextDevNonce
-			pb.NextJoinNonce = tc.NextNextJoinNonce
-			pb.UsedDevNonces = tc.NextUsedDevNonces
+			pb.LastJoinNonce = tc.NextLastJoinNonce
+			if tc.JoinRequest.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				pb.UsedDevNonces = tc.NextUsedDevNonces
+			} else {
+				pb.LastDevNonce = tc.NextLastDevNonce
+			}
 			if !a.So(ret.Session, should.NotBeNil) {
 				t.FailNow()
 			}

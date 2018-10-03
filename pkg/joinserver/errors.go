@@ -29,6 +29,7 @@ var (
 	errGenerateSessionKeyID      = errors.Define("generate_session_key_id", "failed to generate session key ID")
 	errInvalidIdentifiers        = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errInvalidRequest            = errors.DefineInvalidArgument("invalid_request", "invalid request")
+	errJoinNonceTooHigh          = errors.Define("join_nonce_too_high", "JoinNonce is too high")
 	errMACVersionMismatch        = errors.DefineInternal("mac_version_mismatch", "Device MAC version mismatch, in registry: {registered}, selected: {selected}")
 	errMICMismatch               = errors.DefineInvalidArgument("mic_mismatch", "MIC mismatch")
 	errNoAppKey                  = errors.DefineCorruption("no_app_key", "no AppKey specified")

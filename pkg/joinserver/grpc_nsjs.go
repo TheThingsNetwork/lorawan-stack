@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/binary"
 	"math"
+	"sort"
 	"time"
 
 	"github.com/oklog/ulid"
@@ -131,7 +132,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			}
 		}
 		switch {
-		case !match && dev.LoRaWANVersion == ttnpb.MAC_V1_0:
+		case !match && req.SelectedMACVersion == ttnpb.MAC_V1_0:
 			return nil, errUnknownAppEUI
 		case !match:
 			// TODO: Determine the cluster containing the device.
@@ -139,9 +140,28 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			return nil, errForwardJoinRequest
 		}
 
-		// Registered version is lower than selected.
-		if dev.LoRaWANVersion.Compare(req.SelectedMACVersion) == -1 {
-			return nil, errMACVersionMismatch.WithAttributes("registered", dev.LoRaWANVersion, "selected", req.SelectedMACVersion)
+		dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
+		switch req.SelectedMACVersion {
+		case ttnpb.MAC_V1_1:
+			if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
+				if dn <= dev.LastDevNonce {
+					return nil, errDevNonceTooSmall
+				}
+				if dn == math.MaxUint32 {
+					return nil, errDevNonceTooHigh
+				}
+			}
+			dev.LastDevNonce = dn
+		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+			i := sort.Search(len(dev.UsedDevNonces), func(i int) bool { return dev.UsedDevNonces[i] >= dn })
+			if i < len(dev.UsedDevNonces) && dev.UsedDevNonces[i] == dn {
+				return nil, errReuseDevNonce
+			}
+			dev.UsedDevNonces = append(dev.UsedDevNonces, 0)
+			copy(dev.UsedDevNonces[i+1:], dev.UsedDevNonces[i:])
+			dev.UsedDevNonces[i] = dn
+		default:
+			panic("This statement is unreachable. Fix version check.")
 		}
 
 		var b []byte
@@ -150,7 +170,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		} else {
 			b = make([]byte, 0, 33)
 		}
-
 		b, err = (&ttnpb.MHDR{
 			MType: ttnpb.MType_JOIN_ACCEPT,
 			Major: req.Payload.Major,
@@ -159,9 +178,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			return nil, errEncodePayload.WithCause(err)
 		}
 
+		if dev.LastJoinNonce >= 1<<24-1 {
+			return nil, errJoinNonceTooHigh
+		}
+		dev.LastJoinNonce++
+
 		var jn types.JoinNonce
 		nb := make([]byte, 4)
-		binary.BigEndian.PutUint32(nb, dev.NextJoinNonce)
+		binary.BigEndian.PutUint32(nb, dev.LastJoinNonce)
 		copy(jn[:], nb[1:])
 
 		b, err = (&ttnpb.JoinAcceptPayload{
@@ -173,29 +197,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			RxDelay:    req.RxDelay,
 		}).AppendLoRaWAN(b)
 		if err != nil {
-			return nil, errDecodePayload.WithCause(err)
-		}
-
-		dn := binary.BigEndian.Uint16(pld.DevNonce[:])
-		if !dev.ResetsJoinNonces {
-			switch req.SelectedMacVersion {
-			case ttnpb.MAC_V1_1:
-				if uint32(dn) < dev.NextDevNonce {
-					return nil, errDevNonceTooSmall
-				}
-				if dev.NextDevNonce == math.MaxUint32 {
-					return nil, errDevNonceTooHigh
-				}
-				dev.NextDevNonce = uint32(dn + 1)
-			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-				for _, used := range dev.UsedDevNonces {
-					if dn == uint16(used) {
-						return nil, errReuseDevNonce
-					}
-				}
-			default:
-				panic("This statement is unreachable. Fix version check.")
-			}
+			return nil, errEncodePayload.WithCause(err)
 		}
 
 		if dev.RootKeys.AppKey == nil || len(dev.RootKeys.AppKey.Key) == 0 {
@@ -307,8 +309,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			return nil, err
 		}
 
-		dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
-		dev.NextJoinNonce++
 		dev.Session = &ttnpb.Session{
 			StartedAt:   time.Now().UTC(),
 			DevAddr:     *req.EndDeviceIdentifiers.DevAddr,
