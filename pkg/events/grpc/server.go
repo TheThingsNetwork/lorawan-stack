@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -65,10 +66,39 @@ func (srv *EventsServer) Notify(evt events.Event) {
 }
 
 // Stream implements the EventsServer interface.
-func (srv *EventsServer) Stream(ids *ttnpb.CombinedIdentifiers, stream ttnpb.Events_StreamServer) error {
+func (srv *EventsServer) Stream(ids *ttnpb.CombinedIdentifiers, stream ttnpb.Events_StreamServer) (err error) {
 	ctx := stream.Context()
 
-	// TODO: permissions check.
+	for _, applicationIDs := range ids.ApplicationIDs {
+		if err = rights.RequireApplication(ctx, *applicationIDs, ttnpb.RIGHT_APPLICATION_ALL); err != nil {
+			return err
+		}
+	}
+	for _, clientIDs := range ids.ClientIDs {
+		if err = rights.RequireClient(ctx, *clientIDs, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+			return err
+		}
+	}
+	for _, deviceIDs := range ids.DeviceIDs {
+		if err = rights.RequireApplication(ctx, deviceIDs.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_ALL); err != nil {
+			return err
+		}
+	}
+	for _, gatewayIDs := range ids.GatewayIDs {
+		if err = rights.RequireGateway(ctx, *gatewayIDs, ttnpb.RIGHT_GATEWAY_ALL); err != nil {
+			return err
+		}
+	}
+	for _, organizationIDs := range ids.OrganizationIDs {
+		if err = rights.RequireOrganization(ctx, *organizationIDs, ttnpb.RIGHT_ORGANIZATION_ALL); err != nil {
+			return err
+		}
+	}
+	for _, userIDs := range ids.UserIDs {
+		if err = rights.RequireUser(ctx, *userIDs, ttnpb.RIGHT_USER_ALL); err != nil {
+			return err
+		}
+	}
 
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)
