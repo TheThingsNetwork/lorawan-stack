@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
@@ -63,8 +65,14 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 }
 
 type link struct {
-	ctx           context.Context
-	cancel        func()
+	ctx    context.Context
+	cancel func()
+
+	conn         *grpc.ClientConn
+	connName     string
+	connCallOpts []grpc.CallOption
+	connReady    chan struct{}
+
 	subscribeCh   chan *io.Connection
 	unsubscribeCh chan *io.Connection
 	upCh          chan *ttnpb.ApplicationUp
@@ -75,8 +83,39 @@ const linkBufferSize = 10
 var (
 	errAlreadyLinked = errors.DefineAlreadyExists("already_linked", "already linked to `{application_uid}`")
 	errNSNotFound    = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
-	errExternalNS    = errors.DefineFailedPrecondition("external_network_server", "link to external Network Server not supported")
 )
+
+func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink, link *link) error {
+	if target.NetworkServerAddress != "" {
+		// TODO: Add option for insecure (set in ttnpb.ApplicationLink).
+		// TODO: Needs testing.
+		options := rpcclient.DefaultDialOptions(ctx)
+		conn, err := grpc.DialContext(ctx, target.NetworkServerAddress, options...)
+		if err != nil {
+			return err
+		}
+		link.conn = conn
+		link.connName = target.NetworkServerAddress
+		link.connCallOpts = []grpc.CallOption{
+			grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:  "Key",
+				AuthValue: target.APIKey,
+			}),
+		}
+	} else {
+		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+		if ns == nil {
+			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, ids))
+		}
+		link.conn = ns.Conn()
+		link.connName = ns.Name()
+		link.connCallOpts = []grpc.CallOption{
+			as.WithClusterAuth(),
+		}
+	}
+	close(link.connReady)
+	return nil
+}
 
 func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) error {
 	uid := unique.ID(ctx, ids)
@@ -85,6 +124,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	l := &link{
 		ctx:           ctx,
 		cancel:        cancelCtx,
+		connReady:     make(chan struct{}),
 		subscribeCh:   make(chan *io.Connection, 1),
 		unsubscribeCh: make(chan *io.Connection, 1),
 		upCh:          make(chan *ttnpb.ApplicationUp, linkBufferSize),
@@ -97,29 +137,13 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		cancelCtx()
 		as.links.Delete(uid)
 	}()
-	var nsName string
-	var conn *grpc.ClientConn
-	var callOpt grpc.CallOption
-	if target.NetworkServerAddress != "" {
-		// TODO: Dial to external Network Server.
-		// nsName = target.NetworkServerAddress
-		// conn = grpc.Dial(...)
-		// callOpt = grpc.PerRPCCredentials(rpcmetadata.MD{
-		// 	AuthType:  "Key",
-		// 	AuthValue: target.APIKey,
-		// })
-		return errExternalNS
-	} else {
-		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
-		if ns == nil {
-			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, ids))
-		}
-		nsName, conn, callOpt = ns.Name(), ns.Conn(), as.WithClusterAuth()
+	if err := as.connectLink(ctx, ids, target, l); err != nil {
+		return err
 	}
-	client := ttnpb.NewAsNsClient(conn)
+	client := ttnpb.NewAsNsClient(l.conn)
 	logger := log.FromContext(ctx)
 	logger.Debug("Linking")
-	stream, err := client.LinkApplication(ctx, &ids, callOpt)
+	stream, err := client.LinkApplication(ctx, &ids, l.connCallOpts...)
 	if err != nil {
 		logger.WithError(err).Warn("Linking failed")
 		return err
@@ -138,7 +162,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			return err
 		}
 		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
-		registerReceiveUplink(ctx, up, nsName)
+		registerReceiveUplink(ctx, up, l.connName)
 		if err := as.handleUp(ctx, up, target); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
 			registerDropUplink(ctx, up, err)

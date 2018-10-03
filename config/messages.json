@@ -1142,15 +1142,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:external_network_server": {
-    "translations": {
-      "en": "link to external Network Server not supported"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "linking.go"
-    }
-  },
   "error:pkg/applicationserver:formatter_not_configured": {
     "translations": {
       "en": "formatter `{formatter}` is not configured"
