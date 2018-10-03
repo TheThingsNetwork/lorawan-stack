@@ -161,12 +161,16 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 
 	if fp.Rx2 != nil {
 		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2.Frequency
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(fp.Rx2.MinDataRate) // TODO: Get actual DRIdx (https://github.com/TheThingsIndustries/lorawan-stack/issues/1165)
+	}
+	if fp.DefaultRx2DataRate != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
 	}
 
 	if fp.PingSlot != nil {
-		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(fp.PingSlot.MinDataRate) // TODO: Get actual DRIdx (https://github.com/TheThingsIndustries/lorawan-stack/issues/1165)
 		dev.MACState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
+	}
+	if fp.DefaultPingSlotDataRate != nil {
+		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
 	}
 
 	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 {

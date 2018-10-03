@@ -286,10 +286,12 @@ type FrequencyPlan struct {
 	ClockSource uint8   `yaml:"clock-source,omitempty"`
 
 	// PingSlot allows override of default band settings for the class B ping slot.
-	PingSlot *Channel `yaml:"ping-slot,omitempty"`
+	PingSlot                *Channel `yaml:"ping-slot,omitempty"`
+	DefaultPingSlotDataRate *uint8   `yaml:"ping-slot-default-data-rate,omitempty"`
 	// Rx2 allows override of default band settings for Rx2.
-	Rx2     *Channel `yaml:"rx2,omitempty"`
-	MaxEIRP *float32 `yaml:"max-eirp,omitempty"`
+	Rx2                *Channel `yaml:"rx2,omitempty"`
+	DefaultRx2DataRate *uint8   `yaml:"rx2-default-data-rate,omitempty"`
+	MaxEIRP            *float32 `yaml:"max-eirp,omitempty"`
 }
 
 // Extend returns the same frequency plan, with values overridden by the passed frequency plan.
@@ -334,8 +336,18 @@ func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	if ext.PingSlot != nil {
 		fp.PingSlot = ext.PingSlot.Clone()
 	}
+	if ext.DefaultPingSlotDataRate != nil {
+		var i uint8
+		i = *ext.DefaultPingSlotDataRate
+		fp.DefaultPingSlotDataRate = &i
+	}
 	if ext.Rx2 != nil {
 		fp.Rx2 = ext.Rx2.Clone()
+	}
+	if ext.DefaultRx2DataRate != nil {
+		var i uint8
+		i = *ext.DefaultRx2DataRate
+		fp.DefaultRx2DataRate = &i
 	}
 	if ext.MaxEIRP != nil {
 		val := *ext.MaxEIRP
