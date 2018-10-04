@@ -18,32 +18,49 @@ package grpc
 
 import (
 	"context"
+	"runtime"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
+const workersPerCPU = 2
+
 // NewEventsServer returns a new EventsServer on the given PubSub.
 func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
 	srv := &EventsServer{
 		ctx:    ctx,
+		events: make(events.Channel, 256),
 		filter: events.NewIdentifierFilter(),
 	}
-	pubsub.Subscribe("**", srv)
+
+	hander := events.ContextHandler(ctx, srv.events)
+	pubsub.Subscribe("**", hander)
 	go func() {
 		<-ctx.Done()
-		pubsub.Unsubscribe("**", srv)
+		pubsub.Unsubscribe("**", hander)
+		close(srv.events)
 	}()
-	return srv
-}
 
-// EventsServer streams events from a PubSub over gRPC.
-type EventsServer struct {
-	ctx    context.Context
-	filter events.IdentifierFilter
+	for i := 0; i < runtime.NumCPU()*workersPerCPU; i++ {
+		go func() {
+			for evt := range srv.events {
+				proto, err := events.Proto(evt)
+				if err != nil {
+					return
+				}
+				srv.filter.Notify(marshaledEvent{
+					Event: evt,
+					proto: proto,
+				})
+			}
+		}()
+	}
+
+	return srv
 }
 
 type marshaledEvent struct {
@@ -51,18 +68,11 @@ type marshaledEvent struct {
 	proto *ttnpb.Event
 }
 
-// Notify the events server of an event.
-func (srv *EventsServer) Notify(evt events.Event) {
-	go func() {
-		proto, err := events.Proto(evt)
-		if err != nil {
-			return
-		}
-		srv.filter.Notify(marshaledEvent{
-			Event: evt,
-			proto: proto,
-		})
-	}()
+// EventsServer streams events from a PubSub over gRPC.
+type EventsServer struct {
+	ctx    context.Context
+	events events.Channel
+	filter events.IdentifierFilter
 }
 
 // Stream implements the EventsServer interface.
@@ -129,6 +139,6 @@ func (srv *EventsServer) RegisterServices(s *grpc.Server) {
 }
 
 // RegisterHandlers implements rpcserver.Registerer.
-func (srv *EventsServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+func (srv *EventsServer) RegisterHandlers(s *grpc_runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEventsHandler(srv.ctx, s, conn)
 }
