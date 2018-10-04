@@ -15,82 +15,17 @@
 package ttnpb
 
 import (
-	"encoding/gob"
-
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
-
-func init() {
-	gob.Register(&OrganizationOrUserIdentifiers_UserIDs{})
-	gob.Register(&OrganizationOrUserIdentifiers_OrganizationIDs{})
-}
-
-// IsZero returns true if all identifiers have zero-values.
-func (ids UserIdentifiers) IsZero() bool {
-	return ids.UserID == "" && ids.Email == ""
-}
-
-// Equals returns true if the receiver identifiers matches to other identifiers.
-func (ids UserIdentifiers) Equals(other UserIdentifiers) bool {
-	return ids.UserID == other.UserID && ids.Email == other.Email
-}
-
-// Contains returns true if other is contained in the receiver.
-func (ids UserIdentifiers) Contains(other UserIdentifiers) bool {
-	if other.IsZero() {
-		return ids.IsZero()
-	}
-
-	return (other.UserID == "" || ids.UserID == other.UserID) &&
-		(other.Email == "" || ids.Email == other.Email)
-}
-
-// Contains returns true if other is contained in the receiver.
-func (ids ApplicationIdentifiers) Contains(other ApplicationIdentifiers) bool {
-	return ids.ApplicationID == other.ApplicationID
-}
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids ApplicationIdentifiers) IsZero() bool {
 	return ids.ApplicationID == ""
 }
 
-// GetEUI returns if set the EUI otherwise a zero-valued EUI.
-func (ids GatewayIdentifiers) GetEUI() *types.EUI64 {
-	if ids.EUI != nil {
-		return ids.EUI
-	}
-	return new(types.EUI64)
-}
-
-// IsZero returns true if all identifiers have zero-values.
-func (ids GatewayIdentifiers) IsZero() bool {
-	return ids.GatewayID == "" && ids.EUI == nil
-}
-
-// Contains returns true if other is contained in the receiver.
-func (ids GatewayIdentifiers) Contains(other GatewayIdentifiers) bool {
-	if other.IsZero() {
-		return ids.IsZero()
-	}
-
-	return (other.GatewayID == "" || (other.GatewayID != "" && ids.GatewayID == other.GatewayID)) &&
-		((ids.EUI == nil && other.EUI == nil) || (ids.EUI != nil && other.EUI == nil) || ids.EUI.Equal(*other.EUI))
-}
-
 // IsZero returns true if all identifiers have zero-values.
 func (ids ClientIdentifiers) IsZero() bool {
 	return ids.ClientID == ""
-}
-
-// IsZero returns true if all identifiers have zero-values.
-func (ids OrganizationIdentifiers) IsZero() bool {
-	return ids.OrganizationID == ""
-}
-
-// Contains returns true if other is contained in the receiver.
-func (ids OrganizationIdentifiers) Contains(other OrganizationIdentifiers) bool {
-	return ids.OrganizationID == other.OrganizationID
 }
 
 // IsZero reports whether ids represent zero identifiers.
@@ -102,52 +37,171 @@ func (ids EndDeviceIdentifiers) IsZero() bool {
 		(ids.JoinEUI == nil || ids.JoinEUI.IsZero())
 }
 
-// Identifiers identifies an object.
+// IsZero returns true if all identifiers have zero-values.
+func (ids GatewayIdentifiers) IsZero() bool {
+	return ids.GatewayID == "" && ids.EUI == nil
+}
+
+// IsZero returns true if all identifiers have zero-values.
+func (ids OrganizationIdentifiers) IsZero() bool {
+	return ids.OrganizationID == ""
+}
+
+// IsZero returns true if all identifiers have zero-values.
+func (ids UserIdentifiers) IsZero() bool {
+	return ids.UserID == "" && ids.Email == ""
+}
+
+// Identifiers interface for Entity Identifiers.
 type Identifiers interface {
 	CombinedIdentifiers() *CombinedIdentifiers
 }
 
-// CombinedIdentifiers implements Identifiers.
+// CombinedIdentifiers returns the EntityIdentifiers as a CombinedIdentifiers type.
+func (ids EntityIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{EntityIdentifiers: []*EntityIdentifiers{&ids}}
+}
+
+// Identifiers returns the actual Identifiers inside the oneof.
+func (ids EntityIdentifiers) Identifiers() Identifiers {
+	switch oneof := ids.Ids.(type) {
+	case *EntityIdentifiers_ApplicationIDs:
+		return oneof.ApplicationIDs
+	case *EntityIdentifiers_ClientIDs:
+		return oneof.ClientIDs
+	case *EntityIdentifiers_DeviceIDs:
+		return oneof.DeviceIDs
+	case *EntityIdentifiers_GatewayIDs:
+		return oneof.GatewayIDs
+	case *EntityIdentifiers_OrganizationIDs:
+		return oneof.OrganizationIDs
+	case *EntityIdentifiers_UserIDs:
+		return oneof.UserIDs
+	default:
+		panic("missed oneof type in EntityIdentifiers.Identifiers()")
+	}
+}
+
+// EntityIdentifiers returns the ApplicationIdentifiers as EntityIdentifiers.
+func (ids ApplicationIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_ApplicationIDs{
+		ApplicationIDs: &ids,
+	}}
+}
+
+// CombinedIdentifiers returns the ApplicationIdentifiers as CombinedIdentifiers.
 func (ids ApplicationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
-	return &CombinedIdentifiers{ApplicationIDs: []*ApplicationIdentifiers{&ids}}
+	return ids.EntityIdentifiers().CombinedIdentifiers()
 }
 
-// CombinedIdentifiers implements Identifiers.
+// EntityIdentifiers returns the ClientIdentifiers as EntityIdentifiers.
+func (ids ClientIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_ClientIDs{
+		ClientIDs: &ids,
+	}}
+}
+
+// CombinedIdentifiers returns the ClientIdentifiers as CombinedIdentifiers.
 func (ids ClientIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
-	return &CombinedIdentifiers{ClientIDs: []*ClientIdentifiers{&ids}}
+	return ids.EntityIdentifiers().CombinedIdentifiers()
 }
 
-// CombinedIdentifiers implements Identifiers.
+// EntityIdentifiers returns the EndDeviceIdentifiers as EntityIdentifiers.
+func (ids EndDeviceIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_DeviceIDs{
+		DeviceIDs: &ids,
+	}}
+}
+
+// CombinedIdentifiers returns the EndDeviceIdentifiers as CombinedIdentifiers.
 func (ids EndDeviceIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
-	return &CombinedIdentifiers{DeviceIDs: []*EndDeviceIdentifiers{&ids}}
+	return ids.EntityIdentifiers().CombinedIdentifiers()
 }
 
-// CombinedIdentifiers implements Identifiers.
+// EntityIdentifiers returns the GatewayIdentifiers as EntityIdentifiers.
+func (ids GatewayIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_GatewayIDs{
+		GatewayIDs: &ids,
+	}}
+}
+
+// CombinedIdentifiers returns the GatewayIdentifiers as CombinedIdentifiers.
 func (ids GatewayIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
-	return &CombinedIdentifiers{GatewayIDs: []*GatewayIdentifiers{&ids}}
+	return ids.EntityIdentifiers().CombinedIdentifiers()
 }
 
-// CombinedIdentifiers implements Identifiers.
+// EntityIdentifiers implements returns theOrganizationIdentifiers as EntityIdentifiers.
+func (ids OrganizationIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_OrganizationIDs{
+		OrganizationIDs: &ids,
+	}}
+}
+
+// CombinedIdentifiers returns the OrganizationIdentifiers as CombinedIdentifiers.
 func (ids OrganizationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
-	return &CombinedIdentifiers{OrganizationIDs: []*OrganizationIdentifiers{&ids}}
+	return ids.EntityIdentifiers().CombinedIdentifiers()
 }
 
-// CombinedIdentifiers implements Identifiers.
+// OrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.
+func (ids OrganizationIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
+	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_OrganizationIDs{
+		OrganizationIDs: &ids,
+	}}
+}
+
+// EntityIdentifiers returns the UserIdentifiers as EntityIdentifiers.
+func (ids UserIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_UserIDs{
+		UserIDs: &ids,
+	}}
+}
+
+// CombinedIdentifiers returns the UserIdentifiers as CombinedIdentifiers.
 func (ids UserIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
-	return &CombinedIdentifiers{UserIDs: []*UserIdentifiers{&ids}}
+	return ids.EntityIdentifiers().CombinedIdentifiers()
+}
+
+// OrganizationOrUserIdentifiers returns the UserIdentifiers as *OrganizationOrUserIdentifiers.
+func (ids UserIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
+	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_UserIDs{
+		UserIDs: &ids,
+	}}
+}
+
+// Identifiers returns the OrganizationOrUserIdentifiers as Identifiers.
+func (ids OrganizationOrUserIdentifiers) Identifiers() Identifiers {
+	switch oneof := ids.Ids.(type) {
+	case *OrganizationOrUserIdentifiers_OrganizationIDs:
+		return oneof.OrganizationIDs
+	case *OrganizationOrUserIdentifiers_UserIDs:
+		return oneof.UserIDs
+	default:
+		panic("missed oneof type in OrganizationOrUserIdentifiers.Identifiers()")
+	}
+}
+
+// EntityIdentifiers returns the OrganizationOrUserIdentifiers as EntityIdentifiers.
+func (ids OrganizationOrUserIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+	switch oneof := ids.Ids.(type) {
+	case *OrganizationOrUserIdentifiers_OrganizationIDs:
+		return oneof.OrganizationIDs.EntityIdentifiers()
+	case *OrganizationOrUserIdentifiers_UserIDs:
+		return oneof.UserIDs.EntityIdentifiers()
+	default:
+		panic("missed oneof type in OrganizationOrUserIdentifiers.EntityIdentifiers()")
+	}
+}
+
+// CombinedIdentifiers returns the OrganizationOrUserIdentifiers as CombinedIdentifiers.
+func (ids OrganizationOrUserIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return ids.EntityIdentifiers().CombinedIdentifiers()
 }
 
 // CombineIdentifiers merges the identifiers of the multiple entities.
 func CombineIdentifiers(ids ...Identifiers) *CombinedIdentifiers {
 	combined := &CombinedIdentifiers{}
 	for _, id := range ids {
-		asCombined := id.CombinedIdentifiers()
-		combined.ApplicationIDs = append(combined.ApplicationIDs, asCombined.ApplicationIDs...)
-		combined.ClientIDs = append(combined.ClientIDs, asCombined.ClientIDs...)
-		combined.DeviceIDs = append(combined.DeviceIDs, asCombined.DeviceIDs...)
-		combined.GatewayIDs = append(combined.GatewayIDs, asCombined.GatewayIDs...)
-		combined.OrganizationIDs = append(combined.OrganizationIDs, asCombined.OrganizationIDs...)
-		combined.UserIDs = append(combined.UserIDs, asCombined.UserIDs...)
+		combined.EntityIdentifiers = append(combined.EntityIdentifiers, id.CombinedIdentifiers().GetEntityIdentifiers()...)
 	}
 	return combined
 }

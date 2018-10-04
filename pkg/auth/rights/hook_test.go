@@ -83,30 +83,22 @@ func TestHook(t *testing.T) {
 				userError:         errPermissionDenied,
 			},
 			Req: &ttnpb.CombinedIdentifiers{
-				ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
-				ClientIDs:       []*ttnpb.ClientIdentifiers{{ClientID: "foo"}},
-				GatewayIDs:      []*ttnpb.GatewayIdentifiers{{GatewayID: "foo"}},
-				OrganizationIDs: []*ttnpb.OrganizationIdentifiers{{OrganizationID: "foo"}},
-				UserIDs:         []*ttnpb.UserIdentifiers{{UserID: "foo"}},
+				EntityIdentifiers: []*ttnpb.EntityIdentifiers{
+					ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}.EntityIdentifiers(),
+					ttnpb.ClientIdentifiers{ClientID: "foo"}.EntityIdentifiers(),
+					ttnpb.GatewayIdentifiers{GatewayID: "foo"}.EntityIdentifiers(),
+					ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}.EntityIdentifiers(),
+					ttnpb.UserIdentifiers{UserID: "foo"}.EntityIdentifiers(),
+				},
 			},
 			Call: func(a *assertions.Assertion, ctx context.Context, req interface{}) {
 				rights, ok := FromContext(ctx)
 				a.So(ok, should.BeTrue)
-				if a.So(rights.ApplicationRights, should.HaveLength, 1) {
-					a.So(rights.ApplicationRights[unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})], should.BeNil)
-				}
-				if a.So(rights.ClientRights, should.HaveLength, 1) {
-					a.So(rights.ClientRights[unique.ID(ctx, ttnpb.ClientIdentifiers{ClientID: "foo"})], should.BeNil)
-				}
-				if a.So(rights.GatewayRights, should.HaveLength, 1) {
-					a.So(rights.GatewayRights[unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo"})], should.BeNil)
-				}
-				if a.So(rights.OrganizationRights, should.HaveLength, 1) {
-					a.So(rights.OrganizationRights[unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})], should.BeNil)
-				}
-				if a.So(rights.UserRights, should.HaveLength, 1) {
-					a.So(rights.UserRights[unique.ID(ctx, ttnpb.UserIdentifiers{UserID: "foo"})], should.BeNil)
-				}
+				a.So(rights.ApplicationRights[unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})], should.BeNil)
+				a.So(rights.ClientRights[unique.ID(ctx, ttnpb.ClientIdentifiers{ClientID: "foo"})], should.BeNil)
+				a.So(rights.GatewayRights[unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "foo"})], should.BeNil)
+				a.So(rights.OrganizationRights[unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})], should.BeNil)
+				a.So(rights.UserRights[unique.ID(ctx, ttnpb.UserIdentifiers{UserID: "foo"})], should.BeNil)
 			},
 		},
 		"AllInfoRights": {
@@ -118,11 +110,13 @@ func TestHook(t *testing.T) {
 				userRights:         ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
 			},
 			Req: &ttnpb.CombinedIdentifiers{
-				ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
-				ClientIDs:       []*ttnpb.ClientIdentifiers{{ClientID: "foo"}},
-				GatewayIDs:      []*ttnpb.GatewayIdentifiers{{GatewayID: "foo"}},
-				OrganizationIDs: []*ttnpb.OrganizationIdentifiers{{OrganizationID: "foo"}},
-				UserIDs:         []*ttnpb.UserIdentifiers{{UserID: "foo"}},
+				EntityIdentifiers: []*ttnpb.EntityIdentifiers{
+					ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}.EntityIdentifiers(),
+					ttnpb.ClientIdentifiers{ClientID: "foo"}.EntityIdentifiers(),
+					ttnpb.GatewayIdentifiers{GatewayID: "foo"}.EntityIdentifiers(),
+					ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}.EntityIdentifiers(),
+					ttnpb.UserIdentifiers{UserID: "foo"}.EntityIdentifiers(),
+				},
 			},
 			Call: func(a *assertions.Assertion, ctx context.Context, req interface{}) {
 				rights, ok := FromContext(ctx)

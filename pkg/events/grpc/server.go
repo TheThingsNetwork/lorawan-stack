@@ -79,33 +79,22 @@ type EventsServer struct {
 func (srv *EventsServer) Stream(ids *ttnpb.CombinedIdentifiers, stream ttnpb.Events_StreamServer) (err error) {
 	ctx := stream.Context()
 
-	for _, applicationIDs := range ids.ApplicationIDs {
-		if err = rights.RequireApplication(ctx, *applicationIDs, ttnpb.RIGHT_APPLICATION_ALL); err != nil {
-			return err
+	for _, entityIDs := range ids.GetEntityIdentifiers() {
+		switch ids := entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_ALL)
+		case *ttnpb.ClientIdentifiers:
+			err = rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL)
+		case *ttnpb.EndDeviceIdentifiers:
+			err = rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_ALL)
+		case *ttnpb.GatewayIdentifiers:
+			err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_ALL)
+		case *ttnpb.OrganizationIdentifiers:
+			err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_ALL)
+		case *ttnpb.UserIdentifiers:
+			err = rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_ALL)
 		}
-	}
-	for _, clientIDs := range ids.ClientIDs {
-		if err = rights.RequireClient(ctx, *clientIDs, ttnpb.RIGHT_CLIENT_ALL); err != nil {
-			return err
-		}
-	}
-	for _, deviceIDs := range ids.DeviceIDs {
-		if err = rights.RequireApplication(ctx, deviceIDs.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_ALL); err != nil {
-			return err
-		}
-	}
-	for _, gatewayIDs := range ids.GatewayIDs {
-		if err = rights.RequireGateway(ctx, *gatewayIDs, ttnpb.RIGHT_GATEWAY_ALL); err != nil {
-			return err
-		}
-	}
-	for _, organizationIDs := range ids.OrganizationIDs {
-		if err = rights.RequireOrganization(ctx, *organizationIDs, ttnpb.RIGHT_ORGANIZATION_ALL); err != nil {
-			return err
-		}
-	}
-	for _, userIDs := range ids.UserIDs {
-		if err = rights.RequireUser(ctx, *userIDs, ttnpb.RIGHT_USER_ALL); err != nil {
+		if err != nil {
 			return err
 		}
 	}

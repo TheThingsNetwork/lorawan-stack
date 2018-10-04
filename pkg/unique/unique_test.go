@@ -155,6 +155,14 @@ func TestRoundtrip(t *testing.T) {
 		t.Run(fmt.Sprintf("%T", tc.ID), func(t *testing.T) {
 			a := assertions.New(t)
 			a.So(ID(test.Context(), tc.ID), should.Equal, tc.Expected)
+			if id, ok := tc.ID.(interface {
+				EntityIdentifiers() *ttnpb.EntityIdentifiers
+			}); ok {
+				wrapped := id.EntityIdentifiers()
+				a.So(ID(test.Context(), wrapped), should.Equal, tc.Expected)
+				a.So(ID(test.Context(), *wrapped), should.Equal, tc.Expected)
+			}
+			a.So(ID(test.Context(), tc.ID), should.Equal, tc.Expected)
 			if tc.Parser != nil {
 				parsed, err := tc.Parser(tc.Expected)
 				if a.So(err, should.BeNil) {

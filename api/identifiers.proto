@@ -58,19 +58,26 @@ message OrganizationIdentifiers {
 }
 
 message OrganizationOrUserIdentifiers {
-  oneof ID {
+  oneof ids {
     UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs"];
     OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+  }
+}
+
+// EntityIdentifiers contains one of the possible entity identifiers.
+message EntityIdentifiers {
+  oneof ids {
+    ApplicationIdentifiers application_ids = 1 [(gogoproto.customname) = "ApplicationIDs"];
+    ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs"];
+    EndDeviceIdentifiers device_ids = 3 [(gogoproto.customname) = "DeviceIDs"];
+    GatewayIdentifiers gateway_ids = 4 [(gogoproto.customname) = "GatewayIDs"];
+    OrganizationIdentifiers organization_ids = 5 [(gogoproto.customname) = "OrganizationIDs"];
+    UserIdentifiers user_ids = 6 [(gogoproto.customname) = "UserIDs"];
   }
 }
 
 // Combine the identifiers of multiple entities.
 // The main purpose of this message is its use in events.
 message CombinedIdentifiers {
-  repeated ApplicationIdentifiers application_ids = 1 [(gogoproto.customname) = "ApplicationIDs"];
-  repeated ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs"];
-  repeated EndDeviceIdentifiers device_ids = 3 [(gogoproto.customname) = "DeviceIDs"];
-  repeated GatewayIdentifiers gateway_ids = 4 [(gogoproto.customname) = "GatewayIDs"];
-  repeated OrganizationIdentifiers organization_ids = 5 [(gogoproto.customname) = "OrganizationIDs"];
-  repeated UserIdentifiers user_ids = 6 [(gogoproto.customname) = "UserIDs"];
+  repeated EntityIdentifiers entity_identifiers = 1;
 }

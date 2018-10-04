@@ -57,12 +57,14 @@ func TestIdentifierFilter(t *testing.T) {
 	evtUsrBar := events.New(test.Context(), "test", ttnpb.UserIdentifiers{UserID: "bar"}, "hello bar")
 
 	fooIDs := &ttnpb.CombinedIdentifiers{
-		ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
-		ClientIDs:       []*ttnpb.ClientIdentifiers{{ClientID: "foo"}},
-		DeviceIDs:       []*ttnpb.EndDeviceIdentifiers{{DeviceID: "foo", ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}}},
-		GatewayIDs:      []*ttnpb.GatewayIdentifiers{{GatewayID: "foo"}},
-		OrganizationIDs: []*ttnpb.OrganizationIdentifiers{{OrganizationID: "foo"}},
-		UserIDs:         []*ttnpb.UserIdentifiers{{UserID: "foo"}},
+		EntityIdentifiers: []*ttnpb.EntityIdentifiers{
+			ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}.EntityIdentifiers(),
+			ttnpb.ClientIdentifiers{ClientID: "foo"}.EntityIdentifiers(),
+			ttnpb.EndDeviceIdentifiers{DeviceID: "foo", ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}}.EntityIdentifiers(),
+			ttnpb.GatewayIdentifiers{GatewayID: "foo"}.EntityIdentifiers(),
+			ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}.EntityIdentifiers(),
+			ttnpb.UserIdentifiers{UserID: "foo"}.EntityIdentifiers(),
+		},
 	}
 
 	filter.Subscribe(test.Context(), fooIDs, ch)

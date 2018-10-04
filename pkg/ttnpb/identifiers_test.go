@@ -61,28 +61,6 @@ func TestUserIdentifiersIsZero(t *testing.T) {
 	a.So(ids.IsZero(), should.BeTrue)
 }
 
-func TestUserIdentifiersContains(t *testing.T) {
-	a := assertions.New(t)
-
-	ids := UserIdentifiers{
-		UserID: "foo",
-		Email:  "foo@bar.com",
-	}
-	a.So(ids.Contains(UserIdentifiers{}), should.BeFalse)
-	a.So(ids.Contains(UserIdentifiers{UserID: "foo"}), should.BeTrue)
-	a.So(ids.Contains(UserIdentifiers{Email: "foo@bar.com"}), should.BeTrue)
-	a.So(ids.Contains(ids), should.BeTrue)
-	a.So(ids.Contains(UserIdentifiers{UserID: "bar"}), should.BeFalse)
-
-	ids = UserIdentifiers{
-		Email: "foo@bar.com",
-	}
-	a.So(ids.Contains(UserIdentifiers{}), should.BeFalse)
-	a.So(ids.Contains(UserIdentifiers{Email: "foo@barbaz.com"}), should.BeFalse)
-	a.So(ids.Contains(UserIdentifiers{UserID: "bar"}), should.BeFalse)
-	a.So(ids.Contains(ids), should.BeTrue)
-}
-
 func TestGatewayIdentifiersIsZero(t *testing.T) {
 	a := assertions.New(t)
 
@@ -109,27 +87,4 @@ func TestGatewayIdentifiersIsZero(t *testing.T) {
 
 	ids = GatewayIdentifiers{}
 	a.So(ids.IsZero(), should.BeTrue)
-}
-
-func TestGatewayIdentifiersContains(t *testing.T) {
-	a := assertions.New(t)
-
-	ids := GatewayIdentifiers{
-		GatewayID: "foo-gtw",
-		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
-	}
-	a.So(ids.Contains(GatewayIdentifiers{}), should.BeFalse)
-	a.So(ids.Contains(GatewayIdentifiers{GatewayID: "foo-gtw"}), should.BeTrue)
-	a.So(ids.Contains(GatewayIdentifiers{EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}}), should.BeTrue)
-	a.So(ids.Contains(ids), should.BeTrue)
-	a.So(ids.Contains(GatewayIdentifiers{GatewayID: "bar"}), should.BeFalse)
-
-	ids = GatewayIdentifiers{
-		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
-	}
-	a.So(ids.Contains(GatewayIdentifiers{}), should.BeFalse)
-	a.So(ids.Contains(GatewayIdentifiers{EUI: &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}), should.BeFalse)
-	a.So(ids.Contains(GatewayIdentifiers{GatewayID: "bar"}), should.BeFalse)
-	a.So(ids.Contains(GatewayIdentifiers{EUI: &types.EUI64{0x99, 0x99, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}}), should.BeFalse)
-	a.So(ids.Contains(ids), should.BeTrue)
 }

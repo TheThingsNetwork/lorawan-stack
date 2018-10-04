@@ -62,6 +62,10 @@ func ID(ctx context.Context, id ttnpb.Identifiers) (res string) {
 		res = val.UserID
 	case *ttnpb.UserIdentifiers:
 		res = val.UserID
+	case ttnpb.EntityIdentifiers:
+		return ID(ctx, val.Identifiers())
+	case *ttnpb.EntityIdentifiers:
+		return ID(ctx, val.Identifiers())
 	default:
 		panic(fmt.Errorf("failed to determine unique ID: %T is not a valid ttnpb.Identifiers", id))
 	}

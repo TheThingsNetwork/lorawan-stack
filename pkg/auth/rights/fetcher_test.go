@@ -168,14 +168,13 @@ func TestFetcherFunc(t *testing.T) {
 	a.So(res.OrgErr, should.Resemble, fetcher.err)
 	a.So(res.UsrErr, should.Resemble, fetcher.err)
 
-	a.So(fetcher.ids, should.HaveLength, 5)
-	a.So(ttnpb.CombineIdentifiers(fetcher.ids...), should.Resemble, &ttnpb.CombinedIdentifiers{
-		ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
-		ClientIDs:       []*ttnpb.ClientIdentifiers{{ClientID: "foo"}},
-		GatewayIDs:      []*ttnpb.GatewayIdentifiers{{GatewayID: "foo"}},
-		OrganizationIDs: []*ttnpb.OrganizationIdentifiers{{OrganizationID: "foo"}},
-		UserIDs:         []*ttnpb.UserIdentifiers{{UserID: "foo"}},
-	})
+	if a.So(fetcher.ids, should.HaveLength, 5) {
+		a.So(fetcher.ids, should.Contain, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})
+		a.So(fetcher.ids, should.Contain, ttnpb.ClientIdentifiers{ClientID: "foo"})
+		a.So(fetcher.ids, should.Contain, ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+		a.So(fetcher.ids, should.Contain, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
+		a.So(fetcher.ids, should.Contain, ttnpb.UserIdentifiers{UserID: "foo"})
+	}
 }
 
 func TestAccessFetcher(t *testing.T) {

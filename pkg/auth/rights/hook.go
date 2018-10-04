@@ -58,71 +58,50 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		if !ok {
 			panic(fmt.Errorf("Could not execute rights hook: %T does not implement ttnpb.Identifiers", req))
 		}
+		fetchRights := func(entityIDs *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
+			switch ids := entityIDs.Identifiers().(type) {
+			case *ttnpb.ApplicationIdentifiers:
+				return fetcher.ApplicationRights(ctx, *ids)
+			case *ttnpb.ClientIdentifiers:
+				return fetcher.ClientRights(ctx, *ids)
+			case *ttnpb.GatewayIdentifiers:
+				return fetcher.GatewayRights(ctx, *ids)
+			case *ttnpb.OrganizationIdentifiers:
+				return fetcher.OrganizationRights(ctx, *ids)
+			case *ttnpb.UserIdentifiers:
+				return fetcher.UserRights(ctx, *ids)
+			}
+			return nil, nil
+		}
 		combined := ids.CombinedIdentifiers()
 		results := Rights{
-			ApplicationRights:  make(map[string]*ttnpb.Rights, len(combined.ApplicationIDs)),
-			ClientRights:       make(map[string]*ttnpb.Rights, len(combined.ClientIDs)),
-			GatewayRights:      make(map[string]*ttnpb.Rights, len(combined.GatewayIDs)),
-			OrganizationRights: make(map[string]*ttnpb.Rights, len(combined.OrganizationIDs)),
-			UserRights:         make(map[string]*ttnpb.Rights, len(combined.UserIDs)),
+			ApplicationRights:  make(map[string]*ttnpb.Rights),
+			ClientRights:       make(map[string]*ttnpb.Rights),
+			GatewayRights:      make(map[string]*ttnpb.Rights),
+			OrganizationRights: make(map[string]*ttnpb.Rights),
+			UserRights:         make(map[string]*ttnpb.Rights),
 		}
-		for _, id := range combined.ApplicationIDs {
-			uid := unique.ID(ctx, id)
-			rights, err := fetcher.ApplicationRights(ctx, *id)
-			switch {
-			case err == nil:
-				results.ApplicationRights[uid] = rights
-			case errors.IsPermissionDenied(err):
-				results.ApplicationRights[uid] = nil
-			default:
-				return nil, err
+		setRights := func(entityIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) {
+			switch ids := entityIDs.Identifiers().(type) {
+			case *ttnpb.ApplicationIdentifiers:
+				results.ApplicationRights[unique.ID(ctx, ids)] = rights
+			case *ttnpb.ClientIdentifiers:
+				results.ClientRights[unique.ID(ctx, ids)] = rights
+			case *ttnpb.GatewayIdentifiers:
+				results.GatewayRights[unique.ID(ctx, ids)] = rights
+			case *ttnpb.OrganizationIdentifiers:
+				results.OrganizationRights[unique.ID(ctx, ids)] = rights
+			case *ttnpb.UserIdentifiers:
+				results.UserRights[unique.ID(ctx, ids)] = rights
 			}
 		}
-		for _, id := range combined.ClientIDs {
-			uid := unique.ID(ctx, id)
-			rights, err := fetcher.ClientRights(ctx, *id)
-			switch {
-			case err == nil:
-				results.ClientRights[uid] = rights
-			case errors.IsPermissionDenied(err):
-				results.ClientRights[uid] = nil
-			default:
-				return nil, err
+		for _, ids := range combined.GetEntityIdentifiers() {
+			rights, err := fetchRights(ids)
+			if err == nil {
+				setRights(ids, rights)
+				continue
 			}
-		}
-		for _, id := range combined.GatewayIDs {
-			uid := unique.ID(ctx, id)
-			rights, err := fetcher.GatewayRights(ctx, *id)
-			switch {
-			case err == nil:
-				results.GatewayRights[uid] = rights
-			case errors.IsPermissionDenied(err):
-				results.GatewayRights[uid] = nil
-			default:
-				return nil, err
-			}
-		}
-		for _, id := range combined.OrganizationIDs {
-			uid := unique.ID(ctx, id)
-			rights, err := fetcher.OrganizationRights(ctx, *id)
-			switch {
-			case err == nil:
-				results.OrganizationRights[uid] = rights
-			case errors.IsPermissionDenied(err):
-				results.OrganizationRights[uid] = nil
-			default:
-				return nil, err
-			}
-		}
-		for _, id := range combined.UserIDs {
-			uid := unique.ID(ctx, id)
-			rights, err := fetcher.UserRights(ctx, *id)
-			switch {
-			case err == nil:
-				results.UserRights[uid] = rights
-			case errors.IsPermissionDenied(err):
-				results.UserRights[uid] = nil
-			default:
+			if !errors.IsPermissionDenied(err) {
 				return nil, err
 			}
 		}

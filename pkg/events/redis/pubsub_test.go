@@ -87,8 +87,8 @@ func TestRedisPubSub(t *testing.T) {
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "redis.test.evt0")
-		if a.So(e.Identifiers(), should.NotBeNil) {
-			a.So(e.Identifiers().ApplicationIDs, should.Resemble, []*ttnpb.ApplicationIdentifiers{appID})
+		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers().GetEntityIdentifiers(), should.HaveLength, 1) {
+			a.So(e.Identifiers().GetEntityIdentifiers()[0].GetApplicationIDs(), should.Resemble, appID)
 		}
 	case <-time.After(time.Second):
 		t.Error("Did not receive expected event")

@@ -62,108 +62,73 @@ type identifierFilter struct {
 }
 
 func (f *identifierFilter) Subscribe(ctx context.Context, ids ttnpb.Identifiers, handler Handler) {
-	cids := ids.CombinedIdentifiers()
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	for _, id := range cids.ApplicationIDs {
-		uid := unique.ID(ctx, id)
-		f.applicationIDs[uid] = append(f.applicationIDs[uid], handler)
-	}
-	for _, id := range cids.ClientIDs {
-		uid := unique.ID(ctx, id)
-		f.clientIDs[uid] = append(f.clientIDs[uid], handler)
-	}
-	for _, id := range cids.DeviceIDs {
-		uid := unique.ID(ctx, id)
-		f.deviceIDs[uid] = append(f.deviceIDs[uid], handler)
-	}
-	for _, id := range cids.GatewayIDs {
-		uid := unique.ID(ctx, id)
-		f.gatewayIDs[uid] = append(f.gatewayIDs[uid], handler)
-	}
-	for _, id := range cids.OrganizationIDs {
-		uid := unique.ID(ctx, id)
-		f.organizationIDs[uid] = append(f.organizationIDs[uid], handler)
-	}
-	for _, id := range cids.UserIDs {
-		uid := unique.ID(ctx, id)
-		f.userIDs[uid] = append(f.userIDs[uid], handler)
+	for _, entityIDs := range ids.CombinedIdentifiers().GetEntityIdentifiers() {
+		uid := unique.ID(ctx, entityIDs)
+		switch entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			f.applicationIDs[uid] = append(f.applicationIDs[uid], handler)
+		case *ttnpb.ClientIdentifiers:
+			f.clientIDs[uid] = append(f.clientIDs[uid], handler)
+		case *ttnpb.EndDeviceIdentifiers:
+			f.deviceIDs[uid] = append(f.deviceIDs[uid], handler)
+		case *ttnpb.GatewayIdentifiers:
+			f.gatewayIDs[uid] = append(f.gatewayIDs[uid], handler)
+		case *ttnpb.OrganizationIdentifiers:
+			f.organizationIDs[uid] = append(f.organizationIDs[uid], handler)
+		case *ttnpb.UserIdentifiers:
+			f.userIDs[uid] = append(f.userIDs[uid], handler)
+		}
 	}
 }
 
+func removeHandler(handlers []Handler, toRemove Handler) []Handler {
+	updated := make([]Handler, 0, len(handlers))
+	for _, registered := range handlers {
+		if registered == toRemove {
+			continue
+		}
+		updated = append(updated, registered)
+	}
+	return updated
+}
+
 func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifiers, handler Handler) {
-	cids := ids.CombinedIdentifiers()
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	for _, id := range cids.ApplicationIDs {
-		uid := unique.ID(ctx, id)
-		for i, registered := range f.applicationIDs[uid] {
-			if registered == handler {
-				f.applicationIDs[uid] = append(f.applicationIDs[uid][:i], f.applicationIDs[uid][i+1:]...)
-				if len(f.applicationIDs[uid]) == 0 {
-					delete(f.applicationIDs, uid)
-				}
-				break
+	for _, entityIDs := range ids.CombinedIdentifiers().GetEntityIdentifiers() {
+		uid := unique.ID(ctx, entityIDs)
+		switch entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			f.applicationIDs[uid] = removeHandler(f.applicationIDs[uid], handler)
+			if len(f.applicationIDs[uid]) == 0 {
+				delete(f.applicationIDs, uid)
 			}
-		}
-	}
-	for _, id := range cids.ClientIDs {
-		uid := unique.ID(ctx, id)
-		for i, registered := range f.clientIDs[uid] {
-			if registered == handler {
-				f.clientIDs[uid] = append(f.clientIDs[uid][:i], f.clientIDs[uid][i+1:]...)
-				if len(f.clientIDs[uid]) == 0 {
-					delete(f.clientIDs, uid)
-				}
-				break
+		case *ttnpb.ClientIdentifiers:
+			f.clientIDs[uid] = removeHandler(f.clientIDs[uid], handler)
+			if len(f.clientIDs[uid]) == 0 {
+				delete(f.clientIDs, uid)
 			}
-		}
-	}
-	for _, id := range cids.DeviceIDs {
-		uid := unique.ID(ctx, id)
-		for i, registered := range f.deviceIDs[uid] {
-			if registered == handler {
-				f.deviceIDs[uid] = append(f.deviceIDs[uid][:i], f.deviceIDs[uid][i+1:]...)
-				if len(f.deviceIDs[uid]) == 0 {
-					delete(f.deviceIDs, uid)
-				}
-				break
+		case *ttnpb.EndDeviceIdentifiers:
+			f.deviceIDs[uid] = removeHandler(f.deviceIDs[uid], handler)
+			if len(f.deviceIDs[uid]) == 0 {
+				delete(f.deviceIDs, uid)
 			}
-		}
-	}
-	for _, id := range cids.GatewayIDs {
-		uid := unique.ID(ctx, id)
-		for i, registered := range f.gatewayIDs[uid] {
-			if registered == handler {
-				f.gatewayIDs[uid] = append(f.gatewayIDs[uid][:i], f.gatewayIDs[uid][i+1:]...)
-				if len(f.gatewayIDs[uid]) == 0 {
-					delete(f.gatewayIDs, uid)
-				}
-				break
+		case *ttnpb.GatewayIdentifiers:
+			f.gatewayIDs[uid] = removeHandler(f.gatewayIDs[uid], handler)
+			if len(f.gatewayIDs[uid]) == 0 {
+				delete(f.gatewayIDs, uid)
 			}
-		}
-	}
-	for _, id := range cids.OrganizationIDs {
-		uid := unique.ID(ctx, id)
-		for i, registered := range f.organizationIDs[uid] {
-			if registered == handler {
-				f.organizationIDs[uid] = append(f.organizationIDs[uid][:i], f.organizationIDs[uid][i+1:]...)
-				if len(f.organizationIDs[uid]) == 0 {
-					delete(f.organizationIDs, uid)
-				}
-				break
+		case *ttnpb.OrganizationIdentifiers:
+			f.organizationIDs[uid] = removeHandler(f.organizationIDs[uid], handler)
+			if len(f.organizationIDs[uid]) == 0 {
+				delete(f.organizationIDs, uid)
 			}
-		}
-	}
-	for _, id := range cids.UserIDs {
-		uid := unique.ID(ctx, id)
-		for i, registered := range f.userIDs[uid] {
-			if registered == handler {
-				f.userIDs[uid] = append(f.userIDs[uid][:i], f.userIDs[uid][i+1:]...)
-				if len(f.userIDs[uid]) == 0 {
-					delete(f.userIDs, uid)
-				}
-				break
+		case *ttnpb.UserIdentifiers:
+			f.userIDs[uid] = removeHandler(f.userIDs[uid], handler)
+			if len(f.userIDs[uid]) == 0 {
+				delete(f.userIDs, uid)
 			}
 		}
 	}
@@ -171,29 +136,23 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 
 func (f *identifierFilter) Notify(evt Event) {
 	var matched []Handler
-	ids := evt.Identifiers()
-	if ids == nil {
-		return
-	}
 	f.mu.RLock()
-	for _, id := range ids.ApplicationIDs {
-		matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), id)]...)
-	}
-	for _, id := range ids.ClientIDs {
-		matched = append(matched, f.clientIDs[unique.ID(evt.Context(), id)]...)
-	}
-	for _, id := range ids.DeviceIDs {
-		matched = append(matched, f.deviceIDs[unique.ID(evt.Context(), id)]...)
-		matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), id.ApplicationIdentifiers)]...)
-	}
-	for _, id := range ids.GatewayIDs {
-		matched = append(matched, f.gatewayIDs[unique.ID(evt.Context(), id)]...)
-	}
-	for _, id := range ids.OrganizationIDs {
-		matched = append(matched, f.organizationIDs[unique.ID(evt.Context(), id)]...)
-	}
-	for _, id := range ids.UserIDs {
-		matched = append(matched, f.userIDs[unique.ID(evt.Context(), id)]...)
+	for _, entityIDs := range evt.Identifiers().GetEntityIdentifiers() {
+		switch ids := entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), ids)]...)
+		case *ttnpb.ClientIdentifiers:
+			matched = append(matched, f.clientIDs[unique.ID(evt.Context(), ids)]...)
+		case *ttnpb.EndDeviceIdentifiers:
+			matched = append(matched, f.deviceIDs[unique.ID(evt.Context(), ids)]...)
+			matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), ids.ApplicationIdentifiers)]...)
+		case *ttnpb.GatewayIdentifiers:
+			matched = append(matched, f.gatewayIDs[unique.ID(evt.Context(), ids)]...)
+		case *ttnpb.OrganizationIdentifiers:
+			matched = append(matched, f.organizationIDs[unique.ID(evt.Context(), ids)]...)
+		case *ttnpb.UserIdentifiers:
+			matched = append(matched, f.userIDs[unique.ID(evt.Context(), ids)]...)
+		}
 	}
 	f.mu.RUnlock()
 	notified := make(map[Handler]struct{}, len(matched))
