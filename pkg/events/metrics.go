@@ -39,6 +39,15 @@ var subscriptions = metrics.NewGaugeVec(
 	[]string{"name"},
 )
 
+var channelDropped = metrics.NewContextualCounterVec(
+	prometheus.CounterOpts{
+		Subsystem: subsystem,
+		Name:      "channel_dropped_total",
+		Help:      "Number of events dropped from event channels",
+	},
+	[]string{"name"},
+)
+
 func init() {
-	metrics.MustRegister(publishes, subscriptions)
+	metrics.MustRegister(publishes, subscriptions, channelDropped)
 }

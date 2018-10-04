@@ -46,6 +46,7 @@ func (ch Channel) Notify(evt Event) {
 	select {
 	case ch <- evt:
 	default:
+		channelDropped.WithLabelValues(evt.Context(), evt.Name())
 	}
 }
 
