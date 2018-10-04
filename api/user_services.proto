@@ -50,6 +50,14 @@ service UserRegistry {
     };
   };
 
+  // Create a temporary password that can be used for updating a forgotten password.
+  // The generated password is sent to the user's email address.
+  rpc CreateTemporaryPassword(CreateTemporaryPasswordRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/{user_ids.user_id}/temporary_password"
+    };
+  }
+
   rpc UpdatePassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{user_ids.user_id}/password"

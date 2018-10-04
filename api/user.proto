@@ -43,7 +43,7 @@ message User {
   // This address is not public, use contact_info for that.
   string primary_email_address = 8;
 
-  // Only used on create; never returned.
+  // Only used on create; never returned on API calls.
   string password = 9;
   google.protobuf.Timestamp password_updated_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   bool require_password_update = 11;
@@ -54,6 +54,11 @@ message User {
   // This user is an admin.
   // This field can only be modified by other admins.
   bool admin = 13;
+
+  // The temporary password can only be used to update a user's password; never returned on API calls.
+  string temporary_password = 14;
+  google.protobuf.Timestamp temporary_password_created_at = 15 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp temporary_password_expires_at = 16 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
 }
 
 message Users {
@@ -73,6 +78,10 @@ message CreateUserRequest {
 message UpdateUserRequest {
   User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message CreateTemporaryPasswordRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message UpdateUserPasswordRequest {

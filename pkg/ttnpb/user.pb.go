@@ -45,7 +45,7 @@ type User struct {
 	// Primary email address that can be used for logging in.
 	// This address is not public, use contact_info for that.
 	PrimaryEmailAddress string `protobuf:"bytes,8,opt,name=primary_email_address,json=primaryEmailAddress,proto3" json:"primary_email_address,omitempty"`
-	// Only used on create; never returned.
+	// Only used on create; never returned on API calls.
 	Password              string    `protobuf:"bytes,9,opt,name=password,proto3" json:"password,omitempty"`
 	PasswordUpdatedAt     time.Time `protobuf:"bytes,10,opt,name=password_updated_at,json=passwordUpdatedAt,stdtime" json:"password_updated_at"`
 	RequirePasswordUpdate bool      `protobuf:"varint,11,opt,name=require_password_update,json=requirePasswordUpdate,proto3" json:"require_password_update,omitempty"`
@@ -54,15 +54,19 @@ type User struct {
 	State State `protobuf:"varint,12,opt,name=state,proto3,enum=ttn.lorawan.v3.State" json:"state,omitempty"`
 	// This user is an admin.
 	// This field can only be modified by other admins.
-	Admin                bool     `protobuf:"varint,13,opt,name=admin,proto3" json:"admin,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Admin bool `protobuf:"varint,13,opt,name=admin,proto3" json:"admin,omitempty"`
+	// The temporary password can only be used to update a user's password; never returned on API calls.
+	TemporaryPassword          string     `protobuf:"bytes,14,opt,name=temporary_password,json=temporaryPassword,proto3" json:"temporary_password,omitempty"`
+	TemporaryPasswordCreatedAt *time.Time `protobuf:"bytes,15,opt,name=temporary_password_created_at,json=temporaryPasswordCreatedAt,stdtime" json:"temporary_password_created_at,omitempty"`
+	TemporaryPasswordExpiresAt *time.Time `protobuf:"bytes,16,opt,name=temporary_password_expires_at,json=temporaryPasswordExpiresAt,stdtime" json:"temporary_password_expires_at,omitempty"`
+	XXX_NoUnkeyedLiteral       struct{}   `json:"-"`
+	XXX_sizecache              int32      `json:"-"`
 }
 
 func (m *User) Reset()      { *m = User{} }
 func (*User) ProtoMessage() {}
 func (*User) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{0}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{0}
 }
 func (m *User) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -175,6 +179,27 @@ func (m *User) GetAdmin() bool {
 	return false
 }
 
+func (m *User) GetTemporaryPassword() string {
+	if m != nil {
+		return m.TemporaryPassword
+	}
+	return ""
+}
+
+func (m *User) GetTemporaryPasswordCreatedAt() *time.Time {
+	if m != nil {
+		return m.TemporaryPasswordCreatedAt
+	}
+	return nil
+}
+
+func (m *User) GetTemporaryPasswordExpiresAt() *time.Time {
+	if m != nil {
+		return m.TemporaryPasswordExpiresAt
+	}
+	return nil
+}
+
 type Users struct {
 	Users                []*User  `protobuf:"bytes,1,rep,name=users" json:"users,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -184,7 +209,7 @@ type Users struct {
 func (m *Users) Reset()      { *m = Users{} }
 func (*Users) ProtoMessage() {}
 func (*Users) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{1}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{1}
 }
 func (m *Users) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -230,7 +255,7 @@ type GetUserRequest struct {
 func (m *GetUserRequest) Reset()      { *m = GetUserRequest{} }
 func (*GetUserRequest) ProtoMessage() {}
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{2}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{2}
 }
 func (m *GetUserRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -276,7 +301,7 @@ type CreateUserRequest struct {
 func (m *CreateUserRequest) Reset()      { *m = CreateUserRequest{} }
 func (*CreateUserRequest) ProtoMessage() {}
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{3}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{3}
 }
 func (m *CreateUserRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -322,7 +347,7 @@ type UpdateUserRequest struct {
 func (m *UpdateUserRequest) Reset()      { *m = UpdateUserRequest{} }
 func (*UpdateUserRequest) ProtoMessage() {}
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{4}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{4}
 }
 func (m *UpdateUserRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -358,6 +383,44 @@ func (m *UpdateUserRequest) GetFieldMask() types.FieldMask {
 	return types.FieldMask{}
 }
 
+type CreateTemporaryPasswordRequest struct {
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateTemporaryPasswordRequest) Reset()      { *m = CreateTemporaryPasswordRequest{} }
+func (*CreateTemporaryPasswordRequest) ProtoMessage() {}
+func (*CreateTemporaryPasswordRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{5}
+}
+func (m *CreateTemporaryPasswordRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CreateTemporaryPasswordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CreateTemporaryPasswordRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *CreateTemporaryPasswordRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateTemporaryPasswordRequest.Merge(dst, src)
+}
+func (m *CreateTemporaryPasswordRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *CreateTemporaryPasswordRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateTemporaryPasswordRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateTemporaryPasswordRequest proto.InternalMessageInfo
+
 type UpdateUserPasswordRequest struct {
 	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
 	New                  string   `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
@@ -369,7 +432,7 @@ type UpdateUserPasswordRequest struct {
 func (m *UpdateUserPasswordRequest) Reset()      { *m = UpdateUserPasswordRequest{} }
 func (*UpdateUserPasswordRequest) ProtoMessage() {}
 func (*UpdateUserPasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{5}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{6}
 }
 func (m *UpdateUserPasswordRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -423,7 +486,7 @@ type CreateUserAPIKeyRequest struct {
 func (m *CreateUserAPIKeyRequest) Reset()      { *m = CreateUserAPIKeyRequest{} }
 func (*CreateUserAPIKeyRequest) ProtoMessage() {}
 func (*CreateUserAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{6}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{7}
 }
 func (m *CreateUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -476,7 +539,7 @@ type UpdateUserAPIKeyRequest struct {
 func (m *UpdateUserAPIKeyRequest) Reset()      { *m = UpdateUserAPIKeyRequest{} }
 func (*UpdateUserAPIKeyRequest) ProtoMessage() {}
 func (*UpdateUserAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{7}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{8}
 }
 func (m *UpdateUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -518,7 +581,7 @@ type Invitation struct {
 func (m *Invitation) Reset()      { *m = Invitation{} }
 func (*Invitation) ProtoMessage() {}
 func (*Invitation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{8}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{9}
 }
 func (m *Invitation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -591,7 +654,7 @@ type Invitations struct {
 func (m *Invitations) Reset()      { *m = Invitations{} }
 func (*Invitations) ProtoMessage() {}
 func (*Invitations) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{9}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{10}
 }
 func (m *Invitations) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -636,7 +699,7 @@ type SendInvitationRequest struct {
 func (m *SendInvitationRequest) Reset()      { *m = SendInvitationRequest{} }
 func (*SendInvitationRequest) ProtoMessage() {}
 func (*SendInvitationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{10}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{11}
 }
 func (m *SendInvitationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -681,7 +744,7 @@ type DeleteInvitationRequest struct {
 func (m *DeleteInvitationRequest) Reset()      { *m = DeleteInvitationRequest{} }
 func (*DeleteInvitationRequest) ProtoMessage() {}
 func (*DeleteInvitationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_user_69b81de12837bf0a, []int{11}
+	return fileDescriptor_user_73a6d2dccc8ac865, []int{12}
 }
 func (m *DeleteInvitationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -730,6 +793,8 @@ func init() {
 	golang_proto.RegisterType((*CreateUserRequest)(nil), "ttn.lorawan.v3.CreateUserRequest")
 	proto.RegisterType((*UpdateUserRequest)(nil), "ttn.lorawan.v3.UpdateUserRequest")
 	golang_proto.RegisterType((*UpdateUserRequest)(nil), "ttn.lorawan.v3.UpdateUserRequest")
+	proto.RegisterType((*CreateTemporaryPasswordRequest)(nil), "ttn.lorawan.v3.CreateTemporaryPasswordRequest")
+	golang_proto.RegisterType((*CreateTemporaryPasswordRequest)(nil), "ttn.lorawan.v3.CreateTemporaryPasswordRequest")
 	proto.RegisterType((*UpdateUserPasswordRequest)(nil), "ttn.lorawan.v3.UpdateUserPasswordRequest")
 	golang_proto.RegisterType((*UpdateUserPasswordRequest)(nil), "ttn.lorawan.v3.UpdateUserPasswordRequest")
 	proto.RegisterType((*CreateUserAPIKeyRequest)(nil), "ttn.lorawan.v3.CreateUserAPIKeyRequest")
@@ -811,6 +876,23 @@ func (this *User) Equal(that interface{}) bool {
 		return false
 	}
 	if this.Admin != that1.Admin {
+		return false
+	}
+	if this.TemporaryPassword != that1.TemporaryPassword {
+		return false
+	}
+	if that1.TemporaryPasswordCreatedAt == nil {
+		if this.TemporaryPasswordCreatedAt != nil {
+			return false
+		}
+	} else if !this.TemporaryPasswordCreatedAt.Equal(*that1.TemporaryPasswordCreatedAt) {
+		return false
+	}
+	if that1.TemporaryPasswordExpiresAt == nil {
+		if this.TemporaryPasswordExpiresAt != nil {
+			return false
+		}
+	} else if !this.TemporaryPasswordExpiresAt.Equal(*that1.TemporaryPasswordExpiresAt) {
 		return false
 	}
 	return true
@@ -921,6 +1003,30 @@ func (this *UpdateUserRequest) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
+func (this *CreateTemporaryPasswordRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CreateTemporaryPasswordRequest)
+	if !ok {
+		that2, ok := that.(CreateTemporaryPasswordRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
 		return false
 	}
 	return true
@@ -1255,6 +1361,34 @@ func (m *User) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
+	if len(m.TemporaryPassword) > 0 {
+		dAtA[i] = 0x72
+		i++
+		i = encodeVarintUser(dAtA, i, uint64(len(m.TemporaryPassword)))
+		i += copy(dAtA[i:], m.TemporaryPassword)
+	}
+	if m.TemporaryPasswordCreatedAt != nil {
+		dAtA[i] = 0x7a
+		i++
+		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordCreatedAt)))
+		n5, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.TemporaryPasswordCreatedAt, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if m.TemporaryPasswordExpiresAt != nil {
+		dAtA[i] = 0x82
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordExpiresAt)))
+		n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.TemporaryPasswordExpiresAt, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
 	return i, nil
 }
 
@@ -1306,19 +1440,19 @@ func (m *GetUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n5, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
+	n7, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n5
+	i += n7
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.FieldMask.Size()))
-	n6, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n8, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n6
+	i += n8
 	return i, nil
 }
 
@@ -1340,11 +1474,11 @@ func (m *CreateUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.User.Size()))
-	n7, err := m.User.MarshalTo(dAtA[i:])
+	n9, err := m.User.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n7
+	i += n9
 	if len(m.InvitationToken) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -1372,19 +1506,45 @@ func (m *UpdateUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.User.Size()))
-	n8, err := m.User.MarshalTo(dAtA[i:])
+	n10, err := m.User.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n8
+	i += n10
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.FieldMask.Size()))
-	n9, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n11, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n9
+	i += n11
+	return i, nil
+}
+
+func (m *CreateTemporaryPasswordRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateTemporaryPasswordRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
+	n12, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n12
 	return i, nil
 }
 
@@ -1406,11 +1566,11 @@ func (m *UpdateUserPasswordRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n10, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
+	n13, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n10
+	i += n13
 	if len(m.New) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -1444,11 +1604,11 @@ func (m *CreateUserAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n11, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
+	n14, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n11
+	i += n14
 	if len(m.Name) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -1456,21 +1616,21 @@ func (m *CreateUserAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Name)
 	}
 	if len(m.Rights) > 0 {
-		dAtA13 := make([]byte, len(m.Rights)*10)
-		var j12 int
+		dAtA16 := make([]byte, len(m.Rights)*10)
+		var j15 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA16[j15] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j12++
+				j15++
 			}
-			dAtA13[j12] = uint8(num)
-			j12++
+			dAtA16[j15] = uint8(num)
+			j15++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintUser(dAtA, i, uint64(j12))
-		i += copy(dAtA[i:], dAtA13[:j12])
+		i = encodeVarintUser(dAtA, i, uint64(j15))
+		i += copy(dAtA[i:], dAtA16[:j15])
 	}
 	return i, nil
 }
@@ -1493,19 +1653,19 @@ func (m *UpdateUserAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n14, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
+	n17, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n14
+	i += n17
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(m.APIKey.Size()))
-	n15, err := m.APIKey.MarshalTo(dAtA[i:])
+	n18, err := m.APIKey.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n15
+	i += n18
 	return i, nil
 }
 
@@ -1539,27 +1699,27 @@ func (m *Invitation) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n16, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
+	n19, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n19
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n17, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	n20, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n20
 	dAtA[i] = 0x2a
 	i++
 	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n18, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	n21, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n18
+	i += n21
 	return i, nil
 }
 
@@ -1681,6 +1841,13 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this.RequirePasswordUpdate = bool(r.Intn(2) == 0)
 	this.State = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.Admin = bool(r.Intn(2) == 0)
+	this.TemporaryPassword = randStringUser(r)
+	if r.Intn(10) != 0 {
+		this.TemporaryPasswordCreatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.TemporaryPasswordExpiresAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	}
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1732,10 +1899,19 @@ func NewPopulatedUpdateUserRequest(r randyUser, easy bool) *UpdateUserRequest {
 	return this
 }
 
-func NewPopulatedUpdateUserPasswordRequest(r randyUser, easy bool) *UpdateUserPasswordRequest {
-	this := &UpdateUserPasswordRequest{}
+func NewPopulatedCreateTemporaryPasswordRequest(r randyUser, easy bool) *CreateTemporaryPasswordRequest {
+	this := &CreateTemporaryPasswordRequest{}
 	v13 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v13
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedUpdateUserPasswordRequest(r randyUser, easy bool) *UpdateUserPasswordRequest {
+	this := &UpdateUserPasswordRequest{}
+	v14 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIdentifiers = *v14
 	this.New = randStringUser(r)
 	this.Old = randStringUser(r)
 	if !easy && r.Intn(10) != 0 {
@@ -1745,12 +1921,12 @@ func NewPopulatedUpdateUserPasswordRequest(r randyUser, easy bool) *UpdateUserPa
 
 func NewPopulatedCreateUserAPIKeyRequest(r randyUser, easy bool) *CreateUserAPIKeyRequest {
 	this := &CreateUserAPIKeyRequest{}
-	v14 := NewPopulatedUserIdentifiers(r, easy)
-	this.UserIdentifiers = *v14
+	v15 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIdentifiers = *v15
 	this.Name = randStringUser(r)
-	v15 := r.Intn(10)
-	this.Rights = make([]Right, v15)
-	for i := 0; i < v15; i++ {
+	v16 := r.Intn(10)
+	this.Rights = make([]Right, v16)
+	for i := 0; i < v16; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}[r.Intn(54)])
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -1760,10 +1936,10 @@ func NewPopulatedCreateUserAPIKeyRequest(r randyUser, easy bool) *CreateUserAPIK
 
 func NewPopulatedUpdateUserAPIKeyRequest(r randyUser, easy bool) *UpdateUserAPIKeyRequest {
 	this := &UpdateUserAPIKeyRequest{}
-	v16 := NewPopulatedUserIdentifiers(r, easy)
-	this.UserIdentifiers = *v16
-	v17 := NewPopulatedAPIKey(r, easy)
-	this.APIKey = *v17
+	v17 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIdentifiers = *v17
+	v18 := NewPopulatedAPIKey(r, easy)
+	this.APIKey = *v18
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1773,12 +1949,12 @@ func NewPopulatedInvitation(r randyUser, easy bool) *Invitation {
 	this := &Invitation{}
 	this.Email = randStringUser(r)
 	this.Token = randStringUser(r)
-	v18 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.ExpiresAt = *v18
 	v19 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.CreatedAt = *v19
+	this.ExpiresAt = *v19
 	v20 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.UpdatedAt = *v20
+	this.CreatedAt = *v20
+	v21 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.UpdatedAt = *v21
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1787,9 +1963,9 @@ func NewPopulatedInvitation(r randyUser, easy bool) *Invitation {
 func NewPopulatedInvitations(r randyUser, easy bool) *Invitations {
 	this := &Invitations{}
 	if r.Intn(10) != 0 {
-		v21 := r.Intn(5)
-		this.Invitations = make([]*Invitation, v21)
-		for i := 0; i < v21; i++ {
+		v22 := r.Intn(5)
+		this.Invitations = make([]*Invitation, v22)
+		for i := 0; i < v22; i++ {
 			this.Invitations[i] = NewPopulatedInvitation(r, easy)
 		}
 	}
@@ -1833,9 +2009,9 @@ func randUTF8RuneUser(r randyUser) rune {
 	return rune(ru + 61)
 }
 func randStringUser(r randyUser) string {
-	v22 := r.Intn(100)
-	tmps := make([]rune, v22)
-	for i := 0; i < v22; i++ {
+	v23 := r.Intn(100)
+	tmps := make([]rune, v23)
+	for i := 0; i < v23; i++ {
 		tmps[i] = randUTF8RuneUser(r)
 	}
 	return string(tmps)
@@ -1857,11 +2033,11 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
-		v23 := r.Int63()
+		v24 := r.Int63()
 		if r.Intn(2) == 0 {
-			v23 *= -1
+			v24 *= -1
 		}
-		dAtA = encodeVarintPopulateUser(dAtA, uint64(v23))
+		dAtA = encodeVarintPopulateUser(dAtA, uint64(v24))
 	case 1:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1936,6 +2112,18 @@ func (m *User) Size() (n int) {
 	if m.Admin {
 		n += 2
 	}
+	l = len(m.TemporaryPassword)
+	if l > 0 {
+		n += 1 + l + sovUser(uint64(l))
+	}
+	if m.TemporaryPasswordCreatedAt != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordCreatedAt)
+		n += 1 + l + sovUser(uint64(l))
+	}
+	if m.TemporaryPasswordExpiresAt != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordExpiresAt)
+		n += 2 + l + sovUser(uint64(l))
+	}
 	return n
 }
 
@@ -1979,6 +2167,14 @@ func (m *UpdateUserRequest) Size() (n int) {
 	l = m.User.Size()
 	n += 1 + l + sovUser(uint64(l))
 	l = m.FieldMask.Size()
+	n += 1 + l + sovUser(uint64(l))
+	return n
+}
+
+func (m *CreateTemporaryPasswordRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.UserIdentifiers.Size()
 	n += 1 + l + sovUser(uint64(l))
 	return n
 }
@@ -2121,6 +2317,9 @@ func (this *User) String() string {
 		`RequirePasswordUpdate:` + fmt.Sprintf("%v", this.RequirePasswordUpdate) + `,`,
 		`State:` + fmt.Sprintf("%v", this.State) + `,`,
 		`Admin:` + fmt.Sprintf("%v", this.Admin) + `,`,
+		`TemporaryPassword:` + fmt.Sprintf("%v", this.TemporaryPassword) + `,`,
+		`TemporaryPasswordCreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.TemporaryPasswordCreatedAt), "Timestamp", "types.Timestamp", 1) + `,`,
+		`TemporaryPasswordExpiresAt:` + strings.Replace(fmt.Sprintf("%v", this.TemporaryPasswordExpiresAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2164,6 +2363,16 @@ func (this *UpdateUserRequest) String() string {
 	s := strings.Join([]string{`&UpdateUserRequest{`,
 		`User:` + strings.Replace(strings.Replace(this.User.String(), "User", "User", 1), `&`, ``, 1) + `,`,
 		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateTemporaryPasswordRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateTemporaryPasswordRequest{`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2728,6 +2937,101 @@ func (m *User) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.Admin = bool(v != 0)
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TemporaryPassword", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TemporaryPassword = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 15:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TemporaryPasswordCreatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.TemporaryPasswordCreatedAt == nil {
+				m.TemporaryPasswordCreatedAt = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.TemporaryPasswordCreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TemporaryPasswordExpiresAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.TemporaryPasswordExpiresAt == nil {
+				m.TemporaryPasswordExpiresAt = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.TemporaryPasswordExpiresAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipUser(dAtA[iNdEx:])
@@ -3135,6 +3439,86 @@ func (m *UpdateUserRequest) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipUser(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthUser
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateTemporaryPasswordRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowUser
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateTemporaryPasswordRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateTemporaryPasswordRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4120,75 +4504,79 @@ var (
 	ErrIntOverflowUser   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_69b81de12837bf0a) }
+func init() { proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_73a6d2dccc8ac865) }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_69b81de12837bf0a)
+	golang_proto.RegisterFile("lorawan-stack/api/user.proto", fileDescriptor_user_73a6d2dccc8ac865)
 }
 
-var fileDescriptor_user_69b81de12837bf0a = []byte{
-	// 1016 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x3d, 0x6c, 0xdb, 0xc6,
-	0x17, 0xe7, 0x59, 0x92, 0x6d, 0x3d, 0xe5, 0xef, 0xd8, 0x4c, 0xfc, 0x37, 0xab, 0xb4, 0x67, 0x81,
-	0xcd, 0xe0, 0x7e, 0x98, 0x02, 0x6c, 0xa0, 0xe8, 0x77, 0xe1, 0x8f, 0xb4, 0x30, 0x8c, 0x02, 0x01,
-	0xe3, 0x2c, 0x5d, 0x84, 0x93, 0x78, 0x92, 0x0f, 0x92, 0x48, 0x86, 0x77, 0xb4, 0xab, 0x2d, 0x4b,
-	0x51, 0x8f, 0xd9, 0x5a, 0x74, 0x2a, 0x32, 0x65, 0xcc, 0x98, 0x31, 0xa3, 0x47, 0x8f, 0x99, 0xd2,
-	0x88, 0x5a, 0xd2, 0x2d, 0x63, 0xc6, 0xe2, 0x8e, 0xa4, 0x49, 0xcb, 0x0a, 0x50, 0x27, 0xee, 0x76,
-	0xef, 0xfd, 0x7e, 0xef, 0xf1, 0xe9, 0xf7, 0xee, 0xbd, 0x13, 0xbc, 0xdf, 0xf3, 0x02, 0x72, 0x48,
-	0xdc, 0x55, 0x2e, 0x48, 0xab, 0x5b, 0x27, 0x3e, 0xab, 0x87, 0x9c, 0x06, 0x96, 0x1f, 0x78, 0xc2,
-	0xd3, 0xe7, 0x84, 0x70, 0xad, 0x84, 0x61, 0x1d, 0xac, 0x57, 0x57, 0x3b, 0x4c, 0xec, 0x87, 0x4d,
-	0xab, 0xe5, 0xf5, 0xeb, 0x1d, 0xaf, 0xe3, 0xd5, 0x15, 0xad, 0x19, 0xb6, 0x95, 0xa5, 0x0c, 0x75,
-	0x8a, 0xc3, 0xab, 0x37, 0x3a, 0x9e, 0xd7, 0xe9, 0xd1, 0x8c, 0x45, 0xfb, 0xbe, 0x18, 0x24, 0x60,
-	0x6d, 0x1c, 0x6c, 0x33, 0xda, 0x73, 0x1a, 0x7d, 0xc2, 0xbb, 0x09, 0x63, 0x79, 0x9c, 0x21, 0x58,
-	0x9f, 0x72, 0x41, 0xfa, 0x7e, 0x42, 0xc0, 0xe7, 0x8b, 0x6f, 0xf5, 0x18, 0x75, 0x45, 0x82, 0xdf,
-	0x9c, 0x80, 0x7b, 0xae, 0x20, 0x2d, 0xd1, 0x60, 0x6e, 0x3b, 0xad, 0xf2, 0x83, 0xf3, 0x2c, 0xea,
-	0x86, 0x7d, 0x9e, 0xc0, 0x1f, 0x9e, 0x87, 0x99, 0x43, 0x5d, 0xc1, 0xda, 0x8c, 0x06, 0xfc, 0xcd,
-	0x95, 0x04, 0xac, 0xb3, 0x2f, 0x12, 0xdc, 0xfc, 0xbb, 0x04, 0xc5, 0xbb, 0x9c, 0x06, 0xfa, 0x57,
-	0x50, 0x60, 0x0e, 0x37, 0x50, 0x0d, 0xad, 0x54, 0xd6, 0x96, 0xad, 0xb3, 0xfa, 0x5a, 0x92, 0xb2,
-	0x93, 0x25, 0xdf, 0x9c, 0x3d, 0x7e, 0xbe, 0xac, 0x9d, 0x3c, 0x5f, 0x46, 0xb6, 0x8c, 0xd2, 0xb7,
-	0x00, 0x5a, 0x01, 0x25, 0x82, 0x3a, 0x0d, 0x22, 0x8c, 0x29, 0x95, 0xa3, 0x6a, 0xc5, 0x2a, 0x59,
-	0xa9, 0x4a, 0xd6, 0x5e, 0xaa, 0x52, 0x1c, 0xfe, 0xe0, 0xaf, 0x65, 0x64, 0x97, 0x93, 0xb8, 0x0d,
-	0x21, 0x93, 0x84, 0xbe, 0x93, 0x26, 0x29, 0x5c, 0x24, 0x49, 0x12, 0xb7, 0x21, 0x74, 0x1d, 0x8a,
-	0x2e, 0xe9, 0x53, 0xa3, 0x58, 0x43, 0x2b, 0x65, 0x5b, 0x9d, 0xf5, 0x1a, 0x54, 0x1c, 0xca, 0x5b,
-	0x01, 0xf3, 0x05, 0xf3, 0x5c, 0xa3, 0xa4, 0xa0, 0xbc, 0x4b, 0xdf, 0x06, 0x20, 0x42, 0x04, 0xac,
-	0x19, 0x0a, 0xca, 0x8d, 0xe9, 0x5a, 0x61, 0xa5, 0xb2, 0x76, 0x73, 0x92, 0x06, 0xd6, 0xc6, 0x29,
-	0xed, 0x96, 0x2b, 0x82, 0x81, 0x9d, 0x8b, 0xd3, 0xbf, 0x85, 0x2b, 0xf9, 0x2e, 0x1a, 0x33, 0x2a,
-	0xcf, 0x8d, 0xf1, 0x3c, 0x5b, 0x31, 0x67, 0xc7, 0x6d, 0x7b, 0x76, 0xa5, 0x95, 0x19, 0xfa, 0x1a,
-	0x2c, 0xfa, 0x01, 0xeb, 0x93, 0x60, 0xd0, 0xa0, 0x7d, 0xc2, 0x7a, 0x0d, 0xe2, 0x38, 0x01, 0xe5,
-	0xdc, 0x98, 0x55, 0x15, 0x5f, 0x4b, 0xc0, 0x5b, 0x12, 0xdb, 0x88, 0x21, 0xbd, 0x0a, 0xb3, 0x3e,
-	0xe1, 0xfc, 0xd0, 0x0b, 0x1c, 0xa3, 0xac, 0x68, 0xa7, 0xb6, 0xbe, 0x07, 0xd7, 0xd2, 0x73, 0x23,
-	0xa7, 0x2c, 0x5c, 0x40, 0xd9, 0x85, 0x34, 0xc1, 0xdd, 0x53, 0x85, 0x3f, 0x83, 0xa5, 0x80, 0xde,
-	0x0b, 0x59, 0x40, 0x1b, 0x63, 0xd9, 0x8d, 0x4a, 0x0d, 0xad, 0xcc, 0xda, 0x8b, 0x09, 0x7c, 0xfb,
-	0x4c, 0xa8, 0xfe, 0x09, 0x94, 0xb8, 0x90, 0xac, 0x2b, 0x35, 0xb4, 0x32, 0xb7, 0xb6, 0x38, 0x2e,
-	0xcb, 0x1d, 0x09, 0xda, 0x31, 0x47, 0xbf, 0x0e, 0x25, 0xe2, 0xf4, 0x99, 0x6b, 0xfc, 0x4f, 0xa5,
-	0x8c, 0x8d, 0xea, 0x37, 0x70, 0x75, 0x4c, 0x7f, 0x7d, 0x1e, 0x0a, 0x5d, 0x3a, 0x50, 0xd7, 0xb6,
-	0x6c, 0xcb, 0xa3, 0x0c, 0x3d, 0x20, 0xbd, 0x90, 0xaa, 0x6b, 0x58, 0xb6, 0x63, 0xe3, 0xcb, 0xa9,
-	0xcf, 0x91, 0xb9, 0x0e, 0x25, 0xd9, 0x43, 0xae, 0x7f, 0x0c, 0x25, 0xb9, 0x4b, 0xe4, 0x6d, 0x97,
-	0x1d, 0xba, 0x3e, 0xa9, 0xd3, 0x76, 0x4c, 0x31, 0x7f, 0x43, 0x30, 0xf7, 0x03, 0x15, 0xca, 0x45,
-	0xef, 0x85, 0x94, 0x0b, 0x7d, 0x1b, 0x66, 0x25, 0xd6, 0x78, 0xab, 0x79, 0x99, 0x09, 0x15, 0xc4,
-	0xf5, 0xef, 0x00, 0xb2, 0xc5, 0xf2, 0xc6, 0x99, 0xf9, 0x5e, 0x52, 0x7e, 0x24, 0xbc, 0xbb, 0x59,
-	0x94, 0x29, 0xec, 0x72, 0x3b, 0x75, 0x98, 0x01, 0x2c, 0x6c, 0xa9, 0xe1, 0xc9, 0xd7, 0xb6, 0x06,
-	0x45, 0xf9, 0x81, 0xa4, 0xae, 0x89, 0xbf, 0x2c, 0x57, 0x8c, 0xe2, 0xea, 0x1f, 0xc1, 0x3c, 0x73,
-	0x0f, 0x98, 0x20, 0x72, 0x16, 0x1a, 0xc2, 0xeb, 0x52, 0x37, 0x11, 0xef, 0x6a, 0xe6, 0xdf, 0x93,
-	0x6e, 0xf3, 0x08, 0xc1, 0x42, 0xdc, 0xcf, 0x77, 0xfd, 0xe8, 0x3b, 0xff, 0xfc, 0x5f, 0x10, 0xbc,
-	0x97, 0x95, 0x92, 0x5e, 0xb6, 0xcb, 0xed, 0xd1, 0x3c, 0x14, 0x5c, 0x7a, 0x98, 0x88, 0x21, 0x8f,
-	0xd2, 0xe3, 0xf5, 0x1c, 0xb5, 0x9d, 0xca, 0xb6, 0x3c, 0x9a, 0x0f, 0x11, 0x2c, 0x65, 0x7d, 0xd8,
-	0xb8, 0xbd, 0xb3, 0x4b, 0x07, 0x97, 0x5b, 0x45, 0xba, 0xd3, 0xa6, 0x72, 0x3b, 0x6d, 0x15, 0xa6,
-	0xe3, 0x3d, 0x6e, 0x14, 0x6a, 0x85, 0x49, 0xe3, 0x64, 0x4b, 0xd4, 0x4e, 0x48, 0xe6, 0x1f, 0x08,
-	0x96, 0x32, 0xb1, 0xfe, 0x8b, 0x22, 0xbf, 0x80, 0x19, 0xe2, 0xb3, 0x86, 0x1c, 0xc6, 0xb8, 0x99,
-	0xff, 0x1f, 0x4f, 0x12, 0x7f, 0x35, 0x17, 0x3b, 0x4d, 0x7c, 0xb6, 0x4b, 0x07, 0xe6, 0xaf, 0x53,
-	0x00, 0x3b, 0xa7, 0x17, 0x4d, 0x0e, 0xb0, 0x5a, 0x7f, 0xc9, 0x50, 0xc7, 0x86, 0xf4, 0xe6, 0x6f,
-	0x66, 0x6c, 0xc8, 0x37, 0x83, 0xfe, 0xec, 0xb3, 0x80, 0xf2, 0x0b, 0xbf, 0x19, 0x49, 0x5c, 0xfc,
-	0xf0, 0xe4, 0x5e, 0xaf, 0xe2, 0x65, 0xbc, 0x5e, 0xa5, 0xb7, 0x7a, 0xbd, 0xcc, 0x5d, 0xa8, 0x64,
-	0x42, 0x70, 0xfd, 0x6b, 0xa8, 0x64, 0x03, 0x98, 0x6e, 0xab, 0xea, 0xb8, 0xae, 0x59, 0x84, 0x9d,
-	0xa7, 0x9b, 0xab, 0xb0, 0x78, 0x87, 0xba, 0x4e, 0x0e, 0x4e, 0x1a, 0x3e, 0x51, 0x60, 0xb3, 0x0e,
-	0x4b, 0xdb, 0xb4, 0x47, 0x05, 0xfd, 0x97, 0x01, 0x9b, 0x0f, 0xd1, 0xf1, 0x10, 0xa3, 0x93, 0x21,
-	0x46, 0xcf, 0x86, 0x58, 0x7b, 0x31, 0xc4, 0xda, 0xcb, 0x21, 0xd6, 0x5e, 0x0d, 0xb1, 0xf6, 0x7a,
-	0x88, 0xd1, 0xfd, 0x08, 0xa3, 0xa3, 0x08, 0x6b, 0x8f, 0x22, 0x8c, 0x1e, 0x47, 0x58, 0x7b, 0x12,
-	0x61, 0xed, 0x69, 0x84, 0xb5, 0xe3, 0x08, 0xa3, 0x93, 0x08, 0xa3, 0x67, 0x11, 0xd6, 0x5e, 0x44,
-	0x18, 0xbd, 0x8c, 0xb0, 0xf6, 0x2a, 0xc2, 0xe8, 0x75, 0x84, 0xb5, 0xfb, 0x23, 0xac, 0x1d, 0x8d,
-	0x30, 0x7a, 0x30, 0xc2, 0xda, 0xef, 0x23, 0x8c, 0xfe, 0x1c, 0x61, 0xed, 0xd1, 0x08, 0x6b, 0x8f,
-	0x47, 0x18, 0x3d, 0x19, 0x61, 0xf4, 0x74, 0x84, 0xd1, 0x4f, 0x9f, 0x76, 0x3c, 0x4b, 0xec, 0x53,
-	0xb1, 0xcf, 0xdc, 0x0e, 0xb7, 0x5c, 0x2a, 0x0e, 0xbd, 0xa0, 0x5b, 0x3f, 0xfb, 0x37, 0xc7, 0xef,
-	0x76, 0xea, 0x42, 0xb8, 0x7e, 0xb3, 0x39, 0xad, 0xa4, 0x5f, 0xff, 0x27, 0x00, 0x00, 0xff, 0xff,
-	0x23, 0x4b, 0x59, 0x70, 0x4f, 0x0a, 0x00, 0x00,
+var fileDescriptor_user_73a6d2dccc8ac865 = []byte{
+	// 1079 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x3b, 0x6c, 0x1b, 0x37,
+	0x18, 0x3e, 0x5a, 0x92, 0x6d, 0xfd, 0x4a, 0x9d, 0x98, 0x89, 0xeb, 0xab, 0xd2, 0xd0, 0xc2, 0x35,
+	0x83, 0xfb, 0xf0, 0x09, 0x70, 0x80, 0xa2, 0xef, 0x42, 0x7e, 0xb4, 0x30, 0x8c, 0x02, 0xc1, 0xc5,
+	0x59, 0xba, 0x1c, 0xce, 0x3a, 0x4a, 0x26, 0xa4, 0x7b, 0xe4, 0x48, 0xd9, 0xd5, 0x96, 0xa5, 0xa8,
+	0xc7, 0x6c, 0x2d, 0x3a, 0x15, 0x99, 0x32, 0x66, 0xcc, 0x98, 0xd1, 0xa3, 0xc7, 0x4c, 0x69, 0x74,
+	0x5a, 0x82, 0x4e, 0x19, 0x33, 0x16, 0xbc, 0x87, 0xee, 0x2c, 0x2b, 0x40, 0x1c, 0x3b, 0x1b, 0xc9,
+	0xef, 0xfb, 0x1f, 0xfc, 0xf8, 0xf3, 0x27, 0xe1, 0xe3, 0xae, 0x17, 0x58, 0x07, 0x96, 0xbb, 0xc2,
+	0x85, 0xd5, 0xec, 0xd4, 0x2d, 0x9f, 0xd5, 0x7b, 0x9c, 0x06, 0xba, 0x1f, 0x78, 0xc2, 0xc3, 0x73,
+	0x42, 0xb8, 0x7a, 0xc2, 0xd0, 0xf7, 0x6f, 0x55, 0x57, 0xda, 0x4c, 0xec, 0xf5, 0x76, 0xf5, 0xa6,
+	0xe7, 0xd4, 0xdb, 0x5e, 0xdb, 0xab, 0x47, 0xb4, 0xdd, 0x5e, 0x2b, 0x9a, 0x45, 0x93, 0x68, 0x14,
+	0x9b, 0x57, 0xaf, 0xb7, 0x3d, 0xaf, 0xdd, 0xa5, 0x19, 0x8b, 0x3a, 0xbe, 0xe8, 0x27, 0x60, 0x6d,
+	0x1c, 0x6c, 0x31, 0xda, 0xb5, 0x4d, 0xc7, 0xe2, 0x9d, 0x84, 0xb1, 0x34, 0xce, 0x10, 0xcc, 0xa1,
+	0x5c, 0x58, 0x8e, 0x9f, 0x10, 0xc8, 0xe9, 0xe4, 0x9b, 0x5d, 0x46, 0x5d, 0x91, 0xe0, 0x37, 0x27,
+	0xe0, 0x9e, 0x2b, 0xac, 0xa6, 0x30, 0x99, 0xdb, 0x4a, 0xb3, 0xbc, 0x71, 0x9a, 0x45, 0xdd, 0x9e,
+	0xc3, 0x13, 0xf8, 0x93, 0xd3, 0x30, 0xb3, 0xa9, 0x2b, 0x58, 0x8b, 0xd1, 0x80, 0xbf, 0x39, 0x93,
+	0x80, 0xb5, 0xf7, 0x44, 0x82, 0x6b, 0xff, 0xcd, 0x40, 0xf1, 0x2e, 0xa7, 0x01, 0xfe, 0x16, 0x0a,
+	0xcc, 0xe6, 0x2a, 0xaa, 0xa1, 0xe5, 0xca, 0xea, 0x92, 0x7e, 0x52, 0x5f, 0x5d, 0x52, 0xb6, 0x32,
+	0xe7, 0x6b, 0xb3, 0x47, 0xcf, 0x97, 0x94, 0xe3, 0xe7, 0x4b, 0xc8, 0x90, 0x56, 0x78, 0x1d, 0xa0,
+	0x19, 0x50, 0x4b, 0x50, 0xdb, 0xb4, 0x84, 0x3a, 0x15, 0xf9, 0xa8, 0xea, 0xb1, 0x4a, 0x7a, 0xaa,
+	0x92, 0xbe, 0x93, 0xaa, 0x14, 0x9b, 0x3f, 0xf8, 0x77, 0x09, 0x19, 0xe5, 0xc4, 0xae, 0x21, 0xa4,
+	0x93, 0x9e, 0x6f, 0xa7, 0x4e, 0x0a, 0x67, 0x71, 0x92, 0xd8, 0x35, 0x04, 0xc6, 0x50, 0x74, 0x2d,
+	0x87, 0xaa, 0xc5, 0x1a, 0x5a, 0x2e, 0x1b, 0xd1, 0x18, 0xd7, 0xa0, 0x62, 0x53, 0xde, 0x0c, 0x98,
+	0x2f, 0x98, 0xe7, 0xaa, 0xa5, 0x08, 0xca, 0x2f, 0xe1, 0x0d, 0x00, 0x4b, 0x88, 0x80, 0xed, 0xf6,
+	0x04, 0xe5, 0xea, 0x74, 0xad, 0xb0, 0x5c, 0x59, 0xbd, 0x39, 0x49, 0x03, 0xbd, 0x31, 0xa2, 0x6d,
+	0xba, 0x22, 0xe8, 0x1b, 0x39, 0x3b, 0xfc, 0x03, 0x5c, 0xca, 0x9f, 0xa2, 0x3a, 0x13, 0xf9, 0xb9,
+	0x3e, 0xee, 0x67, 0x3d, 0xe6, 0x6c, 0xb9, 0x2d, 0xcf, 0xa8, 0x34, 0xb3, 0x09, 0x5e, 0x85, 0x05,
+	0x3f, 0x60, 0x8e, 0x15, 0xf4, 0x4d, 0xea, 0x58, 0xac, 0x6b, 0x5a, 0xb6, 0x1d, 0x50, 0xce, 0xd5,
+	0xd9, 0x28, 0xe3, 0xab, 0x09, 0xb8, 0x29, 0xb1, 0x46, 0x0c, 0xe1, 0x2a, 0xcc, 0xfa, 0x16, 0xe7,
+	0x07, 0x5e, 0x60, 0xab, 0xe5, 0x88, 0x36, 0x9a, 0xe3, 0x1d, 0xb8, 0x9a, 0x8e, 0xcd, 0x9c, 0xb2,
+	0x70, 0x06, 0x65, 0xe7, 0x53, 0x07, 0x77, 0x47, 0x0a, 0x7f, 0x09, 0x8b, 0x01, 0xbd, 0xd7, 0x63,
+	0x01, 0x35, 0xc7, 0xbc, 0xab, 0x95, 0x1a, 0x5a, 0x9e, 0x35, 0x16, 0x12, 0xf8, 0xf6, 0x09, 0x53,
+	0xfc, 0x39, 0x94, 0xb8, 0x90, 0xac, 0x4b, 0x35, 0xb4, 0x3c, 0xb7, 0xba, 0x30, 0x2e, 0xcb, 0x1d,
+	0x09, 0x1a, 0x31, 0x07, 0x5f, 0x83, 0x92, 0x65, 0x3b, 0xcc, 0x55, 0x3f, 0x88, 0x5c, 0xc6, 0x13,
+	0xbc, 0x02, 0x58, 0x50, 0xc7, 0xf7, 0x02, 0x29, 0xd1, 0x68, 0xdb, 0x73, 0xd1, 0xb6, 0xe7, 0x47,
+	0x48, 0x1a, 0x17, 0xb7, 0xe1, 0xc6, 0x69, 0xba, 0x99, 0x2b, 0xd4, 0xcb, 0x6f, 0xa5, 0x04, 0x8a,
+	0x94, 0xa8, 0x9e, 0xf2, 0xbf, 0x3e, 0xaa, 0xdc, 0xc9, 0x81, 0xe8, 0x6f, 0x3e, 0x0b, 0x28, 0x97,
+	0x81, 0xae, 0x9c, 0x2b, 0xd0, 0x66, 0xec, 0xa8, 0x21, 0xaa, 0xdf, 0xc3, 0xe5, 0xb1, 0x02, 0xc4,
+	0x57, 0xa0, 0xd0, 0xa1, 0xfd, 0xe8, 0xde, 0x96, 0x0d, 0x39, 0x94, 0xda, 0xed, 0x5b, 0xdd, 0x1e,
+	0x8d, 0xee, 0x61, 0xd9, 0x88, 0x27, 0xdf, 0x4c, 0x7d, 0x85, 0xb4, 0x5b, 0x50, 0x92, 0x45, 0xcc,
+	0xf1, 0x67, 0x50, 0x92, 0xcd, 0x54, 0x5e, 0x77, 0x59, 0xa2, 0xd7, 0x26, 0x95, 0xba, 0x11, 0x53,
+	0xb4, 0x3f, 0x11, 0xcc, 0xfd, 0x4c, 0x45, 0xb4, 0x44, 0xef, 0xf5, 0x28, 0x17, 0x78, 0x03, 0x66,
+	0x25, 0x66, 0xbe, 0x53, 0xc3, 0x98, 0xe9, 0x45, 0x10, 0xc7, 0x3f, 0x02, 0x64, 0x9d, 0xf5, 0x8d,
+	0x4d, 0xe3, 0x27, 0x49, 0xf9, 0xc5, 0xe2, 0x9d, 0xb5, 0xa2, 0x74, 0x61, 0x94, 0x5b, 0xe9, 0x82,
+	0x16, 0xc0, 0x7c, 0x7c, 0x06, 0xf9, 0xdc, 0x56, 0xa1, 0x28, 0x03, 0x24, 0x79, 0x4d, 0xdc, 0x59,
+	0x2e, 0x99, 0x88, 0x8b, 0x3f, 0x85, 0x2b, 0xcc, 0xdd, 0x67, 0xc2, 0x92, 0xcd, 0xc0, 0x14, 0x5e,
+	0x87, 0xba, 0x89, 0x78, 0x97, 0xb3, 0xf5, 0x1d, 0xb9, 0xac, 0x1d, 0x22, 0x98, 0x8f, 0x0b, 0xfa,
+	0xbc, 0x41, 0xcf, 0xbd, 0xfd, 0x16, 0x90, 0x78, 0xfb, 0x3b, 0xe3, 0x05, 0x73, 0xa1, 0xe7, 0xa4,
+	0xfd, 0x8e, 0xe0, 0xa3, 0x6c, 0xcb, 0xef, 0x25, 0x86, 0xac, 0x62, 0x97, 0x1e, 0x24, 0xa2, 0xcb,
+	0xa1, 0x5c, 0xf1, 0xba, 0x76, 0xf4, 0x0c, 0x94, 0x0d, 0x39, 0xd4, 0x1e, 0x22, 0x58, 0xcc, 0xce,
+	0xbb, 0x71, 0x7b, 0x6b, 0x9b, 0xf6, 0x2f, 0x36, 0x8b, 0xf4, 0xf1, 0x98, 0xca, 0x3d, 0x1e, 0x2b,
+	0x30, 0x1d, 0x3f, 0x98, 0x6a, 0xa1, 0x56, 0x98, 0xd4, 0xb7, 0x0c, 0x89, 0x1a, 0x09, 0x49, 0xfb,
+	0x1b, 0xc1, 0x62, 0x26, 0xd6, 0xfb, 0x48, 0xf2, 0x6b, 0x98, 0xb1, 0x7c, 0x66, 0xca, 0x4b, 0x1f,
+	0x17, 0xcd, 0x87, 0xe3, 0x4e, 0xe2, 0xa8, 0x39, 0xdb, 0x69, 0xcb, 0x67, 0xdb, 0xb4, 0xaf, 0xfd,
+	0x31, 0x05, 0xb0, 0x35, 0x2a, 0x68, 0xd9, 0x28, 0xa2, 0x77, 0x26, 0x69, 0x1e, 0xf1, 0x44, 0xae,
+	0xe6, 0x6f, 0x40, 0x3c, 0x91, 0x8f, 0x73, 0xae, 0x9f, 0x9d, 0xe9, 0x71, 0xa6, 0x69, 0xfb, 0x1a,
+	0xfb, 0x26, 0x14, 0x2f, 0xe2, 0x9b, 0x50, 0x7a, 0xa7, 0x6f, 0x82, 0xb6, 0x0d, 0x95, 0x4c, 0x08,
+	0x8e, 0xbf, 0x83, 0x4a, 0x76, 0xd1, 0xd3, 0xae, 0x58, 0x1d, 0xd7, 0x35, 0xb3, 0x30, 0xf2, 0x74,
+	0x6d, 0x05, 0x16, 0xee, 0x50, 0xd7, 0xce, 0xc1, 0xc9, 0x81, 0x4f, 0x14, 0x58, 0xab, 0xc3, 0xe2,
+	0x06, 0xed, 0x52, 0x41, 0xdf, 0xd2, 0x60, 0xed, 0x21, 0x3a, 0x1a, 0x10, 0x74, 0x3c, 0x20, 0xe8,
+	0xd9, 0x80, 0x28, 0x2f, 0x06, 0x44, 0x79, 0x39, 0x20, 0xca, 0xab, 0x01, 0x51, 0x5e, 0x0f, 0x08,
+	0xba, 0x1f, 0x12, 0x74, 0x18, 0x12, 0xe5, 0x51, 0x48, 0xd0, 0xe3, 0x90, 0x28, 0x4f, 0x42, 0xa2,
+	0x3c, 0x0d, 0x89, 0x72, 0x14, 0x12, 0x74, 0x1c, 0x12, 0xf4, 0x2c, 0x24, 0xca, 0x8b, 0x90, 0xa0,
+	0x97, 0x21, 0x51, 0x5e, 0x85, 0x04, 0xbd, 0x0e, 0x89, 0x72, 0x7f, 0x48, 0x94, 0xc3, 0x21, 0x41,
+	0x0f, 0x86, 0x44, 0xf9, 0x6b, 0x48, 0xd0, 0x3f, 0x43, 0xa2, 0x3c, 0x1a, 0x12, 0xe5, 0xf1, 0x90,
+	0xa0, 0x27, 0x43, 0x82, 0x9e, 0x0e, 0x09, 0xfa, 0xf5, 0x8b, 0xb6, 0xa7, 0x8b, 0x3d, 0x2a, 0xf6,
+	0x98, 0xdb, 0xe6, 0xba, 0x4b, 0xc5, 0x81, 0x17, 0x74, 0xea, 0x27, 0xff, 0x93, 0x7e, 0xa7, 0x5d,
+	0x17, 0xc2, 0xf5, 0x77, 0x77, 0xa7, 0x23, 0xe9, 0x6f, 0xfd, 0x1f, 0x00, 0x00, 0xff, 0xff, 0x42,
+	0xf8, 0xde, 0x2d, 0xb8, 0x0b, 0x00, 0x00,
 }
