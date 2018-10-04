@@ -104,7 +104,7 @@ service UserAccess {
 }
 
 service UserInvitationRegistry {
-  rpc Send(SendInvitationRequest) returns (google.protobuf.Empty) {
+  rpc Send(SendInvitationRequest) returns (Invitation) {
     option (google.api.http) = {
       post: "/invitations"
       body: "*"
