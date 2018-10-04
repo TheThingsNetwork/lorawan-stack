@@ -9,8 +9,8 @@
   "scripts": {
     "build": "babel src -d dist",
     "build:watch": "babel -w src -d dist",
-    "test": "jest --testPathIgnorePatterns=/dist/",
-    "test:watch": "jest --testPathIgnorePatterns=/dist/ --watch"
+    "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
+    "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch"
   },
   "devDependencies": {
     "babel": "^6.23.0",
