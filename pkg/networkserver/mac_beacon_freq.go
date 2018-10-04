@@ -20,6 +20,16 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.BeaconFrequency == dev.MACState.CurrentParameters.BeaconFrequency {
+		return
+	}
+
+	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_BeaconFreqReq{
+		Frequency: dev.MACState.DesiredParameters.BeaconFrequency,
+	}).MACCommand())
+}
+
 func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) (err error) {
 	if pld == nil {
 		return errNoPayload

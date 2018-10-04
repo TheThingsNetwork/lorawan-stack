@@ -27,6 +27,18 @@ var (
 	evtMACDeviceStatus        = events.Define("ns.mac.device_status", "handled device status")
 )
 
+func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.LastStatusReceivedAt == nil ||
+		dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
+		dev.MACSettings.StatusTimePeriodicity > 0 && dev.LastStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).Before(time.Now()) {
+		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, ttnpb.CID_DEV_STATUS.MACCommand())
+		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
+
+	} else if dev.NextStatusAfter != 0 {
+		dev.NextStatusAfter--
+	}
+}
+
 func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, recvAt time.Time) (err error) {
 	if pld == nil {
 		return errNoPayload

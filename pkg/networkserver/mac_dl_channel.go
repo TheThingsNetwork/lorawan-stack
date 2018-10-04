@@ -26,6 +26,20 @@ var (
 	evtMacDLChannelReject = events.Define("ns.mac.dl_channel.reject", "device rejected downlink channel request")
 )
 
+func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
+		if dev.MACState.DesiredParameters.Channels[i].UplinkFrequency == dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency &&
+			dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency == dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
+			continue
+		}
+
+		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DLChannelReq{
+			ChannelIndex: uint32(i),
+			Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
+		}).MACCommand())
+	}
+}
+
 func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) (err error) {
 	if pld == nil {
 		return errNoPayload

@@ -26,6 +26,18 @@ var (
 	evtMACADRParamAccept  = events.Define("ns.mac.adr_param.accept", "device accepted ADR parameter setup request")
 )
 
+func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.ADRAckLimit == dev.MACState.CurrentParameters.ADRAckLimit &&
+		dev.MACState.DesiredParameters.ADRAckDelay == dev.MACState.CurrentParameters.ADRAckDelay {
+		return
+	}
+
+	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_ADRParamSetupReq{
+		ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
+		ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
+	}).MACCommand())
+}
+
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetADRParamSetupReq()

@@ -20,6 +20,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.PingSlotDataRateIndex == dev.MACState.CurrentParameters.PingSlotDataRateIndex &&
+		dev.MACState.DesiredParameters.PingSlotFrequency == dev.MACState.CurrentParameters.PingSlotFrequency {
+		return
+	}
+
+	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_PingSlotChannelReq{
+		Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
+		DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndex,
+	}).MACCommand())
+}
+
 func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotChannelAns) (err error) {
 	if pld == nil {
 		return errNoPayload

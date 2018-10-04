@@ -26,6 +26,17 @@ var (
 	evtMACRejoinParamAccept  = events.Define("ns.mac.rejoin_param.accept", "device accepted rejoin parameter setup request")
 )
 
+func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.RejoinTimePeriodicity == dev.MACState.CurrentParameters.RejoinTimePeriodicity {
+		return
+	}
+
+	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RejoinParamSetupReq{
+		MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
+		MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
+	}).MACCommand())
+}
+
 func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RejoinParamSetupAns) (err error) {
 	if pld == nil {
 		return errNoPayload

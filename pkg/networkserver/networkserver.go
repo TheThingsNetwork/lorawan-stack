@@ -240,109 +240,20 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	// TODO: Queue LinkADRReq(https://github.com/TheThingsIndustries/ttn/issues/837)
-
-	if dev.MACState.DesiredParameters.MaxDutyCycle != dev.MACState.CurrentParameters.MaxDutyCycle {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DutyCycleReq{
-			MaxDutyCycle: dev.MACState.DesiredParameters.MaxDutyCycle,
-		}).MACCommand())
-	}
-
-	if dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency ||
-		dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
-		dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxParamSetupReq{
-			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
-			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
-			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
-		}).MACCommand())
-	}
-
-	if dev.LastStatusReceivedAt == nil ||
-		dev.MACSettings.StatusCountPeriodicity > 0 && dev.NextStatusAfter == 0 ||
-		dev.MACSettings.StatusTimePeriodicity > 0 && dev.LastStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).Before(time.Now()) {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, ttnpb.CID_DEV_STATUS.MACCommand())
-		dev.NextStatusAfter = dev.MACSettings.StatusCountPeriodicity
-
-	} else if dev.NextStatusAfter != 0 {
-		dev.NextStatusAfter--
-	}
-
-	for i := len(dev.MACState.DesiredParameters.Channels); i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_NewChannelReq{
-			ChannelIndex: uint32(i),
-		}).MACCommand())
-	}
-
-	for i, ch := range dev.MACState.DesiredParameters.Channels {
-		if len(dev.MACState.CurrentParameters.Channels) <= i ||
-			ch.MinDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex ||
-			ch.MaxDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex ||
-			ch.UplinkFrequency != dev.MACState.CurrentParameters.Channels[i].UplinkFrequency {
-
-			dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_NewChannelReq{
-				ChannelIndex:     uint32(i),
-				MinDataRateIndex: ch.MinDataRateIndex,
-				MaxDataRateIndex: ch.MaxDataRateIndex,
-			}).MACCommand())
-		}
-
-		if (len(dev.MACState.CurrentParameters.Channels) <= i && ch.UplinkFrequency != ch.DownlinkFrequency) ||
-			ch.DownlinkFrequency != dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
-
-			dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DLChannelReq{
-				ChannelIndex: uint32(i),
-				Frequency:    ch.DownlinkFrequency,
-			}).MACCommand())
-		}
-	}
-
-	if dev.MACState.DesiredParameters.Rx1Delay != dev.MACState.CurrentParameters.Rx1Delay {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxTimingSetupReq{
-			Delay: dev.MACState.DesiredParameters.Rx1Delay,
-		}).MACCommand())
-	}
-
-	if dev.MACState.DesiredParameters.MaxEIRP != dev.MACState.CurrentParameters.MaxEIRP ||
-		dev.MACState.DesiredParameters.DownlinkDwellTime != dev.MACState.CurrentParameters.DownlinkDwellTime ||
-		dev.MACState.DesiredParameters.UplinkDwellTime != dev.MACState.CurrentParameters.UplinkDwellTime {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_TxParamSetupReq{
-			MaxEIRPIndex:      ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
-			DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime,
-			UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime,
-		}).MACCommand())
-	}
-
-	if dev.MACState.DesiredParameters.ADRAckLimit != dev.MACState.CurrentParameters.ADRAckLimit ||
-		dev.MACState.DesiredParameters.ADRAckDelay != dev.MACState.CurrentParameters.ADRAckDelay {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_ADRParamSetupReq{
-			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
-			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
-		}).MACCommand())
-	}
-
+	enqueueLinkADRReq(ctx, dev)
+	enqueueDutyCycleReq(ctx, dev)
+	enqueueRxParamSetupReq(ctx, dev)
+	enqueueDevStatusReq(ctx, dev)
+	enqueueNewChannelReq(ctx, dev)
+	enqueueDLChannelReq(ctx, dev)
+	enqueueRxTimingSetupReq(ctx, dev)
+	enqueueTxParamSetupReq(ctx, dev)
+	enqueueADRParamSetupReq(ctx, dev)
+	enqueueRejoinParamSetupReq(ctx, dev)
 	// TODO: Queue ForceRejoinReq(https://github.com/TheThingsIndustries/ttn/issues/837)
-
-	if dev.MACState.DesiredParameters.RejoinTimePeriodicity != dev.MACState.CurrentParameters.RejoinTimePeriodicity {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RejoinParamSetupReq{
-			MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
-			MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
-		}).MACCommand())
-	}
-
-	if dev.MACState.DesiredParameters.PingSlotDataRateIndex != dev.MACState.CurrentParameters.PingSlotDataRateIndex ||
-		dev.MACState.DesiredParameters.PingSlotFrequency != dev.MACState.CurrentParameters.PingSlotFrequency {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_PingSlotChannelReq{
-			Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
-			DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndex,
-		}).MACCommand())
-	}
-
-	if dev.MACState.DesiredParameters.BeaconFrequency != dev.MACState.CurrentParameters.BeaconFrequency {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_BeaconFreqReq{
-			Frequency: dev.MACState.DesiredParameters.BeaconFrequency,
-		}).MACCommand())
-	}
+	//enqueueForceRejoinReq(ctx, dev)
+	enqueuePingSlotChannelReq(ctx, dev)
+	enqueueBeaconFreqReq(ctx, dev)
 
 	if !ack &&
 		len(dev.MACState.PendingRequests) == 0 &&

@@ -27,6 +27,18 @@ var (
 	evtMACRxParamReject  = events.Define("ns.mac.rx_param.reject", "device rejected rx parameter setup request")
 )
 
+func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency ||
+		dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
+		dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset {
+		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxParamSetupReq{
+			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
+			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
+			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
+		}).MACCommand())
+	}
+}
+
 func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) (err error) {
 	if pld == nil {
 		return errNoPayload

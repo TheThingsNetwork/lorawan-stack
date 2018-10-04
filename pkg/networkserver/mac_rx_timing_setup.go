@@ -26,6 +26,16 @@ var (
 	evtMACRxTimingAccept  = events.Define("ns.mac.rx_timing.accept", "device accepted receive window timing setup request")
 )
 
+func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.Rx1Delay == dev.MACState.CurrentParameters.Rx1Delay {
+		return
+	}
+
+	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxTimingSetupReq{
+		Delay: dev.MACState.DesiredParameters.Rx1Delay,
+	}).MACCommand())
+}
+
 func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRxTimingSetupReq()

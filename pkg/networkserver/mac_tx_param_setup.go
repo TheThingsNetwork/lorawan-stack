@@ -26,6 +26,20 @@ var (
 	evtMACTxParamAccept  = events.Define("ns.mac.tx_param.accept", "device accepted transmit parameter setup request")
 )
 
+func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	if dev.MACState.DesiredParameters.MaxEIRP == dev.MACState.CurrentParameters.MaxEIRP &&
+		dev.MACState.DesiredParameters.DownlinkDwellTime == dev.MACState.CurrentParameters.DownlinkDwellTime &&
+		dev.MACState.DesiredParameters.UplinkDwellTime == dev.MACState.CurrentParameters.UplinkDwellTime {
+		return
+	}
+
+	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_TxParamSetupReq{
+		MaxEIRPIndex:      ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
+		DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime,
+		UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime,
+	}).MACCommand())
+}
+
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()

@@ -27,6 +27,24 @@ var (
 	evtMACNewChannelReject  = events.Define("ns.mac.new_channel.reject", "device rejected new channel request")
 )
 
+func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
+	for i, ch := range dev.MACState.DesiredParameters.Channels {
+		if i <= len(dev.MACState.CurrentParameters.Channels) &&
+			ch.UplinkFrequency == dev.MACState.CurrentParameters.Channels[i].UplinkFrequency &&
+			ch.MinDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex &&
+			ch.MaxDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
+			continue
+		}
+
+		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_NewChannelReq{
+			ChannelIndex:     uint32(i),
+			Frequency:        ch.UplinkFrequency,
+			MinDataRateIndex: ch.MinDataRateIndex,
+			MaxDataRateIndex: ch.MaxDataRateIndex,
+		}).MACCommand())
+	}
+}
+
 func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (err error) {
 	if pld == nil {
 		return errNoPayload
