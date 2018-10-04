@@ -22,8 +22,8 @@ sdk.deps: sdk.js.deps
 # JS SDK make rules
 
 sdk.js.deps:
-	@$(log) "Fetching js dependencies"
-	@$(YARN_SDK) install $(YARN_FLAGS)
+	@$(log) "Fetching JS SDK dependencies"
+	@$(YARN_SDK) install $(YARN_FLAGS) --production=false
 
 include .make/sdk/build.make
 include .make/sdk/quality.make
