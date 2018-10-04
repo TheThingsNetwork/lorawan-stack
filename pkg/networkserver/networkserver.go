@@ -1124,6 +1124,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		var b []byte
 		var genErr bool
 		dev, err := ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+			if dev == nil {
+				return nil, errOutdatedData
+			}
+
 			b, err = generateDownlink(ctx, dev, needsAck, confFCnt)
 			if err != nil && !errors.Resemble(err, errNoDownlink) {
 				logger.WithError(err).Error("Failed to generate downlink in reception slot")
