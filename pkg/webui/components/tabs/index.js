@@ -67,6 +67,7 @@ Tabs.propTypes = {
     title: PropTypes.message.isRequired,
     icon: PropTypes.string,
     disabled: PropTypes.bool,
+    name: PropTypes.string.isRequired,
   })).isRequired,
   /**
    * Function to be called when the selected tab changes. Passes
