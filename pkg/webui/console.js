@@ -17,8 +17,9 @@ import DOM from 'react-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
-import { BreadcrumbsProvider } from './components/breadcrumbs/context'
 
+import { EnvProvider } from './lib/components/env'
+import { BreadcrumbsProvider } from './components/breadcrumbs/context'
 import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 
@@ -27,19 +28,22 @@ import App from './views/console/app'
 
 const history = createBrowserHistory()
 const store = createStore(history)
+const env = window.ENV || {}
 
 const Console = () => (
-  <Provider store={store}>
-    <Init>
-      <WithLocale>
-        <ConnectedRouter history={history}>
-          <BreadcrumbsProvider>
-            <App />
-          </BreadcrumbsProvider>
-        </ConnectedRouter>
-      </WithLocale>
-    </Init>
-  </Provider>
+  <EnvProvider env={env}>
+    <Provider store={store}>
+      <Init>
+        <WithLocale>
+          <ConnectedRouter history={history}>
+            <BreadcrumbsProvider>
+              <App />
+            </BreadcrumbsProvider>
+          </ConnectedRouter>
+        </WithLocale>
+      </Init>
+    </Provider>
+  </EnvProvider>
 )
 
 DOM.render((<Console />), document.getElementById('app'))
