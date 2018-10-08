@@ -138,8 +138,9 @@ enum Right {
   // The pseudo-right for all (current and future) organization rights.
   RIGHT_ORGANIZATION_ALL = 51;
 
-  // The right to send invite
-  RIGHT_SEND_INVITES = 52; // note that this is not prefixed with "USER_"; it is not a right on the user entity.
+  // The right to send invites to new users.
+  // Note that this is not prefixed with "USER_"; it is not a right on the user entity.
+  RIGHT_SEND_INVITES = 52;
 
   // The pseudo-right for all (current and future) possible rights.
   RIGHT_ALL = 53;

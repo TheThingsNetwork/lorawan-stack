@@ -319,8 +319,6 @@ message EndDevice {
 
   // Home NetID. Stored in Join Server.
   bytes net_id = 26 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID", (gogoproto.customname) = "NetID"];
-  // NOTE: Join Server address can be derived from join EUI.
-
   // Settings for how the Network Server handles MAC for this device. Stored in Network Server.
   MACSettings mac_settings = 27 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.

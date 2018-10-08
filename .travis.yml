@@ -19,7 +19,7 @@ install:
 before_script:
 - make dev.databases.start
 script:
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.protos.clean go.protos; fi # only on pull requests
+- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make protos.clean protos; fi # only on pull requests
 - make go.misspell
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.unconvert; fi # only on pull requests
 - make go.fmt

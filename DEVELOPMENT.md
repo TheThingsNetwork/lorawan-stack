@@ -181,5 +181,5 @@ From the `.proto` files, we generate code using the `protoc` compiler. As we pla
 The actual commands for compilation are handled by our Makefile, so the only thing you have to execute, is:
 
 ```sh
-make go.protos
+make protos
 ```
