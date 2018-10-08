@@ -17,6 +17,7 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
+import { Container, Row, Col } from 'react-grid-system'
 
 import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
@@ -26,6 +27,7 @@ import style from './login.styl'
 const m = defineMessages({
   welcome: 'Welcome to {ttnConsole}',
   login: 'You need to be logged in to use this site',
+  loginViaTTN: 'Login via TTN Account',
 })
 
 @connect(state => ({
@@ -48,16 +50,20 @@ export default class Login extends React.PureComponent {
     }
 
     return (
-      <div className={style.login}>
-        <Message
-          className={style.loginHeader}
-          values={{ ttnConsole: 'The Things Network Console' }}
-          component="h2"
-          content={m.welcome}
-        />
-        <Message className={style.loginSub} content={m.login} />
-        <Button message="Login via TTN Account" onClick={this.redirectToLogin} />
-      </div>
+      <Container>
+        <Row>
+          <Col>
+            <Message
+              className={style.loginHeader}
+              values={{ ttnConsole: 'The Things Network Console' }}
+              component="h2"
+              content={m.welcome}
+            />
+            <Message className={style.loginSub} content={m.login} />
+            <Button message={m.loginViaTTN} onClick={this.redirectToLogin} />
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }
