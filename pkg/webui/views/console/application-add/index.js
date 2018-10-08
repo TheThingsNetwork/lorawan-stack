@@ -13,34 +13,23 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
 
-import ApplicationAdd from '../application-add'
-import ApplicationList from '../applications-list'
-import Application from '../application'
-
-import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import sharedMessages from '../../../lib/shared-messages'
 
-@withBreadcrumb('apps', function (props) {
+@withBreadcrumb('apps.add', function (props) {
   return (
     <Breadcrumb
-      path="/console/applications"
-      content={sharedMessages.applications}
+      path="/console/applications/add"
+      icon="add"
+      content={sharedMessages.add}
     />
   )
 })
-export default class Applications extends React.Component {
+export default class Add extends React.Component {
 
   render () {
-    const { path } = this.props.match
-    return (
-      <Switch>
-        <Route exact path={`${path}`} component={ApplicationList} />
-        <Route path={`${path}/add`} component={ApplicationAdd} />
-        <Route path={`${path}/:appId`} component={Application} />
-      </Switch>
-    )
+    return <div>add app</div>
   }
 }
