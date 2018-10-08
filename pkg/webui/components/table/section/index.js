@@ -26,7 +26,15 @@ const Section = function ({
       className={className}
       {...rest}
     >
-      {children}
+      {
+        React.Children.map(children, row => (
+          React.cloneElement(row, {
+            head: Component === 'thead',
+            body: Component === 'tbody',
+            foot: Component === 'tfoot',
+          })
+        ))
+      }
     </Component>
   )
 }
