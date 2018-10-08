@@ -26,6 +26,7 @@
   "lib.shared-messages.userId": "User ID",
   "views.console.login.index.welcome": "Welcome to {ttnConsole}",
   "views.console.login.index.login": "You need to be logged in to use this site",
+  "views.console.login.index.loginViaTTN": "Login via TTN Account",
   "views.oauth.authorize.index.modalTitle": "Request for Permission",
   "views.oauth.authorize.index.modalSubtitle": "{clientName} is requesting permissions to do the following:",
   "views.oauth.authorize.index.loginInfo": "You are logged in as {userId}.",
