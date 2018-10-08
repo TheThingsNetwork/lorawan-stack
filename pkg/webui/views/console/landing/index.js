@@ -14,14 +14,16 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import { Container } from 'react-grid-system'
 
 import WithAuth from '../../../lib/components/with-auth'
 import Overview from '../overview'
 import Applications from '../applications'
 import Gateways from '../gateways'
 import Organizations from '../organizations'
-
 import Breadcrumbs from '../../../components/breadcrumbs'
+
+import style from './landing.styl'
 
 export default class Landing extends React.PureComponent {
 
@@ -29,7 +31,11 @@ export default class Landing extends React.PureComponent {
     const { path } = this.props.match
     return (
       <React.Fragment>
-        <Breadcrumbs />
+        <div className={style.breadcrumbs}>
+          <Container>
+            <Breadcrumbs />
+          </Container>
+        </div>
         <Switch>
           <WithAuth>
             <Route exact path={`${path}`} component={Overview} />

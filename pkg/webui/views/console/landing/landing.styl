@@ -12,30 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import classnames from 'classnames'
-
-import PropTypes from '../../lib/prop-types'
-
-import style from './breadcrumbs.styl'
-
-const Breadcrumbs = ({ className, breadcrumbs }) => (
-
-  <nav className={classnames(className, style.breadcrumbs)}>
-    {breadcrumbs.map(function (component, index) {
-      return (
-        React.cloneElement(component, { key: index })
-      )
-    })}
-  </nav>
-)
-
-Breadcrumbs.propTypes = {
-  /** A list of breadcrumb elements */
-  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.element,
-  ])),
-}
-
-export default Breadcrumbs
+.breadcrumbs
+  border-normal('bottom')
