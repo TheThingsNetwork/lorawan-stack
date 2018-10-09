@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 export default defineMessages({
   // Keep these sorted alphabetically
   access: 'Access',
+  add: 'Add',
   applications: 'Applications',
   approve: 'Approve',
   cancel: 'Cancel',
@@ -28,6 +29,7 @@ export default defineMessages({
   login: 'Login',
   logout: 'Logout',
   loading: 'Loading',
+  noMatch: 'No items matched your criteria',
   ok: 'Ok',
   organizations: 'Organizations',
   overview: 'Overview',

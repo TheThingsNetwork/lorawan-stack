@@ -13,6 +13,7 @@
   "lib.shared-messages.login": "Login",
   "lib.shared-messages.logout": "Logout",
   "lib.shared-messages.loading": "Loading",
+  "lib.shared-messages.noMatch": "No items matched your criteria",
   "lib.shared-messages.ok": "Ok",
   "lib.shared-messages.organizations": "Organizations",
   "lib.shared-messages.overview": "Overview",
