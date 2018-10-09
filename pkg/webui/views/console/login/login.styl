@@ -14,6 +14,15 @@
 
 .login
   height: 100%
+  background: url('../../../assets/img/layout/bg/ttn-console-bg.png') no-repeat
+  background-size: 160vh
+  background-position: 40vw 20%
+  +media-query($bp.m)
+    background-size: 140vh
+    background-position: 37vw 20%
+  +media-query($bp.s)
+    background-size: 160vh
+    background-position: 0vw 20vh
 
   &-header
     h2()

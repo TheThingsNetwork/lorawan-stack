@@ -50,20 +50,22 @@ export default class Login extends React.PureComponent {
     }
 
     return (
-      <Container>
-        <Row>
-          <Col>
-            <Message
-              className={style.loginHeader}
-              values={{ ttnConsole: 'The Things Network Console' }}
-              component="h2"
-              content={m.welcome}
-            />
-            <Message className={style.loginSub} content={m.login} />
-            <Button message={m.loginViaTTN} onClick={this.redirectToLogin} />
-          </Col>
-        </Row>
-      </Container>
+      <div className={style.login}>
+        <Container>
+          <Row>
+            <Col>
+              <Message
+                className={style.loginHeader}
+                values={{ ttnConsole: 'The Things Network Console' }}
+                component="h2"
+                content={m.welcome}
+              />
+              <Message className={style.loginSub} content={m.login} />
+              <Button message={m.loginViaTTN} onClick={this.redirectToLogin} />
+            </Col>
+          </Row>
+        </Container>
+      </div>
     )
   }
 }
