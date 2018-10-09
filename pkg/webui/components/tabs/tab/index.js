@@ -32,9 +32,9 @@ const Tab = function ({
       role="button"
       onClick={onClick}
       className={classnames(className, style.tab, {
-        [style.tabActive]: !isDisabled && isActive,
-        [style.tabDefault]: !isDisabled && !isActive,
+        [style.tabActive]: isActive,
         [style.tabDisabled]: isDisabled,
+        [style.tabDefault]: !isDisabled && !isActive,
       })}
     >
       {children}
