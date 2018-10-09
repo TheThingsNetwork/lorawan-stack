@@ -15,45 +15,69 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 
 import Paginate from 'react-paginate'
 import Icon from '../icon'
 
 import style from './pagination.styl'
 
-const Pagination = function (props) {
-  const containerClassNames = classnames(style.pagination, props.className)
-  const breakClassNames = classnames(style.item, style.itemBreak)
-  const navigationNextClassNames = classnames(style.item, style.itemNavigationNext)
-  const navigationPrevClassNames = classnames(style.item, style.itemNavigationPrev)
+@bind
+class Pagination extends React.PureComponent {
 
-  return (
-    <Paginate
-      previousClassName={navigationPrevClassNames}
-      previousLinkClassName={style.link}
-      previousLabel={
-        <Icon
-          icon="navigate_before"
-          small aria-label="Go to the previous page"
-        />
-      }
-      nextClassName={navigationNextClassNames}
-      nextLinkClassName={style.link}
-      nextLabel={
-        <Icon
-          icon="navigate_next"
-          small aria-label="Go to the next page"
-        />
-      }
-      containerClassName={containerClassNames}
-      pageClassName={style.item}
-      breakClassName={breakClassNames}
-      pageLinkClassName={style.link}
-      disabledClassName={style.itemDisabled}
-      activeClassName={style.itemActive}
-      {...props}
-    />
-  )
+  onPageChange (page) {
+    this.props.onPageChange(page.selected + 1)
+  }
+
+  render () {
+    const {
+      className,
+      forcePage,
+      initialPage = 1,
+      pageRangeDisplayed,
+      marginPagesDisplayed,
+      onPageChange,
+      ...rest
+    } = this.props
+
+    const containerClassNames = classnames(style.pagination, className)
+    const breakClassNames = classnames(style.item, style.itemBreak)
+    const navigationNextClassNames = classnames(style.item, style.itemNavigationNext)
+    const navigationPrevClassNames = classnames(style.item, style.itemNavigationPrev)
+
+    return (
+      <Paginate
+        previousClassName={navigationPrevClassNames}
+        previousLinkClassName={style.link}
+        previousLabel={
+          <Icon
+            icon="navigate_before"
+            small aria-label="Go to the previous page"
+          />
+        }
+        nextClassName={navigationNextClassNames}
+        nextLinkClassName={style.link}
+        nextLabel={
+          <Icon
+            icon="navigate_next"
+            small aria-label="Go to the next page"
+          />
+        }
+        containerClassName={containerClassNames}
+        pageClassName={style.item}
+        breakClassName={breakClassNames}
+        pageLinkClassName={style.link}
+        disabledClassName={style.itemDisabled}
+        activeClassName={style.itemActive}
+        forcePage={forcePage - 1}
+        initialPage={initialPage - 1}
+        pageRangeDisplayed={pageRangeDisplayed}
+        marginPagesDisplayed={marginPagesDisplayed}
+        onPageChange={this.onPageChange}
+        {...rest}
+      />
+    )
+  }
 }
 
 Pagination.propTypes = {
@@ -64,6 +88,8 @@ Pagination.propTypes = {
    * pageCount, then all pages will be displayed without gaps.
    */
   pageRangeDisplayed: PropTypes.number,
+  /** Page to be displayed immediately */
+  forcePage: PropTypes.number,
   /**
    * The number of pages to be displayed in the beginning/end of
    * the component. For example, marginPagesDisplayed = 2, then the
@@ -73,7 +99,7 @@ Pagination.propTypes = {
    */
   marginPagesDisplayed: PropTypes.number,
   /** The initial page number to be selected when the component
-   * gets rendered for the first time. Is 0-based.
+   * gets rendered for the first time. Is 1-based.
    * */
   initialPage: PropTypes.number,
   /** An onClick handler that gets called with the new page number */
@@ -84,7 +110,7 @@ Pagination.defaultProps = {
   onPageChange: () => null,
   pageRangeDisplayed: 1,
   marginPagesDisplayed: 1,
-  initialPage: 0,
+  initialPage: 1,
 }
 
 export default Pagination

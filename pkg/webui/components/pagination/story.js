@@ -33,12 +33,12 @@ storiesOf('Pagination', module)
         />
         <Pagination
           pageCount={3}
-          initialPage={0}
+          initialPage={2}
           marginPagesDisplayed={2}
         />
         <Pagination
           pageCount={3}
-          initialPage={2}
+          initialPage={3}
           marginPagesDisplayed={2}
         />
       </div>

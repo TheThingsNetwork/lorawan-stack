@@ -26,7 +26,7 @@ import style from './tabular.styl'
 class Tabular extends React.Component {
 
   onPageChange (page) {
-    this.props.onPageChange(page.selected)
+    this.props.onPageChange(page)
   }
 
   onSortRequest (newOrderBy) {
@@ -57,7 +57,7 @@ class Tabular extends React.Component {
       orderBy = undefined,
       totalCount,
       pageSize,
-      initialPage = 0,
+      initialPage = 1,
       paginated = false,
       data,
       headers,
@@ -133,7 +133,7 @@ class Tabular extends React.Component {
         >
           <Pagination
             className={style.pagination}
-            pageCount={Math.ceil(totalCount / pageSize)}
+            pageCount={Math.ceil(totalCount / pageSize) || 1}
             initialPage={initialPage}
             onPageChange={this.onPageChange}
             disableInitialCallback
@@ -187,7 +187,7 @@ Tabular.propTypes = {
   onRowClick: PropTypes.func,
   /**
    * Function to be called when the page is changed. Passes the new
-   * page number as an argument [0...pageCount - 1].
+   * page number as an argument [1...pageCount - 1].
    */
   onPageChange: PropTypes.func,
   /**
