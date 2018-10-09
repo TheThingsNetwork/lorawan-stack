@@ -74,8 +74,9 @@ func New(conf *Config) *Client {
 	return &Client{
 		namespace: Key(append(conf.Redis.Namespace, conf.Namespace...)...),
 		Client: redis.NewClient(&redis.Options{
-			Addr: conf.Address,
-			DB:   conf.Database,
+			Addr:     conf.Address,
+			Password: conf.Password,
+			DB:       conf.Database,
 		}),
 	}
 }
