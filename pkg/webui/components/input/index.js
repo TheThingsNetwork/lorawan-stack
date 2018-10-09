@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import Icon from '../icon'
+import Spinner from '../spinner'
 import ByteInput from './byte'
 
 import style from './input.styl'
@@ -61,6 +62,7 @@ export default class Input extends React.Component {
     readOnly: PropTypes.bool,
     type: PropTypes.string.isRequired,
     label: PropTypes.string,
+    loading: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -92,6 +94,7 @@ export default class Input extends React.Component {
       className,
       label,
       component = 'input',
+      loading,
       ...rest
     } = this.props
 
@@ -131,7 +134,8 @@ export default class Input extends React.Component {
           readOnly={readOnly}
           {...filter(rest)}
         />
-        <Valid show={v} />
+        { v && <Valid show={v} /> }
+        { loading && <Spinner className={style.spinner} small /> }
       </div>
     )
   }
