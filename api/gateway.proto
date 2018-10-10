@@ -90,8 +90,12 @@ message Gateway {
 
   GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // The address (host:port) of the Gateway Server to connect to.
-  string cluster_address = 9;
+  // The address of the Gateway Server to connect to.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string gateway_server_address = 9;
   bool auto_update = 10;
   string update_channel = 11;
   string frequency_plan_id = 12 [(gogoproto.customname) = "FrequencyPlanID"];
