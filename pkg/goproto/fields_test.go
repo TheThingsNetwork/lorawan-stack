@@ -108,8 +108,8 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 			expected: []string{"MACState", "RecentUplinks", "FrequencyPlanID"},
 		},
 		{
-			fields:   []string{"session.next_f_cnt_up"},
-			expected: []string{"Session.NextFCntUp"},
+			fields:   []string{"session.last_f_cnt_up"},
+			expected: []string{"Session.LastFCntUp"},
 		},
 		{
 			fields:   []string{"ids.application_ids.application_id"},
@@ -118,7 +118,7 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 	} {
 		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
 			Session: &ttnpb.Session{
-				NextFCntUp: 5,
+				LastFCntUp: 5,
 			},
 		})
 
