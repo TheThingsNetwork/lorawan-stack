@@ -250,8 +250,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 	enqueueTxParamSetupReq(ctx, dev)
 	enqueueADRParamSetupReq(ctx, dev)
 	enqueueRejoinParamSetupReq(ctx, dev)
-	// TODO: Queue ForceRejoinReq(https://github.com/TheThingsIndustries/ttn/issues/837)
-	//enqueueForceRejoinReq(ctx, dev)
+	enqueueForceRejoinReq(ctx, dev)
 	enqueuePingSlotChannelReq(ctx, dev)
 	enqueueBeaconFreqReq(ctx, dev)
 
