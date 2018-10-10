@@ -23,7 +23,7 @@ import (
 
 // ApplicationServer implements the Application Server component.
 //
-// The Application Server exposes the As, AppAs and AsDeviceRegistry services.
+// The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
 type ApplicationServer struct {
 	*component.Component
 
@@ -51,13 +51,13 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
 	ttnpb.RegisterAppAsServer(s, as)
-	// TODO: Register AsDeviceRegistryServer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
+	// TODO: Register AsEndDeviceRegistryServer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
-	// TODO: Register AsDeviceRegistryHandler (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
+	// TODO: Register AsEndDeviceRegistryHandler (https://github.com/TheThingsIndustries/lorawan-stack/issues/1117)
 }
 
 // Roles returns the roles that the Application Server fulfills.

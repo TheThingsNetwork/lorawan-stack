@@ -1528,12 +1528,12 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsNsServer(s, ns)
 	ttnpb.RegisterAsNsServer(s, ns)
-	ttnpb.RegisterNsDeviceRegistryServer(s, ns)
+	ttnpb.RegisterNsEndDeviceRegistryServer(s, ns)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterNsDeviceRegistryHandler(ns.Context(), s, conn)
+	ttnpb.RegisterNsEndDeviceRegistryHandler(ns.Context(), s, conn)
 }
 
 // Roles returns the roles that the Network Server fulfills.

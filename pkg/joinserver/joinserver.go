@@ -88,10 +88,10 @@ func (js *JoinServer) Roles() []ttnpb.PeerInfo_Role {
 func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsJsServer(s, js)
 	ttnpb.RegisterNsJsServer(s, js)
-	ttnpb.RegisterJsDeviceRegistryServer(s, js)
+	ttnpb.RegisterJsEndDeviceRegistryServer(s, js)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterJsDeviceRegistryHandler(js.Context(), s, conn)
+	ttnpb.RegisterJsEndDeviceRegistryHandler(js.Context(), s, conn)
 }
