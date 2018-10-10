@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import React from 'react'
+import classnames from 'classnames'
 
 import Logo from '../logo'
 import NavigationBar from '../navigation/bar'
@@ -60,6 +61,7 @@ const defaultDropdownItems = handleLogout => [
 ]
 
 const Header = function ({
+  className,
   handleLogout = () => null,
   dropdownItems = defaultDropdownItems(handleLogout),
   navigationEntries = defaultNavigationEntries,
@@ -70,7 +72,7 @@ const Header = function ({
   const isGuest = !Boolean(user)
 
   return (
-    <header {...rest} className={styles.bar}>
+    <header {...rest} className={classnames(className, styles.bar)}>
       {
         isGuest ? (
           <div className={styles.left}>
