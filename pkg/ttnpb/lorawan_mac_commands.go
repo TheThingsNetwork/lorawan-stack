@@ -23,8 +23,8 @@ import (
 // MACCommandDescriptor descibes a MAC command.
 type MACCommandDescriptor struct {
 	InitiatedByDevice bool
-	UplinkLength      uint
-	DownlinkLength    uint
+	UplinkLength      uint16
+	DownlinkLength    uint16
 	NewUplink         func() lorawan.AppendUnmarshaler
 	NewDownlink       func() lorawan.AppendUnmarshaler
 }

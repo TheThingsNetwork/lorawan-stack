@@ -1347,7 +1347,7 @@ func (spec MACCommandSpec) Read(r io.Reader, isUplink bool, cmd *MACCommand) err
 	}
 
 	var pld lorawan.AppendUnmarshaler
-	var n uint
+	var n uint16
 	if isUplink {
 		n = desc.UplinkLength
 		if desc.NewUplink != nil {
