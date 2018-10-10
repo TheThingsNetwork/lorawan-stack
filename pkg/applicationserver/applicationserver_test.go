@@ -299,6 +299,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.NotBeNil)
+							a.So(dev.Session.DevAddr, should.Resemble, types.DevAddr{0x84, 0xff, 0xff, 0xff})
 							a.So(dev.Session.SessionKeyID, should.Equal, "session1")
 							a.So(dev.Session.AppSKey, should.Resemble, &ttnpb.KeyEnvelope{
 								Key:      []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5},
@@ -334,6 +335,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.NotBeNil)
+							a.So(dev.Session.DevAddr, should.Resemble, types.DevAddr{0x42, 0xff, 0xff, 0xff})
 							a.So(dev.Session.SessionKeyID, should.Equal, "session2")
 							a.So(dev.Session.AppSKey, should.Resemble, &ttnpb.KeyEnvelope{
 								Key:      []byte{0xa3, 0x34, 0x38, 0x1c, 0xca, 0x1c, 0x12, 0x7a, 0x5b, 0xb1, 0xa8, 0x97, 0x39, 0xc7, 0x5, 0x34, 0x91, 0x26, 0x9b, 0x21, 0x4f, 0x27, 0x80, 0x19},
@@ -417,6 +419,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.NotBeNil)
+							a.So(dev.Session.DevAddr, should.Resemble, types.DevAddr{0x24, 0x24, 0xff, 0xff})
 							a.So(dev.Session.SessionKeyID, should.Equal, "session3")
 							a.So(dev.Session.AppSKey, should.Resemble, &ttnpb.KeyEnvelope{
 								Key:      []byte{0x8c, 0xe9, 0x14, 0x4b, 0x82, 0x23, 0x8, 0x39, 0x65, 0x73, 0xd, 0x42, 0x9f, 0x2a, 0x7c, 0x9c, 0x9c, 0xbe, 0x38, 0xbe, 0x35, 0x5d, 0x44, 0xf},
@@ -452,6 +455,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.NotBeNil)
+							a.So(dev.Session.DevAddr, should.Resemble, types.DevAddr{0x24, 0xff, 0xff, 0xff})
 							a.So(dev.Session.SessionKeyID, should.Equal, "session1")
 							a.So(dev.Session.AppSKey, should.Resemble, &ttnpb.KeyEnvelope{
 								Key:      []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5},
@@ -498,6 +502,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.NotBeNil)
+							a.So(dev.Session.DevAddr, should.Resemble, types.DevAddr{0x24, 0xff, 0xff, 0xff})
 							a.So(dev.Session.SessionKeyID, should.Equal, "session1")
 							a.So(dev.Session.AppSKey, should.Resemble, &ttnpb.KeyEnvelope{
 								Key:      []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5},

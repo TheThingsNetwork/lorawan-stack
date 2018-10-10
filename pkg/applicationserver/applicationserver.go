@@ -208,6 +208,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				logger.Debug("Received AppSKey from Join Server")
 			}
 			dev.Session = &ttnpb.Session{
+				DevAddr: *ids.DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
 					SessionKeyID: joinAccept.SessionKeyID,
 					AppSKey:      &appSKey,
@@ -251,6 +252,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					return nil, nil, errGetAppSKey.WithCause(err)
 				}
 				dev.Session = &ttnpb.Session{
+					DevAddr: *ids.DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						SessionKeyID: uplink.SessionKeyID,
 						AppSKey:      &appSKey,
