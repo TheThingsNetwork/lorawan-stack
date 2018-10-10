@@ -58,8 +58,8 @@ service AsJs {
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
 }
 
-// The JsDeviceRegistry service allows clients to manage their end devices on the Join Server.
-service JsDeviceRegistry {
+// The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
+service JsEndDeviceRegistry {
   // Get returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {

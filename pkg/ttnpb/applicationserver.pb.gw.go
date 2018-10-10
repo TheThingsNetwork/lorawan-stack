@@ -122,10 +122,10 @@ func request_As_DeleteLink_0(ctx context.Context, marshaler runtime.Marshaler, c
 }
 
 var (
-	filter_AsDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_AsEndDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
-func request_AsDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AsEndDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client AsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetEndDeviceRequest
 	var metadata runtime.ServerMetadata
 
@@ -158,7 +158,7 @@ func request_AsDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AsDeviceRegistry_Get_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AsEndDeviceRegistry_Get_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -167,7 +167,7 @@ func request_AsDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marsh
 
 }
 
-func request_AsDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AsEndDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marshaler, client AsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SetDeviceRequest
 	var metadata runtime.ServerMetadata
 
@@ -209,7 +209,7 @@ func request_AsDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marsh
 
 }
 
-func request_AsDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AsEndDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marshaler, client AsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SetDeviceRequest
 	var metadata runtime.ServerMetadata
 
@@ -241,10 +241,10 @@ func request_AsDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marsh
 }
 
 var (
-	filter_AsDeviceRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_AsEndDeviceRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
-func request_AsDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AsEndDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client AsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq EndDeviceIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -277,7 +277,7 @@ func request_AsDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AsDeviceRegistry_Delete_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AsEndDeviceRegistry_Delete_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -430,9 +430,9 @@ var (
 	forward_As_DeleteLink_0 = runtime.ForwardResponseMessage
 )
 
-// RegisterAsDeviceRegistryHandlerFromEndpoint is same as RegisterAsDeviceRegistryHandler but
+// RegisterAsEndDeviceRegistryHandlerFromEndpoint is same as RegisterAsEndDeviceRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterAsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterAsEndDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -452,23 +452,23 @@ func RegisterAsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runti
 		}()
 	}()
 
-	return RegisterAsDeviceRegistryHandler(ctx, mux, conn)
+	return RegisterAsEndDeviceRegistryHandler(ctx, mux, conn)
 }
 
-// RegisterAsDeviceRegistryHandler registers the http handlers for service AsDeviceRegistry to "mux".
+// RegisterAsEndDeviceRegistryHandler registers the http handlers for service AsEndDeviceRegistry to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterAsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterAsDeviceRegistryHandlerClient(ctx, mux, NewAsDeviceRegistryClient(conn))
+func RegisterAsEndDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterAsEndDeviceRegistryHandlerClient(ctx, mux, NewAsEndDeviceRegistryClient(conn))
 }
 
-// RegisterAsDeviceRegistryHandlerClient registers the http handlers for service AsDeviceRegistry
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AsDeviceRegistryClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AsDeviceRegistryClient"
+// RegisterAsEndDeviceRegistryHandlerClient registers the http handlers for service AsEndDeviceRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AsEndDeviceRegistryClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AsEndDeviceRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "AsDeviceRegistryClient" to call the correct interceptors.
-func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AsDeviceRegistryClient) error {
+// "AsEndDeviceRegistryClient" to call the correct interceptors.
+func RegisterAsEndDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AsEndDeviceRegistryClient) error {
 
-	mux.Handle("GET", pattern_AsDeviceRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AsEndDeviceRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -486,18 +486,18 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AsDeviceRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AsEndDeviceRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AsDeviceRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AsEndDeviceRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AsDeviceRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_AsEndDeviceRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -515,18 +515,18 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AsDeviceRegistry_Set_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AsEndDeviceRegistry_Set_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AsDeviceRegistry_Set_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AsEndDeviceRegistry_Set_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AsDeviceRegistry_Set_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AsEndDeviceRegistry_Set_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -544,18 +544,18 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AsDeviceRegistry_Set_1(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AsEndDeviceRegistry_Set_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AsDeviceRegistry_Set_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AsEndDeviceRegistry_Set_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_AsDeviceRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AsEndDeviceRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -573,14 +573,14 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AsDeviceRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AsEndDeviceRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AsDeviceRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AsEndDeviceRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -588,21 +588,21 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_AsDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
+	pattern_AsEndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
 
-	pattern_AsDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
+	pattern_AsEndDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
 
-	pattern_AsDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
+	pattern_AsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
 
-	pattern_AsDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
+	pattern_AsEndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )
 
 var (
-	forward_AsDeviceRegistry_Get_0 = runtime.ForwardResponseMessage
+	forward_AsEndDeviceRegistry_Get_0 = runtime.ForwardResponseMessage
 
-	forward_AsDeviceRegistry_Set_0 = runtime.ForwardResponseMessage
+	forward_AsEndDeviceRegistry_Set_0 = runtime.ForwardResponseMessage
 
-	forward_AsDeviceRegistry_Set_1 = runtime.ForwardResponseMessage
+	forward_AsEndDeviceRegistry_Set_1 = runtime.ForwardResponseMessage
 
-	forward_AsDeviceRegistry_Delete_0 = runtime.ForwardResponseMessage
+	forward_AsEndDeviceRegistry_Delete_0 = runtime.ForwardResponseMessage
 )

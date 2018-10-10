@@ -38,8 +38,8 @@ service AsNs {
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
 }
 
-// The NsDeviceRegistry service allows clients to manage their end devices on the Network Server.
-service NsDeviceRegistry {
+// The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
+service NsEndDeviceRegistry {
   // Get returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {

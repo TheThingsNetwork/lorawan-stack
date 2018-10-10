@@ -29,10 +29,10 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 var (
-	filter_JsDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_JsEndDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
-func request_JsDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_JsEndDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client JsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetEndDeviceRequest
 	var metadata runtime.ServerMetadata
 
@@ -65,7 +65,7 @@ func request_JsDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JsDeviceRegistry_Get_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JsEndDeviceRegistry_Get_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -74,7 +74,7 @@ func request_JsDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marsh
 
 }
 
-func request_JsDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_JsEndDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marshaler, client JsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SetDeviceRequest
 	var metadata runtime.ServerMetadata
 
@@ -116,7 +116,7 @@ func request_JsDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marsh
 
 }
 
-func request_JsDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_JsEndDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marshaler, client JsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SetDeviceRequest
 	var metadata runtime.ServerMetadata
 
@@ -148,10 +148,10 @@ func request_JsDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marsh
 }
 
 var (
-	filter_JsDeviceRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_JsEndDeviceRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
-func request_JsDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_JsEndDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client JsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq EndDeviceIdentifiers
 	var metadata runtime.ServerMetadata
 
@@ -184,7 +184,7 @@ func request_JsDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JsDeviceRegistry_Delete_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JsEndDeviceRegistry_Delete_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -193,9 +193,9 @@ func request_JsDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
-// RegisterJsDeviceRegistryHandlerFromEndpoint is same as RegisterJsDeviceRegistryHandler but
+// RegisterJsEndDeviceRegistryHandlerFromEndpoint is same as RegisterJsEndDeviceRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterJsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterJsEndDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -215,23 +215,23 @@ func RegisterJsDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runti
 		}()
 	}()
 
-	return RegisterJsDeviceRegistryHandler(ctx, mux, conn)
+	return RegisterJsEndDeviceRegistryHandler(ctx, mux, conn)
 }
 
-// RegisterJsDeviceRegistryHandler registers the http handlers for service JsDeviceRegistry to "mux".
+// RegisterJsEndDeviceRegistryHandler registers the http handlers for service JsEndDeviceRegistry to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterJsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterJsDeviceRegistryHandlerClient(ctx, mux, NewJsDeviceRegistryClient(conn))
+func RegisterJsEndDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterJsEndDeviceRegistryHandlerClient(ctx, mux, NewJsEndDeviceRegistryClient(conn))
 }
 
-// RegisterJsDeviceRegistryHandlerClient registers the http handlers for service JsDeviceRegistry
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "JsDeviceRegistryClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "JsDeviceRegistryClient"
+// RegisterJsEndDeviceRegistryHandlerClient registers the http handlers for service JsEndDeviceRegistry
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "JsEndDeviceRegistryClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "JsEndDeviceRegistryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "JsDeviceRegistryClient" to call the correct interceptors.
-func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client JsDeviceRegistryClient) error {
+// "JsEndDeviceRegistryClient" to call the correct interceptors.
+func RegisterJsEndDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client JsEndDeviceRegistryClient) error {
 
-	mux.Handle("GET", pattern_JsDeviceRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_JsEndDeviceRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -249,18 +249,18 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_JsDeviceRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_JsEndDeviceRegistry_Get_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_JsDeviceRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_JsEndDeviceRegistry_Get_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_JsDeviceRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_JsEndDeviceRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -278,18 +278,18 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_JsDeviceRegistry_Set_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_JsEndDeviceRegistry_Set_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_JsDeviceRegistry_Set_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_JsEndDeviceRegistry_Set_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_JsDeviceRegistry_Set_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_JsEndDeviceRegistry_Set_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -307,18 +307,18 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_JsDeviceRegistry_Set_1(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_JsEndDeviceRegistry_Set_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_JsDeviceRegistry_Set_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_JsEndDeviceRegistry_Set_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_JsDeviceRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_JsEndDeviceRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -336,14 +336,14 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_JsDeviceRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_JsEndDeviceRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_JsDeviceRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_JsEndDeviceRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -351,21 +351,21 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_JsDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
+	pattern_JsEndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
 
-	pattern_JsDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
+	pattern_JsEndDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
 
-	pattern_JsDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
+	pattern_JsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
 
-	pattern_JsDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
+	pattern_JsEndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )
 
 var (
-	forward_JsDeviceRegistry_Get_0 = runtime.ForwardResponseMessage
+	forward_JsEndDeviceRegistry_Get_0 = runtime.ForwardResponseMessage
 
-	forward_JsDeviceRegistry_Set_0 = runtime.ForwardResponseMessage
+	forward_JsEndDeviceRegistry_Set_0 = runtime.ForwardResponseMessage
 
-	forward_JsDeviceRegistry_Set_1 = runtime.ForwardResponseMessage
+	forward_JsEndDeviceRegistry_Set_1 = runtime.ForwardResponseMessage
 
-	forward_JsDeviceRegistry_Delete_0 = runtime.ForwardResponseMessage
+	forward_JsEndDeviceRegistry_Delete_0 = runtime.ForwardResponseMessage
 )
