@@ -3275,6 +3275,15 @@
       "file": "mac_duty_cycle.go"
     }
   },
+  "event:ns.mac.force_rejoin.request": {
+    "translations": {
+      "en": "request force rejoin"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "mac_force_rejoin.go"
+    }
+  },
   "event:ns.mac.link_check": {
     "translations": {
       "en": "handled link check request"
