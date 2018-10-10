@@ -25,8 +25,6 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -227,7 +225,8 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 }
 
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
-	logger := log.FromContext(ctx).WithField("session_key_id", uplink.SessionKeyID)
+	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
+	logger := log.FromContext(ctx)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -270,26 +269,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	if err != nil {
 		return err
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
-	if err != nil {
+	if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 		return err
-	}
-	frmPayload, err := crypto.DecryptUplink(appSKey, *ids.DevAddr, uplink.FCnt, uplink.FRMPayload)
-	if err != nil {
-		return err
-	}
-	uplink.FRMPayload = frmPayload
-	var formatter ttnpb.PayloadFormatter
-	var parameter string
-	if dev.Formatters != nil {
-		formatter, parameter = dev.Formatters.UpFormatter, dev.Formatters.UpFormatterParameter
-	} else if link.DefaultFormatters != nil {
-		formatter, parameter = link.DefaultFormatters.UpFormatter, link.DefaultFormatters.UpFormatterParameter
-	}
-	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-		if err := as.formatter.Decode(ctx, ids, dev.VersionIDs, uplink, formatter, parameter); err != nil {
-			logger.WithError(err).Warn("Payload decoding failed")
-		}
 	}
 	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsIndustries/lorawan-stack/issues/1221)
 	return nil

@@ -17,11 +17,40 @@ package applicationserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	logger := log.FromContext(ctx)
+	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	if err != nil {
+		return err
+	}
+	frmPayload, err := crypto.DecryptUplink(appSKey, dev.Session.DevAddr, uplink.FCnt, uplink.FRMPayload)
+	if err != nil {
+		return err
+	}
+	uplink.FRMPayload = frmPayload
+	var formatter ttnpb.PayloadFormatter
+	var parameter string
+	if dev.Formatters != nil {
+		formatter, parameter = dev.Formatters.UpFormatter, dev.Formatters.UpFormatterParameter
+	} else if defaultFormatters != nil {
+		formatter, parameter = defaultFormatters.UpFormatter, defaultFormatters.UpFormatterParameter
+	}
+	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
+		if err := as.formatter.Decode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
+			logger.WithError(err).Warn("Payload decoding failed")
+		}
+	}
+	return nil
+}
 
 type payloadFormatter struct {
 	repository     *devicerepository.Client
