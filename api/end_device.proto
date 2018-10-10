@@ -237,129 +237,148 @@ message EndDevice {
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // Friendly name of the device. Stored in Application Server.
+  // Friendly name of the device. Stored in Entity Registry.
   string name = 4;
-  // Description of the device. Stored in Application Server.
+  // Description of the device. Stored in Entity Registry.
   string description = 5;
-  // Attributes of the device. Stored in Application Server.
+  // Attributes of the device. Stored in Entity Registry.
   map<string,string> attributes = 6;
 
-  // Version Identifiers. Stored in Application Server.
+  // Version Identifiers. Stored in Entity Registry.
   EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
 
-  // Default service profile. Stored in Network Server.
+  // Default service profile. Stored in Entity Registry.
   string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID"];
+
+  // The address of the Network Server where this device is supposed to be registered.
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string network_server_address = 9;
+  // The address of the Application Server where this device is supposed to be registered.
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string application_server_address = 10;
+  // The address of the Join Server where this device is supposed to be registered.
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string join_server_address = 11;
+
+  // Location of the device. Stored in Entity Registry.
+  map<string,Location> locations = 12;
 
   // Whether the device supports class B.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool supports_class_b = 9;
+  bool supports_class_b = 13;
   // Whether the device supports class C.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool supports_class_c = 10;
+  bool supports_class_c = 14;
   // LoRaWAN MAC version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACVersion lorawan_version = 11 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion"];
   // LoRaWAN PHY version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  PHYVersion lorawan_phy_version = 12 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion"];
   // ID of the frequency plan used by this device.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  string frequency_plan_id = 13 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID"];
   // Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACParameters default_mac_parameters = 14 [(gogoproto.customname) = "DefaultMACParameters"];
+  MACParameters default_mac_parameters = 18 [(gogoproto.customname) = "DefaultMACParameters"];
   // Minimum frequency the device is capable of using (Hz). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  uint64 min_frequency = 15;
+  uint64 min_frequency = 19;
   // Maximum frequency the device is capable of using (Hz). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  uint64 max_frequency = 16;
+  uint64 max_frequency = 20;
   // Whether the device resets the frame counters (not LoRaWAN compliant). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool resets_f_cnt = 17;
+  bool resets_f_cnt = 21;
   // Whether the device uses 32-bit frame counters. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool uses_32_bit_f_cnt = 18 [(gogoproto.customname) = "Uses32BitFCnt"];
+  bool uses_32_bit_f_cnt = 22 [(gogoproto.customname) = "Uses32BitFCnt"];
   // The device supports join (it's OTAA).
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool supports_join = 19;
+  bool supports_join = 23;
   // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool resets_join_nonces = 20;
+  bool resets_join_nonces = 24;
 
   // Device root keys. Stored in Join Server.
-  RootKeys root_keys = 21;
-  // The address (host:port) of the Network Server associated with this device. Stored in Join Server.
-  string network_server_address = 22;
-  // The address (host:port) of the Application Server associated with this device. Stored in Join Server.
-  string application_server_address = 23;
+  RootKeys root_keys = 25;
+
   // Home NetID. Stored in Join Server.
-  bytes net_id = 24 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID", (gogoproto.customname) = "NetID"];
+  bytes net_id = 26 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID", (gogoproto.customname) = "NetID"];
   // NOTE: Join Server address can be derived from join EUI.
 
   // Settings for how the Network Server handles MAC for this device. Stored in Network Server.
-  MACSettings mac_settings = 25 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 27 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.
-  MACState mac_state = 26 [(gogoproto.customname) = "MACState"];
+  MACState mac_state = 28 [(gogoproto.customname) = "MACState"];
   // Current session. Stored in Network Server.
-  Session session = 27;
+  Session session = 29;
   // Fallback session. Stored in Network Server until RekeyInd is received.
-  Session session_fallback = 28;
+  Session session_fallback = 30;
 
   // Next DevNonce to be expected (in case of LoRaWAN 1.1).
   // Stored in Join Server.
-  uint32 next_dev_nonce = 29;
+  uint32 next_dev_nonce = 31;
   // Used DevNonces (in case of LoRaWAN 1.0).
   // Stored in Join Server.
-  repeated uint32 used_dev_nonces = 30;
+  repeated uint32 used_dev_nonces = 32;
   // Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1).
   // Stored in Join Server.
-  uint32 next_join_nonce = 31;
+  uint32 next_join_nonce = 33;
   // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0).
   // Stored in Join Server.
-  repeated uint32 used_join_nonces = 32;
+  repeated uint32 used_join_nonces = 34;
   // Next Rejoin counter (type 0/2) to be expected.
   // Stored in Join Server.
-  uint32 next_rj_count_0 = 33 [(gogoproto.customname) = "NextRJCount0"];
+  uint32 next_rj_count_0 = 35 [(gogoproto.customname) = "NextRJCount0"];
   // Next Rejoin counter (type 1) to be expected.
   // Stored in Join Server.
-  uint32 next_rj_count_1 = 34 [(gogoproto.customname) = "NextRJCount1"];
+  uint32 next_rj_count_1 = 36 [(gogoproto.customname) = "NextRJCount1"];
 
   // Number of messages, after which a new DevStatus MAC command shall be scheduled.
   // Stored in Network Server.
-  uint64 next_status_after = 35;
+  uint64 next_status_after = 37;
   // Time when the device status was last received via the DevStatus MAC command.
   // Stored in Network Server.
-  google.protobuf.Timestamp last_status_received_at = 36 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_status_received_at = 38 [(gogoproto.stdtime) = true];
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  PowerState power_state = 37;
+  PowerState power_state = 39;
   // Latest-known battery percentage of the device.
   // Received via the DevStatus MAC command at status_received_at or earlier.
   // Stored in Network Server.
-  float battery_percentage = 38;
+  float battery_percentage = 40;
   // Demodulation signal-to-noise ratio (dB).
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  int32 downlink_margin = 39;
+  int32 downlink_margin = 41;
 
   // Recent uplink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated UplinkMessage recent_uplinks = 40;
+  repeated UplinkMessage recent_uplinks = 42;
   // Recent downlink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated DownlinkMessage recent_downlinks = 41;
+  repeated DownlinkMessage recent_downlinks = 43;
   // Queued Application downlink messages. Stored in Application Server,
   // which sets them on the Network Server.
-  repeated ApplicationDownlink queued_application_downlinks = 42;
+  repeated ApplicationDownlink queued_application_downlinks = 44;
 
   // The payload formatters for this end device. Stored in Application Server.
   // Copied on creation from template identified by version_ids.
-  MessagePayloadFormatters formatters = 43;
-
-  // Location of the device. Stored in Application Server.
-  map<string,Location> locations = 44;
+  MessagePayloadFormatters formatters = 45;
 }
 
 message EndDevices {
