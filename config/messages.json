@@ -1934,6 +1934,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:join_nonce_too_high": {
+    "translations": {
+      "en": "JoinNonce is too high"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:lorawan_version": {
     "translations": {
       "en": "unsupported LoRaWAN version: {version}"
