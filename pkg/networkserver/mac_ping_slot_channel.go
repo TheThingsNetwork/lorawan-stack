@@ -20,16 +20,23 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
+func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
 	if dev.MACState.DesiredParameters.PingSlotDataRateIndex == dev.MACState.CurrentParameters.PingSlotDataRateIndex &&
 		dev.MACState.DesiredParameters.PingSlotFrequency == dev.MACState.CurrentParameters.PingSlotFrequency {
-		return
+		return maxDownLen, maxUpLen, true
 	}
 
-	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_PingSlotChannelReq{
-		Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
-		DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndex,
-	}).MACCommand())
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		if nDown < 1 || nUp < 1 {
+			return nil, 0, false
+		}
+		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_PingSlotChannelReq{
+			Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
+			DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndex,
+		}).MACCommand()}, 1, true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotChannelAns) (err error) {

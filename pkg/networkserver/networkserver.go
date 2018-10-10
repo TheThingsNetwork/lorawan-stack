@@ -229,11 +229,7 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confFCnt uint32) (b []byte, err error) {
-	if !ack && confFCnt > 0 {
-		panic("confFCnt must be 0 if ack is false")
-	}
-
+func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, maxDownLen, maxUpLen uint16) ([]byte, error) {
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
 	}
@@ -244,60 +240,42 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	enqueueLinkADRReq(ctx, dev)
-	enqueueDutyCycleReq(ctx, dev)
-	enqueueRxParamSetupReq(ctx, dev)
-	enqueueDevStatusReq(ctx, dev)
-	enqueueNewChannelReq(ctx, dev)
-	enqueueDLChannelReq(ctx, dev)
-	enqueueRxTimingSetupReq(ctx, dev)
-	enqueueTxParamSetupReq(ctx, dev)
-	enqueueADRParamSetupReq(ctx, dev)
-	enqueueRejoinParamSetupReq(ctx, dev)
-	enqueueForceRejoinReq(ctx, dev)
-	enqueuePingSlotChannelReq(ctx, dev)
-	enqueueBeaconFreqReq(ctx, dev)
+	var fPending bool
+	for _, f := range []func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool){
+		// LoRaWAN 1.0+
+		enqueueLinkADRReq,
+		enqueueDutyCycleReq,
+		enqueueRxParamSetupReq,
+		enqueueDevStatusReq,
+		enqueueNewChannelReq,
+		enqueueRxTimingSetupReq,
+		enqueuePingSlotChannelReq,
+		enqueueBeaconFreqReq,
 
+		// LoRaWAN 1.0.2+
+		enqueueTxParamSetupReq,
+		enqueueDLChannelReq,
+
+		// LoRaWAN 1.1+
+		enqueueADRParamSetupReq,
+		enqueueForceRejoinReq,
+		enqueueRejoinParamSetupReq,
+	} {
+		var ok bool
+		maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
+		fPending = fPending || !ok
+	}
+
+	ack := up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP
 	if !ack &&
 		len(dev.MACState.PendingRequests) == 0 &&
 		len(dev.MACState.QueuedResponses) == 0 &&
 		len(dev.QueuedApplicationDownlinks) == 0 {
 		return nil, errNoDownlink
 	}
-
-	sort.SliceStable(dev.MACState.PendingRequests, func(i, j int) bool {
-		// NOTE: The ordering of a sequence of commands with identical CIDs shall not be changed.
-
-		ci := dev.MACState.PendingRequests[i].CID
-		cj := dev.MACState.PendingRequests[j].CID
-		switch {
-		case ci >= 0x80: // Proprietary
-			return false
-		case cj >= 0x80:
-			return true
-
-		case ci > 0x0F: // >1.1
-			return false
-		case cj > 0x0F:
-			return true
-
-		case ci < 0x02, ci > 0x0A: // >1.0.2
-			return false
-		case cj < 0x02, cj > 0x0A:
-			return true
-
-		case ci > 0x08: // >1.0.1
-			return false
-		case cj > 0x08:
-			return true
-		}
-		return false
-	})
-
 	cmds := append(dev.MACState.QueuedResponses, dev.MACState.PendingRequests...)
 
-	// TODO: Ensure cmds can be answered in one frame (https://github.com/TheThingsIndustries/ttn/issues/836)
-
+	var err error
 	cmdBuf := make([]byte, 0, len(cmds))
 	for _, cmd := range cmds {
 		cmdBuf, err = cmd.AppendLoRaWAN(cmdBuf)
@@ -353,12 +331,15 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		pld.FRMPayload = cmdBuf
 		dev.Session.LastNFCntDown++
 	} else {
-		// TODO: Ensure that maxPayloadSize of the data rate is not exceeded. (https://github.com/TheThingsIndustries/lorawan-stack/issues/995)
 		pld.FHDR.FOpts = cmdBuf
 	}
 
-	// TODO: Set to true if commands were trimmed. (https://github.com/TheThingsIndustries/ttn/issues/836)
-	pld.FHDR.FCtrl.FPending = len(dev.QueuedApplicationDownlinks) > 0
+	if len(pld.FRMPayload) > int(maxDownLen) {
+		fPending = true
+		pld.FRMPayload = pld.FRMPayload[:maxDownLen]
+	}
+
+	pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
 
 	switch {
 	case dev.MACState.DeviceClass != ttnpb.CLASS_C,
@@ -372,7 +353,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		dev.MACState.LastConfirmedDownlinkAt = timePtr(time.Now().UTC())
 	}
 
-	b, err = (ttnpb.Message{
+	b, err := (ttnpb.Message{
 		MHDR: ttnpb.MHDR{
 			MType: mType,
 			Major: ttnpb.Major_LORAWAN_R1,
@@ -408,6 +389,10 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, ack bool, confF
 		copy(key[:], dev.Session.SNwkSIntKey.Key[:])
 	}
 
+	var confFCnt uint32
+	if ack {
+		confFCnt = up.Payload.GetMACPayload().FCnt
+	}
 	mic, err := crypto.ComputeDownlinkMIC(
 		key,
 		*dev.EndDeviceIdentifiers.DevAddr,
@@ -1029,50 +1014,20 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	defer time.AfterFunc(updateTimeout, func() {
 		// TODO: Decouple Class A downlink from uplink. (https://github.com/TheThingsIndustries/lorawan-stack/issues/905)
-
-		needsAck := up.Payload.MType == ttnpb.MType_CONFIRMED_UP
-		var confFCnt uint32
-		if needsAck {
-			confFCnt = pld.FHDR.FCnt
-		}
-
-		var b []byte
-		var genErr bool
-		dev, err := ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			if dev == nil {
-				return nil, errOutdatedData
-			}
-
-			b, err = generateDownlink(ctx, dev, needsAck, confFCnt)
-			if err != nil && !errors.Resemble(err, errNoDownlink) {
-				logger.WithError(err).Error("Failed to generate downlink in reception slot")
-			}
-			if err != nil {
-				genErr = true
-				return nil, err
-			}
-			return dev, nil
-		})
-		if err != nil && !genErr {
-			logger.WithError(err).Error("Failed to update device in registry")
-			// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
-			return
-		}
-
-		down, err := ns.scheduleDownlink(ctx, dev, up, acc, b, false)
-		if err != nil {
-			logger.WithError(err).Error("Failed to schedule downlink in reception slot")
-			return
-		}
-
+		var schedErr bool
 		_, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			stored.RecentDownlinks = append(stored.RecentDownlinks, down)
-			if len(stored.RecentDownlinks) > recentDownlinkCount {
-				stored.RecentDownlinks = append(stored.RecentDownlinks[:0], stored.RecentDownlinks[len(stored.RecentDownlinks)-recentDownlinkCount:]...)
+			_, err := ns.scheduleDownlink(ctx, stored, up, acc, nil, false)
+			if err != nil {
+				schedErr = true
+				return nil, err
 			}
 			return stored, nil
 		})
-		if err != nil {
+		if schedErr && !errors.Resemble(err, errNoDownlink) {
+			logger.Debug("No downlink to schedule")
+		} else if schedErr {
+			logger.WithError(err).Error("Failed to schedule downlink in reception slot")
+		} else {
 			logger.WithError(err).Error("Failed to update device in registry")
 			// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
 		}
@@ -1218,20 +1173,19 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			return err
 		}
 
-		down, err := ns.scheduleDownlink(ctx, dev, up, nil, resp.RawPayload, true)
-		if err != nil {
+		var schedErr bool
+		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+			_, err := ns.scheduleDownlink(ctx, stored, up, nil, resp.RawPayload, true)
+			if err != nil {
+				schedErr = true
+				return nil, err
+			}
+			return stored, nil
+		})
+		if schedErr {
 			logger.WithError(err).Debug("Failed to schedule join-accept")
 			return err
-		}
-
-		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			stored.RecentDownlinks = append(stored.RecentDownlinks, down)
-			if len(stored.RecentDownlinks) > recentDownlinkCount {
-				stored.RecentDownlinks = append(stored.RecentDownlinks[:0], stored.RecentDownlinks[len(stored.RecentDownlinks)-recentDownlinkCount:]...)
-			}
-			return dev, nil
-		})
-		if err != nil {
+		} else if err != nil {
 			logger.WithError(err).Error("Failed to update device in registry")
 			// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
 			return err
@@ -1292,7 +1246,7 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessa
 // up represents the uplink message, which triggered the downlink(if such exists).
 // acc represents the metadata accumulator used to deduplicate up.
 // scheduleDownlink returns the downlink scheduled and error if any.
-func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) (*ttnpb.DownlinkMessage, error) {
+func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) ([]string, error) {
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
 	}
@@ -1302,7 +1256,6 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	))
 
 	down := &ttnpb.DownlinkMessage{
-		RawPayload:   b,
 		EndDeviceIDs: &dev.EndDeviceIdentifiers,
 	}
 
@@ -1370,6 +1323,8 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 		mds = up.RxMetadata
 		slots = append(slots, rx1)
+
+		down.CorrelationIDs = up.CorrelationIDs
 	}
 
 	if uint(dev.MACState.CurrentParameters.Rx2DataRateIndex) > uint(len(band.DataRates)) {
@@ -1416,6 +1371,24 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	for _, s := range slots {
 		down.Settings = s.TxSettings
 
+		if b == nil {
+			var maxUpDR ttnpb.DataRateIndex
+			for _, ch := range dev.MACState.CurrentParameters.Channels {
+				if !ch.EnableUplink {
+					continue
+				}
+				maxUpDR = ch.MaxDataRateIndex
+			}
+			b, err = generateDownlink(ctx, dev, up,
+				band.DataRates[down.Settings.DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+				band.DataRates[maxUpDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+			)
+			if err != nil {
+				return nil, err
+			}
+		}
+		down.RawPayload = b
+
 		for _, md := range mds {
 			logger := logger.WithField(
 				"gateway_uid", unique.ID(ctx, md.GatewayIdentifiers),
@@ -1439,14 +1412,17 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 			}
 
 			dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-			return down, nil
+			if len(dev.RecentDownlinks) > recentDownlinkCount {
+				dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
+			}
+			return nil, nil
 		}
 	}
 
 	for i, err := range errs {
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
-	logger.Warn("all Gateway Servers failed to schedule the downlink")
+	logger.Warn("All Gateway Servers failed to schedule the downlink")
 	return nil, errSchedule
 }
 

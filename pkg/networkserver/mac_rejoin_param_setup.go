@@ -26,15 +26,22 @@ var (
 	evtMACRejoinParamAccept  = events.Define("ns.mac.rejoin_param.accept", "device accepted rejoin parameter setup request")
 )
 
-func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
 	if dev.MACState.DesiredParameters.RejoinTimePeriodicity == dev.MACState.CurrentParameters.RejoinTimePeriodicity {
-		return
+		return maxDownLen, maxUpLen, true
 	}
 
-	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RejoinParamSetupReq{
-		MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
-		MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
-	}).MACCommand())
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		if nDown < 1 || nUp < 1 {
+			return nil, 0, false
+		}
+		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_RejoinParamSetupReq{
+			MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
+			MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
+		}).MACCommand()}, 1, true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RejoinParamSetupAns) (err error) {

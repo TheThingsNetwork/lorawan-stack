@@ -29,7 +29,7 @@ var (
 	evtMACLinkADRReject  = events.Define("ns.mac.adr.reject", "device rejected ADR request")
 )
 
-func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice) {
+func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
 	// TODO: Generate LinkADRReq(https://github.com/TheThingsIndustries/ttn/issues/837)
 	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
 		if dev.MACState.DesiredParameters.Channels[i].EnableUplink != dev.MACState.CurrentParameters.Channels[i].EnableUplink {
@@ -41,6 +41,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice) {
 		dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans ||
 		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex {
 	}
+	return maxDownLen, maxUpLen, true
 }
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (err error) {

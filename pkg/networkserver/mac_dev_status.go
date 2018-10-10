@@ -27,12 +27,21 @@ var (
 	evtMACDeviceStatus        = events.Define("ns.mac.device_status", "handled device status")
 )
 
-func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice) {
-	if dev.LastDevStatusReceivedAt == nil ||
-		dev.MACSettings.StatusCountPeriodicity > 0 && dev.MACState.LastDevStatusFCntUp+dev.MACSettings.StatusCountPeriodicity <= dev.Session.LastFCntUp ||
-		dev.MACSettings.StatusTimePeriodicity > 0 && dev.LastDevStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).Before(time.Now()) {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, ttnpb.CID_DEV_STATUS.MACCommand())
+func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+	if dev.LastDevStatusReceivedAt != nil &&
+		(dev.MACSettings.StatusCountPeriodicity == 0 || dev.MACState.LastDevStatusFCntUp+dev.MACSettings.StatusCountPeriodicity > dev.Session.LastFCntUp) &&
+		(dev.MACSettings.StatusTimePeriodicity == 0 || dev.LastDevStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).After(time.Now())) {
+		return maxDownLen, maxUpLen, true
 	}
+
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		if nDown < 1 || nUp < 1 {
+			return nil, 0, false
+		}
+		return []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}, 1, true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, recvAt time.Time) (err error) {

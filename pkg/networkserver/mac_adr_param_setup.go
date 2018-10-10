@@ -26,16 +26,23 @@ var (
 	evtMACADRParamAccept  = events.Define("ns.mac.adr_param.accept", "device accepted ADR parameter setup request")
 )
 
-func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
+func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
 	if dev.MACState.DesiredParameters.ADRAckLimit == dev.MACState.CurrentParameters.ADRAckLimit &&
 		dev.MACState.DesiredParameters.ADRAckDelay == dev.MACState.CurrentParameters.ADRAckDelay {
-		return
+		return maxDownLen, maxUpLen, true
 	}
 
-	dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_ADRParamSetupReq{
-		ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
-		ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
-	}).MACCommand())
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		if nDown < 1 || nUp < 1 {
+			return nil, 0, false
+		}
+		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_ADRParamSetupReq{
+			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
+			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
+		}).MACCommand()}, 1, true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {

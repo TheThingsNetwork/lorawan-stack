@@ -1573,7 +1573,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 				close(collectionDoneCh)
 
-				_, err = GenerateDownlink(ctx, pb, tc.UplinkMessage.Payload.MType == ttnpb.MType_CONFIRMED_UP, 0)
+				_, err = GenerateDownlink(ctx, pb, CopyUplinkMessage(tc.UplinkMessage), math.MaxUint16, math.MaxUint16)
 				if err != nil {
 					a.So(err, should.Equal, ErrNoDownlink)
 				}

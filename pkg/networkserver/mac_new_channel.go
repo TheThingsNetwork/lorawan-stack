@@ -27,22 +27,33 @@ var (
 	evtMACNewChannelReject  = events.Define("ns.mac.new_channel.reject", "device rejected new channel request")
 )
 
-func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
-	for i, ch := range dev.MACState.DesiredParameters.Channels {
-		if i <= len(dev.MACState.CurrentParameters.Channels) &&
-			ch.UplinkFrequency == dev.MACState.CurrentParameters.Channels[i].UplinkFrequency &&
-			ch.MinDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex &&
-			ch.MaxDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
-			continue
-		}
+func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		var cmds []*ttnpb.MACCommand
+		for i, ch := range dev.MACState.DesiredParameters.Channels {
+			if i <= len(dev.MACState.CurrentParameters.Channels) &&
+				ch.UplinkFrequency == dev.MACState.CurrentParameters.Channels[i].UplinkFrequency &&
+				ch.MinDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex &&
+				ch.MaxDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
+				continue
+			}
+			if nDown < 1 || nUp < 1 {
+				return cmds, uint16(len(cmds)), false
+			}
+			nDown--
+			nUp--
 
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_NewChannelReq{
-			ChannelIndex:     uint32(i),
-			Frequency:        ch.UplinkFrequency,
-			MinDataRateIndex: ch.MinDataRateIndex,
-			MaxDataRateIndex: ch.MaxDataRateIndex,
-		}).MACCommand())
-	}
+			cmds = append(cmds, (&ttnpb.MACCommand_NewChannelReq{
+				ChannelIndex:     uint32(i),
+				Frequency:        ch.UplinkFrequency,
+				MinDataRateIndex: ch.MinDataRateIndex,
+				MaxDataRateIndex: ch.MaxDataRateIndex,
+			}).MACCommand())
+		}
+		return cmds, uint16(len(cmds)), true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (err error) {

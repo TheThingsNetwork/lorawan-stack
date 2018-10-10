@@ -26,18 +26,29 @@ var (
 	evtMACDLChannelReject = events.Define("ns.mac.dl_channel.reject", "device rejected downlink channel request")
 )
 
-func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice) {
-	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		if dev.MACState.DesiredParameters.Channels[i].UplinkFrequency == dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency &&
-			dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency == dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
-			continue
-		}
+func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		var cmds []*ttnpb.MACCommand
+		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
+			if dev.MACState.DesiredParameters.Channels[i].UplinkFrequency == dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency &&
+				dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency == dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
+				continue
+			}
+			if nDown < 1 || nUp < 1 {
+				return cmds, uint16(len(cmds)), false
+			}
+			nDown--
+			nUp--
 
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_DLChannelReq{
-			ChannelIndex: uint32(i),
-			Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
-		}).MACCommand())
-	}
+			cmds = append(cmds, (&ttnpb.MACCommand_DLChannelReq{
+				ChannelIndex: uint32(i),
+				Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
+			}).MACCommand())
+		}
+		return cmds, uint16(len(cmds)), true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) (err error) {

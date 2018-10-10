@@ -25,6 +25,7 @@ var (
 	evtMACForceRejoinRequest = events.Define("ns.mac.force_rejoin.request", "request force rejoin") // TODO(#988): publish when requesting
 )
 
-func enqueueForceRejoinReq(ctx context.Context, dev *ttnpb.EndDevice) {
+func enqueueForceRejoinReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
 	// TODO: Generate ForceRejoinReq(https://github.com/TheThingsIndustries/ttn/issues/837)
+	return maxDownLen, maxUpLen, true
 }

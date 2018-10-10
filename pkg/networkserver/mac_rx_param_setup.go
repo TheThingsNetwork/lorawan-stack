@@ -27,16 +27,25 @@ var (
 	evtMACRxParamReject  = events.Define("ns.mac.rx_param.reject", "device rejected rx parameter setup request")
 )
 
-func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice) {
-	if dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency ||
-		dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
-		dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset {
-		dev.MACState.PendingRequests = append(dev.MACState.PendingRequests, (&ttnpb.MACCommand_RxParamSetupReq{
+func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+	if dev.MACState.DesiredParameters.Rx2Frequency == dev.MACState.CurrentParameters.Rx2Frequency &&
+		dev.MACState.DesiredParameters.Rx2DataRateIndex == dev.MACState.CurrentParameters.Rx2DataRateIndex &&
+		dev.MACState.DesiredParameters.Rx1DataRateOffset == dev.MACState.CurrentParameters.Rx1DataRateOffset {
+		return maxDownLen, maxUpLen, true
+	}
+
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		if nDown < 1 || nUp < 1 {
+			return nil, 0, false
+		}
+		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_RxParamSetupReq{
 			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
 			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
 			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
-		}).MACCommand())
-	}
+		}).MACCommand()}, 1, true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) (err error) {
