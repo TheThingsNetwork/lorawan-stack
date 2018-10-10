@@ -110,11 +110,10 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	logger := log.FromContext(ctx).WithField("application_uid", uid)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("application_conn:%s", events.NewCorrelationID()))
 
-	val, ok := as.links.Load(uid)
-	if !ok {
-		return nil, errNotLinked.WithAttributes("application_uid", uid)
+	l, err := as.getLink(ctx, ids)
+	if err != nil {
+		return nil, err
 	}
-	l := val.(*link)
 	conn := io.NewConnection(ctx, protocol, ids)
 	l.subscribeCh <- conn
 	go func() {

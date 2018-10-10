@@ -192,6 +192,15 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 	return nil
 }
 
+func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*link, error) {
+	uid := unique.ID(ctx, ids)
+	val, ok := as.links.Load(uid)
+	if !ok {
+		return nil, errNotLinked.WithAttributes("application_uid", uid)
+	}
+	return val.(*link), nil
+}
+
 func (l *link) run() {
 	subscribers := make(map[*io.Connection]string)
 	for {
