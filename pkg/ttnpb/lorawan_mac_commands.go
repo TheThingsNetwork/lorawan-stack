@@ -20,8 +20,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 )
 
-// macCommandDescriptor descibes a MAC command.
-type macCommandDescriptor struct {
+// MACCommandDescriptor descibes a MAC command.
+type MACCommandDescriptor struct {
 	InitiatedByDevice bool
 	UplinkLength      uint
 	DownlinkLength    uint
@@ -29,13 +29,13 @@ type macCommandDescriptor struct {
 	NewDownlink       func() lorawan.AppendUnmarshaler
 }
 
-// macCommandSpec maps the CID of MACCommand to a *macCommandDescriptor.
-type macCommandSpec [0xff + 1]*macCommandDescriptor
+// MACCommandSpec maps the CID of MACCommand to a *MACCommandDescriptor.
+type MACCommandSpec [0xff + 1]*MACCommandDescriptor
 
-var defaultMACCommands macCommandSpec
+var DefaultMACCommands MACCommandSpec
 
 func init() {
-	defaultMACCommands[CID_RESET] = &macCommandDescriptor{
+	DefaultMACCommands[CID_RESET] = &MACCommandDescriptor{
 		InitiatedByDevice: true,
 		UplinkLength:      1,
 		DownlinkLength:    1,
@@ -50,7 +50,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_LINK_CHECK] = &macCommandDescriptor{
+	DefaultMACCommands[CID_LINK_CHECK] = &MACCommandDescriptor{
 		InitiatedByDevice: true,
 		UplinkLength:      0,
 		DownlinkLength:    2,
@@ -61,7 +61,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_LINK_ADR] = &macCommandDescriptor{
+	DefaultMACCommands[CID_LINK_ADR] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    4,
@@ -76,7 +76,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_DUTY_CYCLE] = &macCommandDescriptor{
+	DefaultMACCommands[CID_DUTY_CYCLE] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      0,
 		DownlinkLength:    1,
@@ -87,7 +87,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_RX_PARAM_SETUP] = &macCommandDescriptor{
+	DefaultMACCommands[CID_RX_PARAM_SETUP] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    4,
@@ -102,7 +102,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_DEV_STATUS] = &macCommandDescriptor{
+	DefaultMACCommands[CID_DEV_STATUS] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      2,
 		DownlinkLength:    0,
@@ -113,7 +113,7 @@ func init() {
 		},
 		NewDownlink: nil,
 	}
-	defaultMACCommands[CID_NEW_CHANNEL] = &macCommandDescriptor{
+	DefaultMACCommands[CID_NEW_CHANNEL] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    5,
@@ -128,7 +128,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_RX_TIMING_SETUP] = &macCommandDescriptor{
+	DefaultMACCommands[CID_RX_TIMING_SETUP] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      0,
 		DownlinkLength:    1,
@@ -139,7 +139,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_TX_PARAM_SETUP] = &macCommandDescriptor{
+	DefaultMACCommands[CID_TX_PARAM_SETUP] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      0,
 		DownlinkLength:    1,
@@ -150,7 +150,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_DL_CHANNEL] = &macCommandDescriptor{
+	DefaultMACCommands[CID_DL_CHANNEL] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    4,
@@ -165,7 +165,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_REKEY] = &macCommandDescriptor{
+	DefaultMACCommands[CID_REKEY] = &MACCommandDescriptor{
 		InitiatedByDevice: true,
 		UplinkLength:      1,
 		DownlinkLength:    1,
@@ -180,7 +180,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_ADR_PARAM_SETUP] = &macCommandDescriptor{
+	DefaultMACCommands[CID_ADR_PARAM_SETUP] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      0,
 		DownlinkLength:    1,
@@ -191,7 +191,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_DEVICE_TIME] = &macCommandDescriptor{
+	DefaultMACCommands[CID_DEVICE_TIME] = &MACCommandDescriptor{
 		InitiatedByDevice: true,
 		UplinkLength:      0,
 		DownlinkLength:    5,
@@ -202,7 +202,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_FORCE_REJOIN] = &macCommandDescriptor{
+	DefaultMACCommands[CID_FORCE_REJOIN] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      0,
 		DownlinkLength:    2,
@@ -213,7 +213,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_REJOIN_PARAM_SETUP] = &macCommandDescriptor{
+	DefaultMACCommands[CID_REJOIN_PARAM_SETUP] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    1,
@@ -228,7 +228,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_PING_SLOT_INFO] = &macCommandDescriptor{
+	DefaultMACCommands[CID_PING_SLOT_INFO] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    0,
@@ -239,7 +239,7 @@ func init() {
 		},
 		NewDownlink: nil,
 	}
-	defaultMACCommands[CID_PING_SLOT_CHANNEL] = &macCommandDescriptor{
+	DefaultMACCommands[CID_PING_SLOT_CHANNEL] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    4,
@@ -254,7 +254,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_BEACON_TIMING] = &macCommandDescriptor{
+	DefaultMACCommands[CID_BEACON_TIMING] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      0,
 		DownlinkLength:    3,
@@ -265,7 +265,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_BEACON_FREQ] = &macCommandDescriptor{
+	DefaultMACCommands[CID_BEACON_FREQ] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    3,
@@ -280,7 +280,7 @@ func init() {
 			}
 		},
 	}
-	defaultMACCommands[CID_DEVICE_MODE] = &macCommandDescriptor{
+	DefaultMACCommands[CID_DEVICE_MODE] = &MACCommandDescriptor{
 		InitiatedByDevice: false,
 		UplinkLength:      1,
 		DownlinkLength:    1,
@@ -309,10 +309,10 @@ func (cid MACCommandIdentifier) Validate() error {
 // InitiatedByDevice returns false, false if cid is not known.
 // The second return value is true if cid is known.
 func (cid MACCommandIdentifier) InitiatedByDevice() (bool, bool) {
-	if cid < 0 || int(cid) >= len(defaultMACCommands) {
+	if cid < 0 || int(cid) >= len(DefaultMACCommands) {
 		return false, false
 	}
-	desc := defaultMACCommands[cid]
+	desc := DefaultMACCommands[cid]
 	if desc == nil {
 		return false, false
 	}

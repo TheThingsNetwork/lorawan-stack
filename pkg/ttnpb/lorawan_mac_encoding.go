@@ -1312,7 +1312,7 @@ func (cmd *MACCommand) MarshalLoRaWAN() ([]byte, error) {
 
 // UnmarshalLoRaWAN unmarshals the MAC command and payload.
 func (cmd *MACCommand) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
-	return defaultMACCommands.Read(bytes.NewReader(b), isUplink, cmd)
+	return DefaultMACCommands.Read(bytes.NewReader(b), isUplink, cmd)
 }
 
 var (
@@ -1321,7 +1321,7 @@ var (
 )
 
 // Read reads a MACCommand from r into cmd and returns any errors encountered.
-func (spec macCommandSpec) Read(r io.Reader, isUplink bool, cmd *MACCommand) error {
+func (spec MACCommandSpec) Read(r io.Reader, isUplink bool, cmd *MACCommand) error {
 	b := make([]byte, 1)
 	_, err := r.Read(b)
 	if err != nil {
@@ -1399,5 +1399,5 @@ func (spec macCommandSpec) Read(r io.Reader, isUplink bool, cmd *MACCommand) err
 
 // ReadMACCommand reads a MACCommand from r into cmd and returns any errors encountered.
 func ReadMACCommand(r io.Reader, isUplink bool, cmd *MACCommand) error {
-	return defaultMACCommands.Read(r, isUplink, cmd)
+	return DefaultMACCommands.Read(r, isUplink, cmd)
 }
