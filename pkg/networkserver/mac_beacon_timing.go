@@ -22,5 +22,6 @@ import (
 
 func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) error {
 	// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+	// NOTE: This command is deprecated in LoRaWAN 1.1
 	return nil
 }
