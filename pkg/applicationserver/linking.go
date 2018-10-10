@@ -76,6 +76,8 @@ type link struct {
 	subscribeCh   chan *io.Connection
 	unsubscribeCh chan *io.Connection
 	upCh          chan *ttnpb.ApplicationUp
+
+	defaultFormatters *ttnpb.MessagePayloadFormatters
 }
 
 const linkBufferSize = 10
@@ -122,12 +124,13 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	l := &link{
-		ctx:           ctx,
-		cancel:        cancelCtx,
-		connReady:     make(chan struct{}),
-		subscribeCh:   make(chan *io.Connection, 1),
-		unsubscribeCh: make(chan *io.Connection, 1),
-		upCh:          make(chan *ttnpb.ApplicationUp, linkBufferSize),
+		ctx:               ctx,
+		cancel:            cancelCtx,
+		connReady:         make(chan struct{}),
+		subscribeCh:       make(chan *io.Connection, 1),
+		unsubscribeCh:     make(chan *io.Connection, 1),
+		upCh:              make(chan *ttnpb.ApplicationUp, linkBufferSize),
+		defaultFormatters: target.DefaultFormatters,
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
 		cancelCtx()
