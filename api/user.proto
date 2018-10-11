@@ -59,6 +59,25 @@ message User {
   string temporary_password = 14;
   google.protobuf.Timestamp temporary_password_created_at = 15 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp temporary_password_expires_at = 16 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
+
+  Picture profile_picture = 17;
+}
+
+message Picture {
+  message Embedded {
+    // MIME type of the picture.
+    string mime_type = 1;
+    // Picture data. A data URI can be constructed as follows:
+    // `data:<mime_type>;base64,<data>`.
+    bytes data = 2;
+  }
+
+  // Embedded picture, always maximum 128px in size.
+  // Omitted if there are external URLs available (in sizes).
+  Embedded embedded = 1;
+
+  // URLs of the picture for different sizes, if available on a CDN.
+  map<uint32,string> sizes = 2;
 }
 
 message Users {

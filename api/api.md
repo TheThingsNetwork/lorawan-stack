@@ -432,6 +432,9 @@
     - [GetUserRequest](#ttn.lorawan.v3.GetUserRequest)
     - [Invitation](#ttn.lorawan.v3.Invitation)
     - [Invitations](#ttn.lorawan.v3.Invitations)
+    - [Picture](#ttn.lorawan.v3.Picture)
+    - [Picture.Embedded](#ttn.lorawan.v3.Picture.Embedded)
+    - [Picture.SizesEntry](#ttn.lorawan.v3.Picture.SizesEntry)
     - [SendInvitationRequest](#ttn.lorawan.v3.SendInvitationRequest)
     - [UpdateUserAPIKeyRequest](#ttn.lorawan.v3.UpdateUserAPIKeyRequest)
     - [UpdateUserPasswordRequest](#ttn.lorawan.v3.UpdateUserPasswordRequest)
@@ -5210,6 +5213,54 @@ This service is not implemented on all deployments.
 
 
 
+<a name="ttn.lorawan.v3.Picture"/>
+
+### Picture
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| embedded | [Picture.Embedded](#ttn.lorawan.v3.Picture.Embedded) |  | Embedded picture, always maximum 128px in size. Omitted if there are external URLs available (in sizes). |
+| sizes | [Picture.SizesEntry](#ttn.lorawan.v3.Picture.SizesEntry) | repeated | URLs of the picture for different sizes, if available on a CDN. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.Picture.Embedded"/>
+
+### Picture.Embedded
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| mime_type | [string](#string) |  | MIME type of the picture. |
+| data | [bytes](#bytes) |  | Picture data. A data URI can be constructed as follows: `data:&lt;mime_type&gt;;base64,&lt;data&gt;`. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.Picture.SizesEntry"/>
+
+### Picture.SizesEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [uint32](#uint32) |  |  |
+| value | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.SendInvitationRequest"/>
 
 ### SendInvitationRequest
@@ -5298,6 +5349,7 @@ User is the message that defines an user on the network.
 | temporary_password | [string](#string) |  | The temporary password can only be used to update a user&#39;s password; never returned on API calls. |
 | temporary_password_created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | temporary_password_expires_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| profile_picture | [Picture](#ttn.lorawan.v3.Picture) |  |  |
 
 
 

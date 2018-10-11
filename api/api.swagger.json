@@ -3860,6 +3860,20 @@
         }
       }
     },
+    "PictureEmbedded": {
+      "type": "object",
+      "properties": {
+        "mime_type": {
+          "type": "string",
+          "description": "MIME type of the picture."
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "Picture data. A data URI can be constructed as follows:\n`data:\u003cmime_type\u003e;base64,\u003cdata\u003e`."
+        }
+      }
+    },
     "TxAcknowledgmentResult": {
       "type": "string",
       "enum": [
@@ -6193,6 +6207,22 @@
       "default": "FORMATTER_NONE",
       "description": " - FORMATTER_NONE: No payload formatter to work with raw payload only.\n - FORMATTER_REPOSITORY: Use payload formatter for the end device type from a repository.\n - FORMATTER_GRPC_SERVICE: gRPC service payload formatter. The parameter is the host:port of the service.\n - FORMATTER_JAVASCRIPT: Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.\n - FORMATTER_CAYENNELPP: CayenneLPP payload formatter."
     },
+    "v3Picture": {
+      "type": "object",
+      "properties": {
+        "embedded": {
+          "$ref": "#/definitions/PictureEmbedded",
+          "description": "Embedded picture, always maximum 128px in size.\nOmitted if there are external URLs available (in sizes)."
+        },
+        "sizes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "URLs of the picture for different sizes, if available on a CDN."
+        }
+      }
+    },
     "v3PingSlotPeriod": {
       "type": "string",
       "enum": [
@@ -6987,6 +7017,9 @@
         "temporary_password_expires_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "profile_picture": {
+          "$ref": "#/definitions/v3Picture"
         }
       },
       "description": "User is the message that defines an user on the network."
