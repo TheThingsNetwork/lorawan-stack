@@ -183,7 +183,7 @@ message MACSettings {
   // The interval after which a DevStatusReq MACCommand shall be sent.
   google.protobuf.Duration status_time_periodicity = 5 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
   // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
-  uint64 status_count_periodicity = 6;
+  uint32 status_count_periodicity = 6;
 }
 
 // MACState represents the state of MAC layer of the device.
@@ -206,16 +206,18 @@ message MACState {
   MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion"];
   // Time when the last confirmed downlink message or MAC command was scheduled.
   google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
+  // Frame counter value of last uplink containing DevStatusAns.
+  uint32 last_dev_status_f_cnt_up = 6;
   // Periodicity of the class B ping slot.
-  PingSlotPeriod ping_slot_periodicity = 8;
+  PingSlotPeriod ping_slot_periodicity = 7;
   // A confirmed application downlink, for which an acknowledgment is expected to arrive.
-  ApplicationDownlink pending_application_downlink = 9;
+  ApplicationDownlink pending_application_downlink = 8;
   // Queued MAC responses.
   // Regenerated on each uplink.
-  repeated MACCommand queued_responses = 10;
+  repeated MACCommand queued_responses = 9;
   // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
   // Regenerated on each downlink.
-  repeated MACCommand pending_requests = 11;
+  repeated MACCommand pending_requests = 10;
 
   // TODO: Add info about failed MAC requests
 }
@@ -347,22 +349,19 @@ message EndDevice {
   // Stored in Join Server.
   uint32 last_rj_count_1 = 36 [(gogoproto.customname) = "LastRJCount1"];
 
-  // Number of messages, after which a new DevStatus MAC command shall be scheduled.
+  // Time when last DevStatus MAC command was received.
   // Stored in Network Server.
-  uint64 last_status_f_cnt = 37;
-  // Time when the device status was last received via the DevStatus MAC command.
-  // Stored in Network Server.
-  google.protobuf.Timestamp last_status_received_at = 38 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_dev_status_received_at = 38 [(gogoproto.stdtime) = true];
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
   PowerState power_state = 39;
   // Latest-known battery percentage of the device.
-  // Received via the DevStatus MAC command at status_received_at or earlier.
+  // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
   // Stored in Network Server.
   float battery_percentage = 40;
   // Demodulation signal-to-noise ratio (dB).
-  // Received via the DevStatus MAC command at status_received_at.
+  // Received via the DevStatus MAC command at last_dev_status_received_at.
   // Stored in Network Server.
   int32 downlink_margin = 41;
 

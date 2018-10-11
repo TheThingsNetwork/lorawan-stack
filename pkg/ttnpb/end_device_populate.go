@@ -138,7 +138,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 			out.QueuedApplicationDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
-	out.LastStatusReceivedAt = pbtypes.NewPopulatedStdTime(r, easy)
+	out.LastDevStatusReceivedAt = pbtypes.NewPopulatedStdTime(r, easy)
 	out.BatteryPercentage = r.Float32()
 	out.DownlinkMargin = r.Int31()
 	if r.Intn(2) == 0 {
