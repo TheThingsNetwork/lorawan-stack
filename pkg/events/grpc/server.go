@@ -20,6 +20,8 @@ import (
 	"context"
 	"runtime"
 
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
+
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -76,10 +78,10 @@ type EventsServer struct {
 }
 
 // Stream implements the EventsServer interface.
-func (srv *EventsServer) Stream(ids *ttnpb.CombinedIdentifiers, stream ttnpb.Events_StreamServer) (err error) {
+func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) (err error) {
 	ctx := stream.Context()
 
-	for _, entityIDs := range ids.GetEntityIdentifiers() {
+	for _, entityIDs := range req.GetEntityIdentifiers() {
 		switch ids := entityIDs.Identifiers().(type) {
 		case *ttnpb.ApplicationIdentifiers:
 			err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_ALL)
@@ -101,8 +103,13 @@ func (srv *EventsServer) Stream(ids *ttnpb.CombinedIdentifiers, stream ttnpb.Eve
 
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)
-	srv.filter.Subscribe(ctx, ids, handler)
-	defer srv.filter.Unsubscribe(ctx, ids, handler)
+	srv.filter.Subscribe(ctx, &req.CombinedIdentifiers, handler)
+	defer srv.filter.Unsubscribe(ctx, &req.CombinedIdentifiers, handler)
+
+	if req.Tail > 0 || req.After != nil {
+		// TODO: Get event tail from buffer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1213)
+		warning.Add(ctx, "Historical events not implemented")
+	}
 
 	for {
 		select {

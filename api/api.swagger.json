@@ -1073,6 +1073,7 @@
     },
     "/events": {
       "post": {
+        "summary": "Stream live events, optionally with a tail of historical events (depending on server support and retention policy).\nEvents may arrive out-of-order.",
         "operationId": "Stream",
         "responses": {
           "200": {
@@ -1088,7 +1089,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3CombinedIdentifiers"
+              "$ref": "#/definitions/v3StreamEventsRequest"
             }
           }
         ],
@@ -6617,6 +6618,24 @@
       ],
       "default": "STATE_REQUESTED",
       "description": "State enum defines states that an entity can be in.\n\n - STATE_REQUESTED: Denotes that the entity has been requested and is pending review by an admin.\n - STATE_APPROVED: Denotes that the entity has been reviewed and approved by an admin.\n - STATE_REJECTED: Denotes that the entity has been reviewed and rejected by an admin.\n - STATE_FLAGGED: Denotes that the entity has been flagged and is pending review by an admin.\n - STATE_SUSPENDED: Denotes that the entity has been reviewed and suspended by an admin."
+    },
+    "v3StreamEventsRequest": {
+      "type": "object",
+      "properties": {
+        "identifiers": {
+          "$ref": "#/definitions/v3CombinedIdentifiers"
+        },
+        "tail": {
+          "type": "integer",
+          "format": "int64",
+          "description": "If greater than zero, this will return historical events, up to this maximum when the stream starts.\nIf used in combination with \"after\", the limit that is reached first, is used.\nThe availability of historical events depends on server support and retention policy."
+        },
+        "after": {
+          "type": "string",
+          "format": "date-time",
+          "description": "If not empty, this will return historical events after the given time when the stream starts.\nIf used in combination with \"tail\", the limit that is reached first, is used.\nThe availability of historical events depends on server support and retention policy."
+        }
+      }
     },
     "v3TxAcknowledgment": {
       "type": "object",

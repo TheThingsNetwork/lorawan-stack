@@ -26,7 +26,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message Event {
   string name = 1;
-  google.protobuf.Timestamp time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];;
+  google.protobuf.Timestamp time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   CombinedIdentifiers identifiers = 3;
   google.protobuf.Any data = 4;
   repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
@@ -34,9 +34,23 @@ message Event {
   map<string,bytes> context = 7;
 }
 
-// The Events service streams events that match
+message StreamEventsRequest {
+  CombinedIdentifiers identifiers = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  // If greater than zero, this will return historical events, up to this maximum when the stream starts.
+  // If used in combination with "after", the limit that is reached first, is used.
+  // The availability of historical events depends on server support and retention policy.
+  uint32 tail = 2;
+  // If not empty, this will return historical events after the given time when the stream starts.
+  // If used in combination with "tail", the limit that is reached first, is used.
+  // The availability of historical events depends on server support and retention policy.
+  google.protobuf.Timestamp after = 3 [(gogoproto.stdtime) = true];
+}
+
+// The Events service serves events from the cluster.
 service Events {
-  rpc Stream(CombinedIdentifiers) returns (stream Event) {
+  // Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
+  // Events may arrive out-of-order.
+  rpc Stream(StreamEventsRequest) returns (stream Event) {
     option (google.api.http) = {
       post: "/events"
       body: "*"

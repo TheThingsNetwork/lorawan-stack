@@ -138,6 +138,7 @@
 - [lorawan-stack/api/events.proto](#lorawan-stack/api/events.proto)
     - [Event](#ttn.lorawan.v3.Event)
     - [Event.ContextEntry](#ttn.lorawan.v3.Event.ContextEntry)
+    - [StreamEventsRequest](#ttn.lorawan.v3.StreamEventsRequest)
   
   
   
@@ -1738,6 +1739,23 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 
 
 
+
+<a name="ttn.lorawan.v3.StreamEventsRequest"/>
+
+### StreamEventsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifiers | [CombinedIdentifiers](#ttn.lorawan.v3.CombinedIdentifiers) |  |  |
+| tail | [uint32](#uint32) |  | If greater than zero, this will return historical events, up to this maximum when the stream starts. If used in combination with &#34;after&#34;, the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
+| after | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | If not empty, this will return historical events after the given time when the stream starts. If used in combination with &#34;tail&#34;, the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
+
+
+
+
+
  
 
  
@@ -1748,11 +1766,11 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 <a name="ttn.lorawan.v3.Events"/>
 
 ### Events
-The Events service streams events that match
+The Events service serves events from the cluster.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Stream | [CombinedIdentifiers](#ttn.lorawan.v3.CombinedIdentifiers) | [Event](#ttn.lorawan.v3.CombinedIdentifiers) |  |
+| Stream | [StreamEventsRequest](#ttn.lorawan.v3.StreamEventsRequest) | [Event](#ttn.lorawan.v3.StreamEventsRequest) | Stream live events, optionally with a tail of historical events (depending on server support and retention policy). Events may arrive out-of-order. |
 
  
 
