@@ -74,7 +74,7 @@ func collectEvents(name string) eventCollector {
 func (ch eventCollector) expect(t *testing.T, n int) []events.Event {
 	collected := make([]events.Event, 0, n)
 	for i := 0; i < n; i++ {
-		evt := events.Channel(ch).ReceiveTimeout(10 * time.Millisecond * test.Delay)
+		evt := events.Channel(ch).ReceiveTimeout(10 * test.Delay)
 		if evt == nil {
 			t.Fatalf("Did not receive expected event %d/%d", i+1, n)
 		}
