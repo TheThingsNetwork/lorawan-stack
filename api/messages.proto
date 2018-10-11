@@ -186,6 +186,11 @@ message ApplicationDownlinks {
   repeated ApplicationDownlink downlinks = 1;
 }
 
+message ApplicationInvalidatedDownlinks {
+  repeated ApplicationDownlink downlinks = 1;
+  uint32 last_f_cnt_down = 2;
+}
+
 message ApplicationUp {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
@@ -197,7 +202,7 @@ message ApplicationUp {
     ApplicationDownlink downlink_nack = 6;
     ApplicationDownlink downlink_sent = 7;
     ApplicationDownlink downlink_queued = 8;
-    ApplicationDownlinks downlink_queue_invalidated = 9;
+    ApplicationInvalidatedDownlinks downlink_queue_invalidated = 9;
     ApplicationLocation location_solved = 10;
   }
 }

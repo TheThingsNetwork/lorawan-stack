@@ -4202,6 +4202,21 @@
         }
       }
     },
+    "v3ApplicationInvalidatedDownlinks": {
+      "type": "object",
+      "properties": {
+        "downlinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationDownlink"
+          }
+        },
+        "last_f_cnt_down": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "v3ApplicationJoinAccept": {
       "type": "object",
       "properties": {
@@ -4284,7 +4299,7 @@
           "$ref": "#/definitions/v3ApplicationDownlink"
         },
         "downlink_queue_invalidated": {
-          "$ref": "#/definitions/v3ApplicationDownlinks"
+          "$ref": "#/definitions/v3ApplicationInvalidatedDownlinks"
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationLocation"
