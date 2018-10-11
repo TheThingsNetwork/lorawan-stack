@@ -41,7 +41,7 @@ func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	out.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])
 	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
 	out.PingSlotPeriodicity = PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
-	out.NextConfirmedDownlinkAt = pbtypes.NewPopulatedStdTime(r, easy)
+	out.LastConfirmedDownlinkAt = pbtypes.NewPopulatedStdTime(r, easy)
 	if r.Intn(10) != 0 {
 		out.QueuedResponses = make([]*MACCommand, r.Intn(5))
 		for i := range out.QueuedResponses {
@@ -66,18 +66,18 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out := &EndDevice{}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, easy)
 	out.RootKeys = NewPopulatedRootKeys(r, easy)
-	out.NextDevNonce = r.Uint32()
+	out.LastDevNonce = r.Uint32()
 	out.UsedDevNonces = make([]uint32, r.Intn(10))
 	for i := range out.UsedDevNonces {
 		out.UsedDevNonces[i] = r.Uint32()
 	}
-	out.NextJoinNonce = r.Uint32()
+	out.LastJoinNonce = r.Uint32()
 	out.UsedJoinNonces = make([]uint32, r.Intn(10))
 	for i := range out.UsedJoinNonces {
 		out.UsedJoinNonces[i] = r.Uint32()
 	}
-	out.NextRJCount0 = r.Uint32()
-	out.NextRJCount1 = r.Uint32()
+	out.LastRJCount0 = r.Uint32()
+	out.LastRJCount1 = r.Uint32()
 	if r.Intn(10) != 0 {
 		out.Session = NewPopulatedSession(r, easy)
 	}

@@ -36,13 +36,13 @@ message Session {
   // Known by Network Server, Application Server and Join Server. Owned by Network Server.
   bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (gogoproto.nullable) = false];
   SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // Next FCntUp to be expected. Network Server only. Application Server assumes the Network Server checked it.
-  uint32 next_f_cnt_up = 4;
-  // Next NFCntDown to be used. Network Server only.
-  uint32 next_n_f_cnt_down = 5;
-  // Next AFCntDown to be used. Application Server only.
-  uint32 next_a_f_cnt_down = 6;
-  // FCnt of the last confirmed downlink message sent. Network Server only.
+  // Last uplink frame counter value used. Network Server only. Application Server assumes the Network Server checked it.
+  uint32 last_f_cnt_up = 4;
+  // Last network downlink frame counter value used. Network Server only.
+  uint32 last_n_f_cnt_down = 5;
+  // Last application downlink frame counter value used. Application Server only.
+  uint32 last_a_f_cnt_down = 6;
+  // Frame counter of the last confirmed downlink message sent. Network Server only.
   uint32 last_conf_f_cnt_down = 7;
   // Time when the session started. Network Server only.
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -204,18 +204,18 @@ message MACState {
   Class device_class = 3;
   // LoRaWAN MAC version.
   MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion"];
-  // Time when a new confirmed downlink message or MAC command is ready to be scheduled for class C.
-  google.protobuf.Timestamp next_confirmed_downlink_at = 6 [(gogoproto.stdtime) = true];
+  // Time when the last confirmed downlink message or MAC command was scheduled.
+  google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
   // Periodicity of the class B ping slot.
-  PingSlotPeriod ping_slot_periodicity = 7;
+  PingSlotPeriod ping_slot_periodicity = 8;
   // A confirmed application downlink, for which an acknowledgment is expected to arrive.
-  ApplicationDownlink pending_application_downlink = 8;
+  ApplicationDownlink pending_application_downlink = 9;
   // Queued MAC responses.
   // Regenerated on each uplink.
-  repeated MACCommand queued_responses = 9;
+  repeated MACCommand queued_responses = 10;
   // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
   // Regenerated on each downlink.
-  repeated MACCommand pending_requests = 10;
+  repeated MACCommand pending_requests = 11;
 
   // TODO: Add info about failed MAC requests
 }
@@ -328,28 +328,28 @@ message EndDevice {
   // Fallback session. Stored in Network Server until RekeyInd is received.
   Session session_fallback = 30;
 
-  // Next DevNonce to be expected (in case of LoRaWAN 1.1).
+  // Last DevNonce used (in case of LoRaWAN 1.1).
   // Stored in Join Server.
-  uint32 next_dev_nonce = 31;
+  uint32 last_dev_nonce = 31;
   // Used DevNonces (in case of LoRaWAN 1.0).
   // Stored in Join Server.
   repeated uint32 used_dev_nonces = 32;
-  // Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1).
+  // Last JoinNonce/AppNonce used (in case of LoRaWAN 1.1).
   // Stored in Join Server.
-  uint32 next_join_nonce = 33;
+  uint32 last_join_nonce = 33;
   // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0).
   // Stored in Join Server.
   repeated uint32 used_join_nonces = 34;
-  // Next Rejoin counter (type 0/2) to be expected.
+  // Last Rejoin counter value used (type 0/2).
   // Stored in Join Server.
-  uint32 next_rj_count_0 = 35 [(gogoproto.customname) = "NextRJCount0"];
-  // Next Rejoin counter (type 1) to be expected.
+  uint32 last_rj_count_0 = 35 [(gogoproto.customname) = "LastRJCount0"];
+  // Last Rejoin counter value used (type 1).
   // Stored in Join Server.
-  uint32 next_rj_count_1 = 36 [(gogoproto.customname) = "NextRJCount1"];
+  uint32 last_rj_count_1 = 36 [(gogoproto.customname) = "LastRJCount1"];
 
   // Number of messages, after which a new DevStatus MAC command shall be scheduled.
   // Stored in Network Server.
-  uint64 next_status_after = 37;
+  uint64 last_status_f_cnt = 37;
   // Time when the device status was last received via the DevStatus MAC command.
   // Stored in Network Server.
   google.protobuf.Timestamp last_status_received_at = 38 [(gogoproto.stdtime) = true];
