@@ -172,12 +172,14 @@ message ApplicationJoinAccept {
 message ApplicationDownlink {
   option (gogoproto.populate) = false;
 
-  uint32 f_port = 1;
-  uint32 f_cnt = 2;
-  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
-  google.protobuf.Struct decoded_payload = 4;
-  bool confirmed = 5;
-  repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
+  // Join Server issued identifier for the session keys used by this downlink.
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
+  uint32 f_port = 2;
+  uint32 f_cnt = 3;
+  bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
+  google.protobuf.Struct decoded_payload = 5;
+  bool confirmed = 6;
+  repeated string correlation_ids = 7 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlinks {

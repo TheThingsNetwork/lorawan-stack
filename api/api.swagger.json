@@ -4152,6 +4152,10 @@
     "v3ApplicationDownlink": {
       "type": "object",
       "properties": {
+        "session_key_id": {
+          "type": "string",
+          "description": "Join Server issued identifier for the session keys used by this downlink."
+        },
         "f_port": {
           "type": "integer",
           "format": "int64"

@@ -3970,6 +3970,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| session_key_id | [string](#string) |  | Join Server issued identifier for the session keys used by this downlink. |
 | f_port | [uint32](#uint32) |  |  |
 | f_cnt | [uint32](#uint32) |  |  |
 | frm_payload | [bytes](#bytes) |  |  |
