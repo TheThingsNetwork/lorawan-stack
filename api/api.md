@@ -4007,6 +4007,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | ----- | ---- | ----- | ----------- |
 | session_key_id | [string](#string) |  | Join Server issued identifier for the session keys negotiated in this join. |
 | app_s_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | Encrypted Application Session Key (if Join Server sent it to Network Server). |
+| invalidated_downlinks | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) | repeated | Downlink messages in the queue that got invalidated because of the session change. |
 
 
 

@@ -165,6 +165,8 @@ message ApplicationJoinAccept {
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   // Encrypted Application Session Key (if Join Server sent it to Network Server).
   KeyEnvelope app_s_key = 2;
+  // Downlink messages in the queue that got invalidated because of the session change.
+  repeated ApplicationDownlink invalidated_downlinks = 3;
 }
 
 message ApplicationDownlink {

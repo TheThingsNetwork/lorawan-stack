@@ -4208,6 +4208,13 @@
         "app_s_key": {
           "$ref": "#/definitions/v3KeyEnvelope",
           "description": "Encrypted Application Session Key (if Join Server sent it to Network Server)."
+        },
+        "invalidated_downlinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationDownlink"
+          },
+          "description": "Downlink messages in the queue that got invalidated because of the session change."
         }
       }
     },
