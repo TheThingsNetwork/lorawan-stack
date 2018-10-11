@@ -74,9 +74,9 @@ message TxMetadata {
 
 message Location {
   // The North–South position (degrees; -90 to +90), where 0 is the equator, North pole is positive, South pole is negative.
-  float latitude = 1;
+  double latitude = 1;
   // The East-West position (degrees; -180 to +180), where 0 is the Prime Meridian (Greenwich), East is positive , West is negative.
-  float longitude = 2;
+  double longitude = 2;
   // The altitude (meters), where 0 is the mean sea level.
   int32 altitude = 3;
   // The accuracy of the location (meters).

@@ -244,7 +244,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	if stat.Lati != nil && stat.Long != nil {
-		loc := &ttnpb.Location{Latitude: float32(*stat.Lati), Longitude: float32(*stat.Long)}
+		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long}
 		if stat.Alti != nil {
 			loc.Altitude = *stat.Alti
 		}
