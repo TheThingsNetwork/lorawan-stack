@@ -468,7 +468,6 @@ func TestTraffic(t *testing.T) {
 				// Sync the clock at 0, i.e. approximate time.Now().
 				var clockSynced time.Time
 				if tc.SyncClock {
-					clockSynced = time.Now()
 					packet := generatePushData(eui2, false, 0)
 					buf, err = packet.MarshalBinary()
 					if !a.So(err, should.BeNil) {
@@ -480,7 +479,9 @@ func TestTraffic(t *testing.T) {
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
+					clockSynced = time.Now()
 					expectAck(t, udpConn, true, encoding.PushAck, token)
+					time.Sleep(timeout) // Ensure that clock gets actually synced.
 				}
 
 				// Send the downlink message, optionally buffer first.
