@@ -158,7 +158,7 @@ func (as *ApplicationServer) getAppSKey(ctx context.Context, sessionKeyID string
 	return res.AppSKey, nil
 }
 
-func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
@@ -175,7 +175,7 @@ var (
 	errNoAppSKey  = errors.DefineCorruption("no_app_s_key", "no AppSKey")
 )
 
-func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *link) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"join_eui", ids.JoinEUI,
 		"dev_eui", ids.DevEUI,
@@ -223,7 +223,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	return nil
 }
 
-func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *link) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	logger := log.FromContext(ctx)
 	dev, err := as.deviceRegistry.Set(ctx, ids,

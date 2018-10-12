@@ -65,6 +65,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 }
 
 type link struct {
+	ttnpb.ApplicationLink
 	ctx    context.Context
 	cancel func()
 
@@ -87,21 +88,21 @@ var (
 	errNSNotFound    = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
 )
 
-func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink, link *link) error {
-	if target.NetworkServerAddress != "" {
+func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, link *link) error {
+	if link.NetworkServerAddress != "" {
 		// TODO: Add option for insecure (set in ttnpb.ApplicationLink).
 		// TODO: Needs testing.
 		options := rpcclient.DefaultDialOptions(ctx)
-		conn, err := grpc.DialContext(ctx, target.NetworkServerAddress, options...)
+		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress, options...)
 		if err != nil {
 			return err
 		}
 		link.conn = conn
-		link.connName = target.NetworkServerAddress
+		link.connName = link.NetworkServerAddress
 		link.connCallOpts = []grpc.CallOption{
 			grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:  "Key",
-				AuthValue: target.APIKey,
+				AuthValue: link.APIKey,
 			}),
 		}
 	} else {
@@ -124,6 +125,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	l := &link{
+		ApplicationLink:   *target,
 		ctx:               ctx,
 		cancel:            cancelCtx,
 		connReady:         make(chan struct{}),
@@ -140,7 +142,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		cancelCtx()
 		as.links.Delete(uid)
 	}()
-	if err := as.connectLink(ctx, ids, target, l); err != nil {
+	if err := as.connectLink(ctx, ids, l); err != nil {
 		return err
 	}
 	client := ttnpb.NewAsNsClient(l.conn)
@@ -166,7 +168,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		}
 		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
 		registerReceiveUplink(ctx, up, l.connName)
-		if err := as.handleUp(ctx, up, target); err != nil {
+		if err := as.handleUp(ctx, up, l); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
 			registerDropUplink(ctx, up, err)
 			continue
