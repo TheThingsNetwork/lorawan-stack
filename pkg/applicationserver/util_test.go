@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -62,7 +63,11 @@ hardware_versions:
 	};
 }`),
 	"thethingsproducts/thethingsnode/1.0/encoder.js": []byte(`function Encoder(payload, f_port) {
-	return [0x01, 0x02, 0x03];
+	var res = [];
+	for (i = 0; i < payload.sum; i++) {
+		res[i] = 1;
+	}
+	return res;
 }`)}
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
@@ -263,17 +268,19 @@ func (r *memLinkRegistry) Range(ctx context.Context, paths []string, f func(ttnp
 }
 
 type mockNS struct {
-	ttnpb.AsNsServer
-	linkCh   chan ttnpb.ApplicationIdentifiers
-	unlinkCh chan ttnpb.ApplicationIdentifiers
-	upCh     chan *ttnpb.ApplicationUp
+	linkCh          chan ttnpb.ApplicationIdentifiers
+	unlinkCh        chan ttnpb.ApplicationIdentifiers
+	upCh            chan *ttnpb.ApplicationUp
+	downlinkQueueMu sync.RWMutex
+	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
 }
 
 func startMockNS(ctx context.Context) (*mockNS, string) {
 	ns := &mockNS{
-		linkCh:   make(chan ttnpb.ApplicationIdentifiers, 1),
-		unlinkCh: make(chan ttnpb.ApplicationIdentifiers, 1),
-		upCh:     make(chan *ttnpb.ApplicationUp, 1),
+		linkCh:        make(chan ttnpb.ApplicationIdentifiers, 1),
+		unlinkCh:      make(chan ttnpb.ApplicationIdentifiers, 1),
+		upCh:          make(chan *ttnpb.ApplicationUp, 1),
+		downlinkQueue: make(map[string][]*ttnpb.ApplicationDownlink),
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterAsNsServer(srv.Server, ns)
@@ -301,11 +308,47 @@ func (ns *mockNS) LinkApplication(ids *ttnpb.ApplicationIdentifiers, stream ttnp
 		case <-stream.Context().Done():
 			return nil
 		case up := <-ns.upCh:
+			if up.GetJoinAccept() != nil {
+				// Reset the downlink queue on join-accept; it's invalid and AS will replace it.
+				ns.downlinkQueueMu.Lock()
+				ns.downlinkQueue[unique.ID(stream.Context(), up.EndDeviceIdentifiers)] = nil
+				ns.downlinkQueueMu.Unlock()
+			}
 			if err := stream.Send(up); err != nil {
 				return err
 			}
 		}
 	}
+}
+
+func (ns *mockNS) reset() {
+	ns.downlinkQueueMu.Lock()
+	ns.downlinkQueue = make(map[string][]*ttnpb.ApplicationDownlink)
+	ns.downlinkQueueMu.Unlock()
+}
+
+func (ns *mockNS) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	ns.downlinkQueueMu.Lock()
+	ns.downlinkQueue[unique.ID(ctx, req.EndDeviceIdentifiers)] = req.Downlinks
+	ns.downlinkQueueMu.Unlock()
+	return ttnpb.Empty, nil
+}
+
+func (ns *mockNS) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	ns.downlinkQueueMu.Lock()
+	uid := unique.ID(ctx, req.EndDeviceIdentifiers)
+	ns.downlinkQueue[uid] = append(ns.downlinkQueue[uid], req.Downlinks...)
+	ns.downlinkQueueMu.Unlock()
+	return ttnpb.Empty, nil
+}
+
+func (ns *mockNS) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
+	ns.downlinkQueueMu.RLock()
+	queue := ns.downlinkQueue[unique.ID(ctx, ids)]
+	ns.downlinkQueueMu.RUnlock()
+	return &ttnpb.ApplicationDownlinks{
+		Downlinks: queue,
+	}, nil
 }
 
 type mockIS struct {
@@ -366,7 +409,7 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 	}
 	for _, auth := range auths {
 		if auth == authorization[0] {
-			res.Rights = append(res.Rights, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
+			res.Rights = append(res.Rights, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE)
 		}
 	}
 	return

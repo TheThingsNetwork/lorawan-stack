@@ -173,6 +173,10 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			registerDropUplink(ctx, up, err)
 			continue
 		}
+		// Downlink queue invalidation is not forwarded to the application.
+		if up.GetDownlinkQueueInvalidated() != nil {
+			continue
+		}
 		l.upCh <- up
 		registerForwardUplink(ctx, up)
 	}

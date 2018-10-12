@@ -1142,6 +1142,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:device_not_found": {
+    "translations": {
+      "en": "device `{device_uid}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:formatter_not_configured": {
     "translations": {
       "en": "formatter `{formatter}` is not configured"
@@ -1185,6 +1194,15 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:no_payload": {
+    "translations": {
+      "en": "no payload"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "payload.go"
     }
   },
   "error:pkg/applicationserver:no_version": {

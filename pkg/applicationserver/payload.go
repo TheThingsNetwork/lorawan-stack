@@ -26,6 +26,38 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+var errNoPayload = errors.Define("no_payload", "no payload")
+
+func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	if downlink.FRMPayload == nil && downlink.DecodedPayload == nil {
+		return errNoPayload
+	}
+	if downlink.FRMPayload == nil && downlink.DecodedPayload != nil {
+		var formatter ttnpb.PayloadFormatter
+		var parameter string
+		if dev.Formatters != nil {
+			formatter, parameter = dev.Formatters.DownFormatter, dev.Formatters.DownFormatterParameter
+		} else if defaultFormatters != nil {
+			formatter, parameter = defaultFormatters.DownFormatter, defaultFormatters.DownFormatterParameter
+		}
+		if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
+			if err := as.formatter.Encode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
+				return err
+			}
+		}
+	}
+	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	if err != nil {
+		return err
+	}
+	frmPayload, err := crypto.EncryptDownlink(appSKey, dev.Session.DevAddr, downlink.FCnt, downlink.FRMPayload)
+	if err != nil {
+		return err
+	}
+	downlink.FRMPayload = frmPayload
+	return nil
+}
+
 func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	logger := log.FromContext(ctx)
 	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
