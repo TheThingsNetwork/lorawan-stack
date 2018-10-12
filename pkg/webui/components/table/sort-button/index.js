@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 
 import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
@@ -21,34 +22,38 @@ import Icon from '../../icon'
 
 import style from './sort-button.styl'
 
-const SortButton = function ({
-  className,
-  active,
-  title,
-  onSort,
-  name,
-  direction,
-  ...rest
-}) {
-  const buttonClassNames = classnames(className, style.button, {
-    [style.buttonActive]: active,
-    [style.buttonDesc]: active && direction === 'desc',
-  })
+@bind
+class SortButton extends React.PureComponent {
+  onSort () {
+    const { name, onSort } = this.props
 
-  return (
-    <button
-      className={buttonClassNames}
-      type="button"
-      onClick={onSort}
-      {...rest}
-    >
-      <Message content={title} />
-      <Icon className={style.icon} icon="sort" />
-    </button>
-  )
+    onSort(name)
+  }
+
+  render () {
+    const { className, active, direction, title } = this.props
+
+    const buttonClassNames = classnames(className, style.button, {
+      [style.buttonActive]: active,
+      [style.buttonDesc]: active && direction === 'desc',
+    })
+
+    return (
+      <button
+        className={buttonClassNames}
+        type="button"
+        onClick={this.onSort}
+      >
+        <Message content={title} />
+        <Icon className={style.icon} icon="sort" />
+      </button>
+    )
+  }
 }
 
 SortButton.propTypes = {
+  /** The name of the column that the sort button represents */
+  name: PropTypes.string.isRequired,
   /** A flag identifying whether the button is active */
   active: PropTypes.bool.isRequired,
   /** The text of the button */

@@ -64,8 +64,6 @@ class Tabular extends React.Component {
       emptyMessage,
     } = this.props
 
-    const onSortRequest = this.onSortRequest
-
     const columns = (
       <Table.Row>
         {
@@ -81,10 +79,9 @@ class Tabular extends React.Component {
                   <Table.SortButton
                     title={header.displayName}
                     direction={order}
+                    name={header.name}
                     active={orderBy === header.name}
-                    onSort={function () {
-                      onSortRequest(header.name)
-                    }}
+                    onSort={this.onSortRequest}
                   />
                 ) : null
               }
@@ -98,6 +95,7 @@ class Tabular extends React.Component {
       data.map((row, rowKey) => (
         <Table.Row
           key={rowKey}
+          clickable={row.clickable}
           onClick={
             row.clickable ? function () {
               onRowClick(rowKey)
