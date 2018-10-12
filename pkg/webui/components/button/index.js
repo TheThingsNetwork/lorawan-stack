@@ -97,7 +97,7 @@ Button.propTypes = {
   /**
    * A flag specifying whether the `naked` styling should applied to the button
    */
-  naked: PropTypes.naked,
+  naked: PropTypes.bool,
   /**
    * A flag specifying whether the `large` styling should applied to the button
    */

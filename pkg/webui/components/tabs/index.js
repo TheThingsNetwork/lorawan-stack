@@ -32,23 +32,20 @@ const Tabs = function ({
     <ul className={classnames(className, style.tabs)}>
       {tabs.map(function (tab, index) {
         const {
-          disabled = false,
+          disabled,
           title,
           name,
-          icon = null,
+          icon,
         } = tab
 
         return (
           <Tab
             key={index}
             tabIndex={index + 1}
-            isActive={name === active}
-            isDisabled={disabled}
-            onClick={function () {
-              if (!disabled) {
-                onTabChange(name)
-              }
-            }}
+            active={name === active}
+            name={name}
+            disabled={disabled}
+            onClick={onTabChange}
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />
@@ -62,16 +59,17 @@ const Tabs = function ({
 Tabs.propTypes = {
   /** The name of the active tab */
   active: PropTypes.string.isRequired,
-  /** List of tabs */
+  /** A list of tabs */
   tabs: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.message.isRequired,
+    name: PropTypes.string.isRequired,
     icon: PropTypes.string,
     disabled: PropTypes.bool,
     name: PropTypes.string.isRequired,
   })).isRequired,
   /**
-   * Function to be called when the selected tab changes. Passes
-   * index of the tab as an argument.
+   * A click handler to be called when the selected tab changes. Passes
+   * the name of the new active tab as an argument.
    */
   onTabChange: PropTypes.func.isRequired,
 }

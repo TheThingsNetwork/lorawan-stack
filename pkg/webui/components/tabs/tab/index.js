@@ -15,40 +15,63 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 
 import style from './tab.styl'
 
-const Tab = function ({
-  className,
-  onClick,
-  isActive = false,
-  isDisabled = false,
-  children,
-  ...rest
-}) {
-  return (
-    <li
-      {...rest}
-      role="button"
-      onClick={onClick}
-      className={classnames(className, style.tab, {
-        [style.tabActive]: isActive,
-        [style.tabDisabled]: isDisabled,
-        [style.tabDefault]: !isDisabled && !isActive,
-      })}
-    >
-      {children}
-    </li>
-  )
+@bind
+class Tab extends React.PureComponent {
+
+  handleClick () {
+    const { onClick, name, disabled } = this.props
+
+    if (!disabled) {
+      onClick(name)
+    }
+  }
+
+  render () {
+    const {
+      className,
+      onClick,
+      name,
+      active = false,
+      disabled = false,
+      children,
+      ...rest
+    } = this.props
+
+    const tabClassNames = classnames(className, style.tab, {
+      [style.tabActive]: !disabled && active,
+      [style.tabDefault]: !disabled && !active,
+      [style.tabDisabled]: disabled,
+    })
+
+    return (
+      <li
+        {...rest}
+        role="button"
+        onClick={this.handleClick}
+        className={tabClassNames}
+      >
+        {children}
+      </li>
+    )
+  }
 }
 
 Tab.propTypes = {
-  /** Function to be called when the tab gets clicked */
+  /**
+   * A click handler to be called when the selected tab changes. Passes
+   * the name of the new active tab as an argument.
+   */
   onClick: PropTypes.func.isRequired,
-  /** Boolean flag identifying whether the tab is active */
-  isActive: PropTypes.bool,
-  /** Boolean flag identifying whether the tab is disabled */
-  isDisabled: PropTypes.bool,
+  /** A flag specifying whether the tab is active */
+  active: PropTypes.bool,
+  /** A flag specifying whether the tab is disabled */
+  disabled: PropTypes.bool,
+  /** The name of the tab */
+  name: PropTypes.string.isRequired,
 }
 
 export default Tab
