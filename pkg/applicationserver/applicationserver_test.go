@@ -105,12 +105,6 @@ func TestApplicationServer(t *testing.T) {
 	})
 
 	deviceRegistry := newMemDeviceRegistry()
-	resetDeviceRegistry := func() {
-		deviceRegistry.Reset()
-		deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			return registeredDevice, []string{"ids", "version_ids", "formatters"}, nil
-		})
-	}
 	linkRegistry := newMemLinkRegistry()
 	linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
@@ -249,9 +243,6 @@ func TestApplicationServer(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("Traffic/%v", ptc.Protocol), func(t *testing.T) {
-			// Tests change the device registry; reset it to avoid side-effects from previous protocol tests.
-			resetDeviceRegistry()
-
 			ctx, cancel := context.WithCancel(ctx)
 			upCh := make(chan *ttnpb.ApplicationUp)
 			downCh := make(chan *ttnpb.ApplicationDownlink)
@@ -269,6 +260,12 @@ func TestApplicationServer(t *testing.T) {
 			time.Sleep(timeout)
 
 			t.Run("Upstream", func(t *testing.T) {
+				// Tests change the device registry; reset it to avoid side-effects from previous tests.
+				deviceRegistry.Reset()
+				deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+					return registeredDevice, []string{"ids", "version_ids", "formatters"}, nil
+				})
+
 				for _, tc := range []struct {
 					Name         string
 					Message      *ttnpb.ApplicationUp
@@ -276,7 +273,7 @@ func TestApplicationServer(t *testing.T) {
 					AssertDevice func(t *testing.T, dev *ttnpb.EndDevice)
 				}{
 					{
-						Name: "JoinAccept/RegisteredDevice/WithoutAppSKey",
+						Name: "RegisteredDevice/JoinAccept/WithoutAppSKey",
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x84, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -308,7 +305,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "JoinAccept/RegisteredDevice/WithAppSKey",
+						Name: "RegisteredDevice/JoinAccept/WithAppSKey",
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -344,7 +341,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "UplinkMessage/CurrentSession",
+						Name: "RegisteredDevice/UplinkMessage/CurrentSession",
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -381,7 +378,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "UplinkMessage/ChangedSession",
+						Name: "RegisteredDevice/UplinkMessage/ChangedSession",
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x24, 0x24, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -428,7 +425,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "JoinAccept/UnregisteredDevice",
+						Name: "UnregisteredDevice/JoinAccept",
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x24, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -464,7 +461,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "UplinkMessage/UnregisteredDevice",
+						Name: "UnregisteredDevice/UplinkMessage",
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x24, 0xff, 0xff, 0xff}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
