@@ -79,11 +79,45 @@ class Button extends React.PureComponent {
 }
 
 Button.propTypes = {
+  /** The message to be displayed within the button */
   message: PropTypes.message,
+  /**
+   * A click listener to be called when the button is pressed.
+   * Not called if the button is in the `busy` or `disabled` state.
+   */
   onClick: PropTypes.func,
+  /**
+   * A flag specifying whether the `danger` styling should applied to the button
+   */
   danger: PropTypes.bool,
-  boring: PropTypes.bool,
+  /**
+   * A flag specifying whether the `secodnary` styling should applied to the button
+   */
+  secondary: PropTypes.bool,
+  /**
+   * A flag specifying whether the `naked` styling should applied to the button
+   */
+  naked: PropTypes.naked,
+  /**
+   * A flag specifying whether the `large` styling should applied to the button
+   */
+  large: PropTypes.bool,
+  /**
+   * A flag specifying whether the `error` styling should applied to the button
+   */
+  error: PropTypes.bool,
+  /** The name of an icon to be displayed within the button*/
+  icon: PropTypes.string,
+  /**
+   * A flag specifying whether the button in the `busy` state and the appropriate
+   * styling should be applied.
+   */
   busy: PropTypes.bool,
+  /**
+   * A flag specifying whether the button in the `disabled` state and the appropriate
+   * styling should be applied.
+   */
+  disabled: PropTypes.bool,
 }
 
 Button.defaultProps = {
