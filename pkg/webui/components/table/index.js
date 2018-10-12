@@ -96,11 +96,8 @@ class Tabular extends React.Component {
         <Table.Row
           key={rowKey}
           clickable={row.clickable}
-          onClick={
-            row.clickable ? function () {
-              onRowClick(rowKey)
-            } : undefined
-          }
+          id={rowKey}
+          onClick={onRowClick}
         >
           {
             headers.map((header, index) => (

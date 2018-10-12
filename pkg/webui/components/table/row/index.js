@@ -14,35 +14,61 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 import PropTypes from '../../../lib/prop-types'
 
 import style from './row.styl'
 
-const Row = function ({
-  className,
-  children,
-  head = false,
-  body = true,
-  footer = false,
-  onClick,
-}) {
-  const clickable = !!onClick
-  const rowClassNames = classnames(className, {
-    [style.clickable]: body && clickable,
-    [style.rowHead]: head,
-    [style.rowBody]: body,
-    [style.rowFooter]: footer,
-  })
+@bind
+class Row extends React.Component {
 
-  return (
-    <tr
-      className={rowClassNames}
-      onClick={body && clickable ? onClick : undefined}
-      tabIndex={body && clickable ? 0 : -1}
-    >
-      {children}
-    </tr>
-  )
+  onClick () {
+    const { id, onClick } = this.props
+
+    onClick(id)
+  }
+
+  get clickListener () {
+    const { body, clickable } = this.props
+
+    if (body && clickable) {
+      return this.onClick
+    }
+  }
+
+  get tabIndex () {
+    const { body, clickable } = this.props
+
+    return body && clickable ? 0 : -1
+  }
+
+  render () {
+    const {
+      className,
+      children,
+      head = false,
+      body = true,
+      footer = false,
+      clickable = false,
+    } = this.props
+
+    const rowClassNames = classnames(className, {
+      [style.clickable]: body && clickable,
+      [style.rowHead]: head,
+      [style.rowBody]: body,
+      [style.rowFooter]: footer,
+    })
+
+    return (
+      <tr
+        className={rowClassNames}
+        onClick={this.clickListener}
+        tabIndex={this.tabIndex}
+      >
+        {children}
+      </tr>
+    )
+  }
 }
 
 Row.propTypes = {
@@ -52,7 +78,14 @@ Row.propTypes = {
   body: PropTypes.bool,
   /** A flag indicating whether the row is wrapping the footer of a table */
   footer: PropTypes.bool,
-  /** Function to be called when the row gets clicked */
+  /** A flag indicating whether the row is clickable */
+  clickable: PropTypes.bool,
+  /** The idenntifier of the row */
+  id: PropTypes.number,
+  /**
+   * Function to be called when the row gets clicked. The identifier of the row
+   * is passed as an argument.
+   */
   onClick: PropTypes.func,
 }
 
