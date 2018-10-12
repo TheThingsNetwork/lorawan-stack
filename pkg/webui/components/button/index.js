@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 
 import PropTypes from '../../lib/prop-types'
 import Spinner from '../spinner'
@@ -22,52 +23,59 @@ import Icon from '../icon'
 
 import style from './button.styl'
 
-const Button = function ({
-  message,
-  danger,
-  secondary,
-  naked,
-  icon,
-  busy,
-  large,
-  className,
-  onClick,
-  error,
-  ...rest
-}) {
+@bind
+class Button extends React.PureComponent {
 
-  const classname = classnames(style.button, className, {
-    [style.danger]: danger,
-    [style.secondary]: secondary,
-    [style.naked]: naked,
-    [style.busy]: busy,
-    [style.withIcon]: icon !== undefined && message,
-    [style.onlyIcon]: icon !== undefined && !message,
-    [style.error]: error && !busy,
-    [style.large]: large,
-  })
+  handleClick (evt) {
+    const { busy, disabled, onClick } = this.props
 
-  const handleClick = function (evt) {
-    if (busy || rest.disabled) {
+    if (busy || disabled) {
       return
     }
 
     onClick(evt)
   }
 
-  return (
-    <button
-      className={classname}
-      onClick={handleClick}
-      {...rest}
-    >
-      <div className={style.content}>
-        {icon ? <Icon className={style.icon} nudgeUp icon={icon} /> : null}
-        {busy ? <Spinner className={style.spinner} small after={200} /> : null}
-        {message ? <Message content={message} /> : null}
-      </div>
-    </button>
-  )
+  render () {
+    const {
+      message,
+      danger,
+      secondary,
+      naked,
+      icon,
+      busy,
+      large,
+      className,
+      onClick,
+      error,
+      ...rest
+    } = this.props
+
+    const buttonClassNames = classnames(style.button, className, {
+      [style.danger]: danger,
+      [style.secondary]: secondary,
+      [style.naked]: naked,
+      [style.busy]: busy,
+      [style.withIcon]: icon !== undefined && message,
+      [style.onlyIcon]: icon !== undefined && !message,
+      [style.error]: error && !busy,
+      [style.large]: large,
+    })
+
+    return (
+      <button
+        className={buttonClassNames}
+        onClick={this.handleClick}
+        {...rest}
+      >
+        <div className={style.content}>
+          {icon ? <Icon className={style.icon} nudgeUp icon={icon} /> : null}
+          {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+          {message ? <Message content={message} /> : null}
+        </div>
+      </button>
+    )
+  }
 }
 
 Button.propTypes = {
