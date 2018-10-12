@@ -14,7 +14,7 @@
 
 DOCKER ?= docker
 
-PROTO_FILES = $(PWD)/api/'*.proto'
+API_PROTO_FILES = $(PWD)/api/'*.proto'
 
 PROTOC_OUT ?= /out
 
@@ -31,7 +31,7 @@ protoc:
 SWAGGER_PROTOC_FLAGS ?= --swagger_out=allow_merge,merge_file_name=api:$(PWD)/api
 
 swagger.protos: $(wildcard api/*.proto)
-	$(PROTOC) $(SWAGGER_PROTOC_FLAGS) $(PROTO_FILES)
+	$(PROTOC) $(SWAGGER_PROTOC_FLAGS) $(API_PROTO_FILES)
 
 swagger.protos.clean:
 	rm -f $(PWD)/api/api.swagger.json
@@ -39,7 +39,7 @@ swagger.protos.clean:
 MARKDOWN_PROTOC_FLAGS ?= --doc_opt=markdown,api.md --doc_out=$(PWD)/api
 
 markdown.protos: $(wildcard api/*.proto)
-	$(PROTOC) $(MARKDOWN_PROTOC_FLAGS) $(PROTO_FILES)
+	$(PROTOC) $(MARKDOWN_PROTOC_FLAGS) $(API_PROTO_FILES)
 
 markdown.protos.clean:
 	rm -f $(PWD)/api/api.md
