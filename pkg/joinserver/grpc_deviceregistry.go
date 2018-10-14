@@ -27,7 +27,7 @@ func (ns *JoinServer) Get(context.Context, *ttnpb.GetEndDeviceRequest) (*ttnpb.E
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (ns *JoinServer) Set(context.Context, *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
+func (ns *JoinServer) Set(context.Context, *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 

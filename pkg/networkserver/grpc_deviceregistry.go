@@ -28,7 +28,7 @@ func (ns *NetworkServer) Get(context.Context, *ttnpb.GetEndDeviceRequest) (*ttnp
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (ns *NetworkServer) Set(context.Context, *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
+func (ns *NetworkServer) Set(context.Context, *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
