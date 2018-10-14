@@ -203,8 +203,12 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
-						FPort:      1,
-						FRMPayload: []byte{0x01, 0x01, 0x01},
+						SessionKeyID:   "test", // This gets discarded.
+						FPort:          1,
+						FCnt:           100, // This gets discarded.
+						FRMPayload:     []byte{0x01, 0x01, 0x01},
+						Confirmed:      true,
+						CorrelationIDs: []string{"test"}, // This gets discarded.
 					},
 					{
 						FPort:      2,
@@ -233,6 +237,7 @@ func TestTraffic(t *testing.T) {
 			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
 				{
 					FPort:      1,
+					Confirmed:  true,
 					FRMPayload: []byte{0x01, 0x01, 0x01},
 				},
 				{
@@ -267,7 +272,9 @@ func TestTraffic(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
+						FCnt:       100, // This gets discarded.
 						FRMPayload: []byte{0x04, 0x04, 0x04},
+						Confirmed:  true,
 					},
 				},
 			})
@@ -281,6 +288,7 @@ func TestTraffic(t *testing.T) {
 				{
 					FPort:      4,
 					FRMPayload: []byte{0x04, 0x04, 0x04},
+					Confirmed:  true,
 				},
 			})
 		}
