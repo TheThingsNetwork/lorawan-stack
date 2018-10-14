@@ -31,7 +31,7 @@ func (as *ApplicationServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceReq
 }
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
-func (as *ApplicationServer) Set(ctx context.Context, req *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
+func (as *ApplicationServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}

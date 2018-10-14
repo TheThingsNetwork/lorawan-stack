@@ -84,7 +84,7 @@ func TestDeviceRegistry(t *testing.T) {
 		})
 		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
-		_, err = client.Set(ctx, &ttnpb.SetDeviceRequest{
+		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
 			Device: ttnpb.EndDevice{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 				FrequencyPlanID:      "EU_863_870",
@@ -113,7 +113,7 @@ func TestDeviceRegistry(t *testing.T) {
 		}, creds)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		_, err = client.Set(ctx, &ttnpb.SetDeviceRequest{
+		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
 			Device: ttnpb.EndDevice{
 				EndDeviceIdentifiers: otherID,
 				FrequencyPlanID:      "EU_863_870",
@@ -158,7 +158,7 @@ func TestDeviceRegistry(t *testing.T) {
 
 		// Update and assert new value.
 		registeredDevice.Formatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
-		_, err = client.Set(ctx, &ttnpb.SetDeviceRequest{
+		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
 			Device: *registeredDevice,
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"formatters"},
