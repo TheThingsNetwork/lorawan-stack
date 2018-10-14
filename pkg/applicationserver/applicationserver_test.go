@@ -35,45 +35,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
-	// links automatically on start to the Network Server.
-	registeredApplicationID        = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
-	registeredApplicationKey       = "secret"
-	registeredApplicationFormatter = ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
-
-	// This device gets registered in the device registry of the Application Server.
-	registeredDevice = &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: registeredApplicationID,
-			DeviceID:               "foo-device",
-			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-		},
-		VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-			BrandID:         "thethingsproducts",
-			ModelID:         "thethingsnode",
-			HardwareVersion: "1.0",
-			FirmwareVersion: "1.1",
-		},
-		Formatters: &ttnpb.MessagePayloadFormatters{
-			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-		},
-	}
-
-	// This device does not get registered in the device registry of the Application Server and will be created on join
-	// and on uplink.
-	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "bar-device",
-		JoinEUI:                eui64Ptr(types.EUI64{0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-	}
-
-	timeout = 10 * test.Delay
-)
-
 type connChannels struct {
 	up          chan *ttnpb.ApplicationUp
 	downPush    chan *ttnpb.DownlinkQueueRequest
