@@ -148,7 +148,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			for _, item := range items {
 				item.SessionKeyID = dev.Session.SessionKeyID
 				item.FCnt = dev.Session.LastAFCntDown + 1
-				if err := as.encodeAndEncrypt(ctx, dev, item, link.defaultFormatters); err != nil {
+				if err := as.encodeAndEncrypt(ctx, dev, item, link.DefaultFormatters); err != nil {
 					return nil, nil, err
 				}
 				item.DecodedPayload = nil
