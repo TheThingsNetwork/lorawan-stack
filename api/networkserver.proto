@@ -49,7 +49,7 @@ service NsEndDeviceRegistry {
   };
 
   // Set creates or updates the device.
-  rpc Set(SetDeviceRequest) returns (EndDevice) {
+  rpc Set(SetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/ns/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"

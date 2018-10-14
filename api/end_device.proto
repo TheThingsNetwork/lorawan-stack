@@ -400,7 +400,7 @@ message ListEndDevicesRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
-message SetDeviceRequest {
+message SetEndDeviceRequest {
   EndDevice device = 1 [(gogoproto.nullable) = false];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }

@@ -75,7 +75,7 @@ func request_NsEndDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Ma
 }
 
 func request_NsEndDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Marshaler, client NsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetDeviceRequest
+	var protoReq SetEndDeviceRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -117,7 +117,7 @@ func request_NsEndDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Ma
 }
 
 func request_NsEndDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Marshaler, client NsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetDeviceRequest
+	var protoReq SetEndDeviceRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {

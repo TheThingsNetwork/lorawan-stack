@@ -105,7 +105,7 @@
     - [MACSettings](#ttn.lorawan.v3.MACSettings)
     - [MACState](#ttn.lorawan.v3.MACState)
     - [Session](#ttn.lorawan.v3.Session)
-    - [SetDeviceRequest](#ttn.lorawan.v3.SetDeviceRequest)
+    - [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest)
     - [UpdateEndDeviceRequest](#ttn.lorawan.v3.UpdateEndDeviceRequest)
   
     - [PowerState](#ttn.lorawan.v3.PowerState)
@@ -800,7 +800,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
-| Set | [SetDeviceRequest](#ttn.lorawan.v3.SetDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetDeviceRequest) | Set creates or updates the device. |
+| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
 | Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
  
@@ -1535,9 +1535,9 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.SetDeviceRequest"/>
+<a name="ttn.lorawan.v3.SetEndDeviceRequest"/>
 
-### SetDeviceRequest
+### SetEndDeviceRequest
 
 
 
@@ -2639,7 +2639,7 @@ The JsEndDeviceRegistry service allows clients to manage their end devices on th
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
-| Set | [SetDeviceRequest](#ttn.lorawan.v3.SetDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetDeviceRequest) | Set creates or updates the device. |
+| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
 | Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
 
@@ -4398,7 +4398,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
-| Set | [SetDeviceRequest](#ttn.lorawan.v3.SetDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetDeviceRequest) | Set creates or updates the device. |
+| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
 | Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
  

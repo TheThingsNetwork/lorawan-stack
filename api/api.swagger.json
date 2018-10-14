@@ -722,7 +722,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3SetDeviceRequest"
+              "$ref": "#/definitions/v3SetEndDeviceRequest"
             }
           }
         ],
@@ -760,7 +760,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3SetDeviceRequest"
+              "$ref": "#/definitions/v3SetEndDeviceRequest"
             }
           }
         ],
@@ -1592,7 +1592,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3SetDeviceRequest"
+              "$ref": "#/definitions/v3SetEndDeviceRequest"
             }
           }
         ],
@@ -1630,7 +1630,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3SetDeviceRequest"
+              "$ref": "#/definitions/v3SetEndDeviceRequest"
             }
           }
         ],
@@ -1780,7 +1780,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3SetDeviceRequest"
+              "$ref": "#/definitions/v3SetEndDeviceRequest"
             }
           }
         ],
@@ -1818,7 +1818,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3SetDeviceRequest"
+              "$ref": "#/definitions/v3SetEndDeviceRequest"
             }
           }
         ],
@@ -6630,7 +6630,7 @@
         }
       }
     },
-    "v3SetDeviceRequest": {
+    "v3SetEndDeviceRequest": {
       "type": "object",
       "properties": {
         "device": {
