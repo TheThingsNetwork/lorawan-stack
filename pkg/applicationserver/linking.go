@@ -88,9 +88,10 @@ var (
 
 func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, link *link) error {
 	if link.NetworkServerAddress != "" {
-		// TODO: Add option for insecure (set in ttnpb.ApplicationLink).
-		// TODO: Needs testing.
 		options := rpcclient.DefaultDialOptions(ctx)
+		if link.AllowInsecure {
+			options = append(options, grpc.WithInsecure())
+		}
 		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress, options...)
 		if err != nil {
 			return err
@@ -99,8 +100,9 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 		link.connName = link.NetworkServerAddress
 		link.connCallOpts = []grpc.CallOption{
 			grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:  "Key",
-				AuthValue: link.APIKey,
+				AuthType:      "Key",
+				AuthValue:     link.APIKey,
+				AllowInsecure: link.AllowInsecure,
 			}),
 		}
 	} else {
@@ -143,7 +145,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		return err
 	}
 	client := ttnpb.NewAsNsClient(l.conn)
-	logger := log.FromContext(ctx)
+	logger := log.FromContext(ctx).WithField("network_server", l.connName)
 	logger.Debug("Linking")
 	stream, err := client.LinkApplication(ctx, &ids, l.connCallOpts...)
 	if err != nil {

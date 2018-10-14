@@ -79,7 +79,14 @@ func TestLink(t *testing.T) {
 	}
 
 	// app2: expect no link, set link, expect link, delete link and expect link to be gone.
-	{
+	for _, link := range []ttnpb.ApplicationLink{
+		{}, // Cluster-local Network Server.
+		{
+			NetworkServerAddress: nsAddr, // External Network Server.
+			APIKey:               "secret",
+			AllowInsecure:        true,
+		},
+	} {
 		ctx := rights.NewContext(ctx, rights.Rights{
 			ApplicationRights: map[string]*ttnpb.Rights{
 				unique.ID(ctx, app2): {
@@ -98,7 +105,6 @@ func TestLink(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		// Set link, expect link to establish.
-		link := ttnpb.ApplicationLink{}
 		_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
 			ApplicationIdentifiers: app2,
 			ApplicationLink:        link,
