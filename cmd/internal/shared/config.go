@@ -77,6 +77,11 @@ var DefaultAssetsConfig = assets.Config{
 	SearchPath: []string{"public", "/srv/ttn-lorawan/public"},
 }
 
+// DefaultBlobConfig is the default config for the blob store.
+var DefaultBlobConfig = config.Blob{
+	Provider: "local",
+}
+
 // DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
 var DefaultFrequencyPlansConfig = config.FrequencyPlans{
 	URL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
@@ -99,6 +104,7 @@ var DefaultServiceBase = config.ServiceBase{
 	GRPC:           DefaultGRPCConfig,
 	HTTP:           DefaultHTTPConfig,
 	TLS:            DefaultTLSConfig,
+	Blob:           DefaultBlobConfig,
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 	Rights:         DefaultRightsConfig,
 	KeyVault:       DefaultKeyVaultConfig,

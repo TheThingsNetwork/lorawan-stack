@@ -138,6 +138,34 @@ func (v KeyVault) KeyVault() crypto.KeyVault {
 	}
 }
 
+// BlobConfigLocal is the blob store configuration for the local filesystem provider.
+type BlobConfigLocal struct {
+	Directory string `name:"directory" description:"Local directory that holds the buckets"`
+}
+
+// BlobConfigAWS is the blob store configuration for the AWS provider.
+type BlobConfigAWS struct {
+	Endpoint        string `name:"endpoint" description:"S3 endpoint"`
+	Region          string `name:"region" description:"S3 region"`
+	AccessKeyID     string `name:"access-key-id" description:"Access key ID"`
+	SecretAccessKey string `name:"secret-access-key" description:"Secret access key"`
+	SessionToken    string `name:"session-token" description:"Session token"`
+}
+
+// BlobConfigGCP is the blob store configuration for the GCP provider.
+type BlobConfigGCP struct {
+	CredentialsFile string `name:"credentials-file" description:"Path to the GCP credentials JSON file"`
+	Credentials     string `name:"credentials" description:"JSON data of the GCP credentials, if not using JSON file"`
+}
+
+// Blob store configuration.
+type Blob struct {
+	Provider string          `name:"provider" description:"Blob store provider (local|aws|gcp)"`
+	Local    BlobConfigLocal `name:"local"`
+	AWS      BlobConfigAWS   `name:"aws"`
+	GCP      BlobConfigGCP   `name:"gcp"`
+}
+
 // FrequencyPlans contains the source of the frequency plans.
 type FrequencyPlans struct {
 	Directory string `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
@@ -168,6 +196,7 @@ type ServiceBase struct {
 	HTTP           HTTP           `name:"http"`
 	TLS            TLS            `name:"tls"`
 	Sentry         Sentry         `name:"sentry"`
+	Blob           Blob           `name:"blob"`
 	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
 	Rights         Rights         `name:"rights"`
 	KeyVault       KeyVault       `name:"key-vault"`
