@@ -112,7 +112,7 @@ func (c Config) getGCP(ctx context.Context, bucket string) (*blob.Bucket, error)
 	} else {
 		return nil, errConfig
 	}
-	creds, err := google.CredentialsFromJSON(ctx, jsonData)
+	creds, err := google.CredentialsFromJSON(ctx, jsonData, "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
 		return nil, err
 	}
