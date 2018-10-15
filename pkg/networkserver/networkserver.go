@@ -229,13 +229,27 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, maxDownLen, maxUpLen uint16) ([]byte, error) {
+func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) ([]byte, error) {
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
 	}
 
 	if dev.Session == nil {
 		return nil, errEmptySession
+	}
+
+	cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
+	for _, cmd := range dev.MACState.QueuedResponses {
+		if ttnpb.DefaultMACCommands[cmd.CID].DownlinkLength > maxDownLen {
+			continue
+		}
+		cmds = append(cmds, cmd)
+		desc := ttnpb.DefaultMACCommands[cmd.CID]
+		if desc == nil {
+			maxDownLen = 0
+			continue
+		}
+		maxDownLen -= desc.DownlinkLength
 	}
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
@@ -265,30 +279,40 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.Uplin
 		maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
 		fPending = fPending || !ok
 	}
+	cmds = append(cmds, dev.MACState.PendingRequests...)
 
-	ack := up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP
-	if !ack &&
-		len(dev.MACState.PendingRequests) == 0 &&
-		len(dev.MACState.QueuedResponses) == 0 &&
-		len(dev.QueuedApplicationDownlinks) == 0 {
-		return nil, errNoDownlink
-	}
-	cmds := append(dev.MACState.QueuedResponses, dev.MACState.PendingRequests...)
-
-	var err error
-	cmdBuf := make([]byte, 0, len(cmds))
+	cmdBuf := make([]byte, 0, maxDownLen)
 	for _, cmd := range cmds {
+		var err error
 		cmdBuf, err = cmd.AppendLoRaWAN(cmdBuf)
 		if err != nil {
 			return nil, errEncodeMAC.WithCause(err)
 		}
 	}
 
+	var up *ttnpb.UplinkMessage
+	for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
+		switch up = dev.RecentUplinks[i]; up.Payload.MHDR.MType {
+		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP, ttnpb.MType_JOIN_REQUEST:
+			break
+		}
+	}
+
+	// NOTE: up may be nil
+
+	if up.GetPayload().GetMType() != ttnpb.MType_CONFIRMED_UP &&
+		!up.GetPayload().GetMACPayload().GetADRAckReq() &&
+		len(dev.MACState.PendingRequests) == 0 &&
+		len(dev.MACState.QueuedResponses) == 0 &&
+		len(dev.QueuedApplicationDownlinks) == 0 {
+		return nil, errNoDownlink
+	}
+
 	pld := &ttnpb.MACPayload{
 		FHDR: ttnpb.FHDR{
 			DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
 			FCtrl: ttnpb.FCtrl{
-				Ack: ack,
+				Ack: up.GetPayload().GetMType() == ttnpb.MType_CONFIRMED_UP,
 			},
 			FCnt: dev.Session.LastNFCntDown + 1,
 		},
@@ -321,6 +345,8 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.Uplin
 			panic("Unsupported")
 		}
 		copy(key[:], dev.Session.NwkSEncKey.Key[:])
+
+		var err error
 		cmdBuf, err = crypto.EncryptDownlink(key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
 			return nil, errEncryptMAC.WithCause(err)
@@ -329,14 +355,13 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.Uplin
 
 	if pld.FPort == 0 {
 		pld.FRMPayload = cmdBuf
-		dev.Session.LastNFCntDown++
+		dev.Session.LastNFCntDown = pld.FCnt
 	} else {
 		pld.FHDR.FOpts = cmdBuf
 	}
 
-	if len(pld.FRMPayload) > int(maxDownLen) {
-		fPending = true
-		pld.FRMPayload = pld.FRMPayload[:maxDownLen]
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && pld.FCnt > dev.Session.LastNFCntDown {
+		dev.Session.LastNFCntDown = pld.FCnt
 	}
 
 	pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
@@ -390,8 +415,8 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.Uplin
 	}
 
 	var confFCnt uint32
-	if ack {
-		confFCnt = up.Payload.GetMACPayload().FCnt
+	if pld.Ack {
+		confFCnt = up.GetPayload().GetMACPayload().GetFCnt()
 	}
 	mic, err := crypto.ComputeDownlinkMIC(
 		key,
@@ -1379,7 +1404,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 				}
 				maxUpDR = ch.MaxDataRateIndex
 			}
-			b, err = generateDownlink(ctx, dev, up,
+			b, err = generateDownlink(ctx, dev,
 				band.DataRates[down.Settings.DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 				band.DataRates[maxUpDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
 			)

@@ -614,7 +614,6 @@ func TestGenerateDownlink(t *testing.T) {
 		Name       string
 		Device     *ttnpb.EndDevice
 		Context    context.Context
-		Uplink     *ttnpb.UplinkMessage
 		Bytes      []byte
 		Error      error
 		DeviceDiff func(*ttnpb.EndDevice)
@@ -630,13 +629,13 @@ func TestGenerateDownlink(t *testing.T) {
 				},
 				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes:      nil,
 			Error:      errNoDownlink,
@@ -658,13 +657,13 @@ func TestGenerateDownlink(t *testing.T) {
 					LastFCntUp: 4,
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes:      nil,
 			Error:      errNoDownlink,
@@ -683,13 +682,13 @@ func TestGenerateDownlink(t *testing.T) {
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Now()),
 				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes:      nil,
 			Error:      errNoDownlink,
@@ -718,20 +717,20 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_CONFIRMED_UP,
-					},
-					Payload: &ttnpb.Message_MACPayload{
-						MACPayload: &ttnpb.MACPayload{
-							FHDR: ttnpb.FHDR{
-								FCnt: 24,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_CONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{
+							MACPayload: &ttnpb.MACPayload{
+								FHDR: ttnpb.FHDR{
+									FCnt: 24,
+								},
 							},
 						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -786,13 +785,13 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -849,20 +848,20 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_CONFIRMED_UP,
-					},
-					Payload: &ttnpb.Message_MACPayload{
-						MACPayload: &ttnpb.MACPayload{
-							FHDR: ttnpb.FHDR{
-								FCnt: 24,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_CONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{
+							MACPayload: &ttnpb.MACPayload{
+								FHDR: ttnpb.FHDR{
+									FCnt: 24,
+								},
 							},
 						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -919,13 +918,13 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -983,20 +982,20 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_CONFIRMED_UP,
-					},
-					Payload: &ttnpb.Message_MACPayload{
-						MACPayload: &ttnpb.MACPayload{
-							FHDR: ttnpb.FHDR{
-								FCnt: 24,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_CONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{
+							MACPayload: &ttnpb.MACPayload{
+								FHDR: ttnpb.FHDR{
+									FCnt: 24,
+								},
 							},
 						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -1050,13 +1049,13 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 				},
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -1111,13 +1110,13 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 				},
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_UNCONFIRMED_UP,
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
 					},
-				},
+				}},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -1154,7 +1153,7 @@ func TestGenerateDownlink(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			b, err := generateDownlink(tc.Context, dev, CopyUplinkMessage(tc.Uplink), math.MaxUint16, math.MaxUint16)
+			b, err := generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
