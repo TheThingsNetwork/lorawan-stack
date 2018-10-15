@@ -21,23 +21,24 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var evtMACDeviceMode = events.Define("ns.mac.device_mode", "handled device mode indication")
+var (
+	evtReceiveDeviceModeIndication   = defineReceiveMACIndicationEvent("device_mode", "device mode")
+	evtEnqueueDeviceModeConfirmation = defineEnqueueMACConfirmationEvent("device_mode", "device mode")
+)
 
 func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) error {
 	if pld == nil {
 		return errNoPayload
 	}
+	events.Publish(evtReceiveDeviceModeIndication(ctx, dev.EndDeviceIdentifiers, pld))
+
+	dev.MACState.DeviceClass = pld.Class
 
 	conf := &ttnpb.MACCommand_DeviceModeConf{
 		Class: pld.Class,
 	}
+	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 
-	dev.MACState.DeviceClass = pld.Class
-	dev.MACState.QueuedResponses = append(
-		dev.MACState.QueuedResponses,
-		conf.MACCommand(),
-	)
-
-	events.Publish(evtMACDeviceMode(ctx, dev.EndDeviceIdentifiers, conf))
+	events.Publish(evtEnqueueDeviceModeConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

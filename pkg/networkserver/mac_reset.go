@@ -22,9 +22,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var evtMACReset = events.Define("ns.mac.reset_ind", "handled device reset indication")
+var (
+	evtReceiveResetIndication   = defineReceiveMACIndicationEvent("reset", "device reset")
+	evtEnqueueResetConfirmation = defineEnqueueMACConfirmationEvent("reset", "device reset")
+)
 
 func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store) error {
+	events.Publish(evtReceiveResetIndication(ctx, dev.EndDeviceIdentifiers, pld))
+
 	if dev.SupportsJoin {
 		return nil
 	}
@@ -36,16 +41,13 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	if err := resetMACState(fps, dev); err != nil {
 		return err
 	}
+	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 
 	conf := &ttnpb.MACCommand_ResetConf{
 		MinorVersion: pld.MinorVersion,
 	}
+	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 
-	dev.MACState.QueuedResponses = append(
-		dev.MACState.QueuedResponses,
-		conf.MACCommand(),
-	)
-
-	events.Publish(evtMACReset(ctx, dev.EndDeviceIdentifiers, conf))
+	events.Publish(evtEnqueueRekeyConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

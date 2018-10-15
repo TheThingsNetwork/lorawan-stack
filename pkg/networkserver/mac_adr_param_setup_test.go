@@ -25,7 +25,7 @@ import (
 )
 
 func TestHandleADRParamSetupAns(t *testing.T) {
-	events := collectEvents("ns.mac.adr_param.accept")
+	events := collectEvents("ns.mac.adr_param_setup.accept")
 
 	for _, tc := range []struct {
 		Name             string

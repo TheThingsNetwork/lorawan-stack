@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtMACDutyCycleRequest = events.Define("ns.mac.duty_cycle.request", "request duty cycle") // TODO(#988): publish when requesting
-	evtMACDutyCycle        = events.Define("ns.mac.duty_cycle.accept", "device accepted duty cycle request")
+	evtEnqueueDutyCycleRequest = defineEnqueueMACRequestEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")
+	evtReceiveDutyCycleAnswer  = defineReceiveMACAnswerEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")
 )
 
 func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -36,20 +36,23 @@ func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_DutyCycleReq{
+		pld := &ttnpb.MACCommand_DutyCycleReq{
 			MaxDutyCycle: dev.MACState.DesiredParameters.MaxDutyCycle,
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueueDutyCycleRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
 
 func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) error {
+		events.Publish(evtReceiveDutyCycleAnswer(ctx, dev.EndDeviceIdentifiers, nil))
+
 		req := cmd.GetDutyCycleReq()
 
 		dev.MACState.CurrentParameters.MaxDutyCycle = req.MaxDutyCycle
-
-		events.Publish(evtMACDutyCycle(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

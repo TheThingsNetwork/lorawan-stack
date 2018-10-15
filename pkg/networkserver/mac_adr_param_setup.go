@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtMACADRParamRequest = events.Define("ns.mac.adr_param.request", "request ADR parameter setup") // TODO(#988): publish when requesting
-	evtMACADRParamAccept  = events.Define("ns.mac.adr_param.accept", "device accepted ADR parameter setup request")
+	evtEnqueueADRParamSetupRequest = defineEnqueueMACRequestEvent("adr_param_setup", "ADR parameter setup")
+	evtReceiveADRParamSetupAnswer  = defineReceiveMACAnswerEvent("adr_param_setup", "ADR parameter setup")
 )
 
 func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -37,30 +37,32 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_ADRParamSetupReq{
+
+		req := &ttnpb.MACCommand_ADRParamSetupReq{
 			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
 			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueueADRParamSetupRequest(ctx, dev.EndDeviceIdentifiers, req))
+		return []*ttnpb.MACCommand{req.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+		events.Publish(evtReceiveADRParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
+
 		req := cmd.GetADRParamSetupReq()
 
 		dev.MACState.CurrentParameters.ADRAckDelay = ttnpb.ADRAckDelayExponentToUint32(req.ADRAckDelayExponent)
 		dev.MACState.CurrentParameters.ADRAckLimit = ttnpb.ADRAckLimitExponentToUint32(req.ADRAckLimitExponent)
-
 		if ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay) == req.ADRAckDelayExponent {
 			dev.MACState.DesiredParameters.ADRAckDelay = dev.MACState.CurrentParameters.ADRAckDelay
 		}
-
 		if ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit) == req.ADRAckLimitExponent {
 			dev.MACState.DesiredParameters.ADRAckLimit = dev.MACState.CurrentParameters.ADRAckLimit
 		}
-
-		events.Publish(evtMACADRParamAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

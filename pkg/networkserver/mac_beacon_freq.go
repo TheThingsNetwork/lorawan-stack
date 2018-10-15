@@ -17,7 +17,14 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtEnqueueBeaconFreqRequest = defineEnqueueMACRequestEvent("beacon_freq", "beacon frequency change")
+	evtReceiveBeaconFreqReject  = defineReceiveMACRejectEvent("beacon_freq", "beacon frequency change")
+	evtReceiveBeaconFreqAccept  = defineReceiveMACAcceptEvent("beacon_freq", "beacon frequency change")
 )
 
 func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -30,9 +37,13 @@ func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_BeaconFreqReq{
+
+		pld := &ttnpb.MACCommand_BeaconFreqReq{
 			Frequency: dev.MACState.DesiredParameters.BeaconFrequency,
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueueBeaconFreqRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -43,15 +54,14 @@ func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
+		req := cmd.GetBeaconFreqReq()
 		if !pld.FrequencyAck {
+			events.Publish(evtReceiveBeaconFreqReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
-
-		req := cmd.GetBeaconFreqReq()
+		events.Publish(evtReceiveBeaconFreqAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		dev.MACState.CurrentParameters.BeaconFrequency = req.Frequency
-
-		// TODO: ev
 		return nil
 
 	}, dev.MACState.PendingRequests...)

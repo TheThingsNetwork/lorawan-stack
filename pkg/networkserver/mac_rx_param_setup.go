@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	evtMACRxParamRequest = events.Define("ns.mac.rx_param.request", "request rx parameter setup") // TODO(#988): publish when requesting
-	evtMACRxParamAccept  = events.Define("ns.mac.rx_param.accept", "device accepted rx parameter setup request")
-	evtMACRxParamReject  = events.Define("ns.mac.rx_param.reject", "device rejected rx parameter setup request")
+	evtEnqueueRxParamSetupRequest = defineEnqueueMACRequestEvent("rx_param_setup", "Rx parameter setup")
+	evtReceiveRxParamSetupAccept  = defineReceiveMACAcceptEvent("rx_param_setup", "Rx parameter setup")
+	evtReceiveRxParamSetupReject  = defineReceiveMACRejectEvent("rx_param_setup", "Rx parameter setup")
 )
 
 func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -39,11 +39,14 @@ func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_RxParamSetupReq{
+		pld := &ttnpb.MACCommand_RxParamSetupReq{
 			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
 			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
 			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueueRxParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -57,17 +60,16 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtMACRxParamReject(ctx, dev.EndDeviceIdentifiers, pld))
+			events.Publish(evtReceiveRxParamSetupReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
+		events.Publish(evtReceiveRxParamSetupAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req := cmd.GetRxParamSetupReq()
 
 		dev.MACState.CurrentParameters.Rx1DataRateOffset = req.Rx1DataRateOffset
 		dev.MACState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
 		dev.MACState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
-
-		events.Publish(evtMACRxParamAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

@@ -22,8 +22,9 @@ import (
 )
 
 var (
-	evtMACDLChannelAccept = events.Define("ns.mac.dl_channel.accept", "device accepted downlink channel request")
-	evtMACDLChannelReject = events.Define("ns.mac.dl_channel.reject", "device rejected downlink channel request")
+	evtEnqueueDLChannelRequest = defineEnqueueMACRequestEvent("dl_channel", "downlink Rx1 channel frequency modification")
+	evtReceiveDLChannelAccept  = defineReceiveMACAcceptEvent("dl_channel", "downlink Rx1 channel frequency modification")
+	evtReceiveDLChannelReject  = defineReceiveMACRejectEvent("dl_channel", "downlink Rx1 channel frequency modification")
 )
 
 func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -41,12 +42,16 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 			nDown--
 			nUp--
 
-			cmds = append(cmds, (&ttnpb.MACCommand_DLChannelReq{
+			pld := &ttnpb.MACCommand_DLChannelReq{
 				ChannelIndex: uint32(i),
 				Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
-			}).MACCommand())
+			}
+			cmds = append(cmds, pld.MACCommand())
+
+			events.Publish(evtEnqueueDLChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		}
 		return cmds, uint16(len(cmds)), true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -60,18 +65,16 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		if !pld.ChannelIndexAck && !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtMACDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
+			events.Publish(evtReceiveDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
+		events.Publish(evtReceiveDLChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req := cmd.GetDlChannelReq()
-
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) || dev.MACState.CurrentParameters.Channels[req.ChannelIndex] == nil {
 			return errCorruptedMACState.WithCause(errUnknownChannel)
 		}
 		dev.MACState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
-
-		events.Publish(evtMACDLChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

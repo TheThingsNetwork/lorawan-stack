@@ -23,9 +23,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var evtMACDeviceTime = events.Define("ns.mac.device_time", "handled device time request")
+var (
+	evtReceiveDeviceTimeRequest = defineReceiveMACRequestEvent("device_time", "device time")
+	evtEnqueueDeviceTimeAnswer  = defineEnqueueMACAnswerEvent("device_time", "device time")
+)
 
 func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
+	events.Publish(evtReceiveDeviceTimeRequest(ctx, dev.EndDeviceIdentifiers, nil))
+
 	ts := make([]time.Time, 0, len(msg.RxMetadata))
 	for _, md := range msg.RxMetadata {
 		if md.Time == nil {
@@ -48,12 +53,8 @@ func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 	ans := &ttnpb.MACCommand_DeviceTimeAns{
 		Time: t,
 	}
+	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
 
-	dev.MACState.QueuedResponses = append(
-		dev.MACState.QueuedResponses,
-		ans.MACCommand(),
-	)
-
-	events.Publish(evtMACDeviceTime(ctx, dev.EndDeviceIdentifiers, ans))
+	events.Publish(evtEnqueueDeviceTimeAnswer(ctx, dev.EndDeviceIdentifiers, ans))
 	return nil
 }

@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtMACRejoinParamRequest = events.Define("ns.mac.rejoin_param.request", "request rejoin parameter setup") // TODO(#988): publish when requesting
-	evtMACRejoinParamAccept  = events.Define("ns.mac.rejoin_param.accept", "device accepted rejoin parameter setup request")
+	evtEnqueueRejoinParamSetupRequest = defineEnqueueMACRequestEvent("rejoin_param", "rejoin parameter setup")
+	evtReceiveRejoinParamSetupAnswer  = defineReceiveMACAnswerEvent("rejoin_param", "rejoin parameter setup")
 )
 
 func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -36,10 +36,14 @@ func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_RejoinParamSetupReq{
+
+		pld := &ttnpb.MACCommand_RejoinParamSetupReq{
 			MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
 			MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueueRejoinParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -50,18 +54,14 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+		events.Publish(evtReceiveRejoinParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, pld))
+
 		req := cmd.GetRejoinParamSetupReq()
 
 		dev.MACState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent
-		acked := &ttnpb.MACCommand_RejoinParamSetupReq{
-			MaxCountExponent: req.MaxCountExponent,
-		}
 		if pld.MaxTimeExponentAck {
 			dev.MACState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
-			acked.MaxTimeExponent = req.MaxTimeExponent
 		}
-
-		events.Publish(evtMACRejoinParamAccept(ctx, dev.EndDeviceIdentifiers, acked))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

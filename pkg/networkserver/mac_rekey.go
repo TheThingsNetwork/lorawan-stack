@@ -21,9 +21,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var evtMACRekey = events.Define("ns.mac.rekey_ind", "handled device rekey indication")
+var (
+	evtReceiveRekeyIndication   = defineReceiveMACIndicationEvent("rekey", "device rekey")
+	evtEnqueueRekeyConfirmation = defineEnqueueMACConfirmationEvent("rekey", "device rekey")
+)
 
 func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) error {
+	events.Publish(evtReceiveRekeyIndication(ctx, dev.EndDeviceIdentifiers, pld))
+
 	if !dev.SupportsJoin {
 		return nil
 	}
@@ -31,17 +36,14 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	if pld == nil {
 		return errNoPayload
 	}
+	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+	dev.PendingSession = nil
 
 	conf := &ttnpb.MACCommand_RekeyConf{
 		MinorVersion: pld.MinorVersion,
 	}
+	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 
-	dev.PendingSession = nil
-	dev.MACState.QueuedResponses = append(
-		dev.MACState.QueuedResponses,
-		conf.MACCommand(),
-	)
-
-	events.Publish(evtMACRekey(ctx, dev.EndDeviceIdentifiers, conf))
+	events.Publish(evtEnqueueRekeyConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

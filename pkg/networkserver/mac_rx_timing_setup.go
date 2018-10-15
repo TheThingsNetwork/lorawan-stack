@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtMACRxTimingRequest = events.Define("ns.mac.rx_timing.request", "request receive window timing setup") // TODO(#988): publish when requesting
-	evtMACRxTimingAccept  = events.Define("ns.mac.rx_timing.accept", "device accepted receive window timing setup request")
+	evtEnqueueRxTimingSetupRequest = defineEnqueueMACRequestEvent("rx_timing_setup", "Rx timing setup")
+	evtReceiveRxTimingSetupAnswer  = defineReceiveMACAnswerEvent("rx_timing_setup", "Rx timing setup")
 )
 
 func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -36,20 +36,23 @@ func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_RxTimingSetupReq{
+		pld := &ttnpb.MACCommand_RxTimingSetupReq{
 			Delay: dev.MACState.DesiredParameters.Rx1Delay,
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueueRxTimingSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
 
 func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
+		events.Publish(evtReceiveRxTimingSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
+
 		req := cmd.GetRxTimingSetupReq()
 
 		dev.MACState.CurrentParameters.Rx1Delay = req.Delay
-
-		events.Publish(evtMACRxTimingAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

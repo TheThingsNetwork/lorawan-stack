@@ -17,15 +17,24 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtEnqueuePingSlotInfoAnswer  = defineEnqueueMACAnswerEvent("ping_slot_info", "ping slot info")
+	evtReceivePingSlotInfoRequest = defineReceiveMACRequestEvent("ping_slot_info", "ping slot info")
 )
 
 func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) error {
 	if pld == nil {
 		return errNoPayload
 	}
+	events.Publish(evtReceivePingSlotInfoRequest(ctx, dev.EndDeviceIdentifiers, pld))
 
 	dev.MACState.PingSlotPeriodicity = pld.Period
+	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ttnpb.CID_PING_SLOT_INFO.MACCommand())
 
+	events.Publish(evtEnqueuePingSlotInfoAnswer(ctx, dev.EndDeviceIdentifiers, nil))
 	return nil
 }

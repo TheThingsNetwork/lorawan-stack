@@ -14,7 +14,20 @@
 
 package networkserver
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import (
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, uint16, uint16, bool) {
+	desc := ttnpb.DefaultMACCommands[cid]
+	maxDown := maxDownLen / (1 + desc.DownlinkLength)
+	maxUp := maxUpLen / (1 + desc.UplinkLength)
+	enq, nUp, ok := f(maxDown, maxUp)
+	if len(enq) > int(maxDown) || nUp > maxUp {
+		panic("Invalid amount of MAC commands enqueued")
+	}
+	return append(cmds, enq...), maxDownLen - uint16(len(enq))*desc.DownlinkLength, maxUpLen - nUp*desc.UplinkLength, ok
+}
 
 func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	for i, cmd := range cmds {

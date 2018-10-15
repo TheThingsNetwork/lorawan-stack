@@ -17,7 +17,13 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtEnqueuePingSlotChannelRequest = defineEnqueueMACRequestEvent("ping_slot_channel", "ping slot channel")
+	evtReceivePingSlotChannelAnswer  = defineReceiveMACAcceptEvent("ping_slot_channel", "ping slot channel")
 )
 
 func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -31,10 +37,13 @@ func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDow
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
-		return []*ttnpb.MACCommand{(&ttnpb.MACCommand_PingSlotChannelReq{
+		pld := &ttnpb.MACCommand_PingSlotChannelReq{
 			Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
 			DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndex,
-		}).MACCommand()}, 1, true
+		}
+		events.Publish(evtEnqueuePingSlotChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -45,11 +54,12 @@ func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
+		events.Publish(evtReceivePingSlotChannelAnswer(ctx, dev.EndDeviceIdentifiers, pld))
+
 		req := cmd.GetPingSlotChannelReq()
 
 		dev.MACState.CurrentParameters.PingSlotDataRateIndex = req.DataRateIndex
 		dev.MACState.CurrentParameters.PingSlotFrequency = req.Frequency
-
 		return nil
 
 	}, dev.MACState.PendingRequests...)

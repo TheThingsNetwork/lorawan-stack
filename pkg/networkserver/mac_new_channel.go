@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	evtMACNewChannelRequest = events.Define("ns.mac.new_channel.request", "request new channel") // TODO(#988): publish when requesting
-	evtMACNewChannelAccept  = events.Define("ns.mac.new_channel.accept", "device accepted new channel request")
-	evtMACNewChannelReject  = events.Define("ns.mac.new_channel.reject", "device rejected new channel request")
+	evtEnqueueNewChannelRequest = defineEnqueueMACRequestEvent("new_channel", "new channel")
+	evtReceiveNewChannelAccept  = defineReceiveMACAcceptEvent("new_channel", "new channel")
+	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")
 )
 
 func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -44,14 +44,18 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 			nDown--
 			nUp--
 
-			cmds = append(cmds, (&ttnpb.MACCommand_NewChannelReq{
+			pld := &ttnpb.MACCommand_NewChannelReq{
 				ChannelIndex:     uint32(i),
 				Frequency:        ch.UplinkFrequency,
 				MinDataRateIndex: ch.MinDataRateIndex,
 				MaxDataRateIndex: ch.MaxDataRateIndex,
-			}).MACCommand())
+			}
+			cmds = append(cmds, pld.MACCommand())
+
+			events.Publish(evtEnqueueNewChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		}
 		return cmds, uint16(len(cmds)), true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -65,9 +69,10 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		if !pld.DataRateAck || !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtMACNewChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
+			events.Publish(evtReceiveNewChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
+		events.Publish(evtReceiveNewChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req := cmd.GetNewChannelReq()
 
@@ -86,8 +91,6 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		ch.UplinkFrequency = req.Frequency
 		ch.MinDataRateIndex = req.MinDataRateIndex
 		ch.MaxDataRateIndex = req.MaxDataRateIndex
-
-		events.Publish(evtMACNewChannelAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

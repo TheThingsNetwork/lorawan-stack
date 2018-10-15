@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,6 +26,38 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
+
+func defineReceiveMACAcceptEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc))
+}
+
+func defineReceiveMACAnswerEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc))
+}
+
+func defineReceiveMACIndicationEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc))
+}
+
+func defineReceiveMACRejectEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc))
+}
+
+func defineReceiveMACRequestEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc))
+}
+
+func defineEnqueueMACAnswerEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc))
+}
+
+func defineEnqueueMACConfirmationEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc))
+}
+
+func defineEnqueueMACRequestEvent(name, desc string) events.Definition {
+	return events.Define(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc))
+}
 
 var (
 	evtBeginApplicationLink = events.Define("ns.application.begin_link", "begin application link")
@@ -42,6 +75,10 @@ var (
 
 	evtDropRejoin    = events.Define("ns.up.rejoin.drop", "drop rejoin-request")
 	evtForwardRejoin = events.Define("ns.up.rejoin.forward", "forward rejoin-request")
+
+	evtEnqueueProprietaryMACAnswer  = defineEnqueueMACAnswerEvent("proprietary", "proprietary MAC command")
+	evtEnqueueProprietaryMACRequest = defineEnqueueMACRequestEvent("proprietary", "proprietary MAC command")
+	evtReceiveProprietaryMAC        = events.Define("ns.mac.proprietary.receive", "proprietary MAC command received")
 )
 
 const (

@@ -22,9 +22,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-var evtMACLinkCheck = events.Define("ns.mac.link_check", "handled link check request")
+var (
+	evtReceiveLinkCheckRequest = defineReceiveMACRequestEvent("link_check", "link check")
+	evtEnqueueLinkCheckAnswer  = defineEnqueueMACAnswerEvent("link_check", "link check")
+)
 
 func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
+	events.Publish(evtReceiveLinkCheckRequest(ctx, dev.EndDeviceIdentifiers, nil))
+
 	floor, ok := demodulationFloor[msg.Settings.SpreadingFactor][msg.Settings.Bandwidth]
 	if !ok {
 		return errInvalidDataRate
@@ -47,12 +52,8 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 		Margin:       uint32(uint8(maxSNR - floor)),
 		GatewayCount: uint32(len(gtws)),
 	}
+	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
 
-	dev.MACState.QueuedResponses = append(
-		dev.MACState.QueuedResponses,
-		ans.MACCommand(),
-	)
-
-	events.Publish(evtMACLinkCheck(ctx, dev.EndDeviceIdentifiers, ans))
+	events.Publish(evtEnqueueLinkCheckAnswer(ctx, dev.EndDeviceIdentifiers, ans))
 	return nil
 }

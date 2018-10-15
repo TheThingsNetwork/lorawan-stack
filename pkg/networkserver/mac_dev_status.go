@@ -23,8 +23,8 @@ import (
 )
 
 var (
-	evtMACDeviceStatusRequest = events.Define("ns.mac.device_status.request", "request device status") // TODO(#988): publish when requesting
-	evtMACDeviceStatus        = events.Define("ns.mac.device_status", "handled device status")
+	evtEnqueueDevStatusRequest = defineEnqueueMACRequestEvent("dev_status", "device status")
+	evtReceiveDevStatusAnswer  = defineReceiveMACAnswerEvent("dev_status", "device status")
 )
 
 func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -39,7 +39,10 @@ func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, false
 		}
+
+		events.Publish(evtEnqueueDevStatusRequest(ctx, dev.EndDeviceIdentifiers, nil))
 		return []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}, 1, true
+
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -50,6 +53,8 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	}
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
+		events.Publish(evtReceiveDevStatusAnswer(ctx, dev.EndDeviceIdentifiers, pld))
+
 		switch pld.Battery {
 		case 0:
 			dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
@@ -64,8 +69,6 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		dev.DownlinkMargin = pld.Margin
 		dev.LastDevStatusReceivedAt = &recvAt
 		dev.MACState.LastDevStatusFCntUp = dev.Session.LastFCntUp
-
-		events.Publish(evtMACDeviceStatus(ctx, dev.EndDeviceIdentifiers, pld))
 		return nil
 
 	}, dev.MACState.PendingRequests...)

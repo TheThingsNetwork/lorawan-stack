@@ -24,9 +24,9 @@ import (
 )
 
 var (
-	evtMACLinkADRRequest = events.Define("ns.mac.adr.request", "request ADR") // TODO(#988): publish when requesting
-	evtMACLinkADRAccept  = events.Define("ns.mac.adr.accept", "device accepted ADR request")
-	evtMACLinkADRReject  = events.Define("ns.mac.adr.reject", "device rejected ADR request")
+	evtEnqueueLinkADRRequest = defineEnqueueMACRequestEvent("link_adr", "ADR request")
+	evtReceiveLinkADRAccept  = defineReceiveMACAcceptEvent("link_adr", "ADR request")
+	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "ADR request")
 )
 
 func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
@@ -40,6 +40,9 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	if dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex ||
 		dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans ||
 		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex {
+	}
+	if false {
+		events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, nil))
 	}
 	return maxDownLen, maxUpLen, true
 }
@@ -79,9 +82,10 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtMACLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
+			events.Publish(evtReceiveLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
+		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req = cmd.GetLinkADRReq()
 
@@ -113,7 +117,6 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			dev.MACState.CurrentParameters.Channels[i].EnableUplink = masked
 		}
 
-		events.Publish(evtMACLinkADRAccept(ctx, dev.EndDeviceIdentifiers, req))
 		return nil
 
 	}, dev.MACState.PendingRequests...)
