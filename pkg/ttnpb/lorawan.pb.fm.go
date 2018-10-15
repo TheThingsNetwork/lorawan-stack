@@ -988,46 +988,46 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) {
 			dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns.SetFields(src.GetDeviceTimeAns(), _pathsWithoutPrefix("device_time_ans", paths)...)
 		case "dl_channel_ans":
 			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DlChannelAns{}
+				dst.Payload = &MACCommand_DLChannelAns_{}
 			}
-			dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns = src.GetDlChannelAns()
+			dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = src.GetDLChannelAns()
 		case "dl_channel_ans.channel_index_ack":
 			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DlChannelAns{}
+				dst.Payload = &MACCommand_DLChannelAns_{}
 			}
-			if dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns == nil {
-				dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns = &MACCommand_DLChannelAns{}
+			if dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns == nil {
+				dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = &MACCommand_DLChannelAns{}
 			}
-			dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns.SetFields(src.GetDlChannelAns(), _pathsWithoutPrefix("dl_channel_ans", paths)...)
+			dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns.SetFields(src.GetDLChannelAns(), _pathsWithoutPrefix("dl_channel_ans", paths)...)
 		case "dl_channel_ans.frequency_ack":
 			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DlChannelAns{}
+				dst.Payload = &MACCommand_DLChannelAns_{}
 			}
-			if dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns == nil {
-				dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns = &MACCommand_DLChannelAns{}
+			if dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns == nil {
+				dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = &MACCommand_DLChannelAns{}
 			}
-			dst.Payload.(*MACCommand_DlChannelAns).DlChannelAns.SetFields(src.GetDlChannelAns(), _pathsWithoutPrefix("dl_channel_ans", paths)...)
+			dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns.SetFields(src.GetDLChannelAns(), _pathsWithoutPrefix("dl_channel_ans", paths)...)
 		case "dl_channel_req":
 			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DlChannelReq{}
+				dst.Payload = &MACCommand_DLChannelReq_{}
 			}
-			dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq = src.GetDlChannelReq()
+			dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = src.GetDLChannelReq()
 		case "dl_channel_req.channel_index":
 			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DlChannelReq{}
+				dst.Payload = &MACCommand_DLChannelReq_{}
 			}
-			if dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq == nil {
-				dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq = &MACCommand_DLChannelReq{}
+			if dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq == nil {
+				dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = &MACCommand_DLChannelReq{}
 			}
-			dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq.SetFields(src.GetDlChannelReq(), _pathsWithoutPrefix("dl_channel_req", paths)...)
+			dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq.SetFields(src.GetDLChannelReq(), _pathsWithoutPrefix("dl_channel_req", paths)...)
 		case "dl_channel_req.frequency":
 			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DlChannelReq{}
+				dst.Payload = &MACCommand_DLChannelReq_{}
 			}
-			if dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq == nil {
-				dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq = &MACCommand_DLChannelReq{}
+			if dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq == nil {
+				dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = &MACCommand_DLChannelReq{}
 			}
-			dst.Payload.(*MACCommand_DlChannelReq).DlChannelReq.SetFields(src.GetDlChannelReq(), _pathsWithoutPrefix("dl_channel_req", paths)...)
+			dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq.SetFields(src.GetDLChannelReq(), _pathsWithoutPrefix("dl_channel_req", paths)...)
 		case "duty_cycle_req":
 			if dst.Payload == nil {
 				dst.Payload = &MACCommand_DutyCycleReq_{}

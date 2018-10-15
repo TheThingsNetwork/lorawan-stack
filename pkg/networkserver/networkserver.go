@@ -1018,7 +1018,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			case ttnpb.CID_TX_PARAM_SETUP:
 				err = handleTxParamSetupAns(ctx, stored)
 			case ttnpb.CID_DL_CHANNEL:
-				err = handleDLChannelAns(ctx, stored, cmd.GetDlChannelAns())
+				err = handleDLChannelAns(ctx, stored, cmd.GetDLChannelAns())
 			case ttnpb.CID_REKEY:
 				err = handleRekeyInd(ctx, stored, cmd.GetRekeyInd())
 			case ttnpb.CID_ADR_PARAM_SETUP:

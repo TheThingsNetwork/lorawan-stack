@@ -470,7 +470,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-			pld := cmd.GetDlChannelAns()
+			pld := cmd.GetDLChannelAns()
 			var v byte
 			if pld.ChannelIndexAck {
 				v |= 1
@@ -481,9 +481,9 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DlChannelAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
-			cmd.Payload = &ttnpb.MACCommand_DlChannelAns{
-				DlChannelAns: &ttnpb.MACCommand_DLChannelAns{
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DLChannelAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+			cmd.Payload = &ttnpb.MACCommand_DLChannelAns_{
+				DLChannelAns: &ttnpb.MACCommand_DLChannelAns{
 					ChannelIndexAck: b[0]&1 == 1,
 					FrequencyAck:    (b[0]>>1)&1 == 1,
 				},
@@ -493,7 +493,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 		DownlinkLength: 4,
 		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-			pld := cmd.GetDlChannelReq()
+			pld := cmd.GetDLChannelReq()
 			if pld.ChannelIndex > math.MaxUint8 {
 				return nil, errExpectedLowerOrEqual("ChannelIndex", math.MaxUint8)(pld.ChannelIndex)
 			}
@@ -505,9 +505,9 @@ var DefaultMACCommands = MACCommandSpec{
 			b = appendUint64(b, pld.Frequency/100, 3)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DlChannelReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
-			cmd.Payload = &ttnpb.MACCommand_DlChannelReq{
-				DlChannelReq: &ttnpb.MACCommand_DLChannelReq{
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DLChannelReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
+			cmd.Payload = &ttnpb.MACCommand_DLChannelReq_{
+				DLChannelReq: &ttnpb.MACCommand_DLChannelReq{
 					ChannelIndex: uint32(b[0]),
 					Frequency:    parseUint64(b[1:4]) * 100,
 				},

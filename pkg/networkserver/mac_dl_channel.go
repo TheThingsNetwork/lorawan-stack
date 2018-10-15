@@ -74,7 +74,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 			return nil
 		}
 
-		req := cmd.GetDlChannelReq()
+		req := cmd.GetDLChannelReq()
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) || dev.MACState.CurrentParameters.Channels[req.ChannelIndex] == nil {
 			return errCorruptedMACState.WithCause(errUnknownChannel)
 		}

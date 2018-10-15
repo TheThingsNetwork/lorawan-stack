@@ -279,8 +279,8 @@ message MACCommand {
     DevStatusAns dev_status_ans = 11;
     NewChannelReq new_channel_req = 12;
     NewChannelAns new_channel_ans = 13;
-    DLChannelReq dl_channel_req = 14;
-    DLChannelAns dl_channel_ans = 15;
+    DLChannelReq dl_channel_req = 14 [(gogoproto.customname) = "DLChannelReq"];
+    DLChannelAns dl_channel_ans = 15 [(gogoproto.customname) = "DLChannelAns"];
     RxTimingSetupReq rx_timing_setup_req = 16;
     TxParamSetupReq tx_param_setup_req = 17;
     RekeyInd rekey_ind = 18;
