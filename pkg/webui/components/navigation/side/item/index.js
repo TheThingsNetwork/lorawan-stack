@@ -14,6 +14,7 @@
 
 import React, { Fragment } from 'react'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 import PropTypes from '../../../../lib/prop-types'
 
 import SideNavigationList from '../list'
@@ -23,53 +24,71 @@ import Icon from '../../../icon'
 
 import style from './item.styl'
 
-const SideNavigationItem = ({
-  className,
-  title,
-  depth,
-  icon = null,
-  path = null,
-  exact = true,
-  isCollapsable = false,
-  isMinimized,
-  isExpanded,
-  isActive,
-  onExpand,
-  items,
-}) => (
-  <li
-    className={classnames(className, style.item, {
-      [style.itemMinimized]: isMinimized,
-    })}
-  >
-    {
-      isCollapsable
-        ? (
-          <CollapsableItem
-            title={title}
-            icon={icon}
-            onExpand={onExpand}
-            depth={depth}
-            items={items}
-            isActive={isActive}
-            isExpanded={isExpanded}
-            isMinimized={isMinimized}
-          />
-        ) : (
-          <LinkItem
-            title={title}
-            icon={icon}
-            exact={exact}
-            path={path}
-            depth={depth}
-            onExpand={onExpand}
-          />
-        )
-    }
-  </li>
-)
+@bind
+class SideNavigationItem extends React.PureComponent {
+
+  onExpandCollapsableItem () {
+    this.props.onExpand(false)
+  }
+
+  onExpandLinkItem () {
+    this.props.onExpand(true)
+  }
+
+  render () {
+    const {
+      className,
+      title,
+      depth,
+      icon = null,
+      path = null,
+      exact = true,
+      onExpand,
+      isCollapsable = false,
+      isMinimized,
+      isExpanded,
+      isActive,
+      items,
+    } = this.props
+
+    return (
+      <li
+        className={classnames(className, style.item, {
+          [style.itemMinimized]: isMinimized,
+        })}
+      >
+        {
+          isCollapsable
+            ? (
+              <CollapsableItem
+                title={title}
+                icon={icon}
+                onExpand={onExpand}
+                onClick={this.onExpandCollapsableItem}
+                depth={depth}
+                items={items}
+                isActive={isActive}
+                isExpanded={isExpanded}
+                isMinimized={isMinimized}
+              />
+            ) : (
+              <LinkItem
+                title={title}
+                icon={icon}
+                exact={exact}
+                path={path}
+                depth={depth}
+                onExpand={this.onExpandLinkItem}
+              />
+            )
+        }
+      </li>
+    )
+  }
+}
 
 const CollapsableItem = ({
+  onClick,
   onExpand,
   isActive,
   isExpanded,
@@ -86,9 +105,7 @@ const CollapsableItem = ({
       })}
       type="button"
       data-hook="side-nav-item-button"
-      onClick={function () {
-        onExpand(false)
-      }}
+      onClick={onClick}
     >
       {icon && <Icon icon={icon} className={style.icon} />}
       <Message content={title} className={style.message} />
@@ -114,7 +131,6 @@ const LinkItem = ({
   icon,
   exact,
   path,
-  depth,
   onExpand,
 }) => (
   <NavigationLink
@@ -122,9 +138,7 @@ const LinkItem = ({
     activeClassName={style.linkActive}
     exact={exact}
     path={path}
-    onClick={function () {
-      onExpand(true)
-    }}
+    onClick={onExpand}
     data-hook="side-nav-item-link"
   >
     {icon && <Icon icon={icon} className={style.icon} />}
