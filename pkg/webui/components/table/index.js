@@ -94,7 +94,7 @@ class Tabular extends React.Component {
       </Table.Row>
     )
 
-    const rows = data.length > 0 ? (
+    const rows = loading ? null : data.length > 0 ? (
       data.map((row, rowKey) => (
         <Table.Row
           key={rowKey}
