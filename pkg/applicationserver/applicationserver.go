@@ -308,7 +308,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 					SessionKeyID: joinAccept.SessionKeyID,
 					AppSKey:      &appSKey,
 				},
-				StartedAt: time.Now(),
+				StartedAt: time.Now(), // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 			}
 			if len(joinAccept.InvalidatedDownlinks) > 0 {
 				// The Network Server reset the downlink queue as the new security session invalidated it. The invalidated
