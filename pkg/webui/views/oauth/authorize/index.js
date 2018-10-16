@@ -16,7 +16,6 @@ import React, { PureComponent, Fragment } from 'react'
 import Query from 'query-string'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { Helmet } from 'react-helmet'
 
 import api from '../../../api'
 import sharedMessages from '../../../lib/shared-messages'
@@ -25,6 +24,7 @@ import Modal from '../../../components/modal'
 import Spinner from '../../../components/spinner'
 import Icon from '../../../components/icon'
 import Message from '../../../lib/components/message'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import { getClient } from '../../../actions/client'
 
@@ -86,9 +86,9 @@ export default class Authorize extends PureComponent {
 
     return (
       <Fragment>
-        <Helmet>
-          <title>Authorize</title>
-        </Helmet>
+        <IntlHelmet>
+          <title><Message content={m.authorize} /></title>
+        </IntlHelmet>
         <Modal
           title={m.modalTitle}
           subtitle={{ ...m.modalSubtitle, values: { clientName }}}
