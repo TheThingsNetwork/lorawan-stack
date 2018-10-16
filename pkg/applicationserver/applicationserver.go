@@ -288,7 +288,6 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 					EndDeviceIdentifiers: ids,
 				}
 				created = true
-				mask = append(mask, "ids")
 			}
 			var appSKey ttnpb.KeyEnvelope
 			if joinAccept.AppSKey != nil {
@@ -353,7 +352,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					EndDeviceIdentifiers: ids,
 				}
 				created = true
-				mask = append(mask, "ids")
 			}
 			if dev.Session == nil || dev.Session.SessionKeyID != uplink.SessionKeyID {
 				if dev.Session != nil {
