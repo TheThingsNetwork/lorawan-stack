@@ -22,6 +22,8 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 import CleanWebpackPlugin from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+
 
 import convert from 'koa-connect'
 import history from 'connect-history-api-fallback'
@@ -219,6 +221,8 @@ export default {
           ],
         }),
       }),
+      // Copy static assets to output directory
+      new CopyWebpackPlugin([ `${src}/assets/static` ]),
     ],
     development: [
       new webpack.DllReferencePlugin({
