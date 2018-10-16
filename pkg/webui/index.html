@@ -1,9 +1,30 @@
 <!doctype html>
-<html>
+<% if (!htmlWebpackPlugin.options.devServerBuild) { %>
+<html lang="{{.Env.default_language}}">
+<% } else { %>
+<html lang="en">
+<% } %>
   <head>
     <title>The Things Network</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    <meta name="theme-color" content="#0D83D0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+    <meta name="description" content="The Things Network Console is the official management and configuration tool for The Things Network. It can be used to manage applications, gateways, traffic and much more." />
+
+    <meta property="og:url" content="https://console.thethingsnetwork.org">
+    <meta property="og:site_name" content="The Things Network Console">
+    <meta property="og:title" content="The official configuration platform for The Things Network">
+    <meta property="og:description" content="The Things Network Console is the official management and configuration tool for The Things Network. It can be used to manage applications, gateways, traffic and much more." />
+
+    <meta property="og:image" content="<%= webpackConfig.output.publicPath %>/og-ttn-console.png" />
+    <meta property="og:image:secure_url" content="<%= webpackConfig.output.publicPath %>/og-ttn-console.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
     <link href="https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2" rel="preload" as="font" type="font/woff2" crossorigin>
+    <link rel="shortcut icon" type="image/x-icon" href="<%= webpackConfig.output.publicPath %>/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="<%= webpackConfig.output.publicPath %>/touch-icon.png">
   </head>
   <body>
     <div id="app"></div>
