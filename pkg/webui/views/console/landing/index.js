@@ -16,12 +16,12 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { Container } from 'react-grid-system'
 
+import Breadcrumbs from '../../../components/breadcrumbs'
 import WithAuth from '../../../lib/components/with-auth'
 import Overview from '../overview'
 import Applications from '../applications'
 import Gateways from '../gateways'
 import Organizations from '../organizations'
-import Breadcrumbs from '../../../components/breadcrumbs'
 
 import style from './landing.styl'
 
@@ -31,19 +31,21 @@ export default class Landing extends React.PureComponent {
     const { path } = this.props.match
     return (
       <React.Fragment>
-        <div className={style.breadcrumbs}>
+        <div className={style.breadcrumbsContainer}>
           <Container>
             <Breadcrumbs />
           </Container>
         </div>
-        <Switch>
-          <WithAuth>
-            <Route exact path={`${path}`} component={Overview} />
-            <Route path={`${path}/applications`} component={Applications} />
-            <Route path={`${path}/gateways`} component={Gateways} />
-            <Route path={`${path}/organizations`} component={Organizations} />
-          </WithAuth>
-        </Switch>
+        <Container>
+          <Switch>
+            <WithAuth>
+              <Route exact path={`${path}`} component={Overview} />
+              <Route path={`${path}/applications`} component={Applications} />
+              <Route path={`${path}/gateways`} component={Gateways} />
+              <Route path={`${path}/organizations`} component={Organizations} />
+            </WithAuth>
+          </Switch>
+        </Container>
       </React.Fragment>
       // TODO:  render not found
     )

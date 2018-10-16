@@ -48,11 +48,16 @@ export default class ConsoleApp extends React.Component {
       <div className={style.app}>
         <Header className={style.header} user={user} handleLogout={this.handleLogout} />
         <main className={style.main}>
-          <Switch>
-            {/* routes for registration, privacy policy, other public pages */}
-            <Route path="/console/login" component={Login} />
-            <Route path="/console" component={Landing} />
-          </Switch>
+          <div>
+            {/* side navigation here*/}
+          </div>
+          <div className={style.content}>
+            <Switch>
+              {/* routes for registration, privacy policy, other public pages */}
+              <Route path="/console/login" component={Login} />
+              <Route path="/console" component={Landing} />
+            </Switch>
+          </div>
         </main>
         <Footer className={style.footer} />
       </div>

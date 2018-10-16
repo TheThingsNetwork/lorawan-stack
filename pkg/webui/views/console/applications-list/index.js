@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import Query from 'query-string'
 import { defineMessages } from 'react-intl'
+import { Row, Col } from 'react-grid-system'
 
 import Tabs from '../../../components/tabs'
 import Tabular from '../../../components/table'
