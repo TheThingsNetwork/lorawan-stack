@@ -24,7 +24,7 @@ GO_PROTO_VALIDATOR_FLAGS ?= \
 	--govalidators_out=gogoimport=true:$(PROTOC_OUT)
 
 go.protos: $(wildcard api/*.proto)
-	$(PROTOC) $(GO_PROTOC_FLAGS)  $(GO_PROTO_VALIDATOR_FLAGS) $(PROTO_FILES) 2>&1 | grep -vE ' protoc-gen-gogo: WARNING: failed finding publicly imported dependency for \.ttn\.lorawan\.v3\..* used in' || true
+	$(PROTOC) $(GO_PROTOC_FLAGS)  $(GO_PROTO_VALIDATOR_FLAGS) $(API_PROTO_FILES) 2>&1 | grep -vE ' protoc-gen-gogo: WARNING: failed finding publicly imported dependency for \.ttn\.lorawan\.v3\..* used in' || true
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh api
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' -or -name '*pb.gw.go' | grep -v 'vendor'`
 	goimports -w $(PWD)/pkg/ttnpb

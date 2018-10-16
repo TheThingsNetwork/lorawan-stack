@@ -51,6 +51,23 @@ func (this *User) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("TemporaryPasswordExpiresAt", err)
 		}
 	}
+	if this.ProfilePicture != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ProfilePicture); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ProfilePicture", err)
+		}
+	}
+	return nil
+}
+func (this *Picture) Validate() error {
+	if this.Embedded != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Embedded); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Embedded", err)
+		}
+	}
+	// Validation of proto3 map<> fields is unsupported.
+	return nil
+}
+func (this *Picture_Embedded) Validate() error {
 	return nil
 }
 func (this *Users) Validate() error {

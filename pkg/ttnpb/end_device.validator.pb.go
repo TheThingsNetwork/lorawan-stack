@@ -234,7 +234,7 @@ func (this *ListEndDevicesRequest) Validate() error {
 	}
 	return nil
 }
-func (this *SetDeviceRequest) Validate() error {
+func (this *SetEndDeviceRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Device)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("Device", err)
 	}
