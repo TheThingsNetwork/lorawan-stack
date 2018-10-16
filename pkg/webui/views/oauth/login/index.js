@@ -17,6 +17,7 @@ import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import Query from 'query-string'
 import { defineMessages } from 'react-intl'
+import { Helmet } from 'react-helmet'
 
 import api from '../../../api'
 import sharedMessages from '../../../lib/shared-messages'
@@ -68,6 +69,9 @@ export default class OAuth extends React.PureComponent {
 
     return (
       <div className={style.fullHeightCenter}>
+        <Helmet>
+          <title>Login</title>
+        </Helmet>
         <div>
           <div className={style.left}>
             <div>

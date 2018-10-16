@@ -16,6 +16,7 @@ import React, { PureComponent, Fragment } from 'react'
 import Query from 'query-string'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { Helmet } from 'react-helmet'
 
 import api from '../../../api'
 import sharedMessages from '../../../lib/shared-messages'
@@ -84,31 +85,36 @@ export default class Authorize extends PureComponent {
     }
 
     return (
-      <Modal
-        title={m.modalTitle}
-        subtitle={{ ...m.modalSubtitle, values: { clientName }}}
-        bottomLine={bottomLine}
-        buttonMessage={m.authorize}
-        method="POST"
-        formName="authorize"
-        approval
-        logo
-      >
-        <Fragment>
-          <div className={style.left}>
-            <ul>
-              { client.rights.map(right => (
-                <li key={right}><Icon icon="check" className={style.icon} /><Message content={{ id: `enum:${right}` }} /></li>
-              )
-              )}
-            </ul>
-          </div>
-          <div className={style.right}>
-            <h3>{capitalize(client_id)}</h3>
-            <p>{client.description}</p>
-          </div>
-        </Fragment>
-      </Modal>
+      <Fragment>
+        <Helmet>
+          <title>Authorize</title>
+        </Helmet>
+        <Modal
+          title={m.modalTitle}
+          subtitle={{ ...m.modalSubtitle, values: { clientName }}}
+          bottomLine={bottomLine}
+          buttonMessage={m.authorize}
+          method="POST"
+          formName="authorize"
+          approval
+          logo
+        >
+          <Fragment>
+            <div className={style.left}>
+              <ul>
+                { client.rights.map(right => (
+                  <li key={right}><Icon icon="check" className={style.icon} /><Message content={{ id: `enum:${right}` }} /></li>
+                )
+                )}
+              </ul>
+            </div>
+            <div className={style.right}>
+              <h3>{capitalize(client_id)}</h3>
+              <p>{client.description}</p>
+            </div>
+          </Fragment>
+        </Modal>
+      </Fragment>
     )
   }
 }
