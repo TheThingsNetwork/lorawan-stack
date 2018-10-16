@@ -17,6 +17,7 @@ import React from 'react'
 import { Route, Switch, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
+import { Helmet } from 'react-helmet'
 
 import Header from '../../../components/header'
 import Footer from '../../../components/footer'
@@ -46,6 +47,10 @@ export default class ConsoleApp extends React.Component {
 
     return (
       <div className={style.app}>
+        <Helmet
+          titleTemplate="%s - Console - The Things Network"
+          defaultTitle="The Things Network Console"
+        />
         <Header className={style.header} user={user} handleLogout={this.handleLogout} />
         <main className={style.main}>
           <div>
