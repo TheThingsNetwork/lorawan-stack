@@ -23,6 +23,8 @@ exports[`Table has clickable rows should match snapshot 1`] = `
       </Component>
       <Component>
         <Row
+          clickable={true}
+          id={0}
           key="0"
           onClick={[Function]}
         >
@@ -40,6 +42,8 @@ exports[`Table has clickable rows should match snapshot 1`] = `
           </DataCell>
         </Row>
         <Row
+          clickable={true}
+          id={1}
           key="1"
           onClick={[Function]}
         >
@@ -119,6 +123,7 @@ exports[`Table is paginated should match snapshot 1`] = `
       </Component>
       <Component>
         <Row
+          id={0}
           key="0"
         >
           <DataCell
@@ -135,6 +140,7 @@ exports[`Table is paginated should match snapshot 1`] = `
           </DataCell>
         </Row>
         <Row
+          id={1}
           key="1"
         >
           <DataCell
@@ -190,6 +196,7 @@ exports[`Table is sortable should match snapshot 1`] = `
           >
             <SortButton
               active={false}
+              name="test-column-name"
               onSort={[Function]}
               title="test-column-display"
             />
@@ -205,6 +212,7 @@ exports[`Table is sortable should match snapshot 1`] = `
           >
             <SortButton
               active={false}
+              name="test-column-name3"
               onSort={[Function]}
               title="test-column-display3"
             />
@@ -213,6 +221,7 @@ exports[`Table is sortable should match snapshot 1`] = `
       </Component>
       <Component>
         <Row
+          id={0}
           key="0"
         >
           <DataCell
@@ -235,6 +244,7 @@ exports[`Table is sortable should match snapshot 1`] = `
           </DataCell>
         </Row>
         <Row
+          id={1}
           key="1"
         >
           <DataCell
