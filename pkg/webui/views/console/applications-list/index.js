@@ -13,10 +13,57 @@
 // limitations under the License.
 
 import React from 'react'
+import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
+import { push } from 'connected-react-router'
 import Query from 'query-string'
+import { defineMessages } from 'react-intl'
 
-import { getApplicationsList } from '../../../actions/applications'
+import Tabs from '../../../components/tabs'
+import Tabular from '../../../components/table'
+import Button from '../../../components/button'
+import Input from '../../../components/input'
+import sharedMessages from '../../../lib/shared-messages'
+
+import {
+  getApplicationsList,
+  searchApplicationsList,
+  changeApplicationsPage,
+  changeApplicationsOrder,
+  changeApplicationsTab,
+  changeApplicationsSearch,
+} from '../../../actions/applications'
+
+import style from './applications-list.styl'
+
+const m = defineMessages({
+  all: 'All',
+  appId: 'Application ID',
+  desc: 'Description',
+  empty: 'No items matched your criteria',
+  add: 'Add Application',
+})
+
+const tabs = [
+  {
+    title: m.all,
+    name: 'all',
+    disabled: true,
+  },
+]
+
+const headers = [
+  {
+    name: 'application_id',
+    displayName: m.appId,
+  },
+  {
+    name: 'description',
+    displayName: m.desc,
+  },
+]
+
+const PAGE_SIZE = 3
 
 @connect(({ applications }) => ({
   applications: applications.applications,
@@ -26,24 +73,63 @@ import { getApplicationsList } from '../../../actions/applications'
   error: applications.error,
   filters: applications.filters,
 }))
+@bind
 export default class List extends React.Component {
 
-  componentDidMount () {
-    const {
-      dispatch,
-      location,
-      page,
-      order,
-      orderBy,
-    } = this.props
+  onQueryChange (query) {
+    const { dispatch } = this.props
 
+    dispatch(changeApplicationsSearch(query))
+  }
+
+  onPageChange (page) {
+    const { dispatch } = this.props
+
+    dispatch(changeApplicationsPage(page))
+  }
+
+  onOrderChange (order, orderBy) {
+    const { dispatch } = this.props
+
+    dispatch(changeApplicationsOrder(order, orderBy))
+  }
+
+  onTabChange (tab) {
+    const { dispatch } = this.props
+
+    dispatch(changeApplicationsTab(tab))
+  }
+
+  onApplicationClick (index) {
+    const { applications, dispatch, match } = this.props
+    const appId = applications[index].application_id
+
+    dispatch(push(`${match.url}/${appId}`))
+  }
+
+  onApplicationAdd () {
+    const { dispatch, match } = this.props
+
+    dispatch(push(`${match.url}/add`))
+  }
+
+  componentDidMount () {
+    const { filters, location, dispatch } = this.props
+
+    // process query params first and only after consider using default props
     const queryParams = Query.parse(location.search)
 
-    const urlPage = queryParams.page || page
-    const urlOrder = queryParams.order || order
-    const urlOrderBy = queryParams.orderBy || orderBy
+    const page = Number(queryParams.page) || filters.page
+    const order = queryParams.order || filters.order
+    const orderBy = queryParams.orderBy || filters.orderBy
+    const tab = queryParams.tab || filters.tab
+    const query = queryParams.query || filters.query
 
-    dispatch(getApplicationsList(urlPage, urlOrder, urlOrderBy))
+    if (query) {
+      dispatch(searchApplicationsList(page, order, orderBy, tab, query))
+    } else {
+      dispatch(getApplicationsList(page, order, orderBy, tab))
+    }
   }
 
   render () {
@@ -111,5 +197,4 @@ export default class List extends React.Component {
       </Row>
     )
   }
-
 }

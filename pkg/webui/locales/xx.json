@@ -28,6 +28,7 @@
   "views.console.applications-list.index.all": "Xxx",
   "views.console.applications-list.index.appId": "Xxxxxxxxxxx XX",
   "views.console.applications-list.index.desc": "Xxxxxxxxxxx",
+  "views.console.applications-list.index.empty": "Xxx xxxx xx xxxxxxxxxxxx",
   "views.console.applications-list.index.add": "Xxx Xxxxxxxxxxx",
   "views.console.login.index.welcome": "Xxxxxxx xx {ttnConsole}",
   "views.console.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
