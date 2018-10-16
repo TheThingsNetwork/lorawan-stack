@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
+import { Helmet } from 'react-helmet'
 
 import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
@@ -51,6 +52,9 @@ export default class Login extends React.PureComponent {
 
     return (
       <div className={style.login}>
+        <Helmet>
+          <title>Login</title>
+        </Helmet>
         <Container>
           <Row>
             <Col>
