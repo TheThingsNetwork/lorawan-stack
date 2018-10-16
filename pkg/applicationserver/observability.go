@@ -40,6 +40,8 @@ var (
 	evtReceiveDataDown = events.Define("as.down.data.receive", "receive downlink data message")
 	evtDropDataDown    = events.Define("as.down.data.drop", "drop downlink data message")
 	evtForwardDataDown = events.Define("as.down.data.forward", "forward downlink data message")
+
+	evtCreateDevice = events.Define("as.end_device.create", "create end device")
 )
 
 const (

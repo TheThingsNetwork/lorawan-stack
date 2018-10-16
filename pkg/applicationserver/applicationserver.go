@@ -274,7 +274,8 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		"dev_eui", ids.DevEUI,
 		"session_key_id", joinAccept.SessionKeyID,
 	))
-	_, err := as.deviceRegistry.Set(ctx, ids,
+	created := false
+	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
 			"session_fallback",
@@ -282,10 +283,11 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
 			if dev == nil {
-				logger.Info("Creating new device")
+				logger.Debug("Creating new device")
 				dev = &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 				}
+				created = true
 				mask = append(mask, "ids")
 			}
 			var appSKey ttnpb.KeyEnvelope
@@ -324,6 +326,9 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	if err != nil {
 		return err
 	}
+	if created {
+		events.Publish(evtCreateDevice(ctx, dev.EndDeviceIdentifiers, nil))
+	}
 	joinAccept.AppSKey = nil
 	joinAccept.InvalidatedDownlinks = nil
 	return nil
@@ -332,6 +337,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *link) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	logger := log.FromContext(ctx)
+	created := false
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -342,10 +348,11 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
 			if dev == nil {
-				logger.Info("Creating new device")
+				logger.Debug("Creating new device")
 				dev = &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 				}
+				created = true
 				mask = append(mask, "ids")
 			}
 			if dev.Session == nil || dev.Session.SessionKeyID != uplink.SessionKeyID {
@@ -386,6 +393,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	)
 	if err != nil {
 		return err
+	}
+	if created {
+		events.Publish(evtCreateDevice(ctx, dev.EndDeviceIdentifiers, nil))
 	}
 	if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 		return err
