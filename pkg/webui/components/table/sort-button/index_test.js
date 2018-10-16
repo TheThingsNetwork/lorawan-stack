@@ -28,6 +28,7 @@ describe('SortButton', function () {
       driver.when.created({
         active: false,
         title: 'test-title',
+        name: 'test-name',
         direction: undefined,
         onSort,
       })
@@ -62,6 +63,7 @@ describe('SortButton', function () {
         driver.when.created({
           active: true,
           title: 'test-title',
+          name: 'test-name',
           direction: 'asc',
           onSort,
         })
@@ -95,6 +97,7 @@ describe('SortButton', function () {
         driver.when.created({
           active: true,
           title: 'test-title',
+          name: 'test-name',
           direction: 'desc',
           onSort,
         })
