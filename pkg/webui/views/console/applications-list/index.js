@@ -24,7 +24,9 @@ import Tabs from '../../../components/tabs'
 import Tabular from '../../../components/table'
 import Button from '../../../components/button'
 import Input from '../../../components/input'
+import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import {
   getApplicationsList,
@@ -154,6 +156,9 @@ export default class List extends React.Component {
 
     return (
       <Row>
+        <IntlHelmet>
+          <title><Message content={sharedMessages.applications} /></title>
+        </IntlHelmet>
         <Col sm={12}>
           <div className={style.filters}>
             <div className={style.filterLeft}>
