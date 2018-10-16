@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -45,7 +46,7 @@ message User {
   google.protobuf.Timestamp primary_email_address_validated_at = 9 [(gogoproto.stdtime) = true];
 
   // Only used on create; never returned on API calls.
-  string password = 10;
+  string password = 10 [(validator.field) = {regex: "^.{8,}$"}];
   google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   bool require_password_update = 12;
 
@@ -106,8 +107,8 @@ message CreateTemporaryPasswordRequest {
 
 message UpdateUserPasswordRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string new = 2;
-  string old = 3;
+  string new = 2 [(validator.field) = {regex: "^.{8,}$"}];
+  string old = 3 [(validator.field) = {regex: "^.{8,}$"}];
 }
 
 message CreateUserAPIKeyRequest {
@@ -138,16 +139,16 @@ message Invitations {
 }
 
 message SendInvitationRequest {
-  string email = 1;
+  string email = 1 [(validator.field) = {string_not_empty: true}];
 }
 
 message DeleteInvitationRequest {
-  string email = 1;
+  string email = 1 [(validator.field) = {string_not_empty: true}];
 }
 
 message UserSessionIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string session_id = 2 [(gogoproto.customname) = "SessionID"];
+  string session_id = 2 [(gogoproto.customname) = "SessionID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
 }
 
 message UserSession {
@@ -166,9 +167,9 @@ message ListUserSessionsRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 2;
+  string order = 2 [(validator.field) = {string_not_empty: true}];
   // Limit the number of results per page.
-  uint32 limit = 3;
+  uint32 limit = 3 [(validator.field) = {string_not_empty: true}];
   // Page number for pagination. 0 is interpreted as 1.
-  uint32 page = 4;
+  uint32 page = 4 [(validator.field) = {string_not_empty: true}];
 }

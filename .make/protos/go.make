@@ -20,7 +20,7 @@ GO_PROTOC_FLAGS ?= \
 	--gogottn_out=plugins=grpc,$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT) \
 	--grpc-gateway_out=$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT)
 GO_PROTO_VALIDATOR_FLAGS ?= \
-	-I=$(PWD):$(PROTOC_GO_PATH)/src \
+	-I=$(PWD):$(PWD)/vendor \
 	--govalidators_out=gogoimport=true:$(PROTOC_OUT)
 
 go.protos: $(wildcard api/*.proto)

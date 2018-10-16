@@ -599,6 +599,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:5b03ac9ee9fbb8146951b90f0fb0021abeec183a2c0df5e619b76c663017e4e6"
+  name = "github.com/mwitkow/go-proto-validators"
+  packages = ["."]
+  pruneopts = ""
+  revision = "0950a79900071e9f3f5979b78078c599376422fd"
+
+[[projects]]
+  branch = "master"
   digest = "1:3adc46876d4d0e4d5bbcfcc44c2116b95d7a5c966e2ee92a219488547fd453f2"
   name = "github.com/nightlyone/lockfile"
   packages = ["."]
@@ -1129,8 +1137,11 @@
     "github.com/gogo/protobuf/types",
     "github.com/golang/dep",
     "github.com/golang/protobuf/proto",
+    "github.com/golang/protobuf/ptypes/any",
+    "github.com/golang/protobuf/ptypes/duration",
     "github.com/golang/protobuf/ptypes/empty",
     "github.com/golang/protobuf/ptypes/struct",
+    "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/google/go-cloud/blob",
     "github.com/google/go-cloud/blob/fileblob",
     "github.com/google/go-cloud/blob/gcsblob",
@@ -1159,6 +1170,7 @@
     "github.com/mattn/go-isatty",
     "github.com/mitchellh/mapstructure",
     "github.com/mohae/deepcopy",
+    "github.com/mwitkow/go-proto-validators",
     "github.com/oklog/ulid",
     "github.com/pkg/errors",
     "github.com/prometheus/client_golang/prometheus",

@@ -3,11 +3,13 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
+import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 
@@ -21,6 +23,9 @@ func (this *KeyEnvelope) Validate() error {
 	return nil
 }
 func (this *RootKeys) Validate() error {
+	if this.RootKeyID == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("RootKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.RootKeyID))
+	}
 	if this.AppKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AppKey); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("AppKey", err)
@@ -33,7 +38,16 @@ func (this *RootKeys) Validate() error {
 	}
 	return nil
 }
+
+var _regex_SessionKeys_SessionKeyID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *SessionKeys) Validate() error {
+	if !_regex_SessionKeys_SessionKeyID.MatchString(this.SessionKeyID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionKeyID))
+	}
+	if this.SessionKeyID == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.SessionKeyID))
+	}
 	if this.FNwkSIntKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.FNwkSIntKey); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("FNwkSIntKey", err)

@@ -3,13 +3,15 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/empty"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/protobuf/field_mask"
 
 import time "time"
@@ -19,6 +21,8 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
+
+var _regex_User_Password = regexp.MustCompile(`^.{8,}$`)
 
 func (this *User) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
@@ -37,6 +41,14 @@ func (this *User) Validate() error {
 				return github_com_mwitkow_go_proto_validators.FieldError("ContactInfo", err)
 			}
 		}
+	}
+	if this.PrimaryEmailAddressValidatedAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.PrimaryEmailAddressValidatedAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("PrimaryEmailAddressValidatedAt", err)
+		}
+	}
+	if !_regex_User_Password.MatchString(this.Password) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Password", fmt.Errorf(`value '%v' must be a string conforming to regex "^.{8,}$"`, this.Password))
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.PasswordUpdatedAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("PasswordUpdatedAt", err)
@@ -110,9 +122,19 @@ func (this *CreateTemporaryPasswordRequest) Validate() error {
 	}
 	return nil
 }
+
+var _regex_UpdateUserPasswordRequest_New = regexp.MustCompile(`^.{8,}$`)
+var _regex_UpdateUserPasswordRequest_Old = regexp.MustCompile(`^.{8,}$`)
+
 func (this *UpdateUserPasswordRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
+	}
+	if !_regex_UpdateUserPasswordRequest_New.MatchString(this.New) {
+		return github_com_mwitkow_go_proto_validators.FieldError("New", fmt.Errorf(`value '%v' must be a string conforming to regex "^.{8,}$"`, this.New))
+	}
+	if !_regex_UpdateUserPasswordRequest_Old.MatchString(this.Old) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Old", fmt.Errorf(`value '%v' must be a string conforming to regex "^.{8,}$"`, this.Old))
 	}
 	return nil
 }
@@ -141,6 +163,16 @@ func (this *Invitation) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UpdatedAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UpdatedAt", err)
 	}
+	if this.AcceptedAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AcceptedAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("AcceptedAt", err)
+		}
+	}
+	if this.AcceptedBy != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AcceptedBy); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("AcceptedBy", err)
+		}
+	}
 	return nil
 }
 func (this *Invitations) Validate() error {
@@ -154,8 +186,62 @@ func (this *Invitations) Validate() error {
 	return nil
 }
 func (this *SendInvitationRequest) Validate() error {
+	if this.Email == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Email", fmt.Errorf(`value '%v' must not be an empty string`, this.Email))
+	}
 	return nil
 }
 func (this *DeleteInvitationRequest) Validate() error {
+	if this.Email == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Email", fmt.Errorf(`value '%v' must not be an empty string`, this.Email))
+	}
+	return nil
+}
+
+var _regex_UserSessionIdentifiers_SessionID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
+func (this *UserSessionIdentifiers) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
+	}
+	if !_regex_UserSessionIdentifiers_SessionID.MatchString(this.SessionID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionID))
+	}
+	return nil
+}
+func (this *UserSession) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserSessionIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserSessionIdentifiers", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CreatedAt)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UpdatedAt)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UpdatedAt", err)
+	}
+	if this.ExpiresAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ExpiresAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ExpiresAt", err)
+		}
+	}
+	return nil
+}
+func (this *UserSessions) Validate() error {
+	for _, item := range this.Sessions {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Sessions", err)
+			}
+		}
+	}
+	return nil
+}
+func (this *ListUserSessionsRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
+	}
+	if this.Order == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
+	}
 	return nil
 }

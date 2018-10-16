@@ -3,13 +3,15 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/empty"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
 import time "time"
@@ -28,6 +30,34 @@ func (this *ContactInfo) Validate() error {
 	}
 	return nil
 }
+
+var _regex_ContactInfoValidation_ID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *ContactInfoValidation) Validate() error {
+	if !_regex_ContactInfoValidation_ID.MatchString(this.ID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.ID))
+	}
+	if this.Entity != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Entity); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Entity", err)
+		}
+	}
+	for _, item := range this.ContactInfo {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("ContactInfo", err)
+			}
+		}
+	}
+	if this.CreatedAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.CreatedAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)
+		}
+	}
+	if this.ExpiresAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ExpiresAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ExpiresAt", err)
+		}
+	}
 	return nil
 }

@@ -3,9 +3,10 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-import fmt "fmt"
+import regexp "regexp"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/mwitkow/go-proto-validators"
@@ -22,21 +23,12 @@ func (this *Rights) Validate() error {
 	return nil
 }
 func (this *APIKey) Validate() error {
-	if this.ID == "" {
-		return github_com_mwitkow_go_proto_validators.FieldError("ID", fmt.Errorf(`value '%v' must not be an empty string`, this.ID))
-	}
-	if this.Key == "" {
-		return github_com_mwitkow_go_proto_validators.FieldError("Key", fmt.Errorf(`value '%v' must not be an empty string`, this.Key))
-	}
-	if len(this.Rights) < 1 {
-		return github_com_mwitkow_go_proto_validators.FieldError("Rights", fmt.Errorf(`value '%v' must contain at least 1 elements`, this.Rights))
-	}
 	return nil
 }
+
+var _regex_APIKeys_APIKeys = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *APIKeys) Validate() error {
-	if len(this.APIKeys) < 1 {
-		return github_com_mwitkow_go_proto_validators.FieldError("APIKeys", fmt.Errorf(`value '%v' must contain at least 1 elements`, this.APIKeys))
-	}
 	for _, item := range this.APIKeys {
 		if item != nil {
 			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
@@ -50,15 +42,9 @@ func (this *Collaborator) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.OrganizationOrUserIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("OrganizationOrUserIdentifiers", err)
 	}
-	if len(this.Rights) < 1 {
-		return github_com_mwitkow_go_proto_validators.FieldError("Rights", fmt.Errorf(`value '%v' must contain at least 1 elements`, this.Rights))
-	}
 	return nil
 }
 func (this *Collaborators) Validate() error {
-	if len(this.Collaborators) < 1 {
-		return github_com_mwitkow_go_proto_validators.FieldError("Collaborators", fmt.Errorf(`value '%v' must contain at least 1 elements`, this.Collaborators))
-	}
 	for _, item := range this.Collaborators {
 		if item != nil {
 			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {

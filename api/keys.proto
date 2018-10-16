@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 
 package ttn.lorawan.v3;
 
@@ -31,7 +32,7 @@ message KeyEnvelope {
 // These are stored on the Join Server.
 message RootKeys {
   // Join Server issued identifier for the root keys.
-  string root_key_id = 1 [(gogoproto.customname) = "RootKeyID"];
+  string root_key_id = 1 [(gogoproto.customname) = "RootKeyID", (validator.field) = {string_not_empty: true}];
   // The (encrypted) Application Key.
   KeyEnvelope app_key = 2;
   // The (encrypted) Network Key.
@@ -45,7 +46,7 @@ message SessionKeys {
 
   // Join Server issued identifier for the session keys.
   // This ID can be used to request the keys from the Join Server in case the are lost.
-  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {string_not_empty: true, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
   // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
   // This key is stored by the (forwarding) Network Server.
   KeyEnvelope f_nwk_s_int_key = 2;

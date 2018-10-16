@@ -25,19 +25,19 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message ApplicationIdentifiers {
   option (gogoproto.populate) = false;
 
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID", (validator.field) = {msg_exists: false, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 }
 
 message ClientIdentifiers {
   option (gogoproto.populate) = false;
 
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
+  string client_id = 1 [(gogoproto.customname) = "ClientID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 }
 
 message EndDeviceIdentifiers {
   option (gogoproto.populate) = false;
 
-  string device_id = 1 [(gogoproto.customname) = "DeviceID"];
+  string device_id = 1 [(gogoproto.customname) = "DeviceID", (validator.field) = {msg_exists: false, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // The LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI", (validator.field) = {length_eq: 8}];
@@ -50,24 +50,24 @@ message EndDeviceIdentifiers {
 message GatewayIdentifiers {
   option (gogoproto.populate) = false;
 
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 
   // Secondary identifier, which can only be used in specific requests.
-  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
+  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI", (validator.field) = {length_eq: 8}];
 }
 
 message OrganizationIdentifiers {
   option (gogoproto.populate) = false;
 
   // This ID shares namespace with user IDs.
-  string organization_id = 1 [(gogoproto.customname) = "OrganizationID"];
+  string organization_id = 1 [(gogoproto.customname) = "OrganizationID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 }
 
 message UserIdentifiers {
   option (gogoproto.populate) = false;
 
   // This ID shares namespace with organization IDs.
-  string user_id = 1 [(gogoproto.customname) = "UserID"];
+  string user_id = 1 [(gogoproto.customname) = "UserID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 
   // Secondary identifier, which can only be used in specific requests.
   string email = 2;

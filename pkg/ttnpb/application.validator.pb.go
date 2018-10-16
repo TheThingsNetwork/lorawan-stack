@@ -3,12 +3,13 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
 
@@ -67,6 +68,9 @@ func (this *ListApplicationsRequest) Validate() error {
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FieldMask)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FieldMask", err)
+	}
+	if this.Order == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
 	}
 	return nil
 }

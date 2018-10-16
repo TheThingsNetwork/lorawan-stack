@@ -3,13 +3,15 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/duration"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
 
@@ -49,7 +51,17 @@ func (this *EndDeviceBrand) Validate() error {
 func (this *EndDeviceModel) Validate() error {
 	return nil
 }
+
+var _regex_EndDeviceVersionIdentifiers_BrandID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+var _regex_EndDeviceVersionIdentifiers_ModelID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *EndDeviceVersionIdentifiers) Validate() error {
+	if !_regex_EndDeviceVersionIdentifiers_BrandID.MatchString(this.BrandID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("BrandID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.BrandID))
+	}
+	if !_regex_EndDeviceVersionIdentifiers_ModelID.MatchString(this.ModelID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ModelID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.ModelID))
+	}
 	return nil
 }
 func (this *EndDeviceVersion) Validate() error {
@@ -153,9 +165,9 @@ func (this *EndDevice) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("Session", err)
 		}
 	}
-	if this.SessionFallback != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.SessionFallback); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("SessionFallback", err)
+	if this.PendingSession != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.PendingSession); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("PendingSession", err)
 		}
 	}
 	if this.LastDevStatusReceivedAt != nil {
@@ -231,6 +243,9 @@ func (this *ListEndDevicesRequest) Validate() error {
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FieldMask)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FieldMask", err)
+	}
+	if this.Order == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
 	}
 	return nil
 }

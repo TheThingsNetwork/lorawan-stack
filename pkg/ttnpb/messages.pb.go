@@ -9,6 +9,7 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
+import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 

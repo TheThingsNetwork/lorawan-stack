@@ -38,8 +38,8 @@ func (this *Event) Validate() error {
 	return nil
 }
 func (this *StreamEventsRequest) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CombinedIdentifiers)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("CombinedIdentifiers", err)
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Identifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("Identifiers", err)
 	}
 	if this.After != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.After); err != nil {

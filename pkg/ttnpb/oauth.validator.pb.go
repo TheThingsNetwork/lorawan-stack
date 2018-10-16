@@ -3,12 +3,14 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 
@@ -18,12 +20,21 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-func (this *OAuthClientAuthorization) Validate() error {
+func (this *OAuthClientAuthorizationIdentifiers) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIDs", err)
+	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
 	}
+	return nil
+}
+func (this *OAuthClientAuthorization) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIDs)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UserIDs", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CreatedAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)
@@ -33,12 +44,31 @@ func (this *OAuthClientAuthorization) Validate() error {
 	}
 	return nil
 }
-func (this *OAuthAuthorizationCode) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
+func (this *OAuthClientAuthorizations) Validate() error {
+	for _, item := range this.Authorizations {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Authorizations", err)
+			}
+		}
 	}
+	return nil
+}
+func (this *ListOAuthClientAuthorizationsRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
+	}
+	if this.Order == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
+	}
+	return nil
+}
+func (this *OAuthAuthorizationCode) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIDs)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UserIDs", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CreatedAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)
@@ -48,18 +78,55 @@ func (this *OAuthAuthorizationCode) Validate() error {
 	}
 	return nil
 }
-func (this *OAuthAccessToken) Validate() error {
+
+var _regex_OAuthAccessTokenIdentifiers_ID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
+func (this *OAuthAccessTokenIdentifiers) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIDs", err)
+	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
 	}
+	if !_regex_OAuthAccessTokenIdentifiers_ID.MatchString(this.ID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.ID))
+	}
+	return nil
+}
+func (this *OAuthAccessToken) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIDs)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UserIDs", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CreatedAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ExpiresAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ExpiresAt", err)
+	}
+	return nil
+}
+func (this *OAuthAccessTokens) Validate() error {
+	for _, item := range this.Tokens {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Tokens", err)
+			}
+		}
+	}
+	return nil
+}
+func (this *ListOAuthAccessTokensRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIDs", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClientIDs)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("ClientIDs", err)
+	}
+	if this.Order == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
 	}
 	return nil
 }

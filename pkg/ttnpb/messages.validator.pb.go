@@ -3,13 +3,15 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/struct"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 
@@ -67,7 +69,16 @@ func (this *DownlinkMessage) Validate() error {
 func (this *TxAcknowledgment) Validate() error {
 	return nil
 }
+
+var _regex_ApplicationUplink_SessionKeyID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *ApplicationUplink) Validate() error {
+	if !_regex_ApplicationUplink_SessionKeyID.MatchString(this.SessionKeyID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionKeyID))
+	}
+	if this.SessionKeyID == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.SessionKeyID))
+	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("DecodedPayload", err)
@@ -89,7 +100,16 @@ func (this *ApplicationLocation) Validate() error {
 	// Validation of proto3 map<> fields is unsupported.
 	return nil
 }
+
+var _regex_ApplicationJoinAccept_SessionKeyID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *ApplicationJoinAccept) Validate() error {
+	if !_regex_ApplicationJoinAccept_SessionKeyID.MatchString(this.SessionKeyID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionKeyID))
+	}
+	if this.SessionKeyID == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.SessionKeyID))
+	}
 	if this.AppSKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AppSKey); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("AppSKey", err)
@@ -104,11 +124,46 @@ func (this *ApplicationJoinAccept) Validate() error {
 	}
 	return nil
 }
+
+var _regex_ApplicationDownlink_SessionKeyID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *ApplicationDownlink) Validate() error {
+	if !_regex_ApplicationDownlink_SessionKeyID.MatchString(this.SessionKeyID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionKeyID))
+	}
+	if this.SessionKeyID == "" {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.SessionKeyID))
+	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("DecodedPayload", err)
 		}
+	}
+	if this.ClassBC != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ClassBC); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ClassBC", err)
+		}
+	}
+	return nil
+}
+func (this *ApplicationDownlink_ClassBC) Validate() error {
+	for _, item := range this.Gateways {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Gateways", err)
+			}
+		}
+	}
+	if this.Time != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Time); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Time", err)
+		}
+	}
+	return nil
+}
+func (this *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("GatewayIdentifiers", err)
 	}
 	return nil
 }
@@ -119,6 +174,15 @@ func (this *ApplicationDownlinks) Validate() error {
 				return github_com_mwitkow_go_proto_validators.FieldError("Downlinks", err)
 			}
 		}
+	}
+	return nil
+}
+func (this *ApplicationDownlinkFailed) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ApplicationDownlink)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationDownlink", err)
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Error)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("Error", err)
 	}
 	return nil
 }
@@ -168,6 +232,13 @@ func (this *ApplicationUp) Validate() error {
 		if oneOfNester.DownlinkSent != nil {
 			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.DownlinkSent); err != nil {
 				return github_com_mwitkow_go_proto_validators.FieldError("DownlinkSent", err)
+			}
+		}
+	}
+	if oneOfNester, ok := this.GetUp().(*ApplicationUp_DownlinkFailed); ok {
+		if oneOfNester.DownlinkFailed != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.DownlinkFailed); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("DownlinkFailed", err)
 			}
 		}
 	}
