@@ -18,10 +18,11 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
-import { Helmet } from 'react-helmet'
 
 import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
+import IntlHelmet from '../../../lib/components/intl-helmet'
+import sharedMessages from '../../../lib/shared-messages'
 
 import style from './login.styl'
 
@@ -52,9 +53,9 @@ export default class Login extends React.PureComponent {
 
     return (
       <div className={style.login}>
-        <Helmet>
-          <title>Login</title>
-        </Helmet>
+        <IntlHelmet>
+          <title><Message content={sharedMessages.login} /></title>
+        </IntlHelmet>
         <Container>
           <Row>
             <Col>
