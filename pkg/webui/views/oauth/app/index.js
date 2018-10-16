@@ -17,6 +17,7 @@ import { Switch, Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
+import { Helmet } from 'react-helmet'
 
 import WithLocale from '../../../lib/components/with-locale'
 import { EnvProvider } from '../../../lib/components/env'
@@ -37,6 +38,10 @@ export default class OAuthApp extends React.PureComponent {
       <EnvProvider env={env}>
         <Provider store={store}>
           <Init>
+            <Helmet
+              titleTemplate="%s - Account - The Things Network"
+              defaultTitle="The Things Network Account"
+            />
             <WithLocale>
               <ConnectedRouter history={history}>
                 <Switch>
