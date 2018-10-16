@@ -234,7 +234,8 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 
 var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
-func (as *ApplicationServer) getAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID string) (ttnpb.KeyEnvelope, error) {
+func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID string) (ttnpb.KeyEnvelope, error) {
+	// TODO: Lookup Join Server (https://github.com/TheThingsIndustries/lorawan-stack/issues/244)
 	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
 	if js == nil {
 		return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
@@ -265,7 +266,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	}
 }
 
-var errGetAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
+var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 
 func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *link) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -292,13 +293,13 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				logger.Debug("Received AppSKey from Network Server")
 				appSKey = *joinAccept.AppSKey
 			} else {
-				logger.Debug("Getting AppSKey from Join Server...")
-				key, err := as.getAppSKey(ctx, ids, joinAccept.SessionKeyID)
+				logger.Debug("Fetching AppSKey from Join Server...")
+				key, err := as.fetchAppSKey(ctx, ids, joinAccept.SessionKeyID)
 				if err != nil {
-					return nil, nil, errGetAppSKey.WithCause(err)
+					return nil, nil, errFetchAppSKey.WithCause(err)
 				}
 				appSKey = key
-				logger.Debug("Received AppSKey from Join Server")
+				logger.Debug("Fetched AppSKey from Join Server")
 			}
 			dev.SessionFallback = dev.Session
 			dev.Session = &ttnpb.Session{
@@ -351,9 +352,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 				if dev.Session != nil {
 					logger.Warn("Session mismatch; restoring session...")
 				}
-				appSKey, err := as.getAppSKey(ctx, ids, uplink.SessionKeyID)
+				appSKey, err := as.fetchAppSKey(ctx, ids, uplink.SessionKeyID)
 				if err != nil {
-					return nil, nil, errGetAppSKey.WithCause(err)
+					return nil, nil, errFetchAppSKey.WithCause(err)
 				}
 				dev.SessionFallback = dev.Session
 				dev.Session = &ttnpb.Session{
