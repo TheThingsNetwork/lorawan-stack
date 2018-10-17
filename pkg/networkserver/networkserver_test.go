@@ -1475,9 +1475,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					select {
 					case req := <-asSendCh:
 						if tc.UplinkMessage.Payload.GetMACPayload().Ack {
-							a.So(req.up.GetDownlinkAck(), should.Resemble, pb.MACState.PendingApplicationDownlink)
+							a.So(pretty.Diff(req.up.GetDownlinkAck(), pb.MACState.PendingApplicationDownlink), should.BeEmpty)
 						} else {
-							a.So(req.up.GetDownlinkNack(), should.Resemble, pb.MACState.PendingApplicationDownlink)
+							a.So(pretty.Diff(req.up.GetDownlinkNack(), pb.MACState.PendingApplicationDownlink), should.BeEmpty)
 						}
 						close(req.errch)
 
@@ -1491,9 +1491,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				var asUpReq asSendReq
 				select {
 				case asUpReq = <-asSendCh:
-					if !a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata) {
-						metadataLdiff(t, asUpReq.up.GetUplinkMessage().RxMetadata, md)
-					}
+					a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata)
 					a.So(asUpReq.up.CorrelationIDs, should.NotBeEmpty)
 
 					a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
@@ -1558,9 +1556,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					a.So(retUp.CorrelationIDs, should.NotBeEmpty)
 					pbUp.CorrelationIDs = retUp.CorrelationIDs
 
-					if !a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata) {
-						metadataLdiff(t, retUp.RxMetadata, pbUp.RxMetadata)
-					}
+					a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata)
 					pbUp.RxMetadata = retUp.RxMetadata
 
 					a.So(pretty.Diff(ret, pb), should.BeEmpty)
@@ -1585,9 +1581,7 @@ func HandleUplinkTest() func(t *testing.T) {
 
 						select {
 						case we := <-deduplicationDoneCh:
-							if !a.So(we.msg.RxMetadata, should.HaveSameElementsDeep, md) {
-								metadataLdiff(t, md, we.msg.RxMetadata)
-							}
+							a.So(we.msg.RxMetadata, should.HaveSameElementsDiff, md)
 
 							close(deduplicationDoneCh)
 
@@ -1667,9 +1661,7 @@ func HandleUplinkTest() func(t *testing.T) {
 
 					select {
 					case asUpReq = <-asSendCh:
-						if !a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata) {
-							metadataLdiff(t, asUpReq.up.GetUplinkMessage().RxMetadata, md)
-						}
+						a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata)
 						a.So(asUpReq.up.CorrelationIDs, should.NotBeEmpty)
 
 						a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
@@ -1717,9 +1709,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						case we := <-deduplicationDoneCh:
 							close(deduplicationDoneCh)
 
-							if !a.So(we.msg.RxMetadata, should.HaveSameElementsDeep, md) {
-								metadataLdiff(t, md, we.msg.RxMetadata)
-							}
+							a.So(we.msg.RxMetadata, should.HaveSameElementsDiff, md)
 
 							msg := CopyUplinkMessage(tc.UplinkMessage)
 
@@ -2212,9 +2202,7 @@ func HandleJoinTest() func(t *testing.T) {
 					a.So(retUp.CorrelationIDs, should.NotBeEmpty)
 					pbUp.CorrelationIDs = retUp.CorrelationIDs
 
-					if !a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata) {
-						metadataLdiff(t, retUp.RxMetadata, pbUp.RxMetadata)
-					}
+					a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata)
 					pbUp.RxMetadata = retUp.RxMetadata
 
 					a.So(pretty.Diff(ret, pb), should.BeEmpty)
