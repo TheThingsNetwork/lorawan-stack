@@ -298,13 +298,12 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		}
 	}
 
-	// NOTE: up may be nil
-
-	if up.GetPayload().GetMType() != ttnpb.MType_CONFIRMED_UP &&
-		!up.GetPayload().GetMACPayload().GetADRAckReq() &&
-		len(dev.MACState.PendingRequests) == 0 &&
+	if len(dev.MACState.PendingRequests) == 0 &&
 		len(dev.MACState.QueuedResponses) == 0 &&
-		len(dev.QueuedApplicationDownlinks) == 0 {
+		len(dev.QueuedApplicationDownlinks) == 0 &&
+		!(up.GetPayload() != nil &&
+			(up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP ||
+				up.Payload.MHDR.MType == ttnpb.MType_UNCONFIRMED_UP && up.Payload.GetMACPayload().FCtrl.ADRAckReq)) {
 		return nil, errNoDownlink
 	}
 
@@ -312,7 +311,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		FHDR: ttnpb.FHDR{
 			DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
 			FCtrl: ttnpb.FCtrl{
-				Ack: up.GetPayload().GetMType() == ttnpb.MType_CONFIRMED_UP,
+				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
 			},
 			FCnt: dev.Session.LastNFCntDown + 1,
 		},
@@ -929,15 +928,14 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			return nil, errOutdatedData
 		}
 		stored.Session = dev.Session
+		if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			// LoRaWAN1.1+ device will send a RekeyInd.
+			stored.PendingSession = nil
+		}
 
 		stored.RecentUplinks = append(stored.RecentUplinks, up)
 		if len(stored.RecentUplinks) >= recentUplinkCount {
 			stored.RecentUplinks = stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount+1:]
-		}
-
-		if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			// LoRaWAN1.1+ device will send a RekeyInd.
-			stored.PendingSession = nil
 		}
 
 		if stored.MACState != nil {
