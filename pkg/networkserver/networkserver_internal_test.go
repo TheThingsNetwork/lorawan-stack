@@ -260,10 +260,8 @@ func TestScheduleDownlink(t *testing.T) {
 		Name              string
 		Context           context.Context
 		Device            *ttnpb.EndDevice
-		Uplink            *ttnpb.UplinkMessage
 		Accumulator       *metadataAccumulator
 		Bytes             []byte
-		IsJoinAccept      bool
 		DeduplicationDone WindowEndFunc
 		NsGsClient        NsGsClientFunc
 		Error             error
@@ -287,14 +285,20 @@ func TestScheduleDownlink(t *testing.T) {
 					},
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
-					DataRateIndex:      ttnpb.DATA_RATE_0,
-					CodingRate:         "4/5",
-					InvertPolarization: false,
-					ChannelIndex:       3,
-				},
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+					},
+					Settings: ttnpb.TxSettings{
+						DataRateIndex:      ttnpb.DATA_RATE_0,
+						CodingRate:         "4/5",
+						InvertPolarization: false,
+						ChannelIndex:       3,
+					},
+				}},
 			},
 			Accumulator: newMetadataAccumulator(
 				&ttnpb.RxMetadata{
@@ -313,8 +317,7 @@ func TestScheduleDownlink(t *testing.T) {
 					SNR:                -1,
 				},
 			),
-			Bytes:        testBytes,
-			IsJoinAccept: false,
+			Bytes: testBytes,
 			DeduplicationDone: func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ctx, should.HaveParentContext, testCtx)
@@ -401,14 +404,20 @@ func TestScheduleDownlink(t *testing.T) {
 					},
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-			},
-			Uplink: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
-					DataRateIndex:      ttnpb.DATA_RATE_0,
-					CodingRate:         "4/5",
-					InvertPolarization: false,
-					ChannelIndex:       3,
-				},
+				RecentUplinks: []*ttnpb.UplinkMessage{{
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+					},
+					Settings: ttnpb.TxSettings{
+						DataRateIndex:      ttnpb.DATA_RATE_0,
+						CodingRate:         "4/5",
+						InvertPolarization: false,
+						ChannelIndex:       3,
+					},
+				}},
 			},
 			Accumulator: newMetadataAccumulator(
 				&ttnpb.RxMetadata{
@@ -427,8 +436,7 @@ func TestScheduleDownlink(t *testing.T) {
 					SNR:                -1,
 				},
 			),
-			Bytes:        testBytes,
-			IsJoinAccept: false,
+			Bytes: testBytes,
 			DeduplicationDone: func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ctx, should.HaveParentContext, testCtx)
@@ -560,10 +568,9 @@ func TestScheduleDownlink(t *testing.T) {
 			ctx = context.WithValue(ctx, nsKey{}, ns)
 
 			dev := CopyEndDevice(tc.Device)
-			up := CopyUplinkMessage(tc.Uplink)
 			b := deepcopy.Copy(tc.Bytes).([]byte)
 
-			_, err := ns.scheduleDownlink(ctx, dev, up, tc.Accumulator, b, tc.IsJoinAccept)
+			_, err := ns.scheduleDownlink(ctx, dev, tc.Accumulator, b)
 			if tc.Error == nil && !a.So(err, should.BeNil) ||
 				tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) {
 				t.FailNow()
@@ -575,7 +582,6 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 
 			a.So(dev, should.Resemble, expected)
-			a.So(up, should.Resemble, tc.Uplink)
 			a.So(b, should.Resemble, tc.Bytes)
 		})
 	}

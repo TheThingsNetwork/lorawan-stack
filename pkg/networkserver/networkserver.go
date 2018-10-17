@@ -1043,7 +1043,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		// TODO: Decouple Class A downlink from uplink. (https://github.com/TheThingsIndustries/lorawan-stack/issues/905)
 		var schedErr bool
 		_, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			_, err := ns.scheduleDownlink(ctx, stored, up, acc, nil, false)
+			_, err := ns.scheduleDownlink(ctx, stored, acc, nil)
 			if err != nil {
 				schedErr = true
 				return nil, err
@@ -1202,7 +1202,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 
 		var schedErr bool
 		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			_, err := ns.scheduleDownlink(ctx, stored, up, nil, resp.RawPayload, true)
+			_, err := ns.scheduleDownlink(ctx, stored, nil, resp.RawPayload)
 			if err != nil {
 				schedErr = true
 				return nil, err
@@ -1273,7 +1273,7 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessa
 // up represents the uplink message, which triggered the downlink(if such exists).
 // acc represents the metadata accumulator used to deduplicate up.
 // scheduleDownlink returns the downlink scheduled and error if any.
-func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) ([]string, error) {
+func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, acc *metadataAccumulator, b []byte) ([]string, error) {
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
 	}
@@ -1281,10 +1281,6 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 	))
-
-	down := &ttnpb.DownlinkMessage{
-		EndDeviceIDs: &dev.EndDeviceIdentifiers,
-	}
 
 	type tx struct {
 		ttnpb.TxSettings
@@ -1302,43 +1298,49 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		return nil, errUnknownBand.WithCause(err)
 	}
 
-	var mds []*ttnpb.RxMetadata
-	if up == nil {
-		// Class C
-		if len(dev.RecentUplinks) == 0 {
-			return nil, errUplinkNotFound
-		}
-		mds = dev.RecentUplinks[len(dev.RecentUplinks)-1].RxMetadata
-	} else {
-		drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
-		if err != nil {
-			return nil, err
-		}
+	if len(dev.RecentUplinks) == 0 {
+		return nil, errUplinkNotFound
+	}
+	up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 
-		chIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
-		if err != nil {
-			return nil, err
-		}
-		if uint(chIdx) >= uint(len(dev.MACState.CurrentParameters.Channels)) {
-			return nil, errChannelIndexTooHigh
-		}
+	if b == nil && up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST || up.Payload.MHDR.MType == ttnpb.MType_REJOIN_REQUEST {
+		return nil, errNoPayload
+	}
 
-		ch := dev.MACState.CurrentParameters.Channels[int(chIdx)]
-		if ch == nil || ch.DownlinkFrequency == 0 {
-			return nil, errUnknownChannel
+	var upADR bool
+	for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
+		switch up := dev.RecentUplinks[i]; up.Payload.MHDR.MType {
+		case ttnpb.MType_JOIN_REQUEST:
+			break
+		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
+			upADR = up.Payload.GetMACPayload().FHDR.FCtrl.ADR
+			break
 		}
+	}
 
+	drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
+	if err != nil {
+		return nil, err
+	}
+
+	chIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
+	if err != nil {
+		return nil, err
+	}
+	if uint(chIdx) < uint(len(dev.MACState.CurrentParameters.Channels)) &&
+		dev.MACState.CurrentParameters.Channels[int(chIdx)] != nil &&
+		dev.MACState.CurrentParameters.Channels[int(chIdx)].DownlinkFrequency != 0 {
 		rx1 := tx{
 			TxSettings: ttnpb.TxSettings{
 				DataRateIndex:      drIdx,
 				CodingRate:         "4/5",
 				InvertPolarization: true,
 				ChannelIndex:       chIdx,
-				Frequency:          ch.DownlinkFrequency,
+				Frequency:          dev.MACState.CurrentParameters.Channels[int(chIdx)].DownlinkFrequency,
 				TxPower:            int32(band.DefaultMaxEIRP),
 			},
 		}
-		if isJoinAccept {
+		if up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST {
 			rx1.Delay = band.JoinAcceptDelay1
 		} else {
 			rx1.Delay = time.Second * time.Duration(dev.MACState.CurrentParameters.Rx1Delay)
@@ -1347,11 +1349,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
 			return nil, err
 		}
-
-		mds = up.RxMetadata
 		slots = append(slots, rx1)
-
-		down.CorrelationIDs = up.CorrelationIDs
 	}
 
 	if uint(dev.MACState.CurrentParameters.Rx2DataRateIndex) > uint(len(band.DataRates)) {
@@ -1367,7 +1365,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 			TxPower:            int32(band.DefaultMaxEIRP),
 		},
 	}
-	if isJoinAccept {
+	if up != nil && up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST {
 		rx2.Delay = band.JoinAcceptDelay2
 	} else {
 		rx2.Delay = time.Second * time.Duration(1+dev.MACState.CurrentParameters.Rx1Delay)
@@ -1376,9 +1374,9 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex]); err != nil {
 		return nil, err
 	}
-
 	slots = append(slots, rx2)
 
+	mds := up.RxMetadata
 	if acc != nil {
 		select {
 		case <-ctx.Done():
@@ -1396,19 +1394,28 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	var errs []error
 	for _, s := range slots {
-		down.Settings = s.TxSettings
+		down := &ttnpb.DownlinkMessage{
+			EndDeviceIDs: &dev.EndDeviceIdentifiers,
+			Settings:     s.TxSettings,
+			RawPayload:   b,
+			// TODO: Create a new ID and append.
+			CorrelationIDs: up.CorrelationIDs,
+		}
 
-		if b == nil {
-			// TODO: Account for ADR here (https://github.com/TheThingsIndustries/lorawan-stack/issues/377)
-			b, err = generateDownlink(ctx, dev,
+		if down.RawPayload == nil {
+			var maxUpDR ttnpb.DataRateIndex
+			if upADR {
+				maxUpDR = up.Settings.DataRateIndex
+			}
+
+			down.RawPayload, err = generateDownlink(ctx, dev,
 				band.DataRates[down.Settings.DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-				band.DataRates[0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+				band.DataRates[maxUpDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
 			)
 			if err != nil {
 				return nil, err
 			}
 		}
-		down.RawPayload = b
 
 		for _, md := range mds {
 			logger := logger.WithField(
