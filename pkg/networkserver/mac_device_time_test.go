@@ -31,8 +31,8 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "empty queue",
@@ -55,12 +55,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[0].Data(), should.BeNil) &&
 					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
 					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
 						Time: time.Unix(42, 42),
@@ -103,12 +102,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[0].Data(), should.BeNil) &&
 					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
 					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
 						Time: time.Unix(42, 42),
@@ -154,12 +152,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[0].Data(), should.BeNil) &&
 					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
 					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
 						Time: time.Unix(42, 45),
@@ -181,7 +178,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

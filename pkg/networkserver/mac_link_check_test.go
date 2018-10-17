@@ -30,8 +30,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "SF13BW250",
@@ -47,13 +47,13 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					Bandwidth:       250,
 				},
 			},
-			Error: errInvalidDataRate,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil)
+					a.So(evs[0].Data(), should.BeNil)
 			},
+			Error: errInvalidDataRate,
 		},
 		{
 			Name: "SF12BW250/1 gateway/empty queue",
@@ -84,12 +84,11 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[0].Data(), should.BeNil) &&
 					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
 					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
 						Margin:       42,
@@ -135,12 +134,11 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[0].Data(), should.BeNil) &&
 					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
 					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
 						Margin:       42,
@@ -198,12 +196,11 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error: nil,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[0].Data(), should.BeNil) &&
 					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
 					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
 						Margin:       42,
@@ -226,7 +223,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

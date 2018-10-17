@@ -56,14 +56,18 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return errNoPayload
 	}
 
+	if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
+		events.Publish(evtReceiveRxParamSetupReject(ctx, dev.EndDeviceIdentifiers, pld))
+	} else {
+		events.Publish(evtReceiveRxParamSetupAccept(ctx, dev.EndDeviceIdentifiers, pld))
+	}
+
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtReceiveRxParamSetupReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
-		events.Publish(evtReceiveRxParamSetupAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req := cmd.GetRxParamSetupReq()
 

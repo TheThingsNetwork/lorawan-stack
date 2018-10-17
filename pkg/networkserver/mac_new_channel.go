@@ -65,14 +65,18 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return errNoPayload
 	}
 
+	if !pld.DataRateAck || !pld.FrequencyAck {
+		events.Publish(evtReceiveNewChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
+	} else {
+		events.Publish(evtReceiveNewChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
+	}
+
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		if !pld.DataRateAck || !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtReceiveNewChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
-		events.Publish(evtReceiveNewChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req := cmd.GetNewChannelReq()
 

@@ -30,8 +30,8 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RxParamSetupAns
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -41,11 +41,10 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: nil,
-			Error:   errNoPayload,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
 			},
+			Error: errNoPayload,
 		},
 		{
 			Name: "no request",
@@ -55,11 +54,22 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: ttnpb.NewPopulatedMACCommand_RxParamSetupAns(test.Randy, false),
-			Error:   errMACRequestNotFound,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			Payload: &ttnpb.MACCommand_RxParamSetupAns{
+				Rx1DataRateOffsetAck: true,
+				Rx2DataRateIndexAck:  true,
+				Rx2FrequencyAck:      true,
 			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RxParamSetupAns{
+						Rx1DataRateOffsetAck: true,
+						Rx2DataRateIndexAck:  true,
+						Rx2FrequencyAck:      true,
+					})
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "all ack",
@@ -93,7 +103,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.accept") &&
@@ -135,7 +145,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      false,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.reject") &&
@@ -161,7 +171,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

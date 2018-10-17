@@ -53,9 +53,9 @@ func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 		return errNoPayload
 	}
 
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
-		events.Publish(evtReceivePingSlotChannelAnswer(ctx, dev.EndDeviceIdentifiers, pld))
+	events.Publish(evtReceivePingSlotChannelAnswer(ctx, dev.EndDeviceIdentifiers, pld))
 
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetPingSlotChannelReq()
 
 		dev.MACState.CurrentParameters.PingSlotDataRateIndex = req.DataRateIndex

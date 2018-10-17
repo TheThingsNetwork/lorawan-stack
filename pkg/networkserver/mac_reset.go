@@ -42,7 +42,6 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return err
 	}
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
-
 	conf := &ttnpb.MACCommand_ResetConf{
 		MinorVersion: pld.MinorVersion,
 	}

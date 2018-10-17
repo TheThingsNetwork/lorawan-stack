@@ -30,8 +30,8 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_PingSlotChannelAns
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -41,11 +41,10 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: nil,
-			Error:   errNoPayload,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
 			},
+			Error: errNoPayload,
 		},
 		{
 			Name: "no request",
@@ -55,11 +54,20 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: ttnpb.NewPopulatedMACCommand_PingSlotChannelAns(test.Randy, false),
-			Error:   errMACRequestNotFound,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			Payload: &ttnpb.MACCommand_PingSlotChannelAns{
+				FrequencyAck:     true,
+				DataRateIndexAck: true,
 			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.ping_slot_channel.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_PingSlotChannelAns{
+						FrequencyAck:     true,
+						DataRateIndexAck: true,
+					})
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "both ack",
@@ -86,7 +94,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				FrequencyAck:     true,
 				DataRateIndexAck: true,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.ping_slot_channel.answer.accept") &&
@@ -111,7 +119,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

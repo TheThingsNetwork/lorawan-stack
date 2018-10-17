@@ -53,9 +53,9 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 		return errNoPayload
 	}
 
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		events.Publish(evtReceiveRejoinParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, pld))
+	events.Publish(evtReceiveRejoinParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, pld))
 
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRejoinParamSetupReq()
 
 		dev.MACState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent

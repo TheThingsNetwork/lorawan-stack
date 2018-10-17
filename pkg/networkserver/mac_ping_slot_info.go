@@ -30,6 +30,7 @@ func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 	if pld == nil {
 		return errNoPayload
 	}
+
 	events.Publish(evtReceivePingSlotInfoRequest(ctx, dev.EndDeviceIdentifiers, pld))
 
 	dev.MACState.PingSlotPeriodicity = pld.Period

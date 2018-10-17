@@ -52,6 +52,12 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return errNoPayload
 	}
 
+	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
+		events.Publish(evtReceiveLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
+	} else {
+		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
+	}
+
 	fp, err := fps.GetByID(dev.FrequencyPlanID)
 	if err != nil {
 		return err
@@ -82,10 +88,8 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtReceiveLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
-		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req = cmd.GetLinkADRReq()
 

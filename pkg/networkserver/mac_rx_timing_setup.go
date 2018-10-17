@@ -47,9 +47,9 @@ func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 }
 
 func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
-		events.Publish(evtReceiveRxTimingSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
+	events.Publish(evtReceiveRxTimingSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
 
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRxTimingSetupReq()
 
 		dev.MACState.CurrentParameters.Rx1Delay = req.Delay

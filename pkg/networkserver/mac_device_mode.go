@@ -30,10 +30,10 @@ func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	if pld == nil {
 		return errNoPayload
 	}
+
 	events.Publish(evtReceiveDeviceModeIndication(ctx, dev.EndDeviceIdentifiers, pld))
 
 	dev.MACState.DeviceClass = pld.Class
-
 	conf := &ttnpb.MACCommand_DeviceModeConf{
 		Class: pld.Class,
 	}

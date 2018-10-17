@@ -50,9 +50,9 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 }
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		events.Publish(evtReceiveADRParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
+	events.Publish(evtReceiveADRParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
 
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetADRParamSetupReq()
 
 		dev.MACState.CurrentParameters.ADRAckDelay = ttnpb.ADRAckDelayExponentToUint32(req.ADRAckDelayExponent)

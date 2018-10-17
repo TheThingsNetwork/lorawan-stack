@@ -32,8 +32,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_LinkADRAns
 		DupCount         uint
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name:     "nil payload",
@@ -51,10 +51,10 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Payload: nil,
-			Error:   errNoPayload,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
 			},
+			Error: errNoPayload,
 		},
 		{
 			Name:     "no request",
@@ -71,11 +71,22 @@ func TestHandleLinkADRAns(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 			},
-			Payload: ttnpb.NewPopulatedMACCommand_LinkADRAns(test.Randy, false),
-			Error:   errMACRequestNotFound,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			Payload: &ttnpb.MACCommand_LinkADRAns{
+				ChannelMaskAck:   true,
+				DataRateIndexAck: true,
+				TxPowerIndexAck:  true,
 			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_LinkADRAns{
+						ChannelMaskAck:   true,
+						DataRateIndexAck: true,
+						TxPowerIndexAck:  true,
+					})
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name:     "1 request/all ack",
@@ -134,7 +145,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
@@ -228,7 +239,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
@@ -322,7 +333,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
@@ -427,7 +438,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
@@ -453,7 +464,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

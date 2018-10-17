@@ -51,9 +51,9 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 }
 
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		events.Publish(evtReceiveTxParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
+	events.Publish(evtReceiveTxParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
 
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()
 
 		dev.MACState.CurrentParameters.DownlinkDwellTime = req.DownlinkDwellTime

@@ -39,7 +39,6 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 	dev.PendingSession = nil
-
 	conf := &ttnpb.MACCommand_RekeyConf{
 		MinorVersion: pld.MinorVersion,
 	}

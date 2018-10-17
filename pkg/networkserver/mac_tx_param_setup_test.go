@@ -29,8 +29,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "no request",
@@ -40,10 +40,13 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Error: errMACRequestNotFound,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.tx_param_setup.answer") &&
+					a.So(evs[0].Data(), should.BeNil)
 			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "EIRP 26, dwell time both",
@@ -68,7 +71,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 1) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.tx_param_setup.answer") &&
@@ -90,7 +93,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

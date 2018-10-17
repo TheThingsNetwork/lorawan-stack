@@ -30,8 +30,8 @@ func TestHandleDeviceModeInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DeviceModeInd
+		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
-		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -42,10 +42,10 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: nil,
-			Error:   errNoPayload,
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
 			},
+			Error: errNoPayload,
 		},
 		{
 			Name: "empty queue",
@@ -68,7 +68,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_C,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.device_mode.indication") &&
@@ -109,7 +109,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_A,
 			},
-			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
 				return a.So(evs, should.HaveLength, 2) &&
 					a.So(evs[0].Name(), should.Equal, "ns.mac.device_mode.indication") &&
@@ -137,7 +137,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
 		})
 	}
 }

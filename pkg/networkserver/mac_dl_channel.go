@@ -61,14 +61,18 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		return errNoPayload
 	}
 
+	if !pld.ChannelIndexAck || !pld.FrequencyAck {
+		events.Publish(evtReceiveDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
+	} else {
+		events.Publish(evtReceiveDLChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
+	}
+
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		if !pld.ChannelIndexAck || !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
-			events.Publish(evtReceiveDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
-		events.Publish(evtReceiveDLChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
 
 		req := cmd.GetDlChannelReq()
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) || dev.MACState.CurrentParameters.Channels[req.ChannelIndex] == nil {

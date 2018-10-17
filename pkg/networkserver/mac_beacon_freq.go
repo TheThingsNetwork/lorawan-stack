@@ -53,14 +53,18 @@ func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return errNoPayload
 	}
 
+	if !pld.FrequencyAck {
+		events.Publish(evtReceiveBeaconFreqReject(ctx, dev.EndDeviceIdentifiers, pld))
+	} else {
+		events.Publish(evtReceiveBeaconFreqAccept(ctx, dev.EndDeviceIdentifiers, pld))
+	}
+
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetBeaconFreqReq()
+
 		if !pld.FrequencyAck {
-			events.Publish(evtReceiveBeaconFreqReject(ctx, dev.EndDeviceIdentifiers, pld))
 			return nil
 		}
-		events.Publish(evtReceiveBeaconFreqAccept(ctx, dev.EndDeviceIdentifiers, pld))
-
 		dev.MACState.CurrentParameters.BeaconFrequency = req.Frequency
 		return nil
 
