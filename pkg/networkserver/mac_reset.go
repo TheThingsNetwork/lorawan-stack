@@ -28,14 +28,14 @@ var (
 )
 
 func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store) error {
+	if pld == nil {
+		return errNoPayload
+	}
+
 	events.Publish(evtReceiveResetIndication(ctx, dev.EndDeviceIdentifiers, pld))
 
 	if dev.SupportsJoin {
 		return nil
-	}
-
-	if pld == nil {
-		return errNoPayload
 	}
 
 	if err := resetMACState(fps, dev); err != nil {
@@ -48,6 +48,6 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 
-	events.Publish(evtEnqueueRekeyConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
+	events.Publish(evtEnqueueResetConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
 	return nil
 }

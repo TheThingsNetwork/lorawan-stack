@@ -20,20 +20,19 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleDeviceTimeReq(t *testing.T) {
-	events := collectEvents("ns.mac.device_time")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "empty queue",
@@ -56,8 +55,17 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			Error: nil,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
+						Time: time.Unix(42, 42),
+					})
+			},
 		},
 		{
 			Name: "non-empty queue/odd",
@@ -95,8 +103,17 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			Error: nil,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
+						Time: time.Unix(42, 42),
+					})
+			},
 		},
 		{
 			Name: "non-empty queue/even",
@@ -137,8 +154,17 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			Error: nil,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
+						Time: time.Unix(42, 45),
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -146,16 +172,16 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleDeviceTimeReq(test.Context(), dev, tc.Message)
+			var err error
+			evs := collectEvents(func() {
+				err = handleDeviceTimeReq(test.Context(), dev, tc.Message)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

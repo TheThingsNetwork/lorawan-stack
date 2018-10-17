@@ -19,20 +19,19 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleDeviceModeInd(t *testing.T) {
-	events := collectEvents("ns.mac.device_mode")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DeviceModeInd
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -44,6 +43,9 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			},
 			Payload: nil,
 			Error:   errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "empty queue",
@@ -66,7 +68,18 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_C,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.device_mode.indication") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeInd{
+						Class: ttnpb.CLASS_C,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.device_mode.confirmation") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeConf{
+						Class: ttnpb.CLASS_C,
+					})
+			},
 		},
 		{
 			Name: "non-empty queue",
@@ -96,7 +109,18 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_A,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.device_mode.indication") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeInd{
+						Class: ttnpb.CLASS_A,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.device_mode.confirmation") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeConf{
+						Class: ttnpb.CLASS_A,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -104,16 +128,16 @@ func TestHandleDeviceModeInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleDeviceModeInd(test.Context(), dev, tc.Payload)
+			var err error
+			evs := collectEvents(func() {
+				err = handleDeviceModeInd(test.Context(), dev, tc.Payload)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

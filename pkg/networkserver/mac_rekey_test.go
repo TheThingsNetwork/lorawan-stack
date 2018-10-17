@@ -19,20 +19,19 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleRekeyInd(t *testing.T) {
-	events := collectEvents("ns.mac.rekey_ind")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RekeyInd
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -42,8 +41,10 @@ func TestHandleRekeyInd(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
 			},
-			Payload: nil,
-			Error:   errNoPayload,
+			Error: errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "empty queue",
@@ -58,6 +59,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				SupportsJoin:   true,
 				PendingSession: nil,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
 							MinorVersion: 1,
@@ -68,7 +70,18 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.rekey.indication") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RekeyInd{
+						MinorVersion: 1,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.rekey.confirmation") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_RekeyConf{
+						MinorVersion: 1,
+					})
+			},
 		},
 		{
 			Name: "non-empty queue",
@@ -87,6 +100,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				SupportsJoin:   true,
 				PendingSession: nil,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
@@ -100,7 +114,18 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.rekey.indication") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RekeyInd{
+						MinorVersion: 1,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.rekey.confirmation") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_RekeyConf{
+						MinorVersion: 1,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -108,16 +133,16 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleRekeyInd(test.Context(), dev, tc.Payload)
+			var err error
+			evs := collectEvents(func() {
+				err = handleRekeyInd(test.Context(), dev, tc.Payload)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

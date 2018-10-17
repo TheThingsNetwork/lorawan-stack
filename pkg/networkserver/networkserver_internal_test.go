@@ -61,26 +61,49 @@ var (
 	ApplicationID = "test-app"
 )
 
-// TODO(#1008) Move eventCollector to the test package
-type eventCollector events.Channel
-
-func collectEvents(name string) eventCollector {
-	collectedEvents := make(events.Channel, 32)
-	events.Subscribe(name, collectedEvents)
-	return eventCollector(collectedEvents)
+func init() {
+	events.DefaultPubSub = events.NewPubSub(0)
 }
 
-// Expect n events, fail the test if not received within reasonable time.
-func (ch eventCollector) expect(t *testing.T, n int) []events.Event {
-	collected := make([]events.Event, 0, n)
-	for i := 0; i < n; i++ {
-		evt := events.Channel(ch).ReceiveTimeout(10 * test.Delay)
-		if evt == nil {
-			t.Fatalf("Did not receive expected event %d/%d", i+1, n)
-		}
-		collected = append(collected, evt)
+var _ events.PubSub = &MockEventPubSub{}
+
+type MockEventPubSub struct {
+	PublishFunc     func(events.Event)
+	SubscribeFunc   func(string, events.Handler) error
+	UnsubscribeFunc func(string, events.Handler)
+}
+
+func (ps *MockEventPubSub) Publish(ev events.Event) {
+	if ps.PublishFunc == nil {
+		return
 	}
-	return collected
+	ps.PublishFunc(ev)
+}
+
+func (ps *MockEventPubSub) Subscribe(name string, hdl events.Handler) error {
+	if ps.SubscribeFunc == nil {
+		return nil
+	}
+	return ps.SubscribeFunc(name, hdl)
+}
+
+func (ps *MockEventPubSub) Unsubscribe(name string, hdl events.Handler) {
+	if ps.UnsubscribeFunc == nil {
+		return
+	}
+	ps.UnsubscribeFunc(name, hdl)
+}
+
+// TODO(#1008) Move collectEvents to the test package
+func collectEvents(f func()) (evs []events.Event) {
+	oldPS := events.DefaultPubSub
+	events.DefaultPubSub = &MockEventPubSub{
+		PublishFunc: func(ev events.Event) { evs = append(evs, ev) },
+	}
+	defer func() { events.DefaultPubSub = oldPS }()
+
+	f()
+	return evs
 }
 
 func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {

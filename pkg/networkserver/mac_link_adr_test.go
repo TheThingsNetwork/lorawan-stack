@@ -19,21 +19,21 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleLinkADRAns(t *testing.T) {
-	events := collectEvents("ns.mac.adr.accept")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_LinkADRAns
 		DupCount         uint
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name:     "nil payload",
@@ -52,6 +52,9 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Payload: nil,
 			Error:   errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name:     "no request",
@@ -70,6 +73,9 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Payload: ttnpb.NewPopulatedMACCommand_LinkADRAns(test.Randy, false),
 			Error:   errMACRequestNotFound,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name:     "1 request/all ack",
@@ -128,7 +134,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_LinkADRAns{
+						ChannelMaskAck:   true,
+						DataRateIndexAck: true,
+						TxPowerIndexAck:  true,
+					})
+			},
 		},
 		{
 			Name:     "1.1/2 requests/all ack",
@@ -212,6 +227,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 				ChannelMaskAck:   true,
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
+			},
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_LinkADRAns{
+						ChannelMaskAck:   true,
+						DataRateIndexAck: true,
+						TxPowerIndexAck:  true,
+					})
 			},
 		},
 		{
@@ -297,7 +322,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_LinkADRAns{
+						ChannelMaskAck:   true,
+						DataRateIndexAck: true,
+						TxPowerIndexAck:  true,
+					})
+			},
 		},
 		{
 			Name:     "1.0/2 requests/all ack",
@@ -393,7 +427,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_adr.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_LinkADRAns{
+						ChannelMaskAck:   true,
+						DataRateIndexAck: true,
+						TxPowerIndexAck:  true,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -401,16 +444,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleLinkADRAns(test.Context(), dev, tc.Payload, tc.DupCount, frequencyPlansStore)
+			var err error
+			evs := collectEvents(func() {
+				err = handleLinkADRAns(test.Context(), dev, tc.Payload, tc.DupCount, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

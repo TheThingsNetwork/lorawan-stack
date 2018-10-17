@@ -19,6 +19,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -30,6 +31,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_PingSlotInfoReq
 		Error            error
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -41,6 +43,9 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			},
 			Payload: nil,
 			Error:   errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "empty queue",
@@ -52,12 +57,23 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
-						// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+						ttnpb.CID_PING_SLOT_INFO.MACCommand(),
 					},
+					PingSlotPeriodicity: 42,
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
 				Period: 42,
+			},
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.ping_slot_info.request") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_PingSlotInfoReq{
+						Period: 42,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.ping_slot_info.answer") &&
+					a.So(evs[1].Data(), should.Resemble, nil)
 			},
 		},
 		{
@@ -77,12 +93,23 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 						{},
 						{},
 						{},
-						// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+						ttnpb.CID_PING_SLOT_INFO.MACCommand(),
 					},
+					PingSlotPeriodicity: 42,
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
 				Period: 42,
+			},
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.ping_slot_info.request") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_PingSlotInfoReq{
+						Period: 42,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.ping_slot_info.answer") &&
+					a.So(evs[1].Data(), should.Resemble, nil)
 			},
 		},
 	} {
@@ -91,12 +118,16 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handlePingSlotInfoReq(test.Context(), dev, tc.Payload)
+			var err error
+			evs := collectEvents(func() {
+				err = handlePingSlotInfoReq(test.Context(), dev, tc.Payload)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

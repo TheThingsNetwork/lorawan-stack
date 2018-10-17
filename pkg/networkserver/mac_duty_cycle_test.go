@@ -19,19 +19,18 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleDutyCycleAns(t *testing.T) {
-	events := collectEvents("ns.mac.duty_cycle.accept")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "no request",
@@ -42,6 +41,9 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			Error: errMACRequestNotFound,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "2048",
@@ -62,7 +64,12 @@ func TestHandleDutyCycleAns(t *testing.T) {
 					},
 				},
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.duty_cycle.answer") &&
+					a.So(evs[0].Data(), should.Resemble, nil)
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -70,16 +77,16 @@ func TestHandleDutyCycleAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleDutyCycleAns(test.Context(), dev)
+			var err error
+			evs := collectEvents(func() {
+				err = handleDutyCycleAns(test.Context(), dev)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

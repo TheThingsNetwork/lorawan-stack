@@ -27,15 +27,16 @@ var (
 )
 
 func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) error {
+	if pld == nil {
+		return errNoPayload
+	}
+
 	events.Publish(evtReceiveRekeyIndication(ctx, dev.EndDeviceIdentifiers, pld))
 
 	if !dev.SupportsJoin {
 		return nil
 	}
 
-	if pld == nil {
-		return errNoPayload
-	}
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 	dev.PendingSession = nil
 

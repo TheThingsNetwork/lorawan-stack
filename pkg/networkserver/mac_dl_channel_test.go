@@ -19,20 +19,19 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleDLChannelAns(t *testing.T) {
-	events := collectEvents("ns.mac.dl_channel.*")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DLChannelAns
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -44,6 +43,9 @@ func TestHandleDLChannelAns(t *testing.T) {
 			},
 			Payload: nil,
 			Error:   errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "no request",
@@ -55,6 +57,64 @@ func TestHandleDLChannelAns(t *testing.T) {
 			},
 			Payload: ttnpb.NewPopulatedMACCommand_DLChannelAns(test.Randy, false),
 			Error:   errMACRequestNotFound,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
+		},
+		{
+			Name: "frequency nack",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DLChannelReq{
+							ChannelIndex: 2,
+							Frequency:    42,
+						}).MACCommand(),
+					},
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								EnableUplink: true,
+							},
+							nil,
+							{
+								UplinkFrequency:   41,
+								DownlinkFrequency: 41,
+							},
+						},
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								EnableUplink: true,
+							},
+							nil,
+							{
+								UplinkFrequency:   41,
+								DownlinkFrequency: 41,
+							},
+						},
+					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_DLChannelAns{
+				FrequencyAck:    false,
+				ChannelIndexAck: true,
+			},
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.reject") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
+						FrequencyAck:    false,
+						ChannelIndexAck: true,
+					})
+			},
 		},
 		{
 			Name: "both ack/no channel",
@@ -83,6 +143,15 @@ func TestHandleDLChannelAns(t *testing.T) {
 				ChannelIndexAck: true,
 			},
 			Error: errCorruptedMACState.WithCause(errUnknownChannel),
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
+						FrequencyAck:    true,
+						ChannelIndexAck: true,
+					})
+			},
 		},
 		{
 			Name: "both ack/channel exists",
@@ -129,7 +198,15 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
+						FrequencyAck:    true,
+						ChannelIndexAck: true,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -137,16 +214,16 @@ func TestHandleDLChannelAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleDLChannelAns(test.Context(), dev, tc.Payload)
+			var err error
+			evs := collectEvents(func() {
+				err = handleDLChannelAns(test.Context(), dev, tc.Payload)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

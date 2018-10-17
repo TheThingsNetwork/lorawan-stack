@@ -19,6 +19,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -30,6 +31,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_BeaconFreqAns
 		Error            error
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -41,6 +43,9 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			},
 			Payload: nil,
 			Error:   errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "no request",
@@ -52,6 +57,9 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			},
 			Payload: ttnpb.NewPopulatedMACCommand_BeaconFreqAns(test.Randy, false),
 			Error:   errMACRequestNotFound,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "ack",
@@ -67,11 +75,21 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+					CurrentParameters: ttnpb.MACParameters{
+						BeaconFrequency: 42,
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
+			},
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.beacon_freq.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_BeaconFreqAns{
+						FrequencyAck: true,
+					})
 			},
 		},
 	} {
@@ -80,12 +98,16 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleBeaconFreqAns(test.Context(), dev, tc.Payload)
+			var err error
+			evs := collectEvents(func() {
+				err = handleBeaconFreqAns(test.Context(), dev, tc.Payload)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

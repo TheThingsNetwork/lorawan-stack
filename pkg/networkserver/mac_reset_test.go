@@ -15,37 +15,25 @@
 package networkserver
 
 import (
-	"os"
 	"testing"
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var frequencyPlansStore *frequencyplans.Store
-
-func TestMain(t *testing.M) {
-	frequencyPlansStore = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-
-	ret := t.Run()
-
-	os.Exit(ret)
-}
-
 func TestHandleResetInd(t *testing.T) {
-	events := collectEvents("ns.mac.reset_ind")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_ResetInd
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -57,8 +45,10 @@ func TestHandleResetInd(t *testing.T) {
 				SupportsJoin: false,
 				MACState:     &ttnpb.MACState{},
 			},
-			Payload: nil,
-			Error:   errNoPayload,
+			Error: errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "empty queue",
@@ -82,10 +72,11 @@ func TestHandleResetInd(t *testing.T) {
 					SupportsJoin:    false,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
-				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
+				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
 					panic(errors.New("failed to reset MACState").WithCause(err))
 				}
 
+				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 1,
@@ -96,8 +87,18 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.reset.indication") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_ResetInd{
+						MinorVersion: 1,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.reset.confirmation") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_ResetConf{
+						MinorVersion: 1,
+					})
+			},
 		},
 		{
 			Name: "non-empty queue",
@@ -125,10 +126,11 @@ func TestHandleResetInd(t *testing.T) {
 					SupportsJoin:    false,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
-				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
+				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
 					panic(errors.New("failed to reset MACState").WithCause(err))
 				}
 
+				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 1,
@@ -139,8 +141,18 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.reset.indication") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_ResetInd{
+						MinorVersion: 1,
+					}) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.reset.confirmation") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_ResetConf{
+						MinorVersion: 1,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -148,16 +160,16 @@ func TestHandleResetInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleResetInd(test.Context(), dev, tc.Payload, frequencyPlansStore)
+			var err error
+			evs := collectEvents(func() {
+				err = handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

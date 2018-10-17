@@ -20,21 +20,20 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleDevStatusAns(t *testing.T) {
-	events := collectEvents("ns.mac.device_status")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DevStatusAns
 		ReceivedAt       time.Time
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -47,6 +46,9 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Payload:    nil,
 			ReceivedAt: time.Unix(42, 0),
 			Error:      errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "no request",
@@ -59,6 +61,9 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Payload:    ttnpb.NewPopulatedMACCommand_DevStatusAns(test.Randy, false),
 			ReceivedAt: time.Unix(42, 0),
 			Error:      errMACRequestNotFound,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "battery 42/margin 4",
@@ -92,8 +97,16 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 42,
 				Margin:  4,
 			},
-			ReceivedAt:     time.Unix(42, 0),
-			ExpectedEvents: 1,
+			ReceivedAt: time.Unix(42, 0),
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
+						Battery: 42,
+						Margin:  4,
+					})
+			},
 		},
 		{
 			Name: "external power/margin 20",
@@ -127,8 +140,16 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 0,
 				Margin:  20,
 			},
-			ReceivedAt:     time.Unix(42, 0),
-			ExpectedEvents: 1,
+			ReceivedAt: time.Unix(42, 0),
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
+						Battery: 0,
+						Margin:  20,
+					})
+			},
 		},
 		{
 			Name: "unknown power/margin -5",
@@ -162,8 +183,16 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 255,
 				Margin:  -5,
 			},
-			ReceivedAt:     time.Unix(42, 0),
-			ExpectedEvents: 1,
+			ReceivedAt: time.Unix(42, 0),
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
+						Battery: 255,
+						Margin:  -5,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -171,16 +200,16 @@ func TestHandleDevStatusAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleDevStatusAns(test.Context(), dev, tc.Payload, tc.ReceivedAt)
+			var err error
+			evs := collectEvents(func() {
+				err = handleDevStatusAns(test.Context(), dev, tc.Payload, tc.ReceivedAt)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

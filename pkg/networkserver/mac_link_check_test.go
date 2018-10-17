@@ -19,20 +19,19 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleLinkCheckReq(t *testing.T) {
-	events := collectEvents("ns.mac.link_check")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "SF13BW250",
@@ -49,6 +48,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 			},
 			Error: errInvalidDataRate,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil)
+			},
 		},
 		{
 			Name: "SF12BW250/1 gateway/empty queue",
@@ -79,8 +84,18 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			Error: nil,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
+						Margin:       42,
+						GatewayCount: 1,
+					})
+			},
 		},
 		{
 			Name: "SF12BW250/1 gateway/non-empty queue",
@@ -120,8 +135,18 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			Error: nil,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
+						Margin:       42,
+						GatewayCount: 1,
+					})
+			},
 		},
 		{
 			Name: "SF12BW250/3 gateways/non-empty queue",
@@ -173,8 +198,18 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Error:          nil,
-			ExpectedEvents: 1,
+			Error: nil,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 2) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
+					a.So(evs[0].Data(), should.Resemble, nil) &&
+					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
+					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
+						Margin:       42,
+						GatewayCount: 3,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -182,16 +217,16 @@ func TestHandleLinkCheckReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleLinkCheckReq(test.Context(), dev, tc.Message)
+			var err error
+			evs := collectEvents(func() {
+				err = handleLinkCheckReq(test.Context(), dev, tc.Message)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }

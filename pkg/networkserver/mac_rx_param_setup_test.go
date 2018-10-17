@@ -19,20 +19,19 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHandleRxParamSetupAns(t *testing.T) {
-	events := collectEvents("ns.mac.rx_param.*")
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RxParamSetupAns
 		Error            error
-		ExpectedEvents   int
+		EventAssertion   func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -44,6 +43,9 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Payload: nil,
 			Error:   errNoPayload,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "no request",
@@ -55,6 +57,9 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Payload: ttnpb.NewPopulatedMACCommand_RxParamSetupAns(test.Randy, false),
 			Error:   errMACRequestNotFound,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
 		},
 		{
 			Name: "all ack",
@@ -88,7 +93,16 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.accept") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RxParamSetupAns{
+						Rx1DataRateOffsetAck: true,
+						Rx2DataRateIndexAck:  true,
+						Rx2FrequencyAck:      true,
+					})
+			},
 		},
 		{
 			Name: "data rate ack",
@@ -121,7 +135,16 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      false,
 			},
-			ExpectedEvents: 1,
+			EventAssertion: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.reject") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RxParamSetupAns{
+						Rx1DataRateOffsetAck: true,
+						Rx2DataRateIndexAck:  true,
+						Rx2FrequencyAck:      false,
+					})
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -129,16 +152,16 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleRxParamSetupAns(test.Context(), dev, tc.Payload)
+			var err error
+			evs := collectEvents(func() {
+				err = handleRxParamSetupAns(test.Context(), dev, tc.Payload)
+			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-
-			if tc.ExpectedEvents > 0 {
-				events.expect(t, tc.ExpectedEvents)
-			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(tc.EventAssertion(t, evs...), should.BeTrue)
 		})
 	}
 }
