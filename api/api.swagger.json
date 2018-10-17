@@ -6985,6 +6985,10 @@
           "type": "string",
           "description": "Primary email address that can be used for logging in.\nThis address is not public, use contact_info for that."
         },
+        "primary_email_address_validated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "password": {
           "type": "string",
           "description": "Only used on create; never returned on API calls."

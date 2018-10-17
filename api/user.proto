@@ -42,25 +42,26 @@ message User {
   // Primary email address that can be used for logging in.
   // This address is not public, use contact_info for that.
   string primary_email_address = 8;
+  google.protobuf.Timestamp primary_email_address_validated_at = 9 [(gogoproto.stdtime) = true];
 
   // Only used on create; never returned on API calls.
-  string password = 9;
-  google.protobuf.Timestamp password_updated_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  bool require_password_update = 11;
+  string password = 10;
+  google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  bool require_password_update = 12;
 
   // The reviewing state of the user.
   // This field can only be modified by admins.
-  State state = 12;
+  State state = 13;
   // This user is an admin.
   // This field can only be modified by other admins.
-  bool admin = 13;
+  bool admin = 14;
 
   // The temporary password can only be used to update a user's password; never returned on API calls.
-  string temporary_password = 14;
-  google.protobuf.Timestamp temporary_password_created_at = 15 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp temporary_password_expires_at = 16 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
+  string temporary_password = 15;
+  google.protobuf.Timestamp temporary_password_created_at = 16 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
 
-  Picture profile_picture = 17;
+  Picture profile_picture = 18;
 }
 
 message Picture {

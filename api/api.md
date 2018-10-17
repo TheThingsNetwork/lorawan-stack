@@ -5341,6 +5341,7 @@ User is the message that defines an user on the network.
 | attributes | [User.AttributesEntry](#ttn.lorawan.v3.User.AttributesEntry) | repeated |  |
 | contact_info | [ContactInfo](#ttn.lorawan.v3.ContactInfo) | repeated |  |
 | primary_email_address | [string](#string) |  | Primary email address that can be used for logging in. This address is not public, use contact_info for that. |
+| primary_email_address_validated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | password | [string](#string) |  | Only used on create; never returned on API calls. |
 | password_updated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | require_password_update | [bool](#bool) |  |  |
