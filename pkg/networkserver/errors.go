@@ -44,6 +44,7 @@ var (
 	errLoRaAndFSK                = errors.DefineInvalidArgument("lora_and_fsk", "both LoRa and FSK modulation is specified")
 	errMACRequestNotFound        = errors.DefineInvalidArgument("mac_request_not_found", "MAC response received, but corresponding request not found")
 	errNoPayload                 = errors.DefineInvalidArgument("no_payload", "no message payload specified")
+	errNoRekey                   = errors.DefineInvalidArgument("no_rekey", "rekey not received after join-accept")
 	errOutdatedData              = errors.DefineNotFound("outdated_data", "data is outdated")
 	errRawPayloadTooLong         = errors.Define("raw_payload_too_long", "length of RawPayload must not be less than 4")
 	errSchedule                  = errors.Define("schedule", "all Gateway Servers failed to schedule the downlink")

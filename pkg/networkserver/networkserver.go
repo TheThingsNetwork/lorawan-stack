@@ -1020,6 +1020,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				return nil, err
 			}
 		}
+		if dev.SessionFallback != nil {
+			handleErr = true
+			return nil, errNoRekey
+		}
 		return stored, nil
 	})
 	if err != nil && !handleErr {
