@@ -30,21 +30,30 @@ var (
 )
 
 func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	// TODO: Generate LinkADRReq(https://github.com/TheThingsIndustries/ttn/issues/837)
-	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		if dev.MACState.DesiredParameters.Channels[i].EnableUplink != dev.MACState.CurrentParameters.Channels[i].EnableUplink {
+	if dev.MACState.DesiredParameters.ADRDataRateIndex == dev.MACState.CurrentParameters.ADRDataRateIndex &&
+		dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans &&
+		dev.MACState.DesiredParameters.ADRTxPowerIndex == dev.MACState.CurrentParameters.ADRTxPowerIndex {
+		return maxDownLen, maxUpLen, true
+	}
 
+	var ok bool
+	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+		if nDown < 1 || nUp < 1 {
+			return nil, 0, false
 		}
-	}
+		pld := &ttnpb.MACCommand_LinkADRReq{
+			DataRateIndex: dev.MACState.DesiredParameters.ADRDataRateIndex,
+			NbTrans:       dev.MACState.DesiredParameters.ADRNbTrans,
+			TxPowerIndex:  dev.MACState.DesiredParameters.ADRTxPowerIndex,
+			// NOTE: This is invalid in most of the cases.
+			// TODO: Generate proper ChannelMask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1235)
+			ChannelMask: []bool{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+		}
+		events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
 
-	if dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex ||
-		dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans ||
-		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex {
-	}
-	if false {
-		events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, nil))
-	}
-	return maxDownLen, maxUpLen, true
+	}, dev.MACState.PendingRequests...)
+	return maxDownLen, maxUpLen, ok
 }
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (err error) {

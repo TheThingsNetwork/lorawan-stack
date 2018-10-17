@@ -257,11 +257,11 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	var fPending bool
 	for _, f := range []func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool){
 		// LoRaWAN 1.0+
+		enqueueNewChannelReq,
 		enqueueLinkADRReq,
 		enqueueDutyCycleReq,
 		enqueueRxParamSetupReq,
 		enqueueDevStatusReq,
-		enqueueNewChannelReq,
 		enqueueRxTimingSetupReq,
 		enqueuePingSlotChannelReq,
 		enqueueBeaconFreqReq,
