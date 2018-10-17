@@ -657,6 +657,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
@@ -685,6 +686,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
@@ -710,6 +712,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
@@ -813,6 +816,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
@@ -946,6 +950,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
@@ -1077,6 +1082,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
@@ -1138,6 +1144,7 @@ func TestGenerateDownlink(t *testing.T) {
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
 						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
 				}},
 			},
