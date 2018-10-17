@@ -38,6 +38,7 @@ var Registry prometheus.Registerer = registry
 func init() {
 	registry.MustRegister(prometheus.NewProcessCollector(os.Getpid(), ""))
 	registry.MustRegister(prometheus.NewGoCollector())
+	registry.MustRegister(ttnInfo)
 	view.RegisterExporter(exporter)
 }
 
