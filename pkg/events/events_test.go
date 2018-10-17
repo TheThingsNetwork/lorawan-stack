@@ -52,7 +52,7 @@ func TestEvents(t *testing.T) {
 		eventCh <- e
 	})
 
-	pubsub := events.NewPubSub()
+	pubsub := events.NewPubSub(events.DefaultBufferSize)
 
 	pubsub.Subscribe("**", allEvents)
 

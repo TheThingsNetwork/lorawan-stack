@@ -123,7 +123,7 @@ var DefaultWatcher Watcher
 
 func init() {
 	var err error
-	DefaultWatcher, err = NewWatcher(events.NewPubSub())
+	DefaultWatcher, err = NewWatcher(events.NewPubSub(events.DefaultBufferSize))
 	if err != nil {
 		log.WithError(err).Warn("Could not initialize filesystem watcher")
 	}

@@ -52,7 +52,7 @@ func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub) {
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
 func NewPubSub(conf config.Redis) *PubSub {
-	return WrapPubSub(events.NewPubSub(), conf)
+	return WrapPubSub(events.NewPubSub(events.DefaultBufferSize), conf)
 }
 
 // PubSub with Redis backend.

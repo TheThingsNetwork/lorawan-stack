@@ -21,7 +21,7 @@ import (
 )
 
 // DefaultPubSub is the default event pubsub.
-var DefaultPubSub = NewPubSub()
+var DefaultPubSub = NewPubSub(DefaultBufferSize)
 
 // Subscribe adds an event handler to the default event pubsub.
 // The name can be a glob in order to catch multiple event types.

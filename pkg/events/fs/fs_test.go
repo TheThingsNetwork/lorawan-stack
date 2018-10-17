@@ -34,7 +34,7 @@ func TestWatcher(t *testing.T) {
 
 	filename := filepath.Join(os.TempDir(), fmt.Sprintf("fs_%d", time.Now().Unix()))
 
-	pubsub := events.NewPubSub()
+	pubsub := events.NewPubSub(events.DefaultBufferSize)
 	watcher, err := fs.NewWatcher(pubsub)
 	a.So(err, should.BeNil)
 

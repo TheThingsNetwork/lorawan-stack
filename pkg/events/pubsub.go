@@ -56,13 +56,13 @@ type pubsub struct {
 	events   chan Event
 }
 
-// EventBufferSize is the number of events that can be buffered before Publish starts to block.
-const EventBufferSize = 64
+// DefaultBufferSize is the default number of events that can be buffered before Publish starts to block.
+const DefaultBufferSize = 64
 
 // NewPubSub returns a new event pubsub and starts a goroutine for handling.
-func NewPubSub() PubSub {
+func NewPubSub(bufSize uint) PubSub {
 	e := &pubsub{
-		events: make(chan Event, EventBufferSize),
+		events: make(chan Event, bufSize),
 	}
 	go e.Run()
 	return e
