@@ -322,14 +322,18 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		var down *ttnpb.ApplicationDownlink
 		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
 
-		pld.FHDR.FCnt = down.FCnt
-		pld.FPort = down.FPort
-		pld.FRMPayload = down.FRMPayload
-		if down.Confirmed {
-			dev.MACState.PendingApplicationDownlink = down
-			dev.Session.LastConfFCntDown = pld.FCnt
+		if len(pld.FRMPayload) > int(maxDownLen) {
+			// TODO: Inform AS that payload is too long(https://github.com/TheThingsIndustries/lorawan-stack/issues/377)
+		} else {
+			pld.FHDR.FCnt = down.FCnt
+			pld.FPort = down.FPort
+			pld.FRMPayload = down.FRMPayload
+			if down.Confirmed {
+				dev.MACState.PendingApplicationDownlink = down
+				dev.Session.LastConfFCntDown = pld.FCnt
 
-			mType = ttnpb.MType_CONFIRMED_DOWN
+				mType = ttnpb.MType_CONFIRMED_DOWN
+			}
 		}
 	}
 
