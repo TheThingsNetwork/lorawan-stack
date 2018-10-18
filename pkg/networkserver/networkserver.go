@@ -1399,16 +1399,10 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		down.Settings = s.TxSettings
 
 		if b == nil {
-			var maxUpDR ttnpb.DataRateIndex
-			for _, ch := range dev.MACState.CurrentParameters.Channels {
-				if !ch.EnableUplink {
-					continue
-				}
-				maxUpDR = ch.MaxDataRateIndex
-			}
+			// TODO: Account for ADR here (https://github.com/TheThingsIndustries/lorawan-stack/issues/377)
 			b, err = generateDownlink(ctx, dev,
 				band.DataRates[down.Settings.DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-				band.DataRates[maxUpDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+				band.DataRates[0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
 			)
 			if err != nil {
 				return nil, err
