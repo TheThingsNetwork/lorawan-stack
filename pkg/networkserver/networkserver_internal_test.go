@@ -210,12 +210,13 @@ func TestScheduleDownlink(t *testing.T) {
 		ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 	}
 
-	rx1Downlink := func(chIdx uint32, drIdx ttnpb.DataRateIndex, drOffset uint32, dwellTime bool, md ttnpb.TxMetadata) *ttnpb.DownlinkMessage {
+	rx1Downlink := func(chIdx uint32, drIdx ttnpb.DataRateIndex, drOffset uint32, dwellTime bool, md ttnpb.TxMetadata, correlationIDs ...string) *ttnpb.DownlinkMessage {
 		chIdx = test.Must(band.Rx1Channel(chIdx)).(uint32)
 		drIdx = test.Must(band.Rx1DataRate(drIdx, drOffset, dwellTime)).(ttnpb.DataRateIndex)
 
 		msg := &ttnpb.DownlinkMessage{
-			RawPayload: testBytes,
+			RawPayload:     testBytes,
+			CorrelationIDs: correlationIDs,
 			EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 				DeviceID:               DeviceID,
@@ -235,9 +236,10 @@ func TestScheduleDownlink(t *testing.T) {
 		return msg
 	}
 
-	rx2Downlink := func(freq uint64, drIdx ttnpb.DataRateIndex, md ttnpb.TxMetadata) *ttnpb.DownlinkMessage {
+	rx2Downlink := func(freq uint64, drIdx ttnpb.DataRateIndex, md ttnpb.TxMetadata, correlationIDs ...string) *ttnpb.DownlinkMessage {
 		msg := &ttnpb.DownlinkMessage{
-			RawPayload: testBytes,
+			RawPayload:     testBytes,
+			CorrelationIDs: correlationIDs,
 			EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 				DeviceID:               DeviceID,
@@ -344,10 +346,11 @@ func TestScheduleDownlink(t *testing.T) {
 						return &MockNsGsClient{
 							ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 								a.So(ctx, should.HaveParentContext, testCtx)
+								a.So(msg.CorrelationIDs, should.NotBeEmpty)
 								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
 									GatewayIdentifiers: gateways[1],
 									Timestamp:          uint64(time.Unix(0, 124).Add(3 * time.Second).UnixNano()),
-								}))
+								}, msg.CorrelationIDs...))
 
 								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
@@ -359,10 +362,11 @@ func TestScheduleDownlink(t *testing.T) {
 						return &MockNsGsClient{
 							ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 								a.So(ctx, should.HaveParentContext, testCtx)
+								a.So(msg.CorrelationIDs, should.NotBeEmpty)
 								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
 									GatewayIdentifiers: gateways[2],
 									Timestamp:          uint64(time.Unix(0, 42).Add(3 * time.Second).UnixNano()),
-								}))
+								}, msg.CorrelationIDs...))
 								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return ttnpb.Empty, nil
 							},
@@ -474,10 +478,11 @@ func TestScheduleDownlink(t *testing.T) {
 							return &MockNsGsClient{
 								ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 									a.So(ctx, should.HaveParentContext, testCtx)
+									a.So(msg.CorrelationIDs, should.NotBeEmpty)
 									a.So(msg, should.Resemble, rx2Downlink(42, ttnpb.DATA_RATE_3, ttnpb.TxMetadata{
 										GatewayIdentifiers: md.GatewayIdentifiers,
 										Timestamp:          md.Timestamp + uint64(time.Second.Nanoseconds()),
-									}))
+									}, msg.CorrelationIDs...))
 									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 									return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 								},
@@ -488,7 +493,8 @@ func TestScheduleDownlink(t *testing.T) {
 						return &MockNsGsClient{
 							ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 								a.So(ctx, should.HaveParentContext, testCtx)
-								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, md))
+								a.So(msg.CorrelationIDs, should.NotBeEmpty)
+								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, md, msg.CorrelationIDs...))
 								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
@@ -507,10 +513,11 @@ func TestScheduleDownlink(t *testing.T) {
 							return &MockNsGsClient{
 								ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 									a.So(ctx, should.HaveParentContext, testCtx)
+									a.So(msg.CorrelationIDs, should.NotBeEmpty)
 									a.So(msg, should.Resemble, rx2Downlink(42, ttnpb.DATA_RATE_3, ttnpb.TxMetadata{
 										GatewayIdentifiers: md.GatewayIdentifiers,
 										Timestamp:          md.Timestamp + uint64(time.Second.Nanoseconds()),
-									}))
+									}, msg.CorrelationIDs...))
 									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 									return ttnpb.Empty, nil
 								},
@@ -521,7 +528,8 @@ func TestScheduleDownlink(t *testing.T) {
 						return &MockNsGsClient{
 							ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 								a.So(ctx, should.HaveParentContext, testCtx)
-								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, md))
+								a.So(msg.CorrelationIDs, should.NotBeEmpty)
+								a.So(msg, should.Resemble, rx1Downlink(3, ttnpb.DATA_RATE_0, 2, false, md, msg.CorrelationIDs...))
 								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
@@ -579,6 +587,9 @@ func TestScheduleDownlink(t *testing.T) {
 			expected := CopyEndDevice(tc.Device)
 			if tc.DeviceDiff != nil {
 				tc.DeviceDiff(expected)
+			}
+			if a.So(dev.RecentDownlinks, should.NotBeEmpty) && a.So(dev.RecentDownlinks[len(dev.RecentDownlinks)-1].CorrelationIDs, should.NotBeEmpty) {
+				expected.RecentDownlinks[len(expected.RecentDownlinks)-1].CorrelationIDs = dev.RecentDownlinks[len(dev.RecentDownlinks)-1].CorrelationIDs
 			}
 
 			a.So(dev, should.Resemble, expected)

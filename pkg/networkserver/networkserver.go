@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
@@ -859,12 +860,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			asUp.Up = &ttnpb.ApplicationUp_DownlinkAck{
 				DownlinkAck: dev.MACState.PendingApplicationDownlink,
 			}
-			asUp.CorrelationIDs = append(asUp.CorrelationIDs, up.CorrelationIDs...)
 		} else {
 			asUp.Up = &ttnpb.ApplicationUp_DownlinkNack{
 				DownlinkNack: dev.MACState.PendingApplicationDownlink,
 			}
 		}
+		asUp.CorrelationIDs = append(asUp.CorrelationIDs, up.CorrelationIDs...)
 
 		if err := asCl.Send(asUp); err != nil {
 			return err
@@ -1396,14 +1397,18 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		return mds[i].SNR > mds[j].SNR
 	})
 
+	ctx = events.ContextWithCorrelationID(ctx, append(
+		up.CorrelationIDs,
+		fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()),
+	)...)
+
 	var errs []error
 	for _, s := range slots {
 		down := &ttnpb.DownlinkMessage{
-			EndDeviceIDs: &dev.EndDeviceIdentifiers,
-			Settings:     s.TxSettings,
-			RawPayload:   b,
-			// TODO: Create a new ID and append.
-			CorrelationIDs: up.CorrelationIDs,
+			EndDeviceIDs:   &dev.EndDeviceIdentifiers,
+			Settings:       s.TxSettings,
+			RawPayload:     b,
+			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 		}
 
 		if down.RawPayload == nil {
