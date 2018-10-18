@@ -201,6 +201,14 @@
   version = "v1.39.0"
 
 [[projects]]
+  digest = "1:d2c62efe1c1814929e4016d9fd4c566051ece9e4f03aa3245311449ccf931cc0"
+  name = "github.com/go-mail/mail"
+  packages = ["."]
+  pruneopts = ""
+  revision = "63235f23494bf20d713a585bce40b2a0675c2f77"
+  version = "2.2.0"
+
+[[projects]]
   digest = "1:52735cb54d5122db78b96f7c8980fcb91dba9a65497bae324996d1ea152ad7d4"
   name = "github.com/go-redis/redis"
   packages = [
@@ -423,6 +431,14 @@
   revision = "c73681c634de898c869684602cf0c0d2ce938c4d"
 
 [[projects]]
+  branch = "master"
+  digest = "1:d90c6c1d8c3a177b31271aa2166f1a31ccb488f261264527e88c34fa6d9b6fc3"
+  name = "github.com/jaytaylor/html2text"
+  packages = ["."]
+  pruneopts = ""
+  revision = "57d518f124b0cf46ea2021f25a01396b3522e6fb"
+
+[[projects]]
   digest = "1:dc5126f78aa052ba39be47f4854a29683f29ab5064394646458f49b00bb0fc29"
   name = "github.com/jmank88/nuts"
   packages = ["."]
@@ -502,6 +518,14 @@
   version = "v0.0.4"
 
 [[projects]]
+  digest = "1:82b912465c1da0668582a7d1117339c278e786c2536b3c3623029a0c7141c2d0"
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  pruneopts = ""
+  revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
+  version = "v0.0.3"
+
+[[projects]]
   digest = "1:63722a4b1e1717be7b98fc686e0b30d5e7f734b9e93d7dee86293b6deab7ea28"
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
@@ -540,6 +564,14 @@
   pruneopts = ""
   revision = "02a8604050d8466dd915307496174adb9be4593a"
   version = "v1.3.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:171c1337a8ad95624633b9a66fe318b4a1de286440c7efccdc21c86c773674ad"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  pruneopts = ""
+  revision = "be2c049b30ccd4d3fd795d6bf7dce74e42eeedaa"
 
 [[projects]]
   digest = "1:894aef961c056b6d85d12bac890bf60c44e99b46292888bfa66caf529f804457"
@@ -636,6 +668,25 @@
   revision = "836a144573533ea4da4e6929c235fd348aed1c80"
 
 [[projects]]
+  digest = "1:f66a8bd3128df79a2648daea552403c5c66d841c7ae844d5d22b445afbdf0878"
+  name = "github.com/sendgrid/rest"
+  packages = ["."]
+  pruneopts = ""
+  revision = "306b9bef57dc36f3435ccfcc08fe6ae2c6920344"
+  version = "v2.4.1"
+
+[[projects]]
+  digest = "1:f03d623f2a89d6a506655dc152c24f4d1eee449a8c335bfe229972bba4047fa5"
+  name = "github.com/sendgrid/sendgrid-go"
+  packages = [
+    ".",
+    "helpers/mail",
+  ]
+  pruneopts = ""
+  revision = "8caf17aa96b4a98bae8bd216878dd50ff12897b5"
+  version = "v3.4.1"
+
+[[projects]]
   branch = "master"
   digest = "1:7984ea8b3555db5d97adfeed56f1e61e24777f39e0009d2e60ce23af60f08577"
   name = "github.com/smartystreets/assertions"
@@ -709,6 +760,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:f1e3a889b271bb29598c04dc70a94ff66f674adbb862832b64fcb77bbf06b225"
+  name = "github.com/ssor/bom"
+  packages = ["."]
+  pruneopts = ""
+  revision = "6386211fdfcf24c0bfbdaceafd02849ed9a8a509"
+
+[[projects]]
+  branch = "master"
   digest = "1:857a9ecd5cb13379ecc8f798f6e6b6b574c98b9355657d91e068275f1120aaf7"
   name = "github.com/valyala/bytebufferpool"
   packages = ["."]
@@ -765,6 +824,8 @@
   packages = [
     "context",
     "context/ctxhttp",
+    "html",
+    "html/atom",
     "http/httpguts",
     "http2",
     "http2/hpack",
@@ -920,6 +981,14 @@
   version = "v1.14.0"
 
 [[projects]]
+  branch = "v3"
+  digest = "1:fa33d1dde8ce5b0b37c38c767c250a7684ecd385f9dbabe594ea8543e4d55807"
+  name = "gopkg.in/alexcesaro/quotedprintable.v3"
+  packages = ["."]
+  pruneopts = ""
+  revision = "2caba252f4dc53eaf6b553000885530023f54623"
+
+[[projects]]
   branch = "v1"
   digest = "1:043ca79ca48d5972cd04a1fd31aa762471080a2a6ab30603f97160ac0fc22c44"
   name = "gopkg.in/jarcoal/httpmock.v1"
@@ -965,6 +1034,7 @@
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/fsnotify/fsnotify",
     "github.com/getsentry/raven-go",
+    "github.com/go-mail/mail",
     "github.com/go-redis/redis",
     "github.com/gobwas/glob",
     "github.com/gogo/protobuf/gogoproto",
@@ -994,6 +1064,7 @@
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/jacobsa/crypto/cmac",
+    "github.com/jaytaylor/html2text",
     "github.com/kr/pretty",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
@@ -1006,6 +1077,8 @@
     "github.com/prometheus/client_golang/prometheus",
     "github.com/robertkrimen/otto",
     "github.com/satori/go.uuid",
+    "github.com/sendgrid/sendgrid-go",
+    "github.com/sendgrid/sendgrid-go/helpers/mail",
     "github.com/smartystreets/assertions",
     "github.com/smartystreets/assertions/should",
     "github.com/soheilhy/cmux",
