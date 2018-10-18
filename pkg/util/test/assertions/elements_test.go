@@ -126,8 +126,8 @@ func TestSameElements(t *testing.T) {
 		t.Run(fmt.Sprintf("%v/%v", tc.A, tc.B), func(t *testing.T) {
 			a := assertions.New(t)
 
-			a.So(sameElementsDeep(tc.A, tc.B), should.Equal, tc.Same)
-			a.So(sameElementsDiff(tc.A, tc.B), should.Equal, tc.Same)
+			a.So(sameElements(reflect.DeepEqual, tc.A, tc.B), should.Equal, tc.Same)
+			a.So(sameElements(diffEqual, tc.A, tc.B), should.Equal, tc.Same)
 		})
 	}
 }
