@@ -167,6 +167,9 @@ message ApplicationJoinAccept {
   KeyEnvelope app_s_key = 2;
   // Downlink messages in the queue that got invalidated because of the session change.
   repeated ApplicationDownlink invalidated_downlinks = 3;
+  // Indicates whether the security context refers to the next session, i.e. when this join-accept is an answer to a
+  // rejoin-request.
+  bool next_session = 4;
 }
 
 message ApplicationDownlink {

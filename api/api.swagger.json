@@ -4248,6 +4248,11 @@
             "$ref": "#/definitions/v3ApplicationDownlink"
           },
           "description": "Downlink messages in the queue that got invalidated because of the session change."
+        },
+        "next_session": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates whether the security context refers to the next session, i.e. when this join-accept is an answer to a\nrejoin-request."
         }
       }
     },
@@ -4985,11 +4990,11 @@
         },
         "session": {
           "$ref": "#/definitions/v3Session",
-          "description": "Current session. Stored in Network Server."
+          "description": "Current session. Stored in Network Server and Application Server."
         },
-        "session_fallback": {
+        "next_session": {
           "$ref": "#/definitions/v3Session",
-          "description": "Fallback session. Stored in Network Server until RekeyInd is received."
+          "description": "Next session. Stored in Network Server and Application Server until RekeyInd is received."
         },
         "last_dev_nonce": {
           "type": "integer",
