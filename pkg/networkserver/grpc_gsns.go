@@ -651,6 +651,22 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				// Sanity check
 				panic(fmt.Errorf("Session mismatch"))
 			}
+
+			if !pld.FHDR.ADR {
+				dev.RecentADRUplinks = nil
+				return stored, paths, nil
+			}
+
+			dev.RecentADRUplinks = append(dev.RecentADRUplinks, up)
+			if len(dev.RecentADRUplinks) > recentDownlinkCount {
+				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentDownlinkCount:]...)
+			}
+			paths = append(paths, "recent_adr_uplinks")
+
+			if err := adaptDataRate(ns.Component.FrequencyPlans, dev); err != nil {
+				handleErr = true
+				return nil, nil, err
+			}
 			return stored, paths, nil
 		})
 	if err != nil && !handleErr {

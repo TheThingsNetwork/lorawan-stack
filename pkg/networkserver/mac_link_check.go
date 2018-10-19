@@ -41,11 +41,10 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 	for _, md := range msg.RxMetadata {
 		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
 
-		snr := md.SNR
-		if snr <= maxSNR {
+		if md.SNR <= maxSNR {
 			continue
 		}
-		maxSNR = snr
+		maxSNR = md.SNR
 	}
 
 	ans := &ttnpb.MACCommand_LinkCheckAns{
