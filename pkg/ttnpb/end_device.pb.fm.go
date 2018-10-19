@@ -1338,6 +1338,7 @@ var EndDeviceFieldPathsNested = []string{
 	"pending_session.started_at",
 	"power_state",
 	"queued_application_downlinks",
+	"recent_adr_uplinks",
 	"recent_downlinks",
 	"recent_uplinks",
 	"resets_f_cnt",
@@ -1415,6 +1416,7 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"pending_session",
 	"power_state",
 	"queued_application_downlinks",
+	"recent_adr_uplinks",
 	"recent_downlinks",
 	"recent_uplinks",
 	"resets_f_cnt",
@@ -1904,6 +1906,15 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				var zero int32
 				dst.DownlinkMargin = zero
 			}
+		case "recent_adr_uplinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'recent_adr_uplinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RecentADRUplinks = src.RecentADRUplinks
+			} else {
+				dst.RecentADRUplinks = nil
+			}
 		case "recent_uplinks":
 			if len(subs) > 0 {
 				return fmt.Errorf("'recent_uplinks' has no subfields, but %s were specified", subs)
@@ -2133,6 +2144,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_session.started_at",
 	"end_device.power_state",
 	"end_device.queued_application_downlinks",
+	"end_device.recent_adr_uplinks",
 	"end_device.recent_downlinks",
 	"end_device.recent_uplinks",
 	"end_device.resets_f_cnt",
@@ -2358,6 +2370,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_session.started_at",
 	"end_device.power_state",
 	"end_device.queued_application_downlinks",
+	"end_device.recent_adr_uplinks",
 	"end_device.recent_downlinks",
 	"end_device.recent_uplinks",
 	"end_device.resets_f_cnt",
@@ -2736,6 +2749,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.pending_session.started_at",
 	"device.power_state",
 	"device.queued_application_downlinks",
+	"device.recent_adr_uplinks",
 	"device.recent_downlinks",
 	"device.recent_uplinks",
 	"device.resets_f_cnt",
