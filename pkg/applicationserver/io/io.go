@@ -22,7 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-const bufferSize = 10
+const bufferSize = 32
 
 // Server represents the Application Server to gateway frontends.
 type Server interface {
