@@ -262,6 +262,14 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 		return as.handleUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIdentifiers, p.DownlinkQueueInvalidated, link)
+	case *ttnpb.ApplicationUp_DownlinkQueued:
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkQueued)
+	case *ttnpb.ApplicationUp_DownlinkSent:
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent)
+	case *ttnpb.ApplicationUp_DownlinkAck:
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck)
+	case *ttnpb.ApplicationUp_DownlinkNack:
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkNack)
 	default:
 		return nil
 	}
@@ -440,6 +448,25 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			return dev, []string{"session"}, nil
 		},
 	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) error {
+	dev, err := as.deviceRegistry.Get(ctx, ids, []string{"session"})
+	if err != nil {
+		return err
+	}
+	if dev.Session == nil || dev.Session.SessionKeyID != msg.SessionKeyID || dev.Session.AppSKey == nil {
+		return errNoAppSKey
+	}
+	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	if err != nil {
+		return err
+	}
+	msg.FRMPayload, err = crypto.DecryptDownlink(appSKey, dev.Session.DevAddr, msg.FCnt, msg.FRMPayload)
 	if err != nil {
 		return err
 	}

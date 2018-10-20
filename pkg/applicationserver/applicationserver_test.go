@@ -463,6 +463,122 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
+						Name: "RegisteredDevice/DownlinkMessage/Queued",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							Up: &ttnpb.ApplicationUp_DownlinkQueued{
+								DownlinkQueued: &ttnpb.ApplicationDownlink{
+									SessionKeyID: "session3",
+									FPort:        42,
+									FCnt:         42,
+									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								Up: &ttnpb.ApplicationUp_DownlinkQueued{
+									DownlinkQueued: &ttnpb.ApplicationDownlink{
+										SessionKeyID: "session3",
+										FPort:        42,
+										FCnt:         42,
+										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									},
+								},
+							})
+						},
+					},
+					{
+						Name: "RegisteredDevice/DownlinkMessage/Sent",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							Up: &ttnpb.ApplicationUp_DownlinkSent{
+								DownlinkSent: &ttnpb.ApplicationDownlink{
+									SessionKeyID: "session3",
+									FPort:        42,
+									FCnt:         42,
+									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								Up: &ttnpb.ApplicationUp_DownlinkSent{
+									DownlinkSent: &ttnpb.ApplicationDownlink{
+										SessionKeyID: "session3",
+										FPort:        42,
+										FCnt:         42,
+										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									},
+								},
+							})
+						},
+					},
+					{
+						Name: "RegisteredDevice/DownlinkMessage/Ack",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							Up: &ttnpb.ApplicationUp_DownlinkAck{
+								DownlinkAck: &ttnpb.ApplicationDownlink{
+									SessionKeyID: "session3",
+									FPort:        42,
+									FCnt:         42,
+									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								Up: &ttnpb.ApplicationUp_DownlinkAck{
+									DownlinkAck: &ttnpb.ApplicationDownlink{
+										SessionKeyID: "session3",
+										FPort:        42,
+										FCnt:         42,
+										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									},
+								},
+							})
+						},
+					},
+					{
+						Name: "RegisteredDevice/DownlinkMessage/Nack",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							Up: &ttnpb.ApplicationUp_DownlinkNack{
+								DownlinkNack: &ttnpb.ApplicationDownlink{
+									SessionKeyID: "session3",
+									FPort:        42,
+									FCnt:         42,
+									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								Up: &ttnpb.ApplicationUp_DownlinkNack{
+									DownlinkNack: &ttnpb.ApplicationDownlink{
+										SessionKeyID: "session3",
+										FPort:        42,
+										FCnt:         42,
+										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									},
+								},
+							})
+						},
+					},
+					{
 						Name: "RegisteredDevice/JoinAccept/WithAppSKey/WithQueue/WithNextSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
