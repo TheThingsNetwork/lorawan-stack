@@ -29,9 +29,10 @@ var (
 	evtApplicationSubscribe   = events.Define("as.application.subscribe", "application subscribe")
 	evtApplicationUnsubscribe = events.Define("as.application.unsubscribe", "application unsubscribe")
 
-	evtReceiveDataUp = events.Define("as.up.data.receive", "receive uplink data message")
-	evtDropDataUp    = events.Define("as.up.data.drop", "drop uplink data message")
-	evtForwardDataUp = events.Define("as.up.data.forward", "forward uplink data message")
+	evtReceiveDataUp    = events.Define("as.up.data.receive", "receive uplink data message")
+	evtDropDataUp       = events.Define("as.up.data.drop", "drop uplink data message")
+	evtForwardDataUp    = events.Define("as.up.data.forward", "forward uplink data message")
+	evtDecodeFailDataUp = events.Define("as.up.data.decode.fail", "decode uplink data message fail")
 
 	evtReceiveJoinAccept = events.Define("as.up.join.receive", "receive join-accept message")
 	evtDropJoinAccept    = events.Define("as.up.join.drop", "drop join-accept message")

@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -79,6 +80,7 @@ func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.En
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
 		if err := as.formatter.Decode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
 			logger.WithError(err).Warn("Payload decoding failed")
+			events.Publish(evtDecodeFailDataUp(ctx, dev.EndDeviceIdentifiers, err))
 		}
 	}
 	return nil
