@@ -22,33 +22,37 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+type deviceRegistryRPC struct {
+	registry DeviceRegistry
+}
+
 // Get implements ttnpb.AsEndDeviceRegistryServer.
-func (as *ApplicationServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r *deviceRegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	return as.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
+	return r.registry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
 }
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
-func (as *ApplicationServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r *deviceRegistryRPC) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	return as.deviceRegistry.Set(ctx, req.Device.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	return r.registry.Set(ctx, req.Device.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return &req.Device, req.FieldMask.Paths, nil
 	})
 }
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.
-func (as *ApplicationServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (r *deviceRegistryRPC) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	_, err := as.deviceRegistry.Set(ctx, *ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, err := r.registry.Set(ctx, *ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return nil, nil, nil
 	})
 	if err != nil {

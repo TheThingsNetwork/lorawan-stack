@@ -87,7 +87,9 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
-	ttnpb.RegisterAsEndDeviceRegistryServer(s, as)
+	ttnpb.RegisterAsEndDeviceRegistryServer(s, &deviceRegistryRPC{
+		registry: as.deviceRegistry,
+	})
 	ttnpb.RegisterAppAsServer(s, iogrpc.New(as))
 }
 
