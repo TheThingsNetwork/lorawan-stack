@@ -440,8 +440,9 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 // recalculateDownlinkQueue decrypts items in the given invalid downlink queue, encrypts the items with frame counters
 // starting from the given frame counter, and replaces the downlink queue in the Network Server.
 // If re-encrypting a message fails, the message is skipped.
-// This function requires the given end device's session and fallback session to be set.
-// This function does not change the contents of the given invalid downlink queue.
+// This method requires the given end device's session and next session to be set. This method mutates the end device's
+// session LastAFCntDown.
+// This method does not change the contents of the given invalid downlink queue.
 func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, previousSession *ttnpb.Session, invalid []*ttnpb.ApplicationDownlink, nextAFCntDown uint32, link *link) (err error) {
 	logger := log.FromContext(ctx)
 	logger.WithFields(log.Fields(
