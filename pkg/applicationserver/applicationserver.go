@@ -130,6 +130,7 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 var errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
 	logger := log.FromContext(ctx)
 	link, err := as.getLink(ctx, ids.ApplicationIdentifiers)
 	if err != nil {
@@ -156,6 +157,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					continue
 				}
 				item.DecodedPayload = nil
+				item.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 				dev.Session.LastAFCntDown = item.FCnt
 			}
 			client := ttnpb.NewAsNsClient(link.conn)
