@@ -467,22 +467,21 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	if dev.Session == nil || dev.Session.AppSKey == nil {
 		return errNoAppSKey
 	}
-	dev.Session.LastAFCntDown = nextAFCntDown - 1
 	newAppSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
+	dev.Session.LastAFCntDown = nextAFCntDown - 1
 	valid := make([]*ttnpb.ApplicationDownlink, 0, len(invalid))
-	for _, ptr := range invalid {
-		item := *ptr
+	for _, oldItem := range invalid {
 		logger := logger.WithFields(log.Fields(
-			"f_port", item.FPort,
-			"f_cnt", item.FCnt,
-			"session_key_id", item.SessionKeyID,
+			"f_port", oldItem.FPort,
+			"f_cnt", oldItem.FCnt,
+			"session_key_id", oldItem.SessionKeyID,
 		))
 		var oldSession *ttnpb.Session
 		for _, s := range []*ttnpb.Session{previousSession, dev.Session} {
-			if s != nil && s.SessionKeyID == item.SessionKeyID {
+			if s != nil && s.SessionKeyID == oldItem.SessionKeyID {
 				oldSession = s
 				break
 			}
@@ -497,20 +496,25 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			logger.WithError(err).Warn("Dropping downlink message; failed to unwrap AppSKey for decryption")
 			continue
 		}
-		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, item.FCnt, item.FRMPayload)
+		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, oldItem.FCnt, oldItem.FRMPayload)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to decrypt")
 			continue
 		}
-		item.SessionKeyID = dev.Session.SessionKeyID
-		item.FCnt = dev.Session.LastAFCntDown + 1
-		item.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, dev.Session.DevAddr, item.FCnt, frmPayload)
+		newItem := &ttnpb.ApplicationDownlink{
+			SessionKeyID:   dev.Session.SessionKeyID,
+			FPort:          oldItem.FPort,
+			FCnt:           dev.Session.LastAFCntDown + 1,
+			Confirmed:      oldItem.Confirmed,
+			CorrelationIDs: oldItem.CorrelationIDs,
+		}
+		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, dev.Session.DevAddr, newItem.FCnt, frmPayload)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to encrypt")
 			continue
 		}
-		valid = append(valid, &item)
-		dev.Session.LastAFCntDown++
+		valid = append(valid, newItem)
+		dev.Session.LastAFCntDown = newItem.FCnt
 	}
 	client := ttnpb.NewAsNsClient(link.conn)
 	req := &ttnpb.DownlinkQueueRequest{
