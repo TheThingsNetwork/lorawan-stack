@@ -325,8 +325,6 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	if created {
 		events.Publish(evtCreateDevice(ctx, dev.EndDeviceIdentifiers, nil))
 	}
-	joinAccept.AppSKey = nil
-	joinAccept.InvalidatedDownlinks = nil
 	return nil
 }
 
@@ -433,7 +431,6 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	if err != nil {
 		return err
 	}
-	invalid.Downlinks = nil
 	return nil
 }
 

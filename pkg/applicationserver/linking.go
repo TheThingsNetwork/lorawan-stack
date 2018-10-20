@@ -172,8 +172,11 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			registerDropUplink(ctx, up, err)
 			continue
 		}
-		// Downlink queue invalidation is not forwarded to the application.
-		if up.GetDownlinkQueueInvalidated() != nil {
+		switch p := up.Up.(type) {
+		case *ttnpb.ApplicationUp_JoinAccept:
+			p.JoinAccept.AppSKey = nil
+			p.JoinAccept.InvalidatedDownlinks = nil
+		case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 			continue
 		}
 		l.upCh <- up
