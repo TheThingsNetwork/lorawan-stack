@@ -27,6 +27,7 @@ func (as *ApplicationServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceReq
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
+	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
 	return as.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
 }
 
@@ -35,6 +36,7 @@ func (as *ApplicationServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceReq
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
+	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
 	return as.deviceRegistry.Set(ctx, req.Device.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return &req.Device, req.FieldMask.Paths, nil
 	})
@@ -45,6 +47,7 @@ func (as *ApplicationServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIde
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
+	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
 	_, err := as.deviceRegistry.Set(ctx, *ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return nil, nil, nil
 	})
