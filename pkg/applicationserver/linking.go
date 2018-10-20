@@ -169,7 +169,6 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			}
 			return err
 		}
-		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
 		registerReceiveUplink(ctx, up, l.connName)
 		if err := as.handleUp(ctx, up, l); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
