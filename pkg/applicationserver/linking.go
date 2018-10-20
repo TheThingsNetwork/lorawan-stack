@@ -105,6 +105,10 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 				AllowInsecure: link.AllowInsecure,
 			}),
 		}
+		go func() {
+			<-ctx.Done()
+			conn.Close()
+		}()
 	} else {
 		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
 		if ns == nil {
