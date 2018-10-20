@@ -382,7 +382,14 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 				client := ttnpb.NewAsNsClient(link.conn)
 				res, err := client.DownlinkQueueList(ctx, &ids, link.connCallOpts...)
 				if err != nil {
-					log.WithError(err).Warn("Failed to list downlink queue; any queued items in the Network Server are invalid")
+					log.WithError(err).Warn("Failed to list downlink queue for recalculation; clearing the downlink queue")
+					req := &ttnpb.DownlinkQueueRequest{
+						EndDeviceIdentifiers: ids,
+					}
+					_, err = client.DownlinkQueueReplace(ctx, req, link.connCallOpts...)
+					if err != nil {
+						log.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
+					}
 				} else if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, res.Downlinks, 1, link); err != nil {
 					log.WithError(err).Warn("Failed to recalculate downlink queue")
 				}
