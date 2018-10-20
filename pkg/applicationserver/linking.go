@@ -67,7 +67,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 type link struct {
 	ttnpb.ApplicationLink
 	ctx    context.Context
-	cancel func()
+	cancel context.CancelFunc
 
 	conn         *grpc.ClientConn
 	connName     string
@@ -123,22 +123,22 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) error {
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
-	ctx, cancelCtx := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(ctx)
 	l := &link{
 		ApplicationLink: *target,
 		ctx:             ctx,
-		cancel:          cancelCtx,
+		cancel:          cancel,
 		connReady:       make(chan struct{}),
 		subscribeCh:     make(chan *io.Connection, 1),
 		unsubscribeCh:   make(chan *io.Connection, 1),
 		upCh:            make(chan *ttnpb.ApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
-		cancelCtx()
+		cancel()
 		return errAlreadyLinked.WithAttributes("application_uid", uid)
 	}
 	defer func() {
-		cancelCtx()
+		cancel()
 		as.links.Delete(uid)
 	}()
 	if err := as.connectLink(ctx, ids, l); err != nil {
@@ -184,15 +184,13 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 var errNotLinked = errors.DefineNotFound("not_linked", "not linked to `{application_uid}`")
 
 func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers) error {
-	uid := unique.ID(ctx, ids)
-	val, ok := as.links.Load(uid)
-	if !ok {
-		return errNotLinked.WithAttributes("application_uid", uid)
+	l, err := as.getLink(ctx, ids)
+	if err != nil {
+		return err
 	}
-	l := val.(*link)
+	uid := unique.ID(ctx, ids)
 	log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlinking")
 	l.cancel()
-	<-l.ctx.Done()
 	as.links.Delete(uid)
 	return nil
 }
