@@ -95,6 +95,15 @@ var asMetrics = &messageMetrics{
 		},
 		[]string{"error"},
 	),
+	downlinkReceived: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_received_total",
+			Help:      "Total number of received downlinks",
+		},
+		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
+		[]string{applicationID},
+	),
 	downlinkForwarded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -102,6 +111,14 @@ var asMetrics = &messageMetrics{
 			Help:      "Total number of forwarded downlinks",
 		},
 		[]string{networkServer},
+	),
+	downlinkDropped: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_dropped_total",
+			Help:      "Total number of dropped downlinks (join-accepts and data)",
+		},
+		[]string{"error"},
 	),
 }
 
@@ -115,7 +132,9 @@ type messageMetrics struct {
 	uplinkReceived       *metrics.ContextualCounterVec
 	uplinkForwarded      *metrics.ContextualCounterVec
 	uplinkDropped        *metrics.ContextualCounterVec
+	downlinkReceived     *metrics.ContextualCounterVec
 	downlinkForwarded    *metrics.ContextualCounterVec
+	downlinkDropped      *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -124,7 +143,9 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
+	m.downlinkReceived.Describe(ch)
 	m.downlinkForwarded.Describe(ch)
+	m.downlinkDropped.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -133,7 +154,9 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
+	m.downlinkReceived.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
+	m.downlinkDropped.Collect(ch)
 }
 
 func registerSubscribe(ctx context.Context, conn *io.Connection) {
@@ -180,7 +203,21 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.ApplicationUp, err error
 	}
 }
 
+func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
+	events.Publish(evtReceiveDataDown(ctx, ids, nil))
+	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationID).Inc()
+}
+
 func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
 	events.Publish(evtForwardDataDown(ctx, ids, nil))
 	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
+}
+
+func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
+	events.Publish(evtDropDataDown(ctx, ids, nil))
+	if ttnErr, ok := errors.From(err); ok {
+		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+	} else {
+		asMetrics.downlinkDropped.WithLabelValues(ctx, unknown).Inc()
+	}
 }

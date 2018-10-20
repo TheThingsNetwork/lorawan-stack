@@ -130,6 +130,7 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 var errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
+	logger := log.FromContext(ctx)
 	link, err := as.getLink(ctx, ids.ApplicationIdentifiers)
 	if err != nil {
 		return err
@@ -146,13 +147,16 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
 			for _, item := range items {
+				registerReceiveDownlink(ctx, ids, item)
 				item.SessionKeyID = dev.Session.SessionKeyID
 				item.FCnt = dev.Session.LastAFCntDown + 1
 				if err := as.encodeAndEncrypt(ctx, dev, item, link.DefaultFormatters); err != nil {
-					return nil, nil, err
+					logger.WithError(err).Warn("Dropping downlink message; encoding and encryption failed")
+					registerDropDownlink(ctx, ids, item, err)
+					continue
 				}
 				item.DecodedPayload = nil
-				dev.Session.LastAFCntDown++
+				dev.Session.LastAFCntDown = item.FCnt
 			}
 			client := ttnpb.NewAsNsClient(link.conn)
 			req := &ttnpb.DownlinkQueueRequest{
@@ -161,7 +165,13 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			}
 			_, err = op(client, ctx, req, link.connCallOpts...)
 			if err != nil {
+				for _, item := range items {
+					registerDropDownlink(ctx, ids, item, err)
+				}
 				return nil, nil, err
+			}
+			for _, item := range items {
+				registerForwardDownlink(ctx, ids, item, link.connName)
 			}
 			return dev, []string{"session.last_a_f_cnt_down"}, nil
 		},
@@ -485,17 +495,20 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		}
 		if oldSession == nil || oldSession.AppSKey == nil {
 			logger.Warn("Dropping downlink message; session not found or AppSKey not available")
+			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
 		// TODO: Cache unwrapped keys (https://github.com/TheThingsIndustries/lorawan-stack/issues/1218)
 		oldAppSKey, err := cryptoutil.UnwrapAES128Key(*oldSession.AppSKey, as.KeyVault)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to unwrap AppSKey for decryption")
+			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
 		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, oldItem.FCnt, oldItem.FRMPayload)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to decrypt")
+			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
 		newItem := &ttnpb.ApplicationDownlink{
@@ -508,6 +521,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, dev.Session.DevAddr, newItem.FCnt, frmPayload)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to encrypt")
+			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, newItem, err)
 			continue
 		}
 		valid = append(valid, newItem)
