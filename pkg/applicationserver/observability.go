@@ -53,11 +53,19 @@ const (
 )
 
 var asMetrics = &messageMetrics{
-	subscriptions: metrics.NewContextualGaugeVec(
-		prometheus.GaugeOpts{
+	subscriptionsStarted: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "subscriptions",
-			Help:      "Number of subscriptions",
+			Name:      "subscriptions_started",
+			Help:      "Number of subscriptions started",
+		},
+		[]string{protocol},
+	),
+	subscriptionsEnded: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "subscriptions_ended",
+			Help:      "Number of subscriptions ended",
 		},
 		[]string{protocol},
 	),
@@ -101,15 +109,17 @@ func init() {
 }
 
 type messageMetrics struct {
-	subscriptions     *metrics.ContextualGaugeVec
-	uplinkReceived    *metrics.ContextualCounterVec
-	uplinkForwarded   *metrics.ContextualCounterVec
-	uplinkDropped     *metrics.ContextualCounterVec
-	downlinkForwarded *metrics.ContextualCounterVec
+	subscriptionsStarted *metrics.ContextualCounterVec
+	subscriptionsEnded   *metrics.ContextualCounterVec
+	uplinkReceived       *metrics.ContextualCounterVec
+	uplinkForwarded      *metrics.ContextualCounterVec
+	uplinkDropped        *metrics.ContextualCounterVec
+	downlinkForwarded    *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
-	m.subscriptions.Describe(ch)
+	m.subscriptionsStarted.Describe(ch)
+	m.subscriptionsEnded.Describe(ch)
 	m.uplinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
@@ -117,7 +127,8 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
-	m.subscriptions.Collect(ch)
+	m.subscriptionsStarted.Collect(ch)
+	m.subscriptionsEnded.Collect(ch)
 	m.uplinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
@@ -126,12 +137,12 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 func registerSubscribe(ctx context.Context, conn *io.Connection) {
 	events.Publish(evtApplicationSubscribe(ctx, conn.ApplicationIdentifiers, nil))
-	asMetrics.subscriptions.WithLabelValues(ctx, conn.Protocol()).Inc()
+	asMetrics.subscriptionsStarted.WithLabelValues(ctx, conn.Protocol()).Inc()
 }
 
 func registerUnsubscribe(ctx context.Context, conn *io.Connection) {
 	events.Publish(evtApplicationUnsubscribe(ctx, conn.ApplicationIdentifiers, nil))
-	asMetrics.subscriptions.WithLabelValues(ctx, conn.Protocol()).Dec()
+	asMetrics.subscriptionsEnded.WithLabelValues(ctx, conn.Protocol()).Inc()
 }
 
 func registerReceiveUplink(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {
