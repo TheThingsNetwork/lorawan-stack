@@ -265,7 +265,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		case <-ctx.Done():
 			return
 		case msg := <-conn.Up():
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("uplink:%s", events.NewCorrelationID()))
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			registerReceiveUplink(ctx, conn.Gateway(), msg)
 			drop := func(err error) {
 				logger.WithError(err).Debug("Dropping message")
@@ -286,10 +286,10 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			}
 			registerForwardUplink(ctx, conn.Gateway(), msg, ns)
 		case status := <-conn.Status():
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("status:%s", events.NewCorrelationID()))
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_status:%s", events.NewCorrelationID()))
 			registerReceiveStatus(ctx, conn.Gateway(), status)
 		case ack := <-conn.TxAck():
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("ack:%s", events.NewCorrelationID()))
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("tx_ack:%s", events.NewCorrelationID()))
 			if ack.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, conn.Gateway())
 			} else {
