@@ -25,7 +25,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -122,7 +122,7 @@ func expectAck(t *testing.T, conn net.Conn, expect bool, packetType encoding.Pac
 	}
 }
 
-func expectConnection(t *testing.T, server iotesting.Server, connections *sync.Map, eui types.EUI64, expectNew bool) *io.Connection {
+func expectConnection(t *testing.T, server mock.Server, connections *sync.Map, eui types.EUI64, expectNew bool) *io.Connection {
 	a := assertions.New(t)
 	var conn *io.Connection
 	select {

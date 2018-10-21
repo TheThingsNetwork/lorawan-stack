@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
-	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -46,7 +46,7 @@ func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
 
-	gs := iotesting.NewServer()
+	gs := mock.NewServer()
 	srv := New(gs)
 
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
@@ -120,7 +120,7 @@ func TestTraffic(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 
-	gs := iotesting.NewServer()
+	gs := mock.NewServer()
 	srv := New(gs)
 
 	upCh := make(chan *ttnpb.GatewayUp)
@@ -305,7 +305,7 @@ func TestConcentratorConfig(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
 
-	gs := iotesting.NewServer()
+	gs := mock.NewServer()
 	srv := New(gs)
 
 	ctx = contextWithKey(ctx, registeredGatewayID, registeredGatewayKey)()

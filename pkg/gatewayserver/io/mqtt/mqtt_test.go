@@ -25,8 +25,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
-	iotesting "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/testing"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -49,7 +49,7 @@ func TestAuthentication(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	gs := iotesting.NewServer()
+	gs := mock.NewServer()
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -105,7 +105,7 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	gs := iotesting.NewServer()
+	gs := mock.NewServer()
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
