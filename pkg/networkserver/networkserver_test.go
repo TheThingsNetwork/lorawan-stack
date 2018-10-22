@@ -1376,10 +1376,10 @@ func HandleUplinkTest() func(t *testing.T) {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
-						for pb.SessionFallback != nil && pb.SessionFallback.DevAddr.Equal(s.DevAddr) {
-							pb.SessionFallback.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
+						for pb.PendingSession != nil && pb.PendingSession.DevAddr.Equal(s.DevAddr) {
+							pb.PendingSession.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
 						}
-					} else if s := pb.SessionFallback; s != nil {
+					} else if s := pb.PendingSession; s != nil {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
@@ -1530,7 +1530,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					}
 
 					pb.Session.LastFCntUp = tc.NextFCntUp
-					pb.SessionFallback = nil
+					pb.PendingSession = nil
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					if pb.MACState == nil {
@@ -2189,7 +2189,7 @@ func HandleJoinTest() func(t *testing.T) {
 						StartedAt:   ret.Session.StartedAt,
 						DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
 					}
-					pb.SessionFallback = tc.Device.Session
+					pb.PendingSession = tc.Device.Session
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					pb.RecentDownlinks = ret.RecentDownlinks

@@ -638,9 +638,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		if dev.MACState == nil || dev.Session == nil {
 			return true
 		}
-		if dev.SessionFallback != nil && dev.SessionFallback.DevAddr == pld.DevAddr {
-			dev.Session = dev.SessionFallback
-			dev.SessionFallback = nil
+		if dev.PendingSession != nil && dev.PendingSession.DevAddr == pld.DevAddr {
+			dev.Session = dev.PendingSession
+			dev.PendingSession = nil
 		}
 		devs = append(devs, dev)
 		return true
@@ -927,7 +927,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 		if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			// LoRaWAN1.1+ device will send a RekeyInd.
-			stored.SessionFallback = nil
+			stored.PendingSession = nil
 		}
 
 		if stored.MACState != nil {
@@ -1177,8 +1177,8 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 
 		var resetErr bool
 		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			if dev.SessionFallback == nil {
-				dev.SessionFallback = dev.Session
+			if dev.PendingSession == nil {
+				dev.PendingSession = dev.Session
 			}
 			dev.Session = &ttnpb.Session{
 				DevAddr:     devAddr,

@@ -81,9 +81,9 @@ func getDevAddrsAndIDs(dev *ttnpb.EndDevice) (addrs struct{ current, fallback *t
 		copy(addr[:], dev.Session.DevAddr[:])
 		addrs.current = &addr
 	}
-	if dev.SessionFallback != nil {
+	if dev.PendingSession != nil {
 		var addr types.DevAddr
-		copy(addr[:], dev.SessionFallback.DevAddr[:])
+		copy(addr[:], dev.PendingSession.DevAddr[:])
 		addrs.fallback = &addr
 	}
 	return addrs, *dev.EndDeviceIdentifiers.Copy(&ttnpb.EndDeviceIdentifiers{})

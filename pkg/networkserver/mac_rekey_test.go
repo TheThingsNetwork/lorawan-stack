@@ -48,15 +48,15 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin:    true,
-				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
+				SupportsJoin:   true,
+				PendingSession: ttnpb.NewPopulatedSession(test.Randy, false),
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin:    true,
-				SessionFallback: nil,
+				SupportsJoin:   true,
+				PendingSession: nil,
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
@@ -73,8 +73,8 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin:    true,
-				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
+				SupportsJoin:   true,
+				PendingSession: ttnpb.NewPopulatedSession(test.Randy, false),
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
@@ -84,8 +84,8 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin:    true,
-				SessionFallback: nil,
+				SupportsJoin:   true,
+				PendingSession: nil,
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},

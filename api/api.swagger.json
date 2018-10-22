@@ -4249,10 +4249,10 @@
           },
           "description": "Downlink messages in the queue that got invalidated because of the session change."
         },
-        "next_session": {
+        "pending_session": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Indicates whether the security context refers to the next session, i.e. when this join-accept is an answer to a\nrejoin-request."
+          "description": "Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a\nrejoin-request."
         }
       }
     },
@@ -4992,9 +4992,9 @@
           "$ref": "#/definitions/v3Session",
           "description": "Current session. Stored in Network Server and Application Server."
         },
-        "next_session": {
+        "pending_session": {
           "$ref": "#/definitions/v3Session",
-          "description": "Next session. Stored in Network Server and Application Server until RekeyInd is received."
+          "description": "Pending session. Stored in Network Server and Application Server until RekeyInd is received."
         },
         "last_dev_nonce": {
           "type": "integer",

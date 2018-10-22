@@ -48,7 +48,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 		Session: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 		},
-		SessionFallback: &ttnpb.Session{
+		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
 		},
 	}
@@ -75,7 +75,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pb.SessionFallback.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -111,7 +111,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb})
 
 	rets = nil
-	err = reg.RangeByAddr(pb.SessionFallback.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -162,7 +162,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb, pbOther})
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.SessionFallback.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -195,7 +195,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pbOther})
 
 	rets = nil
-	err = reg.RangeByAddr(pb.SessionFallback.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -228,7 +228,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.SessionFallback.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})

@@ -36,7 +36,7 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		MinorVersion: pld.MinorVersion,
 	}
 
-	dev.SessionFallback = nil
+	dev.PendingSession = nil
 	dev.MACState.QueuedResponses = append(
 		dev.MACState.QueuedResponses,
 		conf.MACCommand(),
