@@ -4047,7 +4047,7 @@ The DownlinkMessageProcessor service processes downlink messages.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Process | [ProcessDownlinkMessageRequest](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) | [DownlinkMessage](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) |  |
+| Process | [ProcessDownlinkMessageRequest](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) | [ApplicationDownlink](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) |  |
 
 
 <a name="ttn.lorawan.v3.UplinkMessageProcessor"/>
@@ -4057,7 +4057,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Process | [ProcessUplinkMessageRequest](#ttn.lorawan.v3.ProcessUplinkMessageRequest) | [UplinkMessage](#ttn.lorawan.v3.ProcessUplinkMessageRequest) |  |
+| Process | [ProcessUplinkMessageRequest](#ttn.lorawan.v3.ProcessUplinkMessageRequest) | [ApplicationUplink](#ttn.lorawan.v3.ProcessUplinkMessageRequest) |  |
 
  
 

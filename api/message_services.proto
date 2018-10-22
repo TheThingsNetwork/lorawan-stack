@@ -39,10 +39,10 @@ message ProcessDownlinkMessageRequest {
 
 // The UplinkMessageProcessor service processes uplink messages.
 service UplinkMessageProcessor {
-  rpc Process(ProcessUplinkMessageRequest) returns (UplinkMessage);
+  rpc Process(ProcessUplinkMessageRequest) returns (ApplicationUplink);
 }
 
 // The DownlinkMessageProcessor service processes downlink messages.
 service DownlinkMessageProcessor {
-  rpc Process(ProcessDownlinkMessageRequest) returns (DownlinkMessage);
+  rpc Process(ProcessDownlinkMessageRequest) returns (ApplicationDownlink);
 }
