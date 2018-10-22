@@ -89,7 +89,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	}
 
 	if r.Intn(10) != 0 {
-		out.NextSession = NewPopulatedSession(r, easy)
+		out.PendingSession = NewPopulatedSession(r, easy)
 	}
 	out.BatteryPercentage = r.Float32()
 	out.FrequencyPlanID = "EU_863_870"

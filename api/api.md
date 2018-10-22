@@ -1234,7 +1234,7 @@ SDKs are responsible for combining (if desired) the three.
 | mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Settings for how the Network Server handles MAC for this device. Stored in Network Server. |
 | mac_state | [MACState](#ttn.lorawan.v3.MACState) |  | MAC state of the device. Stored in Network Server. |
 | session | [Session](#ttn.lorawan.v3.Session) |  | Current session. Stored in Network Server and Application Server. |
-| next_session | [Session](#ttn.lorawan.v3.Session) |  | Next session. Stored in Network Server and Application Server until RekeyInd is received. |
+| pending_session | [Session](#ttn.lorawan.v3.Session) |  | Pending session. Stored in Network Server and Application Server until RekeyInd is received. |
 | last_dev_nonce | [uint32](#uint32) |  | Last DevNonce used. This field is only used for devices using LoRaWAN version 1.1 and later. Stored in Join Server. |
 | used_dev_nonces | [uint32](#uint32) | repeated | Used DevNonces sorted in ascending order. This field is only used for devices using LoRaWAN versions preceding 1.1. Stored in Join Server. |
 | last_join_nonce | [uint32](#uint32) |  | Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used. Stored in Join Server. |
@@ -4029,7 +4029,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | session_key_id | [string](#string) |  | Join Server issued identifier for the session keys negotiated in this join. |
 | app_s_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | Encrypted Application Session Key (if Join Server sent it to Network Server). |
 | invalidated_downlinks | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) | repeated | Downlink messages in the queue that got invalidated because of the session change. |
-| next_session | [bool](#bool) |  | Indicates whether the security context refers to the next session, i.e. when this join-accept is an answer to a rejoin-request. |
+| pending_session | [bool](#bool) |  | Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a rejoin-request. |
 
 
 

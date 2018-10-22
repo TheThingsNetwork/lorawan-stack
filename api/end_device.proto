@@ -325,8 +325,8 @@ message EndDevice {
   MACState mac_state = 28 [(gogoproto.customname) = "MACState"];
   // Current session. Stored in Network Server and Application Server.
   Session session = 29;
-  // Next session. Stored in Network Server and Application Server until RekeyInd is received.
-  Session next_session = 30;
+  // Pending session. Stored in Network Server and Application Server until RekeyInd is received.
+  Session pending_session = 30;
 
   // Last DevNonce used.
   // This field is only used for devices using LoRaWAN version 1.1 and later.
