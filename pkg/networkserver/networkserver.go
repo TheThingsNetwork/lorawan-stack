@@ -1175,11 +1175,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		up.RxMetadata = acc.Accumulated()
 		registerMergeMetadata(ctx, dev, up)
 
+		var invalidatedQueue []*ttnpb.ApplicationDownlink
 		var resetErr bool
 		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-			if dev.PendingSession == nil {
-				dev.PendingSession = dev.Session
-			}
 			dev.Session = &ttnpb.Session{
 				DevAddr:     devAddr,
 				SessionKeys: resp.SessionKeys,
@@ -1206,6 +1204,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			if len(dev.RecentUplinks) > recentUplinkCount {
 				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 			}
+
+			invalidatedQueue = dev.QueuedApplicationDownlinks
+			dev.QueuedApplicationDownlinks = nil
+
 			return dev, nil
 		})
 		if err != nil && !resetErr {
@@ -1256,8 +1258,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 				CorrelationIDs:       up.CorrelationIDs,
 				Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-					AppSKey:      resp.SessionKeys.AppSKey,
-					SessionKeyID: dev.Session.SessionKeyID,
+					AppSKey:              resp.SessionKeys.AppSKey,
+					SessionKeyID:         dev.Session.SessionKeyID,
+					InvalidatedDownlinks: invalidatedQueue,
 				}},
 			}); err != nil {
 				logger.WithField(

@@ -2189,10 +2189,11 @@ func HandleJoinTest() func(t *testing.T) {
 						StartedAt:   ret.Session.StartedAt,
 						DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
 					}
-					pb.PendingSession = tc.Device.Session
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					pb.RecentDownlinks = ret.RecentDownlinks
+
+					pb.QueuedApplicationDownlinks = nil
 
 					msg := CopyUplinkMessage(tc.UplinkMessage)
 					msg.RxMetadata = md
