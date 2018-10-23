@@ -99,6 +99,7 @@ key.pem
 
 # Development data directory
 .dev/
+.env/
 
 # Javascript test coverage
 /coverage

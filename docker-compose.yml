@@ -5,7 +5,7 @@ services:
     entrypoint: ttn-lw-stack
     command: start
     environment:
-      TTN_LW_STACK_IS_DATABASE_URI: postgres://root@cockroach:26257/is_development?sslmode=disable
+      TTN_LW_STACK_IS_DATABASE_URI: postgres://root@cockroach:26257/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
       TTN_LW_STACK_REDIS_ADDRESS: redis:6379
     depends_on:
       - cockroach
@@ -23,14 +23,17 @@ services:
       - "8885:8885"
       - "1700:1700/udp"
   cockroach:
-    image: cockroachdb/cockroach:v2.0.3
+    image: cockroachdb/cockroach:v2.0.6
     command: start --http-port 26256 --insecure
     volumes:
-      - /cockroach/cockroach-data
+      - ${DEV_DATA_DIR:-.env/data}/cockroach:/cockroach/cockroach-data
     ports:
+      - "127.0.0.1:26257:26257" # Cockroach
       - "127.0.0.1:26256:26256" # WebUI
   redis:
-    image: redis:4.0-alpine
+    image: redis:5.0-alpine
     command: redis-server --appendonly yes
     volumes:
-      - /data
+      - ${DEV_DATA_DIR:-.env/data}/redis:/data
+    ports:
+      - "127.0.0.1:6379:6379"

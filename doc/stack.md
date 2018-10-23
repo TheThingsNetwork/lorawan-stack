@@ -28,23 +28,7 @@ To run the Stack, you will also need to have started an instance of [CockroachDB
 
 + The Identity Server will try to connect by default to a Cockroach instance at `localhost:25267`, with the `root` username and without password. You can change the [connection URI](https://www.cockroachlabs.com/docs/v2.0/connection-parameters#connect-using-a-url) and parameters with the `--is.database-uri` flag.
 
-    With Docker installed, you can start a container instance of Cockroach using the following command:
-
-    ```bash
-    docker run -d -p 127.0.0.1:26257:26257 -p 127.0.0.1:26256:26256 -v "./cockroach:/cockroach/cockroach-data" cockroachdb/cockroach:v2.0.3 start --http-port 26256 --insecure
-    ```
-
-    If you'd rather not use Docker, you can explore the [Quickstart section](https://github.com/cockroachdb/cockroach/#quickstart) of the Cockroach documentation to set it up.
-
-+ The Stack will connect by default to a Redis instance at `localhost:6379`. You can change the connection parameters with the `--redis.address`, `--redis.database` and `--redis.namespace` flags.
-
-    With Docker installed, you can start a container instance of Redis using the following command:
-
-    ```bash
-    docker run -d -p 127.0.0.1:6379:6379 -v "./redis:/data" redis:4.0-alpine redis-server --appendonly yes
-    ```
-
-    If you'd rather not use Docker, you can explore the [Redis documentation](https://redis.io/download) to set it up.
++ The Stack will connect by default to a Redis instance at `localhost:6379`. You can change the connection parameters with the `--redis.address`, `--redis.password`, `--redis.database` and `--redis.namespace` flags.
 
 ### Configuration
 
@@ -78,9 +62,9 @@ The `init` command runs database migrations and creates an admin account, with `
 
 #### Run with `docker-compose`
 
-You can also run it using Docker, or container orchestration solutions. A testing [Docker Compose configuration](../docker-compose.yml) is available in the repository:
+You can also run it using Docker, or container orchestration solutions. An example [Docker Compose configuration](../docker-compose.yml) is available in the repository:
 
 ```bash
-$ docker-compose run -e TTN_LW_IDENTITY_SERVER_IS_DATABASE_URI=postgres://root@cockroach:26257/is_development?sslmode=disable --entrypoint ttn-lw-identity-server --rm stack init
+$ docker-compose run --rm --entrypoint ttn-lw-identity-server stack init
 $ docker-compose up
 ```

@@ -49,7 +49,7 @@ var (
 func init() {
 	for _, filepath := range []string{certPem, keyPem} {
 		if _, err := os.Stat(filepath); err != nil {
-			panic(fmt.Sprintf("could not retrieve information about the %s file - if you haven't generated it, generate it with `make dev-cert`.", filepath))
+			panic(fmt.Sprintf("could not retrieve information about the %s file - if you haven't generated it, generate it with `make dev-certs`.", filepath))
 		}
 	}
 }

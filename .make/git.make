@@ -129,4 +129,11 @@ git.commit-msg-casing:
 git.commit-msg-imperative:
 	@grep -q '.*: [A-Za-z]*\(ed\|ing\)' $(ARGS) && $(warn) "Commit messages should follow imperative tense (no 'Added…' or 'Adding…', but 'Add…')" || true
 
+git.diff:
+	@if [[ ! -z "`git diff`" ]]; then \
+		$(err) "Previous operations have created changes that were not recorded in the repository. Please make those changes on your local machine before pushing them to the repository:"; \
+		git diff; \
+		exit 1; \
+	fi
+
 # vim: ft=make
