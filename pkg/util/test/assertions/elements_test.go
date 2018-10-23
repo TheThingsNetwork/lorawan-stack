@@ -185,10 +185,10 @@ func TestShouldHaveSameElements(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			a.So(ShouldHaveSameElements(tc.A, tc.B, reflect.DeepEqual), tc.ShouldFunc)
-			a.So(ShouldNotHaveSameElements(tc.A, tc.B, reflect.DeepEqual), tc.ShouldNotFunc)
-			a.So(ShouldHaveSameElements(tc.A, tc.B, diffEqual), tc.ShouldFunc)
-			a.So(ShouldNotHaveSameElements(tc.A, tc.B, diffEqual), tc.ShouldNotFunc)
+			a.So(ShouldHaveSameElementsFunc(tc.A, tc.B, reflect.DeepEqual), tc.ShouldFunc)
+			a.So(ShouldNotHaveSameElementsFunc(tc.A, tc.B, reflect.DeepEqual), tc.ShouldNotFunc)
+			a.So(ShouldHaveSameElementsFunc(tc.A, tc.B, diffEqual), tc.ShouldFunc)
+			a.So(ShouldNotHaveSameElementsFunc(tc.A, tc.B, diffEqual), tc.ShouldNotFunc)
 			a.So(ShouldHaveSameElementsDeep(tc.A, tc.B), tc.ShouldFunc)
 			a.So(ShouldNotHaveSameElementsDeep(tc.A, tc.B), tc.ShouldNotFunc)
 			a.So(ShouldHaveSameElementsDiff(tc.A, tc.B), tc.ShouldFunc)

@@ -140,9 +140,9 @@ var (
 	StartWith = assertions.ShouldStartWith
 
 	// HaveSameElements asserts that the actual A and expected B elements are equal using an equality function with signature func(A, B) bool.
-	HaveSameElements = testassertions.ShouldHaveSameElements
+	HaveSameElements = testassertions.ShouldHaveSameElementsFunc
 	// NotHaveSameElements asserts that the actual A and expected B elements are not equal using an equality function with signature func(A, B) bool.
-	NotHaveSameElements = testassertions.ShouldNotHaveSameElements
+	NotHaveSameElements = testassertions.ShouldNotHaveSameElementsFunc
 	// HaveSameElementsDeep asserts that the actual A and expected B elements are equal using reflect.Equal.
 	HaveSameElementsDeep = testassertions.ShouldHaveSameElementsDeep
 	// NotHaveSameElementsDeep asserts that the actual A and expected B elements are not equal using reflect.Equal.
