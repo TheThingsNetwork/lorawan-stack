@@ -21,6 +21,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -49,15 +50,23 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin:   true,
-				PendingSession: ttnpb.NewPopulatedSession(test.Randy, false),
+				SupportsJoin: true,
+				PendingSession: &ttnpb.Session{
+					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin:   true,
-				PendingSession: nil,
+				SupportsJoin: true,
+				Session: &ttnpb.Session{
+					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
@@ -86,8 +95,12 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin:   true,
-				PendingSession: ttnpb.NewPopulatedSession(test.Randy, false),
+				SupportsJoin: true,
+				PendingSession: &ttnpb.Session{
+					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
@@ -97,8 +110,12 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin:   true,
-				PendingSession: nil,
+				SupportsJoin: true,
+				Session: &ttnpb.Session{
+					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{

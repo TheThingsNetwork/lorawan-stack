@@ -31,6 +31,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DevStatusAns
+		FCntUp           uint32
 		ReceivedAt       time.Time
 		AssertEvents     func(*testing.T, ...events.Event) bool
 		Error            error
@@ -76,9 +77,6 @@ func TestHandleDevStatusAns(t *testing.T) {
 		{
 			Name: "battery 42/margin 4",
 			Device: &ttnpb.EndDevice{
-				Session: &ttnpb.Session{
-					LastFCntUp: 43,
-				},
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
@@ -90,9 +88,6 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: timePtr(time.Unix(42, 0)),
-				Session: &ttnpb.Session{
-					LastFCntUp: 43,
-				},
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
@@ -105,6 +100,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 42,
 				Margin:  4,
 			},
+			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
@@ -119,9 +115,6 @@ func TestHandleDevStatusAns(t *testing.T) {
 		{
 			Name: "external power/margin 20",
 			Device: &ttnpb.EndDevice{
-				Session: &ttnpb.Session{
-					LastFCntUp: 43,
-				},
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
@@ -133,9 +126,6 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: timePtr(time.Unix(42, 0)),
-				Session: &ttnpb.Session{
-					LastFCntUp: 43,
-				},
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
@@ -148,6 +138,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 0,
 				Margin:  20,
 			},
+			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
@@ -162,9 +153,6 @@ func TestHandleDevStatusAns(t *testing.T) {
 		{
 			Name: "unknown power/margin -5",
 			Device: &ttnpb.EndDevice{
-				Session: &ttnpb.Session{
-					LastFCntUp: 43,
-				},
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
@@ -176,9 +164,6 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: timePtr(time.Unix(42, 0)),
-				Session: &ttnpb.Session{
-					LastFCntUp: 43,
-				},
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
@@ -191,6 +176,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Battery: 255,
 				Margin:  -5,
 			},
+			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				a := assertions.New(t)
@@ -210,7 +196,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 
 			var err error
 			evs := collectEvents(func() {
-				err = handleDevStatusAns(test.Context(), dev, tc.Payload, tc.ReceivedAt)
+				err = handleDevStatusAns(test.Context(), dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
 			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {

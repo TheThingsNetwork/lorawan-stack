@@ -642,33 +642,40 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.Uplink
 // matchDevice tries to match the uplink message with a device.
 // If the uplink message matches a fallback session, that fallback session is recovered.
 // If successful, the FCnt in the uplink message is set to the full FCnt. The LastFCntUp in the session is updated accordingly.
-func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessage) (*ttnpb.EndDevice, error) {
+func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessage) (*ttnpb.EndDevice, *ttnpb.Session, error) {
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithField("dev_addr", pld.DevAddr)
 
-	var devs []*ttnpb.EndDevice
-	if err := ns.devices.RangeByAddr(pld.DevAddr, func(dev *ttnpb.EndDevice) bool {
-		if dev.MACState == nil || dev.Session == nil {
-			return true
-		}
-		if dev.PendingSession != nil && dev.PendingSession.DevAddr == pld.DevAddr {
-			dev.Session = dev.PendingSession
-			dev.PendingSession = nil
-		}
-		devs = append(devs, dev)
-		return true
-	}); err != nil {
-		logger.WithError(err).Warn("Failed to find devices in registry by DevAddr")
-		return nil, err
-	}
-
 	type device struct {
 		*ttnpb.EndDevice
 
-		fCnt uint32
-		gap  uint32
+		matchedSession *ttnpb.Session
+		fCnt           uint32
+		gap            uint32
 	}
+
+	var devs []device
+	if err := ns.devices.RangeByAddr(pld.DevAddr, func(dev *ttnpb.EndDevice) bool {
+		if dev.MACState == nil || (dev.Session == nil && dev.PendingSession == nil) {
+			return true
+		}
+
+		ses := dev.Session
+		if ses == nil {
+			ses = dev.PendingSession
+		}
+		devs = append(devs, device{
+			EndDevice:      dev,
+			matchedSession: ses,
+		})
+		return true
+
+	}); err != nil {
+		logger.WithError(err).Warn("Failed to find devices in registry by DevAddr")
+		return nil, nil, err
+	}
+
 	matching := make([]device, 0, len(devs))
 
 outer:
@@ -676,22 +683,22 @@ outer:
 		fCnt := pld.FCnt
 
 		switch {
-		case !dev.Uses32BitFCnt, fCnt > dev.Session.LastFCntUp:
-		case fCnt > dev.Session.LastFCntUp&0xffff:
-			fCnt |= dev.Session.LastFCntUp &^ 0xffff
-		case dev.Session.LastFCntUp < 0xffff0000:
-			fCnt |= (dev.Session.LastFCntUp + 0x10000) &^ 0xffff
+		case !dev.Uses32BitFCnt, fCnt > dev.matchedSession.LastFCntUp:
+		case fCnt > dev.matchedSession.LastFCntUp&0xffff:
+			fCnt |= dev.matchedSession.LastFCntUp &^ 0xffff
+		case dev.matchedSession.LastFCntUp < 0xffff0000:
+			fCnt |= (dev.matchedSession.LastFCntUp + 0x10000) &^ 0xffff
 		}
 
 		gap := uint32(math.MaxUint32)
-		if fCnt == 0 && dev.Session.LastFCntUp == 0 && len(dev.RecentUplinks) == 0 {
+		if fCnt == 0 && dev.matchedSession.LastFCntUp == 0 && len(dev.RecentUplinks) == 0 {
 			gap = 0
 		} else if !dev.ResetsFCnt {
-			if fCnt <= dev.Session.LastFCntUp {
+			if fCnt <= dev.matchedSession.LastFCntUp {
 				continue outer
 			}
 
-			gap = fCnt - dev.Session.LastFCntUp
+			gap = fCnt - dev.matchedSession.LastFCntUp
 
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
@@ -717,15 +724,17 @@ outer:
 		}
 
 		matching = append(matching, device{
-			EndDevice: dev,
-			gap:       gap,
-			fCnt:      fCnt,
+			EndDevice:      dev.EndDevice,
+			matchedSession: dev.matchedSession,
+			gap:            gap,
+			fCnt:           fCnt,
 		})
 		if dev.ResetsFCnt && fCnt != pld.FCnt {
 			matching = append(matching, device{
-				EndDevice: dev,
-				gap:       gap,
-				fCnt:      pld.FCnt,
+				EndDevice:      dev.EndDevice,
+				matchedSession: dev.matchedSession,
+				gap:            gap,
+				fCnt:           pld.FCnt,
 			})
 		}
 	}
@@ -735,7 +744,7 @@ outer:
 	})
 
 	if len(up.RawPayload) < 4 {
-		return nil, errRawPayloadTooLong
+		return nil, nil, errRawPayloadTooShort
 	}
 	b := up.RawPayload[:len(up.RawPayload)-4]
 
@@ -748,7 +757,7 @@ outer:
 			}
 		}
 
-		if dev.Session.FNwkSIntKey == nil || len(dev.Session.FNwkSIntKey.Key) == 0 {
+		if dev.matchedSession.FNwkSIntKey == nil || len(dev.matchedSession.FNwkSIntKey.Key) == 0 {
 			logger.WithFields(log.Fields(
 				"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 			)).Warn("Device missing FNwkSIntKey in registry")
@@ -756,11 +765,11 @@ outer:
 		}
 
 		var fNwkSIntKey types.AES128Key
-		if dev.Session.FNwkSIntKey.KEKLabel != "" {
+		if dev.matchedSession.FNwkSIntKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
 			panic("Unsupported")
 		}
-		copy(fNwkSIntKey[:], dev.Session.FNwkSIntKey.Key[:])
+		copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
 
 		var computedMIC [4]byte
 		var err error
@@ -773,7 +782,7 @@ outer:
 			)
 
 		} else {
-			if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
+			if dev.matchedSession.SNwkSIntKey == nil || len(dev.matchedSession.SNwkSIntKey.Key) == 0 {
 				logger.WithFields(log.Fields(
 					"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 				)).Warn("Device missing SNwkSIntKey in registry")
@@ -781,15 +790,15 @@ outer:
 			}
 
 			var sNwkSIntKey types.AES128Key
-			if dev.Session.SNwkSIntKey.KEKLabel != "" {
+			if dev.matchedSession.SNwkSIntKey.KEKLabel != "" {
 				// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
 				panic("Unsupported")
 			}
-			copy(sNwkSIntKey[:], dev.Session.SNwkSIntKey.Key[:])
+			copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
 
 			var confFCnt uint32
 			if pld.Ack {
-				confFCnt = dev.Session.LastConfFCntDown
+				confFCnt = dev.matchedSession.LastConfFCntDown
 			}
 
 			computedMIC, err = crypto.ComputeUplinkMIC(
@@ -814,12 +823,12 @@ outer:
 		}
 
 		if dev.fCnt == math.MaxUint32 {
-			return nil, errFCntTooHigh
+			return nil, nil, errFCntTooHigh
 		}
-		dev.Session.LastFCntUp = dev.fCnt
-		return dev.EndDevice, nil
+		dev.matchedSession.LastFCntUp = dev.fCnt
+		return dev.EndDevice, dev.matchedSession, nil
 	}
-	return nil, errDeviceNotFound
+	return nil, nil, errDeviceNotFound
 }
 
 // MACHandler defines the behavior of a MAC command on a device.
@@ -832,7 +841,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		}
 	}()
 
-	dev, err := ns.matchDevice(ctx, up)
+	dev, ses, err := ns.matchDevice(ctx, up)
 	if err != nil {
 		return errDeviceNotFound.WithCause(err)
 	}
@@ -878,16 +887,16 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 
 	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
-		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
+		if ses.NwkSEncKey == nil || len(ses.NwkSEncKey.Key) == 0 {
 			return errUnknownNwkSEncKey
 		}
 
 		var key types.AES128Key
-		if dev.Session.NwkSEncKey.KEKLabel != "" {
+		if ses.NwkSEncKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
 			panic("Unsupported")
 		}
-		copy(key[:], dev.Session.NwkSEncKey.Key[:])
+		copy(key[:], ses.NwkSEncKey.Key[:])
 
 		mac, err = crypto.DecryptUplink(key, *dev.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
 		if err != nil {
@@ -919,23 +928,35 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	var handleErr bool
 	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-		if stored.GetSession().GetSessionKeyID() != dev.Session.SessionKeyID {
+		if stored == nil {
+			logger.Warn("Device deleted during uplink handling, dropping...")
+			handleErr = true
+			return nil, errOutdatedData
+		}
+
+		storedSes := stored.Session
+		if ses != dev.Session {
+			storedSes = stored.PendingSession
+		}
+
+		if storedSes.GetSessionKeyID() != ses.SessionKeyID {
 			logger.Warn("Device changed session during uplink handling, dropping...")
 			handleErr = true
 			return nil, errOutdatedData
 		}
-		if stored.GetSession().GetLastFCntUp() > dev.Session.LastFCntUp && !stored.ResetsFCnt {
+		if storedSes.GetLastFCntUp() > ses.LastFCntUp && !stored.ResetsFCnt {
 			logger.WithFields(log.Fields(
-				"stored_f_cnt", stored.GetSession().GetLastFCntUp(),
-				"got_f_cnt", dev.Session.LastFCntUp,
+				"stored_f_cnt", storedSes.GetLastFCntUp(),
+				"got_f_cnt", ses.LastFCntUp,
 			)).Warn("A more recent uplink was received by device during uplink handling, dropping...")
 			handleErr = true
 			return nil, errOutdatedData
 		}
-		stored.Session = dev.Session
-		if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			// LoRaWAN1.1+ device will send a RekeyInd.
-			stored.PendingSession = nil
+
+		if ses == dev.Session {
+			stored.Session = ses
+		} else {
+			stored.PendingSession = ses
 		}
 
 		stored.RecentUplinks = append(stored.RecentUplinks, up)
@@ -949,6 +970,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			handleErr = true
 			return nil, err
 		}
+
 		stored.MACState.QueuedResponses = stored.MACState.QueuedResponses[:0]
 
 	outer:
@@ -984,7 +1006,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			case ttnpb.CID_RX_PARAM_SETUP:
 				err = handleRxParamSetupAns(ctx, stored, cmd.GetRxParamSetupAns())
 			case ttnpb.CID_DEV_STATUS:
-				err = handleDevStatusAns(ctx, stored, cmd.GetDevStatusAns(), up.ReceivedAt)
+				err = handleDevStatusAns(ctx, stored, cmd.GetDevStatusAns(), ses.LastFCntUp, up.ReceivedAt)
 			case ttnpb.CID_NEW_CHANNEL:
 				err = handleNewChannelAns(ctx, stored, cmd.GetNewChannelAns())
 			case ttnpb.CID_RX_TIMING_SETUP:
@@ -1025,9 +1047,17 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				return nil, err
 			}
 		}
-		if dev.SessionFallback != nil {
+		if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			stored.Session = ses
+			stored.PendingSession = nil
+		} else if stored.PendingSession != nil {
 			handleErr = true
 			return nil, errNoRekey
+		}
+
+		if stored.Session != ses {
+			// Sanity check
+			panic(fmt.Errorf("Session mismatch"))
 		}
 		return stored, nil
 	})

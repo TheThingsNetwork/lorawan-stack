@@ -46,7 +46,7 @@ var (
 	errNoPayload                 = errors.DefineInvalidArgument("no_payload", "no message payload specified")
 	errNoRekey                   = errors.DefineInvalidArgument("no_rekey", "rekey not received after join-accept")
 	errOutdatedData              = errors.DefineNotFound("outdated_data", "data is outdated")
-	errRawPayloadTooLong         = errors.Define("raw_payload_too_long", "length of RawPayload must not be less than 4")
+	errRawPayloadTooShort        = errors.Define("raw_payload_too_short", "length of RawPayload must not be less than 4")
 	errSchedule                  = errors.Define("schedule", "all Gateway Servers failed to schedule the downlink")
 	errScheduleTooSoon           = errors.DefineUnavailable("schedule_too_soon", "confirmed downlink is scheduled too soon")
 	errUnknownApplicationID      = errors.DefineNotFound("unknown_application_id", "application ID is unknown")

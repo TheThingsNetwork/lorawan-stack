@@ -47,7 +47,7 @@ func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, recvAt time.Time) (err error) {
+func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, fCntUp uint32, recvAt time.Time) (err error) {
 	if pld == nil {
 		return errNoPayload
 	}
@@ -68,7 +68,7 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		}
 		dev.DownlinkMargin = pld.Margin
 		dev.LastDevStatusReceivedAt = &recvAt
-		dev.MACState.LastDevStatusFCntUp = dev.Session.LastFCntUp
+		dev.MACState.LastDevStatusFCntUp = fCntUp
 		return nil
 
 	}, dev.MACState.PendingRequests...)
