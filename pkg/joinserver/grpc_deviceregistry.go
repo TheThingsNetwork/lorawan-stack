@@ -23,14 +23,18 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (ns *JoinServer) Get(context.Context, *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+type jsEndDeviceRegistryServer struct {
+	JS *JoinServer
+}
+
+func (jsEndDeviceRegistryServer) Get(context.Context, *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (ns *JoinServer) Set(context.Context, *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (jsEndDeviceRegistryServer) Set(context.Context, *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (ns *JoinServer) Delete(context.Context, *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (jsEndDeviceRegistryServer) Delete(context.Context, *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }

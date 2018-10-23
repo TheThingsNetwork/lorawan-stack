@@ -37,7 +37,7 @@ func TestGetAppSKey(t *testing.T) {
 
 		Context func(context.Context) context.Context
 
-		GetByID     func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
+		GetByID     func(context.Context, types.EUI64, string, []string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.AppSKeyResponse
 
@@ -45,10 +45,13 @@ func TestGetAppSKey(t *testing.T) {
 	}{
 		{
 			Name: "Registry error",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
 				return nil, errTest
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
@@ -66,10 +69,13 @@ func TestGetAppSKey(t *testing.T) {
 		},
 		{
 			Name: "Missing AppSKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
 				return &ttnpb.SessionKeys{}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
@@ -83,10 +89,13 @@ func TestGetAppSKey(t *testing.T) {
 		},
 		{
 			Name: "Matching request",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
 				return &ttnpb.SessionKeys{
 					SessionKeyID: "test",
 					AppSKey: &ttnpb.KeyEnvelope{
@@ -115,24 +124,27 @@ func TestGetAppSKey(t *testing.T) {
 				ctx = tc.Context(ctx)
 			}
 
-			resp, err := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
-				&Config{
-					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
-					Devices: &MockDeviceRegistry{},
-				},
-			)).(*JoinServer).GetAppSKey(ctx, tc.KeyRequest)
+			js := AsJsServer{
+				JS: test.Must(New(
+					component.MustNew(test.GetLogger(t), &component.Config{}),
+					&Config{
+						Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
+						Devices: &MockDeviceRegistry{},
+					},
+				)).(*JoinServer),
+			}
+			res, err := js.GetAppSKey(ctx, tc.KeyRequest)
 
 			if tc.ErrorAssertion != nil {
 				if !tc.ErrorAssertion(t, err) {
 					t.Errorf("Received unexpected error: %s", err)
 				}
-				a.So(resp, should.BeNil)
+				a.So(res, should.BeNil)
 				return
 			}
 
 			a.So(err, should.BeNil)
-			a.So(resp, should.Resemble, tc.KeyResponse)
+			a.So(res, should.Resemble, tc.KeyResponse)
 		})
 	}
 }

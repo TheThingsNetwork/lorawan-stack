@@ -66,54 +66,56 @@ func TestHandleJoin(t *testing.T) {
 	devReg := &redis.DeviceRegistry{Redis: redisClient}
 	keyReg := &redis.KeyRegistry{Redis: redisClient}
 
-	js := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
-		&Config{
-			Devices:         devReg,
-			Keys:            keyReg,
-			JoinEUIPrefixes: joinEUIPrefixes,
-		},
-	)).(*JoinServer)
+	js := NsJsServer{
+		JS: test.Must(New(
+			component.MustNew(test.GetLogger(t), &component.Config{}),
+			&Config{
+				Devices:         devReg,
+				Keys:            keyReg,
+				JoinEUIPrefixes: joinEUIPrefixes,
+			},
+		)).(*JoinServer),
+	}
 
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
-	resp, err := js.HandleJoin(authorizedCtx, req)
+	res, err := js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.EndDeviceIdentifiers.DevAddr = nil
-	resp, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
-	resp, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
-	resp, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{}
-	resp, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().DevEUI = types.EUI64{}
-	resp, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
-	resp, err = js.HandleJoin(authorizedCtx, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
+	res, err = js.HandleJoin(authorizedCtx, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
 	a.So(err, should.NotBeNil)
-	a.So(resp, should.BeNil)
+	a.So(res, should.BeNil)
 
 	for _, tc := range []struct {
 		Name string
@@ -1089,14 +1091,16 @@ func TestHandleJoin(t *testing.T) {
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
 			keyReg := &redis.KeyRegistry{Redis: redisClient}
 
-			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
-				&Config{
-					Devices:         devReg,
-					Keys:            keyReg,
-					JoinEUIPrefixes: joinEUIPrefixes,
-				},
-			)).(*JoinServer)
+			js := NsJsServer{
+				JS: test.Must(New(
+					component.MustNew(test.GetLogger(t), &component.Config{}),
+					&Config{
+						Devices:         devReg,
+						Keys:            keyReg,
+						JoinEUIPrefixes: joinEUIPrefixes,
+					},
+				)).(*JoinServer),
+			}
 
 			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
@@ -1108,24 +1112,24 @@ func TestHandleJoin(t *testing.T) {
 			a.So(ret, should.Resemble, pb)
 
 			start := time.Now()
-			resp, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
+			res, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			if tc.ValidError != nil {
 				if !a.So(err, should.BeError) || !a.So(tc.ValidError(err), should.BeTrue) {
 					t.Fatalf("Received an unexpected error: %s", err)
 				}
-				a.So(resp, should.BeNil)
+				a.So(res, should.BeNil)
 				return
 			}
 
-			if !a.So(err, should.BeNil) || !a.So(resp, should.NotBeNil) {
+			if !a.So(err, should.BeNil) || !a.So(res, should.NotBeNil) {
 				t.FailNow()
 			}
 			expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
-			a.So(resp.SessionKeyID, should.NotBeEmpty)
-			expectedResp.SessionKeyID = resp.SessionKeyID
-			a.So(resp, should.Resemble, expectedResp)
+			a.So(res.SessionKeyID, should.NotBeEmpty)
+			expectedResp.SessionKeyID = res.SessionKeyID
+			a.So(res, should.Resemble, expectedResp)
 
-			ret, err = devReg.GetByEUI(authorizedCtx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+			ret, err = devReg.GetByEUI(authorizedCtx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, nil)
 			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 				t.FailNow()
 			}
@@ -1144,14 +1148,14 @@ func TestHandleJoin(t *testing.T) {
 			a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
 			pb.Session = &ttnpb.Session{
 				DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
-				SessionKeys: resp.SessionKeys,
+				SessionKeys: res.SessionKeys,
 				StartedAt:   ret.GetSession().GetStartedAt(),
 			}
 			a.So(ret, should.ResembleDiff, pb)
 
-			resp, err = js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
+			res, err = js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			a.So(err, should.BeError)
-			a.So(resp, should.BeNil)
+			a.So(res, should.BeNil)
 		})
 	}
 }
@@ -1164,7 +1168,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 		Context func(context.Context) context.Context
 
-		GetByID     func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
+		GetByID     func(context.Context, types.EUI64, string, []string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.NwkSKeysResponse
 
@@ -1172,10 +1176,15 @@ func TestGetNwkSKeys(t *testing.T) {
 	}{
 		{
 			Name: "Registry error",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"f_nwk_s_int_key",
+					"nwk_s_enc_key",
+					"s_nwk_s_int_key",
+				})
 				return nil, errTest
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
@@ -1193,10 +1202,15 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No SNwkSIntKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"f_nwk_s_int_key",
+					"nwk_s_enc_key",
+					"s_nwk_s_int_key",
+				})
 				return &ttnpb.SessionKeys{
 					FNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
 					NwkSEncKey:  ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
@@ -1213,10 +1227,15 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No NwkSEncKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"f_nwk_s_int_key",
+					"nwk_s_enc_key",
+					"s_nwk_s_int_key",
+				})
 				return &ttnpb.SessionKeys{
 					FNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
 					SNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
@@ -1233,10 +1252,15 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No FNwkSIntKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"f_nwk_s_int_key",
+					"nwk_s_enc_key",
+					"s_nwk_s_int_key",
+				})
 				return &ttnpb.SessionKeys{
 					SNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
 					NwkSEncKey:  ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
@@ -1253,10 +1277,15 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "Matching request",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, "test-id")
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"f_nwk_s_int_key",
+					"nwk_s_enc_key",
+					"s_nwk_s_int_key",
+				})
 				return &ttnpb.SessionKeys{
 					SessionKeyID: "test",
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -1301,24 +1330,27 @@ func TestGetNwkSKeys(t *testing.T) {
 				ctx = tc.Context(ctx)
 			}
 
-			resp, err := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
-				&Config{
-					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
-					Devices: &MockDeviceRegistry{},
-				},
-			)).(*JoinServer).GetNwkSKeys(ctx, tc.KeyRequest)
+			js := NsJsServer{
+				JS: test.Must(New(
+					component.MustNew(test.GetLogger(t), &component.Config{}),
+					&Config{
+						Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
+						Devices: &MockDeviceRegistry{},
+					},
+				)).(*JoinServer),
+			}
+			res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 
 			if tc.ErrorAssertion != nil {
 				if !tc.ErrorAssertion(t, err) {
 					t.Errorf("Received unexpected error: %s", err)
 				}
-				a.So(resp, should.BeNil)
+				a.So(res, should.BeNil)
 				return
 			}
 
 			a.So(err, should.BeNil)
-			a.So(resp, should.Resemble, tc.KeyResponse)
+			a.So(res, should.Resemble, tc.KeyResponse)
 		})
 	}
 }

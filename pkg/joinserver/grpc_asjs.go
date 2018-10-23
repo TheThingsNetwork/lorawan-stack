@@ -20,9 +20,17 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+type asJsServer struct {
+	JS *JoinServer
+}
+
 // GetAppSKey returns the AppSKey associated with session keys identified by the supplied request.
-func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID)
+func (srv asJsServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	ks, err := srv.JS.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
+		[]string{
+			"app_s_key",
+		},
+	)
 	if err != nil {
 		return nil, errRegistryOperation.WithCause(err)
 	}

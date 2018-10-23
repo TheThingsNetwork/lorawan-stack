@@ -42,42 +42,46 @@ var (
 	KeyToBytes = keyToBytes
 )
 
+type AsJsServer = asJsServer
+type NsJsServer = nsJsServer
+type JsDeviceServer = jsEndDeviceRegistryServer
+
 type MockDeviceRegistry struct {
-	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64) (*ttnpb.EndDevice, error)
-	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error)
+	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error)
+	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
-func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error) {
+func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	if r.GetByEUIFunc == nil {
 		return nil, errors.New("Not implemented")
 	}
-	return r.GetByEUIFunc(ctx, joinEUI, devEUI)
+	return r.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
 }
 
-func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error) {
+func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if r.SetByEUIFunc == nil {
 		return nil, errors.New("Not implemented")
 	}
-	return r.SetByEUIFunc(ctx, joinEUI, devEUI, f)
+	return r.SetByEUIFunc(ctx, joinEUI, devEUI, paths, f)
 }
 
 type MockKeyRegistry struct {
-	GetByIDFunc func(context.Context, types.EUI64, string) (*ttnpb.SessionKeys, error)
-	SetByIDFunc func(context.Context, types.EUI64, string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error)
+	GetByIDFunc func(context.Context, types.EUI64, string, []string) (*ttnpb.SessionKeys, error)
+	SetByIDFunc func(context.Context, types.EUI64, string, []string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 }
 
-func (r *MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+func (r *MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
 	if r.GetByIDFunc == nil {
 		return nil, errors.New("Not implemented")
 	}
-	return r.GetByIDFunc(ctx, devEUI, id)
+	return r.GetByIDFunc(ctx, devEUI, id, paths)
 }
 
-func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error) {
+func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
 	if r.SetByIDFunc == nil {
 		return nil, errors.New("Not implemented")
 	}
-	return r.SetByIDFunc(ctx, devEUI, id, f)
+	return r.SetByIDFunc(ctx, devEUI, id, paths, f)
 }
 
 func TestMICCheck(t *testing.T) {

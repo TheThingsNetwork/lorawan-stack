@@ -47,7 +47,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		},
 	}
 
-	ret, err := reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	ret, err := reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -66,14 +66,14 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pb.UpdatedAt = ret.UpdatedAt
 	a.So(ret, should.ResembleDiff, pb)
 
-	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.ResembleDiff, pb)
 
 	pbOther := CopyEndDevice(pb)
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -90,7 +90,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pbOther.UpdatedAt = ret.UpdatedAt
 	a.So(ret, should.ResembleDiff, pbOther)
 
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.ResembleDiff, pbOther)
 
@@ -99,7 +99,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -110,11 +110,13 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
+
+	// TODO: Test field mask application once implemented (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
 }
 
 func CopySessionKeys(pb *ttnpb.SessionKeys) *ttnpb.SessionKeys {
@@ -177,7 +179,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	pb := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
 	pb.SessionKeyID = "test-keys"
 
-	ret, err := reg.GetByID(ctx, devEUI, pb.SessionKeyID)
+	ret, err := reg.GetByID(ctx, devEUI, pb.SessionKeyID, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -189,14 +191,14 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	}
 	a.So(ret, should.ResembleDiff, pb)
 
-	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID)
+	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.ResembleDiff, pb)
 
 	pbOther := CopySessionKeys(pb)
 	devEUIOther := types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID)
+	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID, pbOther.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -208,7 +210,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	}
 	a.So(ret, should.ResembleDiff, pbOther)
 
-	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID)
+	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.ResembleDiff, pbOther)
 
@@ -217,7 +219,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID)
+	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -228,11 +230,13 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID)
+	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID, pbOther.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
+
+	// TODO: Test field mask application once implemented (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
 }
 
 func TestSessionKeyRegistries(t *testing.T) {

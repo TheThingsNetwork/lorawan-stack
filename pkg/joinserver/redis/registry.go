@@ -34,7 +34,7 @@ type DeviceRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, _ []string) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -43,10 +43,13 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(joinEUI.String(), devEUI.String())).ScanProto(pb); err != nil {
 		return nil, err
 	}
+
+	// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 	return pb, nil
 }
 
-func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, _ []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -66,11 +69,15 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 
 		createdAt := pb.GetCreatedAt()
 
+		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var err error
-		pb, err = f(pb)
+		pb, _, err = f(pb)
 		if err != nil {
 			return err
 		}
+
+		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
 
 		var f func(redis.Pipeliner) error
 		if pb == nil {
@@ -113,7 +120,7 @@ type KeyRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error) {
+func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string, _ []string) (*ttnpb.SessionKeys, error) {
 	if devEUI.IsZero() || id == "" {
 		return nil, errInvalidIdentifiers
 	}
@@ -122,10 +129,13 @@ func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string
 	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(devEUI.String(), id)).ScanProto(pb); err != nil {
 		return nil, err
 	}
+
+	// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 	return pb, nil
 }
 
-func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error) {
+func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, _ []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
 	if devEUI.IsZero() || id == "" {
 		return nil, errInvalidIdentifiers
 	}
@@ -141,11 +151,15 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string
 			return err
 		}
 
+		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var err error
-		pb, err = f(pb)
+		pb, _, err = f(pb)
 		if err != nil {
 			return err
 		}
+
+		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
 
 		var f func(redis.Pipeliner) error
 		if pb == nil {

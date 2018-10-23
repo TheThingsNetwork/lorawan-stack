@@ -22,12 +22,12 @@ import (
 )
 
 type DeviceRegistry interface {
-	GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error)
-	SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error)
+	GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
+	SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
 func DeleteDevice(ctx context.Context, r DeviceRegistry, joinEUI types.EUI64, devEUI types.EUI64) error {
-	_, err := r.SetByEUI(ctx, joinEUI, devEUI, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error) { return nil, nil })
+	_, err := r.SetByEUI(ctx, joinEUI, devEUI, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
 
@@ -35,11 +35,11 @@ func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (
 	if dev.EndDeviceIdentifiers.JoinEUI == nil || dev.EndDeviceIdentifiers.DevEUI == nil {
 		return nil, errInvalidIdentifiers
 	}
-	dev, err := r.SetByEUI(ctx, *dev.EndDeviceIdentifiers.JoinEUI, *dev.EndDeviceIdentifiers.DevEUI, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+	dev, err := r.SetByEUI(ctx, *dev.EndDeviceIdentifiers.JoinEUI, *dev.EndDeviceIdentifiers.DevEUI, nil, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {
-			return nil, errDuplicateIdentifiers
+			return nil, nil, errDuplicateIdentifiers
 		}
-		return dev, nil
+		return dev, nil, nil
 	})
 	if err != nil {
 		return nil, err
@@ -48,12 +48,12 @@ func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (
 }
 
 type KeyRegistry interface {
-	GetByID(ctx context.Context, devEUI types.EUI64, id string) (*ttnpb.SessionKeys, error)
-	SetByID(ctx context.Context, devEUI types.EUI64, id string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error)) (*ttnpb.SessionKeys, error)
+	GetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error)
+	SetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 }
 
 func DeleteKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, id string) error {
-	_, err := r.SetByID(ctx, devEUI, id, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, error) { return nil, nil })
+	_, err := r.SetByID(ctx, devEUI, id, nil, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) { return nil, nil, nil })
 	return err
 }
 
@@ -61,11 +61,11 @@ func CreateKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, ks *ttnp
 	if devEUI.IsZero() || ks.SessionKeyID == "" {
 		return nil, errInvalidIdentifiers
 	}
-	ks, err := r.SetByID(ctx, devEUI, ks.SessionKeyID, func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, error) {
+	ks, err := r.SetByID(ctx, devEUI, ks.SessionKeyID, nil, func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
 		if stored != nil {
-			return nil, errDuplicateIdentifiers
+			return nil, nil, errDuplicateIdentifiers
 		}
-		return ks, nil
+		return ks, nil, nil
 	})
 	if err != nil {
 		return nil, err

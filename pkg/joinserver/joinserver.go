@@ -45,6 +45,12 @@ type JoinServer struct {
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader
+
+	grpc struct {
+		nsJs      nsJsServer
+		asJs      asJsServer
+		jsDevices jsEndDeviceRegistryServer
+	}
 }
 
 // Config represents the JoinServer configuration.
@@ -71,6 +77,9 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropyMu: &sync.Mutex{},
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
+	js.grpc.jsDevices = jsEndDeviceRegistryServer{JS: js}
+	js.grpc.asJs = asJsServer{JS: js}
+	js.grpc.nsJs = nsJsServer{JS: js}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
@@ -86,9 +95,9 @@ func (js *JoinServer) Roles() []ttnpb.PeerInfo_Role {
 
 // RegisterServices registers services provided by js at s.
 func (js *JoinServer) RegisterServices(s *grpc.Server) {
-	ttnpb.RegisterAsJsServer(s, js)
-	ttnpb.RegisterNsJsServer(s, js)
-	ttnpb.RegisterJsEndDeviceRegistryServer(s, js)
+	ttnpb.RegisterAsJsServer(s, js.grpc.asJs)
+	ttnpb.RegisterNsJsServer(s, js.grpc.nsJs)
+	ttnpb.RegisterJsEndDeviceRegistryServer(s, js.grpc.jsDevices)
 }
 
 // RegisterHandlers registers gRPC handlers.
