@@ -41,7 +41,7 @@ type DeviceRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, _ []string) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
@@ -53,21 +53,30 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(unique.ID(ctx, ids))).ScanProto(dev); err != nil {
 		return nil, err
 	}
+
+	// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 	return dev, nil
 }
 
-func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, _ []string) (*ttnpb.EndDevice, error) {
 	dev := &ttnpb.EndDevice{}
 	if err := ttnredis.FindProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()), r.Redis.Key).ScanProto(dev); err != nil {
 		return nil, err
 	}
+
+	// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 	return dev, nil
 }
 
-func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, f func(*ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, _ []string, f func(*ttnpb.EndDevice) bool) error {
 	return ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() bool) {
 		dev := &ttnpb.EndDevice{}
-		return dev, func() bool { return f(dev) }
+		return dev, func() bool {
+			// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+			return f(dev)
+		}
 	})
 }
 
@@ -103,7 +112,7 @@ func equalEUI(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
-func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, f func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, _ []string, f func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
@@ -128,11 +137,15 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		createdAt := dev.GetCreatedAt()
 		oldAddrs, oldIDs := getDevAddrsAndIDs(dev)
 
+		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var err error
-		dev, err = f(dev)
+		dev, _, err = f(dev)
 		if err != nil {
 			return err
 		}
+
+		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
 
 		var f func(redis.Pipeliner) error
 		if dev == nil {

@@ -52,13 +52,13 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 		},
 	}
 
-	ret, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+	ret, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -66,7 +66,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	var rets []*ttnpb.EndDevice
 	rets = nil
-	err = reg.RangeByAddr(pb.Session.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.Session.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -74,7 +74,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pb.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.PendingSession.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -94,15 +94,15 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pb.UpdatedAt = ret.UpdatedAt
 	a.So(ret, should.ResembleDiff, pb)
 
-	ret, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+	ret, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.ResembleDiff, pb)
 
-	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.ResembleDiff, pb)
 
-	err = reg.RangeByAddr(pb.Session.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.Session.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -110,7 +110,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb})
 
 	rets = nil
-	err = reg.RangeByAddr(pb.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.PendingSession.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -121,13 +121,13 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pbOther.EndDeviceIdentifiers.DeviceID = "test-dev-other"
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
+	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, pbOther.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pbOther.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -144,16 +144,16 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pbOther.UpdatedAt = ret.UpdatedAt
 	a.So(ret, should.ResembleDiff, pbOther)
 
-	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
+	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, pbOther.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.Resemble, pbOther)
 
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pbOther.FieldMaskPaths())
 	a.So(err, should.BeNil)
 	a.So(ret, should.Resemble, pbOther)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.Session.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pbOther.Session.DevAddr, pbOther.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -161,7 +161,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb, pbOther})
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, pbOther.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -173,20 +173,20 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+	ret, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pb.Session.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.Session.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -194,7 +194,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pbOther})
 
 	rets = nil
-	err = reg.RangeByAddr(pb.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pb.PendingSession.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -206,20 +206,20 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
+	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, pbOther.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pbOther.FieldMaskPaths())
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.Session.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pbOther.Session.DevAddr, pbOther.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -227,7 +227,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, pbOther.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})

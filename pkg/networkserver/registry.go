@@ -22,23 +22,23 @@ import (
 )
 
 type DeviceRegistry interface {
-	GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64) (*ttnpb.EndDevice, error)
-	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string) (*ttnpb.EndDevice, error)
-	RangeByAddr(devAddr types.DevAddr, f func(*ttnpb.EndDevice) bool) error
-	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error)) (*ttnpb.EndDevice, error)
+	GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
+	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
+	RangeByAddr(devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error
+	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
 func DeleteDevice(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string) error {
-	_, err := r.SetByID(ctx, appID, devID, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, error) { return nil, nil })
+	_, err := r.SetByID(ctx, appID, devID, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
 
 func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-	dev, err := r.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+	dev, err := r.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, nil, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {
-			return nil, errDuplicateIdentifiers
+			return nil, nil, errDuplicateIdentifiers
 		}
-		return dev, nil
+		return dev, nil, nil
 	})
 	if err != nil {
 		return nil, err

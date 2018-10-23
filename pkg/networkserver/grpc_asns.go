@@ -75,12 +75,12 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
-			return nil, errDeviceNotFound
+			return nil, nil, errDeviceNotFound
 		}
 		dev.QueuedApplicationDownlinks = req.Downlinks
-		return dev, nil
+		return dev, []string{"queued_application_downlinks"}, nil
 	})
 	if err != nil {
 		return nil, err
@@ -94,12 +94,12 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{"queued_application_downlinks"}, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
-			return nil, errDeviceNotFound
+			return nil, nil, errDeviceNotFound
 		}
 		dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
-		return dev, nil
+		return dev, []string{"queued_application_downlinks"}, nil
 	})
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 // DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	dev, err := ns.devices.GetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID)
+	dev, err := ns.devices.GetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, []string{"queued_application_downlinks"})
 	if err != nil {
 		return nil, err
 	}
