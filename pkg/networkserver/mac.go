@@ -18,6 +18,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// enqueueMACCommand appends commands returned by f to cmds.
+// Arguments to f represent the amount of downlink and uplink messages respectively with CID cid which fit in byte limits maxDownLen and maxUpLen.
+// f returns a slice downlink commands to append to cmds, amount of uplinks to expect and bool indicating whether all commands fit.
+// enqueueMACCommand returns the resulting downlink MAC command slice, new value for maxDownLen, maxUpLen and bool indicating whether all commands fit.
 func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, uint16, uint16, bool) {
 	desc := ttnpb.DefaultMACCommands[cid]
 	maxDown := maxDownLen / (1 + desc.DownlinkLength)
@@ -29,6 +33,9 @@ func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint
 	return append(cmds, enq...), maxDownLen - uint16(len(enq))*desc.DownlinkLength, maxUpLen - nUp*desc.UplinkLength, ok
 }
 
+// handleMACResponse searches for first command in cmds with CID equal to cid and calls f with found value as argument.
+// handleMACResponse returns cmds with first MAC command with CID equal to cid removed or
+// cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds.
 func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	for i, cmd := range cmds {
 		if cmd.CID != cid {
@@ -42,6 +49,9 @@ func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand)
 	return cmds, errMACRequestNotFound
 }
 
+// handleMACResponse searches for first MAC command block in cmds with CID equal to cid and calls f for each found value as argument.
+// handleMACResponse returns cmds with first MAC command block with CID equal to cid removed or
+// cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds.
 func handleMACResponseBlock(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	first := -1
 	last := -1
