@@ -27,36 +27,36 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-func defineReceiveMACAcceptEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc))
+func defineReceiveMACAcceptEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc))
 }
 
-func defineReceiveMACAnswerEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc))
+func defineReceiveMACAnswerEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc))
 }
 
-func defineReceiveMACIndicationEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc))
+func defineReceiveMACIndicationEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc))
 }
 
-func defineReceiveMACRejectEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc))
+func defineReceiveMACRejectEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc))
 }
 
-func defineReceiveMACRequestEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc))
+func defineReceiveMACRequestEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc))
 }
 
-func defineEnqueueMACAnswerEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc))
+func defineEnqueueMACAnswerEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc))
 }
 
-func defineEnqueueMACConfirmationEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc))
+func defineEnqueueMACConfirmationEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc))
 }
 
-func defineEnqueueMACRequestEvent(name, desc string) events.Definition {
-	return events.Define(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc))
+func defineEnqueueMACRequestEvent(name, desc string) func() events.Definition {
+	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc))
 }
 
 var (

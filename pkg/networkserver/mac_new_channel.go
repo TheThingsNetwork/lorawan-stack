@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	evtEnqueueNewChannelRequest = defineEnqueueMACRequestEvent("new_channel", "new channel")
-	evtReceiveNewChannelAccept  = defineReceiveMACAcceptEvent("new_channel", "new channel")
-	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")
+	evtEnqueueNewChannelRequest = defineEnqueueMACRequestEvent("new_channel", "new channel")()
+	evtReceiveNewChannelAccept  = defineReceiveMACAcceptEvent("new_channel", "new channel")()
+	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
 func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

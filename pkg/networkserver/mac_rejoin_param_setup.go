@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtEnqueueRejoinParamSetupRequest = defineEnqueueMACRequestEvent("rejoin_param_setup", "rejoin parameter setup")
-	evtReceiveRejoinParamSetupAnswer  = defineReceiveMACAnswerEvent("rejoin_param_setup", "rejoin parameter setup")
+	evtEnqueueRejoinParamSetupRequest = defineEnqueueMACRequestEvent("rejoin_param_setup", "rejoin parameter setup")()
+	evtReceiveRejoinParamSetupAnswer  = defineReceiveMACAnswerEvent("rejoin_param_setup", "rejoin parameter setup")()
 )
 
 func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

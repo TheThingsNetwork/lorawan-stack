@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtEnqueueRxTimingSetupRequest = defineEnqueueMACRequestEvent("rx_timing_setup", "Rx timing setup")
-	evtReceiveRxTimingSetupAnswer  = defineReceiveMACAnswerEvent("rx_timing_setup", "Rx timing setup")
+	evtEnqueueRxTimingSetupRequest = defineEnqueueMACRequestEvent("rx_timing_setup", "Rx timing setup")()
+	evtReceiveRxTimingSetupAnswer  = defineReceiveMACAnswerEvent("rx_timing_setup", "Rx timing setup")()
 )
 
 func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

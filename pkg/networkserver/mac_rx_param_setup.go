@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	evtEnqueueRxParamSetupRequest = defineEnqueueMACRequestEvent("rx_param_setup", "Rx parameter setup")
-	evtReceiveRxParamSetupAccept  = defineReceiveMACAcceptEvent("rx_param_setup", "Rx parameter setup")
-	evtReceiveRxParamSetupReject  = defineReceiveMACRejectEvent("rx_param_setup", "Rx parameter setup")
+	evtEnqueueRxParamSetupRequest = defineEnqueueMACRequestEvent("rx_param_setup", "Rx parameter setup")()
+	evtReceiveRxParamSetupAccept  = defineReceiveMACAcceptEvent("rx_param_setup", "Rx parameter setup")()
+	evtReceiveRxParamSetupReject  = defineReceiveMACRejectEvent("rx_param_setup", "Rx parameter setup")()
 )
 
 func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

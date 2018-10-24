@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	evtEnqueueBeaconFreqRequest = defineEnqueueMACRequestEvent("beacon_freq", "beacon frequency change")
-	evtReceiveBeaconFreqReject  = defineReceiveMACRejectEvent("beacon_freq", "beacon frequency change")
-	evtReceiveBeaconFreqAccept  = defineReceiveMACAcceptEvent("beacon_freq", "beacon frequency change")
+	evtEnqueueBeaconFreqRequest = defineEnqueueMACRequestEvent("beacon_freq", "beacon frequency change")()
+	evtReceiveBeaconFreqReject  = defineReceiveMACRejectEvent("beacon_freq", "beacon frequency change")()
+	evtReceiveBeaconFreqAccept  = defineReceiveMACAcceptEvent("beacon_freq", "beacon frequency change")()
 )
 
 func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

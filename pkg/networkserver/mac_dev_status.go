@@ -23,8 +23,8 @@ import (
 )
 
 var (
-	evtEnqueueDevStatusRequest = defineEnqueueMACRequestEvent("dev_status", "device status")
-	evtReceiveDevStatusAnswer  = defineReceiveMACAnswerEvent("dev_status", "device status")
+	evtEnqueueDevStatusRequest = defineEnqueueMACRequestEvent("dev_status", "device status")()
+	evtReceiveDevStatusAnswer  = defineReceiveMACAnswerEvent("dev_status", "device status")()
 )
 
 func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

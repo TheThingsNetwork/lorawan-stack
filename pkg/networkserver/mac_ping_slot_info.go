@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtEnqueuePingSlotInfoAnswer  = defineEnqueueMACAnswerEvent("ping_slot_info", "ping slot info")
-	evtReceivePingSlotInfoRequest = defineReceiveMACRequestEvent("ping_slot_info", "ping slot info")
+	evtEnqueuePingSlotInfoAnswer  = defineEnqueueMACAnswerEvent("ping_slot_info", "ping slot info")()
+	evtReceivePingSlotInfoRequest = defineReceiveMACRequestEvent("ping_slot_info", "ping slot info")()
 )
 
 func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) error {

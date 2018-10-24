@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	evtEnqueueDutyCycleRequest = defineEnqueueMACRequestEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")
-	evtReceiveDutyCycleAnswer  = defineReceiveMACAnswerEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")
+	evtEnqueueDutyCycleRequest = defineEnqueueMACRequestEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")()
+	evtReceiveDutyCycleAnswer  = defineReceiveMACAnswerEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")()
 )
 
 func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {

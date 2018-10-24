@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	evtReceiveDeviceTimeRequest = defineReceiveMACRequestEvent("device_time", "device time")
-	evtEnqueueDeviceTimeAnswer  = defineEnqueueMACAnswerEvent("device_time", "device time")
+	evtReceiveDeviceTimeRequest = defineReceiveMACRequestEvent("device_time", "device time")()
+	evtEnqueueDeviceTimeAnswer  = defineEnqueueMACAnswerEvent("device_time", "device time")()
 )
 
 func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
