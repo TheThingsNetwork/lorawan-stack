@@ -289,7 +289,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
-			"next_session",
+			"pending_session",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
@@ -321,14 +321,14 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				},
 				StartedAt: time.Now(), // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 			}
-			if joinAccept.NextSession {
-				dev.NextSession = session
-				mask = append(mask, "next_session")
+			if joinAccept.PendingSession {
+				dev.PendingSession = session
+				mask = append(mask, "pending_session")
 			} else {
 				previousSession := dev.Session
 				dev.Session = session
-				dev.NextSession = nil
-				mask = append(mask, "session", "next_session")
+				dev.PendingSession = nil
+				mask = append(mask, "session", "pending_session")
 				if len(joinAccept.InvalidatedDownlinks) > 0 {
 					// The Network Server reset the downlink queue as the new security session invalidated it. The invalidated
 					// downlink queue is passed as part of the join-accept and the Application Server should recalculate it. This
@@ -357,7 +357,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
-			"next_session",
+			"pending_session",
 			"formatters",
 			"version_ids",
 		},
@@ -373,9 +373,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			if dev.Session == nil || dev.Session.SessionKeyID != uplink.SessionKeyID {
 				logger := logger.WithField("session_key_id", uplink.SessionKeyID)
 				previousSession := dev.Session
-				if dev.NextSession != nil && dev.NextSession.SessionKeyID == uplink.SessionKeyID {
-					logger.Debug("Switching to next session")
-					dev.Session = dev.NextSession
+				if dev.PendingSession != nil && dev.PendingSession.SessionKeyID == uplink.SessionKeyID {
+					logger.Debug("Switching to pending session")
+					dev.Session = dev.PendingSession
 				} else {
 					if !created {
 						logger.Warn("Restoring session...")
@@ -394,7 +394,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					}
 					logger.Debug("Restored session")
 				}
-				dev.NextSession = nil
+				dev.PendingSession = nil
 				// At this point, the application downlink queue in the Network Server is invalid; recalculation is necessary.
 				// Next AFCntDown 1 is assumed. If this is a LoRaWAN 1.0.x end device and the Network Server sent MAC layer
 				// downlink already, the Network Server will trigger the DownlinkQueueInvalidated event. Therefore, this
@@ -413,7 +413,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 				} else if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, res.Downlinks, 1, link); err != nil {
 					log.WithError(err).Warn("Failed to recalculate downlink queue")
 				}
-				mask = append(mask, "session", "next_session")
+				mask = append(mask, "session", "pending_session")
 				logger.Debug("Session restored")
 			} else if dev.Session.AppSKey == nil {
 				return nil, nil, errNoAppSKey
@@ -438,7 +438,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
-			"next_session",
+			"pending_session",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -478,7 +478,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 // recalculateDownlinkQueue decrypts items in the given invalid downlink queue, encrypts the items with frame counters
 // starting from the given frame counter, and replaces the downlink queue in the Network Server.
 // If re-encrypting a message fails, the message is skipped.
-// This method requires the given end device's session and next session to be set. This method mutates the end device's
+// This method requires the given end device's session and pending session to be set. This method mutates the end device's
 // session LastAFCntDown.
 // This method does not change the contents of the given invalid downlink queue.
 func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, previousSession *ttnpb.Session, invalid []*ttnpb.ApplicationDownlink, nextAFCntDown uint32, link *link) (err error) {

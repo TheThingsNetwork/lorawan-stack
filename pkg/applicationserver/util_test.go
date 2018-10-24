@@ -348,7 +348,7 @@ func (ns *mockNS) LinkApplication(ids *ttnpb.ApplicationIdentifiers, stream ttnp
 		case <-stream.Context().Done():
 			return nil
 		case up := <-ns.upCh:
-			if joinAccept := up.GetJoinAccept(); joinAccept != nil && !joinAccept.NextSession {
+			if joinAccept := up.GetJoinAccept(); joinAccept != nil && !joinAccept.PendingSession {
 				// Reset the downlink queue on join-accept; it's invalid and AS will replace it.
 				ns.downlinkQueueMu.Lock()
 				ns.downlinkQueue[unique.ID(stream.Context(), up.EndDeviceIdentifiers)] = nil

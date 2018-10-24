@@ -303,7 +303,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 0,
 								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 							})
-							a.So(dev.NextSession, should.BeNil)
+							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.HaveLength, 0)
 						},
 					},
@@ -348,7 +348,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 0,
 								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 							})
-							a.So(dev.NextSession, should.BeNil)
+							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.HaveLength, 0)
 						},
 					},
@@ -407,7 +407,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 2,
 								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 							})
-							a.So(dev.NextSession, should.BeNil)
+							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
 									SessionKeyID: "session3",
@@ -579,7 +579,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "RegisteredDevice/JoinAccept/WithAppSKey/WithQueue/WithNextSession",
+						Name: "RegisteredDevice/JoinAccept/WithAppSKey/WithQueue/WithPendingSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
@@ -591,7 +591,7 @@ func TestApplicationServer(t *testing.T) {
 										Key:      []byte{0x30, 0xcf, 0x47, 0x91, 0x11, 0x64, 0x53, 0x3f, 0xc3, 0xd5, 0xd8, 0x56, 0x5b, 0x71, 0xcb, 0xe7, 0x6d, 0x14, 0x2b, 0x2c, 0xf2, 0xc2, 0xd7, 0x7b},
 										KEKLabel: "test",
 									},
-									NextSession: true,
+									PendingSession: true,
 								},
 							},
 						},
@@ -601,8 +601,8 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
-										SessionKeyID: "session4",
-										NextSession:  true,
+										SessionKeyID:   "session4",
+										PendingSession: true,
 									},
 								},
 							})
@@ -621,7 +621,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 2,
 								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 							})
-							a.So(dev.NextSession, should.Resemble, &ttnpb.Session{
+							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44},
 								SessionKeys: ttnpb.SessionKeys{
 									SessionKeyID: "session4",
@@ -631,7 +631,7 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.NextSession.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+								StartedAt:     dev.PendingSession.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 							})
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
@@ -650,7 +650,7 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "RegisteredDevice/UplinkMessage/NextSession",
+						Name: "RegisteredDevice/UplinkMessage/PendingSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
@@ -700,7 +700,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 2,
 								StartedAt:     dev.Session.StartedAt,
 							})
-							a.So(dev.NextSession, should.BeNil)
+							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
 									SessionKeyID: "session4",
@@ -909,7 +909,7 @@ func TestApplicationServer(t *testing.T) {
 							}
 						}
 						if tc.AssertDevice != nil {
-							dev, err := deviceRegistry.Get(ctx, tc.Message.EndDeviceIdentifiers, []string{"session", "next_session"})
+							dev, err := deviceRegistry.Get(ctx, tc.Message.EndDeviceIdentifiers, []string{"session", "pending_session"})
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
