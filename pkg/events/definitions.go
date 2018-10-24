@@ -31,14 +31,28 @@ type Definition func(ctx context.Context, identifiers ttnpb.Identifiers, data in
 // Events that are defined in init() funcs will be collected for translation.
 var Definitions = make(map[string]string)
 
-// Define a registered event.
-func Define(name, description string) Definition {
+// defineSkip registers an event and returns its definition.
+// The argument skip is the number of stack frames to ascend, with 0 identifying the caller of defineSkip.
+func defineSkip(name, description string, skip uint) Definition {
 	if Definitions[name] != "" {
 		panic(fmt.Errorf("Event %s already defined", name))
 	}
-	i18n.Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description).SetSource(2)
+	i18n.Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description).SetSource(1 + skip)
 	Definitions[name] = description
 	return func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event {
 		return New(ctx, name, identifiers, data)
+	}
+}
+
+// Define a registered event.
+func Define(name, description string) Definition {
+	return defineSkip(name, description, 1)
+}
+
+// DefineFunc generates a function, which returns a Definition with specified name and description.
+// Most callers should be using Define - this function is only useful for helper functions.
+func DefineFunc(name, description string) func() Definition {
+	return func() Definition {
+		return defineSkip(name, description, 1)
 	}
 }

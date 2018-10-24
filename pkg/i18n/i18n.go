@@ -45,9 +45,10 @@ func (m *MessageDescriptor) Touched() bool { return m.touched }
 // Updated returns whether the descriptor was updated.
 func (m *MessageDescriptor) Updated() bool { return m.updated }
 
-// SetSource sets the source package and file name of the message descriptor.
-func (m *MessageDescriptor) SetSource(skip int) {
-	_, file, _, ok := runtime.Caller(skip)
+// SetSource sets the source package and file  name of the message descriptor.
+// The argument skip is the number of stack frames to ascend, with 0 identifying the caller of SetSource.
+func (m *MessageDescriptor) SetSource(skip uint) {
+	_, file, _, ok := runtime.Caller(1 + int(skip))
 	if !ok {
 		panic("could not determine source of message")
 	}
@@ -140,14 +141,14 @@ func (m MessageDescriptorMap) Define(id, message string) *MessageDescriptor {
 		},
 		touched: true,
 	}
-	m[id].SetSource(2)
+	m[id].SetSource(1)
 	return m[id]
 }
 
 // Define a message in the global registry.
 func Define(id, message string) *MessageDescriptor {
 	d := Global.Define(id, message)
-	d.SetSource(2)
+	d.SetSource(1)
 	return d
 }
 

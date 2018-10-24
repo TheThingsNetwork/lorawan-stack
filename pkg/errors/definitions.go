@@ -141,7 +141,7 @@ nextArg:
 	Definitions[fullName] = &def
 
 	desc := i18n.Define(fmt.Sprintf("error:%s", fullName), def.messageFormat)
-	desc.SetSource(3)
+	desc.SetSource(2)
 
 	return def
 }
