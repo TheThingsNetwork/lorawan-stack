@@ -366,12 +366,25 @@
   
 
 - [lorawan-stack/api/oauth.proto](#lorawan-stack/api/oauth.proto)
+    - [ListOAuthAccessTokensRequest](#ttn.lorawan.v3.ListOAuthAccessTokensRequest)
+    - [ListOAuthClientAuthorizationsRequest](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest)
     - [OAuthAccessToken](#ttn.lorawan.v3.OAuthAccessToken)
+    - [OAuthAccessTokenIdentifiers](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers)
+    - [OAuthAccessTokens](#ttn.lorawan.v3.OAuthAccessTokens)
     - [OAuthAuthorizationCode](#ttn.lorawan.v3.OAuthAuthorizationCode)
     - [OAuthClientAuthorization](#ttn.lorawan.v3.OAuthClientAuthorization)
+    - [OAuthClientAuthorizationIdentifiers](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers)
+    - [OAuthClientAuthorizations](#ttn.lorawan.v3.OAuthClientAuthorizations)
   
   
   
+  
+
+- [lorawan-stack/api/oauth_services.proto](#lorawan-stack/api/oauth_services.proto)
+  
+  
+  
+    - [OAuthAuthorizationRegistry](#ttn.lorawan.v3.OAuthAuthorizationRegistry)
   
 
 - [lorawan-stack/api/organization.proto](#lorawan-stack/api/organization.proto)
@@ -4504,6 +4517,43 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
+<a name="ttn.lorawan.v3.ListOAuthAccessTokensRequest"/>
+
+### ListOAuthAccessTokensRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest"/>
+
+### ListOAuthClientAuthorizationsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.OAuthAccessToken"/>
 
 ### OAuthAccessToken
@@ -4512,14 +4562,46 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
-| rights | [Right](#ttn.lorawan.v3.Right) | repeated |  |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | id | [string](#string) |  |  |
 | access_token | [string](#string) |  |  |
 | refresh_token | [string](#string) |  |  |
+| rights | [Right](#ttn.lorawan.v3.Right) | repeated |  |
 | created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | expires_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.OAuthAccessTokenIdentifiers"/>
+
+### OAuthAccessTokenIdentifiers
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.OAuthAccessTokens"/>
+
+### OAuthAccessTokens
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tokens | [OAuthAccessToken](#ttn.lorawan.v3.OAuthAccessToken) | repeated |  |
 
 
 
@@ -4534,8 +4616,8 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | rights | [Right](#ttn.lorawan.v3.Right) | repeated |  |
 | code | [string](#string) |  |  |
 | redirect_uri | [string](#string) |  |  |
@@ -4556,8 +4638,8 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | rights | [Right](#ttn.lorawan.v3.Right) | repeated |  |
 | created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | updated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
@@ -4566,11 +4648,71 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
+
+<a name="ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers"/>
+
+### OAuthClientAuthorizationIdentifiers
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.OAuthClientAuthorizations"/>
+
+### OAuthClientAuthorizations
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authorizations | [OAuthClientAuthorization](#ttn.lorawan.v3.OAuthClientAuthorization) | repeated |  |
+
+
+
+
+
+ 
+
  
 
  
 
  
+
+
+
+<a name="lorawan-stack/api/oauth_services.proto"/>
+<p align="right"><a href="#top">Top</a></p>
+
+## lorawan-stack/api/oauth_services.proto
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ttn.lorawan.v3.OAuthAuthorizationRegistry"/>
+
+### OAuthAuthorizationRegistry
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| List | [ListOAuthClientAuthorizationsRequest](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) | [OAuthClientAuthorizations](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) |  |
+| ListTokens | [ListOAuthAccessTokensRequest](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) | [OAuthAccessTokens](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) |  |
+| Delete | [OAuthClientAuthorizationIdentifiers](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) |  |
+| DeleteToken | [OAuthAccessTokenIdentifiers](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) |  |
 
  
 

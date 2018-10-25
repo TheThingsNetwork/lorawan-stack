@@ -32,9 +32,62 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
+type OAuthClientAuthorizationIdentifiers struct {
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *OAuthClientAuthorizationIdentifiers) Reset()      { *m = OAuthClientAuthorizationIdentifiers{} }
+func (*OAuthClientAuthorizationIdentifiers) ProtoMessage() {}
+func (*OAuthClientAuthorizationIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{0}
+}
+func (m *OAuthClientAuthorizationIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *OAuthClientAuthorizationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_OAuthClientAuthorizationIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *OAuthClientAuthorizationIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OAuthClientAuthorizationIdentifiers.Merge(dst, src)
+}
+func (m *OAuthClientAuthorizationIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *OAuthClientAuthorizationIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_OAuthClientAuthorizationIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OAuthClientAuthorizationIdentifiers proto.InternalMessageInfo
+
+func (m *OAuthClientAuthorizationIdentifiers) GetUserIDs() UserIdentifiers {
+	if m != nil {
+		return m.UserIDs
+	}
+	return UserIdentifiers{}
+}
+
+func (m *OAuthClientAuthorizationIdentifiers) GetClientIDs() ClientIdentifiers {
+	if m != nil {
+		return m.ClientIDs
+	}
+	return ClientIdentifiers{}
+}
+
 type OAuthClientAuthorization struct {
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,1,opt,name=client_ids,json=clientIds" json:"client_ids"`
-	UserIDs              UserIdentifiers   `protobuf:"bytes,2,opt,name=user_ids,json=userIds" json:"user_ids"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
 	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	CreatedAt            time.Time         `protobuf:"bytes,4,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
 	UpdatedAt            time.Time         `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
@@ -45,7 +98,7 @@ type OAuthClientAuthorization struct {
 func (m *OAuthClientAuthorization) Reset()      { *m = OAuthClientAuthorization{} }
 func (*OAuthClientAuthorization) ProtoMessage() {}
 func (*OAuthClientAuthorization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_b76118c64ab80311, []int{0}
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{1}
 }
 func (m *OAuthClientAuthorization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -74,18 +127,18 @@ func (m *OAuthClientAuthorization) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_OAuthClientAuthorization proto.InternalMessageInfo
 
-func (m *OAuthClientAuthorization) GetClientIDs() ClientIdentifiers {
-	if m != nil {
-		return m.ClientIDs
-	}
-	return ClientIdentifiers{}
-}
-
 func (m *OAuthClientAuthorization) GetUserIDs() UserIdentifiers {
 	if m != nil {
 		return m.UserIDs
 	}
 	return UserIdentifiers{}
+}
+
+func (m *OAuthClientAuthorization) GetClientIDs() ClientIdentifiers {
+	if m != nil {
+		return m.ClientIDs
+	}
+	return ClientIdentifiers{}
 }
 
 func (m *OAuthClientAuthorization) GetRights() []Right {
@@ -109,9 +162,120 @@ func (m *OAuthClientAuthorization) GetUpdatedAt() time.Time {
 	return time.Time{}
 }
 
+type OAuthClientAuthorizations struct {
+	Authorizations       []*OAuthClientAuthorization `protobuf:"bytes,1,rep,name=authorizations" json:"authorizations,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *OAuthClientAuthorizations) Reset()      { *m = OAuthClientAuthorizations{} }
+func (*OAuthClientAuthorizations) ProtoMessage() {}
+func (*OAuthClientAuthorizations) Descriptor() ([]byte, []int) {
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{2}
+}
+func (m *OAuthClientAuthorizations) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *OAuthClientAuthorizations) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_OAuthClientAuthorizations.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *OAuthClientAuthorizations) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OAuthClientAuthorizations.Merge(dst, src)
+}
+func (m *OAuthClientAuthorizations) XXX_Size() int {
+	return m.Size()
+}
+func (m *OAuthClientAuthorizations) XXX_DiscardUnknown() {
+	xxx_messageInfo_OAuthClientAuthorizations.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OAuthClientAuthorizations proto.InternalMessageInfo
+
+func (m *OAuthClientAuthorizations) GetAuthorizations() []*OAuthClientAuthorization {
+	if m != nil {
+		return m.Authorizations
+	}
+	return nil
+}
+
+type ListOAuthClientAuthorizationsRequest struct {
+	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	// Order the results by this field path (must be present in the field mask).
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,2,opt,name=order,proto3" json:"order,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page                 uint32   `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) Reset()      { *m = ListOAuthClientAuthorizationsRequest{} }
+func (*ListOAuthClientAuthorizationsRequest) ProtoMessage() {}
+func (*ListOAuthClientAuthorizationsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{3}
+}
+func (m *ListOAuthClientAuthorizationsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListOAuthClientAuthorizationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListOAuthClientAuthorizationsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ListOAuthClientAuthorizationsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListOAuthClientAuthorizationsRequest.Merge(dst, src)
+}
+func (m *ListOAuthClientAuthorizationsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListOAuthClientAuthorizationsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListOAuthClientAuthorizationsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListOAuthClientAuthorizationsRequest proto.InternalMessageInfo
+
+func (m *ListOAuthClientAuthorizationsRequest) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
 type OAuthAuthorizationCode struct {
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,1,opt,name=client_ids,json=clientIds" json:"client_ids"`
-	UserIDs              UserIdentifiers   `protobuf:"bytes,2,opt,name=user_ids,json=userIds" json:"user_ids"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
 	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	Code                 string            `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
 	RedirectURI          string            `protobuf:"bytes,5,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
@@ -125,7 +289,7 @@ type OAuthAuthorizationCode struct {
 func (m *OAuthAuthorizationCode) Reset()      { *m = OAuthAuthorizationCode{} }
 func (*OAuthAuthorizationCode) ProtoMessage() {}
 func (*OAuthAuthorizationCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_b76118c64ab80311, []int{1}
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{4}
 }
 func (m *OAuthAuthorizationCode) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -154,18 +318,18 @@ func (m *OAuthAuthorizationCode) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_OAuthAuthorizationCode proto.InternalMessageInfo
 
-func (m *OAuthAuthorizationCode) GetClientIDs() ClientIdentifiers {
-	if m != nil {
-		return m.ClientIDs
-	}
-	return ClientIdentifiers{}
-}
-
 func (m *OAuthAuthorizationCode) GetUserIDs() UserIdentifiers {
 	if m != nil {
 		return m.UserIDs
 	}
 	return UserIdentifiers{}
+}
+
+func (m *OAuthAuthorizationCode) GetClientIDs() ClientIdentifiers {
+	if m != nil {
+		return m.ClientIDs
+	}
+	return ClientIdentifiers{}
 }
 
 func (m *OAuthAuthorizationCode) GetRights() []Right {
@@ -210,13 +374,74 @@ func (m *OAuthAuthorizationCode) GetExpiresAt() time.Time {
 	return time.Time{}
 }
 
+type OAuthAccessTokenIdentifiers struct {
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	ID                   string            `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *OAuthAccessTokenIdentifiers) Reset()      { *m = OAuthAccessTokenIdentifiers{} }
+func (*OAuthAccessTokenIdentifiers) ProtoMessage() {}
+func (*OAuthAccessTokenIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{5}
+}
+func (m *OAuthAccessTokenIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *OAuthAccessTokenIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_OAuthAccessTokenIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *OAuthAccessTokenIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OAuthAccessTokenIdentifiers.Merge(dst, src)
+}
+func (m *OAuthAccessTokenIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *OAuthAccessTokenIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_OAuthAccessTokenIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OAuthAccessTokenIdentifiers proto.InternalMessageInfo
+
+func (m *OAuthAccessTokenIdentifiers) GetUserIDs() UserIdentifiers {
+	if m != nil {
+		return m.UserIDs
+	}
+	return UserIdentifiers{}
+}
+
+func (m *OAuthAccessTokenIdentifiers) GetClientIDs() ClientIdentifiers {
+	if m != nil {
+		return m.ClientIDs
+	}
+	return ClientIdentifiers{}
+}
+
+func (m *OAuthAccessTokenIdentifiers) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
 type OAuthAccessToken struct {
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,1,opt,name=client_ids,json=clientIds" json:"client_ids"`
-	UserIDs              UserIdentifiers   `protobuf:"bytes,2,opt,name=user_ids,json=userIds" json:"user_ids"`
-	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
-	ID                   string            `protobuf:"bytes,4,opt,name=id,proto3" json:"id,omitempty"`
-	AccessToken          string            `protobuf:"bytes,5,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	RefreshToken         string            `protobuf:"bytes,6,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	ID                   string            `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	AccessToken          string            `protobuf:"bytes,4,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken         string            `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	Rights               []Right           `protobuf:"varint,6,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	CreatedAt            time.Time         `protobuf:"bytes,7,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
 	ExpiresAt            time.Time         `protobuf:"bytes,8,opt,name=expires_at,json=expiresAt,stdtime" json:"expires_at"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
@@ -226,7 +451,7 @@ type OAuthAccessToken struct {
 func (m *OAuthAccessToken) Reset()      { *m = OAuthAccessToken{} }
 func (*OAuthAccessToken) ProtoMessage() {}
 func (*OAuthAccessToken) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_b76118c64ab80311, []int{2}
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{6}
 }
 func (m *OAuthAccessToken) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -255,13 +480,6 @@ func (m *OAuthAccessToken) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_OAuthAccessToken proto.InternalMessageInfo
 
-func (m *OAuthAccessToken) GetClientIDs() ClientIdentifiers {
-	if m != nil {
-		return m.ClientIDs
-	}
-	return ClientIdentifiers{}
-}
-
 func (m *OAuthAccessToken) GetUserIDs() UserIdentifiers {
 	if m != nil {
 		return m.UserIDs
@@ -269,11 +487,11 @@ func (m *OAuthAccessToken) GetUserIDs() UserIdentifiers {
 	return UserIdentifiers{}
 }
 
-func (m *OAuthAccessToken) GetRights() []Right {
+func (m *OAuthAccessToken) GetClientIDs() ClientIdentifiers {
 	if m != nil {
-		return m.Rights
+		return m.ClientIDs
 	}
-	return nil
+	return ClientIdentifiers{}
 }
 
 func (m *OAuthAccessToken) GetID() string {
@@ -297,6 +515,13 @@ func (m *OAuthAccessToken) GetRefreshToken() string {
 	return ""
 }
 
+func (m *OAuthAccessToken) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
+
 func (m *OAuthAccessToken) GetCreatedAt() time.Time {
 	if m != nil {
 		return m.CreatedAt
@@ -311,13 +536,178 @@ func (m *OAuthAccessToken) GetExpiresAt() time.Time {
 	return time.Time{}
 }
 
+type OAuthAccessTokens struct {
+	Tokens               []*OAuthAccessToken `protobuf:"bytes,1,rep,name=tokens" json:"tokens,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
+}
+
+func (m *OAuthAccessTokens) Reset()      { *m = OAuthAccessTokens{} }
+func (*OAuthAccessTokens) ProtoMessage() {}
+func (*OAuthAccessTokens) Descriptor() ([]byte, []int) {
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{7}
+}
+func (m *OAuthAccessTokens) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *OAuthAccessTokens) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_OAuthAccessTokens.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *OAuthAccessTokens) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OAuthAccessTokens.Merge(dst, src)
+}
+func (m *OAuthAccessTokens) XXX_Size() int {
+	return m.Size()
+}
+func (m *OAuthAccessTokens) XXX_DiscardUnknown() {
+	xxx_messageInfo_OAuthAccessTokens.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OAuthAccessTokens proto.InternalMessageInfo
+
+func (m *OAuthAccessTokens) GetTokens() []*OAuthAccessToken {
+	if m != nil {
+		return m.Tokens
+	}
+	return nil
+}
+
+type ListOAuthAccessTokensRequest struct {
+	UserIDs   UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
+	ClientIDs ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	// Order the results by this field path (must be present in the field mask).
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page                 uint32   `protobuf:"varint,5,opt,name=page,proto3" json:"page,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListOAuthAccessTokensRequest) Reset()      { *m = ListOAuthAccessTokensRequest{} }
+func (*ListOAuthAccessTokensRequest) ProtoMessage() {}
+func (*ListOAuthAccessTokensRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{8}
+}
+func (m *ListOAuthAccessTokensRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListOAuthAccessTokensRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListOAuthAccessTokensRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ListOAuthAccessTokensRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListOAuthAccessTokensRequest.Merge(dst, src)
+}
+func (m *ListOAuthAccessTokensRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListOAuthAccessTokensRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListOAuthAccessTokensRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListOAuthAccessTokensRequest proto.InternalMessageInfo
+
+func (m *ListOAuthAccessTokensRequest) GetUserIDs() UserIdentifiers {
+	if m != nil {
+		return m.UserIDs
+	}
+	return UserIdentifiers{}
+}
+
+func (m *ListOAuthAccessTokensRequest) GetClientIDs() ClientIdentifiers {
+	if m != nil {
+		return m.ClientIDs
+	}
+	return ClientIdentifiers{}
+}
+
+func (m *ListOAuthAccessTokensRequest) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *ListOAuthAccessTokensRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *ListOAuthAccessTokensRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
 func init() {
+	proto.RegisterType((*OAuthClientAuthorizationIdentifiers)(nil), "ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers")
+	golang_proto.RegisterType((*OAuthClientAuthorizationIdentifiers)(nil), "ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers")
 	proto.RegisterType((*OAuthClientAuthorization)(nil), "ttn.lorawan.v3.OAuthClientAuthorization")
 	golang_proto.RegisterType((*OAuthClientAuthorization)(nil), "ttn.lorawan.v3.OAuthClientAuthorization")
+	proto.RegisterType((*OAuthClientAuthorizations)(nil), "ttn.lorawan.v3.OAuthClientAuthorizations")
+	golang_proto.RegisterType((*OAuthClientAuthorizations)(nil), "ttn.lorawan.v3.OAuthClientAuthorizations")
+	proto.RegisterType((*ListOAuthClientAuthorizationsRequest)(nil), "ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest")
+	golang_proto.RegisterType((*ListOAuthClientAuthorizationsRequest)(nil), "ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest")
 	proto.RegisterType((*OAuthAuthorizationCode)(nil), "ttn.lorawan.v3.OAuthAuthorizationCode")
 	golang_proto.RegisterType((*OAuthAuthorizationCode)(nil), "ttn.lorawan.v3.OAuthAuthorizationCode")
+	proto.RegisterType((*OAuthAccessTokenIdentifiers)(nil), "ttn.lorawan.v3.OAuthAccessTokenIdentifiers")
+	golang_proto.RegisterType((*OAuthAccessTokenIdentifiers)(nil), "ttn.lorawan.v3.OAuthAccessTokenIdentifiers")
 	proto.RegisterType((*OAuthAccessToken)(nil), "ttn.lorawan.v3.OAuthAccessToken")
 	golang_proto.RegisterType((*OAuthAccessToken)(nil), "ttn.lorawan.v3.OAuthAccessToken")
+	proto.RegisterType((*OAuthAccessTokens)(nil), "ttn.lorawan.v3.OAuthAccessTokens")
+	golang_proto.RegisterType((*OAuthAccessTokens)(nil), "ttn.lorawan.v3.OAuthAccessTokens")
+	proto.RegisterType((*ListOAuthAccessTokensRequest)(nil), "ttn.lorawan.v3.ListOAuthAccessTokensRequest")
+	golang_proto.RegisterType((*ListOAuthAccessTokensRequest)(nil), "ttn.lorawan.v3.ListOAuthAccessTokensRequest")
+}
+func (this *OAuthClientAuthorizationIdentifiers) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*OAuthClientAuthorizationIdentifiers)
+	if !ok {
+		that2, ok := that.(OAuthClientAuthorizationIdentifiers)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.UserIDs.Equal(&that1.UserIDs) {
+		return false
+	}
+	if !this.ClientIDs.Equal(&that1.ClientIDs) {
+		return false
+	}
+	return true
 }
 func (this *OAuthClientAuthorization) Equal(that interface{}) bool {
 	if that == nil {
@@ -338,10 +728,10 @@ func (this *OAuthClientAuthorization) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ClientIDs.Equal(&that1.ClientIDs) {
+	if !this.UserIDs.Equal(&that1.UserIDs) {
 		return false
 	}
-	if !this.UserIDs.Equal(&that1.UserIDs) {
+	if !this.ClientIDs.Equal(&that1.ClientIDs) {
 		return false
 	}
 	if len(this.Rights) != len(that1.Rights) {
@@ -356,6 +746,68 @@ func (this *OAuthClientAuthorization) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
+		return false
+	}
+	return true
+}
+func (this *OAuthClientAuthorizations) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*OAuthClientAuthorizations)
+	if !ok {
+		that2, ok := that.(OAuthClientAuthorizations)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Authorizations) != len(that1.Authorizations) {
+		return false
+	}
+	for i := range this.Authorizations {
+		if !this.Authorizations[i].Equal(that1.Authorizations[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *ListOAuthClientAuthorizationsRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ListOAuthClientAuthorizationsRequest)
+	if !ok {
+		that2, ok := that.(ListOAuthClientAuthorizationsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+		return false
+	}
+	if this.Order != that1.Order {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
 		return false
 	}
 	return true
@@ -379,10 +831,10 @@ func (this *OAuthAuthorizationCode) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ClientIDs.Equal(&that1.ClientIDs) {
+	if !this.UserIDs.Equal(&that1.UserIDs) {
 		return false
 	}
-	if !this.UserIDs.Equal(&that1.UserIDs) {
+	if !this.ClientIDs.Equal(&that1.ClientIDs) {
 		return false
 	}
 	if len(this.Rights) != len(that1.Rights) {
@@ -410,6 +862,36 @@ func (this *OAuthAuthorizationCode) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *OAuthAccessTokenIdentifiers) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*OAuthAccessTokenIdentifiers)
+	if !ok {
+		that2, ok := that.(OAuthAccessTokenIdentifiers)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.UserIDs.Equal(&that1.UserIDs) {
+		return false
+	}
+	if !this.ClientIDs.Equal(&that1.ClientIDs) {
+		return false
+	}
+	if this.ID != that1.ID {
+		return false
+	}
+	return true
+}
 func (this *OAuthAccessToken) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -429,19 +911,11 @@ func (this *OAuthAccessToken) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ClientIDs.Equal(&that1.ClientIDs) {
-		return false
-	}
 	if !this.UserIDs.Equal(&that1.UserIDs) {
 		return false
 	}
-	if len(this.Rights) != len(that1.Rights) {
+	if !this.ClientIDs.Equal(&that1.ClientIDs) {
 		return false
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return false
-		}
 	}
 	if this.ID != that1.ID {
 		return false
@@ -452,6 +926,14 @@ func (this *OAuthAccessToken) Equal(that interface{}) bool {
 	if this.RefreshToken != that1.RefreshToken {
 		return false
 	}
+	if len(this.Rights) != len(that1.Rights) {
+		return false
+	}
+	for i := range this.Rights {
+		if this.Rights[i] != that1.Rights[i] {
+			return false
+		}
+	}
 	if !this.CreatedAt.Equal(that1.CreatedAt) {
 		return false
 	}
@@ -460,6 +942,105 @@ func (this *OAuthAccessToken) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *OAuthAccessTokens) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*OAuthAccessTokens)
+	if !ok {
+		that2, ok := that.(OAuthAccessTokens)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Tokens) != len(that1.Tokens) {
+		return false
+	}
+	for i := range this.Tokens {
+		if !this.Tokens[i].Equal(that1.Tokens[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *ListOAuthAccessTokensRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ListOAuthAccessTokensRequest)
+	if !ok {
+		that2, ok := that.(ListOAuthAccessTokensRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.UserIDs.Equal(&that1.UserIDs) {
+		return false
+	}
+	if !this.ClientIDs.Equal(&that1.ClientIDs) {
+		return false
+	}
+	if this.Order != that1.Order {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
+		return false
+	}
+	return true
+}
+func (m *OAuthClientAuthorizationIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OAuthClientAuthorizationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
+	n1, err := m.UserIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n1
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
+	n2, err := m.ClientIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n2
+	return i, nil
+}
+
 func (m *OAuthClientAuthorization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -477,53 +1058,125 @@ func (m *OAuthClientAuthorization) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n1, err := m.ClientIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
+	n3, err := m.UserIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n1
+	i += n3
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n2, err := m.UserIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
+	n4, err := m.ClientIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n2
+	i += n4
 	if len(m.Rights) > 0 {
-		dAtA4 := make([]byte, len(m.Rights)*10)
-		var j3 int
+		dAtA6 := make([]byte, len(m.Rights)*10)
+		var j5 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA6[j5] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j3++
+				j5++
 			}
-			dAtA4[j3] = uint8(num)
-			j3++
+			dAtA6[j5] = uint8(num)
+			j5++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintOauth(dAtA, i, uint64(j3))
-		i += copy(dAtA[i:], dAtA4[:j3])
+		i = encodeVarintOauth(dAtA, i, uint64(j5))
+		i += copy(dAtA[i:], dAtA6[:j5])
 	}
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n5, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n5
+	i += n7
 	dAtA[i] = 0x2a
 	i++
 	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n6
+	i += n8
+	return i, nil
+}
+
+func (m *OAuthClientAuthorizations) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OAuthClientAuthorizations) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Authorizations) > 0 {
+		for _, msg := range m.Authorizations {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintOauth(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIdentifiers.Size()))
+	n9, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n9
+	if len(m.Order) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.Order)))
+		i += copy(dAtA[i:], m.Order)
+	}
+	if m.Limit != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(m.Page))
+	}
 	return i, nil
 }
 
@@ -544,36 +1197,36 @@ func (m *OAuthAuthorizationCode) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n7, err := m.ClientIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
+	n10, err := m.UserIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n7
+	i += n10
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n8, err := m.UserIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
+	n11, err := m.ClientIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n8
+	i += n11
 	if len(m.Rights) > 0 {
-		dAtA10 := make([]byte, len(m.Rights)*10)
-		var j9 int
+		dAtA13 := make([]byte, len(m.Rights)*10)
+		var j12 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA10[j9] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j9++
+				j12++
 			}
-			dAtA10[j9] = uint8(num)
-			j9++
+			dAtA13[j12] = uint8(num)
+			j12++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintOauth(dAtA, i, uint64(j9))
-		i += copy(dAtA[i:], dAtA10[:j9])
+		i = encodeVarintOauth(dAtA, i, uint64(j12))
+		i += copy(dAtA[i:], dAtA13[:j12])
 	}
 	if len(m.Code) > 0 {
 		dAtA[i] = 0x22
@@ -596,19 +1249,59 @@ func (m *OAuthAuthorizationCode) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x3a
 	i++
 	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n11, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	n14, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n11
+	i += n14
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n12, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
+	n15, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n12
+	i += n15
+	return i, nil
+}
+
+func (m *OAuthAccessTokenIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OAuthAccessTokenIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
+	n16, err := m.UserIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n16
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
+	n17, err := m.ClientIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n17
+	if len(m.ID) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.ID)))
+		i += copy(dAtA[i:], m.ID)
+	}
 	return i, nil
 }
 
@@ -629,71 +1322,151 @@ func (m *OAuthAccessToken) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n13, err := m.ClientIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
+	n18, err := m.UserIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n13
+	i += n18
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n14, err := m.UserIDs.MarshalTo(dAtA[i:])
+	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
+	n19, err := m.ClientIDs.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n14
-	if len(m.Rights) > 0 {
-		dAtA16 := make([]byte, len(m.Rights)*10)
-		var j15 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA16[j15] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j15++
-			}
-			dAtA16[j15] = uint8(num)
-			j15++
-		}
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(j15))
-		i += copy(dAtA[i:], dAtA16[:j15])
-	}
+	i += n19
 	if len(m.ID) > 0 {
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintOauth(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
 	}
 	if len(m.AccessToken) > 0 {
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintOauth(dAtA, i, uint64(len(m.AccessToken)))
 		i += copy(dAtA[i:], m.AccessToken)
 	}
 	if len(m.RefreshToken) > 0 {
-		dAtA[i] = 0x32
+		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintOauth(dAtA, i, uint64(len(m.RefreshToken)))
 		i += copy(dAtA[i:], m.RefreshToken)
 	}
+	if len(m.Rights) > 0 {
+		dAtA21 := make([]byte, len(m.Rights)*10)
+		var j20 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j20++
+			}
+			dAtA21[j20] = uint8(num)
+			j20++
+		}
+		dAtA[i] = 0x32
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(j20))
+		i += copy(dAtA[i:], dAtA21[:j20])
+	}
 	dAtA[i] = 0x3a
 	i++
 	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n17, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	n22, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n22
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n18, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
+	n23, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n18
+	i += n23
+	return i, nil
+}
+
+func (m *OAuthAccessTokens) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OAuthAccessTokens) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Tokens) > 0 {
+		for _, msg := range m.Tokens {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintOauth(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *ListOAuthAccessTokensRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListOAuthAccessTokensRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
+	n24, err := m.UserIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n24
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
+	n25, err := m.ClientIDs.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n25
+	if len(m.Order) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.Order)))
+		i += copy(dAtA[i:], m.Order)
+	}
+	if m.Limit != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintOauth(dAtA, i, uint64(m.Page))
+	}
 	return i, nil
 }
 
@@ -706,21 +1479,58 @@ func encodeVarintOauth(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
+func NewPopulatedOAuthClientAuthorizationIdentifiers(r randyOauth, easy bool) *OAuthClientAuthorizationIdentifiers {
+	this := &OAuthClientAuthorizationIdentifiers{}
+	v1 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIDs = *v1
+	v2 := NewPopulatedClientIdentifiers(r, easy)
+	this.ClientIDs = *v2
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedOAuthClientAuthorization(r randyOauth, easy bool) *OAuthClientAuthorization {
 	this := &OAuthClientAuthorization{}
-	v1 := NewPopulatedClientIdentifiers(r, easy)
-	this.ClientIDs = *v1
-	v2 := NewPopulatedUserIdentifiers(r, easy)
-	this.UserIDs = *v2
-	v3 := r.Intn(10)
-	this.Rights = make([]Right, v3)
-	for i := 0; i < v3; i++ {
+	v3 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIDs = *v3
+	v4 := NewPopulatedClientIdentifiers(r, easy)
+	this.ClientIDs = *v4
+	v5 := r.Intn(10)
+	this.Rights = make([]Right, v5)
+	for i := 0; i < v5; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}[r.Intn(54)])
 	}
-	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.CreatedAt = *v4
-	v5 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.UpdatedAt = *v5
+	v6 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.CreatedAt = *v6
+	v7 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.UpdatedAt = *v7
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedOAuthClientAuthorizations(r randyOauth, easy bool) *OAuthClientAuthorizations {
+	this := &OAuthClientAuthorizations{}
+	if r.Intn(10) != 0 {
+		v8 := r.Intn(5)
+		this.Authorizations = make([]*OAuthClientAuthorization, v8)
+		for i := 0; i < v8; i++ {
+			this.Authorizations[i] = NewPopulatedOAuthClientAuthorization(r, easy)
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedListOAuthClientAuthorizationsRequest(r randyOauth, easy bool) *ListOAuthClientAuthorizationsRequest {
+	this := &ListOAuthClientAuthorizationsRequest{}
+	v9 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIdentifiers = *v9
+	this.Order = randStringOauth(r)
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -728,22 +1538,34 @@ func NewPopulatedOAuthClientAuthorization(r randyOauth, easy bool) *OAuthClientA
 
 func NewPopulatedOAuthAuthorizationCode(r randyOauth, easy bool) *OAuthAuthorizationCode {
 	this := &OAuthAuthorizationCode{}
-	v6 := NewPopulatedClientIdentifiers(r, easy)
-	this.ClientIDs = *v6
-	v7 := NewPopulatedUserIdentifiers(r, easy)
-	this.UserIDs = *v7
-	v8 := r.Intn(10)
-	this.Rights = make([]Right, v8)
-	for i := 0; i < v8; i++ {
+	v10 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIDs = *v10
+	v11 := NewPopulatedClientIdentifiers(r, easy)
+	this.ClientIDs = *v11
+	v12 := r.Intn(10)
+	this.Rights = make([]Right, v12)
+	for i := 0; i < v12; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}[r.Intn(54)])
 	}
 	this.Code = randStringOauth(r)
 	this.RedirectURI = randStringOauth(r)
 	this.State = randStringOauth(r)
-	v9 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.CreatedAt = *v9
-	v10 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.ExpiresAt = *v10
+	v13 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.CreatedAt = *v13
+	v14 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.ExpiresAt = *v14
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedOAuthAccessTokenIdentifiers(r randyOauth, easy bool) *OAuthAccessTokenIdentifiers {
+	this := &OAuthAccessTokenIdentifiers{}
+	v15 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIDs = *v15
+	v16 := NewPopulatedClientIdentifiers(r, easy)
+	this.ClientIDs = *v16
+	this.ID = randStringOauth(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -751,22 +1573,50 @@ func NewPopulatedOAuthAuthorizationCode(r randyOauth, easy bool) *OAuthAuthoriza
 
 func NewPopulatedOAuthAccessToken(r randyOauth, easy bool) *OAuthAccessToken {
 	this := &OAuthAccessToken{}
-	v11 := NewPopulatedClientIdentifiers(r, easy)
-	this.ClientIDs = *v11
-	v12 := NewPopulatedUserIdentifiers(r, easy)
-	this.UserIDs = *v12
-	v13 := r.Intn(10)
-	this.Rights = make([]Right, v13)
-	for i := 0; i < v13; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}[r.Intn(54)])
-	}
+	v17 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIDs = *v17
+	v18 := NewPopulatedClientIdentifiers(r, easy)
+	this.ClientIDs = *v18
 	this.ID = randStringOauth(r)
 	this.AccessToken = randStringOauth(r)
 	this.RefreshToken = randStringOauth(r)
-	v14 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.CreatedAt = *v14
-	v15 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.ExpiresAt = *v15
+	v19 := r.Intn(10)
+	this.Rights = make([]Right, v19)
+	for i := 0; i < v19; i++ {
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}[r.Intn(54)])
+	}
+	v20 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.CreatedAt = *v20
+	v21 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.ExpiresAt = *v21
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedOAuthAccessTokens(r randyOauth, easy bool) *OAuthAccessTokens {
+	this := &OAuthAccessTokens{}
+	if r.Intn(10) != 0 {
+		v22 := r.Intn(5)
+		this.Tokens = make([]*OAuthAccessToken, v22)
+		for i := 0; i < v22; i++ {
+			this.Tokens[i] = NewPopulatedOAuthAccessToken(r, easy)
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedListOAuthAccessTokensRequest(r randyOauth, easy bool) *ListOAuthAccessTokensRequest {
+	this := &ListOAuthAccessTokensRequest{}
+	v23 := NewPopulatedUserIdentifiers(r, easy)
+	this.UserIDs = *v23
+	v24 := NewPopulatedClientIdentifiers(r, easy)
+	this.ClientIDs = *v24
+	this.Order = randStringOauth(r)
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -791,9 +1641,9 @@ func randUTF8RuneOauth(r randyOauth) rune {
 	return rune(ru + 61)
 }
 func randStringOauth(r randyOauth) string {
-	v16 := r.Intn(100)
-	tmps := make([]rune, v16)
-	for i := 0; i < v16; i++ {
+	v25 := r.Intn(100)
+	tmps := make([]rune, v25)
+	for i := 0; i < v25; i++ {
 		tmps[i] = randUTF8RuneOauth(r)
 	}
 	return string(tmps)
@@ -815,11 +1665,11 @@ func randFieldOauth(dAtA []byte, r randyOauth, fieldNumber int, wire int) []byte
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateOauth(dAtA, uint64(key))
-		v17 := r.Int63()
+		v26 := r.Int63()
 		if r.Intn(2) == 0 {
-			v17 *= -1
+			v26 *= -1
 		}
-		dAtA = encodeVarintPopulateOauth(dAtA, uint64(v17))
+		dAtA = encodeVarintPopulateOauth(dAtA, uint64(v26))
 	case 1:
 		dAtA = encodeVarintPopulateOauth(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -844,12 +1694,22 @@ func encodeVarintPopulateOauth(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+func (m *OAuthClientAuthorizationIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = m.UserIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = m.ClientIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	return n
+}
+
 func (m *OAuthClientAuthorization) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientIDs.Size()
-	n += 1 + l + sovOauth(uint64(l))
 	l = m.UserIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = m.ClientIDs.Size()
 	n += 1 + l + sovOauth(uint64(l))
 	if len(m.Rights) > 0 {
 		l = 0
@@ -865,12 +1725,42 @@ func (m *OAuthClientAuthorization) Size() (n int) {
 	return n
 }
 
+func (m *OAuthClientAuthorizations) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Authorizations) > 0 {
+		for _, e := range m.Authorizations {
+			l = e.Size()
+			n += 1 + l + sovOauth(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.UserIdentifiers.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = len(m.Order)
+	if l > 0 {
+		n += 1 + l + sovOauth(uint64(l))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovOauth(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovOauth(uint64(m.Page))
+	}
+	return n
+}
+
 func (m *OAuthAuthorizationCode) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientIDs.Size()
-	n += 1 + l + sovOauth(uint64(l))
 	l = m.UserIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = m.ClientIDs.Size()
 	n += 1 + l + sovOauth(uint64(l))
 	if len(m.Rights) > 0 {
 		l = 0
@@ -898,20 +1788,27 @@ func (m *OAuthAuthorizationCode) Size() (n int) {
 	return n
 }
 
+func (m *OAuthAccessTokenIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = m.UserIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = m.ClientIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = len(m.ID)
+	if l > 0 {
+		n += 1 + l + sovOauth(uint64(l))
+	}
+	return n
+}
+
 func (m *OAuthAccessToken) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientIDs.Size()
-	n += 1 + l + sovOauth(uint64(l))
 	l = m.UserIDs.Size()
 	n += 1 + l + sovOauth(uint64(l))
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovOauth(uint64(e))
-		}
-		n += 1 + sovOauth(uint64(l)) + l
-	}
+	l = m.ClientIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
 	l = len(m.ID)
 	if l > 0 {
 		n += 1 + l + sovOauth(uint64(l))
@@ -924,10 +1821,49 @@ func (m *OAuthAccessToken) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovOauth(uint64(l))
 	}
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovOauth(uint64(e))
+		}
+		n += 1 + sovOauth(uint64(l)) + l
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovOauth(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)
 	n += 1 + l + sovOauth(uint64(l))
+	return n
+}
+
+func (m *OAuthAccessTokens) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Tokens) > 0 {
+		for _, e := range m.Tokens {
+			l = e.Size()
+			n += 1 + l + sovOauth(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ListOAuthAccessTokensRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.UserIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = m.ClientIDs.Size()
+	n += 1 + l + sovOauth(uint64(l))
+	l = len(m.Order)
+	if l > 0 {
+		n += 1 + l + sovOauth(uint64(l))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovOauth(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovOauth(uint64(m.Page))
+	}
 	return n
 }
 
@@ -944,16 +1880,50 @@ func sovOauth(x uint64) (n int) {
 func sozOauth(x uint64) (n int) {
 	return sovOauth((x << 1) ^ uint64((int64(x) >> 63)))
 }
+func (this *OAuthClientAuthorizationIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&OAuthClientAuthorizationIdentifiers{`,
+		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *OAuthClientAuthorization) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthClientAuthorization{`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *OAuthClientAuthorizations) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&OAuthClientAuthorizations{`,
+		`Authorizations:` + strings.Replace(fmt.Sprintf("%v", this.Authorizations), "OAuthClientAuthorization", "OAuthClientAuthorization", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListOAuthClientAuthorizationsRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListOAuthClientAuthorizationsRequest{`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -963,8 +1933,8 @@ func (this *OAuthAuthorizationCode) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthAuthorizationCode{`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`Code:` + fmt.Sprintf("%v", this.Code) + `,`,
 		`RedirectURI:` + fmt.Sprintf("%v", this.RedirectURI) + `,`,
@@ -975,19 +1945,55 @@ func (this *OAuthAuthorizationCode) String() string {
 	}, "")
 	return s
 }
+func (this *OAuthAccessTokenIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&OAuthAccessTokenIdentifiers{`,
+		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *OAuthAccessToken) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthAccessToken{`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`AccessToken:` + fmt.Sprintf("%v", this.AccessToken) + `,`,
 		`RefreshToken:` + fmt.Sprintf("%v", this.RefreshToken) + `,`,
+		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`ExpiresAt:` + strings.Replace(strings.Replace(this.ExpiresAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *OAuthAccessTokens) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&OAuthAccessTokens{`,
+		`Tokens:` + strings.Replace(fmt.Sprintf("%v", this.Tokens), "OAuthAccessToken", "OAuthAccessToken", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListOAuthAccessTokensRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListOAuthAccessTokensRequest{`,
+		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -999,6 +2005,116 @@ func valueToStringOauth(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *OAuthClientAuthorizationIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOauth
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OAuthClientAuthorizationIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OAuthClientAuthorizationIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOauth(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOauth
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *OAuthClientAuthorization) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1031,36 +2147,6 @@ func (m *OAuthClientAuthorization) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOauth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthOauth
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
 			}
 			var msglen int
@@ -1086,6 +2172,36 @@ func (m *OAuthClientAuthorization) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.UserIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1232,6 +2348,234 @@ func (m *OAuthClientAuthorization) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *OAuthClientAuthorizations) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOauth
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OAuthClientAuthorizations: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OAuthClientAuthorizations: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authorizations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Authorizations = append(m.Authorizations, &OAuthClientAuthorization{})
+			if err := m.Authorizations[len(m.Authorizations)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOauth(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOauth
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListOAuthClientAuthorizationsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOauth
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListOAuthClientAuthorizationsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListOAuthClientAuthorizationsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Order", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Order = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOauth(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOauth
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *OAuthAuthorizationCode) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1263,36 +2607,6 @@ func (m *OAuthAuthorizationCode) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOauth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthOauth
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
 			}
 			var msglen int
@@ -1318,6 +2632,36 @@ func (m *OAuthAuthorizationCode) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.UserIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1551,6 +2895,145 @@ func (m *OAuthAuthorizationCode) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *OAuthAccessTokenIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOauth
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OAuthAccessTokenIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OAuthAccessTokenIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOauth(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOauth
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *OAuthAccessToken) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1582,36 +3065,6 @@ func (m *OAuthAccessToken) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOauth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthOauth
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
 			}
 			var msglen int
@@ -1640,7 +3093,124 @@ func (m *OAuthAccessToken) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccessToken", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AccessToken = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RefreshToken", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RefreshToken = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
 			if wireType == 0 {
 				var v Right
 				for shift := uint(0); ; shift += 7 {
@@ -1702,93 +3272,6 @@ func (m *OAuthAccessToken) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOauth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthOauth
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AccessToken", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOauth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthOauth
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AccessToken = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RefreshToken", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOauth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthOauth
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RefreshToken = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
@@ -1849,6 +3332,264 @@ func (m *OAuthAccessToken) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOauth(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOauth
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *OAuthAccessTokens) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOauth
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OAuthAccessTokens: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OAuthAccessTokens: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tokens", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Tokens = append(m.Tokens, &OAuthAccessToken{})
+			if err := m.Tokens[len(m.Tokens)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOauth(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOauth
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListOAuthAccessTokensRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOauth
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListOAuthAccessTokensRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListOAuthAccessTokensRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Order", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOauth
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Order = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOauth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipOauth(dAtA[iNdEx:])
@@ -1976,52 +3717,63 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_b76118c64ab80311)
+	proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_aa8f2a05ea2d4edd)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_b76118c64ab80311)
+	golang_proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_aa8f2a05ea2d4edd)
 }
 
-var fileDescriptor_oauth_b76118c64ab80311 = []byte{
-	// 634 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x94, 0xbd, 0x4f, 0x1b, 0x4b,
-	0x14, 0xc5, 0x67, 0x6c, 0x30, 0x78, 0xcc, 0x83, 0xf7, 0x56, 0x2f, 0xc8, 0x42, 0xca, 0x35, 0x1f,
-	0x0d, 0x45, 0x58, 0x4b, 0xf0, 0x17, 0xd8, 0xd0, 0xa0, 0x14, 0x91, 0x36, 0xd0, 0xa4, 0xb1, 0xd6,
-	0xbb, 0xc3, 0x7a, 0x64, 0xd8, 0x59, 0xcd, 0xcc, 0x86, 0x28, 0x15, 0x25, 0x25, 0x65, 0xca, 0x28,
-	0x15, 0x25, 0x25, 0x25, 0x25, 0x4d, 0x24, 0xd2, 0x51, 0x39, 0xec, 0x6c, 0x43, 0x49, 0x13, 0x89,
-	0x32, 0xf2, 0xec, 0x58, 0x7c, 0x55, 0xa4, 0x8a, 0xe8, 0x66, 0xe6, 0x9e, 0xfb, 0xbb, 0xba, 0xe7,
-	0x68, 0x97, 0xbc, 0xde, 0xe5, 0xc2, 0xdf, 0xf7, 0xe3, 0x15, 0xa9, 0xfc, 0xa0, 0xdf, 0xf4, 0x13,
-	0xd6, 0xe4, 0x7e, 0xaa, 0x7a, 0x6e, 0x22, 0xb8, 0xe2, 0xce, 0xb4, 0x52, 0xb1, 0x6b, 0x25, 0xee,
-	0xc7, 0xb5, 0xb9, 0x95, 0x88, 0xa9, 0x5e, 0xda, 0x75, 0x03, 0xbe, 0xd7, 0x8c, 0x78, 0xc4, 0x9b,
-	0x46, 0xd6, 0x4d, 0x77, 0xcc, 0xcd, 0x5c, 0xcc, 0xa9, 0x68, 0x9f, 0x6b, 0x44, 0x9c, 0x47, 0xbb,
-	0xf4, 0x4e, 0xa5, 0xd8, 0x1e, 0x95, 0xca, 0xdf, 0x4b, 0xac, 0x60, 0xe9, 0xe9, 0x78, 0x16, 0xd2,
-	0x58, 0xb1, 0x1d, 0x46, 0x85, 0xb4, 0x22, 0x78, 0x2a, 0x12, 0x2c, 0xea, 0x29, 0x5b, 0x5f, 0xfc,
-	0x55, 0x22, 0xf5, 0x77, 0xad, 0x54, 0xf5, 0xd6, 0x77, 0x19, 0x8d, 0xd5, 0xf0, 0xc4, 0x05, 0xfb,
-	0xec, 0x2b, 0xc6, 0x63, 0xe7, 0x3d, 0x21, 0x81, 0x79, 0xee, 0xb0, 0x50, 0xd6, 0xf1, 0x3c, 0x5e,
-	0xae, 0xad, 0x2e, 0xb8, 0x0f, 0xd7, 0x72, 0x8b, 0xc6, 0xcd, 0xbb, 0xc9, 0xed, 0xff, 0xce, 0x07,
-	0x0d, 0xa4, 0x07, 0x8d, 0xaa, 0x2d, 0x6d, 0x48, 0xaf, 0x1a, 0x58, 0x95, 0x74, 0xde, 0x92, 0xc9,
-	0x54, 0x52, 0x61, 0x90, 0x25, 0x83, 0x6c, 0x3c, 0x46, 0x6e, 0x4b, 0x2a, 0xee, 0x03, 0x67, 0x2c,
-	0x70, 0xc2, 0x14, 0x36, 0xa4, 0x37, 0x91, 0x1a, 0x85, 0x74, 0x56, 0x48, 0xa5, 0x58, 0xa7, 0x5e,
-	0x9e, 0x2f, 0x2f, 0x4f, 0xaf, 0xbe, 0x7a, 0x8c, 0xf2, 0x86, 0x55, 0xcf, 0x8a, 0x9c, 0x75, 0x42,
-	0x02, 0x41, 0x7d, 0x45, 0xc3, 0x8e, 0xaf, 0xea, 0x63, 0x66, 0xfa, 0x9c, 0x5b, 0x18, 0xed, 0x8e,
-	0x8c, 0x76, 0xb7, 0x46, 0x46, 0xb7, 0x27, 0x87, 0x83, 0x8f, 0x7e, 0x36, 0xb0, 0x57, 0xb5, 0x7d,
-	0x2d, 0x35, 0x84, 0xa4, 0x49, 0x38, 0x82, 0x8c, 0x3f, 0x07, 0x62, 0xfb, 0x5a, 0x6a, 0xf1, 0x47,
-	0x99, 0xcc, 0x1a, 0xdf, 0x1f, 0x38, 0xbe, 0xce, 0x43, 0xfa, 0xf2, 0x5c, 0x77, 0xc8, 0x58, 0xc0,
-	0x43, 0x6a, 0xfc, 0xae, 0x7a, 0xe6, 0xec, 0xac, 0x92, 0x29, 0x41, 0x43, 0x26, 0x68, 0xa0, 0x3a,
-	0xa9, 0x60, 0xc6, 0xc6, 0x6a, 0x7b, 0x46, 0x0f, 0x1a, 0x35, 0xcf, 0xbe, 0x6f, 0x7b, 0x9b, 0x5e,
-	0x6d, 0x24, 0xda, 0x16, 0xcc, 0xf9, 0x9f, 0x8c, 0x4b, 0xe5, 0x2b, 0x5a, 0xaf, 0x18, 0x50, 0x71,
-	0x79, 0x94, 0xe9, 0xc4, 0x1f, 0x67, 0x4a, 0x3f, 0x25, 0x4c, 0x50, 0x39, 0x84, 0x4c, 0x3e, 0x07,
-	0x62, 0xfb, 0x5a, 0x6a, 0xf1, 0x7b, 0x99, 0xfc, 0x5b, 0x64, 0x1a, 0x04, 0x54, 0xca, 0x2d, 0xde,
-	0xa7, 0x2f, 0xf0, 0x1b, 0x9a, 0x25, 0x25, 0x16, 0x16, 0x59, 0xb6, 0x2b, 0x7a, 0xd0, 0x28, 0x6d,
-	0x6e, 0x78, 0x25, 0x16, 0x3a, 0x0b, 0x64, 0xca, 0x37, 0x7b, 0x77, 0xd4, 0x70, 0xf1, 0x22, 0x51,
-	0xaf, 0xe6, 0xdf, 0xf3, 0x62, 0x89, 0xfc, 0x23, 0xe8, 0x8e, 0xa0, 0xb2, 0x67, 0x35, 0x45, 0x90,
-	0x53, 0xf6, 0xb1, 0x10, 0xfd, 0x35, 0x79, 0xb6, 0xbf, 0xe1, 0xf3, 0x0c, 0xf0, 0x45, 0x06, 0xf8,
-	0x32, 0x03, 0x74, 0x95, 0x01, 0xba, 0xce, 0x00, 0xdd, 0x64, 0x80, 0x6e, 0x33, 0xc0, 0x07, 0x1a,
-	0xf0, 0xa1, 0x06, 0x74, 0xac, 0x01, 0x9f, 0x68, 0x40, 0xa7, 0x1a, 0xd0, 0x99, 0x06, 0x74, 0xae,
-	0x01, 0x5f, 0x68, 0xc0, 0x97, 0x1a, 0xd0, 0x95, 0x06, 0x7c, 0xad, 0x01, 0xdd, 0x68, 0xc0, 0xb7,
-	0x1a, 0xd0, 0x41, 0x0e, 0xe8, 0x30, 0x07, 0x7c, 0x94, 0x03, 0xfa, 0x92, 0x03, 0xfe, 0x9a, 0x03,
-	0x3a, 0xce, 0x01, 0x9d, 0xe4, 0x80, 0x4f, 0x73, 0xc0, 0x67, 0x39, 0xe0, 0x0f, 0x6f, 0x22, 0xee,
-	0xaa, 0x1e, 0x55, 0x3d, 0x16, 0x47, 0xd2, 0x8d, 0xa9, 0xda, 0xe7, 0xa2, 0xdf, 0x7c, 0xf8, 0x1f,
-	0x4f, 0xfa, 0x51, 0x53, 0xa9, 0x38, 0xe9, 0x76, 0x2b, 0x66, 0x9b, 0xb5, 0xdf, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0x35, 0x17, 0xc1, 0x33, 0x8d, 0x06, 0x00, 0x00,
+var fileDescriptor_oauth_aa8f2a05ea2d4edd = []byte{
+	// 816 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x56, 0x3d, 0x70, 0x1b, 0x45,
+	0x18, 0xdd, 0x95, 0x6c, 0xd9, 0x5a, 0xd9, 0x0e, 0xb9, 0x81, 0x8c, 0x30, 0xb0, 0xa7, 0x9c, 0x29,
+	0x54, 0xe0, 0xd3, 0x8c, 0xd3, 0xd0, 0x5a, 0x76, 0xe3, 0x01, 0x06, 0x66, 0x89, 0x1b, 0x1a, 0xcf,
+	0xf9, 0x6e, 0x7d, 0xda, 0xb1, 0x74, 0x7b, 0xec, 0xee, 0x11, 0x86, 0xca, 0x65, 0xca, 0x94, 0x94,
+	0x0c, 0x55, 0x0a, 0x8a, 0x94, 0x29, 0xd3, 0xe1, 0x86, 0x19, 0x53, 0x91, 0x4a, 0x44, 0x7b, 0x4d,
+	0xca, 0x34, 0xcc, 0xa4, 0x64, 0x6e, 0x6f, 0x15, 0xfd, 0xc4, 0x2a, 0x44, 0x43, 0x92, 0x6e, 0x7f,
+	0xde, 0xf7, 0xf6, 0x7b, 0xf7, 0x3d, 0xbd, 0x11, 0xfa, 0xa4, 0xcf, 0x45, 0x70, 0x2f, 0x48, 0x76,
+	0xa5, 0x0a, 0xc2, 0xf3, 0x4e, 0x90, 0xb2, 0x0e, 0x0f, 0x32, 0xd5, 0xf3, 0x53, 0xc1, 0x15, 0x77,
+	0xb6, 0x94, 0x4a, 0x7c, 0x0b, 0xf1, 0x7f, 0xb8, 0xb3, 0xbd, 0x1b, 0x33, 0xd5, 0xcb, 0x4e, 0xfd,
+	0x90, 0x0f, 0x3a, 0x31, 0x8f, 0x79, 0xc7, 0xc0, 0x4e, 0xb3, 0x33, 0xb3, 0x33, 0x1b, 0xb3, 0x2a,
+	0xcb, 0xb7, 0xdd, 0x98, 0xf3, 0xb8, 0x4f, 0x27, 0x28, 0xc5, 0x06, 0x54, 0xaa, 0x60, 0x90, 0x5a,
+	0xc0, 0xce, 0xeb, 0xcf, 0xb3, 0x88, 0x26, 0x8a, 0x9d, 0x31, 0x2a, 0xa4, 0x05, 0xe1, 0xd7, 0x41,
+	0x82, 0xc5, 0x3d, 0x65, 0xef, 0xbd, 0xdf, 0x21, 0xda, 0xf9, 0x7a, 0x3f, 0x53, 0xbd, 0x83, 0x3e,
+	0xa3, 0x89, 0x2a, 0x56, 0x5c, 0xb0, 0x9f, 0x02, 0xc5, 0x78, 0x72, 0x34, 0x61, 0x73, 0xbe, 0x40,
+	0xeb, 0x99, 0xa4, 0xe2, 0x84, 0x45, 0xb2, 0x09, 0x5b, 0xb0, 0xdd, 0xd8, 0x73, 0xfd, 0x59, 0x7d,
+	0xfe, 0xb1, 0xa4, 0x62, 0xaa, 0xa4, 0x7b, 0xe3, 0x72, 0xe8, 0x02, 0x3d, 0x74, 0xd7, 0xcc, 0xc5,
+	0xa1, 0x24, 0x6b, 0x99, 0x41, 0x48, 0xe7, 0x5b, 0x84, 0x42, 0xf3, 0x9c, 0xa1, 0xab, 0x18, 0xba,
+	0xdb, 0xf3, 0x74, 0x65, 0x43, 0xd3, 0x84, 0x37, 0x2d, 0x61, 0xdd, 0x5e, 0x1d, 0x4a, 0x52, 0x0f,
+	0x2d, 0x4a, 0x7a, 0xff, 0x54, 0x50, 0x73, 0x91, 0x92, 0x37, 0xbf, 0x7d, 0x67, 0x17, 0xd5, 0xca,
+	0xc1, 0x34, 0xab, 0xad, 0x6a, 0x7b, 0x6b, 0xef, 0x83, 0x79, 0x42, 0x52, 0xdc, 0x12, 0x0b, 0x72,
+	0x0e, 0x10, 0x0a, 0x05, 0x0d, 0x14, 0x8d, 0x4e, 0x02, 0xd5, 0x5c, 0x31, 0x3d, 0x6c, 0xfb, 0xa5,
+	0x65, 0xfc, 0xb1, 0x65, 0xfc, 0xbb, 0x63, 0xcb, 0x74, 0xd7, 0x8b, 0xc7, 0x1f, 0xfc, 0xed, 0x42,
+	0x52, 0xb7, 0x75, 0xfb, 0xaa, 0x20, 0xc9, 0xd2, 0x68, 0x4c, 0xb2, 0xba, 0x0c, 0x89, 0xad, 0xdb,
+	0x57, 0xde, 0x00, 0x7d, 0xb8, 0xe8, 0xb3, 0x4b, 0xe7, 0x1b, 0xb4, 0x15, 0xcc, 0x9c, 0x34, 0x61,
+	0xab, 0xda, 0x6e, 0xec, 0xb5, 0xe7, 0xd5, 0x2d, 0xa2, 0x20, 0x73, 0xf5, 0xde, 0x6f, 0x10, 0x7d,
+	0xfa, 0x25, 0x93, 0x6a, 0xe1, 0x9b, 0x84, 0x7e, 0x9f, 0x51, 0xa9, 0x9c, 0xc3, 0xe5, 0x47, 0x6e,
+	0xf4, 0x5d, 0x0d, 0x5d, 0x38, 0x99, 0xf5, 0xfb, 0x68, 0x95, 0x8b, 0x88, 0x0a, 0x33, 0xe6, 0x3a,
+	0x29, 0x37, 0xc5, 0x69, 0x9f, 0x0d, 0x98, 0x6a, 0x56, 0x5b, 0xb0, 0xbd, 0x49, 0xca, 0x8d, 0xe3,
+	0xa0, 0x95, 0x34, 0x88, 0xa9, 0x99, 0xc6, 0x26, 0x31, 0x6b, 0xef, 0xcf, 0x2a, 0xba, 0x65, 0x5a,
+	0x9d, 0x69, 0xf2, 0x80, 0x47, 0xf4, 0xdd, 0xf3, 0xa4, 0x83, 0x56, 0x42, 0x1e, 0x95, 0xfa, 0xeb,
+	0xc4, 0xac, 0x9d, 0x3d, 0xb4, 0x21, 0x68, 0xc4, 0x04, 0x0d, 0xd5, 0x49, 0x26, 0x98, 0x31, 0x59,
+	0xbd, 0x7b, 0x43, 0x0f, 0xdd, 0x06, 0xb1, 0xe7, 0xc7, 0xe4, 0x88, 0x34, 0xc6, 0xa0, 0x63, 0xc1,
+	0x8a, 0xaf, 0x2b, 0x55, 0xa0, 0x68, 0xb3, 0x56, 0x7e, 0x73, 0xb3, 0x99, 0x73, 0xfc, 0xda, 0x7f,
+	0x76, 0x3c, 0xfd, 0x31, 0x65, 0x82, 0xca, 0x82, 0x64, 0x7d, 0x19, 0x12, 0x5b, 0xb7, 0xaf, 0xbc,
+	0xbf, 0x20, 0xfa, 0xa8, 0x9c, 0x69, 0x18, 0x52, 0x29, 0xef, 0xf2, 0x73, 0xfa, 0x76, 0x65, 0xa5,
+	0x73, 0x0b, 0x55, 0x58, 0x64, 0xcc, 0x5b, 0xef, 0xd6, 0xf4, 0xd0, 0xad, 0x1c, 0x1d, 0x92, 0x0a,
+	0x8b, 0xbc, 0x3f, 0xaa, 0xe8, 0xbd, 0x79, 0x65, 0x6f, 0xaf, 0x1c, 0xe7, 0x36, 0xda, 0x08, 0x8c,
+	0x90, 0x13, 0x55, 0x28, 0xb1, 0xc6, 0x6c, 0x04, 0x53, 0xe2, 0x76, 0xd0, 0xa6, 0xa0, 0x67, 0x82,
+	0xca, 0x9e, 0xc5, 0x18, 0x83, 0x92, 0x0d, 0x7b, 0x58, 0x82, 0x26, 0xbf, 0x83, 0xda, 0xf2, 0xd9,
+	0xfc, 0x7f, 0x3a, 0xf5, 0x2b, 0x74, 0x73, 0x7e, 0x9c, 0xd2, 0xf9, 0x1c, 0xd5, 0x8c, 0xd4, 0x71,
+	0x16, 0xb7, 0xae, 0xcd, 0xe2, 0xa9, 0x12, 0x62, 0xf1, 0xde, 0x45, 0x05, 0x7d, 0xfc, 0x2a, 0x7b,
+	0xa7, 0x39, 0xc7, 0x99, 0xfb, 0xe6, 0x5b, 0xe5, 0x55, 0x9e, 0x57, 0xaf, 0xcd, 0xf3, 0x95, 0xeb,
+	0xf2, 0x7c, 0x75, 0x92, 0xe7, 0xdd, 0x5f, 0xe1, 0xe5, 0x08, 0xc3, 0xab, 0x11, 0x86, 0x4f, 0x47,
+	0x18, 0x3c, 0x1b, 0x61, 0xf0, 0x7c, 0x84, 0xc1, 0x8b, 0x11, 0x06, 0x2f, 0x47, 0x18, 0x5e, 0x68,
+	0x0c, 0xef, 0x6b, 0x0c, 0x1e, 0x6a, 0x0c, 0x1f, 0x69, 0x0c, 0x1e, 0x6b, 0x0c, 0x9e, 0x68, 0x0c,
+	0x2e, 0x35, 0x86, 0x57, 0x1a, 0xc3, 0xa7, 0x1a, 0x83, 0x67, 0x1a, 0xc3, 0xe7, 0x1a, 0x83, 0x17,
+	0x1a, 0xc3, 0x97, 0x1a, 0x83, 0x8b, 0x1c, 0x83, 0xfb, 0x39, 0x86, 0x0f, 0x72, 0x0c, 0x7e, 0xce,
+	0x31, 0xfc, 0x25, 0xc7, 0xe0, 0x61, 0x8e, 0xc1, 0xa3, 0x1c, 0xc3, 0xc7, 0x39, 0x86, 0x4f, 0x72,
+	0x0c, 0xbf, 0xfb, 0x2c, 0xe6, 0xbe, 0xea, 0x51, 0xd5, 0x63, 0x49, 0x2c, 0xfd, 0x84, 0xaa, 0x7b,
+	0x5c, 0x9c, 0x77, 0x66, 0xff, 0xdb, 0xa5, 0xe7, 0x71, 0x47, 0xa9, 0x24, 0x3d, 0x3d, 0xad, 0x19,
+	0x7f, 0xdc, 0xf9, 0x37, 0x00, 0x00, 0xff, 0xff, 0xb2, 0xf7, 0xe9, 0x80, 0xa1, 0x0a, 0x00, 0x00,
 }

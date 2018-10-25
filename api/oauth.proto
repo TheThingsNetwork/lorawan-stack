@@ -23,17 +23,37 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
+message OAuthClientAuthorizationIdentifiers {
+  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+}
+
 message OAuthClientAuthorization {
-  ClientIdentifiers client_ids = 1 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
-  UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
   repeated Right rights = 3;
   google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
+message OAuthClientAuthorizations {
+  repeated OAuthClientAuthorization authorizations = 1;
+}
+
+message ListOAuthClientAuthorizationsRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 2;
+  // Limit the number of results per page.
+  uint32 limit = 3;
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 4;
+}
+
 message OAuthAuthorizationCode {
-  ClientIdentifiers client_ids = 1 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
-  UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
   repeated Right rights = 3;
   string code = 4;
   string redirect_uri = 5 [(gogoproto.customname) = "RedirectURI"];
@@ -42,13 +62,35 @@ message OAuthAuthorizationCode {
   google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
+message OAuthAccessTokenIdentifiers {
+  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+  string id = 3 [(gogoproto.customname) = "ID"];
+}
+
 message OAuthAccessToken {
-  ClientIdentifiers client_ids = 1 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
-  UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
-  repeated Right rights = 3;
-  string id = 4 [(gogoproto.customname) = "ID"];
-  string access_token = 5;
-  string refresh_token = 6;
+  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+  string id = 3 [(gogoproto.customname) = "ID"];
+  string access_token = 4;
+  string refresh_token = 5;
+  repeated Right rights = 6;
   google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message OAuthAccessTokens {
+  repeated OAuthAccessToken tokens = 1;
+}
+
+message ListOAuthAccessTokensRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 3;
+  // Limit the number of results per page.
+  uint32 limit = 4;
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 5;
 }

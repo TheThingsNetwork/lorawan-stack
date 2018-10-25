@@ -278,6 +278,26 @@ func (m *UplinkMessage) CombinedIdentifiers() *CombinedIdentifiers {
 	return m.GetEndDeviceIDs().CombinedIdentifiers()
 }
 
+// CombinedIdentifiers implements Identifiers.
+func (m *ListOAuthAccessTokensRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return CombineIdentifiers(m.UserIDs, m.ClientIDs)
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *ListOAuthClientAuthorizationsRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.UserIdentifiers.CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *OAuthAccessTokenIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return CombineIdentifiers(m.UserIDs, m.ClientIDs)
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *OAuthClientAuthorizationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return CombineIdentifiers(m.UserIDs, m.ClientIDs)
+}
+
 // Copy stores a copy of ids in x and returns it.
 func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifiers {
 	*x = EndDeviceIdentifiers{
