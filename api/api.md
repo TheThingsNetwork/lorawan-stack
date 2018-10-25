@@ -1125,7 +1125,12 @@ PeerInfo
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
 | token | [string](#string) |  |  |
+| entity | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+| contact_info | [ContactInfo](#ttn.lorawan.v3.ContactInfo) | repeated |  |
+| created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| expires_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 
 
 
@@ -1172,7 +1177,8 @@ PeerInfo
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Validate | [ContactInfoValidation](#ttn.lorawan.v3.ContactInfoValidation) | [.google.protobuf.Empty](#ttn.lorawan.v3.ContactInfoValidation) |  |
+| RequestValidation | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) | [ContactInfoValidation](#ttn.lorawan.v3.EntityIdentifiers) | Request validation for the non-validated contact info for the given entity. |
+| Validate | [ContactInfoValidation](#ttn.lorawan.v3.ContactInfoValidation) | [.google.protobuf.Empty](#ttn.lorawan.v3.ContactInfoValidation) | Validate confirms a contact info validation. |
 
  
 

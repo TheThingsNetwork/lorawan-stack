@@ -18,6 +18,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/identifiers.proto";
 
 package ttn.lorawan.v3;
 
@@ -49,13 +50,25 @@ message ContactInfo {
 }
 
 message ContactInfoValidation {
-  string token = 1;
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string token = 2;
+  EntityIdentifiers entity = 3;
+  repeated ContactInfo contact_info = 4;
+  google.protobuf.Timestamp created_at = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 6 [(gogoproto.stdtime) = true];
 }
 
 service ContactInfoRegistry {
+  // Request validation for the non-validated contact info for the given entity.
+  rpc RequestValidation(EntityIdentifiers) returns (ContactInfoValidation) {
+    option (google.api.http) = {
+      post: "/contact_info/validation"
+    };
+  }
+  // Validate confirms a contact info validation.
   rpc Validate(ContactInfoValidation) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/contact_info/validate"
+      patch: "/contact_info/validation"
     };
   };
 }

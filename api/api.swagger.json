@@ -1059,8 +1059,24 @@
         ]
       }
     },
-    "/contact_info/validate": {
+    "/contact_info/validation": {
+      "post": {
+        "summary": "Request validation for the non-validated contact info for the given entity.",
+        "operationId": "RequestValidation",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ContactInfoValidation"
+            }
+          }
+        },
+        "tags": [
+          "ContactInfoRegistry"
+        ]
+      },
       "patch": {
+        "summary": "Validate confirms a contact info validation.",
         "operationId": "Validate",
         "responses": {
           "200": {
@@ -4716,6 +4732,34 @@
           "format": "boolean"
         },
         "validated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v3ContactInfoValidation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "entity": {
+          "$ref": "#/definitions/v3EntityIdentifiers"
+        },
+        "contact_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ContactInfo"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
           "type": "string",
           "format": "date-time"
         }
