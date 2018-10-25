@@ -1281,7 +1281,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			}); err != nil {
 				logger.WithField(
 					"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-				).WithError(err).Errorf("Failed to send Join-accept to AS")
+				).WithError(err).Errorf("Failed to send join-accept to AS")
 			}
 		}()
 		return nil
