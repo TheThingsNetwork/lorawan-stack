@@ -209,6 +209,15 @@
   
   
 
+- [lorawan-stack/api/identityserver.proto](#lorawan-stack/api/identityserver.proto)
+    - [AuthInfoResponse](#ttn.lorawan.v3.AuthInfoResponse)
+    - [AuthInfoResponse.APIKeyAccess](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess)
+  
+  
+  
+    - [EntityAccess](#ttn.lorawan.v3.EntityAccess)
+  
+
 - [lorawan-stack/api/join.proto](#lorawan-stack/api/join.proto)
     - [JoinRequest](#ttn.lorawan.v3.JoinRequest)
     - [JoinResponse](#ttn.lorawan.v3.JoinResponse)
@@ -2509,6 +2518,65 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
  
 
  
+
+ 
+
+
+
+<a name="lorawan-stack/api/identityserver.proto"/>
+<p align="right"><a href="#top">Top</a></p>
+
+## lorawan-stack/api/identityserver.proto
+
+
+
+<a name="ttn.lorawan.v3.AuthInfoResponse"/>
+
+### AuthInfoResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| api_key | [AuthInfoResponse.APIKeyAccess](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess) |  |  |
+| oauth_access_token | [OAuthAccessToken](#ttn.lorawan.v3.OAuthAccessToken) |  |  |
+| universal_rights | [Rights](#ttn.lorawan.v3.Rights) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess"/>
+
+### AuthInfoResponse.APIKeyAccess
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| api_key | [APIKey](#ttn.lorawan.v3.APIKey) |  |  |
+| entity_ids | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ttn.lorawan.v3.EntityAccess"/>
+
+### EntityAccess
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| AuthInfo | [.google.protobuf.Empty](#google.protobuf.Empty) | [AuthInfoResponse](#google.protobuf.Empty) | AuthInfo returns information about the authentication that is used on the request. |
 
  
 

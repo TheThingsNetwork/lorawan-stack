@@ -1,0 +1,47 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/oauth.proto";
+import "lorawan-stack/api/rights.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+message AuthInfoResponse {
+  message APIKeyAccess {
+    APIKey api_key = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+    EntityIdentifiers entity_ids = 2 [(gogoproto.customname) = "EntityIDs", (gogoproto.nullable) = false];
+  }
+  oneof access_method {
+    AuthInfoResponse.APIKeyAccess api_key = 1 [(gogoproto.customname) = "APIKey"];
+    OAuthAccessToken oauth_access_token = 2 [(gogoproto.customname) = "OAuthAccessToken"];
+  }
+  Rights universal_rights = 3;
+}
+
+service EntityAccess {
+  // AuthInfo returns information about the authentication that is used on the request.
+  rpc AuthInfo(google.protobuf.Empty) returns (AuthInfoResponse) {
+    option (google.api.http) = {
+      get: "/auth_info"
+    };
+  };
+}

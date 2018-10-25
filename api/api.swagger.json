@@ -835,6 +835,23 @@
         ]
       }
     },
+    "/auth_info": {
+      "get": {
+        "summary": "AuthInfo returns information about the authentication that is used on the request.",
+        "operationId": "AuthInfo",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3AuthInfoResponse"
+            }
+          }
+        },
+        "tags": [
+          "EntityAccess"
+        ]
+      }
+    },
     "/clients": {
       "get": {
         "summary": "List OAuth clients. See request message for details.",
@@ -3549,6 +3566,17 @@
     }
   },
   "definitions": {
+    "AuthInfoResponseAPIKeyAccess": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "$ref": "#/definitions/v3APIKey"
+        },
+        "entity_ids": {
+          "$ref": "#/definitions/v3EntityIdentifiers"
+        }
+      }
+    },
     "ConcentratorConfigFSKChannel": {
       "type": "object",
       "properties": {
@@ -4494,6 +4522,20 @@
           "items": {
             "$ref": "#/definitions/v3Application"
           }
+        }
+      }
+    },
+    "v3AuthInfoResponse": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "$ref": "#/definitions/AuthInfoResponseAPIKeyAccess"
+        },
+        "oauth_access_token": {
+          "$ref": "#/definitions/v3OAuthAccessToken"
+        },
+        "universal_rights": {
+          "$ref": "#/definitions/v3Rights"
         }
       }
     },
@@ -6287,6 +6329,40 @@
         "nwk_s_enc_key": {
           "$ref": "#/definitions/v3KeyEnvelope",
           "description": "The (encrypted) Network Session Encryption Key."
+        }
+      }
+    },
+    "v3OAuthAccessToken": {
+      "type": "object",
+      "properties": {
+        "client_ids": {
+          "$ref": "#/definitions/v3ClientIdentifiers"
+        },
+        "user_ids": {
+          "$ref": "#/definitions/v3UserIdentifiers"
+        },
+        "rights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3Right"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
