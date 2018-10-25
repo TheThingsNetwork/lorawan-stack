@@ -20,25 +20,22 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-message UserIdentifiers {
-  // This ID shares namespace with organization's IDs.
-  string user_id = 1 [(gogoproto.customname) = "UserID"];
-  string email = 2;
-}
 
 message ApplicationIdentifiers {
   option (gogoproto.populate) = false;
+
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
 }
 
-message GatewayIdentifiers {
+message ClientIdentifiers {
   option (gogoproto.populate) = false;
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
-  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
+
+  string client_id = 1 [(gogoproto.customname) = "ClientID"];
 }
 
 message EndDeviceIdentifiers {
   option (gogoproto.populate) = false;
+
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // The LoRaWAN DevEUI.
@@ -49,18 +46,37 @@ message EndDeviceIdentifiers {
   bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
 }
 
-message ClientIdentifiers {
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
+message GatewayIdentifiers {
+  option (gogoproto.populate) = false;
+
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+
+  // Secondary identifier, which can only be used in specific requests.
+  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
 }
 
 message OrganizationIdentifiers {
+  option (gogoproto.populate) = false;
+
+  // This ID shares namespace with user IDs.
   string organization_id = 1 [(gogoproto.customname) = "OrganizationID"];
 }
 
+message UserIdentifiers {
+  option (gogoproto.populate) = false;
+
+  // This ID shares namespace with organization IDs.
+  string user_id = 1 [(gogoproto.customname) = "UserID"];
+
+  // Secondary identifier, which can only be used in specific requests.
+  string email = 2;
+}
+
+// OrganizationOrUserIdentifiers contains either organization or user identifiers.
 message OrganizationOrUserIdentifiers {
   oneof ids {
-    UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs"];
-    OrganizationIdentifiers organization_ids = 2 [(gogoproto.customname) = "OrganizationIDs"];
+    OrganizationIdentifiers organization_ids = 1 [(gogoproto.customname) = "OrganizationIDs"];
+    UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs"];
   }
 }
 

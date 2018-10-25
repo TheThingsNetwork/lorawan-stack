@@ -2440,7 +2440,7 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | gateway_id | [string](#string) |  |  |
-| eui | [bytes](#bytes) |  |  |
+| eui | [bytes](#bytes) |  | Secondary identifier, which can only be used in specific requests. |
 
 
 
@@ -2455,7 +2455,7 @@ EntityIdentifiers contains one of the possible entity identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| organization_id | [string](#string) |  |  |
+| organization_id | [string](#string) |  | This ID shares namespace with user IDs. |
 
 
 
@@ -2465,13 +2465,13 @@ EntityIdentifiers contains one of the possible entity identifiers.
 <a name="ttn.lorawan.v3.OrganizationOrUserIdentifiers"/>
 
 ### OrganizationOrUserIdentifiers
-
+OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | organization_ids | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 
 
 
@@ -2486,8 +2486,8 @@ EntityIdentifiers contains one of the possible entity identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| user_id | [string](#string) |  | This ID shares namespace with organization&#39;s IDs. |
-| email | [string](#string) |  |  |
+| user_id | [string](#string) |  | This ID shares namespace with organization IDs. |
+| email | [string](#string) |  | Secondary identifier, which can only be used in specific requests. |
 
 
 

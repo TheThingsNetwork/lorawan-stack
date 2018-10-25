@@ -28,9 +28,245 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
+type ApplicationIdentifiers struct {
+	ApplicationID        string   `protobuf:"bytes,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationIdentifiers) Reset()      { *m = ApplicationIdentifiers{} }
+func (*ApplicationIdentifiers) ProtoMessage() {}
+func (*ApplicationIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{0}
+}
+func (m *ApplicationIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ApplicationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ApplicationIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationIdentifiers.Merge(dst, src)
+}
+func (m *ApplicationIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *ApplicationIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationIdentifiers proto.InternalMessageInfo
+
+func (m *ApplicationIdentifiers) GetApplicationID() string {
+	if m != nil {
+		return m.ApplicationID
+	}
+	return ""
+}
+
+type ClientIdentifiers struct {
+	ClientID             string   `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ClientIdentifiers) Reset()      { *m = ClientIdentifiers{} }
+func (*ClientIdentifiers) ProtoMessage() {}
+func (*ClientIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{1}
+}
+func (m *ClientIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClientIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClientIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ClientIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClientIdentifiers.Merge(dst, src)
+}
+func (m *ClientIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClientIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClientIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClientIdentifiers proto.InternalMessageInfo
+
+func (m *ClientIdentifiers) GetClientID() string {
+	if m != nil {
+		return m.ClientID
+	}
+	return ""
+}
+
+type EndDeviceIdentifiers struct {
+	DeviceID               string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	ApplicationIdentifiers `protobuf:"bytes,2,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
+	// The LoRaWAN DevEUI.
+	DevEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"dev_eui,omitempty"`
+	// The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
+	JoinEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,5,opt,name=join_eui,json=joinEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"join_eui,omitempty"`
+	// The LoRaWAN DevAddr.
+	DevAddr              *go_thethings_network_lorawan_stack_pkg_types.DevAddr `protobuf:"bytes,6,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevAddr" json:"dev_addr,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                              `json:"-"`
+	XXX_sizecache        int32                                                 `json:"-"`
+}
+
+func (m *EndDeviceIdentifiers) Reset()      { *m = EndDeviceIdentifiers{} }
+func (*EndDeviceIdentifiers) ProtoMessage() {}
+func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{2}
+}
+func (m *EndDeviceIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EndDeviceIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EndDeviceIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *EndDeviceIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EndDeviceIdentifiers.Merge(dst, src)
+}
+func (m *EndDeviceIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *EndDeviceIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_EndDeviceIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EndDeviceIdentifiers proto.InternalMessageInfo
+
+func (m *EndDeviceIdentifiers) GetDeviceID() string {
+	if m != nil {
+		return m.DeviceID
+	}
+	return ""
+}
+
+type GatewayIdentifiers struct {
+	GatewayID string `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,proto3" json:"gateway_id,omitempty"`
+	// Secondary identifier, which can only be used in specific requests.
+	EUI                  *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=eui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"eui,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                            `json:"-"`
+	XXX_sizecache        int32                                               `json:"-"`
+}
+
+func (m *GatewayIdentifiers) Reset()      { *m = GatewayIdentifiers{} }
+func (*GatewayIdentifiers) ProtoMessage() {}
+func (*GatewayIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{3}
+}
+func (m *GatewayIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GatewayIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GatewayIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *GatewayIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GatewayIdentifiers.Merge(dst, src)
+}
+func (m *GatewayIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *GatewayIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_GatewayIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GatewayIdentifiers proto.InternalMessageInfo
+
+func (m *GatewayIdentifiers) GetGatewayID() string {
+	if m != nil {
+		return m.GatewayID
+	}
+	return ""
+}
+
+type OrganizationIdentifiers struct {
+	// This ID shares namespace with user IDs.
+	OrganizationID       string   `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *OrganizationIdentifiers) Reset()      { *m = OrganizationIdentifiers{} }
+func (*OrganizationIdentifiers) ProtoMessage() {}
+func (*OrganizationIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{4}
+}
+func (m *OrganizationIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *OrganizationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_OrganizationIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *OrganizationIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OrganizationIdentifiers.Merge(dst, src)
+}
+func (m *OrganizationIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *OrganizationIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_OrganizationIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OrganizationIdentifiers proto.InternalMessageInfo
+
+func (m *OrganizationIdentifiers) GetOrganizationID() string {
+	if m != nil {
+		return m.OrganizationID
+	}
+	return ""
+}
+
 type UserIdentifiers struct {
-	// This ID shares namespace with organization's IDs.
-	UserID               string   `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// This ID shares namespace with organization IDs.
+	UserID string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// Secondary identifier, which can only be used in specific requests.
 	Email                string   `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -39,7 +275,7 @@ type UserIdentifiers struct {
 func (m *UserIdentifiers) Reset()      { *m = UserIdentifiers{} }
 func (*UserIdentifiers) ProtoMessage() {}
 func (*UserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{0}
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{5}
 }
 func (m *UserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -82,243 +318,11 @@ func (m *UserIdentifiers) GetEmail() string {
 	return ""
 }
 
-type ApplicationIdentifiers struct {
-	ApplicationID        string   `protobuf:"bytes,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ApplicationIdentifiers) Reset()      { *m = ApplicationIdentifiers{} }
-func (*ApplicationIdentifiers) ProtoMessage() {}
-func (*ApplicationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{1}
-}
-func (m *ApplicationIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ApplicationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ApplicationIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *ApplicationIdentifiers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ApplicationIdentifiers.Merge(dst, src)
-}
-func (m *ApplicationIdentifiers) XXX_Size() int {
-	return m.Size()
-}
-func (m *ApplicationIdentifiers) XXX_DiscardUnknown() {
-	xxx_messageInfo_ApplicationIdentifiers.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ApplicationIdentifiers proto.InternalMessageInfo
-
-func (m *ApplicationIdentifiers) GetApplicationID() string {
-	if m != nil {
-		return m.ApplicationID
-	}
-	return ""
-}
-
-type GatewayIdentifiers struct {
-	GatewayID            string                                              `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,proto3" json:"gateway_id,omitempty"`
-	EUI                  *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=eui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"eui,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                            `json:"-"`
-	XXX_sizecache        int32                                               `json:"-"`
-}
-
-func (m *GatewayIdentifiers) Reset()      { *m = GatewayIdentifiers{} }
-func (*GatewayIdentifiers) ProtoMessage() {}
-func (*GatewayIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{2}
-}
-func (m *GatewayIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GatewayIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_GatewayIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *GatewayIdentifiers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GatewayIdentifiers.Merge(dst, src)
-}
-func (m *GatewayIdentifiers) XXX_Size() int {
-	return m.Size()
-}
-func (m *GatewayIdentifiers) XXX_DiscardUnknown() {
-	xxx_messageInfo_GatewayIdentifiers.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GatewayIdentifiers proto.InternalMessageInfo
-
-func (m *GatewayIdentifiers) GetGatewayID() string {
-	if m != nil {
-		return m.GatewayID
-	}
-	return ""
-}
-
-type EndDeviceIdentifiers struct {
-	DeviceID               string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	ApplicationIdentifiers `protobuf:"bytes,2,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	// The LoRaWAN DevEUI.
-	DevEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"dev_eui,omitempty"`
-	// The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
-	JoinEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,5,opt,name=join_eui,json=joinEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"join_eui,omitempty"`
-	// The LoRaWAN DevAddr.
-	DevAddr              *go_thethings_network_lorawan_stack_pkg_types.DevAddr `protobuf:"bytes,6,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevAddr" json:"dev_addr,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                              `json:"-"`
-	XXX_sizecache        int32                                                 `json:"-"`
-}
-
-func (m *EndDeviceIdentifiers) Reset()      { *m = EndDeviceIdentifiers{} }
-func (*EndDeviceIdentifiers) ProtoMessage() {}
-func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{3}
-}
-func (m *EndDeviceIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *EndDeviceIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_EndDeviceIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *EndDeviceIdentifiers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EndDeviceIdentifiers.Merge(dst, src)
-}
-func (m *EndDeviceIdentifiers) XXX_Size() int {
-	return m.Size()
-}
-func (m *EndDeviceIdentifiers) XXX_DiscardUnknown() {
-	xxx_messageInfo_EndDeviceIdentifiers.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EndDeviceIdentifiers proto.InternalMessageInfo
-
-func (m *EndDeviceIdentifiers) GetDeviceID() string {
-	if m != nil {
-		return m.DeviceID
-	}
-	return ""
-}
-
-type ClientIdentifiers struct {
-	ClientID             string   `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ClientIdentifiers) Reset()      { *m = ClientIdentifiers{} }
-func (*ClientIdentifiers) ProtoMessage() {}
-func (*ClientIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{4}
-}
-func (m *ClientIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClientIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClientIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *ClientIdentifiers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClientIdentifiers.Merge(dst, src)
-}
-func (m *ClientIdentifiers) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClientIdentifiers) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClientIdentifiers.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClientIdentifiers proto.InternalMessageInfo
-
-func (m *ClientIdentifiers) GetClientID() string {
-	if m != nil {
-		return m.ClientID
-	}
-	return ""
-}
-
-type OrganizationIdentifiers struct {
-	OrganizationID       string   `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *OrganizationIdentifiers) Reset()      { *m = OrganizationIdentifiers{} }
-func (*OrganizationIdentifiers) ProtoMessage() {}
-func (*OrganizationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{5}
-}
-func (m *OrganizationIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *OrganizationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_OrganizationIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *OrganizationIdentifiers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_OrganizationIdentifiers.Merge(dst, src)
-}
-func (m *OrganizationIdentifiers) XXX_Size() int {
-	return m.Size()
-}
-func (m *OrganizationIdentifiers) XXX_DiscardUnknown() {
-	xxx_messageInfo_OrganizationIdentifiers.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_OrganizationIdentifiers proto.InternalMessageInfo
-
-func (m *OrganizationIdentifiers) GetOrganizationID() string {
-	if m != nil {
-		return m.OrganizationID
-	}
-	return ""
-}
-
+// OrganizationOrUserIdentifiers contains either organization or user identifiers.
 type OrganizationOrUserIdentifiers struct {
 	// Types that are valid to be assigned to Ids:
-	//	*OrganizationOrUserIdentifiers_UserIDs
 	//	*OrganizationOrUserIdentifiers_OrganizationIDs
+	//	*OrganizationOrUserIdentifiers_UserIDs
 	Ids                  isOrganizationOrUserIdentifiers_Ids `protobuf_oneof:"ids"`
 	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`
 	XXX_sizecache        int32                               `json:"-"`
@@ -327,7 +331,7 @@ type OrganizationOrUserIdentifiers struct {
 func (m *OrganizationOrUserIdentifiers) Reset()      { *m = OrganizationOrUserIdentifiers{} }
 func (*OrganizationOrUserIdentifiers) ProtoMessage() {}
 func (*OrganizationOrUserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{6}
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{6}
 }
 func (m *OrganizationOrUserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -363,26 +367,19 @@ type isOrganizationOrUserIdentifiers_Ids interface {
 	Size() int
 }
 
-type OrganizationOrUserIdentifiers_UserIDs struct {
-	UserIDs *UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,oneof"`
-}
 type OrganizationOrUserIdentifiers_OrganizationIDs struct {
-	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,2,opt,name=organization_ids,json=organizationIds,oneof"`
+	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,oneof"`
+}
+type OrganizationOrUserIdentifiers_UserIDs struct {
+	UserIDs *UserIdentifiers `protobuf:"bytes,2,opt,name=user_ids,json=userIds,oneof"`
 }
 
-func (*OrganizationOrUserIdentifiers_UserIDs) isOrganizationOrUserIdentifiers_Ids()         {}
 func (*OrganizationOrUserIdentifiers_OrganizationIDs) isOrganizationOrUserIdentifiers_Ids() {}
+func (*OrganizationOrUserIdentifiers_UserIDs) isOrganizationOrUserIdentifiers_Ids()         {}
 
 func (m *OrganizationOrUserIdentifiers) GetIds() isOrganizationOrUserIdentifiers_Ids {
 	if m != nil {
 		return m.Ids
-	}
-	return nil
-}
-
-func (m *OrganizationOrUserIdentifiers) GetUserIDs() *UserIdentifiers {
-	if x, ok := m.GetIds().(*OrganizationOrUserIdentifiers_UserIDs); ok {
-		return x.UserIDs
 	}
 	return nil
 }
@@ -394,11 +391,18 @@ func (m *OrganizationOrUserIdentifiers) GetOrganizationIDs() *OrganizationIdenti
 	return nil
 }
 
+func (m *OrganizationOrUserIdentifiers) GetUserIDs() *UserIdentifiers {
+	if x, ok := m.GetIds().(*OrganizationOrUserIdentifiers_UserIDs); ok {
+		return x.UserIDs
+	}
+	return nil
+}
+
 // XXX_OneofFuncs is for the internal use of the proto package.
 func (*OrganizationOrUserIdentifiers) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _OrganizationOrUserIdentifiers_OneofMarshaler, _OrganizationOrUserIdentifiers_OneofUnmarshaler, _OrganizationOrUserIdentifiers_OneofSizer, []interface{}{
-		(*OrganizationOrUserIdentifiers_UserIDs)(nil),
 		(*OrganizationOrUserIdentifiers_OrganizationIDs)(nil),
+		(*OrganizationOrUserIdentifiers_UserIDs)(nil),
 	}
 }
 
@@ -406,14 +410,14 @@ func _OrganizationOrUserIdentifiers_OneofMarshaler(msg proto.Message, b *proto.B
 	m := msg.(*OrganizationOrUserIdentifiers)
 	// ids
 	switch x := m.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_UserIDs:
+	case *OrganizationOrUserIdentifiers_OrganizationIDs:
 		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.UserIDs); err != nil {
+		if err := b.EncodeMessage(x.OrganizationIDs); err != nil {
 			return err
 		}
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
+	case *OrganizationOrUserIdentifiers_UserIDs:
 		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.OrganizationIDs); err != nil {
+		if err := b.EncodeMessage(x.UserIDs); err != nil {
 			return err
 		}
 	case nil:
@@ -426,21 +430,21 @@ func _OrganizationOrUserIdentifiers_OneofMarshaler(msg proto.Message, b *proto.B
 func _OrganizationOrUserIdentifiers_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*OrganizationOrUserIdentifiers)
 	switch tag {
-	case 1: // ids.user_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(UserIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &OrganizationOrUserIdentifiers_UserIDs{msg}
-		return true, err
-	case 2: // ids.organization_ids
+	case 1: // ids.organization_ids
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
 		msg := new(OrganizationIdentifiers)
 		err := b.DecodeMessage(msg)
 		m.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{msg}
+		return true, err
+	case 2: // ids.user_ids
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(UserIdentifiers)
+		err := b.DecodeMessage(msg)
+		m.Ids = &OrganizationOrUserIdentifiers_UserIDs{msg}
 		return true, err
 	default:
 		return false, nil
@@ -451,13 +455,13 @@ func _OrganizationOrUserIdentifiers_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*OrganizationOrUserIdentifiers)
 	// ids
 	switch x := m.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		s := proto.Size(x.UserIDs)
+	case *OrganizationOrUserIdentifiers_OrganizationIDs:
+		s := proto.Size(x.OrganizationIDs)
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		s := proto.Size(x.OrganizationIDs)
+	case *OrganizationOrUserIdentifiers_UserIDs:
+		s := proto.Size(x.UserIDs)
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
@@ -485,7 +489,7 @@ type EntityIdentifiers struct {
 func (m *EntityIdentifiers) Reset()      { *m = EntityIdentifiers{} }
 func (*EntityIdentifiers) ProtoMessage() {}
 func (*EntityIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{7}
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{7}
 }
 func (m *EntityIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -757,7 +761,7 @@ type CombinedIdentifiers struct {
 func (m *CombinedIdentifiers) Reset()      { *m = CombinedIdentifiers{} }
 func (*CombinedIdentifiers) ProtoMessage() {}
 func (*CombinedIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_c9583749460a1e13, []int{8}
+	return fileDescriptor_identifiers_feaf2203ccd1d12f, []int{8}
 }
 func (m *CombinedIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -794,51 +798,24 @@ func (m *CombinedIdentifiers) GetEntityIdentifiers() []*EntityIdentifiers {
 }
 
 func init() {
-	proto.RegisterType((*UserIdentifiers)(nil), "ttn.lorawan.v3.UserIdentifiers")
-	golang_proto.RegisterType((*UserIdentifiers)(nil), "ttn.lorawan.v3.UserIdentifiers")
 	proto.RegisterType((*ApplicationIdentifiers)(nil), "ttn.lorawan.v3.ApplicationIdentifiers")
 	golang_proto.RegisterType((*ApplicationIdentifiers)(nil), "ttn.lorawan.v3.ApplicationIdentifiers")
-	proto.RegisterType((*GatewayIdentifiers)(nil), "ttn.lorawan.v3.GatewayIdentifiers")
-	golang_proto.RegisterType((*GatewayIdentifiers)(nil), "ttn.lorawan.v3.GatewayIdentifiers")
-	proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.lorawan.v3.EndDeviceIdentifiers")
-	golang_proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.lorawan.v3.EndDeviceIdentifiers")
 	proto.RegisterType((*ClientIdentifiers)(nil), "ttn.lorawan.v3.ClientIdentifiers")
 	golang_proto.RegisterType((*ClientIdentifiers)(nil), "ttn.lorawan.v3.ClientIdentifiers")
+	proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.lorawan.v3.EndDeviceIdentifiers")
+	golang_proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.lorawan.v3.EndDeviceIdentifiers")
+	proto.RegisterType((*GatewayIdentifiers)(nil), "ttn.lorawan.v3.GatewayIdentifiers")
+	golang_proto.RegisterType((*GatewayIdentifiers)(nil), "ttn.lorawan.v3.GatewayIdentifiers")
 	proto.RegisterType((*OrganizationIdentifiers)(nil), "ttn.lorawan.v3.OrganizationIdentifiers")
 	golang_proto.RegisterType((*OrganizationIdentifiers)(nil), "ttn.lorawan.v3.OrganizationIdentifiers")
+	proto.RegisterType((*UserIdentifiers)(nil), "ttn.lorawan.v3.UserIdentifiers")
+	golang_proto.RegisterType((*UserIdentifiers)(nil), "ttn.lorawan.v3.UserIdentifiers")
 	proto.RegisterType((*OrganizationOrUserIdentifiers)(nil), "ttn.lorawan.v3.OrganizationOrUserIdentifiers")
 	golang_proto.RegisterType((*OrganizationOrUserIdentifiers)(nil), "ttn.lorawan.v3.OrganizationOrUserIdentifiers")
 	proto.RegisterType((*EntityIdentifiers)(nil), "ttn.lorawan.v3.EntityIdentifiers")
 	golang_proto.RegisterType((*EntityIdentifiers)(nil), "ttn.lorawan.v3.EntityIdentifiers")
 	proto.RegisterType((*CombinedIdentifiers)(nil), "ttn.lorawan.v3.CombinedIdentifiers")
 	golang_proto.RegisterType((*CombinedIdentifiers)(nil), "ttn.lorawan.v3.CombinedIdentifiers")
-}
-func (this *UserIdentifiers) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*UserIdentifiers)
-	if !ok {
-		that2, ok := that.(UserIdentifiers)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.UserID != that1.UserID {
-		return false
-	}
-	if this.Email != that1.Email {
-		return false
-	}
-	return true
 }
 func (this *ApplicationIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
@@ -864,14 +841,14 @@ func (this *ApplicationIdentifiers) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *GatewayIdentifiers) Equal(that interface{}) bool {
+func (this *ClientIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*GatewayIdentifiers)
+	that1, ok := that.(*ClientIdentifiers)
 	if !ok {
-		that2, ok := that.(GatewayIdentifiers)
+		that2, ok := that.(ClientIdentifiers)
 		if ok {
 			that1 = &that2
 		} else {
@@ -883,14 +860,7 @@ func (this *GatewayIdentifiers) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.GatewayID != that1.GatewayID {
-		return false
-	}
-	if that1.EUI == nil {
-		if this.EUI != nil {
-			return false
-		}
-	} else if !this.EUI.Equal(*that1.EUI) {
+	if this.ClientID != that1.ClientID {
 		return false
 	}
 	return true
@@ -943,14 +913,14 @@ func (this *EndDeviceIdentifiers) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ClientIdentifiers) Equal(that interface{}) bool {
+func (this *GatewayIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*ClientIdentifiers)
+	that1, ok := that.(*GatewayIdentifiers)
 	if !ok {
-		that2, ok := that.(ClientIdentifiers)
+		that2, ok := that.(GatewayIdentifiers)
 		if ok {
 			that1 = &that2
 		} else {
@@ -962,7 +932,14 @@ func (this *ClientIdentifiers) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.ClientID != that1.ClientID {
+	if this.GatewayID != that1.GatewayID {
+		return false
+	}
+	if that1.EUI == nil {
+		if this.EUI != nil {
+			return false
+		}
+	} else if !this.EUI.Equal(*that1.EUI) {
 		return false
 	}
 	return true
@@ -987,6 +964,33 @@ func (this *OrganizationIdentifiers) Equal(that interface{}) bool {
 		return false
 	}
 	if this.OrganizationID != that1.OrganizationID {
+		return false
+	}
+	return true
+}
+func (this *UserIdentifiers) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*UserIdentifiers)
+	if !ok {
+		that2, ok := that.(UserIdentifiers)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.UserID != that1.UserID {
+		return false
+	}
+	if this.Email != that1.Email {
 		return false
 	}
 	return true
@@ -1021,30 +1025,6 @@ func (this *OrganizationOrUserIdentifiers) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *OrganizationOrUserIdentifiers_UserIDs) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*OrganizationOrUserIdentifiers_UserIDs)
-	if !ok {
-		that2, ok := that.(OrganizationOrUserIdentifiers_UserIDs)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.UserIDs.Equal(that1.UserIDs) {
-		return false
-	}
-	return true
-}
 func (this *OrganizationOrUserIdentifiers_OrganizationIDs) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1065,6 +1045,30 @@ func (this *OrganizationOrUserIdentifiers_OrganizationIDs) Equal(that interface{
 		return false
 	}
 	if !this.OrganizationIDs.Equal(that1.OrganizationIDs) {
+		return false
+	}
+	return true
+}
+func (this *OrganizationOrUserIdentifiers_UserIDs) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifiers_UserIDs)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifiers_UserIDs)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.UserIDs.Equal(that1.UserIDs) {
 		return false
 	}
 	return true
@@ -1272,6 +1276,174 @@ func (this *CombinedIdentifiers) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (m *ApplicationIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ApplicationID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ApplicationID)))
+		i += copy(dAtA[i:], m.ApplicationID)
+	}
+	return i, nil
+}
+
+func (m *ClientIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClientIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ClientID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ClientID)))
+		i += copy(dAtA[i:], m.ClientID)
+	}
+	return i, nil
+}
+
+func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EndDeviceIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.DeviceID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.DeviceID)))
+		i += copy(dAtA[i:], m.DeviceID)
+	}
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentifiers(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n1, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n1
+	if m.DevEUI != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevEUI.Size()))
+		n2, err := m.DevEUI.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if m.JoinEUI != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.JoinEUI.Size()))
+		n3, err := m.JoinEUI.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	if m.DevAddr != nil {
+		dAtA[i] = 0x32
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevAddr.Size()))
+		n4, err := m.DevAddr.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	return i, nil
+}
+
+func (m *GatewayIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GatewayIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.GatewayID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.GatewayID)))
+		i += copy(dAtA[i:], m.GatewayID)
+	}
+	if m.EUI != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.EUI.Size()))
+		n5, err := m.EUI.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+
+func (m *OrganizationIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OrganizationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.OrganizationID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.OrganizationID)))
+		i += copy(dAtA[i:], m.OrganizationID)
+	}
+	return i, nil
+}
+
 func (m *UserIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1302,174 +1474,6 @@ func (m *UserIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *ApplicationIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ApplicationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.ApplicationID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ApplicationID)))
-		i += copy(dAtA[i:], m.ApplicationID)
-	}
-	return i, nil
-}
-
-func (m *GatewayIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GatewayIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.GatewayID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.GatewayID)))
-		i += copy(dAtA[i:], m.GatewayID)
-	}
-	if m.EUI != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.EUI.Size()))
-		n1, err := m.EUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	return i, nil
-}
-
-func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *EndDeviceIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.DeviceID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.DeviceID)))
-		i += copy(dAtA[i:], m.DeviceID)
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentifiers(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n2, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if m.DevEUI != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevEUI.Size()))
-		n3, err := m.DevEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.JoinEUI != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.JoinEUI.Size()))
-		n4, err := m.JoinEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.DevAddr != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevAddr.Size()))
-		n5, err := m.DevAddr.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
-	return i, nil
-}
-
-func (m *ClientIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ClientIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.ClientID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ClientID)))
-		i += copy(dAtA[i:], m.ClientID)
-	}
-	return i, nil
-}
-
-func (m *OrganizationIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *OrganizationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.OrganizationID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.OrganizationID)))
-		i += copy(dAtA[i:], m.OrganizationID)
-	}
-	return i, nil
-}
-
 func (m *OrganizationOrUserIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1495,13 +1499,13 @@ func (m *OrganizationOrUserIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, error) {
+func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.UserIDs != nil {
+	if m.OrganizationIDs != nil {
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.UserIDs.Size()))
-		n7, err := m.UserIDs.MarshalTo(dAtA[i:])
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.OrganizationIDs.Size()))
+		n7, err := m.OrganizationIDs.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1509,13 +1513,13 @@ func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, err
 	}
 	return i, nil
 }
-func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalTo(dAtA []byte) (int, error) {
+func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.OrganizationIDs != nil {
+	if m.UserIDs != nil {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.OrganizationIDs.Size()))
-		n8, err := m.OrganizationIDs.MarshalTo(dAtA[i:])
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.UserIDs.Size()))
+		n8, err := m.UserIDs.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1671,53 +1675,28 @@ func encodeVarintIdentifiers(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func NewPopulatedUserIdentifiers(r randyIdentifiers, easy bool) *UserIdentifiers {
-	this := &UserIdentifiers{}
-	this.UserID = randStringIdentifiers(r)
-	this.Email = randStringIdentifiers(r)
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedClientIdentifiers(r randyIdentifiers, easy bool) *ClientIdentifiers {
-	this := &ClientIdentifiers{}
-	this.ClientID = randStringIdentifiers(r)
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedOrganizationIdentifiers(r randyIdentifiers, easy bool) *OrganizationIdentifiers {
-	this := &OrganizationIdentifiers{}
-	this.OrganizationID = randStringIdentifiers(r)
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
 func NewPopulatedOrganizationOrUserIdentifiers(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifiers {
 	this := &OrganizationOrUserIdentifiers{}
 	oneofNumber_Ids := []int32{1, 2}[r.Intn(2)]
 	switch oneofNumber_Ids {
 	case 1:
-		this.Ids = NewPopulatedOrganizationOrUserIdentifiers_UserIDs(r, easy)
-	case 2:
 		this.Ids = NewPopulatedOrganizationOrUserIdentifiers_OrganizationIDs(r, easy)
+	case 2:
+		this.Ids = NewPopulatedOrganizationOrUserIdentifiers_UserIDs(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
 }
 
-func NewPopulatedOrganizationOrUserIdentifiers_UserIDs(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifiers_UserIDs {
-	this := &OrganizationOrUserIdentifiers_UserIDs{}
-	this.UserIDs = NewPopulatedUserIdentifiers(r, easy)
-	return this
-}
 func NewPopulatedOrganizationOrUserIdentifiers_OrganizationIDs(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifiers_OrganizationIDs {
 	this := &OrganizationOrUserIdentifiers_OrganizationIDs{}
 	this.OrganizationIDs = NewPopulatedOrganizationIdentifiers(r, easy)
+	return this
+}
+func NewPopulatedOrganizationOrUserIdentifiers_UserIDs(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifiers_UserIDs {
+	this := &OrganizationOrUserIdentifiers_UserIDs{}
+	this.UserIDs = NewPopulatedUserIdentifiers(r, easy)
 	return this
 }
 func NewPopulatedEntityIdentifiers(r randyIdentifiers, easy bool) *EntityIdentifiers {
@@ -1858,20 +1837,6 @@ func encodeVarintPopulateIdentifiers(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *UserIdentifiers) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.UserID)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	l = len(m.Email)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	return n
-}
-
 func (m *ApplicationIdentifiers) Size() (n int) {
 	var l int
 	_ = l
@@ -1882,15 +1847,11 @@ func (m *ApplicationIdentifiers) Size() (n int) {
 	return n
 }
 
-func (m *GatewayIdentifiers) Size() (n int) {
+func (m *ClientIdentifiers) Size() (n int) {
 	var l int
 	_ = l
-	l = len(m.GatewayID)
+	l = len(m.ClientID)
 	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	if m.EUI != nil {
-		l = m.EUI.Size()
 		n += 1 + l + sovIdentifiers(uint64(l))
 	}
 	return n
@@ -1920,11 +1881,15 @@ func (m *EndDeviceIdentifiers) Size() (n int) {
 	return n
 }
 
-func (m *ClientIdentifiers) Size() (n int) {
+func (m *GatewayIdentifiers) Size() (n int) {
 	var l int
 	_ = l
-	l = len(m.ClientID)
+	l = len(m.GatewayID)
 	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	if m.EUI != nil {
+		l = m.EUI.Size()
 		n += 1 + l + sovIdentifiers(uint64(l))
 	}
 	return n
@@ -1940,6 +1905,20 @@ func (m *OrganizationIdentifiers) Size() (n int) {
 	return n
 }
 
+func (m *UserIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	return n
+}
+
 func (m *OrganizationOrUserIdentifiers) Size() (n int) {
 	var l int
 	_ = l
@@ -1949,20 +1928,20 @@ func (m *OrganizationOrUserIdentifiers) Size() (n int) {
 	return n
 }
 
-func (m *OrganizationOrUserIdentifiers_UserIDs) Size() (n int) {
-	var l int
-	_ = l
-	if m.UserIDs != nil {
-		l = m.UserIDs.Size()
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	return n
-}
 func (m *OrganizationOrUserIdentifiers_OrganizationIDs) Size() (n int) {
 	var l int
 	_ = l
 	if m.OrganizationIDs != nil {
 		l = m.OrganizationIDs.Size()
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	return n
+}
+func (m *OrganizationOrUserIdentifiers_UserIDs) Size() (n int) {
+	var l int
+	_ = l
+	if m.UserIDs != nil {
+		l = m.UserIDs.Size()
 		n += 1 + l + sovIdentifiers(uint64(l))
 	}
 	return n
@@ -2055,17 +2034,6 @@ func sovIdentifiers(x uint64) (n int) {
 func sozIdentifiers(x uint64) (n int) {
 	return sovIdentifiers((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (this *UserIdentifiers) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&UserIdentifiers{`,
-		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
-		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *ApplicationIdentifiers) String() string {
 	if this == nil {
 		return "nil"
@@ -2076,13 +2044,12 @@ func (this *ApplicationIdentifiers) String() string {
 	}, "")
 	return s
 }
-func (this *GatewayIdentifiers) String() string {
+func (this *ClientIdentifiers) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&GatewayIdentifiers{`,
-		`GatewayID:` + fmt.Sprintf("%v", this.GatewayID) + `,`,
-		`EUI:` + fmt.Sprintf("%v", this.EUI) + `,`,
+	s := strings.Join([]string{`&ClientIdentifiers{`,
+		`ClientID:` + fmt.Sprintf("%v", this.ClientID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2101,12 +2068,13 @@ func (this *EndDeviceIdentifiers) String() string {
 	}, "")
 	return s
 }
-func (this *ClientIdentifiers) String() string {
+func (this *GatewayIdentifiers) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ClientIdentifiers{`,
-		`ClientID:` + fmt.Sprintf("%v", this.ClientID) + `,`,
+	s := strings.Join([]string{`&GatewayIdentifiers{`,
+		`GatewayID:` + fmt.Sprintf("%v", this.GatewayID) + `,`,
+		`EUI:` + fmt.Sprintf("%v", this.EUI) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2121,6 +2089,17 @@ func (this *OrganizationIdentifiers) String() string {
 	}, "")
 	return s
 }
+func (this *UserIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UserIdentifiers{`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *OrganizationOrUserIdentifiers) String() string {
 	if this == nil {
 		return "nil"
@@ -2131,22 +2110,22 @@ func (this *OrganizationOrUserIdentifiers) String() string {
 	}, "")
 	return s
 }
-func (this *OrganizationOrUserIdentifiers_UserIDs) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&OrganizationOrUserIdentifiers_UserIDs{`,
-		`UserIDs:` + strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *OrganizationOrUserIdentifiers_OrganizationIDs) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OrganizationOrUserIdentifiers_OrganizationIDs{`,
 		`OrganizationIDs:` + strings.Replace(fmt.Sprintf("%v", this.OrganizationIDs), "OrganizationIdentifiers", "OrganizationIdentifiers", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *OrganizationOrUserIdentifiers_UserIDs) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&OrganizationOrUserIdentifiers_UserIDs{`,
+		`UserIDs:` + strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2239,114 +2218,6 @@ func valueToStringIdentifiers(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *UserIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentifiers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UserIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UserIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.UserID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Email = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentifiers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *ApplicationIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2426,7 +2297,7 @@ func (m *ApplicationIdentifiers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GatewayIdentifiers) Unmarshal(dAtA []byte) error {
+func (m *ClientIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2449,15 +2320,15 @@ func (m *GatewayIdentifiers) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GatewayIdentifiers: wiretype end group for non-group")
+			return fmt.Errorf("proto: ClientIdentifiers: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GatewayIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ClientIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2482,39 +2353,7 @@ func (m *GatewayIdentifiers) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.GatewayID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EUI", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v go_thethings_network_lorawan_stack_pkg_types.EUI64
-			m.EUI = &v
-			if err := m.EUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.ClientID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2742,7 +2581,7 @@ func (m *EndDeviceIdentifiers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ClientIdentifiers) Unmarshal(dAtA []byte) error {
+func (m *GatewayIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2765,15 +2604,15 @@ func (m *ClientIdentifiers) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ClientIdentifiers: wiretype end group for non-group")
+			return fmt.Errorf("proto: GatewayIdentifiers: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClientIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GatewayIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2798,7 +2637,39 @@ func (m *ClientIdentifiers) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ClientID = string(dAtA[iNdEx:postIndex])
+			m.GatewayID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v go_thethings_network_lorawan_stack_pkg_types.EUI64
+			m.EUI = &v
+			if err := m.EUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2900,6 +2771,114 @@ func (m *OrganizationIdentifiers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *UserIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentifiers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UserIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UserIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentifiers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *OrganizationOrUserIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2931,38 +2910,6 @@ func (m *OrganizationOrUserIdentifiers) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &UserIdentifiers{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Ids = &OrganizationOrUserIdentifiers_UserIDs{v}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationIDs", wireType)
 			}
 			var msglen int
@@ -2992,6 +2939,38 @@ func (m *OrganizationOrUserIdentifiers) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			m.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &UserIdentifiers{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Ids = &OrganizationOrUserIdentifiers_UserIDs{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3443,67 +3422,67 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_c9583749460a1e13)
+	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_feaf2203ccd1d12f)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_c9583749460a1e13)
+	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_feaf2203ccd1d12f)
 }
 
-var fileDescriptor_identifiers_c9583749460a1e13 = []byte{
+var fileDescriptor_identifiers_feaf2203ccd1d12f = []byte{
 	// 867 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x95, 0x4d, 0x6c, 0xdc, 0x44,
-	0x14, 0xc7, 0x67, 0xd8, 0x64, 0x3f, 0xde, 0x36, 0xbb, 0xc4, 0xad, 0x60, 0x85, 0xc4, 0xb8, 0x6c,
-	0x11, 0x1f, 0x52, 0xeb, 0x95, 0xd2, 0x0a, 0x55, 0x20, 0x10, 0x71, 0xbd, 0x82, 0x20, 0xa4, 0x80,
-	0x21, 0x88, 0x22, 0xa4, 0xc8, 0xbb, 0x9e, 0x3a, 0x43, 0x12, 0x7b, 0xe5, 0x99, 0xdd, 0xa8, 0x9c,
-	0x7a, 0xec, 0x91, 0x23, 0xdc, 0x2a, 0x4e, 0x3d, 0xe6, 0x46, 0x8e, 0x3d, 0xe6, 0x98, 0x63, 0x55,
-	0x21, 0xab, 0x3b, 0xbe, 0xf4, 0xd8, 0x63, 0x8f, 0xc8, 0xb3, 0x76, 0xd6, 0xf6, 0x06, 0x89, 0x06,
-	0xf5, 0xe6, 0x19, 0xbf, 0xf7, 0xf3, 0xfb, 0xf8, 0xbf, 0x67, 0xb8, 0xb2, 0x17, 0x84, 0xce, 0x81,
-	0xe3, 0x5f, 0xe3, 0xc2, 0x19, 0xee, 0xf6, 0x9c, 0x11, 0xeb, 0x31, 0x97, 0xfa, 0x82, 0xdd, 0x61,
-	0x34, 0xe4, 0xc6, 0x28, 0x0c, 0x44, 0xa0, 0xb5, 0x84, 0xf0, 0x8d, 0xd4, 0xd0, 0x98, 0x5c, 0x7f,
-	0xeb, 0x9a, 0xc7, 0xc4, 0xce, 0x78, 0x60, 0x0c, 0x83, 0xfd, 0x9e, 0x17, 0x78, 0x41, 0x4f, 0x99,
-	0x0d, 0xc6, 0x77, 0xd4, 0x49, 0x1d, 0xd4, 0xd3, 0xcc, 0xbd, 0xfb, 0x35, 0xb4, 0xb7, 0x38, 0x0d,
-	0x37, 0xe6, 0x5c, 0xed, 0x0a, 0xd4, 0xc6, 0x9c, 0x86, 0xdb, 0xcc, 0xed, 0xe0, 0xcb, 0xf8, 0x83,
-	0x86, 0x09, 0x32, 0xd2, 0xab, 0xca, 0xca, 0xb2, 0xab, 0x63, 0x65, 0xad, 0x5d, 0x82, 0x65, 0xba,
-	0xef, 0xb0, 0xbd, 0xce, 0x6b, 0x89, 0x89, 0x3d, 0x3b, 0x74, 0x7f, 0x84, 0x37, 0xd6, 0x47, 0xa3,
-	0x3d, 0x36, 0x74, 0x04, 0x0b, 0xfc, 0x3c, 0xf4, 0x26, 0xb4, 0x9c, 0xf9, 0x9b, 0x39, 0x7b, 0x55,
-	0x46, 0xfa, 0x4a, 0xde, 0xc7, 0xb2, 0x57, 0x9c, 0x3c, 0xe2, 0xe3, 0xa5, 0xa3, 0x07, 0x3a, 0xea,
-	0xfe, 0x81, 0x41, 0xfb, 0xc2, 0x11, 0xf4, 0xc0, 0xb9, 0x9b, 0xc7, 0x5e, 0x05, 0xf0, 0x66, 0xb7,
-	0x73, 0xe4, 0x8a, 0x8c, 0xf4, 0x46, 0x66, 0x6b, 0xd9, 0x0d, 0x2f, 0x73, 0xd3, 0x36, 0xa1, 0x42,
-	0xc7, 0x4c, 0x85, 0x7c, 0xc1, 0xfc, 0xf4, 0x49, 0xa4, 0xaf, 0x79, 0x81, 0x21, 0x76, 0xa8, 0xd8,
-	0x61, 0xbe, 0xc7, 0x0d, 0x9f, 0x8a, 0x83, 0x20, 0xdc, 0xed, 0x15, 0xcb, 0x3e, 0xda, 0xf5, 0x7a,
-	0xe2, 0xee, 0x88, 0x72, 0xa3, 0xbf, 0xb5, 0xf1, 0xd1, 0x0d, 0x19, 0xe9, 0x95, 0xfe, 0xd6, 0x86,
-	0x9d, 0x90, 0xd2, 0xd8, 0x0e, 0x2b, 0x70, 0xa9, 0xef, 0xbb, 0x16, 0x9d, 0xb0, 0x21, 0xcd, 0x47,
-	0xf7, 0x21, 0x34, 0x5c, 0x75, 0x39, 0x0f, 0xee, 0x82, 0x8c, 0xf4, 0x7a, 0x6a, 0x69, 0xd9, 0x75,
-	0x37, 0xf5, 0xd1, 0x6e, 0x43, 0xbb, 0x58, 0x1f, 0xae, 0xc2, 0x6c, 0xae, 0xbd, 0x67, 0x14, 0x1b,
-	0x6c, 0x9c, 0x5d, 0x60, 0xb3, 0x7e, 0x1c, 0xe9, 0xe8, 0x24, 0xd2, 0xb1, 0xdd, 0x2a, 0xd4, 0x8f,
-	0x6b, 0xb7, 0xa1, 0xe6, 0xd2, 0xc9, 0x76, 0x92, 0xf9, 0x92, 0xca, 0xfc, 0xf3, 0x73, 0x67, 0x5e,
-	0xb5, 0xe8, 0x24, 0x49, 0xbe, 0xea, 0xd2, 0x49, 0x7f, 0xcc, 0xb4, 0x9f, 0xa1, 0xfe, 0x4b, 0xc0,
-	0x7c, 0xc5, 0x5e, 0x56, 0xec, 0xf5, 0x73, 0xb3, 0x6b, 0x5f, 0x05, 0xcc, 0x4f, 0xe0, 0xb5, 0x04,
-	0x99, 0xd0, 0xbf, 0x83, 0xa4, 0x3e, 0xdb, 0x8e, 0xeb, 0x86, 0x9d, 0xaa, 0xa2, 0xdf, 0x7c, 0x12,
-	0xe9, 0x37, 0x5e, 0x8a, 0x6e, 0xd1, 0xc9, 0xba, 0xeb, 0x86, 0x76, 0x52, 0x82, 0xe4, 0x21, 0x6d,
-	0xd9, 0x67, 0xb0, 0x7a, 0x6b, 0x8f, 0x51, 0x5f, 0x94, 0xda, 0x35, 0x54, 0x97, 0xa5, 0x76, 0xa5,
-	0x96, 0x96, 0x5d, 0x1f, 0xa6, 0x3e, 0xdd, 0x1f, 0xe0, 0xcd, 0xcd, 0xd0, 0x73, 0x7c, 0xf6, 0xeb,
-	0x82, 0xd2, 0x3f, 0x81, 0x76, 0x90, 0x7b, 0x35, 0x67, 0x69, 0x32, 0xd2, 0x5b, 0x05, 0x2f, 0xcb,
-	0x6e, 0x05, 0x05, 0x4a, 0xf7, 0x6f, 0x0c, 0x6f, 0xe7, 0x4d, 0x36, 0xc3, 0xf2, 0x74, 0x6e, 0x40,
-	0x3d, 0x9d, 0x4e, 0xae, 0xb8, 0xcd, 0x35, 0xbd, 0xac, 0x90, 0x92, 0x8b, 0xd9, 0x4c, 0xaa, 0x3b,
-	0x9b, 0x5f, 0xfe, 0x25, 0xb2, 0x6b, 0xb3, 0x11, 0xe6, 0x1a, 0x83, 0xd7, 0x4b, 0x91, 0x66, 0xa2,
-	0x7b, 0xbf, 0x8c, 0xfc, 0x97, 0x64, 0xcd, 0x8b, 0x32, 0xd2, 0xdb, 0xc5, 0x9c, 0x92, 0x4f, 0xb4,
-	0x8b, 0x69, 0x71, 0x73, 0x19, 0x2a, 0xcc, 0xe5, 0xdd, 0xbf, 0x96, 0x60, 0xb5, 0xef, 0x0b, 0x26,
-	0x0a, 0x43, 0x4c, 0x17, 0xb5, 0x8f, 0x5f, 0x4a, 0xfb, 0xaa, 0xb2, 0x85, 0x25, 0x92, 0x04, 0x51,
-	0x9e, 0x83, 0x6f, 0x01, 0x4e, 0xdb, 0x9b, 0x25, 0xfa, 0x4e, 0xf9, 0x0b, 0x0b, 0xaa, 0x98, 0xad,
-	0x93, 0x4c, 0x02, 0x09, 0xb7, 0x91, 0xa9, 0x80, 0x6b, 0xdf, 0x03, 0x9c, 0x0e, 0x38, 0xef, 0x54,
-	0x14, 0xf2, 0xdd, 0x32, 0xf2, 0xac, 0xd5, 0x30, 0xa3, 0x66, 0x7b, 0x40, 0x51, 0xb3, 0x55, 0xc0,
-	0xb5, 0x2d, 0x68, 0xce, 0x97, 0x1a, 0x57, 0x43, 0xdb, 0x5c, 0xeb, 0x96, 0xb1, 0x8b, 0xdb, 0xd0,
-	0x6c, 0xc9, 0x48, 0x87, 0xd3, 0xcd, 0x97, 0x50, 0xe1, 0x74, 0xf9, 0x9d, 0xdd, 0xee, 0xe5, 0x57,
-	0xd2, 0xee, 0x82, 0x48, 0xab, 0xff, 0x4b, 0xa4, 0x99, 0x72, 0x3c, 0xb8, 0x78, 0x2b, 0xd8, 0x1f,
-	0x30, 0x9f, 0xba, 0x79, 0xe9, 0x7c, 0x03, 0x1a, 0x55, 0x7a, 0xda, 0xce, 0xfd, 0x19, 0x3b, 0xf8,
-	0x72, 0xe5, 0xac, 0xde, 0x2e, 0x28, 0xcf, 0x5e, 0xa5, 0xe5, 0x2b, 0xf3, 0x4f, 0x7c, 0x3c, 0x25,
-	0xf8, 0x64, 0x4a, 0xf0, 0xe3, 0x29, 0x41, 0x4f, 0xa7, 0x04, 0x3d, 0x9b, 0x12, 0xf4, 0x7c, 0x4a,
-	0xd0, 0x8b, 0x29, 0xc1, 0xf7, 0x24, 0xc1, 0xf7, 0x25, 0x41, 0x0f, 0x25, 0xc1, 0x87, 0x92, 0xa0,
-	0x23, 0x49, 0xd0, 0x23, 0x49, 0xd0, 0xb1, 0x24, 0xf8, 0x44, 0x12, 0xfc, 0x58, 0x12, 0xf4, 0x54,
-	0x12, 0xfc, 0x4c, 0x12, 0xf4, 0x5c, 0x12, 0xfc, 0x42, 0x12, 0x74, 0x2f, 0x26, 0xe8, 0x7e, 0x4c,
-	0xf0, 0x6f, 0x31, 0x41, 0xbf, 0xc7, 0x04, 0x3f, 0x88, 0x09, 0x7a, 0x18, 0x13, 0x74, 0x18, 0x13,
-	0x7c, 0x14, 0x13, 0xfc, 0x28, 0x26, 0xf8, 0xa7, 0xab, 0xff, 0x75, 0xab, 0x09, 0x7f, 0x34, 0x18,
-	0x54, 0xd5, 0xcf, 0xfb, 0xfa, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x4d, 0xf6, 0xaa, 0x1b, 0x22,
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x95, 0x4f, 0x6c, 0xdc, 0x44,
+	0x14, 0xc6, 0x67, 0xba, 0xc9, 0xfe, 0x79, 0xdb, 0xec, 0x12, 0xb7, 0x82, 0x15, 0x12, 0xe3, 0x90,
+	0x22, 0x08, 0x52, 0xeb, 0x95, 0xd2, 0x0a, 0x55, 0x20, 0x24, 0xe2, 0x7a, 0x05, 0xe1, 0x12, 0x30,
+	0x44, 0xa2, 0xa8, 0x52, 0xe4, 0x5d, 0x4f, 0x9d, 0x21, 0x89, 0xbd, 0xf2, 0xcc, 0x6e, 0x54, 0x4e,
+	0x3d, 0xf6, 0xc8, 0x11, 0x6e, 0x15, 0xa7, 0x1e, 0x73, 0x23, 0xc7, 0x1e, 0x73, 0xcc, 0xb1, 0xaa,
+	0x90, 0xd5, 0x1d, 0x5f, 0x7a, 0xec, 0xb1, 0x47, 0xe4, 0x59, 0x3b, 0x6b, 0x7b, 0x83, 0x44, 0x23,
+	0x7a, 0xb3, 0xc7, 0x6f, 0x7e, 0x6f, 0xbe, 0x79, 0xef, 0x7d, 0x86, 0x6b, 0xfb, 0x41, 0xe8, 0x1c,
+	0x3a, 0xfe, 0x0d, 0x2e, 0x9c, 0xc1, 0x5e, 0xd7, 0x19, 0xb2, 0x2e, 0x73, 0xa9, 0x2f, 0xd8, 0x7d,
+	0x46, 0x43, 0x6e, 0x0c, 0xc3, 0x40, 0x04, 0x5a, 0x4b, 0x08, 0xdf, 0x48, 0x03, 0x8d, 0xf1, 0xcd,
+	0xf7, 0x6f, 0x78, 0x4c, 0xec, 0x8e, 0xfa, 0xc6, 0x20, 0x38, 0xe8, 0x7a, 0x81, 0x17, 0x74, 0x55,
+	0x58, 0x7f, 0x74, 0x5f, 0xbd, 0xa9, 0x17, 0xf5, 0x34, 0xdd, 0xbe, 0xfa, 0x13, 0xbc, 0xbb, 0x31,
+	0x1c, 0xee, 0xb3, 0x81, 0x23, 0x58, 0xe0, 0x6f, 0xce, 0xf0, 0xda, 0x6d, 0x68, 0x39, 0xb3, 0x2f,
+	0x3b, 0xcc, 0xed, 0xe0, 0x15, 0xbc, 0xd6, 0x30, 0x97, 0x65, 0xa4, 0x2f, 0xe5, 0xf7, 0x58, 0xf6,
+	0x92, 0x93, 0x47, 0x7c, 0xbe, 0x70, 0xfc, 0x58, 0x47, 0xab, 0x16, 0x2c, 0xdf, 0xd9, 0x67, 0xd4,
+	0x17, 0x79, 0xe8, 0xa7, 0xd0, 0x18, 0xa8, 0xc5, 0x19, 0xef, 0xb2, 0x8c, 0xf4, 0x7a, 0x1a, 0x69,
+	0xd9, 0xf5, 0x41, 0xba, 0x27, 0xa5, 0x1c, 0x55, 0xe0, 0x6a, 0xcf, 0x77, 0x2d, 0x3a, 0x66, 0x03,
+	0x5a, 0x22, 0xb9, 0x6a, 0xb1, 0x44, 0x4a, 0x23, 0x2d, 0xbb, 0xee, 0xa6, 0x7b, 0xb4, 0xbb, 0xd0,
+	0x2e, 0x2a, 0xe1, 0x9d, 0x4b, 0x2b, 0x78, 0xad, 0xb9, 0xfe, 0xb1, 0x51, 0xbc, 0x3c, 0xe3, 0xfc,
+	0xab, 0x30, 0xeb, 0x27, 0x91, 0x8e, 0x4e, 0x23, 0x1d, 0xdb, 0xad, 0x82, 0x52, 0xae, 0xdd, 0x85,
+	0x9a, 0x4b, 0xc7, 0x3b, 0x74, 0xc4, 0x3a, 0x0b, 0x2b, 0x78, 0xed, 0xb2, 0xf9, 0xd5, 0xf3, 0x48,
+	0x5f, 0xf7, 0x02, 0x43, 0xec, 0x52, 0xb1, 0xcb, 0x7c, 0x8f, 0x1b, 0x3e, 0x15, 0x87, 0x41, 0xb8,
+	0xd7, 0x2d, 0x16, 0x73, 0xb8, 0xe7, 0x75, 0xc5, 0x83, 0x21, 0xe5, 0x46, 0x6f, 0x7b, 0xf3, 0xb3,
+	0x5b, 0x32, 0xd2, 0xab, 0x16, 0x1d, 0xf7, 0xb6, 0x37, 0xed, 0xaa, 0x4b, 0xc7, 0xbd, 0x11, 0xd3,
+	0xee, 0x41, 0xfd, 0x97, 0x80, 0xf9, 0x8a, 0xbd, 0xa8, 0xd8, 0x1b, 0x17, 0x66, 0xd7, 0xbe, 0x0d,
+	0x98, 0x9f, 0xc0, 0x6b, 0x09, 0x32, 0xa1, 0xff, 0x00, 0xc9, 0xfd, 0xec, 0x38, 0xae, 0x1b, 0x76,
+	0xaa, 0x8a, 0x7e, 0xfb, 0x79, 0xa4, 0xdf, 0x7a, 0x23, 0xba, 0x45, 0xc7, 0x1b, 0xae, 0x1b, 0xda,
+	0xc9, 0x15, 0x24, 0x0f, 0x69, 0xc9, 0xfe, 0xc0, 0xa0, 0x7d, 0xed, 0x08, 0x7a, 0xe8, 0x3c, 0xc8,
+	0x17, 0xec, 0x3a, 0x80, 0x37, 0x5d, 0x9d, 0x55, 0x6c, 0x49, 0x46, 0x7a, 0x23, 0x8b, 0xb5, 0xec,
+	0x86, 0x97, 0x6d, 0xd3, 0xb6, 0xa0, 0x92, 0x08, 0xbf, 0xa4, 0x8e, 0xf6, 0xe5, 0x85, 0x85, 0x57,
+	0x12, 0xd1, 0x09, 0x29, 0x3d, 0xdb, 0x3d, 0x78, 0x6f, 0x2b, 0xf4, 0x1c, 0x9f, 0xfd, 0x3a, 0xd7,
+	0xef, 0x5f, 0x40, 0x3b, 0xc8, 0x7d, 0x9a, 0x1d, 0x52, 0x93, 0x91, 0xde, 0x2a, 0xec, 0xb2, 0xec,
+	0x56, 0x50, 0xa0, 0xa4, 0x74, 0x1b, 0xda, 0xdb, 0x9c, 0x86, 0x79, 0xea, 0x35, 0xa8, 0x8d, 0x38,
+	0x0d, 0x67, 0x34, 0x48, 0x4a, 0xad, 0xa2, 0x2c, 0xbb, 0x3a, 0x52, 0xd1, 0xda, 0x55, 0x58, 0xa4,
+	0x07, 0x0e, 0xdb, 0x57, 0x72, 0x1b, 0xf6, 0xf4, 0x25, 0x65, 0xfe, 0x8d, 0xe1, 0x83, 0x7c, 0xf2,
+	0xad, 0xb0, 0x9c, 0x82, 0xc1, 0x3b, 0xa5, 0x83, 0x73, 0x95, 0xab, 0xb9, 0xfe, 0x49, 0xb9, 0xbf,
+	0xff, 0x45, 0xbb, 0x79, 0x45, 0x46, 0x7a, 0xbb, 0x28, 0x91, 0x7f, 0x83, 0xec, 0x76, 0x51, 0x25,
+	0xd7, 0x36, 0xa1, 0x9e, 0xaa, 0xc9, 0x46, 0x48, 0x2f, 0xa7, 0x28, 0x9d, 0xce, 0x6c, 0x26, 0xed,
+	0x37, 0xd5, 0x9b, 0x20, 0x6b, 0x53, 0xc9, 0xdc, 0x5c, 0x84, 0x0a, 0x73, 0xf9, 0xea, 0x5f, 0x0b,
+	0xb0, 0xdc, 0xf3, 0x05, 0x13, 0x85, 0x5e, 0xa1, 0xf3, 0x13, 0x8b, 0xdf, 0x68, 0x62, 0x55, 0xcd,
+	0x0a, 0x26, 0x95, 0x24, 0x2f, 0x4f, 0xef, 0xf7, 0x00, 0x67, 0x6e, 0x94, 0x09, 0xfa, 0xb0, 0x9c,
+	0x61, 0xce, 0xc4, 0xa6, 0x5d, 0x9b, 0x39, 0x56, 0xc2, 0x6d, 0x64, 0xa6, 0xc5, 0xb5, 0x1f, 0x01,
+	0xce, 0x6c, 0x89, 0x77, 0x2a, 0x0a, 0xf9, 0x51, 0x19, 0x79, 0x9e, 0xa1, 0x4d, 0xa9, 0x99, 0x7b,
+	0x29, 0x6a, 0x66, 0x60, 0x5c, 0xdb, 0x86, 0xe6, 0x6c, 0x76, 0xb8, 0xb2, 0x9a, 0xe6, 0xfa, 0x6a,
+	0x19, 0x3b, 0x3f, 0x74, 0x66, 0x4b, 0x46, 0x3a, 0x9c, 0x0d, 0x58, 0x42, 0x85, 0xb3, 0x19, 0x3b,
+	0xbf, 0x73, 0x16, 0xdf, 0x7e, 0xe7, 0x54, 0xff, 0x97, 0xce, 0xf1, 0xe0, 0xca, 0x9d, 0xe0, 0xa0,
+	0xcf, 0x7c, 0xea, 0xe6, 0x5b, 0xe7, 0x3b, 0xd0, 0xa8, 0xea, 0xa7, 0x9d, 0xdc, 0xbf, 0xb2, 0x83,
+	0x57, 0x2a, 0xe7, 0xd5, 0x76, 0xae, 0xf3, 0xec, 0x65, 0x5a, 0x5e, 0x32, 0xff, 0xc4, 0x27, 0x13,
+	0x82, 0x4f, 0x27, 0x04, 0x3f, 0x9b, 0x10, 0xf4, 0x62, 0x42, 0xd0, 0xcb, 0x09, 0x41, 0xaf, 0x26,
+	0x04, 0xbd, 0x9e, 0x10, 0xfc, 0x50, 0x12, 0xfc, 0x48, 0x12, 0xf4, 0x44, 0x12, 0x7c, 0x24, 0x09,
+	0x3a, 0x96, 0x04, 0x3d, 0x95, 0x04, 0x9d, 0x48, 0x82, 0x4f, 0x25, 0xc1, 0xcf, 0x24, 0x41, 0x2f,
+	0x24, 0xc1, 0x2f, 0x25, 0x41, 0xaf, 0x24, 0xc1, 0xaf, 0x25, 0x41, 0x0f, 0x63, 0x82, 0x1e, 0xc5,
+	0x04, 0xff, 0x16, 0x13, 0xf4, 0x7b, 0x4c, 0xf0, 0xe3, 0x98, 0xa0, 0x27, 0x31, 0x41, 0x47, 0x31,
+	0xc1, 0xc7, 0x31, 0xc1, 0x4f, 0x63, 0x82, 0x7f, 0xbe, 0xfe, 0x5f, 0x0d, 0x4f, 0xf8, 0xc3, 0x7e,
+	0xbf, 0xaa, 0x7e, 0xe7, 0x37, 0xff, 0x09, 0x00, 0x00, 0xff, 0xff, 0x07, 0xe4, 0x0a, 0x3d, 0x34,
 	0x08, 0x00, 0x00,
 }

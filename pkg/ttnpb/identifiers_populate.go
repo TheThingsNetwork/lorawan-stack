@@ -14,7 +14,11 @@
 
 package ttnpb
 
-import "go.thethings.network/lorawan-stack/pkg/types"
+import (
+	"fmt"
+
+	"go.thethings.network/lorawan-stack/pkg/types"
+)
 
 const validIDChars = "abcdefghijklmnopqrstuvwxyz1234567890"
 
@@ -32,6 +36,25 @@ func NewPopulatedID(r randyIdentifiers) string {
 	return string(b)
 }
 
+func NewPopulatedApplicationIdentifiers(r randyIdentifiers, _ bool) *ApplicationIdentifiers {
+	return &ApplicationIdentifiers{
+		ApplicationID: NewPopulatedID(r),
+	}
+}
+
+func NewPopulatedClientIdentifiers(r randyIdentifiers, _ bool) *ClientIdentifiers {
+	return &ClientIdentifiers{
+		ClientID: NewPopulatedID(r),
+	}
+}
+
+func NewPopulatedGatewayIdentifiers(r randyIdentifiers, _ bool) *GatewayIdentifiers {
+	return &GatewayIdentifiers{
+		GatewayID: NewPopulatedID(r),
+		EUI:       types.NewPopulatedEUI64(r),
+	}
+}
+
 func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceIdentifiers {
 	out := &EndDeviceIdentifiers{}
 	out.DeviceID = NewPopulatedID(r)
@@ -44,15 +67,16 @@ func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceI
 	return out
 }
 
-func NewPopulatedApplicationIdentifiers(r randyIdentifiers, _ bool) *ApplicationIdentifiers {
-	return &ApplicationIdentifiers{
-		ApplicationID: NewPopulatedID(r),
+func NewPopulatedOrganizationIdentifiers(r randyIdentifiers, _ bool) *OrganizationIdentifiers {
+	return &OrganizationIdentifiers{
+		OrganizationID: NewPopulatedID(r),
 	}
 }
 
-func NewPopulatedGatewayIdentifiers(r randyIdentifiers, _ bool) *GatewayIdentifiers {
-	return &GatewayIdentifiers{
-		GatewayID: NewPopulatedID(r),
-		EUI:       types.NewPopulatedEUI64(r),
+func NewPopulatedUserIdentifiers(r randyIdentifiers, _ bool) *UserIdentifiers {
+	id := NewPopulatedID(r)
+	return &UserIdentifiers{
+		UserID: id,
+		Email:  fmt.Sprintf("%s@example.com", id),
 	}
 }
