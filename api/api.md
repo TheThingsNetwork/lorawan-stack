@@ -5170,38 +5170,40 @@ Right is the enum that defines all the different rights to do something in the n
 | RIGHT_APPLICATION_DELETE | 19 | The right to delete application. |
 | RIGHT_APPLICATION_DEVICES_READ | 20 | The right to view devices in application. |
 | RIGHT_APPLICATION_DEVICES_WRITE | 21 | The right to create devices in application. |
-| RIGHT_APPLICATION_TRAFFIC_READ | 22 | The right to read application traffic (uplink and downlink). |
-| RIGHT_APPLICATION_TRAFFIC_UP_WRITE | 23 | The right to write uplink application traffic. |
-| RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE | 24 | The right to write downlink application traffic. |
-| RIGHT_APPLICATION_LINK | 25 | The right to link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink (API keys only). This right is typically only given to an Application Server. |
-| RIGHT_APPLICATION_ALL | 26 | The pseudo-right for all (current and future) application rights. |
-| RIGHT_CLIENT_ALL | 27 | The pseudo-right for all (current and future) OAuth client rights. |
-| RIGHT_GATEWAY_INFO | 28 | The right to view gateway information. |
-| RIGHT_GATEWAY_SETTINGS_BASIC | 29 | The right to edit basic gateway settings. |
-| RIGHT_GATEWAY_SETTINGS_API_KEYS | 30 | The right to view and edit gateway API keys. |
-| RIGHT_GATEWAY_SETTINGS_COLLABORATORS | 31 | The right to view and edit gateway collaborators. |
-| RIGHT_GATEWAY_DELETE | 32 | The right to delete gateway. |
-| RIGHT_GATEWAY_TRAFFIC_READ | 33 | The right to read gateway traffic. |
-| RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE | 34 | The right to write downlink gateway traffic. |
-| RIGHT_GATEWAY_LINK | 35 | The right to link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only) |
-| RIGHT_GATEWAY_STATUS_READ | 36 | The right to view gateway status. |
-| RIGHT_GATEWAY_LOCATION_READ | 37 | The right to view view gateway location. |
-| RIGHT_GATEWAY_ALL | 38 | The pseudo-right for all (current and future) gateway rights. |
-| RIGHT_ORGANIZATION_INFO | 39 | The right to view organization information. |
-| RIGHT_ORGANIZATION_SETTINGS_BASIC | 40 | The right to edit basic organization settings. |
-| RIGHT_ORGANIZATION_SETTINGS_API_KEYS | 41 | The right to view and edit organization API keys. |
-| RIGHT_ORGANIZATION_SETTINGS_MEMBERS | 42 | The right to view and edit organization members. |
-| RIGHT_ORGANIZATION_DELETE | 43 | The right to delete organization. |
-| RIGHT_ORGANIZATION_APPLICATIONS_LIST | 44 | The right to list the applications the organization is a collaborator of. |
-| RIGHT_ORGANIZATION_APPLICATIONS_CREATE | 45 | The right to create an application under the organization. |
-| RIGHT_ORGANIZATION_GATEWAYS_LIST | 46 | The right to list the gateways the organization is a collaborator of. |
-| RIGHT_ORGANIZATION_GATEWAYS_CREATE | 47 | The right to create a gateway under the organization. |
-| RIGHT_ORGANIZATION_CLIENTS_LIST | 48 | The right to list the OAuth clients the organization is a collaborator of. |
-| RIGHT_ORGANIZATION_CLIENTS_CREATE | 49 | The right to create an OAuth client under the organization. |
-| RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR | 50 | The right to add the organization as a collaborator on an existing entity. |
-| RIGHT_ORGANIZATION_ALL | 51 | The pseudo-right for all (current and future) organization rights. |
-| RIGHT_SEND_INVITES | 52 | The right to send invites to new users. Note that this is not prefixed with &#34;USER_&#34;; it is not a right on the user entity. |
-| RIGHT_ALL | 53 | The pseudo-right for all (current and future) possible rights. |
+| RIGHT_APPLICATION_DEVICES_READ_KEYS | 22 | The right to view device keys in application. Note that keys may not be stored in a way that supports viewing them. |
+| RIGHT_APPLICATION_DEVICES_WRITE_KEYS | 23 | The right to edit device keys in application. |
+| RIGHT_APPLICATION_TRAFFIC_READ | 24 | The right to read application traffic (uplink and downlink). |
+| RIGHT_APPLICATION_TRAFFIC_UP_WRITE | 25 | The right to write uplink application traffic. |
+| RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE | 26 | The right to write downlink application traffic. |
+| RIGHT_APPLICATION_LINK | 27 | The right to link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink (API keys only). This right is typically only given to an Application Server. |
+| RIGHT_APPLICATION_ALL | 28 | The pseudo-right for all (current and future) application rights. |
+| RIGHT_CLIENT_ALL | 29 | The pseudo-right for all (current and future) OAuth client rights. |
+| RIGHT_GATEWAY_INFO | 30 | The right to view gateway information. |
+| RIGHT_GATEWAY_SETTINGS_BASIC | 31 | The right to edit basic gateway settings. |
+| RIGHT_GATEWAY_SETTINGS_API_KEYS | 32 | The right to view and edit gateway API keys. |
+| RIGHT_GATEWAY_SETTINGS_COLLABORATORS | 33 | The right to view and edit gateway collaborators. |
+| RIGHT_GATEWAY_DELETE | 34 | The right to delete gateway. |
+| RIGHT_GATEWAY_TRAFFIC_READ | 35 | The right to read gateway traffic. |
+| RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE | 36 | The right to write downlink gateway traffic. |
+| RIGHT_GATEWAY_LINK | 37 | The right to link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only) |
+| RIGHT_GATEWAY_STATUS_READ | 38 | The right to view gateway status. |
+| RIGHT_GATEWAY_LOCATION_READ | 39 | The right to view view gateway location. |
+| RIGHT_GATEWAY_ALL | 40 | The pseudo-right for all (current and future) gateway rights. |
+| RIGHT_ORGANIZATION_INFO | 41 | The right to view organization information. |
+| RIGHT_ORGANIZATION_SETTINGS_BASIC | 42 | The right to edit basic organization settings. |
+| RIGHT_ORGANIZATION_SETTINGS_API_KEYS | 43 | The right to view and edit organization API keys. |
+| RIGHT_ORGANIZATION_SETTINGS_MEMBERS | 44 | The right to view and edit organization members. |
+| RIGHT_ORGANIZATION_DELETE | 45 | The right to delete organization. |
+| RIGHT_ORGANIZATION_APPLICATIONS_LIST | 46 | The right to list the applications the organization is a collaborator of. |
+| RIGHT_ORGANIZATION_APPLICATIONS_CREATE | 47 | The right to create an application under the organization. |
+| RIGHT_ORGANIZATION_GATEWAYS_LIST | 48 | The right to list the gateways the organization is a collaborator of. |
+| RIGHT_ORGANIZATION_GATEWAYS_CREATE | 49 | The right to create a gateway under the organization. |
+| RIGHT_ORGANIZATION_CLIENTS_LIST | 50 | The right to list the OAuth clients the organization is a collaborator of. |
+| RIGHT_ORGANIZATION_CLIENTS_CREATE | 51 | The right to create an OAuth client under the organization. |
+| RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR | 52 | The right to add the organization as a collaborator on an existing entity. |
+| RIGHT_ORGANIZATION_ALL | 53 | The pseudo-right for all (current and future) organization rights. |
+| RIGHT_SEND_INVITES | 54 | The right to send invites to new users. Note that this is not prefixed with &#34;USER_&#34;; it is not a right on the user entity. |
+| RIGHT_ALL | 55 | The pseudo-right for all (current and future) possible rights. |
 
 
  
