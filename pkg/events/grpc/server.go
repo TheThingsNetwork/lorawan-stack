@@ -81,7 +81,7 @@ type EventsServer struct {
 func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) (err error) {
 	ctx := stream.Context()
 
-	for _, entityIDs := range req.GetEntityIdentifiers() {
+	for _, entityIDs := range req.Identifiers.GetEntityIdentifiers() {
 		switch ids := entityIDs.Identifiers().(type) {
 		case *ttnpb.ApplicationIdentifiers:
 			err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_ALL)
@@ -103,8 +103,8 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)
-	srv.filter.Subscribe(ctx, &req.CombinedIdentifiers, handler)
-	defer srv.filter.Unsubscribe(ctx, &req.CombinedIdentifiers, handler)
+	srv.filter.Subscribe(ctx, &req.Identifiers, handler)
+	defer srv.filter.Unsubscribe(ctx, &req.Identifiers, handler)
 
 	if req.Tail > 0 || req.After != nil {
 		// TODO: Get event tail from buffer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1213)
