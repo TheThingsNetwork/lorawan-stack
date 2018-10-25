@@ -29,6 +29,9 @@ var (
 
 func init() {
 	for k, v := range Right_value {
+		if v == 0 {
+			continue
+		}
 		switch {
 		case strings.HasPrefix(k, "RIGHT_USER_"):
 			AllUserRights.Rights = append(AllUserRights.Rights, Right(v))
