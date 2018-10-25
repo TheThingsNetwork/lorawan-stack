@@ -15,7 +15,6 @@
 package ttnpb_test
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -25,66 +24,187 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var idRegexp = regexp.MustCompile("^[0-9a-z](?:[_-]?[0-9a-z]){1,35}$")
-
-func TestNewPopulatedEndDeviceIdentifiers(t *testing.T) {
-	id := NewPopulatedEndDeviceIdentifiers(test.Randy, false)
-	assertions.New(t).So(id.DeviceID == "" || idRegexp.MatchString(id.DeviceID), should.BeTrue)
-	assertions.New(t).So(id.ApplicationID == "" || idRegexp.MatchString(id.ApplicationID), should.BeTrue)
-}
-
-func TestUserIdentifiersIsZero(t *testing.T) {
+func TestIdentifiersIsZero(t *testing.T) {
 	a := assertions.New(t)
 
-	ids := UserIdentifiers{
-		UserID: "foo",
-		Email:  "foo@bar.com",
+	for _, ids := range []interface{ IsZero() bool }{
+		ApplicationIdentifiers{},
+		&ApplicationIdentifiers{},
+		ClientIdentifiers{},
+		&ClientIdentifiers{},
+		EndDeviceIdentifiers{},
+		&EndDeviceIdentifiers{},
+		GatewayIdentifiers{},
+		&GatewayIdentifiers{},
+		OrganizationIdentifiers{},
+		&OrganizationIdentifiers{},
+		UserIdentifiers{},
+		&UserIdentifiers{},
+	} {
+		a.So(ids.IsZero(), should.BeTrue)
 	}
-	a.So(ids.IsZero(), should.BeFalse)
 
-	ids = UserIdentifiers{
-		UserID: "foo",
+	eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+	devAddr := types.DevAddr{1, 2, 3, 4}
+
+	for _, ids := range []interface{ IsZero() bool }{
+		ApplicationIdentifiers{ApplicationID: "foo"},
+		ClientIdentifiers{ClientID: "foo"},
+		EndDeviceIdentifiers{ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo"}, DeviceID: "foo"},
+		EndDeviceIdentifiers{JoinEUI: &eui, DevEUI: &eui},
+		EndDeviceIdentifiers{DevAddr: &devAddr},
+		GatewayIdentifiers{GatewayID: "foo"},
+		GatewayIdentifiers{EUI: &eui},
+		OrganizationIdentifiers{OrganizationID: "foo"},
+		UserIdentifiers{UserID: "foo"},
+		UserIdentifiers{Email: "foo@example.com"},
+	} {
+		a.So(ids.IsZero(), should.BeFalse)
 	}
-	a.So(ids.IsZero(), should.BeFalse)
-
-	ids = UserIdentifiers{
-		Email: "foo@bar.com",
-	}
-	a.So(ids.IsZero(), should.BeFalse)
-
-	ids = UserIdentifiers{
-		UserID: "",
-	}
-	a.So(ids.IsZero(), should.BeTrue)
-
-	ids = UserIdentifiers{}
-	a.So(ids.IsZero(), should.BeTrue)
 }
-
-func TestGatewayIdentifiersIsZero(t *testing.T) {
+func TestCombinedIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	ids := GatewayIdentifiers{
-		GatewayID: "foo-gtw",
-		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
-	}
-	a.So(ids.IsZero(), should.BeFalse)
+	for _, msg := range []Identifiers{
+		NewPopulatedApplicationIdentifiers(test.Randy, true),
+		NewPopulatedClientIdentifiers(test.Randy, true),
+		NewPopulatedEndDeviceIdentifiers(test.Randy, true),
+		NewPopulatedGatewayIdentifiers(test.Randy, true),
+		NewPopulatedOrganizationIdentifiers(test.Randy, true),
+		NewPopulatedUserIdentifiers(test.Randy, true),
+		NewPopulatedUserSessionIdentifiers(test.Randy, true),
+		NewPopulatedEntityIdentifiers(test.Randy, true),
+		NewPopulatedCombinedIdentifiers(test.Randy, true),
 
-	ids = GatewayIdentifiers{
-		GatewayID: "foo-gtw",
-	}
-	a.So(ids.IsZero(), should.BeFalse)
+		NewPopulatedCreateApplicationRequest(test.Randy, true),
+		NewPopulatedCreateClientRequest(test.Randy, true),
+		NewPopulatedCreateEndDeviceRequest(test.Randy, true),
+		NewPopulatedCreateGatewayRequest(test.Randy, true),
+		NewPopulatedCreateOrganizationRequest(test.Randy, true),
+		NewPopulatedCreateUserRequest(test.Randy, true),
 
-	ids = GatewayIdentifiers{
-		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
-	}
-	a.So(ids.IsZero(), should.BeFalse)
+		NewPopulatedGetApplicationRequest(test.Randy, true),
+		NewPopulatedGetClientRequest(test.Randy, true),
+		NewPopulatedGetEndDeviceRequest(test.Randy, true),
+		NewPopulatedGetGatewayRequest(test.Randy, true),
+		NewPopulatedGetOrganizationRequest(test.Randy, true),
+		NewPopulatedGetUserRequest(test.Randy, true),
 
-	ids = GatewayIdentifiers{
-		EUI: &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-	}
-	a.So(ids.IsZero(), should.BeFalse)
+		NewPopulatedListApplicationsRequest(test.Randy, true),
+		NewPopulatedListClientsRequest(test.Randy, true),
+		NewPopulatedListEndDevicesRequest(test.Randy, true),
+		NewPopulatedListGatewaysRequest(test.Randy, true),
+		NewPopulatedListOrganizationsRequest(test.Randy, true),
+		NewPopulatedListUserSessionsRequest(test.Randy, true),
 
-	ids = GatewayIdentifiers{}
-	a.So(ids.IsZero(), should.BeTrue)
+		NewPopulatedUpdateApplicationRequest(test.Randy, true),
+		NewPopulatedUpdateClientRequest(test.Randy, true),
+		NewPopulatedUpdateEndDeviceRequest(test.Randy, true),
+		NewPopulatedUpdateGatewayRequest(test.Randy, true),
+		NewPopulatedUpdateOrganizationRequest(test.Randy, true),
+		NewPopulatedUpdateUserRequest(test.Randy, true),
+
+		NewPopulatedSetEndDeviceRequest(test.Randy, true),
+
+		NewPopulatedCreateApplicationAPIKeyRequest(test.Randy, true),
+		NewPopulatedCreateGatewayAPIKeyRequest(test.Randy, true),
+		NewPopulatedCreateOrganizationAPIKeyRequest(test.Randy, true),
+		NewPopulatedCreateUserAPIKeyRequest(test.Randy, true),
+
+		NewPopulatedUpdateApplicationAPIKeyRequest(test.Randy, true),
+		NewPopulatedUpdateGatewayAPIKeyRequest(test.Randy, true),
+		NewPopulatedUpdateOrganizationAPIKeyRequest(test.Randy, true),
+		NewPopulatedUpdateUserAPIKeyRequest(test.Randy, true),
+
+		NewPopulatedSetApplicationCollaboratorRequest(test.Randy, true),
+		NewPopulatedSetClientCollaboratorRequest(test.Randy, true),
+		NewPopulatedSetGatewayCollaboratorRequest(test.Randy, true),
+		NewPopulatedSetOrganizationCollaboratorRequest(test.Randy, true),
+
+		NewPopulatedCreateTemporaryPasswordRequest(test.Randy, true),
+		NewPopulatedUpdateUserPasswordRequest(test.Randy, true),
+
+		NewPopulatedPullGatewayConfigurationRequest(test.Randy, true),
+
+		NewPopulatedUplinkMessage(test.Randy, true),
+		NewPopulatedDownlinkMessage(test.Randy, true),
+		NewPopulatedJoinRequest(test.Randy, true),
+
+		NewPopulatedDownlinkQueueRequest(test.Randy, true),
+
+		NewPopulatedGetApplicationLinkRequest(test.Randy, true),
+		NewPopulatedSetApplicationLinkRequest(test.Randy, true),
+
+		NewPopulatedProcessDownlinkMessageRequest(test.Randy, true),
+		NewPopulatedProcessUplinkMessageRequest(test.Randy, true),
+
+		NewPopulatedListOAuthAccessTokensRequest(test.Randy, true),
+		NewPopulatedListOAuthClientAuthorizationsRequest(test.Randy, true),
+		NewPopulatedOAuthAccessTokenIdentifiers(test.Randy, true),
+		NewPopulatedOAuthClientAuthorizationIdentifiers(test.Randy, true),
+
+		NewPopulatedStreamEventsRequest(test.Randy, true),
+	} {
+		combined := msg.CombinedIdentifiers()
+		a.So(combined, should.NotBeNil)
+	}
+}
+
+func TestOrganizationOrUserIdentifiers(t *testing.T) {
+	a := assertions.New(t)
+
+	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
+	ouID := usrID.OrganizationOrUserIdentifiers()
+	a.So(ouID, should.NotBeNil)
+	a.So(ouID.Identifiers(), should.Resemble, usrID)
+
+	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
+	ouID = orgID.OrganizationOrUserIdentifiers()
+	a.So(ouID, should.NotBeNil)
+	a.So(ouID.Identifiers(), should.Resemble, orgID)
+}
+
+func TestEntityIdentifiers(t *testing.T) {
+	a := assertions.New(t)
+
+	appID := NewPopulatedApplicationIdentifiers(test.Randy, true)
+	eID := appID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, appID)
+
+	cliID := NewPopulatedClientIdentifiers(test.Randy, true)
+	eID = cliID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, cliID)
+
+	devID := NewPopulatedEndDeviceIdentifiers(test.Randy, true)
+	eID = devID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, devID)
+
+	gtwID := NewPopulatedGatewayIdentifiers(test.Randy, true)
+	eID = gtwID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, gtwID)
+
+	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
+	eID = orgID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, orgID)
+
+	ouID := orgID.OrganizationOrUserIdentifiers()
+	eID = ouID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, orgID)
+
+	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
+	eID = usrID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, usrID)
+
+	ouID = usrID.OrganizationOrUserIdentifiers()
+	eID = ouID.EntityIdentifiers()
+	a.So(eID, should.NotBeNil)
+	a.So(eID.Identifiers(), should.Resemble, usrID)
+
 }
