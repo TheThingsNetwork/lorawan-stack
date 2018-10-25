@@ -123,3 +123,16 @@ service UserInvitationRegistry {
     };
   };
 }
+
+service UserSessionRegistry {
+  rpc List(ListUserSessionsRequest) returns (UserSessions) {
+    option (google.api.http) = {
+      get: "/users/{user_ids.user_id}/sessions"
+    };
+  };
+  rpc Delete(UserSessionIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_ids.user_id}/sessions/{session_id}"
+    };
+  };
+}

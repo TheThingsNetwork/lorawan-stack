@@ -432,6 +432,7 @@
     - [GetUserRequest](#ttn.lorawan.v3.GetUserRequest)
     - [Invitation](#ttn.lorawan.v3.Invitation)
     - [Invitations](#ttn.lorawan.v3.Invitations)
+    - [ListUserSessionsRequest](#ttn.lorawan.v3.ListUserSessionsRequest)
     - [Picture](#ttn.lorawan.v3.Picture)
     - [Picture.Embedded](#ttn.lorawan.v3.Picture.Embedded)
     - [Picture.SizesEntry](#ttn.lorawan.v3.Picture.SizesEntry)
@@ -441,6 +442,9 @@
     - [UpdateUserRequest](#ttn.lorawan.v3.UpdateUserRequest)
     - [User](#ttn.lorawan.v3.User)
     - [User.AttributesEntry](#ttn.lorawan.v3.User.AttributesEntry)
+    - [UserSession](#ttn.lorawan.v3.UserSession)
+    - [UserSessionIdentifiers](#ttn.lorawan.v3.UserSessionIdentifiers)
+    - [UserSessions](#ttn.lorawan.v3.UserSessions)
     - [Users](#ttn.lorawan.v3.Users)
   
   
@@ -454,6 +458,7 @@
     - [UserAccess](#ttn.lorawan.v3.UserAccess)
     - [UserInvitationRegistry](#ttn.lorawan.v3.UserInvitationRegistry)
     - [UserRegistry](#ttn.lorawan.v3.UserRegistry)
+    - [UserSessionRegistry](#ttn.lorawan.v3.UserSessionRegistry)
   
 
 - [Scalar Value Types](#scalar-value-types)
@@ -5214,6 +5219,21 @@ This service is not implemented on all deployments.
 
 
 
+<a name="ttn.lorawan.v3.ListUserSessionsRequest"/>
+
+### ListUserSessionsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.Picture"/>
 
 ### Picture
@@ -5374,6 +5394,55 @@ User is the message that defines an user on the network.
 
 
 
+<a name="ttn.lorawan.v3.UserSession"/>
+
+### UserSession
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [UserSessionIdentifiers](#ttn.lorawan.v3.UserSessionIdentifiers) |  |  |
+| created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| updated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| expires_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.UserSessionIdentifiers"/>
+
+### UserSessionIdentifiers
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| session_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.UserSessions"/>
+
+### UserSessions
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sessions | [UserSession](#ttn.lorawan.v3.UserSession) | repeated |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.Users"/>
 
 ### Users
@@ -5449,6 +5518,17 @@ User is the message that defines an user on the network.
 | CreateTemporaryPassword | [CreateTemporaryPasswordRequest](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user&#39;s email address. |
 | UpdatePassword | [UpdateUserPasswordRequest](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.UpdateUserPasswordRequest) |  |
 | Delete | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.UserIdentifiers) |  |
+
+
+<a name="ttn.lorawan.v3.UserSessionRegistry"/>
+
+### UserSessionRegistry
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| List | [ListUserSessionsRequest](#ttn.lorawan.v3.ListUserSessionsRequest) | [UserSessions](#ttn.lorawan.v3.ListUserSessionsRequest) |  |
+| Delete | [UserSessionIdentifiers](#ttn.lorawan.v3.UserSessionIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.UserSessionIdentifiers) |  |
 
  
 

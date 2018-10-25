@@ -3336,6 +3336,78 @@
         ]
       }
     },
+    "/users/{user_ids.user_id}/sessions": {
+      "get": {
+        "summary": "Register a new user. This method may be restricted by network settings.",
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3UserSessions"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserSessionRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/sessions/{session_id}": {
+      "delete": {
+        "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protobufEmpty"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserSessionRegistry"
+        ]
+      }
+    },
     "/users/{user_ids.user_id}/temporary_password": {
       "post": {
         "summary": "Create a temporary password that can be used for updating a forgotten password.\nThe generated password is sent to the user's email address.",
@@ -7089,6 +7161,48 @@
         "email": {
           "type": "string",
           "description": "Secondary identifier, which can only be used in specific requests."
+        }
+      }
+    },
+    "v3UserSession": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3UserSessionIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v3UserSessionIdentifiers": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "$ref": "#/definitions/v3UserIdentifiers"
+        },
+        "session_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v3UserSessions": {
+      "type": "object",
+      "properties": {
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3UserSession"
+          }
         }
       }
     },
