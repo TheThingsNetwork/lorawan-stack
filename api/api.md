@@ -610,6 +610,9 @@ where the user or organization is collaborator on.
 | ----- | ---- | ----- | ----------- |
 | collaborator | [OrganizationOrUserIdentifiers](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -931,6 +934,9 @@ where the user or organization is collaborator on.
 | ----- | ---- | ----- | ----------- |
 | collaborator | [OrganizationOrUserIdentifiers](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -1429,6 +1435,9 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -2146,6 +2155,9 @@ where the user or organization is collaborator on.
 | ----- | ---- | ----- | ----------- |
 | collaborator | [OrganizationOrUserIdentifiers](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -4632,6 +4644,9 @@ where the user or organization is collaborator on.
 | ----- | ---- | ----- | ----------- |
 | collaborator | [OrganizationOrUserIdentifiers](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  | NOTE: It is currently not possible to have organizations collaborating on other organizations. |
 | field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -5304,6 +5319,9 @@ This service is not implemented on all deployments.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| order | [string](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 

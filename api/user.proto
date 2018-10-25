@@ -163,4 +163,11 @@ message UserSessions {
 
 message ListUserSessionsRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 2;
+  // Limit the number of results per page.
+  uint32 limit = 3;
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 4;
 }
