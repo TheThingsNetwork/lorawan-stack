@@ -211,6 +211,73 @@ func (ids *CombinedIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
 	return ids
 }
 
+// CombinedIdentifiers implements Identifiers.
+func (m *ListApplicationsRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	if m.Collaborator != nil {
+		return m.Collaborator.CombinedIdentifiers()
+	}
+	return &CombinedIdentifiers{}
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *ListClientsRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	if m.Collaborator != nil {
+		return m.Collaborator.CombinedIdentifiers()
+	}
+	return &CombinedIdentifiers{}
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *ListGatewaysRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	if m.Collaborator != nil {
+		return m.Collaborator.CombinedIdentifiers()
+	}
+	return &CombinedIdentifiers{}
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *ListOrganizationsRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	if m.Collaborator != nil {
+		return m.Collaborator.CombinedIdentifiers()
+	}
+	return &CombinedIdentifiers{}
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *CreateApplicationRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.Collaborator.CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *CreateClientRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.Collaborator.CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *CreateGatewayRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.Collaborator.CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *CreateOrganizationRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.Collaborator.CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *DownlinkMessage) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.GetEndDeviceIDs().CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *SetEndDeviceRequest) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.Device.CombinedIdentifiers()
+}
+
+// CombinedIdentifiers implements Identifiers.
+func (m *UplinkMessage) CombinedIdentifiers() *CombinedIdentifiers {
+	return m.GetEndDeviceIDs().CombinedIdentifiers()
+}
+
 // Copy stores a copy of ids in x and returns it.
 func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifiers {
 	*x = EndDeviceIdentifiers{
