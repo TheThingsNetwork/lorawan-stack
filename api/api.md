@@ -5198,6 +5198,8 @@ This service is not implemented on all deployments.
 | expires_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | updated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| accepted_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| accepted_by | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 
 
 

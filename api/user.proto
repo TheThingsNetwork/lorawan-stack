@@ -128,6 +128,9 @@ message Invitation {
   google.protobuf.Timestamp expires_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  google.protobuf.Timestamp accepted_at = 6 [(gogoproto.stdtime) = true];
+  UserIdentifiers accepted_by = 7;
 }
 
 message Invitations {

@@ -5635,6 +5635,13 @@
         "updated_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "accepted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "accepted_by": {
+          "$ref": "#/definitions/v3UserIdentifiers"
         }
       }
     },
