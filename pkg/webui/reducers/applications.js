@@ -18,9 +18,7 @@ import {
   GET_APPS_LIST_SUCCESS,
   GET_APPS_LIST_FAILURE,
   CHANGE_APPS_PAGE,
-  CHANGE_APPS_ORDER,
   CHANGE_APPS_TAB,
-  CHANGE_APPS_SEARCH,
 } from '../actions/applications'
 
 const defaultState = {
@@ -29,13 +27,6 @@ const defaultState = {
   error: undefined,
   applications: [],
   totalCount: 0,
-  filters: {
-    page: 1,
-    order: undefined,
-    orderBy: undefined,
-    tab: 'all',
-    query: undefined,
-  },
 }
 
 const applications = function (state = defaultState, action) {
@@ -44,27 +35,12 @@ const applications = function (state = defaultState, action) {
     return {
       ...state,
       fetching: true,
-      filters: {
-        ...state.filters,
-        order: action.order,
-        page: action.page,
-        orderBy: action.orderBy,
-        tab: action.tab,
-      },
     }
   case SEARCH_APPS_LIST:
     return {
       ...state,
       fetching: true,
       fetchingSearch: true,
-      filters: {
-        ...state.filters,
-        order: action.order,
-        page: action.page,
-        orderBy: action.orderBy,
-        tab: action.tab,
-        query: action.query,
-      },
     }
   case GET_APPS_LIST_SUCCESS:
     return {
@@ -81,41 +57,15 @@ const applications = function (state = defaultState, action) {
       fetchingSearch: false,
       error: action.error,
     }
-  case CHANGE_APPS_ORDER:
-    return {
-      ...state,
-      fetching: true,
-      filters: {
-        ...state.filters,
-        order: action.order,
-        orderBy: action.orderBy,
-      },
-    }
   case CHANGE_APPS_PAGE:
     return {
       ...state,
       fetching: true,
-      filters: {
-        ...state.filters,
-        page: action.page,
-      },
     }
   case CHANGE_APPS_TAB:
     return {
       ...state,
       fetching: true,
-      filters: {
-        ...state.filters,
-        tab: action.tab,
-      },
-    }
-  case CHANGE_APPS_SEARCH:
-    return {
-      ...state,
-      filters: {
-        ...state.filters,
-        query: action.query,
-      },
     }
   default:
     return state

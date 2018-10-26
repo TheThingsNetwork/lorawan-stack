@@ -13,8 +13,6 @@
 // limitations under the License.
 
 import { createLogic } from 'redux-logic'
-import { push } from 'connected-react-router'
-import Query from 'query-string'
 
 import * as applications from '../actions/applications'
 
@@ -95,72 +93,31 @@ const ALLOWED_TABS = [ 'all' ]
 const ALLOWED_ORDERS = [ 'asc', 'desc', undefined ]
 
 const transformParams = function ({ getState, action }, next) {
-  const { type, ...rest } = action
+  const { type, filters } = action
 
-  rest.query = Boolean(rest.query) ? rest.query : undefined
-
-  if (!ALLOWED_TABS.includes(rest.tab)) {
-    rest.tab = DEFAULT_TAB
+  if (!ALLOWED_TABS.includes(filters.tab)) {
+    filters.tab = DEFAULT_TAB
   }
 
-  if (!ALLOWED_ORDERS.includes(rest.order)) {
-    rest.order = undefined
-    rest.orderBy = undefined
+  if (!ALLOWED_ORDERS.includes(filters.order)) {
+    filters.order = undefined
+    filters.orderBy = undefined
   }
 
   if (
-    Boolean(rest.order) && !Boolean(rest.orderBy)
-      || !Boolean(rest.order) && Boolean(rest.orderBy)
+    Boolean(filters.order) && !Boolean(filters.orderBy)
+      || !Boolean(filters.order) && Boolean(filters.orderBy)
   ) {
-    rest.order = undefined
-    rest.orderBy = undefined
+    filters.order = undefined
+    filters.orderBy = undefined
   }
 
-  if (!Boolean(rest.page) || rest.page < 0) {
-    rest.page = DEFAULT_PAGE
+  if (!Boolean(filters.page) || filters.page < 0) {
+    filters.page = DEFAULT_PAGE
   }
 
-  next({ type, ...rest })
+  next({ type, filters })
 }
-
-const changeSearchQueryLogic = createLogic({
-  type: applications.CHANGE_APPS_SEARCH,
-  async process ({ getState, action }, dispatch, done) {
-    const { page, order, orderBy, tab } = getState().applications.filters
-
-    dispatch(applications.searchApplicationsList(
-      page,
-      order,
-      orderBy,
-      tab,
-      action.query
-    ))
-
-    done()
-  },
-})
-
-const searchApplicationsLogic = createLogic({
-  type: applications.SEARCH_APPS_LIST,
-  debounce: 350,
-  latest: true,
-  transform: transformParams,
-  async process ({ getState, action }, dispatch, done) {
-    const { type, ...rest } = action
-    const search = Query.stringify(rest)
-
-    dispatch(push(`/console/applications?${search}`))
-
-    try {
-      const data = await searchApplicationsStub(rest)
-      dispatch(applications.getApplicationsSuccess(data.applications, data.totalCount))
-    } catch (error) {
-      dispatch(applications.getApplicationsFailure(error))
-    }
-
-    done()
-  },
-})
 
 const getApplicationsLogic = createLogic({
   type: [
@@ -168,16 +125,18 @@ const getApplicationsLogic = createLogic({
     applications.CHANGE_APPS_ORDER,
     applications.CHANGE_APPS_PAGE,
     applications.CHANGE_APPS_TAB,
+    applications.SEARCH_APPS_LIST,
   ],
+  latest: true,
   transform: transformParams,
   async process ({ getState, action }, dispatch, done) {
-    const { type, ...rest } = action
-    const search = Query.stringify(rest)
-
-    dispatch(push(`/console/applications?${search}`))
+    const { filters } = action
 
     try {
-      const data = await getApplicationsStub(rest)
+
+      const data = filters.query
+        ? await searchApplicationsStub(filters)
+        : await getApplicationsStub(filters)
       dispatch(applications.getApplicationsSuccess(data.applications, data.totalCount))
     } catch (error) {
       dispatch(applications.getApplicationsFailure(error))
@@ -189,6 +148,4 @@ const getApplicationsLogic = createLogic({
 
 export default [
   getApplicationsLogic,
-  searchApplicationsLogic,
-  changeSearchQueryLogic,
 ]

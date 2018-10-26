@@ -21,12 +21,12 @@ export const CHANGE_APPS_ORDER = 'CHANGE_APPLICATIONS_ORDER'
 export const CHANGE_APPS_TAB = 'CHANGE_APPLICATIONS_TAB'
 export const CHANGE_APPS_SEARCH = 'CHANGE_APPLICATIONS_SEARCH'
 
-export const getApplicationsList = (page, order, orderBy, tab) => (
-  { type: GET_APPS_LIST, page, order, orderBy, tab }
+export const getApplicationsList = filters => (
+  { type: GET_APPS_LIST, filters }
 )
 
-export const searchApplicationsList = (page, order, orderBy, tab, query) => (
-  { type: SEARCH_APPS_LIST, page, order, orderBy, tab, query }
+export const searchApplicationsList = filters => (
+  { type: SEARCH_APPS_LIST, filters }
 )
 
 export const getApplicationsSuccess = (applications, totalCount) => (
