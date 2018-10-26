@@ -13,10 +13,23 @@
 // limitations under the License.
 
 import React from 'react'
+import { Col, Row } from 'react-grid-system'
+
+import Form from '../../../components/form'
+import Field from '../../../components/field'
+import Button from '../../../components/button'
 
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
+
+import style from './application-add.styl'
+
+const initialValues = {
+  app_id: '',
+  name: '',
+  description: '',
+}
 
 @withBreadcrumb('apps.add', function (props) {
   return (
@@ -29,7 +42,50 @@ import sharedMessages from '../../../lib/shared-messages'
 })
 export default class Add extends React.Component {
 
+  handleSubmit (e) {
+    console.log(e)
+  }
+
   render () {
-    return <div>add app</div>
+    return (
+      <Row>
+        <Col className={style.description} sm={12} md={4}>
+          <h2>Add Application</h2>
+          <p>
+            Here is a text that sort of explains the process of adding an application.
+            This is to help users making sense of what is actually happening.
+            <br />
+            We could also provide links and resources from our documentation.
+            Lorem Ipsum dolor sit amet.
+          </p>
+        </Col>
+        <Col className={style.form} sm={12} md={8}>
+          <Form
+            onSubmit={this.handleSubmit}
+            initialValues={initialValues}
+          >
+            <Field
+              title="Application ID"
+              name="app_id"
+              type="text"
+              required
+            />
+            <Field
+              title="Application Name"
+              name="name"
+              type="text"
+              required
+            />
+            <Field
+              title="Description"
+              name="description"
+              type="text"
+            />
+            <Button type="submit" message="Create Application" />
+            <Button naked message="Cancel" />
+          </Form>
+        </Col>
+      </Row>
+    )
   }
 }
