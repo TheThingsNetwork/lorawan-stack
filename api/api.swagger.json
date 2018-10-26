@@ -4953,6 +4953,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a\nrejoin-request."
+        },
+        "session_started_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server time when the session started."
         }
       }
     },

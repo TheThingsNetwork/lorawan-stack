@@ -887,6 +887,7 @@ var _ApplicationJoinAcceptFieldPaths = [...]string{
 	"invalidated_downlinks",
 	"pending_session",
 	"session_key_id",
+	"session_started_at",
 }
 
 func (*ApplicationJoinAccept) FieldMaskPaths() []string {
@@ -916,6 +917,8 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 			dst.PendingSession = src.PendingSession
 		case "session_key_id":
 			dst.SessionKeyID = src.SessionKeyID
+		case "session_started_at":
+			dst.SessionStartedAt = src.SessionStartedAt
 		default:
 			panic(fmt.Errorf("invalid field path: '%s'", path))
 		}

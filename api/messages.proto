@@ -172,6 +172,8 @@ message ApplicationJoinAccept {
   // Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a
   // rejoin-request.
   bool pending_session = 4;
+  // Server time when the session started.
+  google.protobuf.Timestamp session_started_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 message ApplicationDownlink {
