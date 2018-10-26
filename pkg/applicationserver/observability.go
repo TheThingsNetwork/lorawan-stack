@@ -38,9 +38,11 @@ var (
 	evtDropJoinAccept    = events.Define("as.up.join.drop", "drop join-accept message")
 	evtForwardJoinAccept = events.Define("as.up.join.forward", "forward join-accept message")
 
-	evtReceiveDataDown = events.Define("as.down.data.receive", "receive downlink data message")
-	evtDropDataDown    = events.Define("as.down.data.drop", "drop downlink data message")
-	evtForwardDataDown = events.Define("as.down.data.forward", "forward downlink data message")
+	evtReceiveDataDown      = events.Define("as.down.data.receive", "receive downlink data message")
+	evtDropDataDown         = events.Define("as.down.data.drop", "drop downlink data message")
+	evtForwardDataDown      = events.Define("as.down.data.forward", "forward downlink data message")
+	evtLostQueueDataDown    = events.Define("as.down.data.queue.lost", "lost downlink data queue")
+	evtInvalidQueueDataDown = events.Define("as.down.data.queue.invalid", "invalid downlink data queue")
 
 	evtCreateDevice = events.Define("as.end_device.create", "create end device")
 )

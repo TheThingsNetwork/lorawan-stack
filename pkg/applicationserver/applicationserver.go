@@ -409,6 +409,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					_, err = client.DownlinkQueueReplace(ctx, req, link.connCallOpts...)
 					if err != nil {
 						log.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
+						events.Publish(evtInvalidQueueDataDown(ctx, ids, err))
+					} else {
+						events.Publish(evtLostQueueDataDown(ctx, ids, err))
 					}
 				} else if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, res.Downlinks, 1, link); err != nil {
 					log.WithError(err).Warn("Failed to recalculate downlink queue")
@@ -499,6 +502,9 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			}
 			if _, err := client.DownlinkQueueReplace(ctx, req, link.connCallOpts...); err != nil {
 				log.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
+				events.Publish(evtInvalidQueueDataDown(ctx, dev.EndDeviceIdentifiers, err))
+			} else {
+				events.Publish(evtLostQueueDataDown(ctx, dev.EndDeviceIdentifiers, err))
 			}
 		}
 	}()
