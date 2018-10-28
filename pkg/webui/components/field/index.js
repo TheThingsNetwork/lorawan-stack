@@ -50,8 +50,11 @@ const Field = function (props) {
     props.setFieldValue(props.name, value)
   }
 
-  const handleBlur = function () {
-    props.setFieldTouched(props.name, true)
+  const handleBlur = function (e) {
+    // Always regard inputs that never received a value as untouched (better UX)
+    if (e.target.value !== '') {
+      props.setFieldTouched(props.name, true)
+    }
   }
 
   const {
