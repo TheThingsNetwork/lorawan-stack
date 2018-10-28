@@ -12,14 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.title
-  margin-top: $ls.m
-  margin-bottom: $ls.m
+.wrapper
+  h2
+    text-margin-top($ls.m)
+    text-margin-bottom($ls.m)
 
 .form
-  padding-top: $ls.s
+  +media-query($bp.s)
+    order: 2
+    text-margin-bottom($ls.m)
 
 .description
-  padding-top: $ls.s
-  h2
-    margin-top: 0
+  aside
+    margin-bottom: $ls.m
+    +media-query-min($bp.s)
+      border-dark('left')
+      padding-left: $ls.s
+
+    p
+      eat-text-margins()
+
+.submit-bar
+  border-dark('top')
+  display: flex
+  justify-content: space-between
+  background-color: $c-divider-subtle
+  padding: $cs.m
+
