@@ -33,7 +33,7 @@ const InnerForm = function ({
   horizontal,
 }) {
 
-  const decoratedChildren = React.Children.map(children,
+  const decoratedChildren = recursiveMap(children,
     function (Child) {
       if (Child.type === Field) {
         return React.cloneElement(Child, {
@@ -63,12 +63,35 @@ const InnerForm = function ({
   )
 }
 
-const Form = ({ children, error, ...rest }) => (
-  <Formik {...rest} render={function (props) {
-    return <InnerForm error={error} {...props}>{children}</InnerForm>
-  }
-  }
-  />
+const formRender = ({ children, ...rest }) => function (props) {
+  return (
+    <InnerForm
+      {...rest}
+      {...props}
+    >
+      {children}
+    </InnerForm>
+  )
+}
+
+const Form = ({ children, error, horizontal, ...rest }) => (
+  <Formik {...rest} render={formRender({ children, error, horizontal })} />
 )
+
+function recursiveMap (children, fn) {
+  return React.Children.map(children, function (child) {
+    if (!React.isValidElement(child)) {
+      return child
+    }
+
+    if (child.props.children) {
+      return React.cloneElement(child, {
+        children: recursiveMap(child.props.children, fn),
+      })
+    }
+
+    return fn(child)
+  })
+}
 
 export default Form
