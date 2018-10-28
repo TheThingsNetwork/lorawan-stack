@@ -24,6 +24,7 @@ const InnerForm = function ({
   setFieldTouched,
   handleSubmit,
   isSubmitting,
+  isValid,
   errors,
   error,
   values,
@@ -46,7 +47,7 @@ const InnerForm = function ({
         })
       } else if (Child.type === Button && Child.props.type === 'submit') {
         return React.cloneElement(Child, {
-          disabled: isSubmitting,
+          disabled: isSubmitting || !isValid,
           ...Child.props,
         })
       }
