@@ -17,8 +17,8 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import Query from 'query-string'
-import { defineMessages } from 'react-intl'
 import { Row, Col } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 
 import Tabs from '../../../components/tabs'
 import Tabular from '../../../components/table'
@@ -40,16 +40,12 @@ import {
 import style from './applications-list.styl'
 
 const m = defineMessages({
-  all: 'All',
-  appId: 'Application ID',
-  desc: 'Description',
-  empty: 'No items matched your criteria',
-  add: 'Add Application',
+  addApp: 'Add Application',
 })
 
 const tabs = [
   {
-    title: m.all,
+    title: sharedMessages.all,
     name: 'all',
     disabled: true,
   },
@@ -58,11 +54,11 @@ const tabs = [
 const headers = [
   {
     name: 'application_id',
-    displayName: m.appId,
+    displayName: sharedMessages.appId,
   },
   {
     name: 'description',
-    displayName: m.desc,
+    displayName: sharedMessages.description,
   },
 ]
 
@@ -179,7 +175,7 @@ export default class List extends React.Component {
               <Button
                 onClick={this.onApplicationAdd}
                 className={style.addButton}
-                message={m.add}
+                message={m.addApp}
                 icon="add"
               />
             </div>
