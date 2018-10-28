@@ -64,6 +64,7 @@ const Field = function (props) {
     value,
     warning,
     touched,
+    horizontal = false,
     disabled = false,
     readOnly = false,
     required = false,
@@ -97,6 +98,7 @@ const Field = function (props) {
   const classname = classnames(style.field, style[type], ...from(style, {
     error: _error,
     warning: warning && !_error,
+    horizontal,
     required,
     readOnly,
     disabled,

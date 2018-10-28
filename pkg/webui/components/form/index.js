@@ -29,6 +29,7 @@ const InnerForm = function ({
   values,
   touched,
   children,
+  horizontal,
 }) {
 
   const decoratedChildren = React.Children.map(children,
@@ -40,6 +41,7 @@ const InnerForm = function ({
           errors,
           values,
           touched,
+          horizontal,
           ...Child.props,
         })
       } else if (Child.type === Button && Child.props.type === 'submit') {

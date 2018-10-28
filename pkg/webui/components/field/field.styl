@@ -12,6 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
++media-query-min($bp.xxs)
+  .horizontal.field
+      flex-direction: row
+      width: 100%
+
+      .title
+        font-weight: normal
+
+      .component
+        width: 70%
+
+      .label
+        width: 30%
+        line-height: 2.2
+
+      .description, .err, .warn
+        margin-left: 30%
+
 .field
   margin-bottom: $cs.l
   display: flex
