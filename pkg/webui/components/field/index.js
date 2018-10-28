@@ -177,7 +177,7 @@ const Err = function (props) {
 
   return (
     <div className={classname}>
-      <Icon icon={icon} nudgeBottom className={style.icon} />
+      <Icon icon={icon} className={style.icon} />
       <Message
         content={content.format || content.error_description || content.message || content}
         values={{
