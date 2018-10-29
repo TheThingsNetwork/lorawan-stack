@@ -251,7 +251,7 @@ var usAuBeaconFrequencies = func() [8]uint32 {
 	return freqs
 }()
 
-func chMask16Channels(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
+func parseChMask16(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	chans := make(map[uint8]bool, 16)
 	switch cntl {
 	case 0:
@@ -268,7 +268,7 @@ func chMask16Channels(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	return chans, nil
 }
 
-func chMask72Channels(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
+func parseChMask72(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	chans := make(map[uint8]bool, 72)
 	switch cntl {
 	case 0, 1, 2, 3, 4:
@@ -295,7 +295,7 @@ func chMask72Channels(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	return chans, nil
 }
 
-func chMask96Channels(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
+func parseChMask96(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	chans := make(map[uint8]bool, 96)
 	switch cntl {
 	case 0, 1, 2, 3, 4, 5:

@@ -97,7 +97,7 @@ func init() {
 			}
 			return ttnpb.DataRateIndex(si), nil
 		},
-		ParseChMask: chMask16Channels,
+		ParseChMask: parseChMask16,
 
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,

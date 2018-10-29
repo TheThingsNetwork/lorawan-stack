@@ -38,7 +38,7 @@ func TestParseChMask(t *testing.T) {
 		{
 			name: "16 channels/cntl=0",
 
-			parseChMask: chMask16Channels,
+			parseChMask: parseChMask16,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -52,7 +52,7 @@ func TestParseChMask(t *testing.T) {
 		{
 			name: "16 channels/cntl=6",
 
-			parseChMask: chMask16Channels,
+			parseChMask: parseChMask16,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -69,14 +69,14 @@ func TestParseChMask(t *testing.T) {
 		},
 		{
 			name:        "16 channels/cntl=3",
-			parseChMask: chMask16Channels,
+			parseChMask: parseChMask16,
 			cntl:        3,
 			fails:       true,
 		},
 		{
 			name: "72 channels/cntl=1",
 
-			parseChMask: chMask72Channels,
+			parseChMask: parseChMask72,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -90,7 +90,7 @@ func TestParseChMask(t *testing.T) {
 		{
 			name: "72 channels/cntl=5",
 
-			parseChMask: chMask72Channels,
+			parseChMask: parseChMask72,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -104,7 +104,7 @@ func TestParseChMask(t *testing.T) {
 		{
 			name: "72 channels/cntl=6",
 
-			parseChMask: chMask72Channels,
+			parseChMask: parseChMask72,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -118,7 +118,7 @@ func TestParseChMask(t *testing.T) {
 		{
 			name: "72 channels/cntl=7",
 
-			parseChMask: chMask72Channels,
+			parseChMask: parseChMask72,
 
 			mask: [16]bool{
 				true, false, false, true, true, false, false, false,
@@ -131,14 +131,14 @@ func TestParseChMask(t *testing.T) {
 		},
 		{
 			name:        "72 channels/cntl=math.MaxUint8",
-			parseChMask: chMask72Channels,
+			parseChMask: parseChMask72,
 			cntl:        math.MaxUint8,
 			fails:       true,
 		},
 		{
 			name: "96 channels/cntl=3",
 
-			parseChMask: chMask96Channels,
+			parseChMask: parseChMask96,
 
 			mask: [16]bool{
 				true, false, false, true, true, false, false, false,
@@ -151,13 +151,13 @@ func TestParseChMask(t *testing.T) {
 		},
 		{
 			name:            "96 channels/cntl=6",
-			parseChMask:     chMask96Channels,
+			parseChMask:     parseChMask96,
 			cntl:            6,
 			enabledChannels: []uint8{0, 3, 16, 17, 55, 90},
 		},
 		{
 			name:        "96 channels/cntl=math.MaxUint8",
-			parseChMask: chMask96Channels,
+			parseChMask: parseChMask96,
 			cntl:        math.MaxUint8,
 			fails:       true,
 		},
