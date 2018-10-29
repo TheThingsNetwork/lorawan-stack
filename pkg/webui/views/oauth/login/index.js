@@ -85,6 +85,7 @@ export default class OAuth extends React.PureComponent {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               error={this.state.error}
+              submitEnabledWhenInvalid
             >
               <Field
                 title={sharedMessages.userId}

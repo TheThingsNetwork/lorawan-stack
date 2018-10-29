@@ -32,6 +32,7 @@ const InnerForm = function ({
   touched,
   children,
   horizontal,
+  submitEnabledWhenInvalid,
 }) {
 
   const decoratedChildren = recursiveMap(children,
@@ -44,11 +45,12 @@ const InnerForm = function ({
           values,
           touched,
           horizontal,
+          submitEnabledWhenInvalid,
           ...Child.props,
         })
       } else if (Child.type === Button && Child.props.type === 'submit') {
         return React.cloneElement(Child, {
-          disabled: isSubmitting || !isValid,
+          disabled: isSubmitting || (!submitEnabledWhenInvalid && !isValid),
           ...Child.props,
         })
       }
@@ -75,8 +77,8 @@ const formRender = ({ children, ...rest }) => function (props) {
   )
 }
 
-const Form = ({ children, error, horizontal, ...rest }) => (
-  <Formik {...rest} render={formRender({ children, error, horizontal })} />
+const Form = ({ children, error, horizontal, submitEnabledWhenInvalid, ...rest }) => (
+  <Formik {...rest} render={formRender({ children, error, horizontal, submitEnabledWhenInvalid })} />
 )
 
 function recursiveMap (children, fn) {
