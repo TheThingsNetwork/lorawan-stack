@@ -18,6 +18,7 @@ import { Row, Col } from 'react-grid-system'
 import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+
 import ApplicationsTable from '../../../containers/applications-table'
 
 export default class List extends React.Component {

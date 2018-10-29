@@ -18,10 +18,10 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
-import Tabs from '../tabs'
-import Tabular from '../table'
-import Button from '../button'
-import Input from '../input'
+import Tabs from '../../components/tabs'
+import Tabular from '../../components/table'
+import Button from '../../components/button'
+import Input from '../../components/input'
 
 import sharedMessages from '../../lib/shared-messages'
 import debounce from '../../lib/debounce'
@@ -91,6 +91,8 @@ export default class ApplicationTable extends Component {
     const { dispatch } = this.props
     const filters = this.state
     filters.query = query
+    filters.page = 1
+    this.setState({ page: 1 })
     dispatch(searchApplicationsList(filters))
   }
 
