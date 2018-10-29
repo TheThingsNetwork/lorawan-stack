@@ -14,10 +14,17 @@
 
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { withInfo } from '@storybook/addon-info'
 
-import Field from '.'
+import { Field } from '.'
 
 storiesOf('Field', module)
+  .addDecorator((story, context) => withInfo({
+    inline: true,
+    header: false,
+    source: false,
+    propTables: [ Field ],
+  })(story)(context))
   .add('Default', () => (
     <Field
       title="Foo"
@@ -26,6 +33,25 @@ storiesOf('Field', module)
       required
       form={false}
     />
+  ))
+  .add('Horizontal', () => (
+    <div style={{ width: '60%' }}>
+      <Field
+        title="Foo"
+        name="foo"
+        required
+        horizontal
+        form={false}
+      />
+      <Field
+        title="Bar"
+        name="bar"
+        required
+        horizontal
+        form={false}
+      />
+    </div>
+
   ))
   .add('Number', () => (
     <Field

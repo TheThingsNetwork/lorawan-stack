@@ -139,21 +139,38 @@ const Field = function (props) {
 }
 
 Field.propTypes = {
+  /** The field title, displayed with the input */
   title: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.object,
   ]).isRequired,
+  /** An optional helper description displayed under the input */
   description: PropTypes.node,
+  /** "name" prop applied to the input */
   name: PropTypes.string.isRequired,
+  /**
+   * The field type (eg. text, byte, password, checkbox), thunked values are
+   * allowed as well
+   */
   type: PropTypes.oneOfType([
-    PropTypes.string.isRequired,
-    PropTypes.func.isRequired,
-  ]),
+    PropTypes.string,
+    PropTypes.func,
+  ]).isRequired,
+  /** Error to be displayed next to input */
   error: PropTypes.error,
+  /** Warning to be displayed next to input */
   warning: PropTypes.message,
+  /** Whether the field is required */
   required: PropTypes.bool,
+  /** Whether the field is disabled */
   disabled: PropTypes.bool,
+  /** Whether the field is read only */
   readOnly: PropTypes.bool,
+  /** Whether the field should be displayed in horizontal style */
+  horizontal: PropTypes.bool,
+  /** Whether the field is part of a Form component (default is true).
+   * This is necessary to map form values correctly.
+   */
   form: PropTypes.bool,
 }
 
@@ -189,3 +206,4 @@ const Err = function (props) {
 }
 
 export default injectIntl(Field)
+export { Field }
