@@ -14,14 +14,15 @@
 
 NODE = node
 NPM = npm
-YARN = yarn
 
 CACHE_DIR ?= .cache
 PUBLIC_DIR ?= public
 CONFIG_DIR ?= config
 BINARIES_DIR ?= ./node_modules/.bin
 DEV_SERVER_BUILD ?= false
+YARN_VERSION ?= 1.10.1
 
+YARN ?= $(BINARIES_DIR)/yarn
 ESLINT ?= $(BINARIES_DIR)/eslint
 BABEL ?= $(BINARIES_DIR)/babel
 JSON ?= $(BINARIES_DIR)/json
@@ -73,9 +74,12 @@ no_pb = grep -v '_pb\.js$$'
 # Rules
 
 # install dev dependencies
-js.dev-deps:
+
+$(YARN):
 	@$(log) "fetching js tools"
-	@command -v yarn > /dev/null || ($(log) Installing yarn && npm install -g yarn)
+	$(NPM) install yarn@$(YARN_VERSION) --no-package-lock --no-save
+
+js.dev-deps: $(YARN)
 
 js_init_script = \
 	var fs = require('fs'); \
@@ -94,7 +98,7 @@ js.init:
 INIT_RULES += js.init
 
 # install dependencies
-js.deps:
+js.deps: $(YARN)
 	@$(log) "fetching js dependencies"
 	@$(YARN) install $(YARN_FLAGS)
 

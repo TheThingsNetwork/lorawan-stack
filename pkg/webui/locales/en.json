@@ -1,9 +1,4 @@
 {
-  "components.application-table.index.all": "All",
-  "components.application-table.index.appId": "Application ID",
-  "components.application-table.index.desc": "Description",
-  "components.application-table.index.empty": "No items matched your criteria",
-  "components.application-table.index.add": "Add Application",
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.navigation.side.index.hideSidebar": "Hide Sidebar",
   "lib.shared-messages.access": "Access",
