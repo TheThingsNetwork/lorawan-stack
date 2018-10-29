@@ -26,13 +26,13 @@ func TestParseChMask(t *testing.T) {
 	for _, tc := range []struct {
 		name string
 
-		parseChMask func(mask [16]bool, cntl uint8) (map[int]bool, error)
+		parseChMask func(mask [16]bool, cntl uint8) (map[uint8]bool, error)
 
 		mask [16]bool
 		cntl uint8
 
-		enabledChannels  []int
-		disabledChannels []int
+		enabledChannels  []uint8
+		disabledChannels []uint8
 		fails            bool
 	}{
 		{
@@ -46,8 +46,8 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 0,
 
-			enabledChannels:  []int{0, 3},
-			disabledChannels: []int{1, 2, 4, 5, 11},
+			enabledChannels:  []uint8{0, 3},
+			disabledChannels: []uint8{1, 2, 4, 5, 11},
 		},
 		{
 			name: "16 channels/cntl=6",
@@ -60,8 +60,8 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 6,
 
-			enabledChannels: func() (chans []int) {
-				for i := 0; i < 16; i++ {
+			enabledChannels: func() (chans []uint8) {
+				for i := uint8(0); i < 16; i++ {
 					chans = append(chans, i)
 				}
 				return
@@ -84,8 +84,8 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 1,
 
-			enabledChannels:  []int{16, 19},
-			disabledChannels: []int{0, 3, 4, 5, 17, 18, 20, 32, 64},
+			enabledChannels:  []uint8{16, 19},
+			disabledChannels: []uint8{0, 3, 4, 5, 17, 18, 20, 32, 64},
 		},
 		{
 			name: "72 channels/cntl=5",
@@ -98,8 +98,8 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 5,
 
-			enabledChannels:  []int{0, 3, 7, 24, 25, 26, 30, 31, 64, 67},
-			disabledChannels: []int{8, 9, 10, 11, 32, 33, 55, 65, 66, 68, 70},
+			enabledChannels:  []uint8{0, 3, 7, 24, 25, 26, 30, 31, 64, 67},
+			disabledChannels: []uint8{8, 9, 10, 11, 32, 33, 55, 65, 66, 68, 70},
 		},
 		{
 			name: "72 channels/cntl=6",
@@ -112,8 +112,8 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 6,
 
-			enabledChannels:  []int{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 64, 67},
-			disabledChannels: []int{65, 66, 68},
+			enabledChannels:  []uint8{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 64, 67},
+			disabledChannels: []uint8{65, 66, 68},
 		},
 		{
 			name: "72 channels/cntl=7",
@@ -126,8 +126,8 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 7,
 
-			enabledChannels:  []int{64, 67, 68},
-			disabledChannels: []int{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 65, 66, 69, 70},
+			enabledChannels:  []uint8{64, 67, 68},
+			disabledChannels: []uint8{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 65, 66, 69, 70},
 		},
 		{
 			name:        "72 channels/cntl=math.MaxUint8",
@@ -146,14 +146,14 @@ func TestParseChMask(t *testing.T) {
 			},
 			cntl: 3,
 
-			enabledChannels:  []int{48, 51, 52, 56, 57},
-			disabledChannels: []int{0, 16, 17, 49, 50, 55, 66},
+			enabledChannels:  []uint8{48, 51, 52, 56, 57},
+			disabledChannels: []uint8{0, 16, 17, 49, 50, 55, 66},
 		},
 		{
 			name:            "96 channels/cntl=6",
 			parseChMask:     chMask96Channels,
 			cntl:            6,
-			enabledChannels: []int{0, 3, 16, 17, 55, 90},
+			enabledChannels: []uint8{0, 3, 16, 17, 55, 90},
 		},
 		{
 			name:        "96 channels/cntl=math.MaxUint8",
