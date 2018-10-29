@@ -45,7 +45,7 @@ func (m *MessageDescriptor) Touched() bool { return m.touched }
 // Updated returns whether the descriptor was updated.
 func (m *MessageDescriptor) Updated() bool { return m.updated }
 
-// SetSource sets the source package and file  name of the message descriptor.
+// SetSource sets the source package and file name of the message descriptor.
 // The argument skip is the number of stack frames to ascend, with 0 identifying the caller of SetSource.
 func (m *MessageDescriptor) SetSource(skip uint) {
 	_, file, _, ok := runtime.Caller(1 + int(skip))
