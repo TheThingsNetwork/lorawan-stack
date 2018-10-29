@@ -168,7 +168,7 @@ func TestChannelMasksBands(t *testing.T) {
 	a := assertions.New(t)
 
 	for _, b := range band.All {
-		if !a.So(b.ChannelMask, should.NotBeNil) {
+		if !a.So(b.ParseChMask, should.NotBeNil) {
 			t.Fatalf("Band %s should have a ChannelMask function defined", b.ID)
 		}
 	}

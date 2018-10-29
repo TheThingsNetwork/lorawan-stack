@@ -115,7 +115,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			mask[i] = v
 		}
 
-		m, err := band.ChannelMask(mask, uint8(req.ChannelMaskControl))
+		m, err := band.ParseChMask(mask, uint8(req.ChannelMaskControl))
 		if err != nil {
 			return err
 		}

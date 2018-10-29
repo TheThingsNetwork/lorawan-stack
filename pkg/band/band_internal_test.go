@@ -22,11 +22,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestChannelMask(t *testing.T) {
+func TestParseChMask(t *testing.T) {
 	for _, tc := range []struct {
 		name string
 
-		chMaskFunc ChannelMaskFunc
+		parseChMask func(mask [16]bool, cntl uint8) (map[int]bool, error)
 
 		mask [16]bool
 		cntl uint8
@@ -38,7 +38,7 @@ func TestChannelMask(t *testing.T) {
 		{
 			name: "16 channels/cntl=0",
 
-			chMaskFunc: chMask16Channels,
+			parseChMask: chMask16Channels,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -52,7 +52,7 @@ func TestChannelMask(t *testing.T) {
 		{
 			name: "16 channels/cntl=6",
 
-			chMaskFunc: chMask16Channels,
+			parseChMask: chMask16Channels,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -68,15 +68,15 @@ func TestChannelMask(t *testing.T) {
 			}(),
 		},
 		{
-			name:       "16 channels/cntl=3",
-			chMaskFunc: chMask16Channels,
-			cntl:       3,
-			fails:      true,
+			name:        "16 channels/cntl=3",
+			parseChMask: chMask16Channels,
+			cntl:        3,
+			fails:       true,
 		},
 		{
 			name: "72 channels/cntl=1",
 
-			chMaskFunc: chMask72Channels,
+			parseChMask: chMask72Channels,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -90,7 +90,7 @@ func TestChannelMask(t *testing.T) {
 		{
 			name: "72 channels/cntl=5",
 
-			chMaskFunc: chMask72Channels,
+			parseChMask: chMask72Channels,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -104,7 +104,7 @@ func TestChannelMask(t *testing.T) {
 		{
 			name: "72 channels/cntl=6",
 
-			chMaskFunc: chMask72Channels,
+			parseChMask: chMask72Channels,
 
 			mask: [16]bool{
 				true, false, false, true, false, false, false, false,
@@ -118,7 +118,7 @@ func TestChannelMask(t *testing.T) {
 		{
 			name: "72 channels/cntl=7",
 
-			chMaskFunc: chMask72Channels,
+			parseChMask: chMask72Channels,
 
 			mask: [16]bool{
 				true, false, false, true, true, false, false, false,
@@ -130,15 +130,15 @@ func TestChannelMask(t *testing.T) {
 			disabledChannels: []int{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 65, 66, 69, 70},
 		},
 		{
-			name:       "72 channels/cntl=math.MaxUint8",
-			chMaskFunc: chMask72Channels,
-			cntl:       math.MaxUint8,
-			fails:      true,
+			name:        "72 channels/cntl=math.MaxUint8",
+			parseChMask: chMask72Channels,
+			cntl:        math.MaxUint8,
+			fails:       true,
 		},
 		{
 			name: "96 channels/cntl=3",
 
-			chMaskFunc: chMask96Channels,
+			parseChMask: chMask96Channels,
 
 			mask: [16]bool{
 				true, false, false, true, true, false, false, false,
@@ -151,21 +151,21 @@ func TestChannelMask(t *testing.T) {
 		},
 		{
 			name:            "96 channels/cntl=6",
-			chMaskFunc:      chMask96Channels,
+			parseChMask:     chMask96Channels,
 			cntl:            6,
 			enabledChannels: []int{0, 3, 16, 17, 55, 90},
 		},
 		{
-			name:       "96 channels/cntl=math.MaxUint8",
-			chMaskFunc: chMask96Channels,
-			cntl:       math.MaxUint8,
-			fails:      true,
+			name:        "96 channels/cntl=math.MaxUint8",
+			parseChMask: chMask96Channels,
+			cntl:        math.MaxUint8,
+			fails:       true,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			res, err := tc.chMaskFunc(tc.mask, tc.cntl)
+			res, err := tc.parseChMask(tc.mask, tc.cntl)
 			if tc.fails {
 				if !a.So(err, should.NotBeNil) {
 					t.FailNow()

@@ -101,7 +101,7 @@ func init() {
 			}
 			return ttnpb.DataRateIndex(si), nil
 		},
-		ChannelMask: chMask16Channels,
+		ParseChMask: chMask16Channels,
 
 		DefaultRx2Parameters: Rx2Parameters{2, 923200000},
 
