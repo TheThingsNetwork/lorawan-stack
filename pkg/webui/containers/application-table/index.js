@@ -127,16 +127,16 @@ export default class ApplicationTable extends Component {
   }
 
   onApplicationClick (index) {
-    const { applications, dispatch, match } = this.props
+    const { applications, dispatch, location } = this.props
     const appId = applications[index].application_id
 
-    dispatch(push(`${match.url}/${appId}`))
+    dispatch(push(`${location.pathname}/${appId}`))
   }
 
   onApplicationAdd () {
-    const { dispatch, match } = this.props
+    const { dispatch, location } = this.props
 
-    dispatch(push(`${match.url}/add`))
+    dispatch(push(`${location.pathname}/add`))
   }
 
   componentDidMount () {
@@ -202,7 +202,7 @@ export default class ApplicationTable extends Component {
         <Tabular
           paginated
           initialPage={page}
-          page={page || 1}
+          page={page}
           totalCount={totalCount}
           pageSize={PAGE_SIZE}
           loading={fetching}
