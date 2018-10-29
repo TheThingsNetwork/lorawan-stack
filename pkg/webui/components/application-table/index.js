@@ -14,7 +14,6 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Query from 'query-string'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
@@ -69,6 +68,7 @@ const PAGE_SIZE = 3
   fetching: applications.fetching,
   fetchingSearch: applications.fetchingSearch,
   error: applications.error,
+  location,
 }))
 @bind
 export default class ApplicationTable extends Component {
@@ -78,28 +78,18 @@ export default class ApplicationTable extends Component {
 
     this.state = {
       query: '',
+      tab: 'all',
+      page: 1,
+      order: undefined,
+      orderBy: undefined,
     }
 
     this.requestSearch = debounce(this.requestSearch, 350)
   }
 
-  getCurrentFilters () {
-    const { search } = this.props.location
-    const { page, tab, order, orderBy } = Query.parse(search)
-
-    const result = {
-      page: Number(page),
-      tab,
-      order,
-      orderBy,
-    }
-
-    return result
-  }
-
   requestSearch (query) {
     const { dispatch } = this.props
-    const filters = this.getCurrentFilters()
+    const filters = this.state
     filters.query = query
     dispatch(searchApplicationsList(filters))
   }
@@ -109,29 +99,29 @@ export default class ApplicationTable extends Component {
     this.requestSearch(query)
   }
 
-  onPageChange (page) {
+  async onPageChange (page) {
     const { dispatch } = this.props
-    const filters = this.getCurrentFilters()
-    filters.page = page
-
-    dispatch(push(`/console/applications?${Query.stringify(filters)}`))
+    await this.setState({ page })
+    this.fetchApplications(dispatch)
   }
 
   onOrderChange (order, orderBy) {
     const { dispatch } = this.props
-    const filters = this.getCurrentFilters()
+    const filters = this.state
     filters.order = order
     filters.orderBy = orderBy
 
-    dispatch(push(`/console/applications?${Query.stringify(filters)}`))
+    this.setState(filters)
+    this.fetchApplications(dispatch)
   }
 
   onTabChange (tab) {
     const { dispatch } = this.props
-    const filters = this.getCurrentFilters()
+    const filters = this.state
     filters.tab = tab
 
-    dispatch(push(`/console/applications?${Query.stringify(filters)}`))
+    this.setState(filters)
+    this.fetchApplications(dispatch)
   }
 
   onApplicationClick (index) {
@@ -151,14 +141,8 @@ export default class ApplicationTable extends Component {
     this.fetchApplications(this.props.dispatch)
   }
 
-  componentDidUpdate (newProps, newState) {
-    if (this.props.location.search !== newProps.location.search) {
-      this.fetchApplications(this.props.dispatch)
-    }
-  }
-
   fetchApplications (dispatch) {
-    const filters = this.getCurrentFilters()
+    const filters = this.state
     if (filters.query) {
       dispatch(searchApplicationsList(filters))
     } else {
@@ -175,17 +159,14 @@ export default class ApplicationTable extends Component {
       fetchingSearch,
     } = this.props
 
-    const { query } = this.state
     const {
-      tab = 'all',
-      page = 1,
-      ...rest
-    } = this.getCurrentFilters()
+      page,
+      tab,
+      query,
+    } = this.state
 
     if (error) {
-      return (
-        <span>ERROR</span>
-      )
+      return <span>ERROR</span>
     }
 
     const apps = applications.map(app => ({ ...app, clickable: true }))
@@ -217,10 +198,9 @@ export default class ApplicationTable extends Component {
           </div>
         </div>
         <Tabular
-          {...rest}
           paginated
           initialPage={page}
-          page={page}
+          page={page || 1}
           totalCount={totalCount}
           pageSize={PAGE_SIZE}
           loading={fetching}
