@@ -164,12 +164,22 @@ func TestRx1DataRate(t *testing.T) {
 	}
 }
 
-func TestChannelMasksBands(t *testing.T) {
+func TestParseChMaskBands(t *testing.T) {
 	a := assertions.New(t)
 
 	for _, b := range band.All {
 		if !a.So(b.ParseChMask, should.NotBeNil) {
-			t.Fatalf("Band %s should have a ChannelMask function defined", b.ID)
+			t.Fatalf("Band %s should have a ParseChMask function defined", b.ID)
+		}
+	}
+}
+
+func TestGenerateChMasksBands(t *testing.T) {
+	a := assertions.New(t)
+
+	for _, b := range band.All {
+		if !a.So(b.GenerateChMasks, should.NotBeNil) {
+			t.Fatalf("Band %s should have a GenerateChMasks function defined", b.ID)
 		}
 	}
 }

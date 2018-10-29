@@ -312,3 +312,97 @@ func parseChMask96(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	}
 	return chans, nil
 }
+
+func generateChMaskBlock(mask []bool) ([16]bool, error) {
+	if len(mask) > 16 {
+		return [16]bool{}, errInvalidChannelCount
+	}
+
+	block := [16]bool{}
+	for j, on := range mask {
+		block[j] = on
+	}
+	return block, nil
+}
+
+func generateChMaskMatrix(mask []bool) (map[uint8][16]bool, error) {
+	if len(mask) > math.MaxUint8 {
+		return nil, errInvalidChannelCount
+	}
+
+	n := uint8(len(mask))
+	if n == 0 {
+		return nil, errInvalidChannelCount
+	}
+
+	ret := make(map[uint8][16]bool, 1+n/16)
+	for i := uint8(0); i <= n/16 && 16*i != n; i++ {
+		end := 16*i + 16
+		if end > n {
+			end = n
+		}
+
+		block, err := generateChMaskBlock(mask[16*i : end])
+		if err != nil {
+			return nil, err
+		}
+		ret[i] = block
+	}
+	return ret, nil
+}
+
+func generateChMask16(mask []bool) (map[uint8][16]bool, error) {
+	if len(mask) != 16 {
+		return nil, errInvalidChannelCount
+	}
+
+	for _, on := range mask {
+		if !on {
+			return generateChMaskMatrix(mask)
+		}
+	}
+	return map[uint8][16]bool{6: {}}, nil
+}
+
+func generateChMask72(mask []bool) (map[uint8][16]bool, error) {
+	if len(mask) != 72 {
+		return nil, errInvalidChannelCount
+	}
+
+	on125 := uint8(0)
+	for i := 0; i < 64; i++ {
+		if mask[i] {
+			on125++
+		}
+	}
+
+	if on125 == 0 || on125 == 64 {
+		block, err := generateChMaskBlock(mask[64:72])
+		if err != nil {
+			return nil, err
+		}
+
+		idx := uint8(6)
+		if on125 == 0 {
+			idx = 7
+		}
+		return map[uint8][16]bool{idx: block}, nil
+	}
+
+	// TODO: Support ChMaskCntl 5 if required.
+
+	return generateChMaskMatrix(mask)
+}
+
+func generateChMask96(mask []bool) (map[uint8][16]bool, error) {
+	if len(mask) != 96 {
+		return nil, errInvalidChannelCount
+	}
+
+	for _, on := range mask {
+		if !on {
+			return generateChMaskMatrix(mask)
+		}
+	}
+	return map[uint8][16]bool{6: {}}, nil
+}

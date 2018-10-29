@@ -185,3 +185,125 @@ func TestParseChMask(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateChMask(t *testing.T) {
+	for _, tc := range []struct {
+		Name     string
+		Generate func([]bool) (map[uint8][16]bool, error)
+		Mask     []bool
+		Expected map[uint8][16]bool
+		Error    error
+	}{
+		{
+			Name:     "16 channels/2,4 on",
+			Generate: generateChMask16,
+			Mask: []bool{
+				false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false,
+			},
+			Expected: map[uint8][16]bool{
+				0: {false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
+		},
+		{
+			Name:     "16 channels/all on",
+			Generate: generateChMask16,
+			Mask: []bool{
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+			},
+			Expected: map[uint8][16]bool{
+				6: {},
+			},
+		},
+		{
+			Name:     "72 channels/1-16 on, 42, 67, 69 on",
+			Generate: generateChMask72,
+			Mask: []bool{
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
+			},
+			Expected: map[uint8][16]bool{
+				0: {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+				1: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+				2: {false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false},
+				3: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+				4: {false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false},
+			},
+		},
+		{
+			Name:     "72 channels/125Hz on, 66, 68 on",
+			Generate: generateChMask72,
+			Mask: []bool{
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				false, true, false, true, false, false, false, false,
+			},
+			Expected: map[uint8][16]bool{
+				6: {false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false},
+			},
+		},
+		{
+			Name:     "72 channels/125Hz off, 67, 69 on",
+			Generate: generateChMask72,
+			Mask: []bool{
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
+			},
+			Expected: map[uint8][16]bool{
+				7: {false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false},
+			},
+		},
+		{
+			Name:     "96 channels/1-16 on, 42, 67, 69, 80 on",
+			Generate: generateChMask96,
+			Mask: []bool{
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false,
+				true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+			},
+			Expected: map[uint8][16]bool{
+				0: {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+				1: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+				2: {false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false},
+				3: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+				4: {false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false},
+				5: {true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+			},
+		},
+		{
+			Name:     "96 channels/all on",
+			Generate: generateChMask96,
+			Mask: []bool{
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+			},
+			Expected: map[uint8][16]bool{
+				6: {},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			ret, err := tc.Generate(tc.Mask)
+			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+				tc.Error == nil && !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(ret, should.Resemble, tc.Expected)
+		})
+	}
+}

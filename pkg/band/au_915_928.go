@@ -119,7 +119,9 @@ func init() {
 			}
 			return ttnpb.DataRateIndex(si), nil
 		},
-		ParseChMask: parseChMask72,
+
+		GenerateChMasks: generateChMask72,
+		ParseChMask:     parseChMask72,
 
 		DefaultRx2Parameters: Rx2Parameters{8, 923300000},
 
