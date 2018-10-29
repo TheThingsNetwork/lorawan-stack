@@ -147,10 +147,11 @@ type Band struct {
 	DefaultMaxEIRP float32
 
 	// Rx1Parameters is the default function that determines the settings for a Tx sent during Rx1
-	Rx1Channel  func(idx uint32) (uint32, error)
-	Rx1DataRate func(idx ttnpb.DataRateIndex, offset uint32, dwellTime bool) (ttnpb.DataRateIndex, error)
+	Rx1Channel  func(uint32) (uint32, error)
+	Rx1DataRate func(ttnpb.DataRateIndex, uint32, bool) (ttnpb.DataRateIndex, error)
 
-	ParseChMask func(mask [16]bool, cntl uint8) (map[int]bool, error)
+	GenerateChMasks func([]bool) (map[uint8][16]bool, error)
+	ParseChMask     func([16]bool, uint8) (map[uint8]bool, error)
 
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters
