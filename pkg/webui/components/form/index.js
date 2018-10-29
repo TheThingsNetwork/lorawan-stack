@@ -18,6 +18,7 @@ import { Formik } from 'formik'
 import Field from '../field'
 import Button from '../button'
 import Notification from '../notification'
+import PropTypes from '../../lib/prop-types'
 
 const InnerForm = function ({
   setFieldValue,
@@ -92,6 +93,16 @@ function recursiveMap (children, fn) {
 
     return fn(child)
   })
+}
+
+Form.propTypes = {
+  /** An error message belonging to the form */
+  error: PropTypes.error,
+  /** Whether the form fields should be displayed in horizontal style */
+  horizontal: PropTypes.bool,
+  /** Whether the submit button stays enabled also when the form data is not
+   * not yet valid */
+  submitEnabledWhenInvalid: PropTypes.bool,
 }
 
 export default Form

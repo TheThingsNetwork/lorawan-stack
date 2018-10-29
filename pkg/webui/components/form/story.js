@@ -15,6 +15,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
+import { withInfo } from '@storybook/addon-info'
 
 import Field from '../field'
 import Button from '../button'
@@ -36,11 +37,18 @@ const containerStyles = {
 
 
 storiesOf('Form', module)
+  .addDecorator((story, context) => withInfo({
+    inline: true,
+    header: false,
+    source: true,
+    propTables: [ Form ],
+  })(story)(context))
   .add('Login', () => (
     <div style={containerStyles}>
       <Form
         onSubmit={handleSubmit}
         initialValues={initialValues}
+        submitEnabledWhenInvalid
       >
         <Field
           title="Username or Email"
