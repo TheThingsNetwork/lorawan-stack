@@ -60,6 +60,37 @@ const headers = [
   },
 ]
 
+const DEFAULT_PAGE = 1
+const DEFAULT_TAB = 'all'
+const ALLOWED_TABS = [ 'all' ]
+const ALLOWED_ORDERS = [ 'asc', 'desc', undefined ]
+
+const validateFilters = function (filters) {
+
+  if (!ALLOWED_TABS.includes(filters.tab)) {
+    filters.tab = DEFAULT_TAB
+  }
+
+  if (!ALLOWED_ORDERS.includes(filters.order)) {
+    filters.order = undefined
+    filters.orderBy = undefined
+  }
+
+  if (
+    Boolean(filters.order) && !Boolean(filters.orderBy)
+      || !Boolean(filters.order) && Boolean(filters.orderBy)
+  ) {
+    filters.order = undefined
+    filters.orderBy = undefined
+  }
+
+  if (!Boolean(filters.page) || filters.page < 0) {
+    filters.page = DEFAULT_PAGE
+  }
+
+  return filters
+}
+
 const PAGE_SIZE = 3
 
 @connect(({ applications }) => ({
@@ -88,11 +119,11 @@ export default class ApplicationsTable extends Component {
 
   async requestSearch (query) {
     const { dispatch } = this.props
-    await this.setState({
+    await this.setState(validateFilters({
       ...this.state,
       query,
       page: 1,
-    })
+    }))
 
     dispatch(searchApplicationsList(this.state))
   }
@@ -103,28 +134,28 @@ export default class ApplicationsTable extends Component {
   }
 
   async onPageChange (page) {
-    await this.setState({
+    await this.setState(validateFilters({
       ...this.state,
       page,
-    })
+    }))
     this.fetchApplications()
   }
 
   async onOrderChange (order, orderBy) {
-    await this.setState({
+    await this.setState(validateFilters({
       ...this.state,
       order,
       orderBy,
-    })
+    }))
 
     this.fetchApplications()
   }
 
   async onTabChange (tab) {
-    await this.setState({
+    await this.setState(validateFilters({
       ...this.state,
       tab,
-    })
+    }))
     this.fetchApplications()
   }
 

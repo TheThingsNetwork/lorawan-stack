@@ -87,38 +87,6 @@ const getApplicationsStub = function (params) {
   ), 1000))
 }
 
-const DEFAULT_PAGE = 1
-const DEFAULT_TAB = 'all'
-const ALLOWED_TABS = [ 'all' ]
-const ALLOWED_ORDERS = [ 'asc', 'desc', undefined ]
-
-const transformParams = function ({ getState, action }, next) {
-  const { type, filters } = action
-
-  if (!ALLOWED_TABS.includes(filters.tab)) {
-    filters.tab = DEFAULT_TAB
-  }
-
-  if (!ALLOWED_ORDERS.includes(filters.order)) {
-    filters.order = undefined
-    filters.orderBy = undefined
-  }
-
-  if (
-    Boolean(filters.order) && !Boolean(filters.orderBy)
-      || !Boolean(filters.order) && Boolean(filters.orderBy)
-  ) {
-    filters.order = undefined
-    filters.orderBy = undefined
-  }
-
-  if (!Boolean(filters.page) || filters.page < 0) {
-    filters.page = DEFAULT_PAGE
-  }
-
-  next({ type, filters })
-}
-
 const getApplicationsLogic = createLogic({
   type: [
     applications.GET_APPS_LIST,
@@ -128,7 +96,6 @@ const getApplicationsLogic = createLogic({
     applications.SEARCH_APPS_LIST,
   ],
   latest: true,
-  transform: transformParams,
   async process ({ getState, action }, dispatch, done) {
     const { filters } = action
 
