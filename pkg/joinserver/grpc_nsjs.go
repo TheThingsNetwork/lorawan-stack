@@ -147,7 +147,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				}
 			}
 			switch {
-			case !match && req.SelectedMACVersion == ttnpb.MAC_V1_0:
+			case !match && req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0:
 				return nil, nil, errUnknownAppEUI
 			case !match:
 				// TODO: Determine the cluster containing the device.
