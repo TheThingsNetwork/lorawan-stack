@@ -71,7 +71,7 @@ const PAGE_SIZE = 3
   location,
 }))
 @bind
-export default class ApplicationTable extends Component {
+export default class ApplicationsTable extends Component {
 
   constructor (props) {
     super(props)
