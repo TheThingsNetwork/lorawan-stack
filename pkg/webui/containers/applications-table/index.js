@@ -68,11 +68,10 @@ const PAGE_SIZE = 3
   fetching: applications.fetching,
   fetchingSearch: applications.fetchingSearch,
   error: applications.error,
-  location,
+  pathname: location.pathname,
 }))
 @bind
 export default class ApplicationsTable extends Component {
-
   constructor (props) {
     super(props)
 
@@ -87,13 +86,15 @@ export default class ApplicationsTable extends Component {
     this.requestSearch = debounce(this.requestSearch, 350)
   }
 
-  requestSearch (query) {
+  async requestSearch (query) {
     const { dispatch } = this.props
-    const filters = this.state
-    filters.query = query
-    filters.page = 1
-    this.setState({ page: 1 })
-    dispatch(searchApplicationsList(filters))
+    await this.setState({
+      ...this.state,
+      query,
+      page: 1,
+    })
+
+    dispatch(searchApplicationsList(this.state))
   }
 
   onQueryChange (query) {
@@ -102,48 +103,50 @@ export default class ApplicationsTable extends Component {
   }
 
   async onPageChange (page) {
-    const { dispatch } = this.props
-    await this.setState({ page })
-    this.fetchApplications(dispatch)
+    await this.setState({
+      ...this.state,
+      page,
+    })
+    this.fetchApplications()
   }
 
-  onOrderChange (order, orderBy) {
-    const { dispatch } = this.props
-    const filters = this.state
-    filters.order = order
-    filters.orderBy = orderBy
+  async onOrderChange (order, orderBy) {
+    await this.setState({
+      ...this.state,
+      order,
+      orderBy,
+    })
 
-    this.setState(filters)
-    this.fetchApplications(dispatch)
+    this.fetchApplications()
   }
 
-  onTabChange (tab) {
-    const { dispatch } = this.props
-    const filters = this.state
-    filters.tab = tab
-
-    this.setState(filters)
-    this.fetchApplications(dispatch)
+  async onTabChange (tab) {
+    await this.setState({
+      ...this.state,
+      tab,
+    })
+    this.fetchApplications()
   }
 
   onApplicationClick (index) {
-    const { applications, dispatch, location } = this.props
+    const { applications, dispatch, pathname } = this.props
     const appId = applications[index].application_id
 
-    dispatch(push(`${location.pathname}/${appId}`))
+    dispatch(push(`${pathname}/${appId}`))
   }
 
   onApplicationAdd () {
-    const { dispatch, location } = this.props
+    const { dispatch, pathname } = this.props
 
-    dispatch(push(`${location.pathname}/add`))
+    dispatch(push(`${pathname}/add`))
   }
 
   componentDidMount () {
-    this.fetchApplications(this.props.dispatch)
+    this.fetchApplications()
   }
 
-  fetchApplications (dispatch) {
+  fetchApplications () {
+    const { dispatch } = this.props
     const filters = this.state
     if (filters.query) {
       dispatch(searchApplicationsList(filters))
