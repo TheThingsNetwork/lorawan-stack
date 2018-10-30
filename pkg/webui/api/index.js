@@ -14,6 +14,12 @@
 
 import axios from 'axios'
 import token from '../lib/access-token'
+import getCookieValue from '../lib/cookie'
+
+const csrf = getCookieValue('_csrf')
+const oauthInstance = axios.create({
+  headers: { 'X-CSRF-Token': csrf },
+})
 
 export default {
   v3: {
@@ -49,13 +55,13 @@ export default {
   },
   oauth: {
     login (credentials) {
-      return axios.post('/oauth/api/auth/login', credentials)
+      return oauthInstance.post('/oauth/api/auth/login', credentials)
     },
     logout () {
-      return axios.post('/oauth/api/auth/logout')
+      return oauthInstance.post('/oauth/api/auth/logout')
     },
     me () {
-      return axios.get('/oauth/api/me')
+      return oauthInstance.get('/oauth/api/me')
     },
   },
 }
