@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"net"
 	"sync"
 	"testing"
 	"time"
@@ -36,11 +37,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -201,7 +202,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices:             devReg,
-					JoinServers:         nil,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
@@ -347,7 +347,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices:             devReg,
-					JoinServers:         nil,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
@@ -460,7 +459,6 @@ func TestDownlinkQueueList(t *testing.T) {
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices:             devReg,
-					JoinServers:         nil,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
@@ -553,7 +551,9 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 		}
 
 		go func() {
-			wg.Wait()
+			if !a.So(test.WaitTimeout(Timeout, wg.Wait), should.BeTrue) {
+				t.FailNow()
+			}
 
 			select {
 			case weCh <- time.Now():
@@ -602,7 +602,6 @@ func TestLinkApplication(t *testing.T) {
 		}),
 		&Config{
 			Devices:             devReg,
-			JoinServers:         nil,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		})).(*NetworkServer)
@@ -669,7 +668,6 @@ func HandleUplinkTest() func(t *testing.T) {
 			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
 				Devices:             devReg,
-				JoinServers:         nil,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
 			})).(*NetworkServer)
@@ -1717,19 +1715,23 @@ func HandleUplinkTest() func(t *testing.T) {
 	}
 }
 
-var _ ttnpb.NsJsClient = &MockNsJsClient{}
-
-type MockNsJsClient struct {
-	HandleJoinFunc  func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error)
-	GetNwkSKeysFunc func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
+type MockNsJsServer struct {
+	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error)
 }
 
-func (c *MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-	return c.HandleJoinFunc(ctx, req, opts...)
+func (js *MockNsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	if js.HandleJoinFunc == nil {
+		return nil, errors.New("HandleJoinFunc not set")
+	}
+	return js.HandleJoinFunc(ctx, req)
 }
 
-func (c *MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
-	return c.GetNwkSKeysFunc(ctx, req, opts...)
+func (js *MockNsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+	if js.GetNwkSKeysFunc == nil {
+		return nil, errors.New("GetNwkSKeysFunc not set")
+	}
+	return js.GetNwkSKeysFunc(ctx, req)
 }
 
 func HandleJoinTest() func(t *testing.T) {
@@ -1913,6 +1915,8 @@ func HandleJoinTest() func(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
+				authorizedCtx = test.ContextWithT(authorizedCtx, t)
+
 				redisClient, flush := test.NewRedis(t, "networkserver_test")
 				defer flush()
 				defer redisClient.Close()
@@ -1931,18 +1935,9 @@ func HandleJoinTest() func(t *testing.T) {
 					}
 				}
 
-				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
-
-				getNwkSKeysFunc := func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
-					err := errors.New("GetNwkSKeys should not be called")
-					t.Fatal(err)
-					return nil, err
-				}
-
 				type handleJoinRequest struct {
 					ctx   context.Context
 					req   *ttnpb.JoinRequest
-					opts  []grpc.CallOption
 					ch    chan<- *ttnpb.JoinResponse
 					errch chan<- error
 				}
@@ -1951,26 +1946,38 @@ func HandleJoinTest() func(t *testing.T) {
 				collectionDoneCh := make(chan windowEnd, 1)
 				handleJoinCh := make(chan handleJoinRequest, 1)
 
+				jsSrv := rpcserver.New(test.ContextWithT(test.Context(), t))
+				ttnpb.RegisterNsJsServer(jsSrv.Server, &MockNsJsServer{
+					GetNwkSKeysFunc: func(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+						err := errors.New("GetNwkSKeys should not be called")
+						test.MustTFromContext(ctx).Error(err)
+						return nil, err
+					},
+					HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+						ch := make(chan *ttnpb.JoinResponse, 1)
+						errch := make(chan error, 1)
+						handleJoinCh <- handleJoinRequest{ctx, req, ch, errch}
+						return <-ch, <-errch
+					},
+				})
+
+				jsLst, err := net.Listen("tcp", ":0")
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				go jsSrv.Serve(jsLst)
+				defer jsSrv.Stop()
+
+				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
+
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
+					component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
+						Cluster: config.Cluster{
+							JoinServer: jsLst.Addr().String(),
+						},
+					}}),
 					&Config{
 						Devices: devReg,
-						JoinServers: []ttnpb.NsJsClient{&MockNsJsClient{
-							HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-								return nil, errors.New("test")
-							},
-							GetNwkSKeysFunc: getNwkSKeysFunc,
-						},
-							&MockNsJsClient{
-								HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-									ch := make(chan *ttnpb.JoinResponse, 1)
-									errch := make(chan error, 1)
-									handleJoinCh <- handleJoinRequest{ctx, req, opts, ch, errch}
-									return <-ch, <-errch
-								},
-								GetNwkSKeysFunc: getNwkSKeysFunc,
-							},
-						},
 					},
 					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
 						ch := make(chan time.Time, 1)
@@ -1986,7 +1993,7 @@ func HandleJoinTest() func(t *testing.T) {
 						return &MockNsGsClient{}, nil
 					}),
 				)).(*NetworkServer)
-				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+				ns.Component.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 
 				test.Must(nil, ns.Start())
 
@@ -2073,18 +2080,16 @@ func HandleJoinTest() func(t *testing.T) {
 				}
 
 				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-				close(deduplicationDoneCh)
-
-				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-				close(collectionDoneCh)
 
 				select {
-				case err := <-errch:
-					a.So(err, should.BeNil)
+				case we := <-deduplicationDoneCh:
+					we.ch <- time.Now()
 
 				case <-time.After(Timeout):
-					t.Fatal("Timed out while waiting for HandleUplink to return")
+					t.Fatal("Timed out while waiting for join accept to be sent to device")
 				}
+
+				close(deduplicationDoneCh)
 
 				select {
 				case up := <-asSendCh:
@@ -2100,8 +2105,9 @@ func HandleJoinTest() func(t *testing.T) {
 							ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 						},
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-							AppSKey:      resp.SessionKeys.AppSKey,
-							SessionKeyID: test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+							AppSKey:              resp.SessionKeys.AppSKey,
+							SessionKeyID:         test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+							InvalidatedDownlinks: tc.Device.QueuedApplicationDownlinks,
 						}},
 					})
 
@@ -2109,7 +2115,7 @@ func HandleJoinTest() func(t *testing.T) {
 					t.Fatal("Timed out while waiting for join to be sent to AS")
 				}
 
-				t.Run("device update", func(t *testing.T) {
+				if !t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
 
 					ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
@@ -2182,7 +2188,20 @@ func HandleJoinTest() func(t *testing.T) {
 					pbUp.RxMetadata = retUp.RxMetadata
 
 					a.So(ret, should.HaveEmptyDiff, pb)
-				})
+				}) {
+					t.FailNow()
+				}
+
+				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(collectionDoneCh)
+
+				select {
+				case err := <-errch:
+					a.So(err, should.BeNil)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for HandleUplink to return")
+				}
 
 				deduplicationDoneCh = make(chan windowEnd, 1)
 				collectionDoneCh = make(chan windowEnd, 1)
@@ -2218,6 +2237,14 @@ func HandleJoinTest() func(t *testing.T) {
 					}
 
 					_ = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+					select {
+					case we := <-deduplicationDoneCh:
+						we.ch <- time.Now()
+
+					case <-time.After(Timeout):
+						t.Fatal("Timed out while waiting for join accept to be sent to device")
+					}
 
 					select {
 					case up := <-asSendCh:
@@ -2280,7 +2307,6 @@ func TestHandleUplink(t *testing.T) {
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Devices:             devReg,
-			JoinServers:         nil,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		},

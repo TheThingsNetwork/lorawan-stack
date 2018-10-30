@@ -486,10 +486,9 @@ func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	Devices             DeviceRegistry     `name:"-"`
-	JoinServers         []ttnpb.NsJsClient `name:"-"`
-	DeduplicationWindow time.Duration      `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow      time.Duration      `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+	Devices             DeviceRegistry `name:"-"`
+	DeduplicationWindow time.Duration  `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow      time.Duration  `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 }
 
 // NetworkServer implements the Network Server component.
@@ -501,8 +500,6 @@ type NetworkServer struct {
 	devices DeviceRegistry
 
 	NetID types.NetID
-
-	joinServers []ttnpb.NsJsClient
 
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUpStream
@@ -573,7 +570,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ns := &NetworkServer{
 		Component:               c,
 		devices:                 conf.Devices,
-		joinServers:             conf.JoinServers,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
@@ -1237,156 +1233,154 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		},
 	}
 
-	var errs []error
-	for _, js := range ns.joinServers {
-		registerForwardUplink(ctx, dev, up)
-		resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
+	jsPeer := ns.Component.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, dev.EndDeviceIdentifiers)
+	if jsPeer == nil {
+		logger.Warn("Join Server not found")
+		return errJoinServerNotFound
+	}
+	js := ttnpb.NewNsJsClient(jsPeer.Conn())
 
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-ns.deduplicationDone(ctx, up):
-		}
+	resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
+	if err != nil {
+		logger.WithError(err).Warn("Join Server failed to handle join-request")
+		return err
+	}
+	registerForwardUplink(ctx, dev, up)
 
-		up.RxMetadata = acc.Accumulated()
-		registerMergeMetadata(ctx, dev, up)
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-ns.deduplicationDone(ctx, up):
+	}
 
-		var invalidatedQueue []*ttnpb.ApplicationDownlink
-		var resetErr bool
-		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
-			[]string{
-				"default_mac_parameters",
-				"frequency_plan_id",
-				"lorawan_version",
-				"mac_state",
-				"queued_application_downlinks",
-				"recent_uplinks",
-				"session",
-			},
-			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				paths := make([]string, 0, 5)
+	up.RxMetadata = acc.Accumulated()
+	registerMergeMetadata(ctx, dev, up)
 
-				dev.Session = &ttnpb.Session{
-					DevAddr:     devAddr,
-					SessionKeys: resp.SessionKeys,
-					StartedAt:   time.Now(),
-				}
-				paths = append(paths, "session")
+	var invalidatedQueue []*ttnpb.ApplicationDownlink
+	var resetErr bool
+	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
+		[]string{
+			"default_mac_parameters",
+			"frequency_plan_id",
+			"lorawan_version",
+			"mac_state",
+			"queued_application_downlinks",
+			"recent_uplinks",
+			"session",
+		},
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			paths := make([]string, 0, 5)
 
-				dev.EndDeviceIdentifiers.DevAddr = &devAddr
-				paths = append(paths, "ids.dev_addr")
+			dev.Session = &ttnpb.Session{
+				DevAddr:     devAddr,
+				SessionKeys: resp.SessionKeys,
+				StartedAt:   time.Now(),
+			}
+			paths = append(paths, "session")
 
-				if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
-					return nil, nil, err
-				}
+			dev.EndDeviceIdentifiers.DevAddr = &devAddr
+			paths = append(paths, "ids.dev_addr")
 
-				if req.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
-					// The version will be further negotiated via RekeyInd/RekeyConf
-					dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
-				}
-				dev.MACState.CurrentParameters.Rx1Delay = req.RxDelay
-				dev.MACState.CurrentParameters.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
-				dev.MACState.CurrentParameters.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
-				dev.MACState.DesiredParameters.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
-				dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACState.CurrentParameters.Rx1DataRateOffset
-				dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
-				paths = append(paths, "mac_state")
+			if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
+				resetErr = true
+				return nil, nil, err
+			}
 
-				dev.RecentUplinks = append(dev.RecentUplinks, up)
-				if len(dev.RecentUplinks) > recentUplinkCount {
-					dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
-				}
-				paths = append(paths, "recent_uplinks")
+			if req.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
+				// The version will be further negotiated via RekeyInd/RekeyConf
+				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+			}
+			dev.MACState.CurrentParameters.Rx1Delay = req.RxDelay
+			dev.MACState.CurrentParameters.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
+			dev.MACState.CurrentParameters.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
+			dev.MACState.DesiredParameters.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
+			dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACState.CurrentParameters.Rx1DataRateOffset
+			dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
+			paths = append(paths, "mac_state")
 
-				invalidatedQueue = dev.QueuedApplicationDownlinks
-				dev.QueuedApplicationDownlinks = nil
-				paths = append(paths, "queued_application_downlinks")
+			dev.RecentUplinks = append(dev.RecentUplinks, up)
+			if len(dev.RecentUplinks) > recentUplinkCount {
+				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
+			}
+			paths = append(paths, "recent_uplinks")
 
-				return dev, paths, nil
-			})
-		if err != nil && !resetErr {
-			logger.WithError(err).Error("Failed to update device in registry")
-			// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
-		}
-		if err != nil {
-			return err
-		}
+			invalidatedQueue = dev.QueuedApplicationDownlinks
+			dev.QueuedApplicationDownlinks = nil
+			paths = append(paths, "queued_application_downlinks")
 
-		var schedErr bool
-		dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
-			[]string{
-				"frequency_plan_id",
+			return dev, paths, nil
+		})
+	if err != nil && !resetErr {
+		logger.WithError(err).Error("Failed to update device in registry")
+		// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
+	}
+	if err != nil {
+		return err
+	}
+
+	var schedErr bool
+	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
+		[]string{
+			"frequency_plan_id",
+			"mac_state",
+			"queued_application_downlinks",
+			"recent_downlinks",
+			"recent_uplinks",
+			"session",
+		},
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			err := ns.scheduleDownlink(ctx, stored, acc, resp.RawPayload)
+			if err != nil {
+				schedErr = true
+				return nil, nil, err
+			}
+			return stored, []string{
 				"mac_state",
 				"queued_application_downlinks",
 				"recent_downlinks",
-				"recent_uplinks",
 				"session",
-			},
-			func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				err := ns.scheduleDownlink(ctx, stored, nil, resp.RawPayload)
-				if err != nil {
-					schedErr = true
-					return nil, nil, err
-				}
-				return stored, []string{
-					"mac_state",
-					"queued_application_downlinks",
-					"recent_downlinks",
-					"session",
-				}, nil
-			})
-		if schedErr {
-			logger.WithError(err).Debug("Failed to schedule join-accept")
-			return err
-		} else if err != nil {
-			logger.WithError(err).Error("Failed to update device in registry")
-			// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
-			return err
-		}
+			}, nil
+		})
+	if schedErr {
+		logger.WithError(err).Debug("Failed to schedule join-accept")
+		return err
+	} else if err != nil {
+		logger.WithError(err).Error("Failed to update device in registry")
+		// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
+		return err
+	}
 
-		uid := unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
-		if uid == "" {
-			return errUnknownApplicationID
-		}
+	uid := unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
+	if uid == "" {
+		return errUnknownApplicationID
+	}
 
-		go func() {
-			// TODO: cluster.GetPeer(ctx, ttnpb.PeerInfo_APPLICATION_SERVER, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
-			// If not handled by cluster, try ns.applicationServers[uid].
+	// TODO: cluster.GetPeer(ctx, ttnpb.PeerInfo_APPLICATION_SERVER, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
+	// If not handled by cluster, try ns.applicationServers[uid].
 
-			ns.applicationServersMu.RLock()
-			cl, ok := ns.applicationServers[uid]
-			ns.applicationServersMu.RUnlock()
+	ns.applicationServersMu.RLock()
+	cl, ok := ns.applicationServers[uid]
+	ns.applicationServersMu.RUnlock()
 
-			if !ok {
-				return
-			}
-
-			if err := cl.Send(&ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				CorrelationIDs:       up.CorrelationIDs,
-				Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-					AppSKey:              resp.SessionKeys.AppSKey,
-					SessionKeyID:         dev.Session.SessionKeyID,
-					InvalidatedDownlinks: invalidatedQueue,
-				}},
-			}); err != nil {
-				logger.WithField(
-					"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-				).WithError(err).Errorf("Failed to send join-accept to AS")
-			}
-		}()
+	if !ok {
 		return nil
 	}
 
-	for i, err := range errs {
-		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
+	if err := cl.Send(&ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		CorrelationIDs:       up.CorrelationIDs,
+		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+			AppSKey:              resp.SessionKeys.AppSKey,
+			SessionKeyID:         dev.Session.SessionKeyID,
+			InvalidatedDownlinks: invalidatedQueue,
+		}},
+	}); err != nil {
+		logger.WithField(
+			"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
+		).WithError(err).Errorf("Failed to send join-accept to AS")
+		return err
 	}
-	logger.Warn("Join failed")
-	return errJoin
+	return nil
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {

@@ -564,7 +564,6 @@ func TestScheduleDownlink(t *testing.T) {
 					&component.Config{},
 				),
 				&Config{
-					JoinServers:         nil,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				},

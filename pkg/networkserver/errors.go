@@ -40,7 +40,7 @@ var (
 	errInvalidFrequencyPlan      = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
 	errInvalidPayload            = errors.DefineInvalidArgument("payload", "invalid payload")
 	errInvalidRx2DataRateIndex   = errors.DefineInvalidArgument("rx2_data_rate_index", "invalid Rx2 data rate index")
-	errJoin                      = errors.Define("join", "all Join Servers failed to handle join")
+	errJoinServerNotFound        = errors.DefineNotFound("join_server_not_found", "Join Server not found")
 	errLoRaAndFSK                = errors.DefineInvalidArgument("lora_and_fsk", "both LoRa and FSK modulation is specified")
 	errMACRequestNotFound        = errors.DefineInvalidArgument("mac_request_not_found", "MAC response received, but corresponding request not found")
 	errNoPayload                 = errors.DefineInvalidArgument("no_payload", "no message payload specified")
