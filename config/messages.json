@@ -1322,6 +1322,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/band:invalid_channel_count": {
+    "translations": {
+      "en": "invalid number of channels defined"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/band:lorawan_version_unsupported": {
     "translations": {
       "en": "LoRaWAN Regional Parameters version not supported; supported versions: {supported}"
