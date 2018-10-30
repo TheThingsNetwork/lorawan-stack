@@ -579,7 +579,7 @@ func TestScheduleDownlink(t *testing.T) {
 			dev := CopyEndDevice(tc.Device)
 			b := deepcopy.Copy(tc.Bytes).([]byte)
 
-			_, err := ns.scheduleDownlink(ctx, dev, tc.Accumulator, b)
+			err := ns.scheduleDownlink(ctx, dev, tc.Accumulator, b)
 			if tc.Error == nil && !a.So(err, should.BeNil) ||
 				tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) {
 				t.FailNow()

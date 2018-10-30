@@ -1128,8 +1128,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"recent_uplinks",
 			"session",
 		}, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			_, err := ns.scheduleDownlink(ctx, stored, acc, nil)
-			if err != nil {
+			if err := ns.scheduleDownlink(ctx, stored, acc, nil); err != nil {
 				schedErr = true
 				return nil, nil, err
 			}
@@ -1327,7 +1326,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 				"session",
 			},
 			func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				_, err := ns.scheduleDownlink(ctx, stored, nil, resp.RawPayload)
+				err := ns.scheduleDownlink(ctx, stored, nil, resp.RawPayload)
 				if err != nil {
 					schedErr = true
 					return nil, nil, err
@@ -1403,9 +1402,9 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessa
 // up represents the uplink message, which triggered the downlink(if such exists).
 // acc represents the metadata accumulator used to deduplicate up.
 // scheduleDownlink returns the downlink scheduled and error if any.
-func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, acc *metadataAccumulator, b []byte) ([]string, error) {
+func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, acc *metadataAccumulator, b []byte) error {
 	if dev.MACState == nil {
-		return nil, errUnknownMACState
+		return errUnknownMACState
 	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -1420,21 +1419,21 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 	if err != nil {
-		return nil, errUnknownFrequencyPlan.WithCause(err)
+		return errUnknownFrequencyPlan.WithCause(err)
 	}
 
 	band, err := band.GetByID(fp.BandID)
 	if err != nil {
-		return nil, errUnknownBand.WithCause(err)
+		return errUnknownBand.WithCause(err)
 	}
 
 	if len(dev.RecentUplinks) == 0 {
-		return nil, errUplinkNotFound
+		return errUplinkNotFound
 	}
 	up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 
 	if b == nil && up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST || up.Payload.MHDR.MType == ttnpb.MType_REJOIN_REQUEST {
-		return nil, errNoPayload
+		return errNoPayload
 	}
 
 	var upADR bool
@@ -1450,12 +1449,12 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	chIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if uint(chIdx) < uint(len(dev.MACState.CurrentParameters.Channels)) &&
 		dev.MACState.CurrentParameters.Channels[int(chIdx)] != nil &&
@@ -1477,13 +1476,13 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
-			return nil, err
+			return err
 		}
 		slots = append(slots, rx1)
 	}
 
 	if uint(dev.MACState.CurrentParameters.Rx2DataRateIndex) > uint(len(band.DataRates)) {
-		return nil, errInvalidRx2DataRateIndex
+		return errInvalidRx2DataRateIndex
 	}
 
 	rx2 := tx{
@@ -1502,7 +1501,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	}
 
 	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex]); err != nil {
-		return nil, err
+		return err
 	}
 	slots = append(slots, rx2)
 
@@ -1510,7 +1509,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	if acc != nil {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return ctx.Err()
 		case <-ns.deduplicationDone(ctx, up):
 		}
 
@@ -1547,7 +1546,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 				band.DataRates[maxUpDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 
@@ -1577,7 +1576,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 			if len(dev.RecentDownlinks) > recentDownlinkCount {
 				dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
 			}
-			return nil, nil
+			return nil
 		}
 	}
 
@@ -1585,7 +1584,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("All Gateway Servers failed to schedule the downlink")
-	return nil, errSchedule
+	return errSchedule
 }
 
 // RegisterServices registers services provided by ns at s.
