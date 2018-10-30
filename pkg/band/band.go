@@ -146,12 +146,18 @@ type Band struct {
 	// DefaultMaxEIRP in dBm
 	DefaultMaxEIRP float32
 
-	// Rx1Parameters is the default function that determines the settings for a Tx sent during Rx1
-	Rx1Channel  func(uint32) (uint32, error)
+	// Rx1Channel computes the Rx1 channel index.
+	Rx1Channel func(uint32) (uint32, error)
+	// Rx1DataRate computes the Rx1 data rate index.
 	Rx1DataRate func(ttnpb.DataRateIndex, uint32, bool) (ttnpb.DataRateIndex, error)
 
-	GenerateChMasks func([]bool) (map[uint8][16]bool, error)
-	ParseChMask     func([16]bool, uint8) (map[uint8]bool, error)
+	// GenerateChMasks generates a mapping ChMaskCntl -> ChMask.
+	// Length of chs must be equal to the maximum number of channels defined for the particular band.
+	// Meaning of chs is as follows: for i in range 0..len(chs) if chs[i] == true,
+	// then channel with index i should be enabled, otherwise it should be disabled.
+	GenerateChMasks func(chs []bool) (map[uint8][16]bool, error)
+	// ParseChMask computes the channels that have to be masked given ChMask mask and ChMaskCntl cntl.
+	ParseChMask func(mask [16]bool, cntl uint8) (map[uint8]bool, error)
 
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters
@@ -389,8 +395,7 @@ func generateChMask72(mask []bool) (map[uint8][16]bool, error) {
 		return map[uint8][16]bool{idx: block}, nil
 	}
 
-	// TODO: Support ChMaskCntl 5 if required.
-	// (https://github.com/TheThingsIndustries/lorawan-stack/issues/1264)
+	// TODO: Support ChMaskCntl 5 if required.  (https://github.com/TheThingsIndustries/lorawan-stack/issues/1264)
 
 	return generateChMaskMatrix(mask)
 }
