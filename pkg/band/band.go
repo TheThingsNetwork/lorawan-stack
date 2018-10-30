@@ -390,6 +390,7 @@ func generateChMask72(mask []bool) (map[uint8][16]bool, error) {
 	}
 
 	// TODO: Support ChMaskCntl 5 if required.
+	// (https://github.com/TheThingsIndustries/lorawan-stack/issues/1264)
 
 	return generateChMaskMatrix(mask)
 }
