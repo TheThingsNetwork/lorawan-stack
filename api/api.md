@@ -327,6 +327,7 @@
 
 - [lorawan-stack/api/messages.proto](#lorawan-stack/api/messages.proto)
     - [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink)
+    - [ApplicationDownlink.ClassBC](#ttn.lorawan.v3.ApplicationDownlink.ClassBC)
     - [ApplicationDownlinks](#ttn.lorawan.v3.ApplicationDownlinks)
     - [ApplicationInvalidatedDownlinks](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks)
     - [ApplicationJoinAccept](#ttn.lorawan.v3.ApplicationJoinAccept)
@@ -4084,7 +4085,24 @@ The UplinkMessageProcessor service processes uplink messages.
 | frm_payload | [bytes](#bytes) |  |  |
 | decoded_payload | [google.protobuf.Struct](#google.protobuf.Struct) |  |  |
 | confirmed | [bool](#bool) |  |  |
+| class_b_c | [ApplicationDownlink.ClassBC](#ttn.lorawan.v3.ApplicationDownlink.ClassBC) |  | Optional gateway and timing information for class B and C. If set, this downlink message will only be transmitted as class B or C downlink. If not set, this downlink message may be transmitted in class A, B and C. |
 | correlation_ids | [string](#string) | repeated |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationDownlink.ClassBC"/>
+
+### ApplicationDownlink.ClassBC
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| gateways | [ApplicationDownlink.ClassBC.GatewayAntennaIdentifiers](#ttn.lorawan.v3.ApplicationDownlink.ClassBC.GatewayAntennaIdentifiers) | repeated | Possible gateway identifiers and antenna index to use for this downlink message. The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot. If none of the gateways can be selected, the downlink message fails. If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks. |
+| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If the time is in the past or if there is a scheduling conflict, the downlink message fails. If null, the time is selected based on slot availability. This is recommended in class B mode. |
 
 
 

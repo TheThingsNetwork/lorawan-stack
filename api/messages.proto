@@ -182,7 +182,29 @@ message ApplicationDownlink {
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
   bool confirmed = 6;
-  repeated string correlation_ids = 7 [(gogoproto.customname) = "CorrelationIDs"];
+
+  message ClassBC {
+    message GatewayAntennaIdentifiers {
+      GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+      uint32 antenna_index = 2;
+    }
+    // Possible gateway identifiers and antenna index to use for this downlink message.
+    // The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
+    // If none of the gateways can be selected, the downlink message fails.
+    // If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.
+    repeated GatewayAntennaIdentifiers gateways = 7;
+    // Absolute time when the downlink message should be transmitted.
+    // This requires the gateway to have GPS time synchronization.
+    // If the time is in the past or if there is a scheduling conflict, the downlink message fails.
+    // If null, the time is selected based on slot availability. This is recommended in class B mode.
+    google.protobuf.Timestamp time = 8 [(gogoproto.stdtime) = true];
+  }
+  // Optional gateway and timing information for class B and C.
+  // If set, this downlink message will only be transmitted as class B or C downlink.
+  // If not set, this downlink message may be transmitted in class A, B and C.
+  ClassBC class_b_c = 7;
+
+  repeated string correlation_ids = 8 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlinks {
