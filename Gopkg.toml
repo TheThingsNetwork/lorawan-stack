@@ -65,6 +65,11 @@ required = ["github.com/golang/dep"]
   version = "0.14.0"
 
 [[constraint]]
+  branch = "master"
+  name = "go.thethings.network/lorawan-stack-legacy"
+  source = "github.com/TheThingsIndustries/lorawan-stack-legacy"
+
+[[constraint]]
   name = "google.golang.org/grpc"
   version = "1.14.0"
 

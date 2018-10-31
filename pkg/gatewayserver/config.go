@@ -32,6 +32,7 @@ type UDPConfig struct {
 type Config struct {
 	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
 
-	MQTT MQTTConfig `name:"mqtt"`
-	UDP  UDPConfig  `name:"udp"`
+	MQTT   MQTTConfig `name:"mqtt"`
+	MQTTV2 MQTTConfig `name:"mqtt-v2"`
+	UDP    UDPConfig  `name:"udp"`
 }

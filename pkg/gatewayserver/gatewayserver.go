@@ -92,38 +92,46 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 		udp.Start(lisCtx, gs, conn, conf.UDP.Config)
 	}
 
-	for _, lis := range []struct {
-		Listen   string
-		Protocol string
-		Net      func(component.Listener) (net.Listener, error)
+	for _, version := range []struct {
+		Marshaler mqtt.Marshaler
+		Config    MQTTConfig
 	}{
-		{
-			Listen:   conf.MQTT.Listen,
-			Protocol: "tcp",
-			Net:      component.Listener.TCP,
-		},
-		{
-			Listen:   conf.MQTT.ListenTLS,
-			Protocol: "tls",
-			Net:      component.Listener.TLS,
-		},
+		{Marshaler: mqtt.V3{}, Config: conf.MQTT},
+		{Marshaler: mqtt.V2{}, Config: conf.MQTTV2},
 	} {
-		if lis.Listen == "" {
-			continue
+		for _, lis := range []struct {
+			Listen   string
+			Protocol string
+			Net      func(component.Listener) (net.Listener, error)
+		}{
+			{
+				Listen:   version.Config.Listen,
+				Protocol: "tcp",
+				Net:      component.Listener.TCP,
+			},
+			{
+				Listen:   version.Config.ListenTLS,
+				Protocol: "tls",
+				Net:      component.Listener.TLS,
+			},
+		} {
+			if lis.Listen == "" {
+				continue
+			}
+			var componentLis component.Listener
+			var netLis net.Listener
+			componentLis, err = gs.ListenTCP(lis.Listen)
+			if err == nil {
+				netLis, err = lis.Net(componentLis)
+			}
+			if err != nil {
+				return nil, errListenFrontend.WithCause(err).WithAttributes(
+					"protocol", lis.Protocol,
+					"address", lis.Listen,
+				)
+			}
+			mqtt.Start(ctx, gs, netLis, version.Marshaler, lis.Protocol)
 		}
-		var componentLis component.Listener
-		var netLis net.Listener
-		componentLis, err = gs.ListenTCP(lis.Listen)
-		if err == nil {
-			netLis, err = lis.Net(componentLis)
-		}
-		if err != nil {
-			return nil, errListenFrontend.WithCause(err).WithAttributes(
-				"protocol", lis.Protocol,
-				"address", lis.Listen,
-			)
-		}
-		mqtt.Start(ctx, gs, netLis, lis.Protocol)
 	}
 
 	c.RegisterGRPC(gs)

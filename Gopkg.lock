@@ -796,6 +796,15 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:c73622765060d365934ead247f9bf45467fec0949df492c87f3216dc40b0f7f0"
+  name = "go.thethings.network/lorawan-stack-legacy"
+  packages = ["pkg/ttnpb"]
+  pruneopts = ""
+  revision = "b269511ec18693db22b91804365065f35872d94d"
+  source = "github.com/TheThingsIndustries/lorawan-stack-legacy"
+
+[[projects]]
+  branch = "master"
   digest = "1:b2d8b39397ca07929a3de3a3fd2b6ca4c8d48e9cadaa7cf2b083e27fd9e78107"
   name = "golang.org/x/crypto"
   packages = [
@@ -1077,6 +1086,7 @@
     "go.opencensus.io/exporter/prometheus",
     "go.opencensus.io/plugin/ocgrpc",
     "go.opencensus.io/stats/view",
+    "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb",
     "golang.org/x/crypto/pbkdf2",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/google",

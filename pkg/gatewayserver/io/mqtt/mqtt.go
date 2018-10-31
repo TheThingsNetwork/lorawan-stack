@@ -38,17 +38,26 @@ import (
 
 const qosDownlink byte = 0
 
+type Marshaler interface {
+	Version() topics.Version
+
+	MarshalDownlink(down *ttnpb.DownlinkMessage) ([]byte, error)
+	UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error)
+	UnmarshalStatus(message []byte) (*ttnpb.GatewayStatus, error)
+}
+
 type srv struct {
-	ctx    context.Context
-	server io.Server
-	lis    mqttnet.Listener
+	ctx       context.Context
+	server    io.Server
+	marshaler Marshaler
+	lis       mqttnet.Listener
 }
 
 // Start starts the MQTT frontend.
-func Start(ctx context.Context, server io.Server, listener net.Listener, protocol string) {
+func Start(ctx context.Context, server io.Server, listener net.Listener, marshaler Marshaler, protocol string) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/mqtt")
 	ctx = mqttlog.NewContext(ctx, mqtt.Logger(log.FromContext(ctx)))
-	s := &srv{ctx, server, mqttnet.NewListener(listener, protocol)}
+	s := &srv{ctx, server, marshaler, mqttnet.NewListener(listener, protocol)}
 	go s.accept()
 	go func() {
 		<-ctx.Done()
@@ -68,7 +77,7 @@ func (s *srv) accept() {
 
 		go func() {
 			ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", mqttConn.RemoteAddr().String()))
-			conn := &connection{server: s.server, mqtt: mqttConn}
+			conn := &connection{server: s.server, mqtt: mqttConn, marshaler: s.marshaler}
 			if conn.setup(ctx); err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Failed to setup connection")
 				mqttConn.Close()
@@ -79,10 +88,11 @@ func (s *srv) accept() {
 }
 
 type connection struct {
-	server  io.Server
-	mqtt    mqttnet.Conn
-	session session.Session
-	io      *io.Connection
+	marshaler Marshaler
+	server    io.Server
+	mqtt      mqttnet.Conn
+	session   session.Session
+	io        *io.Connection
 }
 
 func (c *connection) setup(ctx context.Context) error {
@@ -118,23 +128,18 @@ func (c *connection) setup(ctx context.Context) error {
 	// Publish downlinks
 	go func() {
 		for {
-			var err error
 			select {
 			case <-c.io.Context().Done():
 				logger.WithError(c.io.Context().Err()).Debug("Done sending downlink")
 				return
 			case down := <-c.io.Down():
-				msg := &ttnpb.GatewayDown{
-					DownlinkMessage: down,
-				}
-				var buf []byte
-				buf, err = msg.Marshal()
+				buf, err := c.marshaler.MarshalDownlink(down)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
 				}
 				logger.Info("Publishing downlink message")
-				topicParts := topics.Downlink(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers), topics.V3)
+				topicParts := topics.Downlink(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers), c.marshaler.Version())
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
@@ -220,10 +225,10 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	}
 
 	info.Metadata = gatewayTopics{
-		downlinkTopic: topics.Downlink(uid, topics.V3),
-		uplinkTopic:   topics.Uplink(uid, topics.V3),
-		statusTopic:   topics.Status(uid, topics.V3),
-		ackTopic:      topics.TxAck(uid, topics.V3),
+		downlinkTopic: topics.Downlink(uid, c.marshaler.Version()),
+		uplinkTopic:   topics.Uplink(uid, c.marshaler.Version()),
+		statusTopic:   topics.Status(uid, c.marshaler.Version()),
+		ackTopic:      topics.TxAck(uid, c.marshaler.Version()),
 	}
 	info.Interface = c
 	return c.io.Context(), nil
@@ -256,8 +261,8 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
 	switch {
 	case topics.IsUplink(pkt.TopicParts):
-		up := &ttnpb.UplinkMessage{}
-		if err := up.Unmarshal(pkt.Message); err != nil {
+		up, err := c.marshaler.UnmarshalUplink(pkt.Message)
+		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
 		}
@@ -265,8 +270,8 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
 	case topics.IsStatus(pkt.TopicParts):
-		status := &ttnpb.GatewayStatus{}
-		if err := status.Unmarshal(pkt.Message); err != nil {
+		status, err := c.marshaler.UnmarshalStatus(pkt.Message)
+		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal status message")
 			return
 		}

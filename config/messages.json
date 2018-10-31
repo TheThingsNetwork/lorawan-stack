@@ -1898,6 +1898,51 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/gatewayserver/io/mqtt:data_rate": {
+    "translations": {
+      "en": "unknown data rate `{data_rate}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "v2.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:frequency_plan": {
+    "translations": {
+      "en": "unknown frequency plan `{frequency_plan}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "v2.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:lorawan_metadata": {
+    "translations": {
+      "en": "missing LoRaWAN metadata"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "v2.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:lorawan_payload": {
+    "translations": {
+      "en": "invalid LoRaWAN payload"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "v2.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:modulation": {
+    "translations": {
+      "en": "unknown modulation `{modulation}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "v2.go"
+    }
+  },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
