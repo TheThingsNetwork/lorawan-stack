@@ -3392,15 +3392,6 @@
       "file": "observability.go"
     }
   },
-  "event:as.end_device.create": {
-    "translations": {
-      "en": "create end device"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "observability.go"
-    }
-  },
   "event:as.up.data.decode.fail": {
     "translations": {
       "en": "decode uplink data message fail"

@@ -43,8 +43,6 @@ var (
 	evtForwardDataDown      = events.Define("as.down.data.forward", "forward downlink data message")
 	evtLostQueueDataDown    = events.Define("as.down.data.queue.lost", "lost downlink data queue")
 	evtInvalidQueueDataDown = events.Define("as.down.data.queue.invalid", "invalid downlink data queue")
-
-	evtCreateDevice = events.Define("as.end_device.create", "create end device")
 )
 
 const (

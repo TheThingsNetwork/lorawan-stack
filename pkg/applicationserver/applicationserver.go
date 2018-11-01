@@ -285,8 +285,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		"dev_eui", ids.DevEUI,
 		"session_key_id", joinAccept.SessionKeyID,
 	))
-	created := false
-	dev, err := as.deviceRegistry.Set(ctx, ids,
+	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
 			"pending_session",
@@ -298,7 +297,6 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				dev = &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 				}
-				created = true
 			}
 			var appSKey ttnpb.KeyEnvelope
 			if joinAccept.AppSKey != nil {
@@ -344,16 +342,12 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	if err != nil {
 		return err
 	}
-	if created {
-		events.Publish(evtCreateDevice(ctx, dev.EndDeviceIdentifiers, nil))
-	}
 	return nil
 }
 
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *link) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	logger := log.FromContext(ctx)
-	created := false
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -363,6 +357,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
+			created := false
 			if dev == nil {
 				logger.Debug("Creating new device")
 				dev = &ttnpb.EndDevice{
@@ -425,9 +420,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	)
 	if err != nil {
 		return err
-	}
-	if created {
-		events.Publish(evtCreateDevice(ctx, dev.EndDeviceIdentifiers, nil))
 	}
 	if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 		return err
