@@ -218,6 +218,9 @@ message MACState {
   // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
   // Regenerated on each downlink.
   repeated MACCommand pending_requests = 10;
+  // Queued join-accept payload.
+  // Set each time (re-)join request is received and removed each time a downlink is scheduled.
+  bytes queued_join_accept = 11;
 
   // TODO: Add info about failed MAC requests
 }

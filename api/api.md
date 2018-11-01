@@ -1769,6 +1769,7 @@ This is used internally by the Network Server and is read only.
 | pending_application_downlink | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  | A confirmed application downlink, for which an acknowledgment is expected to arrive. |
 | queued_responses | [MACCommand](#ttn.lorawan.v3.MACCommand) | repeated | Queued MAC responses. Regenerated on each uplink. |
 | pending_requests | [MACCommand](#ttn.lorawan.v3.MACCommand) | repeated | Pending MAC requests(i.e. sent requests, for which no response has been received yet). Regenerated on each downlink. |
+| queued_join_accept | [bytes](#bytes) |  | Queued join-accept payload. Set each time (re-)join request is received and removed each time a downlink is scheduled. |
 
 
 

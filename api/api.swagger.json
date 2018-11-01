@@ -7206,6 +7206,11 @@
             "$ref": "#/definitions/v3MACCommand"
           },
           "description": "Pending MAC requests(i.e. sent requests, for which no response has been received yet).\nRegenerated on each downlink."
+        },
+        "queued_join_accept": {
+          "type": "string",
+          "format": "byte",
+          "description": "Queued join-accept payload.\nSet each time (re-)join request is received and removed each time a downlink is scheduled."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server and is read only."

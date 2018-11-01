@@ -1031,6 +1031,7 @@ var MACStateFieldPathsNested = []string{
 	"pending_application_downlink.session_key_id",
 	"pending_requests",
 	"ping_slot_periodicity",
+	"queued_join_accept",
 	"queued_responses",
 }
 
@@ -1044,6 +1045,7 @@ var MACStateFieldPathsTopLevel = []string{
 	"pending_application_downlink",
 	"pending_requests",
 	"ping_slot_periodicity",
+	"queued_join_accept",
 	"queued_responses",
 }
 
@@ -1174,6 +1176,16 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			} else {
 				dst.PendingRequests = nil
 			}
+		case "queued_join_accept":
+			if len(subs) > 0 {
+				return fmt.Errorf("'queued_join_accept' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.QueuedJoinAccept = src.QueuedJoinAccept
+			} else {
+				var zero []byte
+				dst.QueuedJoinAccept = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1296,6 +1308,7 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_state.pending_application_downlink.session_key_id",
 	"mac_state.pending_requests",
 	"mac_state.ping_slot_periodicity",
+	"mac_state.queued_join_accept",
 	"mac_state.queued_responses",
 	"max_frequency",
 	"min_frequency",
@@ -2090,6 +2103,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.pending_application_downlink.session_key_id",
 	"end_device.mac_state.pending_requests",
 	"end_device.mac_state.ping_slot_periodicity",
+	"end_device.mac_state.queued_join_accept",
 	"end_device.mac_state.queued_responses",
 	"end_device.max_frequency",
 	"end_device.min_frequency",
@@ -2314,6 +2328,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.pending_application_downlink.session_key_id",
 	"end_device.mac_state.pending_requests",
 	"end_device.mac_state.ping_slot_periodicity",
+	"end_device.mac_state.queued_join_accept",
 	"end_device.mac_state.queued_responses",
 	"end_device.max_frequency",
 	"end_device.min_frequency",
@@ -2691,6 +2706,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.mac_state.pending_application_downlink.session_key_id",
 	"device.mac_state.pending_requests",
 	"device.mac_state.ping_slot_periodicity",
+	"device.mac_state.queued_join_accept",
 	"device.mac_state.queued_responses",
 	"device.max_frequency",
 	"device.min_frequency",
