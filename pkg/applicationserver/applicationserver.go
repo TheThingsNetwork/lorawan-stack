@@ -319,7 +319,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 					SessionKeyID: joinAccept.SessionKeyID,
 					AppSKey:      &appSKey,
 				},
-				StartedAt: time.Now(), // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+				StartedAt: time.Now().UTC(), // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 			}
 			if joinAccept.PendingSession {
 				dev.PendingSession = session
@@ -378,7 +378,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					dev.Session = dev.PendingSession
 				} else {
 					if !created {
-						logger.Warn("Restoring session...")
+						logger.Debug("Missed join-accept for this session. Restoring session...")
 					}
 					appSKey, err := as.fetchAppSKey(ctx, ids, uplink.SessionKeyID)
 					if err != nil {
@@ -390,7 +390,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 							SessionKeyID: uplink.SessionKeyID,
 							AppSKey:      &appSKey,
 						},
-						StartedAt: time.Now(),
+						StartedAt: time.Now().UTC(),
 					}
 					logger.Debug("Restored session")
 				}
@@ -417,7 +417,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					log.WithError(err).Warn("Failed to recalculate downlink queue")
 				}
 				mask = append(mask, "session", "pending_session")
-				logger.Debug("Session restored")
 			} else if dev.Session.AppSKey == nil {
 				return nil, nil, errNoAppSKey
 			}

@@ -76,6 +76,11 @@ func TestApplicationServer(t *testing.T) {
 		Key:      []byte{0x30, 0xcf, 0x47, 0x91, 0x11, 0x64, 0x53, 0x3f, 0xc3, 0xd5, 0xd8, 0x56, 0x5b, 0x71, 0xcb, 0xe7, 0x6d, 0x14, 0x2b, 0x2c, 0xf2, 0xc2, 0xd7, 0x7b},
 		KEKLabel: "test",
 	})
+	js.add(ctx, *registeredDevice.DevEUI, "session5", ttnpb.KeyEnvelope{
+		// AppSKey is []byte{0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55}
+		Key:      []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
+		KEKLabel: "test",
+	})
 
 	deviceRegistry := newMemDeviceRegistry()
 	linkRegistry := newMemLinkRegistry()
@@ -806,6 +811,74 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyID: "session4",
 									FPort:        22,
 									FCnt:         86,
+									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+								},
+							})
+						},
+					},
+					{
+						Name: "RegisteredDevice/UplinkMessage/KnownSession",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+							Up: &ttnpb.ApplicationUp_UplinkMessage{
+								UplinkMessage: &ttnpb.ApplicationUplink{
+									SessionKeyID: "session5",
+									FPort:        42,
+									FCnt:         42,
+									FRMPayload:   []byte{0xd1, 0x43, 0x6a},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+								Up: &ttnpb.ApplicationUp_UplinkMessage{
+									UplinkMessage: &ttnpb.ApplicationUplink{
+										SessionKeyID: "session5",
+										FPort:        42,
+										FCnt:         42,
+										FRMPayload:   []byte{0x2a, 0x2a, 0x2a},
+										DecodedPayload: &pbtypes.Struct{
+											Fields: map[string]*pbtypes.Value{
+												"sum": {
+													Kind: &pbtypes.Value_NumberValue{
+														NumberValue: 126, // Payload formatter sums the bytes in FRMPayload.
+													},
+												},
+											},
+										},
+									},
+								},
+							})
+						},
+						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
+							a := assertions.New(t)
+							a.So(dev.Session, should.Resemble, &ttnpb.Session{
+								DevAddr: types.DevAddr{0x55, 0x55, 0x55, 0x55},
+								SessionKeys: ttnpb.SessionKeys{
+									SessionKeyID: "session5",
+									AppSKey: &ttnpb.KeyEnvelope{
+										Key:      []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
+										KEKLabel: "test",
+									},
+								},
+								LastAFCntDown: 2,
+								StartedAt:     dev.Session.StartedAt,
+							})
+							a.So(dev.PendingSession, should.BeNil)
+							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
+								{
+									SessionKeyID: "session5",
+									FPort:        11,
+									FCnt:         1,
+									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+								},
+								{
+									SessionKeyID: "session5",
+									FPort:        22,
+									FCnt:         2,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 								},
 							})
