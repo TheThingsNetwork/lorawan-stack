@@ -131,7 +131,6 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m.viper.SetTypeByDefaultValue(true)
 	m.viper.SetConfigName(name)
 	m.viper.SetConfigType("yml")
-	m.viper.SetEnvPrefix(name)
 	m.viper.AutomaticEnv()
 	m.viper.AddConfigPath(".")
 

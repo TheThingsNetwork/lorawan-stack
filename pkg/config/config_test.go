@@ -159,22 +159,22 @@ func TestConfigEnv(t *testing.T) {
 
 	settings := new(example)
 
-	os.Setenv("TEST_BOOL", "false")
-	os.Setenv("TEST_DURATION", "10m")
-	os.Setenv("TEST_TIME", "2017-08-12 01:02:03 +0000 UTC")
-	os.Setenv("TEST_FLOAT", "-112.45")
-	os.Setenv("TEST_INT", "345")
-	os.Setenv("TEST_STRING", "bababa")
-	os.Setenv("TEST_STRINGS", "x y z")
-	os.Setenv("TEST_STRINGPTR", "yo")
-	os.Setenv("TEST_BYTES", "FA00BB")
-	os.Setenv("TEST_STRINGMAP", "q=r s=t")
-	os.Setenv("TEST_BUFFERMAP", "a=0x0bcd c=0x0def")
-	os.Setenv("TEST_STRINGMAPSLICE", "a=b a=c d=e")
-	os.Setenv("TEST_NESTED_STRING", "mud")
-	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
-	os.Setenv("TEST_CUSTOM", "bar")
-	os.Setenv("TEST_CUSTOMS", "bar")
+	os.Setenv("BOOL", "false")
+	os.Setenv("DURATION", "10m")
+	os.Setenv("TIME", "2017-08-12 01:02:03 +0000 UTC")
+	os.Setenv("FLOAT", "-112.45")
+	os.Setenv("INT", "345")
+	os.Setenv("STRING", "bababa")
+	os.Setenv("STRINGS", "x y z")
+	os.Setenv("STRINGPTR", "yo")
+	os.Setenv("BYTES", "FA00BB")
+	os.Setenv("STRINGMAP", "q=r s=t")
+	os.Setenv("BUFFERMAP", "a=0x0bcd c=0x0def")
+	os.Setenv("STRINGMAPSLICE", "a=b a=c d=e")
+	os.Setenv("NESTED_STRING", "mud")
+	os.Setenv("NESTEDPTR_STRING", "mad")
+	os.Setenv("CUSTOM", "bar")
+	os.Setenv("CUSTOMS", "bar")
 
 	// parse no command line args
 	config.Parse()
@@ -228,9 +228,9 @@ func TestBadConfigEnv(t *testing.T) {
 
 	settings := new(example)
 
-	os.Setenv("TEST_STRINGMAP", "q=r ff = f ff s=t")
-	os.Setenv("TEST_BUFFERMAP", "a=0x0b  cd c=0x0=def")
-	os.Setenv("TEST_STRINGMAPSLICE", "a=b= a=c fzef f d=e")
+	os.Setenv("STRINGMAP", "q=r ff = f ff s=t")
+	os.Setenv("BUFFERMAP", "a=0x0b  cd c=0x0=def")
+	os.Setenv("STRINGMAPSLICE", "a=b= a=c fzef f d=e")
 
 	// parse no command line args
 	config.Parse()
@@ -248,21 +248,21 @@ func TestConfigFlags(t *testing.T) {
 
 	settings := new(example)
 
-	os.Setenv("TEST_BOOL", "")
-	os.Setenv("TEST_DURATION", "")
-	os.Setenv("TEST_TIME", "")
-	os.Setenv("TEST_FLOAT", "")
-	os.Setenv("TEST_INT", "")
-	os.Setenv("TEST_STRING", "")
-	os.Setenv("TEST_STRINGS", "")
-	os.Setenv("TEST_STRINGPTR", "")
-	os.Setenv("TEST_BYTES", "")
-	os.Setenv("TEST_STRINGMAP", "")
-	os.Setenv("TEST_BUFFERMAP", "")
-	os.Setenv("TEST_STRINGMAPSLICE", "")
-	os.Setenv("TEST_NESTED_STRING", "")
-	os.Setenv("TEST_NESTEDPTR_STRING", "")
-	os.Setenv("TEST_CUSTOM", "")
+	os.Setenv("BOOL", "")
+	os.Setenv("DURATION", "")
+	os.Setenv("TIME", "")
+	os.Setenv("FLOAT", "")
+	os.Setenv("INT", "")
+	os.Setenv("STRING", "")
+	os.Setenv("STRINGS", "")
+	os.Setenv("STRINGPTR", "")
+	os.Setenv("BYTES", "")
+	os.Setenv("STRINGMAP", "")
+	os.Setenv("BUFFERMAP", "")
+	os.Setenv("STRINGMAPSLICE", "")
+	os.Setenv("NESTED_STRING", "")
+	os.Setenv("NESTEDPTR_STRING", "")
+	os.Setenv("CUSTOM", "")
 
 	// parse command line args
 	config.Parse(
@@ -358,7 +358,7 @@ func TestConfigShorthand(t *testing.T) {
 
 	settings := new(example)
 
-	os.Setenv("TEST_STRING", "")
+	os.Setenv("STRING", "")
 
 	// parse command line args
 	config.Parse("-s", "bababa")
