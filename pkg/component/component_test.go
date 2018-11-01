@@ -264,12 +264,6 @@ func TestContext(t *testing.T) {
 
 	baseCtx := context.Background()
 
-	// No filler
-	{
-		ctx := c.FillContext(baseCtx)
-		a.So(ctx, should.Resemble, baseCtx)
-	}
-
 	// Filler
 	{
 		c.AddContextFiller(func(ctx context.Context) context.Context {
@@ -278,12 +272,10 @@ func TestContext(t *testing.T) {
 			return ctx
 		})
 		ctx := c.FillContext(baseCtx)
-		a.So(ctx, should.Resemble, context.WithValue(
-			context.WithValue(
-				baseCtx,
-				"k1", "v1",
-			),
-			"k2", "v2",
-		))
+		a.So(ctx, should.HaveParentContext, baseCtx)
+		v1 := ctx.Value("k1")
+		a.So(v1, should.Equal, "v1")
+		v2 := ctx.Value("k2")
+		a.So(v2, should.Equal, "v2")
 	}
 }

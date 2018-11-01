@@ -116,6 +116,10 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		return nil, err
 	}
 
+	c.initRights()
+
+	c.initGRPC()
+
 	return c, nil
 }
 
@@ -144,10 +148,6 @@ func (c *Component) AddContextFiller(f fillcontext.Filler) {
 
 // Start starts the component
 func (c *Component) Start() (err error) {
-	c.initRights()
-
-	c.initGRPC()
-
 	if c.grpc != nil {
 		c.logger.Debug("Initializing gRPC server...")
 		if err = c.setupGRPC(); err != nil {
