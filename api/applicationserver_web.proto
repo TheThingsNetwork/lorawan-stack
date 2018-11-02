@@ -1,0 +1,115 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/identifiers.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+message ApplicationWebhookIdentifiers {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string webhook_id = 2 [(gogoproto.customname) = "WebhookID"];
+}
+
+message ApplicationWebhook {
+  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // Base URL to which the message's path is appended.
+  string base_url = 4 [(gogoproto.customname) = "BaseURL"];
+  // HTTP headers to use.
+  map<string,string> headers = 5;
+  // The format to use for the body.
+  // Supported values depend on the Application Server configuration.
+  string format = 6;
+
+  message Message {
+    // Path to append to the base URL.
+    string path = 1;
+  }
+  Message uplink_message = 7;
+  Message join_accept = 8;
+  Message downlink_ack = 9;
+  Message downlink_nack = 10;
+  Message downlink_sent = 11;
+  Message downlink_failed = 12;
+  Message downlink_queued = 13;
+  Message location_solved = 14;
+}
+
+message ApplicationWebhooks {
+  repeated ApplicationWebhook webhooks = 1;
+}
+
+message ApplicationWebhookFormats {
+  // Format and description.
+  map<string, string> formats = 1;
+}
+
+message GetApplicationWebhookRequest {
+  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message ListApplicationWebhooksRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message SetApplicationWebhookRequest {
+  ApplicationWebhook webhook = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+service ApplicationWebhookRegistry {
+  rpc GetFormats(ApplicationIdentifiers) returns (ApplicationWebhookFormats) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_id}/webhook-formats"
+    };
+  };
+
+  rpc Get(GetApplicationWebhookRequest) returns (ApplicationWebhook) {
+    option (google.api.http) = {
+      get: "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}"
+    };
+  };
+
+  rpc List(ListApplicationWebhooksRequest) returns (ApplicationWebhooks) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_ids.application_id}/webhooks"
+    };
+  };
+
+  rpc Set(SetApplicationWebhookRequest) returns (ApplicationWebhook) {
+    option (google.api.http) = {
+      post: "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}",
+      body: "*"
+    };
+  };
+
+  rpc Delete(ApplicationWebhookIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}",
+    };
+  };
+}

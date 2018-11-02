@@ -45,6 +45,23 @@
     - [AsEndDeviceRegistry](#ttn.lorawan.v3.AsEndDeviceRegistry)
   
 
+- [lorawan-stack/api/applicationserver_web.proto](#lorawan-stack/api/applicationserver_web.proto)
+    - [ApplicationWebhook](#ttn.lorawan.v3.ApplicationWebhook)
+    - [ApplicationWebhook.HeadersEntry](#ttn.lorawan.v3.ApplicationWebhook.HeadersEntry)
+    - [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message)
+    - [ApplicationWebhookFormats](#ttn.lorawan.v3.ApplicationWebhookFormats)
+    - [ApplicationWebhookFormats.FormatsEntry](#ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry)
+    - [ApplicationWebhookIdentifiers](#ttn.lorawan.v3.ApplicationWebhookIdentifiers)
+    - [ApplicationWebhooks](#ttn.lorawan.v3.ApplicationWebhooks)
+    - [GetApplicationWebhookRequest](#ttn.lorawan.v3.GetApplicationWebhookRequest)
+    - [ListApplicationWebhooksRequest](#ttn.lorawan.v3.ListApplicationWebhooksRequest)
+    - [SetApplicationWebhookRequest](#ttn.lorawan.v3.SetApplicationWebhookRequest)
+  
+  
+  
+    - [ApplicationWebhookRegistry](#ttn.lorawan.v3.ApplicationWebhookRegistry)
+  
+
 - [lorawan-stack/api/client.proto](#lorawan-stack/api/client.proto)
     - [Client](#ttn.lorawan.v3.Client)
     - [Client.AttributesEntry](#ttn.lorawan.v3.Client.AttributesEntry)
@@ -835,6 +852,205 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 | Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
 | Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+
+ 
+
+
+
+<a name="lorawan-stack/api/applicationserver_web.proto"/>
+<p align="right"><a href="#top">Top</a></p>
+
+## lorawan-stack/api/applicationserver_web.proto
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhook"/>
+
+### ApplicationWebhook
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [ApplicationWebhookIdentifiers](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) |  |  |
+| created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| updated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| base_url | [string](#string) |  | Base URL to which the message&#39;s path is appended. |
+| headers | [ApplicationWebhook.HeadersEntry](#ttn.lorawan.v3.ApplicationWebhook.HeadersEntry) | repeated | HTTP headers to use. |
+| format | [string](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
+| uplink_message | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| join_accept | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| downlink_ack | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| downlink_nack | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| downlink_sent | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| downlink_failed | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| downlink_queued | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| location_solved | [ApplicationWebhook.Message](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry"/>
+
+### ApplicationWebhook.HeadersEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhook.Message"/>
+
+### ApplicationWebhook.Message
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| path | [string](#string) |  | Path to append to the base URL. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhookFormats"/>
+
+### ApplicationWebhookFormats
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| formats | [ApplicationWebhookFormats.FormatsEntry](#ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry) | repeated | Format and description. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry"/>
+
+### ApplicationWebhookFormats.FormatsEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhookIdentifiers"/>
+
+### ApplicationWebhookIdentifiers
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| webhook_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhooks"/>
+
+### ApplicationWebhooks
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| webhooks | [ApplicationWebhook](#ttn.lorawan.v3.ApplicationWebhook) | repeated |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.GetApplicationWebhookRequest"/>
+
+### GetApplicationWebhookRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [ApplicationWebhookIdentifiers](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) |  |  |
+| field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListApplicationWebhooksRequest"/>
+
+### ListApplicationWebhooksRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.SetApplicationWebhookRequest"/>
+
+### SetApplicationWebhookRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| webhook | [ApplicationWebhook](#ttn.lorawan.v3.ApplicationWebhook) |  |  |
+| field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ttn.lorawan.v3.ApplicationWebhookRegistry"/>
+
+### ApplicationWebhookRegistry
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| GetFormats | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationWebhookFormats](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
+| Get | [GetApplicationWebhookRequest](#ttn.lorawan.v3.GetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.GetApplicationWebhookRequest) |  |
+| List | [ListApplicationWebhooksRequest](#ttn.lorawan.v3.ListApplicationWebhooksRequest) | [ApplicationWebhooks](#ttn.lorawan.v3.ListApplicationWebhooksRequest) |  |
+| Set | [SetApplicationWebhookRequest](#ttn.lorawan.v3.SetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.SetApplicationWebhookRequest) |  |
+| Delete | [ApplicationWebhookIdentifiers](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) |  |
 
  
 

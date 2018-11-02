@@ -723,6 +723,70 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/webhooks": {
+      "get": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhooks"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}": {
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protobufEmpty"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
     "/as/applications/{application_id}/link": {
       "delete": {
         "operationId": "DeleteLink",
@@ -744,6 +808,30 @@
         ],
         "tags": [
           "As"
+        ]
+      }
+    },
+    "/as/applications/{application_id}/webhook-formats": {
+      "get": {
+        "operationId": "GetFormats",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhookFormats"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
         ]
       }
     },
@@ -878,6 +966,84 @@
         ],
         "tags": [
           "AsEndDeviceRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhook"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.webhook_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}": {
+      "post": {
+        "operationId": "Set",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhook"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "webhook.ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "webhook.ids.webhook_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationWebhookRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
         ]
       }
     },
@@ -4603,6 +4769,30 @@
         }
       }
     },
+    "lorawanv3Message": {
+      "type": "object",
+      "properties": {
+        "m_hdr": {
+          "$ref": "#/definitions/v3MHDR"
+        },
+        "mic": {
+          "type": "string",
+          "format": "byte"
+        },
+        "mac_payload": {
+          "$ref": "#/definitions/v3MACPayload"
+        },
+        "join_request_payload": {
+          "$ref": "#/definitions/v3JoinRequestPayload"
+        },
+        "join_accept_payload": {
+          "$ref": "#/definitions/v3JoinAcceptPayload"
+        },
+        "rejoin_request_payload": {
+          "$ref": "#/definitions/v3RejoinRequestPayload"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -5070,6 +5260,104 @@
         },
         "settings": {
           "$ref": "#/definitions/v3TxSettings"
+        }
+      }
+    },
+    "v3ApplicationWebhook": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3ApplicationWebhookIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "base_url": {
+          "type": "string",
+          "description": "Base URL to which the message's path is appended."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "HTTP headers to use."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format to use for the body.\nSupported values depend on the Application Server configuration."
+        },
+        "uplink_message": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "join_accept": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "downlink_ack": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "downlink_nack": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "downlink_sent": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "downlink_failed": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "downlink_queued": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "location_solved": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        }
+      }
+    },
+    "v3ApplicationWebhookFormats": {
+      "type": "object",
+      "properties": {
+        "formats": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Format and description."
+        }
+      }
+    },
+    "v3ApplicationWebhookIdentifiers": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "webhook_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v3ApplicationWebhookMessage": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to append to the base URL."
+        }
+      }
+    },
+    "v3ApplicationWebhooks": {
+      "type": "object",
+      "properties": {
+        "webhooks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationWebhook"
+          }
         }
       }
     },
@@ -5589,7 +5877,7 @@
           "format": "byte"
         },
         "payload": {
-          "$ref": "#/definitions/v3Message"
+          "$ref": "#/definitions/lorawanv3Message"
         },
         "end_device_ids": {
           "$ref": "#/definitions/v3EndDeviceIdentifiers"
@@ -6829,30 +7117,6 @@
       ],
       "default": "LORAWAN_R1"
     },
-    "v3Message": {
-      "type": "object",
-      "properties": {
-        "m_hdr": {
-          "$ref": "#/definitions/v3MHDR"
-        },
-        "mic": {
-          "type": "string",
-          "format": "byte"
-        },
-        "mac_payload": {
-          "$ref": "#/definitions/v3MACPayload"
-        },
-        "join_request_payload": {
-          "$ref": "#/definitions/v3JoinRequestPayload"
-        },
-        "join_accept_payload": {
-          "$ref": "#/definitions/v3JoinAcceptPayload"
-        },
-        "rejoin_request_payload": {
-          "$ref": "#/definitions/v3RejoinRequestPayload"
-        }
-      }
-    },
     "v3MessagePayloadFormatters": {
       "type": "object",
       "properties": {
@@ -7507,6 +7771,17 @@
         }
       }
     },
+    "v3SetApplicationWebhookRequest": {
+      "type": "object",
+      "properties": {
+        "webhook": {
+          "$ref": "#/definitions/v3ApplicationWebhook"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        }
+      }
+    },
     "v3SetClientCollaboratorRequest": {
       "type": "object",
       "properties": {
@@ -7811,7 +8086,7 @@
           "format": "byte"
         },
         "payload": {
-          "$ref": "#/definitions/v3Message"
+          "$ref": "#/definitions/lorawanv3Message"
         },
         "end_device_ids": {
           "$ref": "#/definitions/v3EndDeviceIdentifiers"
