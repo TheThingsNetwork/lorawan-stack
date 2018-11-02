@@ -360,11 +360,14 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		IPol: msg.Settings.InvertPolarization,
 		Powe: uint8(msg.Settings.TxPower) - uint8(eirpDelta),
 		Size: uint16(len(payload)),
-		Tmst: uint32(tmst % math.MaxUint32),
 		Data: base64.StdEncoding.EncodeToString(payload),
 	}
-	gpsTime := CompactTime(msg.TxMetadata.Time)
-	tx.Time = &gpsTime
+	if t := msg.TxMetadata.Time; t != nil {
+		gpsTime := CompactTime(*t)
+		tx.Time = &gpsTime
+	} else {
+		tx.Tmst = uint32(tmst % math.MaxUint32)
+	}
 
 	switch msg.Settings.Modulation {
 	case ttnpb.Modulation_LORA:

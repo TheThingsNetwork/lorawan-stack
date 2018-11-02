@@ -4409,7 +4409,7 @@ a message corresponds to one RxMetadata.
 | gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | antenna_index | [uint32](#uint32) |  |  |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-| timestamp | [uint64](#uint64) |  | Gateway&#39;s internal timestamp when the Rx finished (nanoseconds) NOTE: most gateways use microsecond timestamps, so conversion may be needed |
+| timestamp | [uint64](#uint64) |  | Gateway concentrator timestamp when the Rx finished (nanoseconds). NOTE: most gateways use microsecond timestamps, so conversion may be needed. |
 | fine_timestamp | [uint64](#uint64) |  | Gateway&#39;s internal fine timestamp when the Rx finished (nanoseconds). |
 | encrypted_fine_timestamp | [bytes](#bytes) |  | Encrypted gateway&#39;s internal fine timestamp when the Rx finished (nanoseconds). |
 | encrypted_fine_timestamp_key_id | [string](#string) |  |  |
@@ -4438,8 +4438,8 @@ It contains gateway-specific fields that are not in the TxSettings message
 | ----- | ---- | ----- | ----------- |
 | gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | antenna_index | [uint32](#uint32) |  |  |
-| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-| timestamp | [uint64](#uint64) |  |  |
+| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If set, this field takes precedence over timestamp. |
+| timestamp | [uint64](#uint64) |  | Gateway concentrator timestamp when the downlink message should be transmitted (nanoseconds). NOTE: most gateways use microsecond timestamps, so conversion may be needed. |
 | advanced | [google.protobuf.Struct](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 

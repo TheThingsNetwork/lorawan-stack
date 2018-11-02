@@ -7296,7 +7296,7 @@
         "timestamp": {
           "type": "string",
           "format": "uint64",
-          "title": "Gateway's internal timestamp when the Rx finished (nanoseconds)\nNOTE: most gateways use microsecond timestamps, so conversion may be needed"
+          "description": "Gateway concentrator timestamp when the Rx finished (nanoseconds).\nNOTE: most gateways use microsecond timestamps, so conversion may be needed."
         },
         "fine_timestamp": {
           "type": "string",
@@ -7548,11 +7548,13 @@
         },
         "time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Absolute time when the downlink message should be transmitted.\nThis requires the gateway to have GPS time synchronization.\nIf set, this field takes precedence over timestamp."
         },
         "timestamp": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "Gateway concentrator timestamp when the downlink message should be transmitted (nanoseconds).\nNOTE: most gateways use microsecond timestamps, so conversion may be needed."
         },
         "advanced": {
           "$ref": "#/definitions/protobufStruct",
