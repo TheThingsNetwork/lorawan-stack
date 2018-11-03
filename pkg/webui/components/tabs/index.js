@@ -65,7 +65,6 @@ Tabs.propTypes = {
     name: PropTypes.string.isRequired,
     icon: PropTypes.string,
     disabled: PropTypes.bool,
-    name: PropTypes.string.isRequired,
   })).isRequired,
   /**
    * A click handler to be called when the selected tab changes. Passes
