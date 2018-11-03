@@ -54,16 +54,28 @@ class BreadcrumbsProvider extends React.Component {
 
 const withBreadcrumb = (id, element) => function (Component) {
 
-  class TestConsumer extends React.Component {
+  class BreadcrumbsConsumer extends React.Component {
 
     constructor (props) {
       super(props)
 
-      this.props.add(this.props.breadcrumb)
+      this.add()
+    }
+
+    add () {
+      const { add, breadcrumb } = this.props
+
+      add(id, breadcrumb)
+    }
+
+    remove () {
+      const { remove } = this.props
+
+      remove(id)
     }
 
     componentWillUnmount () {
-      this.props.remove()
+      this.remove()
     }
 
     render () {
@@ -75,14 +87,10 @@ const withBreadcrumb = (id, element) => function (Component) {
     <Consumer>
       {
         ({ add, remove }) => (
-          <TestConsumer
+          <BreadcrumbsConsumer
             {...props}
-            add={function (el) {
-              add(id, el)
-            }}
-            remove={function () {
-              remove(id)
-            }}
+            add={add}
+            remove={remove}
             breadcrumb={element(props)}
           />
         )
