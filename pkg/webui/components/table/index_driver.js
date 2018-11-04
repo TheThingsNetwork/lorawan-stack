@@ -30,7 +30,7 @@ export default function () {
         driver.component.setProps(props)
       },
       rowClicked (index) {
-        driver.get.row(index + 1).dive().simulate('click')
+        driver.get.row(index + 1).simulate('click')
         driver.component.update()
       },
       sortButtonPressed (index) {

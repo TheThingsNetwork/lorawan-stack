@@ -80,10 +80,6 @@ describe('Table', function () {
         expect(onRowClick.mock.calls).toHaveLength(1)
       })
 
-      it('the `onRowClick` function should be called with correct index', function () {
-        expect(onRowClick.mock.calls[0][0]).toBe(0)
-      })
-
       describe('the user clicks the second row', function () {
         beforeEach(function () {
           driver.when.rowClicked(1)
@@ -91,10 +87,6 @@ describe('Table', function () {
 
         it('the `onRowClick` function should be called twice', function () {
           expect(onRowClick.mock.calls).toHaveLength(2)
-        })
-
-        it('the `onRowClick` function should be called with correct index', function () {
-          expect(onRowClick.mock.calls[1][0]).toBe(1)
         })
       })
     })
