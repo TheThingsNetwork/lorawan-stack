@@ -17,10 +17,12 @@ import user from './user'
 import client from './client'
 import _console from './console' // conflicting name with window.console
 import applications from './applications'
+import application from './application'
 
 export default combineReducers({
   user,
   client,
   console: _console,
   applications,
+  application,
 })
