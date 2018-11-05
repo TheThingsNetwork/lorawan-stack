@@ -65,6 +65,19 @@ export default {
           ), 1000))
         },
       },
+      application: {
+        get (id) {
+          const app = fakeData.applications.find(a => a.application_id === id)
+
+          return new Promise((resolve, reject) => setTimeout(function () {
+            if (app) {
+              resolve(app)
+            } else {
+              reject(new Error())
+            }
+          }, 750))
+        },
+      },
     },
   },
   console: {
