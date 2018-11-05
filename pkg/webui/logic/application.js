@@ -12,16 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init'
-import applications from './applications'
-import application from './application'
+import { createLogic } from 'redux-logic'
+
+import api from '../api'
+import * as application from '../actions/application'
+
+const getApplicationLogic = createLogic({
+  type: [ application.GET_APP ],
+  async process ({ getState, action }, dispatch, done) {
+    const { id } = action
+    try {
+      const app = await api.v3.is.application.get(id)
+      dispatch(application.getApplicationSuccess(app))
+    } catch (e) {
+      dispatch(application.getApplicationFailure(e))
+    }
+
+    done()
+  },
+})
 
 export default [
-  client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
+  getApplicationLogic,
 ]
