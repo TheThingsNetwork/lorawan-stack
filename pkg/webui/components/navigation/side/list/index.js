@@ -14,66 +14,81 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 import PropTypes from '../../../../lib/prop-types'
 
 import SideNavigationItem from '../item'
 
 import style from './list.styl'
 
-const SideNavigationList = function ({
-  className,
-  items,
-  isMinimized,
-  onItemExpand = () => null,
-  isExpanded = false,
-  depth = 0,
-  itemsExpanded = {},
-}) {
-  const isRoot = depth === 0
-  const listClassNames = classnames(className, style.list, {
-    [style.listNested]: !isRoot,
-    [style.listExpanded]: isExpanded,
-  })
-  return (
-    <ul className={listClassNames}>
-      {items.map(function (item, index) {
-        const itemState = itemsExpanded[index] || {}
-        const {
-          title,
-          icon,
-          path,
-          exact = true,
-          nested = false,
-          items = [],
-        } = item
-        const { isOpen = false, isLink = false } = itemState
+@bind
+class SideNavigationList extends React.Component {
 
-        const isActive = nested && isLink
-        const isExpanded = !isMinimized && isOpen
-        const onExpand = isRoot
-          ? function (isLink) {
-            onItemExpand(index, isLink)
-          } : onItemExpand
+  onRootExpand (index) {
+    const { onItemExpand } = this.props
 
-        return (
-          <SideNavigationItem
-            key={index}
-            title={title}
-            icon={icon}
-            path={path}
-            exact={exact}
-            depth={depth}
-            onExpand={onExpand}
-            isMinimized={isMinimized}
-            isCollapsable={nested}
-            isExpanded={isExpanded}
-            isActive={isActive}
-            items={items}
-          />
-        )
-      })}
-    </ul>
-  )
+    return function (isLink) {
+      onItemExpand(index, isLink)
+    }
+  }
+
+  render () {
+    const {
+      className,
+      items,
+      isMinimized,
+      onItemExpand = () => null,
+      isExpanded = false,
+      depth = 0,
+      itemsExpanded = {},
+    } = this.props
+
+    const onRootExpand = this.onRootExpand
+    const isRoot = depth === 0
+    const listClassNames = classnames(className, style.list, {
+      [style.listNested]: !isRoot,
+      [style.listExpanded]: isExpanded,
+    })
+    return (
+      <ul className={listClassNames}>
+        {items.map(function (item, index) {
+          const itemState = itemsExpanded[index] || {}
+          const {
+            title,
+            icon,
+            path,
+            exact = true,
+            nested = false,
+            items = [],
+          } = item
+          const { isOpen = false, isLink = false } = itemState
+
+          const isActive = nested && isLink
+          const isExpanded = !isMinimized && isOpen
+          const onExpand = isRoot
+            ? onRootExpand(index)
+            : onItemExpand
+
+          return (
+            <SideNavigationItem
+              key={index}
+              title={title}
+              icon={icon}
+              path={path}
+              exact={exact}
+              depth={depth}
+              onExpand={onExpand}
+              isMinimized={isMinimized}
+              isCollapsable={nested}
+              isExpanded={isExpanded}
+              isActive={isActive}
+              items={items}
+            />
+          )
+        })}
+      </ul>
+    )
+  }
 }
 
 SideNavigationList.propTypes = {
