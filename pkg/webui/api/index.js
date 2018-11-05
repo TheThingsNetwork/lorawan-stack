@@ -21,6 +21,8 @@ const oauthInstance = axios.create({
   headers: { 'X-CSRF-Token': csrf },
 })
 
+import fakeData from './fake-data'
+
 export default {
   v3: {
     is: {
@@ -36,6 +38,31 @@ export default {
               Authorization: `Bearer ${(await token()).access_token}`,
             },
           })
+        },
+      },
+      applications: {
+        list (params) {
+          const start = (params.page - 1) * params.pageSize
+          const end = start + params.pageSize
+
+          const res = fakeData.applications.filter(app => app.application_id)
+          const total = res.length
+
+          return new Promise(resolve => setTimeout(() => resolve(
+            { applications: res.slice(start, end), totalCount: total }
+          ), 1000))
+        },
+        search (params) {
+          const start = (params.page - 1) * params.pageSize
+          const end = start + params.pageSize
+          const query = params.query || ''
+
+          const res = fakeData.applications.filter(app => app.application_id.includes(query))
+          const total = res.length
+
+          return new Promise(resolve => setTimeout(() => resolve(
+            { applications: res.slice(start, end), totalCount: total }
+          ), 1000))
         },
       },
     },

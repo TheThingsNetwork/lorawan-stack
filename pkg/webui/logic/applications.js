@@ -14,78 +14,10 @@
 
 import { createLogic } from 'redux-logic'
 
+import api from '../api'
 import * as applications from '../actions/applications'
 
 const PAGE_SIZE = 3
-const apps = [
-  {
-    application_id: 'test-app',
-    created_at: '2018-09-19T08:29:39.952Z',
-    updated_at: '2018-09-19T08:29:39.952Z',
-    name: 'Test App',
-    description: 'description',
-  },
-  {
-    application_id: 'test-app2',
-    created_at: '2018-09-19T08:29:39.952Z',
-    updated_at: '2018-09-19T08:29:39.952Z',
-    name: 'Test App 2',
-    description: 'description 2',
-  },
-  {
-    application_id: 'test-app3',
-    created_at: '2018-09-19T08:29:39.952Z',
-    updated_at: '2018-09-19T08:29:39.952Z',
-    name: 'Test App 3',
-    description: 'description 3',
-  },
-  {
-    application_id: 'test-app4',
-    created_at: '2018-09-19T08:29:39.952Z',
-    updated_at: '2018-09-19T08:29:39.952Z',
-    name: 'Test App 4',
-    description: 'description 4',
-  },
-  {
-    application_id: 'test-app5',
-    created_at: '2018-09-19T08:29:39.952Z',
-    updated_at: '2018-09-19T08:29:39.952Z',
-    name: 'Test App 5',
-    description: 'description 5',
-  },
-  {
-    application_id: 'test-app6',
-    created_at: '2018-09-19T08:29:39.952Z',
-    updated_at: '2018-09-19T08:29:39.952Z',
-    name: 'Test App 6',
-    description: 'description 6',
-  },
-]
-
-const searchApplicationsStub = function (params) {
-  const start = (params.page - 1) * PAGE_SIZE
-  const end = start + PAGE_SIZE
-  const query = params.query || ''
-
-  const res = apps.filter(app => app.application_id.includes(query))
-  const total = res.length
-
-  return new Promise(resolve => setTimeout(() => resolve(
-    { applications: res.slice(start, end), totalCount: total }
-  ), 1000))
-}
-
-const getApplicationsStub = function (params) {
-  const start = (params.page - 1) * PAGE_SIZE
-  const end = start + PAGE_SIZE
-
-  const res = apps.slice(start, end)
-  const total = apps.length
-
-  return new Promise(resolve => setTimeout(() => resolve(
-    { applications: res, totalCount: total }
-  ), 1000))
-}
 
 const getApplicationsLogic = createLogic({
   type: [
@@ -98,12 +30,12 @@ const getApplicationsLogic = createLogic({
   latest: true,
   async process ({ getState, action }, dispatch, done) {
     const { filters } = action
+    filters.pageSize = PAGE_SIZE
 
     try {
-
       const data = filters.query
-        ? await searchApplicationsStub(filters)
-        : await getApplicationsStub(filters)
+        ? await api.v3.is.applications.search(filters)
+        : await api.v3.is.applications.list(filters)
       dispatch(applications.getApplicationsSuccess(data.applications, data.totalCount))
     } catch (error) {
       dispatch(applications.getApplicationsFailure(error))
