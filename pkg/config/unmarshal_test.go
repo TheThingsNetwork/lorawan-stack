@@ -25,7 +25,7 @@ import (
 func TestUnmarshal(t *testing.T) {
 	a := assertions.New(t)
 
-	mgr := Initialize("test", defaults)
+	mgr := Initialize("test", "test", defaults)
 	a.So(mgr, should.NotBeNil)
 
 	mgr.Parse()
@@ -42,7 +42,7 @@ func TestUnmarshal(t *testing.T) {
 func TestUnmarshalKey(t *testing.T) {
 	a := assertions.New(t)
 
-	mgr := Initialize("test", defaults)
+	mgr := Initialize("test", "test", defaults)
 	a.So(mgr, should.NotBeNil)
 
 	mgr.Parse()

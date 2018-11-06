@@ -123,20 +123,20 @@ var (
 
 func TestNilConfig(t *testing.T) {
 	a := assertions.New(t)
-	config := InitializeWithDefaults("empty", nil)
+	config := InitializeWithDefaults("empty", "empty", nil)
 	a.So(config, should.NotBeNil)
 }
 
 func TestInvalidConfig(t *testing.T) {
 	a := assertions.New(t)
-	config := InitializeWithDefaults("invalid", "invalid")
+	config := InitializeWithDefaults("invalid", "invalid", "invalid")
 	a.So(config, should.NotBeNil)
 }
 
 func TestConfigDefaults(t *testing.T) {
 	a := assertions.New(t)
 
-	config := InitializeWithDefaults("test", defaults)
+	config := InitializeWithDefaults("test", "test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
@@ -154,27 +154,27 @@ func TestConfigDefaults(t *testing.T) {
 func TestConfigEnv(t *testing.T) {
 	a := assertions.New(t)
 
-	config := InitializeWithDefaults("test", defaults)
+	config := InitializeWithDefaults("test", "test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
 
-	os.Setenv("BOOL", "false")
-	os.Setenv("DURATION", "10m")
-	os.Setenv("TIME", "2017-08-12 01:02:03 +0000 UTC")
-	os.Setenv("FLOAT", "-112.45")
-	os.Setenv("INT", "345")
-	os.Setenv("STRING", "bababa")
-	os.Setenv("STRINGS", "x y z")
-	os.Setenv("STRINGPTR", "yo")
-	os.Setenv("BYTES", "FA00BB")
-	os.Setenv("STRINGMAP", "q=r s=t")
-	os.Setenv("BUFFERMAP", "a=0x0bcd c=0x0def")
-	os.Setenv("STRINGMAPSLICE", "a=b a=c d=e")
-	os.Setenv("NESTED_STRING", "mud")
-	os.Setenv("NESTEDPTR_STRING", "mad")
-	os.Setenv("CUSTOM", "bar")
-	os.Setenv("CUSTOMS", "bar")
+	os.Setenv("TEST_BOOL", "false")
+	os.Setenv("TEST_DURATION", "10m")
+	os.Setenv("TEST_TIME", "2017-08-12 01:02:03 +0000 UTC")
+	os.Setenv("TEST_FLOAT", "-112.45")
+	os.Setenv("TEST_INT", "345")
+	os.Setenv("TEST_STRING", "bababa")
+	os.Setenv("TEST_STRINGS", "x y z")
+	os.Setenv("TEST_STRINGPTR", "yo")
+	os.Setenv("TEST_BYTES", "FA00BB")
+	os.Setenv("TEST_STRINGMAP", "q=r s=t")
+	os.Setenv("TEST_BUFFERMAP", "a=0x0bcd c=0x0def")
+	os.Setenv("TEST_STRINGMAPSLICE", "a=b a=c d=e")
+	os.Setenv("TEST_NESTED_STRING", "mud")
+	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
+	os.Setenv("TEST_CUSTOM", "bar")
+	os.Setenv("TEST_CUSTOMS", "bar")
 
 	// parse no command line args
 	config.Parse()
@@ -223,14 +223,14 @@ func TestConfigEnv(t *testing.T) {
 func TestBadConfigEnv(t *testing.T) {
 	a := assertions.New(t)
 
-	config := InitializeWithDefaults("test", defaults)
+	config := InitializeWithDefaults("test", "test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
 
-	os.Setenv("STRINGMAP", "q=r ff = f ff s=t")
-	os.Setenv("BUFFERMAP", "a=0x0b  cd c=0x0=def")
-	os.Setenv("STRINGMAPSLICE", "a=b= a=c fzef f d=e")
+	os.Setenv("TEST_STRINGMAP", "q=r ff = f ff s=t")
+	os.Setenv("TEST_BUFFERMAP", "a=0x0b  cd c=0x0=def")
+	os.Setenv("TEST_STRINGMAPSLICE", "a=b= a=c fzef f d=e")
 
 	// parse no command line args
 	config.Parse()
@@ -243,26 +243,26 @@ func TestBadConfigEnv(t *testing.T) {
 func TestConfigFlags(t *testing.T) {
 	a := assertions.New(t)
 
-	config := InitializeWithDefaults("test", defaults)
+	config := InitializeWithDefaults("test", "test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
 
-	os.Setenv("BOOL", "")
-	os.Setenv("DURATION", "")
-	os.Setenv("TIME", "")
-	os.Setenv("FLOAT", "")
-	os.Setenv("INT", "")
-	os.Setenv("STRING", "")
-	os.Setenv("STRINGS", "")
-	os.Setenv("STRINGPTR", "")
-	os.Setenv("BYTES", "")
-	os.Setenv("STRINGMAP", "")
-	os.Setenv("BUFFERMAP", "")
-	os.Setenv("STRINGMAPSLICE", "")
-	os.Setenv("NESTED_STRING", "")
-	os.Setenv("NESTEDPTR_STRING", "")
-	os.Setenv("CUSTOM", "")
+	os.Setenv("TEST_BOOL", "")
+	os.Setenv("TEST_DURATION", "")
+	os.Setenv("TEST_TIME", "")
+	os.Setenv("TEST_FLOAT", "")
+	os.Setenv("TEST_INT", "")
+	os.Setenv("TEST_STRING", "")
+	os.Setenv("TEST_STRINGS", "")
+	os.Setenv("TEST_STRINGPTR", "")
+	os.Setenv("TEST_BYTES", "")
+	os.Setenv("TEST_STRINGMAP", "")
+	os.Setenv("TEST_BUFFERMAP", "")
+	os.Setenv("TEST_STRINGMAPSLICE", "")
+	os.Setenv("TEST_NESTED_STRING", "")
+	os.Setenv("TEST_NESTEDPTR_STRING", "")
+	os.Setenv("TEST_CUSTOM", "")
 
 	// parse command line args
 	config.Parse(
@@ -335,7 +335,7 @@ func TestConfigFlags(t *testing.T) {
 func TestBadConfigFlags(t *testing.T) {
 	a := assertions.New(t)
 
-	config := InitializeWithDefaults("test", defaults)
+	config := InitializeWithDefaults("test", "test", defaults)
 	a.So(config, should.NotBeNil)
 	settings := new(example)
 
@@ -353,12 +353,12 @@ func TestBadConfigFlags(t *testing.T) {
 func TestConfigShorthand(t *testing.T) {
 	a := assertions.New(t)
 
-	config := InitializeWithDefaults("test", defaults)
+	config := InitializeWithDefaults("test", "test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
 
-	os.Setenv("STRING", "")
+	os.Setenv("TEST_STRING", "")
 
 	// parse command line args
 	config.Parse("-s", "bababa")

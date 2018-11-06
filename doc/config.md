@@ -43,12 +43,12 @@ $ ./ttn-lw-stack -c config.yml
 
 ### Environment variables
 
-Environment variables are the uppercased flags, with any separators (`.` or `-`) replaced by underscores (`_`).
+Environment variables are the uppercased flags, with any separators (`.` or `-`) replaced by underscores (`_`). Environment variables are prefixed with `TTN_LW_`
 
 Example of environment variable as options:
 
 ```bash
-$ export COOKIE_HASH_KEY=40847E55ED0CB34B3D491DC557326BF875FCE34EE0C8F50194E1BB3488055FA96D5CC4F3CF6C30C5F4922D8CEB4F72A1FE61317E1A7BC88619617AD6CEA983B3
-$ export LOG_LEVEL=debug
+$ export TTN_LW_COOKIE_HASH_KEY=40847E55ED0CB34B3D491DC557326BF875FCE34EE0C8F50194E1BB3488055FA96D5CC4F3CF6C30C5F4922D8CEB4F72A1FE61317E1A7BC88619617AD6CEA983B3
+$ export TTN_LW_LOG_LEVEL=debug
 $ ttn-lw-identity-server start
 ```

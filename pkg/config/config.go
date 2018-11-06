@@ -119,7 +119,7 @@ var DefaultOptions = []Option{
 //     Configurable                        Parsed by the FromConfigString method
 //     structs with fields of these types  The nested config names will be prefixed by the name of this struct, unless it is `name:",squash"`
 //                                         in which case the names are merged into the parent struct.
-func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
+func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
 	m := &Manager{
 		name:     name,
 		viper:    viper.New(),
@@ -131,6 +131,7 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m.viper.SetTypeByDefaultValue(true)
 	m.viper.SetConfigName(name)
 	m.viper.SetConfigType("yml")
+	m.viper.SetEnvPrefix(envPrefix)
 	m.viper.AutomaticEnv()
 	m.viper.AddConfigPath(".")
 
@@ -173,8 +174,8 @@ func (m *Manager) WithConfig(defaults interface{}) *pflag.FlagSet {
 
 // InitializeWithDefaults is the same as Initialize but it sets some sane default options (see DefaultOptions)
 // alongside the passed in options.
-func InitializeWithDefaults(name string, defaults interface{}, opts ...Option) *Manager {
-	return Initialize(name, defaults, append(DefaultOptions, opts...)...)
+func InitializeWithDefaults(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
+	return Initialize(name, envPrefix, defaults, append(DefaultOptions, opts...)...)
 }
 
 // Parse parses the command line arguments.

@@ -27,7 +27,7 @@ import (
 var (
 	logger *log.Logger
 	name   = "ttn-lw-stack"
-	mgr    = conf.InitializeWithDefaults(name, DefaultConfig)
+	mgr    = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig)
 	config = new(Config)
 
 	// Root command is the entrypoint of the program

@@ -41,7 +41,7 @@ func TestReadSingleConfig(t *testing.T) {
 
 	defaults := &singleFileConfig{}
 
-	mgr := InitializeWithDefaults("empty", defaults)
+	mgr := InitializeWithDefaults("empty", "empty", defaults)
 	a.So(mgr, should.NotBeNil)
 
 	mgr.Parse("--config", first)
@@ -76,7 +76,7 @@ func TestReadMultiConfig(t *testing.T) {
 
 	defaults := &multiFileConfig{}
 
-	mgr := InitializeWithDefaults("empty", defaults)
+	mgr := InitializeWithDefaults("empty", "empty", defaults)
 	a.So(mgr, should.NotBeNil)
 
 	mgr.Parse("--config", first, "--config", second)

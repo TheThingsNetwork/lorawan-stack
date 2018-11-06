@@ -40,7 +40,7 @@ type SubConfig struct {
 var (
 	// mgr is a configuration manager for the example program, initialized
 	// with default config values.
-	mgr = config.InitializeWithDefaults("example", &Config{
+	mgr = config.InitializeWithDefaults("example", "example", &Config{
 		Int:    42,
 		String: "foo",
 	})
