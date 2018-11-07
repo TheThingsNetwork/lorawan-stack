@@ -1493,6 +1493,159 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/encoding/lorawan:cflist_frequencies": {
+    "translations": {
+      "en": "too many CFList frequencies: expected 15 or less"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:decode": {
+    "translations": {
+      "en": "could not decode `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:decoding_mac_command": {
+    "translations": {
+      "en": "could not decode MAC command with CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:encode": {
+    "translations": {
+      "en": "could not encode `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:encoded_field_length_bound": {
+    "translations": {
+      "en": "`{lorawan_field}` encoded length should between `{min}` and `{max}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:encoded_field_length_multiple_choices": {
+    "translations": {
+      "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:encoding_mac_command": {
+    "translations": {
+      "en": "could not encode MAC command with CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:encrypted_joinacceptpayload_length": {
+    "translations": {
+      "en": "encrypted JoinAcceptPayload should have length of 16 or 32"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:field_bound": {
+    "translations": {
+      "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:field_length_equal": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:field_length_with_max": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be lower or equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:field_length_with_min": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be higher or equal to `{expected}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:field_length_with_multiple_choices": {
+    "translations": {
+      "en": "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:field_with_max": {
+    "translations": {
+      "en": "`{lorawan_field}` should be lower or equal to `{max}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:max_cflist_frequency": {
+    "translations": {
+      "en": "expected CFList frequency to be less or equal to MaxUint24"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:unknown_cmd": {
+    "translations": {
+      "en": "unknown MAC command CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:unknown_field": {
+    "translations": {
+      "en": "unknown `{lorawan_field}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/errors:odd_kv": {
     "translations": {
       "en": "Odd number of key-value elements"
@@ -2627,69 +2780,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:cflist_frequencies": {
-    "translations": {
-      "en": "too many CFList frequencies: expected 15 or less"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_encoding.go"
-    }
-  },
-  "error:pkg/ttnpb:decode": {
-    "translations": {
-      "en": "could not decode `{lorawan_field}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:decoding_mac_command": {
-    "translations": {
-      "en": "could not decode MAC command with CID `{cid}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_mac_encoding.go"
-    }
-  },
-  "error:pkg/ttnpb:encode": {
-    "translations": {
-      "en": "could not encode `{lorawan_field}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encoded_field_length_bound": {
-    "translations": {
-      "en": "`{lorawan_field}` encoded length should between `{min}` and `{max}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encoded_field_length_multiple_choices": {
-    "translations": {
-      "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encrypted_joinacceptpayload_length": {
-    "translations": {
-      "en": "encrypted JoinAcceptPayload should have length of 16 or 32"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_encoding.go"
-    }
-  },
   "error:pkg/ttnpb:expected_uplink_mtype": {
     "translations": {
       "en": "MType `{result}` is not an uplink MType"
@@ -2702,42 +2792,6 @@
   "error:pkg/ttnpb:field_bound": {
     "translations": {
       "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:field_length_equal": {
-    "translations": {
-      "en": "`{lorawan_field}` length should be equal to `{expected}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:field_length_with_max": {
-    "translations": {
-      "en": "`{lorawan_field}` length should be lower or equal to `{expected}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:field_length_with_min": {
-    "translations": {
-      "en": "`{lorawan_field}` length should be higher or equal to `{expected}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:field_length_with_multiple_choices": {
-    "translations": {
-      "en": "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -2762,24 +2816,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:max_cflist_frequency": {
-    "translations": {
-      "en": "expected CFList frequency to be less or equal to MaxUint24"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_encoding.go"
-    }
-  },
-  "error:pkg/ttnpb:missing_field": {
-    "translations": {
-      "en": "missing `{lorawan_field}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/ttnpb:parse": {
     "translations": {
       "en": "could not parse `{lorawan_field}`"
@@ -2796,15 +2832,6 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "lorawan.go"
-    }
-  },
-  "error:pkg/ttnpb:payload_type": {
-    "translations": {
-      "en": "payload type `{type}` is unexpected"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_mac_encoding.go"
     }
   },
   "error:pkg/ttnpb:raw_payload": {
