@@ -23,6 +23,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -187,7 +188,7 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 			},
 		},
 	}
-	buf, err := msg.Payload.MarshalLoRaWAN()
+	buf, err := lorawan.MarshalMessage(*msg.Payload)
 	if err != nil {
 		panic(err)
 	}
@@ -229,7 +230,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 			},
 		},
 	}
-	buf, err = msg.Payload.MarshalLoRaWAN()
+	buf, err = lorawan.MarshalMessage(*msg.Payload)
 	if err != nil {
 		panic(err)
 	}
@@ -268,7 +269,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 			MACPayload: pld,
 		},
 	}
-	buf, err = msg.MarshalLoRaWAN()
+	buf, err = lorawan.MarshalMessage(msg)
 	if err != nil {
 		panic(err)
 	}

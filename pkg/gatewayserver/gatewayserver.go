@@ -26,6 +26,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -271,7 +272,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				logger.WithError(err).Debug("Dropping message")
 				registerDropUplink(ctx, conn.Gateway(), msg, err)
 			}
-			if err := msg.UnmarshalIdentifiers(); err != nil {
+			if err := lorawan.UnmarshalUplinkMessageIdentifiers(msg); err != nil {
 				drop(err)
 				break
 			}

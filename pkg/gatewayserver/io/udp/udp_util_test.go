@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	_ "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
