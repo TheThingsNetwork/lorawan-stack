@@ -78,6 +78,33 @@ export default {
           }, 750))
         },
       },
+      devices: {
+        list (appId, params) {
+          const start = (params.page - 1) * params.pageSize
+          const end = start + params.pageSize
+
+          const res = fakeData.devices.filter(d => d.application_id === appId)
+          const total = res.length
+
+          return new Promise(resolve => setTimeout(() => resolve(
+            { devices: res.slice(start, end), totalCount: total }
+          ), 1000))
+        },
+        search (appId, params) {
+          const start = (params.page - 1) * params.pageSize
+          const end = start + params.pageSize
+          const query = params.query || ''
+
+          const res = fakeData.devices
+            .filter(d => d.application_id === appId)
+            .filter(d => d.device_id.includes(query))
+          const total = res.length
+
+          return new Promise(resolve => setTimeout(() => resolve(
+            { devices: res.slice(start, end), totalCount: total }
+          ), 1000))
+        },
+      },
     },
   },
   console: {
