@@ -24,6 +24,7 @@ import (
 	"github.com/oklog/ulid"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -91,7 +92,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		if req.Payload == nil {
 			req.Payload = &ttnpb.Message{}
 		}
-		if err = req.Payload.UnmarshalLoRaWAN(req.RawPayload); err != nil {
+		if err = lorawan.UnmarshalMessage(req.RawPayload, req.Payload); err != nil {
 			return nil, errDecodePayload.WithCause(err)
 		}
 	}
@@ -117,7 +118,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	rawPayload := req.RawPayload
 	if rawPayload == nil {
-		rawPayload, err = req.Payload.MarshalLoRaWAN()
+		rawPayload, err = lorawan.MarshalMessage(*req.Payload)
 		if err != nil {
 			return nil, errEncodePayload.WithCause(err)
 		}
@@ -170,10 +171,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		} else {
 			b = make([]byte, 0, 33)
 		}
-		b, err = (&ttnpb.MHDR{
+		b, err = lorawan.AppendMHDR(b, ttnpb.MHDR{
 			MType: ttnpb.MType_JOIN_ACCEPT,
 			Major: req.Payload.Major,
-		}).AppendLoRaWAN(b)
+		})
 		if err != nil {
 			return nil, errEncodePayload.WithCause(err)
 		}
@@ -188,14 +189,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		binary.BigEndian.PutUint32(nb, dev.LastJoinNonce)
 		copy(jn[:], nb[1:])
 
-		b, err = (&ttnpb.JoinAcceptPayload{
+		b, err = lorawan.AppendJoinAcceptPayload(b, ttnpb.JoinAcceptPayload{
 			NetID:      req.NetID,
 			JoinNonce:  jn,
 			CFList:     req.CFList,
 			DevAddr:    *req.EndDeviceIdentifiers.DevAddr,
 			DLSettings: req.DownlinkSettings,
 			RxDelay:    req.RxDelay,
-		}).AppendLoRaWAN(b)
+		})
 		if err != nil {
 			return nil, errEncodePayload.WithCause(err)
 		}
