@@ -14,6 +14,7 @@
 
 import {
   GET_DEVICES_LIST,
+  SEARCH_DEVICES_LIST,
   GET_DEVICES_LIST_SUCCESS,
   GET_DEVICES_LIST_FAILURE,
 } from '../actions/devices'
@@ -33,10 +34,17 @@ const devices = function (state = defaultState, action) {
       ...state,
       fetching: true,
     }
+  case SEARCH_DEVICES_LIST:
+    return {
+      ...state,
+      fetching: true,
+      fetchingSearch: true,
+    }
   case GET_DEVICES_LIST_SUCCESS:
     return {
       ...state,
       fetching: false,
+      fetchingSearch: false,
       devices: action.devices,
       totalCount: action.totalCount,
     }
@@ -44,6 +52,7 @@ const devices = function (state = defaultState, action) {
     return {
       ...state,
       fetching: false,
+      fetchingSearch: false,
       error: action.error,
       devices: [],
       totalCount: 0,
