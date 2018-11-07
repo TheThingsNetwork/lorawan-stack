@@ -14,12 +14,24 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { Switch, Route } from 'react-router'
 
+import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import Spinner from '../../../components/spinner'
 
-@connect(function (_, props) {
-  return { appId: props.match.params.appId }
+import ApplicationOverview from '../application-overview'
+
+import { getApplication } from '../../../actions/application'
+
+@connect(function ({ application }, props) {
+  return {
+    appId: props.match.params.appId,
+    fetching: application.fetching,
+    error: application.error,
+  }
 })
 @withBreadcrumb('apps.single', function (props) {
   const { appId } = props
@@ -33,8 +45,33 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 })
 export default class Application extends React.Component {
 
+  componentDidMount () {
+    const { dispatch, appId } = this.props
+
+    dispatch(getApplication(appId))
+  }
+
   render () {
-    const { appId } = this.props
-    return <div><strong>{appId}</strong> application</div>
+    const { fetching, error, match } = this.props
+
+    if (fetching) {
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.loading} />
+        </Spinner>
+      )
+    }
+
+    // show any application fetching error, e.g. not found, not rights, etc
+    if (error) {
+      return 'ERROR'
+    }
+
+    return (
+      <Switch>
+        <Route exact path={`${match.path}`} component={ApplicationOverview} />
+        {/* other routes for specific application */}
+      </Switch>
+    )
   }
 }
