@@ -164,11 +164,15 @@ func NewPopulatedMessage_RejoinRequestPayloadType(r randyLorawan, typ RejoinType
 
 func macMICPayload(mhdr MHDR, fhdr FHDR, fPort byte, frmPayload []byte, isUplink bool) ([]byte, error) {
 	b := make([]byte, 0, 4)
-	b, err := mhdr.AppendLoRaWAN(b)
+	b, err := PopulatorConfig.LoRaWAN.AppendMHDR(b, mhdr)
 	if err != nil {
 		return nil, err
 	}
-	b, err = fhdr.AppendLoRaWAN(b, isUplink)
+	if isUplink {
+		b, err = PopulatorConfig.LoRaWAN.AppendFHDR(b, fhdr, true)
+	} else {
+		b, err = PopulatorConfig.LoRaWAN.AppendFHDR(b, fhdr, false)
+	}
 	if err != nil {
 		return nil, err
 	}

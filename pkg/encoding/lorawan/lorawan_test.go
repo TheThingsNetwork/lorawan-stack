@@ -12,109 +12,101 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb_test
+package lorawan_test
 
 import (
-	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	. "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func lorawanEncodingTestName(v interface{}) string {
-	switch v := v.(type) {
-	case *Message:
-		switch v.MType {
-		case MType_UNCONFIRMED_UP:
-			return "Uplink(Unconfirmed)"
-		case MType_UNCONFIRMED_DOWN:
-			return "Downlink(Unconfirmed)"
-		case MType_CONFIRMED_UP:
-			return "Uplink(Confirmed)"
-		case MType_CONFIRMED_DOWN:
-			return "Downlink(Confirmed)"
-		case MType_JOIN_REQUEST:
-			return "JoinRequest"
-		case MType_JOIN_ACCEPT:
-			return "JoinAccept(Encrypted)"
-		case MType_REJOIN_REQUEST:
-			return fmt.Sprintf("RejoinRequest%d", v.GetRejoinRequestPayload().RejoinType)
-		}
-	case *JoinAcceptPayload:
-		if v.CFList == nil {
-			return "JoinAcceptPayload(no CFList)"
-		}
-		return fmt.Sprintf("JoinAcceptPayload(CFListType %d)", v.CFList.Type)
-	}
-	panic("Unmatched type")
-}
-
-type message interface {
-	lorawan.Marshaler
-	lorawan.Appender
-	lorawan.Unmarshaler
-}
-
-func TestLoRaWANEncodingRandomized(t *testing.T) {
+func TestMessageEncodingSymmetricity(t *testing.T) {
 	r := test.Randy
 
-	for i, expected := range []message{
-		NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), false),
-		NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), true),
-		NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), false),
-		NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), true),
-		NewPopulatedMessageJoinRequest(r),
-		NewPopulatedMessageJoinAccept(r, false),
-		NewPopulatedMessageRejoinRequest(r, 0),
-		NewPopulatedMessageRejoinRequest(r, 1),
-		NewPopulatedMessageRejoinRequest(r, 2),
-
-		NewPopulatedJoinAcceptPayload(r, false),
+	for _, tc := range []struct {
+		Name    string
+		Message *ttnpb.Message
+	}{
+		{
+			Name:    "Uplink(Unconfirmed)",
+			Message: ttnpb.NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), false),
+		},
+		{
+			Name:    "Uplink(Confirmed)",
+			Message: ttnpb.NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), true),
+		},
+		{
+			Name:    "Downlink(Unconfirmed)",
+			Message: ttnpb.NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), false),
+		},
+		{
+			Name:    "Downlink(Confirmed)",
+			Message: ttnpb.NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), true),
+		},
+		{
+			Name:    "JoinRequest",
+			Message: ttnpb.NewPopulatedMessageJoinRequest(r),
+		},
+		{
+			Name:    "RejoinRequest/Type0",
+			Message: ttnpb.NewPopulatedMessageRejoinRequest(r, 0),
+		},
+		{
+			Name:    "RejoinRequest/Type1",
+			Message: ttnpb.NewPopulatedMessageRejoinRequest(r, 1),
+		},
+		{
+			Name:    "RejoinRequest/Type2",
+			Message: ttnpb.NewPopulatedMessageRejoinRequest(r, 2),
+		},
+		{
+			Name:    "JoinAccept",
+			Message: ttnpb.NewPopulatedMessageJoinAccept(r, false),
+		},
 	} {
-		t.Run(fmt.Sprintf("%d/%s", i, lorawanEncodingTestName(expected)), func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := expected.MarshalLoRaWAN()
+			b, err := MarshalMessage(*tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.NotBeNil)
 
-			ret, err := expected.AppendLoRaWAN(make([]byte, 0))
+			ret, err := AppendMessage(make([]byte, 0), *tc.Message)
 			a.So(err, should.BeNil)
 			a.So(ret, should.Resemble, b)
 
-			msg := reflect.New(reflect.Indirect(reflect.ValueOf(expected)).Type()).Interface().(lorawan.Unmarshaler)
-			if err := msg.UnmarshalLoRaWAN(b); !a.So(err, should.BeNil) {
+			msg := &ttnpb.Message{}
+			err = UnmarshalMessage(b, msg)
+			if !a.So(err, should.BeNil) {
 				for i, err := range errors.Stack(err) {
 					t.Log(strings.Repeat("  ", i), err)
 				}
 				t.FailNow()
 			}
-			if !a.So(msg, should.Resemble, expected) {
-				pretty.Ldiff(t, msg, expected)
-			}
+			a.So(msg, should.Resemble, tc.Message)
 		})
 	}
 }
 
 func TestLoRaWANEncodingRaw(t *testing.T) {
-	for i, tc := range []struct {
-		Message message
+	for _, tc := range []struct {
+		Name    string
+		Message *ttnpb.Message
 		Bytes   []byte
 	}{
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_JOIN_REQUEST, Major: 0},
-				Payload: &Message_JoinRequestPayload{JoinRequestPayload: &JoinRequestPayload{
+			"JoinRequest",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
+				Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 					JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevNonce: types.DevNonce{0x42, 0xff},
@@ -138,9 +130,10 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_JOIN_ACCEPT, Major: 0},
-				Payload: &Message_JoinAcceptPayload{JoinAcceptPayload: &JoinAcceptPayload{
+			"JoinAccept",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_ACCEPT, Major: 0},
+				Payload: &ttnpb.Message_JoinAcceptPayload{JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 					Encrypted: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				}},
 			},
@@ -152,12 +145,13 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_UNCONFIRMED_UP, Major: 0},
-				Payload: &Message_MACPayload{MACPayload: &MACPayload{
-					FHDR: FHDR{
+			"Uplink(Unconfirmed)",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
+				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
-						FCtrl: FCtrl{
+						FCtrl: ttnpb.FCtrl{
 							ADR:       true,
 							ADRAckReq: false,
 							Ack:       true,
@@ -199,12 +193,13 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_UNCONFIRMED_DOWN, Major: 0},
-				Payload: &Message_MACPayload{MACPayload: &MACPayload{
-					FHDR: FHDR{
+			"Downlink(Unconfirmed)",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
+				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
-						FCtrl: FCtrl{
+						FCtrl: ttnpb.FCtrl{
 							ADR:       true,
 							ADRAckReq: false,
 							Ack:       true,
@@ -246,12 +241,13 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_CONFIRMED_UP, Major: 0},
-				Payload: &Message_MACPayload{MACPayload: &MACPayload{
-					FHDR: FHDR{
+			"Downlink(Confirmed)",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_UP, Major: 0},
+				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
-						FCtrl: FCtrl{
+						FCtrl: ttnpb.FCtrl{
 							ADR:       true,
 							ADRAckReq: false,
 							Ack:       true,
@@ -293,12 +289,13 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_CONFIRMED_DOWN, Major: 0},
-				Payload: &Message_MACPayload{MACPayload: &MACPayload{
-					FHDR: FHDR{
+			"Downlink(Confirmed)",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_DOWN, Major: 0},
+				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
-						FCtrl: FCtrl{
+						FCtrl: ttnpb.FCtrl{
 							ADR:       true,
 							ADRAckReq: false,
 							Ack:       true,
@@ -340,9 +337,10 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_REJOIN_REQUEST, Major: 0},
-				Payload: &Message_RejoinRequestPayload{RejoinRequestPayload: &RejoinRequestPayload{
+			"RejoinRequest/Type0",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
+				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 0,
 					NetID:      types.NetID{0x42, 0xff, 0xff},
 					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -369,9 +367,10 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_REJOIN_REQUEST, Major: 0},
-				Payload: &Message_RejoinRequestPayload{RejoinRequestPayload: &RejoinRequestPayload{
+			"RejoinRequest/Type1",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
+				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 1,
 					JoinEUI:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -398,9 +397,10 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&Message{
-				MHDR: MHDR{MType: MType_REJOIN_REQUEST, Major: 0},
-				Payload: &Message_RejoinRequestPayload{RejoinRequestPayload: &RejoinRequestPayload{
+			"RejoinRequest/Type2",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
+				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 2,
 					NetID:      types.NetID{0x42, 0xff, 0xff},
 					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -426,12 +426,273 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			b, err := MarshalMessage(*tc.Message)
+			a.So(err, should.BeNil)
+			a.So(b, should.NotBeNil)
+			a.So(b, should.Resemble, tc.Bytes)
+
+			ret, err := AppendMessage(make([]byte, 0), *tc.Message)
+			a.So(err, should.BeNil)
+			a.So(ret, should.Resemble, b)
+
+			msg := &ttnpb.Message{}
+			err = UnmarshalMessage(b, msg)
+			if !a.So(err, should.BeNil) {
+				for i, err := range errors.Stack(err) {
+					t.Log(strings.Repeat("  ", i), err)
+				}
+				t.FailNow()
+			}
+			a.So(msg, should.Resemble, tc.Message)
+		})
+	}
+}
+
+func TestUnmarshalIdentifiers(t *testing.T) {
+	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
+	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	joinEUI := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	for i, tc := range []struct {
+		Bytes       []byte
+		Identifiers *ttnpb.EndDeviceIdentifiers
+	}{
 		{
-			&JoinAcceptPayload{
+			[]byte{
+				/* MHDR: Join-request */
+				0x00,
+				/* MACPayload */
+				/** JoinEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** DevNonce **/
+				0xff, 0x42,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			&ttnpb.EndDeviceIdentifiers{
+				JoinEUI: &joinEUI,
+				DevEUI:  &devEUI,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Confirmed up */
+				0x80,
+				/* MACPayload */
+				/** FHDR **/
+				/*** DevAddr ***/
+				0xff, 0xff, 0xff, 0x42,
+				/*** FCtrl ***/
+				0xb2,
+				/*** FCnt ***/
+				0x42, 0xff,
+				/*** FOpts ***/
+				0xfe, 0xff,
+				/** FPort **/
+				0x42,
+				/** FRMPayload **/
+				0xfe, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			&ttnpb.EndDeviceIdentifiers{
+				DevAddr: &devAddr,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Rejoin-request */
+				0xc0,
+				/* MACPayload */
+				/** RejoinType **/
+				0x00,
+				/** NetID **/
+				0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** RejoinCnt **/
+				0x42, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			&ttnpb.EndDeviceIdentifiers{
+				DevEUI: &devEUI,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Rejoin-request */
+				0xc0,
+				/* MACPayload */
+				/** RejoinType **/
+				0x01,
+				/** JoinEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** RejoinCnt **/
+				0x42, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			&ttnpb.EndDeviceIdentifiers{
+				JoinEUI: &joinEUI,
+				DevEUI:  &devEUI,
+			},
+		},
+		{
+			[]byte{
+				/* MHDR: Rejoin-request */
+				0xc0,
+				/* MACPayload */
+				/** RejoinType **/
+				0x02,
+				/** NetID **/
+				0xff, 0xff, 0x42,
+				/** DevEUI **/
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+				/** RejoinCnt **/
+				0x42, 0xff,
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+			&ttnpb.EndDeviceIdentifiers{
+				DevEUI: &devEUI,
+			},
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			msg := &ttnpb.UplinkMessage{
+				RawPayload: tc.Bytes,
+			}
+			err := UnmarshalUplinkMessageIdentifiers(msg)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(msg.EndDeviceIDs, should.Resemble, tc.Identifiers)
+		})
+	}
+}
+
+func TestUnmarshalResilience(t *testing.T) {
+	for i, tc := range [][]byte{
+		// Too little data: FHDR is at least 7 bytes.
+		{
+			byte(ttnpb.MType_UNCONFIRMED_UP)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+			0x01, 0x02,
+		},
+		// Too little data: FHDR is at least 7 bytes.
+		{
+			byte(ttnpb.MType_UNCONFIRMED_DOWN)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+			0x01, 0x02,
+		},
+		// Too little data: no join-request payload.
+		{
+			byte(ttnpb.MType_JOIN_REQUEST)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+		},
+		// Too little data: too little join-request payload.
+		{
+			byte(ttnpb.MType_JOIN_REQUEST)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		},
+		// Too little data: no rejoin-request type.
+		{
+			byte(ttnpb.MType_REJOIN_REQUEST)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+		},
+		// Too little data: too little rejoin-request payload.
+		{
+			byte(ttnpb.MType_REJOIN_REQUEST)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+			0x02,
+		},
+		// Too little data: too little join-accept payload.
+		{
+			byte(ttnpb.MType_JOIN_ACCEPT)<<5 | byte(ttnpb.Major_LORAWAN_R1),
+			0x01, 0x02, 0x03, 0x04,
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(func() {
+				var msg ttnpb.Message
+				err := UnmarshalMessage(tc, &msg)
+				a.So(err, should.NotBeNil)
+			}, should.NotPanic)
+			a.So(func() {
+				msg := &ttnpb.UplinkMessage{
+					RawPayload: tc,
+				}
+				err := UnmarshalUplinkMessageIdentifiers(msg)
+				a.So(err, should.NotBeNil)
+			}, should.NotPanic)
+		})
+	}
+
+	t.Run("Downlink without FPort", func(t *testing.T) {
+		a := assertions.New(t)
+		downlink := &ttnpb.DownlinkMessage{Payload: &ttnpb.Message{}}
+		payload := []byte{0x60, 0x29, 0x2e, 0x01, 0x26, 0x20, 0x03, 0x00, 0xd0, 0x36, 0x78, 0xbd}
+		err := UnmarshalMessage(payload, downlink.Payload)
+		a.So(err, should.BeNil)
+	})
+}
+
+func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
+	r := test.Randy
+
+	for _, tc := range []struct {
+		Name    string
+		Message *ttnpb.JoinAcceptPayload
+	}{
+		{
+			Name:    "JoinAcceptPayload(no CFList)",
+			Message: ttnpb.NewPopulatedJoinAcceptPayload(r, false),
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			b, err := MarshalJoinAcceptPayload(*tc.Message)
+			a.So(err, should.BeNil)
+			a.So(b, should.NotBeNil)
+
+			ret, err := AppendJoinAcceptPayload(make([]byte, 0), *tc.Message)
+			a.So(err, should.BeNil)
+			a.So(ret, should.Resemble, b)
+
+			msg := &ttnpb.JoinAcceptPayload{}
+			err = UnmarshalJoinAcceptPayload(b, msg)
+			if !a.So(err, should.BeNil) {
+				for i, err := range errors.Stack(err) {
+					t.Log(strings.Repeat("  ", i), err)
+				}
+				t.FailNow()
+			}
+			a.So(msg, should.Resemble, tc.Message)
+		})
+	}
+}
+
+func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
+	for _, tc := range []struct {
+		Name    string
+		Message *ttnpb.JoinAcceptPayload
+		Bytes   []byte
+	}{
+		{
+			"JoinAcceptPayload(no CFList)",
+			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
 				NetID:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				DLSettings: DLSettings{
+				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x6,
 					Rx2DR:       0xf,
@@ -452,18 +713,19 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&JoinAcceptPayload{
+			"JoinAcceptPayload(CFListType_FREQUENCIES)",
+			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
 				NetID:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				DLSettings: DLSettings{
+				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x6,
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList: &CFList{
-					Type: CFListType_FREQUENCIES,
+				CFList: &ttnpb.CFList{
+					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff, 0xffffff},
 				},
 			},
@@ -485,18 +747,19 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
-			&JoinAcceptPayload{
+			"JoinAcceptPayload(CFListType_CHANNEL_MASKS)",
+			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
 				NetID:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				DLSettings: DLSettings{
+				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x6,
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList: &CFList{
-					Type: CFListType_CHANNEL_MASKS,
+				CFList: &ttnpb.CFList{
+					Type: ttnpb.CFListType_CHANNEL_MASKS,
 					ChMasks: []bool{
 						false, true, false, false, false, false, true, false,
 						true, true, true, true, true, true, true, true,
@@ -531,213 +794,27 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(fmt.Sprintf("%d/%s", i, lorawanEncodingTestName(tc.Message)), func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := tc.Message.MarshalLoRaWAN()
+			b, err := MarshalJoinAcceptPayload(*tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.NotBeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 
-			b, err = tc.Message.AppendLoRaWAN(make([]byte, 0))
+			b, err = AppendJoinAcceptPayload(make([]byte, 0), *tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 
-			msg := reflect.New(reflect.Indirect(reflect.ValueOf(tc.Message)).Type()).Interface().(lorawan.Unmarshaler)
-			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
+			msg := &ttnpb.JoinAcceptPayload{}
+			err = UnmarshalJoinAcceptPayload(b, msg)
+			if !a.So(err, should.BeNil) {
+				for i, err := range errors.Stack(err) {
+					t.Log(strings.Repeat("  ", i), err)
+				}
+				t.FailNow()
+			}
 			a.So(msg, should.Resemble, tc.Message)
 		})
 	}
-}
-
-func TestUnmarshalIdentifiers(t *testing.T) {
-	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
-	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	joinEUI := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-
-	for i, tc := range []struct {
-		Bytes       []byte
-		Identifiers *EndDeviceIdentifiers
-	}{
-		{
-			[]byte{
-				/* MHDR: Join-request */
-				0x00,
-				/* MACPayload */
-				/** JoinEUI **/
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
-				/** DevEUI **/
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
-				/** DevNonce **/
-				0xff, 0x42,
-				/* MIC */
-				0x42, 0xff, 0xff, 0xff,
-			},
-			&EndDeviceIdentifiers{
-				JoinEUI: &joinEUI,
-				DevEUI:  &devEUI,
-			},
-		},
-		{
-			[]byte{
-				/* MHDR: Confirmed up */
-				0x80,
-				/* MACPayload */
-				/** FHDR **/
-				/*** DevAddr ***/
-				0xff, 0xff, 0xff, 0x42,
-				/*** FCtrl ***/
-				0xb2,
-				/*** FCnt ***/
-				0x42, 0xff,
-				/*** FOpts ***/
-				0xfe, 0xff,
-				/** FPort **/
-				0x42,
-				/** FRMPayload **/
-				0xfe, 0xff,
-				/* MIC */
-				0x42, 0xff, 0xff, 0xff,
-			},
-			&EndDeviceIdentifiers{
-				DevAddr: &devAddr,
-			},
-		},
-		{
-			[]byte{
-				/* MHDR: Rejoin-request */
-				0xc0,
-				/* MACPayload */
-				/** RejoinType **/
-				0x00,
-				/** NetID **/
-				0xff, 0xff, 0x42,
-				/** DevEUI **/
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
-				/** RejoinCnt **/
-				0x42, 0xff,
-				/* MIC */
-				0x42, 0xff, 0xff, 0xff,
-			},
-			&EndDeviceIdentifiers{
-				DevEUI: &devEUI,
-			},
-		},
-		{
-			[]byte{
-				/* MHDR: Rejoin-request */
-				0xc0,
-				/* MACPayload */
-				/** RejoinType **/
-				0x01,
-				/** JoinEUI **/
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
-				/** DevEUI **/
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
-				/** RejoinCnt **/
-				0x42, 0xff,
-				/* MIC */
-				0x42, 0xff, 0xff, 0xff,
-			},
-			&EndDeviceIdentifiers{
-				JoinEUI: &joinEUI,
-				DevEUI:  &devEUI,
-			},
-		},
-		{
-			[]byte{
-				/* MHDR: Rejoin-request */
-				0xc0,
-				/* MACPayload */
-				/** RejoinType **/
-				0x02,
-				/** NetID **/
-				0xff, 0xff, 0x42,
-				/** DevEUI **/
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
-				/** RejoinCnt **/
-				0x42, 0xff,
-				/* MIC */
-				0x42, 0xff, 0xff, 0xff,
-			},
-			&EndDeviceIdentifiers{
-				DevEUI: &devEUI,
-			},
-		},
-	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := assertions.New(t)
-			msg := UplinkMessage{
-				RawPayload: tc.Bytes,
-			}
-			err := msg.UnmarshalIdentifiers()
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(msg.EndDeviceIDs, should.Resemble, tc.Identifiers)
-		})
-	}
-}
-
-func TestUnmarshalResilience(t *testing.T) {
-	for i, tc := range [][]byte{
-		// Too little data: FHDR is at least 7 bytes.
-		{
-			byte(MType_UNCONFIRMED_UP)<<5 | byte(Major_LORAWAN_R1),
-			0x01, 0x02,
-		},
-		// Too little data: FHDR is at least 7 bytes.
-		{
-			byte(MType_UNCONFIRMED_DOWN)<<5 | byte(Major_LORAWAN_R1),
-			0x01, 0x02,
-		},
-		// Too little data: no join-request payload.
-		{
-			byte(MType_JOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
-		},
-		// Too little data: too little join-request payload.
-		{
-			byte(MType_JOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
-			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-		},
-		// Too little data: no rejoin-request type.
-		{
-			byte(MType_REJOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
-		},
-		// Too little data: too little rejoin-request payload.
-		{
-			byte(MType_REJOIN_REQUEST)<<5 | byte(Major_LORAWAN_R1),
-			0x02,
-		},
-		// Too little data: too little join-accept payload.
-		{
-			byte(MType_JOIN_ACCEPT)<<5 | byte(Major_LORAWAN_R1),
-			0x01, 0x02, 0x03, 0x04,
-		},
-	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := assertions.New(t)
-			a.So(func() {
-				var msg Message
-				err := msg.UnmarshalLoRaWAN(tc)
-				a.So(err, should.NotBeNil)
-			}, should.NotPanic)
-			a.So(func() {
-				msg := UplinkMessage{
-					RawPayload: tc,
-				}
-				err := msg.UnmarshalIdentifiers()
-				a.So(err, should.NotBeNil)
-			}, should.NotPanic)
-		})
-	}
-
-	t.Run("Downlink without FPort", func(t *testing.T) {
-		a := assertions.New(t)
-		downlink := &DownlinkMessage{Payload: &Message{}}
-		payload := []byte{0x60, 0x29, 0x2e, 0x01, 0x26, 0x20, 0x03, 0x00, 0xd0, 0x36, 0x78, 0xbd}
-		err := downlink.Payload.UnmarshalLoRaWAN(payload)
-		a.So(err, should.BeNil)
-	})
 }

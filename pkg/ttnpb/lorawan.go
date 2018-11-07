@@ -15,62 +15,12 @@
 package ttnpb
 
 import (
-	"encoding/gob"
 	"strconv"
 
 	"github.com/blang/semver"
 	"github.com/gogo/protobuf/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
-
-func init() {
-	for _, v := range []interface{}{
-		&Message_MACPayload{},
-		&Message_JoinRequestPayload{},
-		&Message_RejoinRequestPayload{},
-		&Message_JoinAcceptPayload{},
-		&MACCommand{},
-		&MACCommand_RawPayload{},
-		&MACCommand_ResetInd{},
-		&MACCommand_ResetInd_{},
-		&MACCommand_ResetConf{},
-		&MACCommand_ResetConf_{},
-		&MACCommand_LinkCheckAns{},
-		&MACCommand_LinkCheckAns_{},
-		&MACCommand_LinkADRReq{},
-		&MACCommand_LinkADRReq_{},
-		&MACCommand_LinkADRAns{},
-		&MACCommand_LinkADRAns_{},
-		&MACCommand_DutyCycleReq_{},
-		&MACCommand_RxParamSetupReq_{},
-		&MACCommand_RxParamSetupAns_{},
-		&MACCommand_DevStatusAns_{},
-		&MACCommand_NewChannelReq_{},
-		&MACCommand_NewChannelAns_{},
-		&MACCommand_DlChannelReq{},
-		&MACCommand_DlChannelAns{},
-		&MACCommand_RxTimingSetupReq_{},
-		&MACCommand_TxParamSetupReq_{},
-		&MACCommand_RekeyInd_{},
-		&MACCommand_RekeyConf_{},
-		&MACCommand_ADRParamSetupReq{},
-		&MACCommand_ADRParamSetupReq_{},
-		&MACCommand_DeviceTimeAns_{},
-		&MACCommand_ForceRejoinReq_{},
-		&MACCommand_RejoinParamSetupReq_{},
-		&MACCommand_RejoinParamSetupAns_{},
-		&MACCommand_PingSlotInfoReq_{},
-		&MACCommand_PingSlotChannelReq_{},
-		&MACCommand_PingSlotChannelAns_{},
-		&MACCommand_BeaconTimingAns_{},
-		&MACCommand_BeaconFreqReq_{},
-		&MACCommand_BeaconFreqAns_{},
-		&MACCommand_DeviceModeInd_{},
-		&MACCommand_DeviceModeConf_{},
-	} {
-		gob.Register(v)
-	}
-}
 
 var errParsingSemanticVersion = unexpectedValue(
 	errors.DefineInvalidArgument("parsing_semantic_version", "could not parse semantic version", valueKey),

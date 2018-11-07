@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb_test
+package lorawan_test
 
 import (
 	"bytes"
@@ -21,8 +21,9 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
-	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -30,44 +31,44 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 	for _, tc := range []struct {
 		Name    string
 		Payload interface {
-			MACCommand() *MACCommand
+			MACCommand() *ttnpb.MACCommand
 		}
 		Bytes    []byte
 		IsUplink bool
 	}{
 		{
 			"ResetConf",
-			&MACCommand_ResetConf{MinorVersion: 1},
+			&ttnpb.MACCommand_ResetConf{MinorVersion: 1},
 			[]byte{0x01, 1},
 			false,
 		},
 		{
 			"ResetInd",
-			&MACCommand_ResetInd{MinorVersion: 1},
+			&ttnpb.MACCommand_ResetInd{MinorVersion: 1},
 			[]byte{0x01, 1},
 			true,
 		},
 		{
 			"ResetConf",
-			&MACCommand_ResetConf{MinorVersion: 1},
+			&ttnpb.MACCommand_ResetConf{MinorVersion: 1},
 			[]byte{0x01, 1},
 			false,
 		},
 		{
 			"LinkCheckReq",
-			CID_LINK_CHECK,
+			ttnpb.CID_LINK_CHECK,
 			[]byte{0x02},
 			true,
 		},
 		{
 			"LinkCheckAns",
-			&MACCommand_LinkCheckAns{Margin: 20, GatewayCount: 3},
+			&ttnpb.MACCommand_LinkCheckAns{Margin: 20, GatewayCount: 3},
 			[]byte{0x02, 20, 3},
 			false,
 		},
 		{
 			"LinkADRReq",
-			&MACCommand_LinkADRReq{
+			&ttnpb.MACCommand_LinkADRReq{
 				DataRateIndex: 0x5,
 				TxPowerIndex:  0x2,
 				ChannelMask: []bool{
@@ -82,7 +83,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"LinkADRAns",
-			&MACCommand_LinkADRAns{
+			&ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
@@ -92,7 +93,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DutyCycleReq",
-			&MACCommand_DutyCycleReq{
+			&ttnpb.MACCommand_DutyCycleReq{
 				MaxDutyCycle: 0x0d,
 			},
 			[]byte{0x04, 0x0d},
@@ -100,13 +101,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DutyCycleAns",
-			CID_DUTY_CYCLE,
+			ttnpb.CID_DUTY_CYCLE,
 			[]byte{0x04},
 			true,
 		},
 		{
 			"RxParamSetupReq",
-			&MACCommand_RxParamSetupReq{
+			&ttnpb.MACCommand_RxParamSetupReq{
 				Rx1DataRateOffset: 5,
 				Rx2DataRateIndex:  12,
 				Rx2Frequency:      1677702600,
@@ -116,7 +117,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RxParamSetupAns",
-			&MACCommand_RxParamSetupAns{
+			&ttnpb.MACCommand_RxParamSetupAns{
 				Rx2FrequencyAck:      true,
 				Rx2DataRateIndexAck:  false,
 				Rx1DataRateOffsetAck: true,
@@ -126,13 +127,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DevStatusReq",
-			CID_DEV_STATUS,
+			ttnpb.CID_DEV_STATUS,
 			[]byte{0x06},
 			false,
 		},
 		{
 			"DevStatusAns",
-			&MACCommand_DevStatusAns{
+			&ttnpb.MACCommand_DevStatusAns{
 				Battery: 0x42,
 				Margin:  -16,
 			},
@@ -141,7 +142,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"NewChannelReq",
-			&MACCommand_NewChannelReq{
+			&ttnpb.MACCommand_NewChannelReq{
 				ChannelIndex:     0xf,
 				Frequency:        0x42ffff * 100,
 				MaxDataRateIndex: 0x4,
@@ -152,7 +153,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"NewChannelReq/Freq 0",
-			&MACCommand_NewChannelReq{
+			&ttnpb.MACCommand_NewChannelReq{
 				ChannelIndex:     0xf,
 				Frequency:        0x0,
 				MaxDataRateIndex: 0x4,
@@ -163,7 +164,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"NewChannelAns",
-			&MACCommand_NewChannelAns{
+			&ttnpb.MACCommand_NewChannelAns{
 				FrequencyAck: false,
 				DataRateAck:  true,
 			},
@@ -172,7 +173,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RxTimingSetupReq",
-			&MACCommand_RxTimingSetupReq{
+			&ttnpb.MACCommand_RxTimingSetupReq{
 				Delay: 0xf,
 			},
 			[]byte{0x08, 0xf},
@@ -180,14 +181,14 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RxTimingSetupAns",
-			CID_RX_TIMING_SETUP,
+			ttnpb.CID_RX_TIMING_SETUP,
 			[]byte{0x08},
 			true,
 		},
 		{
 			"TxParamSetupReq",
-			&MACCommand_TxParamSetupReq{
-				MaxEIRPIndex:      DEVICE_EIRP_36,
+			&ttnpb.MACCommand_TxParamSetupReq{
+				MaxEIRPIndex:      ttnpb.DEVICE_EIRP_36,
 				UplinkDwellTime:   false,
 				DownlinkDwellTime: true,
 			},
@@ -196,13 +197,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"TxParamSetupAns",
-			CID_TX_PARAM_SETUP,
+			ttnpb.CID_TX_PARAM_SETUP,
 			[]byte{0x09},
 			true,
 		},
 		{
 			"DLChannelReq",
-			&MACCommand_DLChannelReq{
+			&ttnpb.MACCommand_DLChannelReq{
 				ChannelIndex: 0x4,
 				Frequency:    0x42ffff * 100,
 			},
@@ -211,7 +212,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DLChannelAns",
-			&MACCommand_DLChannelAns{
+			&ttnpb.MACCommand_DLChannelAns{
 				ChannelIndexAck: false,
 				FrequencyAck:    true,
 			},
@@ -220,40 +221,40 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RekeyInd",
-			&MACCommand_RekeyInd{MinorVersion: 1},
+			&ttnpb.MACCommand_RekeyInd{MinorVersion: 1},
 			[]byte{0x0B, 1},
 			true,
 		},
 		{
 			"RekeyConf",
-			&MACCommand_RekeyConf{MinorVersion: 1},
+			&ttnpb.MACCommand_RekeyConf{MinorVersion: 1},
 			[]byte{0x0B, 1},
 			false,
 		},
 		{
 			"ADRParamSetupReq",
-			&MACCommand_ADRParamSetupReq{
-				ADRAckDelayExponent: ADR_ACK_DELAY_4,
-				ADRAckLimitExponent: ADR_ACK_LIMIT_16,
+			&ttnpb.MACCommand_ADRParamSetupReq{
+				ADRAckDelayExponent: ttnpb.ADR_ACK_DELAY_4,
+				ADRAckLimitExponent: ttnpb.ADR_ACK_LIMIT_16,
 			},
 			[]byte{0x0C, 0x42},
 			false,
 		},
 		{
 			"ADRParamSetupAns",
-			CID_ADR_PARAM_SETUP,
+			ttnpb.CID_ADR_PARAM_SETUP,
 			[]byte{0x0C},
 			true,
 		},
 		{
 			"DeviceTimeReq",
-			CID_DEVICE_TIME,
+			ttnpb.CID_DEVICE_TIME,
 			[]byte{0x0D},
 			true,
 		},
 		{
 			"DeviceTimeAns",
-			&MACCommand_DeviceTimeAns{
+			&ttnpb.MACCommand_DeviceTimeAns{
 				Time: gpstime.Parse(0x42ffffff).Add(0x42 * time.Duration(math.Pow(0.5, 8)*float64(time.Second))).UTC(),
 			},
 			[]byte{0x0D, 0xff, 0xff, 0xff, 0x42, 0x42},
@@ -261,7 +262,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"ForceRejoinReq",
-			&MACCommand_ForceRejoinReq{
+			&ttnpb.MACCommand_ForceRejoinReq{
 				MaxRetries:     0x7,
 				PeriodExponent: 0x7,
 				DataRateIndex:  0xd,
@@ -272,7 +273,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RejoinParamSetupReq",
-			&MACCommand_RejoinParamSetupReq{
+			&ttnpb.MACCommand_RejoinParamSetupReq{
 				MaxTimeExponent:  0x4,
 				MaxCountExponent: 0x2,
 			},
@@ -281,7 +282,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RejoinParamSetupAns",
-			&MACCommand_RejoinParamSetupAns{
+			&ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
 			[]byte{0x0F, 0x1},
@@ -289,21 +290,21 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"PingSlotInfoReq",
-			&MACCommand_PingSlotInfoReq{
-				Period: PingSlotPeriod(0x7),
+			&ttnpb.MACCommand_PingSlotInfoReq{
+				Period: ttnpb.PingSlotPeriod(0x7),
 			},
 			[]byte{0x10, 0x7},
 			true,
 		},
 		{
 			"PingSlotInfoAns",
-			CID_PING_SLOT_INFO,
+			ttnpb.CID_PING_SLOT_INFO,
 			[]byte{0x10},
 			false,
 		},
 		{
 			"PingSlotChannelReq",
-			&MACCommand_PingSlotChannelReq{
+			&ttnpb.MACCommand_PingSlotChannelReq{
 				Frequency:     0x42ffff,
 				DataRateIndex: 0xf,
 			},
@@ -312,7 +313,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"PingSlotChannelAns",
-			&MACCommand_PingSlotChannelAns{
+			&ttnpb.MACCommand_PingSlotChannelAns{
 				DataRateIndexAck: true,
 				FrequencyAck:     false,
 			},
@@ -321,13 +322,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"BeaconTimingReq",
-			CID_BEACON_TIMING,
+			ttnpb.CID_BEACON_TIMING,
 			[]byte{0x12},
 			true,
 		},
 		{
 			"BeaconTimingAns",
-			&MACCommand_BeaconTimingAns{
+			&ttnpb.MACCommand_BeaconTimingAns{
 				Delay:        0x42ff,
 				ChannelIndex: 0x42,
 			},
@@ -336,7 +337,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"BeaconFreqReq",
-			&MACCommand_BeaconFreqReq{
+			&ttnpb.MACCommand_BeaconFreqReq{
 				Frequency: 0x42ffff,
 			},
 			[]byte{0x13, 0xff, 0xff, 0x42},
@@ -344,7 +345,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"BeaconFreqAns",
-			&MACCommand_BeaconFreqAns{
+			&ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
 			},
 			[]byte{0x13, 0x01},
@@ -352,16 +353,16 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DeviceModeInd",
-			&MACCommand_DeviceModeInd{
-				Class: CLASS_A,
+			&ttnpb.MACCommand_DeviceModeInd{
+				Class: ttnpb.CLASS_A,
 			},
 			[]byte{0x20, 0x00},
 			true,
 		},
 		{
 			"DeviceModeConf",
-			&MACCommand_DeviceModeConf{
-				Class: CLASS_C,
+			&ttnpb.MACCommand_DeviceModeConf{
+				Class: ttnpb.CLASS_C,
 			},
 			[]byte{0x20, 0x02},
 			false,
@@ -375,27 +376,25 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 				t.FailNow()
 			}
 
-			b, err := cmd.MarshalLoRaWAN()
+			desc := DefaultMACCommands[ttnpb.MACCommandIdentifier(tc.Bytes[0])]
+			if !a.So(desc, should.NotBeNil) {
+				t.FailNow()
+			}
+
+			appender := DefaultMACCommands.AppendUplink
+			reader := DefaultMACCommands.ReadUplink
+			if !tc.IsUplink {
+				appender = DefaultMACCommands.AppendDownlink
+				reader = DefaultMACCommands.ReadDownlink
+			}
+
+			b, err := appender([]byte{}, *cmd)
 			if a.So(err, should.BeNil) {
 				a.So(b, should.Resemble, tc.Bytes)
 			}
 
-			b, err = cmd.AppendLoRaWAN([]byte{})
-			if a.So(err, should.BeNil) {
-				a.So(b, should.Resemble, tc.Bytes)
-			}
-
-			cmd = &MACCommand{}
-			err = cmd.UnmarshalLoRaWAN(tc.Bytes, tc.IsUplink)
-			if a.So(err, should.BeNil) {
-				if pld := cmd.GetDeviceTimeAns(); pld != nil {
-					pld.Time = pld.Time.UTC()
-				}
-				a.So(cmd, should.Resemble, tc.Payload.MACCommand())
-			}
-
-			cmd = &MACCommand{}
-			err = ReadMACCommand(bytes.NewReader(tc.Bytes), tc.IsUplink, cmd)
+			cmd = &ttnpb.MACCommand{}
+			err = reader(bytes.NewReader(tc.Bytes), cmd)
 			if pld := cmd.GetDeviceTimeAns(); pld != nil {
 				pld.Time = pld.Time.UTC()
 			}

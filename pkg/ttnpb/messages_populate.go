@@ -54,7 +54,7 @@ func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey ty
 	out.EndDeviceIDs.DevAddr = &devAddr
 
 	var err error
-	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	out.RawPayload, err = PopulatorConfig.LoRaWAN.AppendMessage(out.RawPayload, *msg)
 	if err != nil {
 		panic(fmt.Sprintf("could not encode raw payload to LoRaWAN: %s", err))
 	}
@@ -80,7 +80,7 @@ func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
 	out.EndDeviceIDs.DevEUI = &devEUI
 
 	var err error
-	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	out.RawPayload, err = PopulatorConfig.LoRaWAN.AppendMessage(out.RawPayload, *msg)
 	if err != nil {
 		panic(fmt.Sprintf("failed to encode uplink message to LoRaWAN: %s", err))
 	}
@@ -106,7 +106,7 @@ func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinType) *Upl
 	out.EndDeviceIDs.DevEUI = &devEUI
 
 	var err error
-	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	out.RawPayload, err = PopulatorConfig.LoRaWAN.AppendMessage(out.RawPayload, *msg)
 	if err != nil {
 		panic(fmt.Sprintf("failed to encode uplink message to LoRaWAN: %s", err))
 	}
@@ -128,7 +128,7 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	out.Payload = msg
 
 	var err error
-	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	out.RawPayload, err = PopulatorConfig.LoRaWAN.AppendMessage(out.RawPayload, *msg)
 	if err != nil {
 		panic(fmt.Sprintf("failed to encode downlink message to LoRaWAN: %s", err))
 	}

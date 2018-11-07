@@ -12,4 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb
+package ttnpb_test
+
+import _ "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"

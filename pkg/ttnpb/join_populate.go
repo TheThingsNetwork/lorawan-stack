@@ -41,7 +41,7 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	out.Payload = msg
 
 	var err error
-	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	out.RawPayload, err = PopulatorConfig.LoRaWAN.AppendMessage(out.RawPayload, *msg)
 	if err != nil {
 		panic(fmt.Sprintf("failed to encode join-request message to LoRaWAN: %s", err))
 	}

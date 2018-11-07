@@ -12,4 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb
+package lorawan
+
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+
+func init() {
+	ttnpb.PopulatorConfig.LoRaWAN.AppendMHDR = AppendMHDR
+	ttnpb.PopulatorConfig.LoRaWAN.AppendFHDR = AppendFHDR
+	ttnpb.PopulatorConfig.LoRaWAN.AppendMessage = AppendMessage
+	ttnpb.PopulatorConfig.LoRaWAN.MarshalMessage = MarshalMessage
+	ttnpb.PopulatorConfig.LoRaWAN.UnmarshalMessage = UnmarshalMessage
+}

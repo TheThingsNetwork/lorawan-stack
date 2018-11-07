@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb
+package lorawan
 
 import (
 	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
+// AppendMHDR appends encoded msg to dst.
+func AppendMHDR(dst []byte, msg ttnpb.MHDR) ([]byte, error) {
 	if msg.MType > 7 {
 		return nil, errExpectedLowerOrEqual("MType", 7)(msg.MType)
 	}
@@ -32,24 +33,24 @@ func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return append(dst, byte(msg.MType)<<5|byte(msg.Major)), nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg MHDR) MarshalLoRaWAN() ([]byte, error) {
-	return msg.AppendLoRaWAN(make([]byte, 0, 1))
+// MarshalMHDR returns encoded msg.
+func MarshalMHDR(msg ttnpb.MHDR) ([]byte, error) {
+	return AppendMHDR(make([]byte, 0, 1), msg)
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *MHDR) UnmarshalLoRaWAN(b []byte) error {
+// UnmarshalMHDR unmarshals b into msg.
+func UnmarshalMHDR(b []byte, msg *ttnpb.MHDR) error {
 	if len(b) != 1 {
 		return errExpectedLengthEncodedEqual("MHDR", 1)(len(b))
 	}
 	v := b[0]
-	msg.MType = MType(v >> 5)
-	msg.Major = Major(v & 3)
+	msg.MType = ttnpb.MType(v >> 5)
+	msg.Major = ttnpb.Major(v & 3)
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg FCtrl) AppendLoRaWAN(dst []byte, isUplink bool, fOptsLen uint8) ([]byte, error) {
+// AppendFCtrl appends encoded msg to dst.
+func AppendFCtrl(dst []byte, msg ttnpb.FCtrl, isUplink bool, fOptsLen uint8) ([]byte, error) {
 	if fOptsLen > 15 {
 		return nil, errExpectedLowerOrEqual("FOptsLen", 15)(fOptsLen)
 	}
@@ -75,8 +76,8 @@ func (msg FCtrl) AppendLoRaWAN(dst []byte, isUplink bool, fOptsLen uint8) ([]byt
 	return append(dst, b), nil
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *FCtrl) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
+// UnmarshalFCtrl unmarshals b into msg.
+func UnmarshalFCtrl(b []byte, msg *ttnpb.FCtrl, isUplink bool) error {
 	if len(b) != 1 {
 		return errExpectedLengthEncodedEqual("FCtrl", 1)(len(b))
 	}
@@ -92,14 +93,14 @@ func (msg *FCtrl) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg FHDR) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
+// AppendFHDR appends encoded msg to dst.
+func AppendFHDR(dst []byte, msg ttnpb.FHDR, isUplink bool) ([]byte, error) {
 	dst = appendReverse(dst, msg.DevAddr[:]...)
 	fOptsLen := uint8(len(msg.FOpts))
 	if fOptsLen > 15 {
 		return nil, errExpectedLowerOrEqual("FOptsLen", 15)(fOptsLen)
 	}
-	dst, err := msg.FCtrl.AppendLoRaWAN(dst, isUplink, fOptsLen)
+	dst, err := AppendFCtrl(dst, msg.FCtrl, isUplink, fOptsLen)
 	if err != nil {
 		return nil, errFailedEncoding("FCtrl").WithCause(err)
 	}
@@ -111,14 +112,14 @@ func (msg FHDR) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	return dst, nil
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *FHDR) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
+// UnmarshalFHDR unmarshals b into msg.
+func UnmarshalFHDR(b []byte, msg *ttnpb.FHDR, isUplink bool) error {
 	n := len(b)
 	if n < 7 || n > 23 {
 		return errExpectedLengthEncodedBound("FHDR", 7, 23)(n)
 	}
 	copyReverse(msg.DevAddr[:], b[0:4])
-	if err := msg.FCtrl.UnmarshalLoRaWAN(b[4:5], isUplink); err != nil {
+	if err := UnmarshalFCtrl(b[4:5], &msg.FCtrl, isUplink); err != nil {
 		return errFailedDecoding("FCtrl").WithCause(err)
 	}
 	msg.FCnt = parseUint32(b[5:7])
@@ -127,9 +128,9 @@ func (msg *FHDR) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg MACPayload) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
-	dst, err := msg.FHDR.AppendLoRaWAN(dst, isUplink)
+// AppendMACPayload appends encoded msg to dst.
+func AppendMACPayload(dst []byte, msg ttnpb.MACPayload, isUplink bool) ([]byte, error) {
+	dst, err := AppendFHDR(dst, msg.FHDR, isUplink)
 	if err != nil {
 		return nil, errFailedEncoding("FHDR").WithCause(err)
 	}
@@ -143,13 +144,13 @@ func (msg MACPayload) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg MACPayload) MarshalLoRaWAN(isUplink bool) ([]byte, error) {
-	return msg.AppendLoRaWAN(make([]byte, 0, 1), isUplink)
+// MarshalMACPayload returns encoded msg.
+func MarshalMACPayload(msg ttnpb.MACPayload, isUplink bool) ([]byte, error) {
+	return AppendMACPayload(make([]byte, 0, 1), msg, isUplink)
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
+// UnmarshalMACPayload unmarshals b into msg.
+func UnmarshalMACPayload(b []byte, msg *ttnpb.MACPayload, isUplink bool) error {
 	n := uint8(len(b))
 	if n < 7 {
 		return errExpectedLengthHigherOrEqual("FHDR", 7)(n)
@@ -159,7 +160,7 @@ func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	if n < fhdrLen {
 		return errExpectedLengthHigherOrEqual("MACPayload", fhdrLen)(n)
 	}
-	if err := msg.FHDR.UnmarshalLoRaWAN(b[0:fhdrLen], isUplink); err != nil {
+	if err := UnmarshalFHDR(b[0:fhdrLen], &msg.FHDR, isUplink); err != nil {
 		return errFailedDecoding("FHDR").WithCause(err)
 	}
 
@@ -176,8 +177,8 @@ func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
+// AppendDLSettings appends encoded msg to dst.
+func AppendDLSettings(dst []byte, msg ttnpb.DLSettings) ([]byte, error) {
 	if msg.Rx1DROffset > 7 {
 		return nil, errExpectedLowerOrEqual("Rx1DROffset", 7)(msg.Rx1DROffset)
 	}
@@ -192,20 +193,20 @@ func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return append(dst, b), nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg DLSettings) MarshalLoRaWAN() ([]byte, error) {
-	return msg.AppendLoRaWAN(make([]byte, 0, 1))
+// MarshalDLSettings returns encoded msg.
+func MarshalDLSettings(msg ttnpb.DLSettings) ([]byte, error) {
+	return AppendDLSettings(make([]byte, 0, 1), msg)
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
+// UnmarshalDLSettings unmarshals b into msg.
+func UnmarshalDLSettings(b []byte, msg *ttnpb.DLSettings) error {
 	if len(b) != 1 {
 		return errExpectedLengthEncodedEqual("DLSettings", 1)(len(b))
 	}
 	v := uint32(b[0])
 	msg.OptNeg = (v >> 7) != 0
 	msg.Rx1DROffset = (v >> 4) & 0x7
-	msg.Rx2DR = DataRateIndex(v & 0xf)
+	msg.Rx2DR = ttnpb.DataRateIndex(v & 0xf)
 	return nil
 }
 
@@ -218,8 +219,8 @@ var (
 	)
 )
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg CFList) AppendLoRaWAN(dst []byte) ([]byte, error) {
+// AppendCFList appends encoded msg to dst.
+func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 	switch msg.Type {
 	case 0:
 		if len(msg.Freq) > 15 {
@@ -254,18 +255,18 @@ func (msg CFList) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg CFList) MarshalLoRaWAN() ([]byte, error) {
-	return msg.AppendLoRaWAN(make([]byte, 0, 16))
+// MarshalCFList returns encoded msg.
+func MarshalCFList(msg ttnpb.CFList) ([]byte, error) {
+	return AppendCFList(make([]byte, 0, 16), msg)
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
+// UnmarshalCFList unmarshals b into msg.
+func UnmarshalCFList(b []byte, msg *ttnpb.CFList) error {
 	n := len(b)
 	if n != 16 {
 		return errExpectedLengthEncodedEqual("CFList", 16)(n)
 	}
-	msg.Type = CFListType(b[15])
+	msg.Type = ttnpb.CFListType(b[15])
 	switch msg.Type {
 	case 0:
 		msg.Freq = make([]uint32, 0, 5)
@@ -292,12 +293,12 @@ func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
+// AppendJoinAcceptPayload appends encoded msg to dst.
+func AppendJoinAcceptPayload(dst []byte, msg ttnpb.JoinAcceptPayload) ([]byte, error) {
 	dst = appendReverse(dst, msg.JoinNonce[:]...)
 	dst = appendReverse(dst, msg.NetID[:]...)
 	dst = appendReverse(dst, msg.DevAddr[:]...)
-	dst, err := msg.DLSettings.AppendLoRaWAN(dst)
+	dst, err := AppendDLSettings(dst, msg.DLSettings)
 	if err != nil {
 		return nil, errFailedEncoding("DLSettings").WithCause(err)
 	}
@@ -306,7 +307,7 @@ func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	}
 	dst = append(dst, byte(msg.RxDelay))
 	if msg.GetCFList() != nil {
-		dst, err = msg.CFList.AppendLoRaWAN(dst)
+		dst, err = AppendCFList(dst, *msg.CFList)
 		if err != nil {
 			return nil, errFailedEncoding("CFList").WithCause(err)
 		}
@@ -314,16 +315,16 @@ func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg JoinAcceptPayload) MarshalLoRaWAN() ([]byte, error) {
+// MarshalJoinAcceptPayload returns encoded msg.
+func MarshalJoinAcceptPayload(msg ttnpb.JoinAcceptPayload) ([]byte, error) {
 	if msg.GetCFList() != nil {
-		return msg.AppendLoRaWAN(make([]byte, 0, 28))
+		return AppendJoinAcceptPayload(make([]byte, 0, 28), msg)
 	}
-	return msg.AppendLoRaWAN(make([]byte, 0, 12))
+	return AppendJoinAcceptPayload(make([]byte, 0, 12), msg)
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
+// UnmarshalJoinAcceptPayload unmarshals b into msg.
+func UnmarshalJoinAcceptPayload(b []byte, msg *ttnpb.JoinAcceptPayload) error {
 	n := len(b)
 	if n != 12 && n != 28 {
 		return errExpectedLengthEncodedTwoChoices("JoinAcceptPayload", 12, 28)(n)
@@ -331,36 +332,36 @@ func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 	copyReverse(msg.JoinNonce[:], b[0:3])
 	copyReverse(msg.NetID[:], b[3:6])
 	copyReverse(msg.DevAddr[:], b[6:10])
-	if err := msg.DLSettings.UnmarshalLoRaWAN(b[10:11]); err != nil {
+	if err := UnmarshalDLSettings(b[10:11], &msg.DLSettings); err != nil {
 		return errFailedDecoding("DLSettings").WithCause(err)
 	}
-	msg.RxDelay = RxDelay(b[11])
+	msg.RxDelay = ttnpb.RxDelay(b[11])
 
 	if n == 12 {
 		return nil
 	}
-	msg.CFList = &CFList{}
-	if err := msg.CFList.UnmarshalLoRaWAN(b[12:]); err != nil {
+	msg.CFList = &ttnpb.CFList{}
+	if err := UnmarshalCFList(b[12:], msg.CFList); err != nil {
 		return errFailedDecoding("CFList").WithCause(err)
 	}
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg JoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
+// AppendJoinRequestPayload appends encoded msg to dst.
+func AppendJoinRequestPayload(dst []byte, msg ttnpb.JoinRequestPayload) ([]byte, error) {
 	dst = appendReverse(dst, msg.JoinEUI[:]...)
 	dst = appendReverse(dst, msg.DevEUI[:]...)
 	dst = appendReverse(dst, msg.DevNonce[:]...)
 	return dst, nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg JoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
-	return msg.AppendLoRaWAN(make([]byte, 0, 18))
+// MarshalJoinRequestPayload returns encoded msg.
+func MarshalJoinRequestPayload(msg ttnpb.JoinRequestPayload) ([]byte, error) {
+	return AppendJoinRequestPayload(make([]byte, 0, 18), msg)
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
+// UnmarshalJoinRequestPayload unmarshals b into msg.
+func UnmarshalJoinRequestPayload(b []byte, msg *ttnpb.JoinRequestPayload) error {
 	if len(b) != 18 {
 		return errExpectedLengthEncodedEqual("JoinRequestPayload", 18)(len(b))
 	}
@@ -370,8 +371,8 @@ func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg RejoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
+// AppendRejoinRequestPayload appends encoded msg to dst.
+func AppendRejoinRequestPayload(dst []byte, msg ttnpb.RejoinRequestPayload) ([]byte, error) {
 	dst = append(dst, byte(msg.RejoinType))
 	switch msg.RejoinType {
 	case 0, 2:
@@ -390,23 +391,21 @@ func (msg RejoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg RejoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
+// MarshalRejoinRequestPayload returns encoded msg.
+func MarshalRejoinRequestPayload(msg ttnpb.RejoinRequestPayload) ([]byte, error) {
 	if msg.RejoinType == 1 {
-		return msg.AppendLoRaWAN(make([]byte, 0, 19))
+		return AppendRejoinRequestPayload(make([]byte, 0, 19), msg)
 	}
-	return msg.AppendLoRaWAN(make([]byte, 0, 14))
+	return AppendRejoinRequestPayload(make([]byte, 0, 14), msg)
 }
 
 var errEncryptedJoinAcceptPayloadLength = unexpectedValue(
 	errors.DefineInvalidArgument("encrypted_joinacceptpayload_length", "encrypted JoinAcceptPayload should have length of 16 or 32", valueKey),
 )
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-// If message type is a join-accept, only the Encrypted field is populated in
-// the payload. You should decrypt that value and supply it to UnmarshalLoRaWAN of the payload struct to populate it. MIC should be set manually(i.e. msg.MIC = decrypted[len(decrypted)-4:]) after decryption.
-func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
-	msg.RejoinType = RejoinType(b[0])
+// UnmarshalRejoinRequestPayload unmarshals b into msg.
+func UnmarshalRejoinRequestPayload(b []byte, msg *ttnpb.RejoinRequestPayload) error {
+	msg.RejoinType = ttnpb.RejoinType(b[0])
 	switch msg.RejoinType {
 	case 0, 2:
 		if len(b) != 14 {
@@ -428,50 +427,50 @@ func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
-func (msg Message) AppendLoRaWAN(dst []byte) ([]byte, error) {
-	dst, err := msg.MHDR.AppendLoRaWAN(dst)
+// AppendMessage appends encoded msg to dst.
+func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
+	dst, err := AppendMHDR(dst, msg.MHDR)
 	if err != nil {
 		return nil, errFailedEncoding("MHDR").WithCause(err)
 	}
 	switch msg.MType {
-	case MType_CONFIRMED_DOWN, MType_UNCONFIRMED_DOWN:
+	case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN:
 		pld := msg.GetMACPayload()
 		if pld == nil {
 			return nil, errMissing("MACPayload")
 		}
-		dst, err = pld.AppendLoRaWAN(dst, false)
+		dst, err = AppendMACPayload(dst, *pld, false)
 		if err != nil {
 			return nil, errFailedEncoding("MACPayload").WithCause(err)
 		}
-	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		pld := msg.GetMACPayload()
 		if pld == nil {
 			return nil, errMissing("MACPayload")
 		}
-		dst, err = pld.AppendLoRaWAN(dst, true)
+		dst, err = AppendMACPayload(dst, *pld, true)
 		if err != nil {
 			return nil, errFailedEncoding("uplink MACPayload").WithCause(err)
 		}
-	case MType_JOIN_REQUEST:
+	case ttnpb.MType_JOIN_REQUEST:
 		pld := msg.GetJoinRequestPayload()
 		if pld == nil {
 			return nil, errMissing("JoinRequestPayload")
 		}
-		dst, err = pld.AppendLoRaWAN(dst)
+		dst, err = AppendJoinRequestPayload(dst, *pld)
 		if err != nil {
 			return nil, errFailedEncoding("JoinRequestPayload").WithCause(err)
 		}
-	case MType_REJOIN_REQUEST:
+	case ttnpb.MType_REJOIN_REQUEST:
 		pld := msg.GetRejoinRequestPayload()
 		if pld == nil {
 			return nil, errMissing("RejoinRequestPayload")
 		}
-		dst, err = pld.AppendLoRaWAN(dst)
+		dst, err = AppendRejoinRequestPayload(dst, *pld)
 		if err != nil {
 			return nil, errFailedEncoding("RejoinRequestPayload").WithCause(err)
 		}
-	case MType_JOIN_ACCEPT:
+	case ttnpb.MType_JOIN_ACCEPT:
 		pld := msg.GetJoinAcceptPayload()
 		if pld == nil {
 			return nil, errMissing("JoinAcceptPayload")
@@ -488,69 +487,67 @@ func (msg Message) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
-func (msg Message) MarshalLoRaWAN() ([]byte, error) {
+// MarshalMessage returns encoded msg.
+func MarshalMessage(msg ttnpb.Message) ([]byte, error) {
 	switch msg.MType {
-	case MType_CONFIRMED_DOWN, MType_UNCONFIRMED_DOWN, MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+	case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		// MHDR(1) + Payload(up to 250) + MIC(4)
-		return msg.AppendLoRaWAN(make([]byte, 0, 255))
-	case MType_JOIN_REQUEST:
+		return AppendMessage(make([]byte, 0, 255), msg)
+	case ttnpb.MType_JOIN_REQUEST:
 		// MHDR(1) + Payload(18) + MIC(4)
-		return msg.AppendLoRaWAN(make([]byte, 0, 23))
-	case MType_REJOIN_REQUEST:
+		return AppendMessage(make([]byte, 0, 23), msg)
+	case ttnpb.MType_REJOIN_REQUEST:
 		// MHDR(1) + Payload(14|19) + MIC(4)
-		return msg.AppendLoRaWAN(make([]byte, 0, 24))
-	case MType_JOIN_ACCEPT:
+		return AppendMessage(make([]byte, 0, 24), msg)
+	case ttnpb.MType_JOIN_ACCEPT:
 		// MHDR(1) + Encrypted payload(16|32)
-		return msg.AppendLoRaWAN(make([]byte, 0, 33))
+		return AppendMessage(make([]byte, 0, 33), msg)
 	default:
 		return nil, errUnknown("MType")(msg.MType.String())
 	}
 }
 
-// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
-// If message type is a join-accept, only the Encrypted field is populated in
-// the payload. You should decrypt that value and supply it to UnmarshalLoRaWAN of the payload struct to populate it. MIC should be set manually(i.e. msg.MIC = decrypted[len(decrypted)-4:]) after decryption.
-func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
+// UnmarshalMessage unmarshals b into msg.
+func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 	n := len(b)
 	if n == 0 {
 		return errMissing("PHYPayload")
 	}
-	if err := msg.MHDR.UnmarshalLoRaWAN(b[0:1]); err != nil {
+	if err := UnmarshalMHDR(b[0:1], &msg.MHDR); err != nil {
 		return errFailedDecoding("MHDR").WithCause(err)
 	}
 	switch msg.MHDR.MType {
-	case MType_CONFIRMED_DOWN, MType_UNCONFIRMED_DOWN:
+	case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN:
 		if n < 12 {
 			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
 		}
-		pld := &MACPayload{}
-		if err := pld.UnmarshalLoRaWAN(b[1:n-4], false); err != nil {
+		pld := &ttnpb.MACPayload{}
+		if err := UnmarshalMACPayload(b[1:n-4], pld, false); err != nil {
 			return errFailedDecoding("MACPayload").WithCause(err)
 		}
-		msg.Payload = &Message_MACPayload{pld}
+		msg.Payload = &ttnpb.Message_MACPayload{MACPayload: pld}
 		msg.MIC = b[n-4:]
-	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		if n < 12 {
 			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
 		}
-		pld := &MACPayload{}
-		if err := pld.UnmarshalLoRaWAN(b[1:n-4], true); err != nil {
+		pld := &ttnpb.MACPayload{}
+		if err := UnmarshalMACPayload(b[1:n-4], pld, true); err != nil {
 			return errFailedDecoding("MACPayload").WithCause(err)
 		}
-		msg.Payload = &Message_MACPayload{pld}
+		msg.Payload = &ttnpb.Message_MACPayload{MACPayload: pld}
 		msg.MIC = b[n-4:]
-	case MType_JOIN_REQUEST:
+	case ttnpb.MType_JOIN_REQUEST:
 		if n != 23 {
 			return errExpectedLengthEqual("JoinRequestPHYPayload", 23)(n)
 		}
-		pld := &JoinRequestPayload{}
-		if err := pld.UnmarshalLoRaWAN(b[1:19]); err != nil {
+		pld := &ttnpb.JoinRequestPayload{}
+		if err := UnmarshalJoinRequestPayload(b[1:19], pld); err != nil {
 			return errFailedDecoding("JoinRequestPayload").WithCause(err)
 		}
-		msg.Payload = &Message_JoinRequestPayload{pld}
+		msg.Payload = &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: pld}
 		msg.MIC = b[19:]
-	case MType_REJOIN_REQUEST:
+	case ttnpb.MType_REJOIN_REQUEST:
 		if n < 2 {
 			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
 		}
@@ -565,40 +562,40 @@ func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
 		if n != micIdx+4 {
 			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
 		}
-		pld := &RejoinRequestPayload{}
-		if err := pld.UnmarshalLoRaWAN(b[1:micIdx]); err != nil {
+		pld := &ttnpb.RejoinRequestPayload{}
+		if err := UnmarshalRejoinRequestPayload(b[1:micIdx], pld); err != nil {
 			return errFailedDecoding("RejoinRequestPayload").WithCause(err)
 		}
-		msg.Payload = &Message_RejoinRequestPayload{pld}
+		msg.Payload = &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: pld}
 		msg.MIC = b[micIdx:]
-	case MType_JOIN_ACCEPT:
+	case ttnpb.MType_JOIN_ACCEPT:
 		if n != 17 && n != 33 {
 			return errExpectedLengthTwoChoices("JoinAcceptPHYPayload", 17, 33)(n)
 		}
-		msg.Payload = &Message_JoinAcceptPayload{&JoinAcceptPayload{Encrypted: b[1:]}}
+		msg.Payload = &ttnpb.Message_JoinAcceptPayload{JoinAcceptPayload: &ttnpb.JoinAcceptPayload{Encrypted: b[1:]}}
 	default:
 		return errUnknown("MType")(msg.MType.String())
 	}
 	return nil
 }
 
-// UnmarshalIdentifiers unmarshals the end device identifiers.
-func (msg *UplinkMessage) UnmarshalIdentifiers() error {
+// UnmarshalUplinkMessageIdentifiers unmarshals msg.
+func UnmarshalUplinkMessageIdentifiers(msg *ttnpb.UplinkMessage) error {
 	n := len(msg.RawPayload)
 	if n == 0 {
 		return errMissing("PHYPayload")
 	}
 	if msg.Payload == nil {
-		msg.Payload = &Message{}
+		msg.Payload = &ttnpb.Message{}
 	}
 	if msg.EndDeviceIDs == nil {
-		msg.EndDeviceIDs = &EndDeviceIdentifiers{}
+		msg.EndDeviceIDs = &ttnpb.EndDeviceIdentifiers{}
 	}
-	if err := msg.Payload.MHDR.UnmarshalLoRaWAN(msg.RawPayload[0:1]); err != nil {
+	if err := UnmarshalMHDR(msg.RawPayload[0:1], &msg.Payload.MHDR); err != nil {
 		return errFailedDecoding("MHDR").WithCause(err)
 	}
 	switch msg.Payload.MHDR.MType {
-	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
+	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		if n < 12 {
 			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
 		}
@@ -606,7 +603,7 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 		copyReverse(devAddr[:], msg.RawPayload[1:5])
 		msg.EndDeviceIDs.DevAddr = &devAddr
 		return nil
-	case MType_JOIN_REQUEST:
+	case ttnpb.MType_JOIN_REQUEST:
 		if n != 23 {
 			return errExpectedLengthEqual("JoinRequestPHYPayload", 23)(n)
 		}
@@ -616,7 +613,7 @@ func (msg *UplinkMessage) UnmarshalIdentifiers() error {
 		msg.EndDeviceIDs.JoinEUI = &joinEUI
 		msg.EndDeviceIDs.DevEUI = &devEUI
 		return nil
-	case MType_REJOIN_REQUEST:
+	case ttnpb.MType_REJOIN_REQUEST:
 		if n != 19 && n != 24 {
 			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
 		}

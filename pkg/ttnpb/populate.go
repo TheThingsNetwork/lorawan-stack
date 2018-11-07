@@ -13,3 +13,13 @@
 // limitations under the License.
 
 package ttnpb
+
+var PopulatorConfig struct {
+	LoRaWAN struct {
+		AppendMHDR       func(b []byte, mhdr MHDR) ([]byte, error)
+		AppendFHDR       func(b []byte, fhdr FHDR, isUplink bool) ([]byte, error)
+		AppendMessage    func(dst []byte, msg Message) ([]byte, error)
+		MarshalMessage   func(msg Message) ([]byte, error)
+		UnmarshalMessage func(b []byte, msg *Message) error
+	}
+}
