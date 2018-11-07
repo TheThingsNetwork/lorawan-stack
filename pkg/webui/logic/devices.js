@@ -17,8 +17,6 @@ import { createLogic } from 'redux-logic'
 import api from '../api'
 import * as devices from '../actions/devices'
 
-const PAGE_SIZE = 3
-
 const getDevicesListLogic = createLogic({
   type: [
     devices.GET_DEVICES_LIST,
@@ -26,8 +24,6 @@ const getDevicesListLogic = createLogic({
   ],
   async process ({ getState, action }, dispatch, done) {
     const { appId, filters } = action
-
-    filters.pageSize = PAGE_SIZE
 
     try {
       const data = filters.query
