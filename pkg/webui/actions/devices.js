@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_DEVICES_LIST = 'GET_DEVIVES_LIST'
+export const GET_DEVICES_LIST = 'GET_DEVICES_LIST'
+export const SEARCH_DEVICES_LIST = 'SEARCH_DEVICES_LIST'
 export const GET_DEVICES_LIST_SUCCESS = 'GET_DEVICES_LIST_SUCCESS'
 export const GET_DEVICES_LIST_FAILURE = 'GET_DEVICES_LIST_FAILURE'
 
 export const getDevicesList = (appId, filters) => (
   { type: GET_DEVICES_LIST, appId, filters }
+)
+
+export const searchDevicesList = (appId, filters) => (
+  { type: SEARCH_DEVICES_LIST, appId, filters }
 )
 
 export const getDevicesListSuccess = (devices, totalCount) => (
