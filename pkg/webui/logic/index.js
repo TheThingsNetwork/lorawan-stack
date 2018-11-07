@@ -17,6 +17,7 @@ import user from './user'
 import init from './init'
 import applications from './applications'
 import application from './application'
+import devices from './devices'
 
 export default [
   client,
@@ -24,4 +25,5 @@ export default [
   init,
   ...applications,
   ...application,
+  ...devices,
 ]
