@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -621,7 +622,7 @@ func TestGenerateDownlink(t *testing.T) {
 			}
 		}
 
-		b, err := msg.MarshalLoRaWAN()
+		b, err := lorawan.MarshalMessage(*msg)
 		if err != nil {
 			t.Fatal("Failed to marshal downlink")
 		}
@@ -645,7 +646,7 @@ func TestGenerateDownlink(t *testing.T) {
 
 	encodeMAC := func(cmds ...*ttnpb.MACCommand) (b []byte) {
 		for _, cmd := range cmds {
-			b = test.Must(cmd.AppendLoRaWAN(b)).([]byte)
+			b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(b, *cmd)).([]byte)
 		}
 		return
 	}

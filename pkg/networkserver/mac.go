@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -23,7 +24,7 @@ import (
 // f returns a slice downlink commands to append to cmds, amount of uplinks to expect and bool indicating whether all commands fit.
 // enqueueMACCommand returns the resulting downlink MAC command slice, new value for maxDownLen, maxUpLen and bool indicating whether all commands fit.
 func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, uint16, uint16, bool) {
-	desc := ttnpb.DefaultMACCommands[cid]
+	desc := lorawan.DefaultMACCommands[cid]
 	maxDown := maxDownLen / (1 + desc.DownlinkLength)
 	maxUp := maxUpLen / (1 + desc.UplinkLength)
 	enq, nUp, ok := f(maxDown, maxUp)

@@ -23,6 +23,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -45,7 +46,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger := log.FromContext(ctx)
 
 	if up.Payload.Payload == nil {
-		if err := up.Payload.UnmarshalLoRaWAN(up.RawPayload); err != nil {
+		if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
 			return nil, errDecodePayload.WithCause(err)
 		}
 	}

@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
@@ -830,9 +831,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -894,9 +895,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -963,9 +964,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -1033,9 +1034,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -1101,9 +1102,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
 						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -1181,9 +1182,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
 						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -1250,9 +1251,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
 						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -1330,9 +1331,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
 						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
+						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),

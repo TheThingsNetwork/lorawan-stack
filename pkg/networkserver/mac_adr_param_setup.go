@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -39,8 +40,8 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 		}
 
 		req := &ttnpb.MACCommand_ADRParamSetupReq{
-			ADRAckLimitExponent: ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
-			ADRAckDelayExponent: ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
+			ADRAckLimitExponent: lorawan.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
+			ADRAckDelayExponent: lorawan.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
 		}
 		events.Publish(evtEnqueueADRParamSetupRequest(ctx, dev.EndDeviceIdentifiers, req))
 		return []*ttnpb.MACCommand{req.MACCommand()}, 1, true
@@ -55,12 +56,14 @@ func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err erro
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetADRParamSetupReq()
 
-		dev.MACState.CurrentParameters.ADRAckDelay = ttnpb.ADRAckDelayExponentToUint32(req.ADRAckDelayExponent)
-		dev.MACState.CurrentParameters.ADRAckLimit = ttnpb.ADRAckLimitExponentToUint32(req.ADRAckLimitExponent)
-		if ttnpb.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay) == req.ADRAckDelayExponent {
+		dev.MACState.CurrentParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(req.ADRAckDelayExponent)
+		dev.MACState.CurrentParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(req.ADRAckLimitExponent)
+
+		if lorawan.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay) == req.ADRAckDelayExponent {
 			dev.MACState.DesiredParameters.ADRAckDelay = dev.MACState.CurrentParameters.ADRAckDelay
 		}
-		if ttnpb.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit) == req.ADRAckLimitExponent {
+
+		if lorawan.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit) == req.ADRAckLimitExponent {
 			dev.MACState.DesiredParameters.ADRAckLimit = dev.MACState.CurrentParameters.ADRAckLimit
 		}
 		return nil

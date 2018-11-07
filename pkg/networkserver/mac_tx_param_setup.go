@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -39,7 +40,7 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 			return nil, 0, false
 		}
 		pld := &ttnpb.MACCommand_TxParamSetupReq{
-			MaxEIRPIndex:      ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
+			MaxEIRPIndex:      lorawan.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
 			DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime,
 			UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime,
 		}
@@ -58,8 +59,9 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 
 		dev.MACState.CurrentParameters.DownlinkDwellTime = req.DownlinkDwellTime
 		dev.MACState.CurrentParameters.UplinkDwellTime = req.UplinkDwellTime
-		dev.MACState.CurrentParameters.MaxEIRP = ttnpb.DeviceEIRPToFloat32(req.MaxEIRPIndex)
-		if ttnpb.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP) == req.MaxEIRPIndex {
+		dev.MACState.CurrentParameters.MaxEIRP = lorawan.DeviceEIRPToFloat32(req.MaxEIRPIndex)
+
+		if lorawan.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP) == req.MaxEIRPIndex {
 			dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
 		}
 		return nil

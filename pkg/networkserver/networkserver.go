@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -239,17 +240,19 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		return nil, errEmptySession
 	}
 
+	spec := lorawan.DefaultMACCommands
+
 	cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
 	for _, cmd := range dev.MACState.QueuedResponses {
-		if ttnpb.DefaultMACCommands[cmd.CID].DownlinkLength > maxDownLen {
-			continue
-		}
-		cmds = append(cmds, cmd)
-		desc := ttnpb.DefaultMACCommands[cmd.CID]
+		desc := spec[cmd.CID]
 		if desc == nil {
 			maxDownLen = 0
 			continue
 		}
+		if desc.DownlinkLength > maxDownLen {
+			continue
+		}
+		cmds = append(cmds, cmd)
 		maxDownLen -= desc.DownlinkLength
 	}
 
@@ -285,7 +288,8 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	cmdBuf := make([]byte, 0, maxDownLen)
 	for _, cmd := range cmds {
 		var err error
-		cmdBuf, err = cmd.AppendLoRaWAN(cmdBuf)
+		cmdBuf, err = spec.AppendDownlink(cmdBuf, *cmd)
+
 		if err != nil {
 			return nil, errEncodeMAC.WithCause(err)
 		}
@@ -382,7 +386,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		dev.MACState.LastConfirmedDownlinkAt = timePtr(time.Now().UTC())
 	}
 
-	b, err := (ttnpb.Message{
+	b, err := lorawan.MarshalMessage(ttnpb.Message{
 		MHDR: ttnpb.MHDR{
 			MType: mType,
 			Major: ttnpb.Major_LORAWAN_R1,
@@ -390,7 +394,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		Payload: &ttnpb.Message_MACPayload{
 			MACPayload: pld,
 		},
-	}).MarshalLoRaWAN()
+	})
 	if err != nil {
 		return nil, errEncodePayload.WithCause(err)
 	}
@@ -907,7 +911,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	var cmds []*ttnpb.MACCommand
 	for r := bytes.NewReader(mac); r.Len() > 0; {
 		cmd := &ttnpb.MACCommand{}
-		if err := ttnpb.ReadMACCommand(r, true, cmd); err != nil {
+		if err := lorawan.DefaultMACCommands.ReadUplink(r, cmd); err != nil {
 			logger.
 				WithField("unmarshaled", len(cmds)).
 				WithError(err).
