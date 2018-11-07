@@ -27,6 +27,6 @@ go.protos: $(wildcard api/*.proto)
 	gofmt -w -s $(PWD)/pkg/ttnpb
 
 go.protos.clean:
-	find ./pkg/ttnpb -name '*.pb.go' -delete -or -name '*.pb.gw.go' -delete -or -name '*pb_test.go' -delete
+	find ./pkg/ttnpb -name '*.pb.go' -delete -or -name '*.pb.gw.go' -delete
 
 # vim: ft=make
