@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SideNavigation from '.'
+import SideNavigation from './side'
 
 export default function () {
   const driver = {
