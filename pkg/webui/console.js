@@ -20,6 +20,7 @@ import { Provider } from 'react-redux'
 
 import { EnvProvider } from './lib/components/env'
 import { BreadcrumbsProvider } from './components/breadcrumbs/context'
+import { SideNavigationProvider } from './components/navigation/side/context'
 import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 
@@ -42,7 +43,9 @@ const Console = () => (
         <WithLocale>
           <ConnectedRouter history={history}>
             <BreadcrumbsProvider>
-              <App />
+              <SideNavigationProvider>
+                <App />
+              </SideNavigationProvider>
             </BreadcrumbsProvider>
           </ConnectedRouter>
         </WithLocale>

@@ -30,6 +30,7 @@ export default defineMessages({
   description: 'Description',
   devices: 'Devices',
   gateways: 'Gateways',
+  generalSettings: 'General Settings',
   integrations: 'Integrations',
   loading: 'Loading',
   login: 'Login',

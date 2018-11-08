@@ -20,6 +20,7 @@ import bind from 'autobind-decorator'
 import { Helmet } from 'react-helmet'
 
 import { withEnv } from '../../../lib/components/env'
+import SideNavigation from '../../../components/navigation/side'
 import Header from '../../../components/header'
 import Footer from '../../../components/footer'
 import Landing from '../landing'
@@ -57,7 +58,7 @@ export default class ConsoleApp extends React.Component {
         <Header className={style.header} user={user} handleLogout={this.handleLogout} />
         <main className={style.main}>
           <div>
-            {/* side navigation here*/}
+            <SideNavigation />
           </div>
           <div className={style.content}>
             <Switch>

@@ -19,6 +19,7 @@ import { Switch, Route } from 'react-router'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import { withSideNavigation } from '../../../components/navigation/side/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Spinner from '../../../components/spinner'
 
@@ -31,6 +32,55 @@ import { getApplication } from '../../../actions/application'
     appId: props.match.params.appId,
     fetching: application.fetching,
     error: application.error,
+  }
+})
+@withSideNavigation(function (props) {
+  const matchedUrl = props.match.url
+
+  return {
+    header: { title: props.appId, icon: 'application' },
+    entries: [
+      {
+        title: sharedMessages.overview,
+        path: matchedUrl,
+        icon: 'overview',
+      },
+      {
+        title: sharedMessages.devices,
+        path: `${matchedUrl}/devices`,
+        icon: 'devices',
+      },
+      {
+        title: sharedMessages.data,
+        path: `${matchedUrl}/data`,
+        icon: 'data',
+      },
+      {
+        title: sharedMessages.payload_formats,
+        path: `${matchedUrl}/payload-formats`,
+        icon: 'payload_formats',
+      },
+      {
+        title: sharedMessages.integrations,
+        path: `${matchedUrl}/integrations`,
+        icon: 'integration',
+      },
+      {
+        title: sharedMessages.collaborators,
+        path: `${matchedUrl}/collaborators`,
+        icon: 'organization',
+      },
+      {
+        title: sharedMessages.access,
+        path: `${matchedUrl}/access`,
+        icon: 'access',
+      },
+      {
+        title: sharedMessages.generalSettings,
+        path: `${matchedUrl}/general-settings`,
+        icon: 'general_settings',
+      },
+    ],
   }
 })
 @withBreadcrumb('apps.single', function (props) {
