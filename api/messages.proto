@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/error.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
 import "lorawan-stack/api/lorawan.proto";
@@ -211,6 +212,11 @@ message ApplicationDownlinks {
   repeated ApplicationDownlink downlinks = 1;
 }
 
+message ApplicationDownlinkFailed {
+  ApplicationDownlink downlink = 1  [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ErrorDetails error = 2 [(gogoproto.nullable) = false];
+}
+
 message ApplicationInvalidatedDownlinks {
   repeated ApplicationDownlink downlinks = 1;
   uint32 last_f_cnt_down = 2;
@@ -226,9 +232,10 @@ message ApplicationUp {
     ApplicationDownlink downlink_ack = 5;
     ApplicationDownlink downlink_nack = 6;
     ApplicationDownlink downlink_sent = 7;
-    ApplicationDownlink downlink_queued = 8;
-    ApplicationInvalidatedDownlinks downlink_queue_invalidated = 9;
-    ApplicationLocation location_solved = 10;
+    ApplicationDownlinkFailed downlink_failed = 8;
+    ApplicationDownlink downlink_queued = 9;
+    ApplicationInvalidatedDownlinks downlink_queue_invalidated = 10;
+    ApplicationLocation location_solved = 11;
   }
 }
 

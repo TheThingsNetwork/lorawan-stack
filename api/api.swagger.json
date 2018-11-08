@@ -4886,6 +4886,17 @@
         }
       }
     },
+    "v3ApplicationDownlinkFailed": {
+      "type": "object",
+      "properties": {
+        "downlink": {
+          "$ref": "#/definitions/v3ApplicationDownlink"
+        },
+        "error": {
+          "$ref": "#/definitions/v3ErrorDetails"
+        }
+      }
+    },
     "v3ApplicationDownlinks": {
       "type": "object",
       "properties": {
@@ -5002,6 +5013,9 @@
         },
         "downlink_sent": {
           "$ref": "#/definitions/v3ApplicationDownlink"
+        },
+        "downlink_failed": {
+          "$ref": "#/definitions/v3ApplicationDownlinkFailed"
         },
         "downlink_queued": {
           "$ref": "#/definitions/v3ApplicationDownlink"
@@ -5880,6 +5894,36 @@
         }
       },
       "description": "EntityIdentifiers contains one of the possible entity identifiers."
+    },
+    "v3ErrorDetails": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "Namespace of the error (typically the package name in the stack)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the error."
+        },
+        "message_format": {
+          "type": "string",
+          "description": "The default (fallback) message format that should be used for the error.\nThis is also used if the client does not have a translation for the error."
+        },
+        "attributes": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Attributes that should be filled into the message format. Any extra attributes\ncan be displayed as error details."
+        },
+        "correlation_id": {
+          "type": "string",
+          "description": "The correlation ID of the error can be used to correlate the error to stack\ntraces the network may (or may not) store about recent errors."
+        },
+        "cause": {
+          "$ref": "#/definitions/v3ErrorDetails",
+          "description": "The error that caused this error."
+        }
+      },
+      "description": "Error details that are communicated over gRPC (and HTTP) APIs.\nThe messages (for translation) are stored as \"error:\u003cnamespace\u003e:\u003cname\u003e\"."
     },
     "v3Event": {
       "type": "object",

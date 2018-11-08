@@ -328,6 +328,7 @@
 - [lorawan-stack/api/messages.proto](#lorawan-stack/api/messages.proto)
     - [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink)
     - [ApplicationDownlink.ClassBC](#ttn.lorawan.v3.ApplicationDownlink.ClassBC)
+    - [ApplicationDownlinkFailed](#ttn.lorawan.v3.ApplicationDownlinkFailed)
     - [ApplicationDownlinks](#ttn.lorawan.v3.ApplicationDownlinks)
     - [ApplicationInvalidatedDownlinks](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks)
     - [ApplicationJoinAccept](#ttn.lorawan.v3.ApplicationJoinAccept)
@@ -4109,6 +4110,22 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
+<a name="ttn.lorawan.v3.ApplicationDownlinkFailed"/>
+
+### ApplicationDownlinkFailed
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| downlink | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| error | [ErrorDetails](#ttn.lorawan.v3.ErrorDetails) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ApplicationDownlinks"/>
 
 ### ApplicationDownlinks
@@ -4206,6 +4223,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | downlink_ack | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | downlink_nack | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | downlink_sent | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| downlink_failed | [ApplicationDownlinkFailed](#ttn.lorawan.v3.ApplicationDownlinkFailed) |  |  |
 | downlink_queued | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | downlink_queue_invalidated | [ApplicationInvalidatedDownlinks](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks) |  |  |
 | location_solved | [ApplicationLocation](#ttn.lorawan.v3.ApplicationLocation) |  |  |
