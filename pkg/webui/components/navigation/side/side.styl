@@ -14,6 +14,7 @@
 
 .navigation
   border-dark(right)
+  max-width: 16rem
   height: 100%
   display: flex
   flex-direction: column
@@ -26,6 +27,8 @@
     align-self: center
 
 .header
+  display: flex
+  align-content: center
   padding: $cs.l $cs.m
   font-weight: 600
   background-color: $c-backdrop
@@ -40,7 +43,11 @@
       margin-right: 0
 
 .message
-  display: inline-block
+  display: block
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 
 .icon
+  nudge('down', 3px)
   margin-right: $cs.xs
