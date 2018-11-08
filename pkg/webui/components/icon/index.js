@@ -29,6 +29,9 @@ const hardcoded = {
   application: 'web_asset',
   gateway: 'router',
   organization: 'people',
+  payload_formats: 'code',
+  access: 'lock',
+  general_settings: 'settings',
 }
 
 const Icon = function ({
