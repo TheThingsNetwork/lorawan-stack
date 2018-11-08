@@ -12,151 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import bind from 'autobind-decorator'
-import classnames from 'classnames'
-import { defineMessages } from 'react-intl'
-import PropTypes from '../../../lib/prop-types'
+import React from 'react'
 
-import Button from '../../button'
-import Icon from '../../icon'
-import Message from '../../../lib/components/message'
-import SideNavigationList from './list'
+import { SideNavigationConsumer } from './context'
+import SideNavigation from './side'
 
-import style from './side.styl'
+export default props => (
+  <SideNavigationConsumer>
+    {
+      function ({ entries, header }) {
+        if (!entries) {
+          return null
+        }
 
-const m = defineMessages({
-  hideSidebar: 'Hide Sidebar',
-})
-
-@bind
-class SideNavigation extends Component {
-
-  state = {
-    /** A flag specifying whether the side navigation is minimized or not */
-    isMinimized: false,
-    /**
-     * A map of expanded items, where:
-     *  - The key: index of the item
-     *  - The value: an object consisting of:
-     *    - isOpen - boolean flag specifying whether the item is opened or not
-     *    - isLink - boolean flag specifying whether a link is selected within
-     *                this opened item
-     */
-    itemsExpanded: {},
-  }
-
-  onToggle () {
-    this.setState(function (prev) {
-      return { isMinimized: !prev.isMinimized }
-    })
-  }
-
-  onItemExpand (index, linkSelected) {
-    this.setState(function (prev) {
-      const oldItemsExpanded = prev.itemsExpanded
-      const oldMinimized = prev.isMinimized
-
-      // make sure that no more links are active
-      if (linkSelected) {
-        const itemsExpanded = Object.keys(oldItemsExpanded)
-          .map(idx => +idx)
-          .reduce(function (acc, idx) {
-            const { isOpen, isLink } = oldItemsExpanded[idx] || {}
-            if (index === idx) {
-              acc[idx] = { isOpen: true, isLink: true }
-            } else if (isLink) {
-              acc[idx] = { isOpen, isLink: false }
-            } else {
-              acc[idx] = oldItemsExpanded[idx]
-            }
-
-            return acc
-          }, {})
-
-        return { itemsExpanded }
-      }
-
-      const {
-        isOpen = false,
-        isLink = false,
-      } = oldItemsExpanded[index] || {}
-
-      const shouldOpen = oldMinimized || !isOpen
-      const shouldLink = isLink || linkSelected
-      const shouldMinimize = oldMinimized && linkSelected
-
-      return {
-        itemsExpanded: {
-          ...oldItemsExpanded,
-          [index]: { isOpen: shouldOpen, isLink: shouldLink },
-        },
-        isMinimized: shouldMinimize,
-      }
-    })
-  }
-
-  render () {
-    const {
-      className,
-      header,
-      entries,
-    } = this.props
-    const { isMinimized, itemsExpanded } = this.state
-
-    const navigationClassNames = classnames(className, style.navigation, {
-      [style.navigationMinimized]: isMinimized,
-    })
-    const headerClassNames = classnames(style.header, {
-      [style.headerMinimized]: isMinimized,
-    })
-
-    return (
-      <nav className={navigationClassNames}>
-        <div>
-          <div className={headerClassNames}>
-            <Icon className={style.icon} icon={header.icon} />
-            <Message className={style.message} content={header.title} />
-          </div>
-          <SideNavigationList
-            itemsExpanded={itemsExpanded}
-            onItemExpand={this.onItemExpand}
-            items={entries}
-            isMinimized={isMinimized}
+        return (
+          <SideNavigation
+            {...props}
+            header={header}
+            entries={entries}
           />
-        </div>
-        <Button
-          className={style.navigationButton}
-          naked
-          secondary
-          icon={isMinimized ? 'keyboard_arrow_right' : 'keyboard_arrow_left'}
-          message={isMinimized ? null : m.hideSidebar}
-          onClick={this.onToggle}
-          data-hook="side-nav-hide-button"
-        />
-      </nav>
-    )
-  }
-}
-
-SideNavigation.propTypes = {
-  /** A list of entry objects for the side navigation */
-  entries: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.link,
-      PropTypes.shape({
-        title: PropTypes.message.isRequired,
-        icon: PropTypes.string,
-        nested: PropTypes.bool.isRequired,
-        items: PropTypes.array.isRequired,
-      }),
-    ])
-  ).isRequired,
-  /** The header for the side navigation */
-  header: PropTypes.shape({
-    title: PropTypes.string,
-    icon: PropTypes.string,
-  }),
-}
-
-export default SideNavigation
+        )
+      }
+    }
+  </SideNavigationConsumer>
+)

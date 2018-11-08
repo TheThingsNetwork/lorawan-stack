@@ -16,7 +16,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
-import SideNavigation from '../side'
+import SideNavigation from '../side/side'
 
 storiesOf('Navigation', module)
   .addDecorator((story, context) => withInfo({
