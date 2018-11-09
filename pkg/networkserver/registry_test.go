@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
@@ -93,15 +92,15 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pb.CreatedAt = ret.CreatedAt
 	pb.UpdatedAt = ret.UpdatedAt
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	ret, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	err = reg.RangeByAddr(pb.Session.DevAddr, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
@@ -143,7 +142,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pbOther.CreatedAt = ret.CreatedAt
 	pbOther.UpdatedAt = ret.UpdatedAt
-	a.So(pretty.Diff(ret, pbOther), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pbOther)
 
 	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
 	a.So(err, should.BeNil)

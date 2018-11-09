@@ -242,7 +242,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			}
 			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
 			pb.UpdatedAt = ret.UpdatedAt
-			a.So(pretty.Diff(ret, pb), should.BeEmpty)
+			a.So(ret, should.ResembleDiff, pb)
 		})
 	}
 }
@@ -394,7 +394,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			}
 			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
 			pb.UpdatedAt = ret.UpdatedAt
-			a.So(pretty.Diff(ret, pb), should.BeEmpty)
+			a.So(ret, should.ResembleDiff, pb)
 		})
 	}
 }
@@ -505,7 +505,7 @@ func TestDownlinkQueueList(t *testing.T) {
 				return
 			}
 			a.So(tc.Error, should.BeNil)
-			a.So(pretty.Diff(resp, &ttnpb.ApplicationDownlinks{Downlinks: pb.QueuedApplicationDownlinks}), should.BeEmpty)
+			a.So(resp, should.ResembleDiff, &ttnpb.ApplicationDownlinks{Downlinks: pb.QueuedApplicationDownlinks})
 		})
 	}
 }
@@ -1463,7 +1463,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				pb.CreatedAt = ret.CreatedAt
 				a.So(ret.UpdatedAt, should.HappenAfter, start)
 				pb.UpdatedAt = ret.UpdatedAt
-				a.So(pretty.Diff(ret, pb), should.BeEmpty)
+				a.So(ret, should.ResembleDiff, pb)
 
 				errch := make(chan error, 1)
 				go func() {
@@ -1475,9 +1475,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					select {
 					case req := <-asSendCh:
 						if tc.UplinkMessage.Payload.GetMACPayload().Ack {
-							a.So(pretty.Diff(req.up.GetDownlinkAck(), pb.MACState.PendingApplicationDownlink), should.BeEmpty)
+							a.So(req.up.GetDownlinkAck(), should.ResembleDiff, pb.MACState.PendingApplicationDownlink)
 						} else {
-							a.So(pretty.Diff(req.up.GetDownlinkNack(), pb.MACState.PendingApplicationDownlink), should.BeEmpty)
+							a.So(req.up.GetDownlinkNack(), should.ResembleDiff, pb.MACState.PendingApplicationDownlink)
 						}
 						close(req.errch)
 
@@ -1559,7 +1559,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata)
 					pbUp.RxMetadata = retUp.RxMetadata
 
-					a.So(pretty.Diff(ret, pb), should.BeEmpty)
+					a.So(ret, should.ResembleDiff, pb)
 				}) {
 					t.FailNow()
 				}
@@ -1595,7 +1595,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
 							msg.CorrelationIDs = we.msg.CorrelationIDs
 
-							a.So(we.msg, should.Resemble, msg)
+							a.So(we.msg, should.ResembleDiff, msg)
 							a.So(we.ctx, should.HaveParentContext, ctx)
 
 							we.ch <- time.Now()
@@ -1721,7 +1721,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
 							msg.CorrelationIDs = we.msg.CorrelationIDs
 
-							a.So(we.msg, should.Resemble, msg)
+							a.So(we.msg, should.ResembleDiff, msg)
 							a.So(we.ctx, should.HaveParentContext, ctx)
 
 							we.ch <- time.Now()
@@ -2158,7 +2158,7 @@ func HandleJoinTest() func(t *testing.T) {
 						t.FailNow()
 					}
 
-					a.So(pretty.Diff(ret.RecentDownlinks[len(ret.RecentDownlinks)-1].RawPayload, resp.RawPayload), should.BeEmpty)
+					a.So(ret.RecentDownlinks[len(ret.RecentDownlinks)-1].RawPayload, should.ResembleDiff, resp.RawPayload)
 
 					err = ResetMACState(ns.Component.FrequencyPlans, pb)
 					if !a.So(err, should.BeNil) {
@@ -2205,7 +2205,7 @@ func HandleJoinTest() func(t *testing.T) {
 					a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata)
 					pbUp.RxMetadata = retUp.RxMetadata
 
-					a.So(pretty.Diff(ret, pb), should.BeEmpty)
+					a.So(ret, should.ResembleDiff, pb)
 				})
 
 				deduplicationDoneCh = make(chan windowEnd, 1)
