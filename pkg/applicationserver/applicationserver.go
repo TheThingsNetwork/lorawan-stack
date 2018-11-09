@@ -271,6 +271,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_DownlinkAck:
 		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck)
 	case *ttnpb.ApplicationUp_DownlinkNack:
+		// TODO: Retry using a policy (https://github.com/TheThingsIndustries/lorawan-stack/issues/794)
 		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkNack)
 	default:
 		return nil
