@@ -38,6 +38,11 @@ var (
 				Namespace: []string{"js", "devices"},
 			})}
 
+			config.JS.Keys = &jsredis.KeyRegistry{Redis: redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"js", "keys"},
+			})}
+
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
 				return shared.ErrInitializeJoinServer.WithCause(err)

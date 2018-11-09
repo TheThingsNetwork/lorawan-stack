@@ -60,6 +60,11 @@ var (
 				Namespace: []string{"js", "devices"},
 			})}
 
+			config.JS.Keys = &jsredis.KeyRegistry{Redis: redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"js", "keys"},
+			})}
+
 			assets, err := assets.New(c, config.Assets)
 			if err != nil {
 				return shared.ErrInitializeBaseComponent.WithCause(err)
