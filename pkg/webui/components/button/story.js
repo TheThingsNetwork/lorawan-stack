@@ -84,6 +84,15 @@ storiesOf('Button', module)
       <Button message="Default" large busy />
     </div>
   ))
+  .add('Warning', () => (
+    <div>
+      <Button warning message="Warning" />
+      <br /><br />
+      <Button warning message="Warning" disabled />
+      <br /><br />
+      <Button warning message="Warning" busy />
+    </div>
+  ))
   .add('Danger', () => (
     <div>
       <Button danger message="Danger" />
