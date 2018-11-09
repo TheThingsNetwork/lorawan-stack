@@ -22,6 +22,10 @@ import (
 	"github.com/smartystreets/assertions"
 )
 
+const (
+	shouldHaveResembledDiff = "Expected: '%s'\nActual:   '%s'\nDiff:  '%s'(Should resemble diff)!"
+)
+
 func lastLine(s string) string {
 	if s == "" {
 		return ""
@@ -48,4 +52,17 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 		lines = append(lines, fmt.Sprintf("   %s", d))
 	}
 	return strings.Join(append(lines, lastLine(message)), "\n")
+}
+
+// ShouldResembleDiff compares the pretty.Diff of values.
+func ShouldResembleDiff(actual interface{}, expected ...interface{}) (message string) {
+	if message = need(1, expected); message != success {
+		return
+	}
+
+	diff := pretty.Diff(expected[0], actual)
+	if len(diff) != 0 {
+		return fmt.Sprintf(shouldHaveResembledDiff, expected[0], actual, diff)
+	}
+	return success
 }
