@@ -169,7 +169,7 @@ func registerUnsubscribe(ctx context.Context, conn *io.Connection) {
 	asMetrics.subscriptionsEnded.WithLabelValues(ctx, conn.Protocol()).Inc()
 }
 
-func registerReceiveUplink(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {
+func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
 		events.Publish(evtReceiveJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))
@@ -179,7 +179,7 @@ func registerReceiveUplink(ctx context.Context, msg *ttnpb.ApplicationUp, ns str
 	asMetrics.uplinkReceived.WithLabelValues(ctx, ns).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, msg *ttnpb.ApplicationUp) {
+func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
 		events.Publish(evtForwardJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))
@@ -189,7 +189,7 @@ func registerForwardUplink(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.ApplicationID).Inc()
 }
 
-func registerDropUplink(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
+func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
 		events.Publish(evtDropJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))

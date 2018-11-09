@@ -169,10 +169,10 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			}
 			return err
 		}
-		registerReceiveUplink(ctx, up, l.connName)
+		registerReceiveUp(ctx, up, l.connName)
 		if err := as.handleUp(ctx, up, l); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
-			registerDropUplink(ctx, up, err)
+			registerDropUp(ctx, up, err)
 			continue
 		}
 		switch p := up.Up.(type) {
@@ -183,7 +183,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			continue
 		}
 		l.upCh <- up
-		registerForwardUplink(ctx, up)
+		registerForwardUp(ctx, up)
 	}
 }
 
