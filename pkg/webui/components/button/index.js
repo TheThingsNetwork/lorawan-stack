@@ -40,6 +40,7 @@ class Button extends React.PureComponent {
     const {
       message,
       danger,
+      warning,
       secondary,
       naked,
       icon,
@@ -53,6 +54,7 @@ class Button extends React.PureComponent {
 
     const buttonClassNames = classnames(style.button, className, {
       [style.danger]: danger,
+      [style.warning]: warning,
       [style.secondary]: secondary,
       [style.naked]: naked,
       [style.busy]: busy,
@@ -90,6 +92,10 @@ Button.propTypes = {
    * A flag specifying whether the `danger` styling should applied to the button
    */
   danger: PropTypes.bool,
+  /**
+   * A flag specifying whether the `warning` styling should applied to the button
+   */
+  warning: PropTypes.bool,
   /**
    * A flag specifying whether the `secodnary` styling should applied to the button
    */
