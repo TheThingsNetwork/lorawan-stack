@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
@@ -1148,7 +1147,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: resp.SessionKeys,
 				StartedAt:   ret.GetSession().GetStartedAt(),
 			}
-			a.So(pretty.Diff(pb, ret), should.BeEmpty)
+			a.So(ret, should.ResembleDiff, pb)
 
 			resp, err = js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			a.So(err, should.BeError)

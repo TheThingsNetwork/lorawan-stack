@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -65,11 +64,11 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pb.CreatedAt = ret.CreatedAt
 	pb.UpdatedAt = ret.UpdatedAt
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	pbOther := CopyEndDevice(pb)
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -89,11 +88,11 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pbOther.CreatedAt = ret.CreatedAt
 	pbOther.UpdatedAt = ret.UpdatedAt
-	a.So(pretty.Diff(ret, pbOther), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pbOther)
 
 	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(ret, pbOther), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pbOther)
 
 	err = DeleteDevice(ctx, reg, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
 	if !a.So(err, should.BeNil) {
@@ -188,11 +187,11 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(ret, pb), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pb)
 
 	pbOther := CopySessionKeys(pb)
 	devEUIOther := types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -207,11 +206,11 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(pretty.Diff(ret, pbOther), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pbOther)
 
 	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(ret, pbOther), should.BeEmpty)
+	a.So(ret, should.ResembleDiff, pbOther)
 
 	err = DeleteKeys(ctx, reg, devEUI, pb.SessionKeyID)
 	if !a.So(err, should.BeNil) {
