@@ -526,6 +526,45 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
+						Name: "RegisteredDevice/DownlinkMessage/Failed",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							Up: &ttnpb.ApplicationUp_DownlinkFailed{
+								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+									ApplicationDownlink: ttnpb.ApplicationDownlink{
+										SessionKeyID: "session3",
+										FPort:        42,
+										FCnt:         42,
+										FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+									},
+									Error: ttnpb.ErrorDetails{
+										Name: "test",
+									},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								Up: &ttnpb.ApplicationUp_DownlinkFailed{
+									DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+										ApplicationDownlink: ttnpb.ApplicationDownlink{
+											SessionKeyID: "session3",
+											FPort:        42,
+											FCnt:         42,
+											FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										},
+										Error: ttnpb.ErrorDetails{
+											Name: "test",
+										},
+									},
+								},
+							})
+						},
+					},
+					{
 						Name: "RegisteredDevice/DownlinkMessage/Ack",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
