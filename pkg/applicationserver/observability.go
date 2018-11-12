@@ -160,12 +160,12 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerSubscribe(ctx context.Context, conn *io.Connection) {
-	events.Publish(evtApplicationSubscribe(ctx, conn.ApplicationIdentifiers, nil))
+	events.Publish(evtApplicationSubscribe(ctx, conn.ApplicationIDs(), nil))
 	asMetrics.subscriptionsStarted.WithLabelValues(ctx, conn.Protocol()).Inc()
 }
 
 func registerUnsubscribe(ctx context.Context, conn *io.Connection) {
-	events.Publish(evtApplicationUnsubscribe(ctx, conn.ApplicationIdentifiers, nil))
+	events.Publish(evtApplicationUnsubscribe(ctx, conn.ApplicationIDs(), nil))
 	asMetrics.subscriptionsEnded.WithLabelValues(ctx, conn.Protocol()).Inc()
 }
 

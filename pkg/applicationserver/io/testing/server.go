@@ -50,7 +50,7 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Applica
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, protocol, ids)
+	conn := io.NewConnection(ctx, protocol, &ids)
 	select {
 	case s.connectionsCh <- conn:
 	default:

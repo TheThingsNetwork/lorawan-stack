@@ -43,20 +43,20 @@ type Connection struct {
 	cancelCtx errorcontext.CancelFunc
 
 	protocol string
-	ttnpb.ApplicationIdentifiers
+	ids      *ttnpb.ApplicationIdentifiers
 
 	upCh chan *ttnpb.ApplicationUp
 }
 
 // NewConnection instantiates a new application or integration connection.
-func NewConnection(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) *Connection {
+func NewConnection(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) *Connection {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	return &Connection{
-		ctx:                    ctx,
-		cancelCtx:              cancelCtx,
-		protocol:               protocol,
-		ApplicationIdentifiers: ids,
-		upCh:                   make(chan *ttnpb.ApplicationUp, bufferSize),
+		ctx:       ctx,
+		cancelCtx: cancelCtx,
+		protocol:  protocol,
+		ids:       ids,
+		upCh:      make(chan *ttnpb.ApplicationUp, bufferSize),
 	}
 }
 
@@ -70,6 +70,9 @@ func (c *Connection) Disconnect(err error) {
 
 // Protocol returns the protocol used for the connection, i.e. grpc, mqtt or http.
 func (c *Connection) Protocol() string { return c.protocol }
+
+// ApplicationIDs returns the application identifiers, if the connection represents any specific.
+func (c *Connection) ApplicationIDs() *ttnpb.ApplicationIdentifiers { return c.ids }
 
 var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is full")
 

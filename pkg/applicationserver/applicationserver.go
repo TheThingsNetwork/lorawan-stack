@@ -119,7 +119,7 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	if err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, protocol, ids)
+	conn := io.NewConnection(ctx, protocol, &ids)
 	l.subscribeCh <- conn
 	go func() {
 		<-ctx.Done()
