@@ -547,6 +547,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			FPort:          oldItem.FPort,
 			FCnt:           dev.Session.LastAFCntDown + 1,
 			Confirmed:      oldItem.Confirmed,
+			ClassBC:        oldItem.ClassBC,
 			CorrelationIDs: oldItem.CorrelationIDs,
 		}
 		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, dev.Session.DevAddr, newItem.FCnt, frmPayload)
