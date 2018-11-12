@@ -159,6 +159,14 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	logger.Info("Linked")
 
 	go l.run()
+	for _, sub := range as.defaultSubscribers {
+		sub := sub
+		l.subscribeCh <- sub
+		go func() {
+			<-sub.Context().Done()
+			l.unsubscribeCh <- sub
+		}()
+	}
 	for {
 		up, err := stream.Recv()
 		if err != nil {

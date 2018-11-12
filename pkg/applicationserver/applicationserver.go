@@ -50,7 +50,8 @@ type ApplicationServer struct {
 	deviceRegistry DeviceRegistry
 	formatter      payloadFormatter
 
-	links sync.Map
+	links              sync.Map
+	defaultSubscribers []*io.Connection
 }
 
 // New returns new *ApplicationServer.
