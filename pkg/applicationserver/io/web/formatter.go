@@ -17,14 +17,19 @@ package web
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
+
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Formatter encodes up and decodes downlink messages.
 type Formatter interface {
 	Name() string
+	ContentType() string
 	Encode(context.Context, *ttnpb.ApplicationUp) ([]byte, error)
 	Decode(context.Context, []byte) (*ttnpb.ApplicationDownlink, error)
 }
+
+var errFormatterNotFound = errors.DefineNotFound("formatter_not_found", "formatter `{formatter}` not found")
 
 var formatters = make(map[string]Formatter)

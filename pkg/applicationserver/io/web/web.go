@@ -12,34 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package web implements the webhooks integration.
 package web
-
-import (
-	"context"
-	enc "encoding/json"
-
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
-
-type json struct {
-}
-
-func init() {
-	formatters["json"] = json{}
-}
-
-func (json) Name() string { return "JSON" }
-
-func (json) ContentType() string { return "application/json" }
-
-func (json) Encode(ctx context.Context, msg *ttnpb.ApplicationUp) ([]byte, error) {
-	return enc.Marshal(msg)
-}
-
-func (json) Decode(ctx context.Context, data []byte) (*ttnpb.ApplicationDownlink, error) {
-	msg := new(ttnpb.ApplicationDownlink)
-	if err := enc.Unmarshal(data, msg); err != nil {
-		return nil, err
-	}
-	return msg, nil
-}
