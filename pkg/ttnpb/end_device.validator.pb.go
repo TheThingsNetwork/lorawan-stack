@@ -244,9 +244,6 @@ func (this *ListEndDevicesRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FieldMask)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FieldMask", err)
 	}
-	if this.Order == "" {
-		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
-	}
 	return nil
 }
 func (this *SetEndDeviceRequest) Validate() error {

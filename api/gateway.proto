@@ -15,7 +15,6 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -134,11 +133,11 @@ message ListGatewaysRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 3 [(validator.field) = {string_not_empty: true}];
+  string order = 3;
   // Limit the number of results per page.
-  uint32 limit = 4 [(validator.field) = {string_not_empty: true}];
+  uint32 limit = 4;
   // Page number for pagination. 0 is interpreted as 1.
-  uint32 page = 5 [(validator.field) = {string_not_empty: true}];
+  uint32 page = 5;
 }
 
 message CreateGatewayRequest {

@@ -148,7 +148,7 @@ message DeleteInvitationRequest {
 
 message UserSessionIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string session_id = 2 [(gogoproto.customname) = "SessionID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
+  string session_id = 2 [(gogoproto.customname) = "SessionID"];
 }
 
 message UserSession {
@@ -167,9 +167,9 @@ message ListUserSessionsRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 2 [(validator.field) = {string_not_empty: true}];
+  string order = 2;
   // Limit the number of results per page.
-  uint32 limit = 3 [(validator.field) = {string_not_empty: true}];
+  uint32 limit = 3;
   // Page number for pagination. 0 is interpreted as 1.
-  uint32 page = 4 [(validator.field) = {string_not_empty: true}];
+  uint32 page = 4;
 }

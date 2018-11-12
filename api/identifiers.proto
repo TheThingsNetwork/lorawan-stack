@@ -25,7 +25,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message ApplicationIdentifiers {
   option (gogoproto.populate) = false;
 
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID", (validator.field) = {msg_exists: false, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 }
 
 message ClientIdentifiers {
@@ -40,11 +40,11 @@ message EndDeviceIdentifiers {
   string device_id = 1 [(gogoproto.customname) = "DeviceID", (validator.field) = {msg_exists: false, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // The LoRaWAN DevEUI.
-  bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI", (validator.field) = {length_eq: 8}];
+  bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
   // The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
-  bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI", (validator.field) = {length_eq: 8}];
+  bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
   // The LoRaWAN DevAddr.
-  bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (validator.field) = {length_eq: 4}];
+  bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
 }
 
 message GatewayIdentifiers {
@@ -53,7 +53,7 @@ message GatewayIdentifiers {
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
 
   // Secondary identifier, which can only be used in specific requests.
-  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI", (validator.field) = {length_eq: 8}];
+  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
 }
 
 message OrganizationIdentifiers {

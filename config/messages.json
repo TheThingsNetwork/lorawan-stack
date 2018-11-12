@@ -3788,69 +3788,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:cflist_frequencies": {
-    "translations": {
-      "en": "too many CFList frequencies: expected 15 or less"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_encoding.go"
-    }
-  },
-  "error:pkg/ttnpb:decode": {
-    "translations": {
-      "en": "could not decode `{lorawan_field}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:decoding_mac_command": {
-    "translations": {
-      "en": "could not decode MAC command with CID `{cid}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_mac_encoding.go"
-    }
-  },
-  "error:pkg/ttnpb:encode": {
-    "translations": {
-      "en": "could not encode `{lorawan_field}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encoded_field_length_bound": {
-    "translations": {
-      "en": "`{lorawan_field}` encoded length should between `{min}` and `{max}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encoded_field_length_multiple_choices": {
-    "translations": {
-      "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb:encrypted_joinacceptpayload_length": {
-    "translations": {
-      "en": "encrypted JoinAcceptPayload should have length of 16 or 32"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_encoding.go"
-    }
-  },
   "error:pkg/ttnpb:field_bound": {
     "translations": {
       "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
@@ -3894,15 +3831,6 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "lorawan.go"
-    }
-  },
-  "error:pkg/ttnpb:payload_type": {
-    "translations": {
-      "en": "payload type `{type}` is unexpected"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan_mac_encoding.go"
     }
   },
   "error:pkg/ttnpb:unknown_field": {

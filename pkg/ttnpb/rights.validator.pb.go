@@ -3,13 +3,11 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-import regexp "regexp"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 
@@ -25,9 +23,6 @@ func (this *Rights) Validate() error {
 func (this *APIKey) Validate() error {
 	return nil
 }
-
-var _regex_APIKeys_APIKeys = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
-
 func (this *APIKeys) Validate() error {
 	for _, item := range this.APIKeys {
 		if item != nil {

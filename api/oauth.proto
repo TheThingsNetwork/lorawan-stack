@@ -15,7 +15,6 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/rights.proto";
@@ -45,11 +44,11 @@ message ListOAuthClientAuthorizationsRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 2 [(validator.field) = {string_not_empty: true}];
+  string order = 2;
   // Limit the number of results per page.
-  uint32 limit = 3 [(validator.field) = {string_not_empty: true}];
+  uint32 limit = 3;
   // Page number for pagination. 0 is interpreted as 1.
-  uint32 page = 4 [(validator.field) = {string_not_empty: true}];
+  uint32 page = 4;
 }
 
 message OAuthAuthorizationCode {
@@ -66,7 +65,7 @@ message OAuthAuthorizationCode {
 message OAuthAccessTokenIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIDs", (gogoproto.nullable) = false];
   ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
-  string id = 3 [(gogoproto.customname) = "ID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
+  string id = 3 [(gogoproto.customname) = "ID"];
 }
 
 message OAuthAccessToken {
@@ -89,9 +88,9 @@ message ListOAuthAccessTokensRequest {
   ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 3 [(validator.field) = {string_not_empty: true}];
+  string order = 3;
   // Limit the number of results per page.
-  uint32 limit = 4 [(validator.field) = {string_not_empty: true}];
+  uint32 limit = 4;
   // Page number for pagination. 0 is interpreted as 1.
-  uint32 page = 5 [(validator.field) = {string_not_empty: true}];
+  uint32 page = 5;
 }

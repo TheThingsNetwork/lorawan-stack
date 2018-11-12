@@ -22,14 +22,13 @@ PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.0.20
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
                      --mount type=bind,src=$(PWD)/api,dst=$(PWD)/api \
                      --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_OUT)/go.thethings.network/lorawan-stack/pkg/ttnpb \
-                     --mount type=bind,src=$(PWD)/vendor,dst=$(PWD)/vendor\
                      -w $(PWD)
 PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(shell dirname $(PWD))
 
 protoc:
 	$(DOCKER) pull $(PROTOC_DOCKER_IMAGE)
 
-SWAGGER_PROTOC_FLAGS ?= -I=$(PWD)/vendor --swagger_out=allow_merge,merge_file_name=api:$(PWD)/api
+SWAGGER_PROTOC_FLAGS ?= --swagger_out=allow_merge,merge_file_name=api:$(PWD)/api
 
 swagger.protos: $(wildcard api/*.proto)
 	$(PROTOC) $(SWAGGER_PROTOC_FLAGS) $(API_PROTO_FILES)
@@ -37,7 +36,7 @@ swagger.protos: $(wildcard api/*.proto)
 swagger.protos.clean:
 	rm -f $(PWD)/api/api.swagger.json
 
-MARKDOWN_PROTOC_FLAGS ?= -I=$(PWD)/vendor --doc_opt=markdown,api.md --doc_out=$(PWD)/api
+MARKDOWN_PROTOC_FLAGS ?= --doc_opt=markdown,api.md --doc_out=$(PWD)/api
 
 markdown.protos: $(wildcard api/*.proto)
 	$(PROTOC) $(MARKDOWN_PROTOC_FLAGS) $(API_PROTO_FILES)

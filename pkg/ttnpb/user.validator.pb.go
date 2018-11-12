@@ -197,15 +197,9 @@ func (this *DeleteInvitationRequest) Validate() error {
 	}
 	return nil
 }
-
-var _regex_UserSessionIdentifiers_SessionID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
-
 func (this *UserSessionIdentifiers) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
-	}
-	if !_regex_UserSessionIdentifiers_SessionID.MatchString(this.SessionID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionID))
 	}
 	return nil
 }
@@ -239,9 +233,6 @@ func (this *UserSessions) Validate() error {
 func (this *ListUserSessionsRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
-	}
-	if this.Order == "" {
-		return github_com_mwitkow_go_proto_validators.FieldError("Order", fmt.Errorf(`value '%v' must not be an empty string`, this.Order))
 	}
 	return nil
 }

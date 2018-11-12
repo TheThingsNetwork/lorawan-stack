@@ -43,15 +43,6 @@ func (this *EndDeviceIdentifiers) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ApplicationIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationIdentifiers", err)
 	}
-	if !(len(this.DevEUI) == 8) {
-		return github_com_mwitkow_go_proto_validators.FieldError("DevEUI", fmt.Errorf(`value '%v' must length be not equal '8'`, this.DevEUI))
-	}
-	if !(len(this.JoinEUI) == 8) {
-		return github_com_mwitkow_go_proto_validators.FieldError("JoinEUI", fmt.Errorf(`value '%v' must length be not equal '8'`, this.JoinEUI))
-	}
-	if !(len(this.DevAddr) == 4) {
-		return github_com_mwitkow_go_proto_validators.FieldError("DevAddr", fmt.Errorf(`value '%v' must length be not equal '4'`, this.DevAddr))
-	}
 	return nil
 }
 
@@ -60,9 +51,6 @@ var _regex_GatewayIdentifiers_GatewayID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a
 func (this *GatewayIdentifiers) Validate() error {
 	if !_regex_GatewayIdentifiers_GatewayID.MatchString(this.GatewayID) {
 		return github_com_mwitkow_go_proto_validators.FieldError("GatewayID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"`, this.GatewayID))
-	}
-	if !(len(this.EUI) == 8) {
-		return github_com_mwitkow_go_proto_validators.FieldError("EUI", fmt.Errorf(`value '%v' must length be not equal '8'`, this.EUI))
 	}
 	return nil
 }

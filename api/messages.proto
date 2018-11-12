@@ -153,7 +153,7 @@ message TxAcknowledgment {
 
 message ApplicationUplink {
   // Join Server issued identifier for the session keys used by this uplink.
-  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {string_not_empty: true, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
   uint32 f_port = 2;
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
@@ -170,7 +170,7 @@ message ApplicationLocation {
 
 message ApplicationJoinAccept {
   // Join Server issued identifier for the session keys negotiated in this join.
-  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {string_not_empty: true, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
   // Encrypted Application Session Key (if Join Server sent it to Network Server).
   KeyEnvelope app_s_key = 2;
   // Downlink messages in the queue that got invalidated because of the session change.
@@ -186,7 +186,7 @@ message ApplicationDownlink {
   option (gogoproto.populate) = false;
 
   // Join Server issued identifier for the session keys used by this downlink.
-  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {string_not_empty: true, regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
   uint32 f_port = 2;
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];

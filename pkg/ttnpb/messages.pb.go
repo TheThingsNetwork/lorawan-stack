@@ -69,7 +69,7 @@ var PayloadFormatter_value = map[string]int32{
 }
 
 func (PayloadFormatter) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{0}
+	return fileDescriptor_messages_de7300a37571d691, []int{0}
 }
 
 type TxAcknowledgment_Result int32
@@ -110,17 +110,17 @@ var TxAcknowledgment_Result_value = map[string]int32{
 }
 
 func (TxAcknowledgment_Result) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{2, 0}
+	return fileDescriptor_messages_de7300a37571d691, []int{2, 0}
 }
 
 // Uplink message from the end device to the network
 type UplinkMessage struct {
-	RawPayload []byte        `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	Payload    *Message      `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
-	Settings   TxSettings    `protobuf:"bytes,4,opt,name=settings" json:"settings"`
-	RxMetadata []*RxMetadata `protobuf:"bytes,5,rep,name=rx_metadata,json=rxMetadata" json:"rx_metadata,omitempty"`
-	// Server time when a component received the message.
-	// The Gateway Server, Network Server and Application Server may set this value to their local server time of reception.
+	RawPayload   []byte                `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
+	Payload      *Message              `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
+	EndDeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds" json:"end_device_ids,omitempty"`
+	Settings     TxSettings            `protobuf:"bytes,4,opt,name=settings" json:"settings"`
+	RxMetadata   []*RxMetadata         `protobuf:"bytes,5,rep,name=rx_metadata,json=rxMetadata" json:"rx_metadata,omitempty"`
+	// Server time when the Gateway Server received the message.
 	ReceivedAt           time.Time `protobuf:"bytes,6,opt,name=received_at,json=receivedAt,stdtime" json:"received_at"`
 	CorrelationIDs       []string  `protobuf:"bytes,7,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
@@ -130,7 +130,7 @@ type UplinkMessage struct {
 func (m *UplinkMessage) Reset()      { *m = UplinkMessage{} }
 func (*UplinkMessage) ProtoMessage() {}
 func (*UplinkMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{0}
+	return fileDescriptor_messages_de7300a37571d691, []int{0}
 }
 func (m *UplinkMessage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -173,6 +173,13 @@ func (m *UplinkMessage) GetPayload() *Message {
 	return nil
 }
 
+func (m *UplinkMessage) GetEndDeviceIDs() *EndDeviceIdentifiers {
+	if m != nil {
+		return m.EndDeviceIDs
+	}
+	return nil
+}
+
 func (m *UplinkMessage) GetSettings() TxSettings {
 	if m != nil {
 		return m.Settings
@@ -203,22 +210,20 @@ func (m *UplinkMessage) GetCorrelationIDs() []string {
 
 // Downlink message from the network to the end device
 type DownlinkMessage struct {
-	RawPayload   []byte                `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	Payload      *Message              `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
-	EndDeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds" json:"end_device_ids,omitempty"`
-	// Types that are valid to be assigned to Settings:
-	//	*DownlinkMessage_Request
-	//	*DownlinkMessage_Scheduled
-	Settings             isDownlinkMessage_Settings `protobuf_oneof:"settings"`
-	CorrelationIDs       []string                   `protobuf:"bytes,6,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
-	XXX_sizecache        int32                      `json:"-"`
+	RawPayload           []byte                `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
+	Payload              *Message              `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
+	EndDeviceIDs         *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds" json:"end_device_ids,omitempty"`
+	Settings             TxSettings            `protobuf:"bytes,4,opt,name=settings" json:"settings"`
+	TxMetadata           TxMetadata            `protobuf:"bytes,5,opt,name=tx_metadata,json=txMetadata" json:"tx_metadata"`
+	CorrelationIDs       []string              `protobuf:"bytes,6,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
 }
 
 func (m *DownlinkMessage) Reset()      { *m = DownlinkMessage{} }
 func (*DownlinkMessage) ProtoMessage() {}
 func (*DownlinkMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{1}
+	return fileDescriptor_messages_de7300a37571d691, []int{1}
 }
 func (m *DownlinkMessage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -247,30 +252,6 @@ func (m *DownlinkMessage) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DownlinkMessage proto.InternalMessageInfo
 
-type isDownlinkMessage_Settings interface {
-	isDownlinkMessage_Settings()
-	Equal(interface{}) bool
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type DownlinkMessage_Request struct {
-	Request *TxRequest `protobuf:"bytes,4,opt,name=request,oneof"`
-}
-type DownlinkMessage_Scheduled struct {
-	Scheduled *TxSettings `protobuf:"bytes,5,opt,name=scheduled,oneof"`
-}
-
-func (*DownlinkMessage_Request) isDownlinkMessage_Settings()   {}
-func (*DownlinkMessage_Scheduled) isDownlinkMessage_Settings() {}
-
-func (m *DownlinkMessage) GetSettings() isDownlinkMessage_Settings {
-	if m != nil {
-		return m.Settings
-	}
-	return nil
-}
-
 func (m *DownlinkMessage) GetRawPayload() []byte {
 	if m != nil {
 		return m.RawPayload
@@ -292,18 +273,18 @@ func (m *DownlinkMessage) GetEndDeviceIDs() *EndDeviceIdentifiers {
 	return nil
 }
 
-func (m *DownlinkMessage) GetRequest() *TxRequest {
-	if x, ok := m.GetSettings().(*DownlinkMessage_Request); ok {
-		return x.Request
+func (m *DownlinkMessage) GetSettings() TxSettings {
+	if m != nil {
+		return m.Settings
 	}
-	return nil
+	return TxSettings{}
 }
 
-func (m *DownlinkMessage) GetScheduled() *TxSettings {
-	if x, ok := m.GetSettings().(*DownlinkMessage_Scheduled); ok {
-		return x.Scheduled
+func (m *DownlinkMessage) GetTxMetadata() TxMetadata {
+	if m != nil {
+		return m.TxMetadata
 	}
-	return nil
+	return TxMetadata{}
 }
 
 func (m *DownlinkMessage) GetCorrelationIDs() []string {
@@ -311,80 +292,6 @@ func (m *DownlinkMessage) GetCorrelationIDs() []string {
 		return m.CorrelationIDs
 	}
 	return nil
-}
-
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*DownlinkMessage) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _DownlinkMessage_OneofMarshaler, _DownlinkMessage_OneofUnmarshaler, _DownlinkMessage_OneofSizer, []interface{}{
-		(*DownlinkMessage_Request)(nil),
-		(*DownlinkMessage_Scheduled)(nil),
-	}
-}
-
-func _DownlinkMessage_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*DownlinkMessage)
-	// settings
-	switch x := m.Settings.(type) {
-	case *DownlinkMessage_Request:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Request); err != nil {
-			return err
-		}
-	case *DownlinkMessage_Scheduled:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Scheduled); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("DownlinkMessage.Settings has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _DownlinkMessage_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*DownlinkMessage)
-	switch tag {
-	case 4: // settings.request
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TxRequest)
-		err := b.DecodeMessage(msg)
-		m.Settings = &DownlinkMessage_Request{msg}
-		return true, err
-	case 5: // settings.scheduled
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TxSettings)
-		err := b.DecodeMessage(msg)
-		m.Settings = &DownlinkMessage_Scheduled{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _DownlinkMessage_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*DownlinkMessage)
-	// settings
-	switch x := m.Settings.(type) {
-	case *DownlinkMessage_Request:
-		s := proto.Size(x.Request)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *DownlinkMessage_Scheduled:
-		s := proto.Size(x.Scheduled)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type TxAcknowledgment struct {
@@ -397,7 +304,7 @@ type TxAcknowledgment struct {
 func (m *TxAcknowledgment) Reset()      { *m = TxAcknowledgment{} }
 func (*TxAcknowledgment) ProtoMessage() {}
 func (*TxAcknowledgment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{2}
+	return fileDescriptor_messages_de7300a37571d691, []int{2}
 }
 func (m *TxAcknowledgment) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -442,7 +349,7 @@ func (m *TxAcknowledgment) GetResult() TxAcknowledgment_Result {
 
 type ApplicationUplink struct {
 	// Join Server issued identifier for the session keys used by this uplink.
-	SessionKeyID         []byte        `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
+	SessionKeyID         string        `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
 	FPort                uint32        `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
 	FCnt                 uint32        `protobuf:"varint,3,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
 	FRMPayload           []byte        `protobuf:"bytes,4,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
@@ -456,7 +363,7 @@ type ApplicationUplink struct {
 func (m *ApplicationUplink) Reset()      { *m = ApplicationUplink{} }
 func (*ApplicationUplink) ProtoMessage() {}
 func (*ApplicationUplink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{3}
+	return fileDescriptor_messages_de7300a37571d691, []int{3}
 }
 func (m *ApplicationUplink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -485,11 +392,11 @@ func (m *ApplicationUplink) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApplicationUplink proto.InternalMessageInfo
 
-func (m *ApplicationUplink) GetSessionKeyID() []byte {
+func (m *ApplicationUplink) GetSessionKeyID() string {
 	if m != nil {
 		return m.SessionKeyID
 	}
-	return nil
+	return ""
 }
 
 func (m *ApplicationUplink) GetFPort() uint32 {
@@ -545,7 +452,7 @@ type ApplicationLocation struct {
 func (m *ApplicationLocation) Reset()      { *m = ApplicationLocation{} }
 func (*ApplicationLocation) ProtoMessage() {}
 func (*ApplicationLocation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{4}
+	return fileDescriptor_messages_de7300a37571d691, []int{4}
 }
 func (m *ApplicationLocation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -590,7 +497,7 @@ func (m *ApplicationLocation) GetAttributes() map[string]string {
 
 type ApplicationJoinAccept struct {
 	// Join Server issued identifier for the session keys negotiated in this join.
-	SessionKeyID []byte `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
+	SessionKeyID string `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
 	// Encrypted Application Session Key (if Join Server sent it to Network Server).
 	AppSKey *KeyEnvelope `protobuf:"bytes,2,opt,name=app_s_key,json=appSKey" json:"app_s_key,omitempty"`
 	// Downlink messages in the queue that got invalidated because of the session change.
@@ -607,7 +514,7 @@ type ApplicationJoinAccept struct {
 func (m *ApplicationJoinAccept) Reset()      { *m = ApplicationJoinAccept{} }
 func (*ApplicationJoinAccept) ProtoMessage() {}
 func (*ApplicationJoinAccept) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{5}
+	return fileDescriptor_messages_de7300a37571d691, []int{5}
 }
 func (m *ApplicationJoinAccept) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -636,11 +543,11 @@ func (m *ApplicationJoinAccept) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApplicationJoinAccept proto.InternalMessageInfo
 
-func (m *ApplicationJoinAccept) GetSessionKeyID() []byte {
+func (m *ApplicationJoinAccept) GetSessionKeyID() string {
 	if m != nil {
 		return m.SessionKeyID
 	}
-	return nil
+	return ""
 }
 
 func (m *ApplicationJoinAccept) GetAppSKey() *KeyEnvelope {
@@ -673,7 +580,7 @@ func (m *ApplicationJoinAccept) GetSessionStartedAt() time.Time {
 
 type ApplicationDownlink struct {
 	// Join Server issued identifier for the session keys used by this downlink.
-	SessionKeyID   []byte        `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
+	SessionKeyID   string        `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
 	FPort          uint32        `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
 	FCnt           uint32        `protobuf:"varint,3,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
 	FRMPayload     []byte        `protobuf:"bytes,4,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
@@ -682,18 +589,16 @@ type ApplicationDownlink struct {
 	// Optional gateway and timing information for class B and C.
 	// If set, this downlink message will only be transmitted as class B or C downlink.
 	// If not set, this downlink message may be transmitted in class A, B and C.
-	ClassBC *ApplicationDownlink_ClassBC `protobuf:"bytes,7,opt,name=class_b_c,json=classBC" json:"class_b_c,omitempty"`
-	// Priority for scheduling the downlink message.
-	Priority             TxSchedulePriority `protobuf:"varint,8,opt,name=priority,proto3,enum=ttn.lorawan.v3.TxSchedulePriority" json:"priority,omitempty"`
-	CorrelationIDs       []string           `protobuf:"bytes,9,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	ClassBC              *ApplicationDownlink_ClassBC `protobuf:"bytes,7,opt,name=class_b_c,json=classBC" json:"class_b_c,omitempty"`
+	CorrelationIDs       []string                     `protobuf:"bytes,8,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
 }
 
 func (m *ApplicationDownlink) Reset()      { *m = ApplicationDownlink{} }
 func (*ApplicationDownlink) ProtoMessage() {}
 func (*ApplicationDownlink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{6}
+	return fileDescriptor_messages_de7300a37571d691, []int{6}
 }
 func (m *ApplicationDownlink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -722,11 +627,11 @@ func (m *ApplicationDownlink) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApplicationDownlink proto.InternalMessageInfo
 
-func (m *ApplicationDownlink) GetSessionKeyID() []byte {
+func (m *ApplicationDownlink) GetSessionKeyID() string {
 	if m != nil {
 		return m.SessionKeyID
 	}
-	return nil
+	return ""
 }
 
 func (m *ApplicationDownlink) GetFPort() uint32 {
@@ -771,13 +676,6 @@ func (m *ApplicationDownlink) GetClassBC() *ApplicationDownlink_ClassBC {
 	return nil
 }
 
-func (m *ApplicationDownlink) GetPriority() TxSchedulePriority {
-	if m != nil {
-		return m.Priority
-	}
-	return TxSchedulePriority_LOWEST
-}
-
 func (m *ApplicationDownlink) GetCorrelationIDs() []string {
 	if m != nil {
 		return m.CorrelationIDs
@@ -790,12 +688,12 @@ type ApplicationDownlink_ClassBC struct {
 	// The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
 	// If none of the gateways can be selected, the downlink message fails.
 	// If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.
-	Gateways []*GatewayAntennaIdentifiers `protobuf:"bytes,7,rep,name=gateways" json:"gateways,omitempty"`
+	Gateways []*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers `protobuf:"bytes,7,rep,name=gateways" json:"gateways,omitempty"`
 	// Absolute time when the downlink message should be transmitted.
 	// This requires the gateway to have GPS time synchronization.
 	// If the time is in the past or if there is a scheduling conflict, the downlink message fails.
 	// If null, the time is selected based on slot availability. This is recommended in class B mode.
-	AbsoluteTime         *time.Time `protobuf:"bytes,8,opt,name=absolute_time,json=absoluteTime,stdtime" json:"absolute_time,omitempty"`
+	Time                 *time.Time `protobuf:"bytes,8,opt,name=time,stdtime" json:"time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_sizecache        int32      `json:"-"`
 }
@@ -803,7 +701,7 @@ type ApplicationDownlink_ClassBC struct {
 func (m *ApplicationDownlink_ClassBC) Reset()      { *m = ApplicationDownlink_ClassBC{} }
 func (*ApplicationDownlink_ClassBC) ProtoMessage() {}
 func (*ApplicationDownlink_ClassBC) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{6, 0}
+	return fileDescriptor_messages_de7300a37571d691, []int{6, 0}
 }
 func (m *ApplicationDownlink_ClassBC) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -832,18 +730,66 @@ func (m *ApplicationDownlink_ClassBC) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApplicationDownlink_ClassBC proto.InternalMessageInfo
 
-func (m *ApplicationDownlink_ClassBC) GetGateways() []*GatewayAntennaIdentifiers {
+func (m *ApplicationDownlink_ClassBC) GetGateways() []*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers {
 	if m != nil {
 		return m.Gateways
 	}
 	return nil
 }
 
-func (m *ApplicationDownlink_ClassBC) GetAbsoluteTime() *time.Time {
+func (m *ApplicationDownlink_ClassBC) GetTime() *time.Time {
 	if m != nil {
-		return m.AbsoluteTime
+		return m.Time
 	}
 	return nil
+}
+
+type ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers struct {
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
+	AntennaIndex         uint32   `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Reset() {
+	*m = ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers{}
+}
+func (*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) ProtoMessage() {}
+func (*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_messages_de7300a37571d691, []int{6, 0, 0}
+}
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers.Merge(dst, src)
+}
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers proto.InternalMessageInfo
+
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) GetAntennaIndex() uint32 {
+	if m != nil {
+		return m.AntennaIndex
+	}
+	return 0
 }
 
 type ApplicationDownlinks struct {
@@ -855,7 +801,7 @@ type ApplicationDownlinks struct {
 func (m *ApplicationDownlinks) Reset()      { *m = ApplicationDownlinks{} }
 func (*ApplicationDownlinks) ProtoMessage() {}
 func (*ApplicationDownlinks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{7}
+	return fileDescriptor_messages_de7300a37571d691, []int{7}
 }
 func (m *ApplicationDownlinks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -901,7 +847,7 @@ type ApplicationDownlinkFailed struct {
 func (m *ApplicationDownlinkFailed) Reset()      { *m = ApplicationDownlinkFailed{} }
 func (*ApplicationDownlinkFailed) ProtoMessage() {}
 func (*ApplicationDownlinkFailed) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{8}
+	return fileDescriptor_messages_de7300a37571d691, []int{8}
 }
 func (m *ApplicationDownlinkFailed) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -947,7 +893,7 @@ type ApplicationInvalidatedDownlinks struct {
 func (m *ApplicationInvalidatedDownlinks) Reset()      { *m = ApplicationInvalidatedDownlinks{} }
 func (*ApplicationInvalidatedDownlinks) ProtoMessage() {}
 func (*ApplicationInvalidatedDownlinks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{9}
+	return fileDescriptor_messages_de7300a37571d691, []int{9}
 }
 func (m *ApplicationInvalidatedDownlinks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1011,7 +957,7 @@ type ApplicationUp struct {
 func (m *ApplicationUp) Reset()      { *m = ApplicationUp{} }
 func (*ApplicationUp) ProtoMessage() {}
 func (*ApplicationUp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{10}
+	return fileDescriptor_messages_de7300a37571d691, []int{10}
 }
 func (m *ApplicationUp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1385,7 +1331,7 @@ type MessagePayloadFormatters struct {
 func (m *MessagePayloadFormatters) Reset()      { *m = MessagePayloadFormatters{} }
 func (*MessagePayloadFormatters) ProtoMessage() {}
 func (*MessagePayloadFormatters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{11}
+	return fileDescriptor_messages_de7300a37571d691, []int{11}
 }
 func (m *MessagePayloadFormatters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1443,7 +1389,7 @@ func (m *MessagePayloadFormatters) GetDownFormatterParameter() string {
 }
 
 type DownlinkQueueRequest struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,embedded=end_device_ids" json:"end_device_ids"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device,json=endDevice,embedded=end_device" json:"end_device"`
 	Downlinks            []*ApplicationDownlink `protobuf:"bytes,2,rep,name=downlinks" json:"downlinks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
@@ -1452,7 +1398,7 @@ type DownlinkQueueRequest struct {
 func (m *DownlinkQueueRequest) Reset()      { *m = DownlinkQueueRequest{} }
 func (*DownlinkQueueRequest) ProtoMessage() {}
 func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_472cd5b6eabbc308, []int{12}
+	return fileDescriptor_messages_de7300a37571d691, []int{12}
 }
 func (m *DownlinkQueueRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1507,6 +1453,8 @@ func init() {
 	golang_proto.RegisterType((*ApplicationDownlink)(nil), "ttn.lorawan.v3.ApplicationDownlink")
 	proto.RegisterType((*ApplicationDownlink_ClassBC)(nil), "ttn.lorawan.v3.ApplicationDownlink.ClassBC")
 	golang_proto.RegisterType((*ApplicationDownlink_ClassBC)(nil), "ttn.lorawan.v3.ApplicationDownlink.ClassBC")
+	proto.RegisterType((*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers)(nil), "ttn.lorawan.v3.ApplicationDownlink.ClassBC.GatewayAntennaIdentifiers")
+	golang_proto.RegisterType((*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers)(nil), "ttn.lorawan.v3.ApplicationDownlink.ClassBC.GatewayAntennaIdentifiers")
 	proto.RegisterType((*ApplicationDownlinks)(nil), "ttn.lorawan.v3.ApplicationDownlinks")
 	golang_proto.RegisterType((*ApplicationDownlinks)(nil), "ttn.lorawan.v3.ApplicationDownlinks")
 	proto.RegisterType((*ApplicationDownlinkFailed)(nil), "ttn.lorawan.v3.ApplicationDownlinkFailed")
@@ -1563,6 +1511,9 @@ func (this *UplinkMessage) Equal(that interface{}) bool {
 	if !this.Payload.Equal(that1.Payload) {
 		return false
 	}
+	if !this.EndDeviceIDs.Equal(that1.EndDeviceIDs) {
+		return false
+	}
 	if !this.Settings.Equal(&that1.Settings) {
 		return false
 	}
@@ -1615,13 +1566,10 @@ func (this *DownlinkMessage) Equal(that interface{}) bool {
 	if !this.EndDeviceIDs.Equal(that1.EndDeviceIDs) {
 		return false
 	}
-	if that1.Settings == nil {
-		if this.Settings != nil {
-			return false
-		}
-	} else if this.Settings == nil {
+	if !this.Settings.Equal(&that1.Settings) {
 		return false
-	} else if !this.Settings.Equal(that1.Settings) {
+	}
+	if !this.TxMetadata.Equal(&that1.TxMetadata) {
 		return false
 	}
 	if len(this.CorrelationIDs) != len(that1.CorrelationIDs) {
@@ -1631,54 +1579,6 @@ func (this *DownlinkMessage) Equal(that interface{}) bool {
 		if this.CorrelationIDs[i] != that1.CorrelationIDs[i] {
 			return false
 		}
-	}
-	return true
-}
-func (this *DownlinkMessage_Request) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*DownlinkMessage_Request)
-	if !ok {
-		that2, ok := that.(DownlinkMessage_Request)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.Request.Equal(that1.Request) {
-		return false
-	}
-	return true
-}
-func (this *DownlinkMessage_Scheduled) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*DownlinkMessage_Scheduled)
-	if !ok {
-		that2, ok := that.(DownlinkMessage_Scheduled)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.Scheduled.Equal(that1.Scheduled) {
-		return false
 	}
 	return true
 }
@@ -1733,7 +1633,7 @@ func (this *ApplicationUplink) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !bytes.Equal(this.SessionKeyID, that1.SessionKeyID) {
+	if this.SessionKeyID != that1.SessionKeyID {
 		return false
 	}
 	if this.FPort != that1.FPort {
@@ -1815,7 +1715,7 @@ func (this *ApplicationJoinAccept) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !bytes.Equal(this.SessionKeyID, that1.SessionKeyID) {
+	if this.SessionKeyID != that1.SessionKeyID {
 		return false
 	}
 	if !this.AppSKey.Equal(that1.AppSKey) {
@@ -1856,7 +1756,7 @@ func (this *ApplicationDownlink) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !bytes.Equal(this.SessionKeyID, that1.SessionKeyID) {
+	if this.SessionKeyID != that1.SessionKeyID {
 		return false
 	}
 	if this.FPort != that1.FPort {
@@ -1875,9 +1775,6 @@ func (this *ApplicationDownlink) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.ClassBC.Equal(that1.ClassBC) {
-		return false
-	}
-	if this.Priority != that1.Priority {
 		return false
 	}
 	if len(this.CorrelationIDs) != len(that1.CorrelationIDs) {
@@ -1917,11 +1814,38 @@ func (this *ApplicationDownlink_ClassBC) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if that1.AbsoluteTime == nil {
-		if this.AbsoluteTime != nil {
+	if that1.Time == nil {
+		if this.Time != nil {
 			return false
 		}
-	} else if !this.AbsoluteTime.Equal(*that1.AbsoluteTime) {
+	} else if !this.Time.Equal(*that1.Time) {
+		return false
+	}
+	return true
+}
+func (this *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers)
+	if !ok {
+		that2, ok := that.(ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.GatewayIdentifiers.Equal(&that1.GatewayIdentifiers) {
+		return false
+	}
+	if this.AntennaIndex != that1.AntennaIndex {
 		return false
 	}
 	return true
@@ -2367,14 +2291,24 @@ func (m *UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n1
 	}
+	if m.EndDeviceIDs != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIDs.Size()))
+		n2, err := m.EndDeviceIDs.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintMessages(dAtA, i, uint64(m.Settings.Size()))
-	n2, err := m.Settings.MarshalTo(dAtA[i:])
+	n3, err := m.Settings.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n2
+	i += n3
 	if len(m.RxMetadata) > 0 {
 		for _, msg := range m.RxMetadata {
 			dAtA[i] = 0x2a
@@ -2390,11 +2324,11 @@ func (m *UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x32
 	i++
 	i = encodeVarintMessages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ReceivedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ReceivedAt, dAtA[i:])
+	n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ReceivedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n3
+	i += n4
 	if len(m.CorrelationIDs) > 0 {
 		for _, s := range m.CorrelationIDs {
 			dAtA[i] = 0x3a
@@ -2438,29 +2372,38 @@ func (m *DownlinkMessage) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.Payload.Size()))
-		n4, err := m.Payload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.EndDeviceIDs != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIDs.Size()))
-		n5, err := m.EndDeviceIDs.MarshalTo(dAtA[i:])
+		n5, err := m.Payload.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n5
 	}
-	if m.Settings != nil {
-		nn6, err := m.Settings.MarshalTo(dAtA[i:])
+	if m.EndDeviceIDs != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIDs.Size()))
+		n6, err := m.EndDeviceIDs.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn6
+		i += n6
 	}
+	dAtA[i] = 0x22
+	i++
+	i = encodeVarintMessages(dAtA, i, uint64(m.Settings.Size()))
+	n7, err := m.Settings.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n7
+	dAtA[i] = 0x2a
+	i++
+	i = encodeVarintMessages(dAtA, i, uint64(m.TxMetadata.Size()))
+	n8, err := m.TxMetadata.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n8
 	if len(m.CorrelationIDs) > 0 {
 		for _, s := range m.CorrelationIDs {
 			dAtA[i] = 0x32
@@ -2479,34 +2422,6 @@ func (m *DownlinkMessage) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *DownlinkMessage_Request) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.Request != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Request.Size()))
-		n7, err := m.Request.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	return i, nil
-}
-func (m *DownlinkMessage_Scheduled) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.Scheduled != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Scheduled.Size()))
-		n8, err := m.Scheduled.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	return i, nil
-}
 func (m *TxAcknowledgment) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2795,14 +2710,9 @@ func (m *ApplicationDownlink) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n15
 	}
-	if m.Priority != 0 {
-		dAtA[i] = 0x40
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Priority))
-	}
 	if len(m.CorrelationIDs) > 0 {
 		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x4a
+			dAtA[i] = 0x42
 			i++
 			l = len(s)
 			for l >= 1<<7 {
@@ -2845,15 +2755,46 @@ func (m *ApplicationDownlink_ClassBC) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if m.AbsoluteTime != nil {
+	if m.Time != nil {
 		dAtA[i] = 0x42
 		i++
-		i = encodeVarintMessages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.AbsoluteTime)))
-		n16, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AbsoluteTime, dAtA[i:])
+		i = encodeVarintMessages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
+		n16, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n16
+	}
+	return i, nil
+}
+
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintMessages(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n17, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n17
+	if m.AntennaIndex != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintMessages(dAtA, i, uint64(m.AntennaIndex))
 	}
 	return i, nil
 }
@@ -2906,19 +2847,19 @@ func (m *ApplicationDownlinkFailed) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintMessages(dAtA, i, uint64(m.ApplicationDownlink.Size()))
-	n17, err := m.ApplicationDownlink.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n17
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.Error.Size()))
-	n18, err := m.Error.MarshalTo(dAtA[i:])
+	n18, err := m.ApplicationDownlink.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n18
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintMessages(dAtA, i, uint64(m.Error.Size()))
+	n19, err := m.Error.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n19
 	return i, nil
 }
 
@@ -2975,11 +2916,11 @@ func (m *ApplicationUp) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n19, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	n20, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n19
+	i += n20
 	if len(m.CorrelationIDs) > 0 {
 		for _, s := range m.CorrelationIDs {
 			dAtA[i] = 0x12
@@ -2996,11 +2937,11 @@ func (m *ApplicationUp) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if m.Up != nil {
-		nn20, err := m.Up.MarshalTo(dAtA[i:])
+		nn21, err := m.Up.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn20
+		i += nn21
 	}
 	return i, nil
 }
@@ -3011,11 +2952,11 @@ func (m *ApplicationUp_UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n21, err := m.UplinkMessage.MarshalTo(dAtA[i:])
+		n22, err := m.UplinkMessage.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n21
+		i += n22
 	}
 	return i, nil
 }
@@ -3025,11 +2966,11 @@ func (m *ApplicationUp_JoinAccept) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.JoinAccept.Size()))
-		n22, err := m.JoinAccept.MarshalTo(dAtA[i:])
+		n23, err := m.JoinAccept.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n22
+		i += n23
 	}
 	return i, nil
 }
@@ -3039,11 +2980,11 @@ func (m *ApplicationUp_DownlinkAck) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkAck.Size()))
-		n23, err := m.DownlinkAck.MarshalTo(dAtA[i:])
+		n24, err := m.DownlinkAck.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n23
+		i += n24
 	}
 	return i, nil
 }
@@ -3053,11 +2994,11 @@ func (m *ApplicationUp_DownlinkNack) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkNack.Size()))
-		n24, err := m.DownlinkNack.MarshalTo(dAtA[i:])
+		n25, err := m.DownlinkNack.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n24
+		i += n25
 	}
 	return i, nil
 }
@@ -3067,11 +3008,11 @@ func (m *ApplicationUp_DownlinkSent) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkSent.Size()))
-		n25, err := m.DownlinkSent.MarshalTo(dAtA[i:])
+		n26, err := m.DownlinkSent.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n25
+		i += n26
 	}
 	return i, nil
 }
@@ -3081,11 +3022,11 @@ func (m *ApplicationUp_DownlinkFailed) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkFailed.Size()))
-		n26, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
+		n27, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n26
+		i += n27
 	}
 	return i, nil
 }
@@ -3095,11 +3036,11 @@ func (m *ApplicationUp_DownlinkQueued) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkQueued.Size()))
-		n27, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
+		n28, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n27
+		i += n28
 	}
 	return i, nil
 }
@@ -3109,11 +3050,11 @@ func (m *ApplicationUp_DownlinkQueueInvalidated) MarshalTo(dAtA []byte) (int, er
 		dAtA[i] = 0x52
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkQueueInvalidated.Size()))
-		n28, err := m.DownlinkQueueInvalidated.MarshalTo(dAtA[i:])
+		n29, err := m.DownlinkQueueInvalidated.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n28
+		i += n29
 	}
 	return i, nil
 }
@@ -3123,11 +3064,11 @@ func (m *ApplicationUp_LocationSolved) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.LocationSolved.Size()))
-		n29, err := m.LocationSolved.MarshalTo(dAtA[i:])
+		n30, err := m.LocationSolved.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n29
+		i += n30
 	}
 	return i, nil
 }
@@ -3189,11 +3130,11 @@ func (m *DownlinkQueueRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n30, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	n31, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n30
+	i += n31
 	if len(m.Downlinks) > 0 {
 		for _, msg := range m.Downlinks {
 			dAtA[i] = 0x12
@@ -3233,30 +3174,26 @@ func NewPopulatedTxAcknowledgment(r randyMessages, easy bool) *TxAcknowledgment 
 
 func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplink {
 	this := &ApplicationUplink{}
-	v2 := r.Intn(100)
-	this.SessionKeyID = make([]byte, v2)
-	for i := 0; i < v2; i++ {
-		this.SessionKeyID[i] = byte(r.Intn(256))
-	}
+	this.SessionKeyID = randStringMessages(r)
 	this.FPort = r.Uint32()
 	this.FCnt = r.Uint32()
-	v3 := r.Intn(100)
-	this.FRMPayload = make([]byte, v3)
-	for i := 0; i < v3; i++ {
+	v2 := r.Intn(100)
+	this.FRMPayload = make([]byte, v2)
+	for i := 0; i < v2; i++ {
 		this.FRMPayload[i] = byte(r.Intn(256))
 	}
 	if r.Intn(10) != 0 {
 		this.DecodedPayload = types.NewPopulatedStruct(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		v4 := r.Intn(5)
-		this.RxMetadata = make([]*RxMetadata, v4)
-		for i := 0; i < v4; i++ {
+		v3 := r.Intn(5)
+		this.RxMetadata = make([]*RxMetadata, v3)
+		for i := 0; i < v3; i++ {
 			this.RxMetadata[i] = NewPopulatedRxMetadata(r, easy)
 		}
 	}
-	v5 := NewPopulatedTxSettings(r, easy)
-	this.Settings = *v5
+	v4 := NewPopulatedTxSettings(r, easy)
+	this.Settings = *v4
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3265,12 +3202,12 @@ func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplin
 func NewPopulatedApplicationLocation(r randyMessages, easy bool) *ApplicationLocation {
 	this := &ApplicationLocation{}
 	this.Service = randStringMessages(r)
-	v6 := NewPopulatedLocation(r, easy)
-	this.Location = *v6
+	v5 := NewPopulatedLocation(r, easy)
+	this.Location = *v5
 	if r.Intn(10) != 0 {
-		v7 := r.Intn(10)
+		v6 := r.Intn(10)
 		this.Attributes = make(map[string]string)
-		for i := 0; i < v7; i++ {
+		for i := 0; i < v6; i++ {
 			this.Attributes[randStringMessages(r)] = randStringMessages(r)
 		}
 	}
@@ -3281,24 +3218,20 @@ func NewPopulatedApplicationLocation(r randyMessages, easy bool) *ApplicationLoc
 
 func NewPopulatedApplicationJoinAccept(r randyMessages, easy bool) *ApplicationJoinAccept {
 	this := &ApplicationJoinAccept{}
-	v8 := r.Intn(100)
-	this.SessionKeyID = make([]byte, v8)
-	for i := 0; i < v8; i++ {
-		this.SessionKeyID[i] = byte(r.Intn(256))
-	}
+	this.SessionKeyID = randStringMessages(r)
 	if r.Intn(10) != 0 {
 		this.AppSKey = NewPopulatedKeyEnvelope(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		v9 := r.Intn(5)
-		this.InvalidatedDownlinks = make([]*ApplicationDownlink, v9)
-		for i := 0; i < v9; i++ {
+		v7 := r.Intn(5)
+		this.InvalidatedDownlinks = make([]*ApplicationDownlink, v7)
+		for i := 0; i < v7; i++ {
 			this.InvalidatedDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
 	this.PendingSession = bool(r.Intn(2) == 0)
-	v10 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.SessionStartedAt = *v10
+	v8 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.SessionStartedAt = *v8
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3307,15 +3240,25 @@ func NewPopulatedApplicationJoinAccept(r randyMessages, easy bool) *ApplicationJ
 func NewPopulatedApplicationDownlink_ClassBC(r randyMessages, easy bool) *ApplicationDownlink_ClassBC {
 	this := &ApplicationDownlink_ClassBC{}
 	if r.Intn(10) != 0 {
-		v11 := r.Intn(5)
-		this.Gateways = make([]*GatewayAntennaIdentifiers, v11)
-		for i := 0; i < v11; i++ {
-			this.Gateways[i] = NewPopulatedGatewayAntennaIdentifiers(r, easy)
+		v9 := r.Intn(5)
+		this.Gateways = make([]*ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers, v9)
+		for i := 0; i < v9; i++ {
+			this.Gateways[i] = NewPopulatedApplicationDownlink_ClassBC_GatewayAntennaIdentifiers(r, easy)
 		}
 	}
 	if r.Intn(10) != 0 {
-		this.AbsoluteTime = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+		this.Time = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedApplicationDownlink_ClassBC_GatewayAntennaIdentifiers(r randyMessages, easy bool) *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers {
+	this := &ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers{}
+	v10 := NewPopulatedGatewayIdentifiers(r, easy)
+	this.GatewayIdentifiers = *v10
+	this.AntennaIndex = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3324,9 +3267,9 @@ func NewPopulatedApplicationDownlink_ClassBC(r randyMessages, easy bool) *Applic
 func NewPopulatedApplicationDownlinks(r randyMessages, easy bool) *ApplicationDownlinks {
 	this := &ApplicationDownlinks{}
 	if r.Intn(10) != 0 {
-		v12 := r.Intn(5)
-		this.Downlinks = make([]*ApplicationDownlink, v12)
-		for i := 0; i < v12; i++ {
+		v11 := r.Intn(5)
+		this.Downlinks = make([]*ApplicationDownlink, v11)
+		for i := 0; i < v11; i++ {
 			this.Downlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
@@ -3337,10 +3280,10 @@ func NewPopulatedApplicationDownlinks(r randyMessages, easy bool) *ApplicationDo
 
 func NewPopulatedApplicationDownlinkFailed(r randyMessages, easy bool) *ApplicationDownlinkFailed {
 	this := &ApplicationDownlinkFailed{}
-	v13 := NewPopulatedApplicationDownlink(r, easy)
-	this.ApplicationDownlink = *v13
-	v14 := NewPopulatedErrorDetails(r, easy)
-	this.Error = *v14
+	v12 := NewPopulatedApplicationDownlink(r, easy)
+	this.ApplicationDownlink = *v12
+	v13 := NewPopulatedErrorDetails(r, easy)
+	this.Error = *v13
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3349,9 +3292,9 @@ func NewPopulatedApplicationDownlinkFailed(r randyMessages, easy bool) *Applicat
 func NewPopulatedApplicationInvalidatedDownlinks(r randyMessages, easy bool) *ApplicationInvalidatedDownlinks {
 	this := &ApplicationInvalidatedDownlinks{}
 	if r.Intn(10) != 0 {
-		v15 := r.Intn(5)
-		this.Downlinks = make([]*ApplicationDownlink, v15)
-		for i := 0; i < v15; i++ {
+		v14 := r.Intn(5)
+		this.Downlinks = make([]*ApplicationDownlink, v14)
+		for i := 0; i < v14; i++ {
 			this.Downlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
@@ -3363,11 +3306,11 @@ func NewPopulatedApplicationInvalidatedDownlinks(r randyMessages, easy bool) *Ap
 
 func NewPopulatedApplicationUp(r randyMessages, easy bool) *ApplicationUp {
 	this := &ApplicationUp{}
-	v16 := NewPopulatedEndDeviceIdentifiers(r, easy)
-	this.EndDeviceIdentifiers = *v16
-	v17 := r.Intn(10)
-	this.CorrelationIDs = make([]string, v17)
-	for i := 0; i < v17; i++ {
+	v15 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v15
+	v16 := r.Intn(10)
+	this.CorrelationIDs = make([]string, v16)
+	for i := 0; i < v16; i++ {
 		this.CorrelationIDs[i] = randStringMessages(r)
 	}
 	oneofNumber_Up := []int32{3, 4, 5, 6, 7, 8, 9, 10, 11}[r.Intn(9)]
@@ -3454,12 +3397,12 @@ func NewPopulatedMessagePayloadFormatters(r randyMessages, easy bool) *MessagePa
 
 func NewPopulatedDownlinkQueueRequest(r randyMessages, easy bool) *DownlinkQueueRequest {
 	this := &DownlinkQueueRequest{}
-	v18 := NewPopulatedEndDeviceIdentifiers(r, easy)
-	this.EndDeviceIdentifiers = *v18
+	v17 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v17
 	if r.Intn(10) != 0 {
-		v19 := r.Intn(5)
-		this.Downlinks = make([]*ApplicationDownlink, v19)
-		for i := 0; i < v19; i++ {
+		v18 := r.Intn(5)
+		this.Downlinks = make([]*ApplicationDownlink, v18)
+		for i := 0; i < v18; i++ {
 			this.Downlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
@@ -3487,9 +3430,9 @@ func randUTF8RuneMessages(r randyMessages) rune {
 	return rune(ru + 61)
 }
 func randStringMessages(r randyMessages) string {
-	v20 := r.Intn(100)
-	tmps := make([]rune, v20)
-	for i := 0; i < v20; i++ {
+	v19 := r.Intn(100)
+	tmps := make([]rune, v19)
+	for i := 0; i < v19; i++ {
 		tmps[i] = randUTF8RuneMessages(r)
 	}
 	return string(tmps)
@@ -3511,11 +3454,11 @@ func randFieldMessages(dAtA []byte, r randyMessages, fieldNumber int, wire int) 
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateMessages(dAtA, uint64(key))
-		v21 := r.Int63()
+		v20 := r.Int63()
 		if r.Intn(2) == 0 {
-			v21 *= -1
+			v20 *= -1
 		}
-		dAtA = encodeVarintPopulateMessages(dAtA, uint64(v21))
+		dAtA = encodeVarintPopulateMessages(dAtA, uint64(v20))
 	case 1:
 		dAtA = encodeVarintPopulateMessages(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -3549,6 +3492,10 @@ func (m *UplinkMessage) Size() (n int) {
 	}
 	if m.Payload != nil {
 		l = m.Payload.Size()
+		n += 1 + l + sovMessages(uint64(l))
+	}
+	if m.EndDeviceIDs != nil {
+		l = m.EndDeviceIDs.Size()
 		n += 1 + l + sovMessages(uint64(l))
 	}
 	l = m.Settings.Size()
@@ -3585,9 +3532,10 @@ func (m *DownlinkMessage) Size() (n int) {
 		l = m.EndDeviceIDs.Size()
 		n += 1 + l + sovMessages(uint64(l))
 	}
-	if m.Settings != nil {
-		n += m.Settings.Size()
-	}
+	l = m.Settings.Size()
+	n += 1 + l + sovMessages(uint64(l))
+	l = m.TxMetadata.Size()
+	n += 1 + l + sovMessages(uint64(l))
 	if len(m.CorrelationIDs) > 0 {
 		for _, s := range m.CorrelationIDs {
 			l = len(s)
@@ -3597,24 +3545,6 @@ func (m *DownlinkMessage) Size() (n int) {
 	return n
 }
 
-func (m *DownlinkMessage_Request) Size() (n int) {
-	var l int
-	_ = l
-	if m.Request != nil {
-		l = m.Request.Size()
-		n += 1 + l + sovMessages(uint64(l))
-	}
-	return n
-}
-func (m *DownlinkMessage_Scheduled) Size() (n int) {
-	var l int
-	_ = l
-	if m.Scheduled != nil {
-		l = m.Scheduled.Size()
-		n += 1 + l + sovMessages(uint64(l))
-	}
-	return n
-}
 func (m *TxAcknowledgment) Size() (n int) {
 	var l int
 	_ = l
@@ -3735,9 +3665,6 @@ func (m *ApplicationDownlink) Size() (n int) {
 		l = m.ClassBC.Size()
 		n += 1 + l + sovMessages(uint64(l))
 	}
-	if m.Priority != 0 {
-		n += 1 + sovMessages(uint64(m.Priority))
-	}
 	if len(m.CorrelationIDs) > 0 {
 		for _, s := range m.CorrelationIDs {
 			l = len(s)
@@ -3756,9 +3683,20 @@ func (m *ApplicationDownlink_ClassBC) Size() (n int) {
 			n += 1 + l + sovMessages(uint64(l))
 		}
 	}
-	if m.AbsoluteTime != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.AbsoluteTime)
+	if m.Time != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)
 		n += 1 + l + sovMessages(uint64(l))
+	}
+	return n
+}
+
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovMessages(uint64(l))
+	if m.AntennaIndex != 0 {
+		n += 1 + sovMessages(uint64(m.AntennaIndex))
 	}
 	return n
 }
@@ -3952,6 +3890,7 @@ func (this *UplinkMessage) String() string {
 	s := strings.Join([]string{`&UplinkMessage{`,
 		`RawPayload:` + fmt.Sprintf("%v", this.RawPayload) + `,`,
 		`Payload:` + strings.Replace(fmt.Sprintf("%v", this.Payload), "Message", "Message", 1) + `,`,
+		`EndDeviceIDs:` + strings.Replace(fmt.Sprintf("%v", this.EndDeviceIDs), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1) + `,`,
 		`Settings:` + strings.Replace(strings.Replace(this.Settings.String(), "TxSettings", "TxSettings", 1), `&`, ``, 1) + `,`,
 		`RxMetadata:` + strings.Replace(fmt.Sprintf("%v", this.RxMetadata), "RxMetadata", "RxMetadata", 1) + `,`,
 		`ReceivedAt:` + strings.Replace(strings.Replace(this.ReceivedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
@@ -3968,28 +3907,9 @@ func (this *DownlinkMessage) String() string {
 		`RawPayload:` + fmt.Sprintf("%v", this.RawPayload) + `,`,
 		`Payload:` + strings.Replace(fmt.Sprintf("%v", this.Payload), "Message", "Message", 1) + `,`,
 		`EndDeviceIDs:` + strings.Replace(fmt.Sprintf("%v", this.EndDeviceIDs), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1) + `,`,
-		`Settings:` + fmt.Sprintf("%v", this.Settings) + `,`,
+		`Settings:` + strings.Replace(strings.Replace(this.Settings.String(), "TxSettings", "TxSettings", 1), `&`, ``, 1) + `,`,
+		`TxMetadata:` + strings.Replace(strings.Replace(this.TxMetadata.String(), "TxMetadata", "TxMetadata", 1), `&`, ``, 1) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *DownlinkMessage_Request) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&DownlinkMessage_Request{`,
-		`Request:` + strings.Replace(fmt.Sprintf("%v", this.Request), "TxRequest", "TxRequest", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *DownlinkMessage_Scheduled) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&DownlinkMessage_Scheduled{`,
-		`Scheduled:` + strings.Replace(fmt.Sprintf("%v", this.Scheduled), "TxSettings", "TxSettings", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4069,7 +3989,6 @@ func (this *ApplicationDownlink) String() string {
 		`DecodedPayload:` + strings.Replace(fmt.Sprintf("%v", this.DecodedPayload), "Struct", "types.Struct", 1) + `,`,
 		`Confirmed:` + fmt.Sprintf("%v", this.Confirmed) + `,`,
 		`ClassBC:` + strings.Replace(fmt.Sprintf("%v", this.ClassBC), "ApplicationDownlink_ClassBC", "ApplicationDownlink_ClassBC", 1) + `,`,
-		`Priority:` + fmt.Sprintf("%v", this.Priority) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
 		`}`,
 	}, "")
@@ -4080,8 +3999,19 @@ func (this *ApplicationDownlink_ClassBC) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ApplicationDownlink_ClassBC{`,
-		`Gateways:` + strings.Replace(fmt.Sprintf("%v", this.Gateways), "GatewayAntennaIdentifiers", "GatewayAntennaIdentifiers", 1) + `,`,
-		`AbsoluteTime:` + strings.Replace(fmt.Sprintf("%v", this.AbsoluteTime), "Timestamp", "types.Timestamp", 1) + `,`,
+		`Gateways:` + strings.Replace(fmt.Sprintf("%v", this.Gateways), "ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers", "ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers", 1) + `,`,
+		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4342,6 +4272,39 @@ func (m *UplinkMessage) Unmarshal(dAtA []byte) error {
 				m.Payload = &Message{}
 			}
 			if err := m.Payload.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDeviceIDs == nil {
+				m.EndDeviceIDs = &EndDeviceIdentifiers{}
+			}
+			if err := m.EndDeviceIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4614,7 +4577,7 @@ func (m *DownlinkMessage) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Request", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Settings", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4638,15 +4601,13 @@ func (m *DownlinkMessage) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &TxRequest{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Settings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Settings = &DownlinkMessage_Request{v}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Scheduled", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TxMetadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4670,11 +4631,9 @@ func (m *DownlinkMessage) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &TxSettings{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.TxMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Settings = &DownlinkMessage_Scheduled{v}
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
@@ -4857,7 +4816,7 @@ func (m *ApplicationUplink) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionKeyID", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMessages
@@ -4867,22 +4826,20 @@ func (m *ApplicationUplink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthMessages
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SessionKeyID = append(m.SessionKeyID[:0], dAtA[iNdEx:postIndex]...)
-			if m.SessionKeyID == nil {
-				m.SessionKeyID = []byte{}
-			}
+			m.SessionKeyID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
@@ -5328,7 +5285,7 @@ func (m *ApplicationJoinAccept) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionKeyID", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMessages
@@ -5338,22 +5295,20 @@ func (m *ApplicationJoinAccept) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthMessages
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SessionKeyID = append(m.SessionKeyID[:0], dAtA[iNdEx:postIndex]...)
-			if m.SessionKeyID == nil {
-				m.SessionKeyID = []byte{}
-			}
+			m.SessionKeyID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -5523,7 +5478,7 @@ func (m *ApplicationDownlink) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionKeyID", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMessages
@@ -5533,22 +5488,20 @@ func (m *ApplicationDownlink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthMessages
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SessionKeyID = append(m.SessionKeyID[:0], dAtA[iNdEx:postIndex]...)
-			if m.SessionKeyID == nil {
-				m.SessionKeyID = []byte{}
-			}
+			m.SessionKeyID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
@@ -5706,25 +5659,6 @@ func (m *ApplicationDownlink) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
-			}
-			m.Priority = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMessages
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Priority |= (TxSchedulePriority(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CorrelationIDs", wireType)
 			}
@@ -5829,14 +5763,14 @@ func (m *ApplicationDownlink_ClassBC) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Gateways = append(m.Gateways, &GatewayAntennaIdentifiers{})
+			m.Gateways = append(m.Gateways, &ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers{})
 			if err := m.Gateways[len(m.Gateways)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AbsoluteTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5860,13 +5794,112 @@ func (m *ApplicationDownlink_ClassBC) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.AbsoluteTime == nil {
-				m.AbsoluteTime = new(time.Time)
+			if m.Time == nil {
+				m.Time = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.AbsoluteTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Time, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMessages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthMessages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMessages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GatewayAntennaIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GatewayAntennaIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AntennaIndex", wireType)
+			}
+			m.AntennaIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AntennaIndex |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipMessages(dAtA[iNdEx:])
@@ -6939,128 +6972,131 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_472cd5b6eabbc308)
+	proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_de7300a37571d691)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_472cd5b6eabbc308)
+	golang_proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_de7300a37571d691)
 }
 
-var fileDescriptor_messages_472cd5b6eabbc308 = []byte{
-	// 1854 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x58, 0x4d, 0x6c, 0x1b, 0xc7,
-	0x15, 0xde, 0xa5, 0x28, 0x91, 0x7c, 0xa4, 0xa8, 0xcd, 0x44, 0x76, 0x19, 0xd5, 0x5d, 0xaa, 0x4c,
-	0x83, 0x38, 0x6d, 0x43, 0xa1, 0x76, 0x7f, 0x0c, 0xa7, 0x7f, 0x14, 0xb5, 0x92, 0x68, 0xc9, 0x24,
-	0x33, 0xa4, 0x13, 0xbb, 0x28, 0xb0, 0x18, 0xed, 0x0e, 0xe9, 0x0d, 0xc9, 0xdd, 0xcd, 0xee, 0x50,
-	0x32, 0x6f, 0x01, 0x8a, 0xa2, 0x01, 0x7a, 0xf1, 0xad, 0x39, 0x15, 0x46, 0x4f, 0xb9, 0x35, 0xbd,
-	0xf9, 0x98, 0xa3, 0x8f, 0x3e, 0xe6, 0xa4, 0x44, 0x14, 0x0a, 0xf8, 0xe8, 0x63, 0x8e, 0xc5, 0xce,
-	0xce, 0xf2, 0x4f, 0x84, 0x22, 0xa5, 0xc8, 0x25, 0x27, 0x71, 0xe6, 0xbd, 0xef, 0x7b, 0x6f, 0xde,
-	0xbc, 0xf7, 0xe6, 0xad, 0x60, 0xbd, 0xeb, 0x78, 0xe4, 0x88, 0xd8, 0x6f, 0xfb, 0x8c, 0x18, 0x9d,
-	0x0d, 0xe2, 0x5a, 0x1b, 0x3d, 0xea, 0xfb, 0xa4, 0x4d, 0xfd, 0xa2, 0xeb, 0x39, 0xcc, 0x41, 0x59,
-	0xc6, 0xec, 0xa2, 0xd0, 0x2a, 0x1e, 0xde, 0x5c, 0x7b, 0xbb, 0x6d, 0xb1, 0x87, 0xfd, 0x83, 0xa2,
-	0xe1, 0xf4, 0x36, 0xda, 0x4e, 0xdb, 0xd9, 0xe0, 0x6a, 0x07, 0xfd, 0x16, 0x5f, 0xf1, 0x05, 0xff,
-	0x15, 0xc2, 0xd7, 0xae, 0xb5, 0x1d, 0xa7, 0xdd, 0xa5, 0x63, 0x2d, 0x9f, 0x79, 0x7d, 0x83, 0x09,
-	0x69, 0x7e, 0x56, 0xca, 0xac, 0x1e, 0xf5, 0x19, 0xe9, 0xb9, 0x42, 0xe1, 0x47, 0x67, 0xfd, 0xa3,
-	0x9e, 0xe7, 0x78, 0x42, 0xfc, 0xfa, 0x59, 0xb1, 0x65, 0x52, 0x9b, 0x59, 0x2d, 0x8b, 0x7a, 0x7e,
-	0xe4, 0xc2, 0x59, 0xa5, 0x0e, 0x1d, 0x44, 0xd2, 0xfc, 0x59, 0x69, 0x74, 0xda, 0x50, 0x61, 0x6e,
-	0x88, 0x18, 0x31, 0x09, 0x23, 0xa1, 0x46, 0xe1, 0x45, 0x0c, 0x96, 0xef, 0xb9, 0x5d, 0xcb, 0xee,
-	0xdc, 0x0d, 0x63, 0x87, 0xf2, 0x90, 0xf6, 0xc8, 0x91, 0xee, 0x92, 0x41, 0xd7, 0x21, 0x66, 0x4e,
-	0x5e, 0x97, 0xaf, 0x67, 0x30, 0x78, 0xe4, 0xa8, 0x1e, 0xee, 0xa0, 0x5f, 0x40, 0x22, 0x12, 0xc6,
-	0xd6, 0xe5, 0xeb, 0xe9, 0x1b, 0x3f, 0x28, 0x4e, 0xc7, 0xb9, 0x28, 0xa8, 0x70, 0xa4, 0x87, 0x7e,
-	0x0b, 0x49, 0x9f, 0x32, 0x66, 0xd9, 0x6d, 0x3f, 0x17, 0xe7, 0x98, 0xb5, 0x59, 0x4c, 0xf3, 0x51,
-	0x43, 0x68, 0x6c, 0xc6, 0x9f, 0x1d, 0xe7, 0x25, 0x3c, 0x42, 0xa0, 0x77, 0x20, 0xed, 0x3d, 0xd2,
-	0x23, 0xc7, 0x73, 0x8b, 0xeb, 0x0b, 0xf3, 0x08, 0xf0, 0xa3, 0xbb, 0x42, 0x03, 0x83, 0x37, 0xfa,
-	0x8d, 0x34, 0x48, 0x7b, 0xd4, 0xa0, 0xd6, 0x21, 0x35, 0x75, 0xc2, 0x72, 0x4b, 0xc2, 0x7a, 0x78,
-	0x79, 0xc5, 0xe8, 0xf2, 0x8a, 0xcd, 0xe8, 0xf2, 0x36, 0x93, 0x81, 0xf5, 0xc7, 0x5f, 0xe6, 0x65,
-	0x0c, 0x11, 0xb0, 0xc4, 0xd0, 0x3b, 0xb0, 0x62, 0x38, 0x9e, 0x47, 0xbb, 0x84, 0x59, 0x8e, 0xad,
-	0x5b, 0xa6, 0x9f, 0x4b, 0xac, 0x2f, 0x5c, 0x4f, 0x6d, 0xa2, 0xe1, 0x71, 0x3e, 0x5b, 0x1e, 0x8b,
-	0x2a, 0x5b, 0x3e, 0xce, 0x4e, 0xa8, 0x56, 0x4c, 0xff, 0x76, 0xfc, 0xe9, 0x93, 0xbc, 0x54, 0xf8,
-	0xeb, 0x02, 0xac, 0x6c, 0x39, 0x47, 0xf6, 0x77, 0x1d, 0xec, 0x3f, 0x43, 0x96, 0xda, 0xa6, 0x6e,
-	0xd2, 0x43, 0xcb, 0xa0, 0xdc, 0xd3, 0x05, 0x8e, 0xfc, 0xc9, 0x2c, 0x52, 0xb3, 0xcd, 0x2d, 0xae,
-	0x54, 0x19, 0xe7, 0xdd, 0xa6, 0x32, 0x3c, 0xce, 0x67, 0xc6, 0x92, 0x2d, 0x1f, 0x67, 0xe8, 0x58,
-	0xcf, 0x47, 0xbf, 0x82, 0x84, 0x47, 0x3f, 0xec, 0x53, 0x9f, 0x89, 0x9b, 0x7c, 0xed, 0xec, 0x4d,
-	0xe2, 0x50, 0x61, 0x57, 0xc2, 0x91, 0x2e, 0xba, 0x0d, 0x29, 0xdf, 0x78, 0x48, 0xcd, 0x7e, 0x97,
-	0x9a, 0xb9, 0xc5, 0x6f, 0x4a, 0x81, 0x5d, 0x09, 0x8f, 0xd5, 0xe7, 0xc5, 0x7e, 0xe9, 0x72, 0xb1,
-	0xdf, 0x84, 0x71, 0x02, 0x16, 0xfe, 0x13, 0x03, 0xa5, 0xf9, 0xa8, 0x64, 0x74, 0x6c, 0xe7, 0xa8,
-	0x4b, 0xcd, 0x76, 0x8f, 0xda, 0x73, 0xef, 0x57, 0xbe, 0xa8, 0x0d, 0xf4, 0x07, 0x58, 0xf2, 0xa8,
-	0xdf, 0xef, 0x32, 0x7e, 0x47, 0xd9, 0x1b, 0x6f, 0x9e, 0x3d, 0xd9, 0xb4, 0xb9, 0x22, 0xe6, 0xea,
-	0x58, 0xc0, 0x0a, 0xff, 0x94, 0x61, 0x29, 0xdc, 0x42, 0x69, 0x48, 0x34, 0xee, 0x95, 0xcb, 0x5a,
-	0xa3, 0xa1, 0x48, 0xe8, 0x15, 0x58, 0xbe, 0x57, 0xdd, 0xab, 0xd6, 0xde, 0xaf, 0xea, 0x1a, 0xc6,
-	0x35, 0xac, 0xc8, 0x28, 0x03, 0xc9, 0x66, 0xad, 0xa6, 0xef, 0x97, 0x9a, 0x9a, 0x12, 0x43, 0xcb,
-	0x90, 0x0a, 0x56, 0x5a, 0x09, 0xef, 0x3f, 0x50, 0x16, 0xd0, 0x2a, 0x28, 0xe5, 0xda, 0xfe, 0x7e,
-	0xa5, 0x51, 0xa9, 0x55, 0xf5, 0x7a, 0xa9, 0xbc, 0xa7, 0x35, 0x95, 0xf8, 0xf4, 0xee, 0xa6, 0x56,
-	0x2a, 0xd7, 0xaa, 0xca, 0x62, 0x60, 0xa8, 0x79, 0x5f, 0xdf, 0xc6, 0xda, 0xbb, 0xca, 0x12, 0x67,
-	0xbd, 0xaf, 0xd7, 0x6b, 0xef, 0x6b, 0x58, 0x49, 0x20, 0x05, 0x32, 0x3b, 0xf5, 0x86, 0x7e, 0xaf,
-	0xba, 0x5f, 0x2b, 0xef, 0x69, 0x5b, 0x4a, 0xb2, 0xf0, 0xdf, 0x18, 0xbc, 0x52, 0x72, 0xdd, 0xae,
-	0x65, 0xf0, 0x43, 0x87, 0x1d, 0x03, 0xfd, 0x1a, 0xb2, 0x3e, 0xf5, 0xfd, 0x20, 0x60, 0x1d, 0x3a,
-	0xd0, 0x2d, 0x91, 0xc0, 0x61, 0x0e, 0x35, 0x42, 0xc9, 0x1e, 0x1d, 0x54, 0xb6, 0x70, 0xc6, 0x1f,
-	0xaf, 0x4c, 0x74, 0x05, 0x96, 0x5a, 0xba, 0xeb, 0x78, 0x61, 0xbc, 0x96, 0xf1, 0x62, 0xab, 0xee,
-	0x78, 0x0c, 0xbd, 0x0a, 0x8b, 0x2d, 0xdd, 0xb0, 0x19, 0xcf, 0xd7, 0x65, 0x1c, 0x6f, 0x95, 0x6d,
-	0x86, 0x36, 0x20, 0xdd, 0xf2, 0x7a, 0xa3, 0x0a, 0x89, 0x73, 0x03, 0xd9, 0xe1, 0x71, 0x1e, 0xb6,
-	0xf1, 0x5d, 0x51, 0x25, 0x18, 0x5a, 0x5e, 0x2f, 0xaa, 0x98, 0x3f, 0xc2, 0x8a, 0x49, 0x0d, 0xc7,
-	0xa4, 0xe6, 0x08, 0xb4, 0x28, 0x2a, 0x67, 0xb6, 0xe8, 0x1b, 0xbc, 0x9f, 0xe3, 0xac, 0xd0, 0x8f,
-	0x18, 0x66, 0xfa, 0xcd, 0xd2, 0xa5, 0xfa, 0xcd, 0x64, 0xab, 0x4b, 0x5c, 0xb6, 0xd5, 0x15, 0xfe,
-	0x12, 0x83, 0x57, 0x27, 0xe2, 0xbc, 0xef, 0x84, 0x7f, 0x51, 0x0e, 0x12, 0x3e, 0xf5, 0x82, 0x1a,
-	0xe4, 0x21, 0x4e, 0xe1, 0x68, 0x89, 0x7e, 0x0f, 0xc9, 0xae, 0xd0, 0x12, 0x1d, 0x22, 0x37, 0x6b,
-	0x2f, 0x62, 0x09, 0x5b, 0xdb, 0xf3, 0xe3, 0xbc, 0x8c, 0x47, 0x18, 0xd4, 0x00, 0x20, 0x8c, 0x79,
-	0xd6, 0x41, 0x9f, 0xd1, 0xa0, 0x53, 0x04, 0x67, 0xbd, 0x39, 0xcb, 0x30, 0xc7, 0xa5, 0x62, 0x69,
-	0x84, 0xd2, 0x6c, 0xe6, 0x0d, 0xf0, 0x04, 0xcd, 0xda, 0xef, 0x60, 0x65, 0x46, 0x8c, 0x14, 0x58,
-	0xe8, 0xd0, 0x81, 0xf0, 0x3e, 0xf8, 0x89, 0x56, 0x61, 0xf1, 0x90, 0x74, 0xfb, 0x94, 0xbb, 0x9d,
-	0xc2, 0xe1, 0xe2, 0x76, 0xec, 0x96, 0x5c, 0xf8, 0x32, 0x06, 0x57, 0x26, 0x4c, 0xde, 0x71, 0x2c,
-	0xbb, 0x64, 0x18, 0xd4, 0x65, 0xdf, 0x3a, 0xe3, 0x7e, 0x03, 0x29, 0xe2, 0xba, 0xba, 0x1f, 0xa0,
-	0x44, 0x98, 0x7e, 0x38, 0x7b, 0xc8, 0x3d, 0x3a, 0xd0, 0xec, 0x43, 0xda, 0x75, 0x5c, 0x8a, 0x13,
-	0xc4, 0x75, 0x1b, 0x7b, 0x74, 0x80, 0xee, 0xc3, 0x15, 0xcb, 0x3e, 0x24, 0x5d, 0xcb, 0x24, 0x8c,
-	0x9a, 0xba, 0x29, 0xfa, 0x77, 0x14, 0xa9, 0xd7, 0xcf, 0x89, 0x54, 0xd4, 0xeb, 0xf1, 0xea, 0x04,
-	0x43, 0xb4, 0xe9, 0xa3, 0x37, 0x61, 0xc5, 0xa5, 0xb6, 0x69, 0xd9, 0x6d, 0x5d, 0xb8, 0xca, 0x93,
-	0x3b, 0x89, 0xb3, 0x62, 0x5b, 0x1c, 0x07, 0x61, 0x40, 0xd1, 0x99, 0x7d, 0x46, 0x3c, 0x16, 0x3e,
-	0x64, 0x8b, 0x97, 0x78, 0xc8, 0x14, 0x81, 0x6f, 0x84, 0xf0, 0x12, 0x2b, 0xbc, 0x8c, 0x4f, 0xe5,
-	0x59, 0xe4, 0xd5, 0xf7, 0xb5, 0xa2, 0xaf, 0x41, 0xca, 0x70, 0xec, 0x96, 0xe5, 0xf5, 0xa8, 0xc9,
-	0x47, 0x80, 0x24, 0x1e, 0x6f, 0xa0, 0x1d, 0x48, 0x19, 0x5d, 0xe2, 0xfb, 0xfa, 0x81, 0x6e, 0x88,
-	0x9a, 0xfd, 0xd9, 0x05, 0xee, 0xb5, 0x58, 0x0e, 0x40, 0x9b, 0x65, 0x9c, 0x30, 0xc2, 0x1f, 0x41,
-	0x2d, 0xba, 0x9e, 0xe5, 0x78, 0x16, 0x1b, 0xe4, 0x92, 0xfc, 0x25, 0x28, 0xcc, 0xa9, 0x7d, 0xf1,
-	0xae, 0xd5, 0x85, 0x26, 0x1e, 0x61, 0xe6, 0x3d, 0x42, 0xa9, 0x8b, 0x3e, 0x42, 0x6b, 0xff, 0x90,
-	0x21, 0x21, 0x3c, 0x42, 0x1a, 0x24, 0xdb, 0x84, 0xd1, 0x23, 0x32, 0x08, 0xc7, 0x94, 0xf4, 0x8d,
-	0xb7, 0x66, 0x1d, 0xd9, 0x09, 0xe5, 0x25, 0x9b, 0x51, 0xdb, 0x26, 0x13, 0x13, 0x00, 0x1e, 0x41,
-	0x91, 0x06, 0xcb, 0xe4, 0xc0, 0x77, 0xba, 0x7d, 0x46, 0xf5, 0x60, 0xba, 0xe5, 0x87, 0x3a, 0x3f,
-	0xe9, 0xe2, 0x3c, 0xe1, 0x32, 0x11, 0x2c, 0x10, 0x88, 0xf1, 0xe7, 0x01, 0xac, 0xce, 0x09, 0xa2,
-	0x8f, 0x4a, 0x90, 0x1a, 0x57, 0x95, 0x7c, 0xf1, 0xaa, 0x1a, 0xa3, 0x0a, 0x4f, 0x64, 0x78, 0x6d,
-	0x8e, 0xca, 0x36, 0xb1, 0x82, 0xf1, 0xa1, 0x02, 0xc9, 0x48, 0x95, 0x67, 0xf3, 0xc5, 0xf8, 0x27,
-	0x9b, 0x65, 0x04, 0x47, 0xb7, 0x60, 0x91, 0x8f, 0xf0, 0xa2, 0x85, 0x5c, 0x3b, 0x33, 0x51, 0x05,
-	0xc2, 0x2d, 0xca, 0x88, 0xd5, 0x8d, 0x7a, 0x7b, 0x08, 0x28, 0xfc, 0x5d, 0x86, 0xfc, 0x84, 0x95,
-	0xca, 0xbc, 0x8e, 0xf0, 0xff, 0x47, 0x02, 0xbd, 0x01, 0x2b, 0x5d, 0xe2, 0x33, 0x9d, 0x57, 0x1d,
-	0xef, 0x56, 0xa2, 0x20, 0x33, 0xc1, 0xf6, 0x76, 0xd9, 0x66, 0x01, 0xaa, 0xf0, 0xb7, 0x04, 0x2c,
-	0x4f, 0x3d, 0xe7, 0xa8, 0x79, 0x66, 0x68, 0x94, 0x2f, 0x31, 0x34, 0x8e, 0x63, 0x35, 0x3d, 0x2c,
-	0xce, 0x49, 0xe8, 0xd8, 0x85, 0xa7, 0xaa, 0x3b, 0x90, 0xed, 0xf3, 0x39, 0x43, 0x17, 0x9f, 0x75,
-	0x62, 0x8e, 0xfd, 0xf1, 0x39, 0x31, 0x09, 0x07, 0x93, 0x5d, 0x09, 0x2f, 0xf7, 0xa7, 0x3e, 0x6a,
-	0x76, 0x21, 0xfd, 0x81, 0x63, 0xd9, 0x3a, 0xe1, 0xcf, 0x88, 0x98, 0x5c, 0xdf, 0x38, 0x87, 0x68,
-	0xfc, 0xe6, 0xec, 0x4a, 0x18, 0x3e, 0x18, 0xbf, 0x40, 0xbb, 0x90, 0x89, 0xc2, 0xad, 0x13, 0xa3,
-	0x23, 0x3a, 0xd1, 0x45, 0xee, 0x69, 0x57, 0xc2, 0xe9, 0x08, 0x5a, 0x32, 0x3a, 0xe8, 0x0e, 0x2c,
-	0x8f, 0x98, 0xec, 0x80, 0x6a, 0xe9, 0x32, 0x54, 0x23, 0x2f, 0xaa, 0x64, 0x86, 0xcb, 0xa7, 0x36,
-	0x13, 0x6d, 0xec, 0xb2, 0x5c, 0x8d, 0x60, 0x14, 0x6e, 0xc2, 0xca, 0x88, 0xab, 0xc5, 0x4b, 0x48,
-	0xd4, 0xfd, 0x5b, 0x17, 0x60, 0x0b, 0x6b, 0x6e, 0x57, 0xc2, 0x59, 0x73, 0xba, 0x0a, 0xab, 0x13,
-	0xac, 0x1f, 0xf6, 0x69, 0x9f, 0x9a, 0xb9, 0xd4, 0x65, 0x7c, 0x1c, 0xf1, 0xbd, 0xcb, 0xc1, 0xc8,
-	0x81, 0xb5, 0x69, 0x3e, 0x7d, 0xe2, 0x95, 0xcd, 0x01, 0xa7, 0xde, 0x38, 0x87, 0x7a, 0x5e, 0x05,
-	0xee, 0x4a, 0x38, 0x37, 0x65, 0x66, 0x42, 0x29, 0x38, 0x40, 0x34, 0x34, 0xe9, 0xbe, 0xd3, 0x3d,
-	0xa4, 0x66, 0x2e, 0xfd, 0x8d, 0x07, 0x88, 0xa6, 0xa5, 0xe0, 0x00, 0x11, 0xba, 0xc1, 0xc1, 0x9b,
-	0x71, 0x88, 0xf5, 0xdd, 0xc2, 0x27, 0x31, 0xc8, 0x89, 0x24, 0x15, 0x8f, 0xd5, 0xb6, 0xe3, 0xf5,
-	0x08, 0x63, 0xd4, 0xf3, 0x51, 0x19, 0x32, 0x7d, 0x57, 0x6f, 0x45, 0x1b, 0xbc, 0x24, 0xb3, 0x37,
-	0xd6, 0x67, 0xed, 0xcd, 0x02, 0x71, 0xba, 0xef, 0x8e, 0x16, 0xe8, 0x97, 0x70, 0x75, 0x92, 0x44,
-	0x77, 0x89, 0x47, 0x7a, 0x34, 0xa0, 0x0b, 0xe7, 0xae, 0xd5, 0x09, 0xe5, 0x7a, 0x24, 0x43, 0x3b,
-	0xc0, 0x03, 0x3e, 0x61, 0x7c, 0xe1, 0x82, 0xc6, 0x79, 0x22, 0x8e, 0xcd, 0xdf, 0x82, 0xdc, 0x34,
-	0xd1, 0x84, 0x03, 0x71, 0xee, 0xc0, 0xd5, 0x29, 0xc0, 0xc8, 0x85, 0xc2, 0xbf, 0x65, 0x58, 0xdd,
-	0x9a, 0xbc, 0x0d, 0xf1, 0x59, 0xf9, 0x1d, 0xf5, 0xaa, 0xa9, 0xee, 0x1b, 0xfb, 0x36, 0xdd, 0xf7,
-	0xa7, 0x8f, 0x65, 0x50, 0x66, 0xe3, 0x81, 0x10, 0x64, 0xb7, 0x6b, 0xf8, 0x6e, 0xa9, 0xd9, 0xd4,
-	0xb0, 0x5e, 0xad, 0x55, 0x35, 0x45, 0x42, 0x39, 0x58, 0x1d, 0xef, 0x61, 0xad, 0x5e, 0x6b, 0x54,
-	0x9a, 0x35, 0xfc, 0x40, 0x91, 0xd1, 0x1a, 0x5c, 0x1d, 0x4b, 0x76, 0x70, 0xbd, 0xac, 0x37, 0x34,
-	0xfc, 0x5e, 0xa5, 0x1c, 0x7c, 0xec, 0x4d, 0xa1, 0xee, 0x94, 0xde, 0x2b, 0x35, 0xca, 0xb8, 0x52,
-	0x6f, 0x2a, 0x0b, 0xd3, 0x92, 0x72, 0xe9, 0x81, 0x56, 0xad, 0x6a, 0xfb, 0xf5, 0xba, 0x12, 0xdf,
-	0xfc, 0x97, 0xfc, 0xec, 0x44, 0x95, 0x9f, 0x9f, 0xa8, 0xf2, 0x17, 0x27, 0xaa, 0xf4, 0xd5, 0x89,
-	0x2a, 0xbd, 0x38, 0x51, 0xa5, 0x97, 0x27, 0xaa, 0xf4, 0xf5, 0x89, 0x2a, 0x7f, 0x34, 0x54, 0xe5,
-	0x8f, 0x87, 0xaa, 0xf4, 0xe9, 0x50, 0x95, 0x3f, 0x1b, 0xaa, 0xd2, 0xd3, 0xa1, 0x2a, 0x7d, 0x3e,
-	0x54, 0xa5, 0x67, 0x43, 0x55, 0x7e, 0x3e, 0x54, 0xe5, 0x2f, 0x86, 0xaa, 0xf4, 0xd5, 0x50, 0x95,
-	0x5f, 0x0c, 0x55, 0xe9, 0xe5, 0x50, 0x95, 0xbf, 0x1e, 0xaa, 0xd2, 0x47, 0xa7, 0xaa, 0xf4, 0xf1,
-	0xa9, 0x2a, 0x3f, 0x3e, 0x55, 0xa5, 0x4f, 0x4e, 0x55, 0xf9, 0xc9, 0xa9, 0x2a, 0x7d, 0x7a, 0xaa,
-	0x4a, 0x9f, 0x9d, 0xaa, 0xf2, 0xd3, 0x53, 0x55, 0xfe, 0xfc, 0x54, 0x95, 0xff, 0xf4, 0xf3, 0xb6,
-	0x53, 0x64, 0x0f, 0x29, 0x7b, 0x18, 0x7c, 0xd5, 0x14, 0x6d, 0xca, 0x8e, 0x1c, 0xaf, 0xb3, 0x31,
-	0xfd, 0xdf, 0x28, 0xb7, 0xd3, 0xde, 0x60, 0xcc, 0x76, 0x0f, 0x0e, 0x96, 0xf8, 0x20, 0x71, 0xf3,
-	0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x10, 0x98, 0x7b, 0x89, 0xd2, 0x13, 0x00, 0x00,
+var fileDescriptor_messages_de7300a37571d691 = []byte{
+	// 1895 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x58, 0x3d, 0x70, 0x1b, 0xc7,
+	0x15, 0xbe, 0x03, 0x41, 0x02, 0x78, 0x00, 0xc1, 0xf3, 0x9a, 0x52, 0x60, 0x46, 0x39, 0x30, 0x90,
+	0x34, 0x96, 0x13, 0x13, 0x88, 0x25, 0x27, 0x91, 0xe5, 0x24, 0x0a, 0x00, 0x1e, 0x49, 0x88, 0x24,
+	0x00, 0x2f, 0x20, 0x5b, 0x8a, 0x63, 0xdf, 0x2c, 0x71, 0x0b, 0xe8, 0x0c, 0xe0, 0xee, 0x7c, 0xb7,
+	0xe0, 0x4f, 0x7e, 0x66, 0x3c, 0x93, 0xc2, 0x9e, 0x49, 0x11, 0x95, 0xae, 0x32, 0x9a, 0x54, 0x2a,
+	0x9d, 0x19, 0x17, 0x2a, 0x5d, 0x65, 0x54, 0xaa, 0x74, 0x45, 0x9b, 0x60, 0xe3, 0xd2, 0x55, 0xc6,
+	0x65, 0xe6, 0xee, 0xf6, 0xf0, 0x47, 0x58, 0x26, 0x9d, 0x71, 0xa5, 0x8a, 0xb7, 0xfb, 0xde, 0xfb,
+	0xde, 0xdb, 0xf7, 0x0f, 0xc2, 0x72, 0xc7, 0xb4, 0xc9, 0x1e, 0x31, 0x56, 0x1c, 0x46, 0x1a, 0xed,
+	0x1c, 0xb1, 0xf4, 0x5c, 0x97, 0x3a, 0x0e, 0x69, 0x51, 0x27, 0x6b, 0xd9, 0x26, 0x33, 0x51, 0x92,
+	0x31, 0x23, 0xcb, 0xb9, 0xb2, 0xbb, 0xd7, 0x96, 0x56, 0x5a, 0x3a, 0xbb, 0xd7, 0xdb, 0xc9, 0x36,
+	0xcc, 0x6e, 0xae, 0x65, 0xb6, 0xcc, 0x9c, 0xc7, 0xb6, 0xd3, 0x6b, 0x7a, 0x27, 0xef, 0xe0, 0x7d,
+	0xf9, 0xe2, 0x4b, 0xbf, 0x1a, 0x61, 0xef, 0xee, 0xe9, 0xac, 0x6d, 0xee, 0xe5, 0x5a, 0xe6, 0x8a,
+	0x47, 0x5c, 0xd9, 0x25, 0x1d, 0x5d, 0x23, 0xcc, 0xb4, 0x9d, 0xdc, 0xe0, 0x93, 0xcb, 0x5d, 0x68,
+	0x99, 0x66, 0xab, 0x43, 0x87, 0xe8, 0x0e, 0xb3, 0x7b, 0x0d, 0xc6, 0xa9, 0xe9, 0x49, 0x2a, 0xd3,
+	0xbb, 0xd4, 0x61, 0xa4, 0x6b, 0x71, 0x86, 0x9f, 0x9c, 0x7c, 0x17, 0xb5, 0xed, 0x01, 0xfa, 0xc5,
+	0x93, 0x64, 0x5d, 0xa3, 0x06, 0xd3, 0x9b, 0x3a, 0xb5, 0x9d, 0xc0, 0x84, 0x93, 0x4c, 0x6d, 0x7a,
+	0x10, 0x50, 0xd3, 0x27, 0xa9, 0x81, 0x97, 0x7c, 0x86, 0xa9, 0xae, 0x65, 0x44, 0x23, 0x8c, 0xf8,
+	0x1c, 0x99, 0xff, 0xcc, 0xc0, 0xfc, 0x6d, 0xab, 0xa3, 0x1b, 0xed, 0x6d, 0xdf, 0xe7, 0x28, 0x0d,
+	0x71, 0x9b, 0xec, 0xa9, 0x16, 0x39, 0xe8, 0x98, 0x44, 0x4b, 0x89, 0xcb, 0xe2, 0x95, 0x04, 0x06,
+	0x9b, 0xec, 0x55, 0xfd, 0x1b, 0xf4, 0x0a, 0x44, 0x02, 0x62, 0x68, 0x59, 0xbc, 0x12, 0xbf, 0xfa,
+	0xa3, 0xec, 0x78, 0x7c, 0xb2, 0x1c, 0x0a, 0x07, 0x7c, 0xe8, 0x8f, 0x90, 0xa4, 0x86, 0xa6, 0x6a,
+	0x74, 0x57, 0x6f, 0x50, 0x55, 0xd7, 0x9c, 0xd4, 0x8c, 0x27, 0x79, 0x69, 0x52, 0x52, 0x31, 0xb4,
+	0x55, 0x8f, 0xa9, 0x34, 0x74, 0x45, 0x41, 0xea, 0x1f, 0xa6, 0x13, 0x43, 0xca, 0xaa, 0x83, 0x13,
+	0x74, 0xc8, 0xe7, 0xa0, 0xdf, 0x40, 0xd4, 0xa1, 0x8c, 0xe9, 0x46, 0xcb, 0x49, 0x85, 0x3d, 0xdc,
+	0xa5, 0x49, 0xdc, 0xfa, 0x7e, 0x8d, 0x73, 0x14, 0xc2, 0x8f, 0x0f, 0xd3, 0x02, 0x1e, 0x48, 0xa0,
+	0xd7, 0x21, 0x6e, 0xef, 0xab, 0x81, 0x5b, 0x52, 0xb3, 0xcb, 0x33, 0xd3, 0x00, 0xf0, 0xfe, 0x36,
+	0xe7, 0xc0, 0x60, 0x0f, 0xbe, 0x91, 0x02, 0x71, 0x9b, 0x36, 0xa8, 0xbe, 0x4b, 0x35, 0x95, 0xb0,
+	0xd4, 0x1c, 0xd7, 0xee, 0xa7, 0x46, 0x36, 0x48, 0x8d, 0x6c, 0x3d, 0x48, 0x8d, 0x42, 0xd4, 0xd5,
+	0x7e, 0xff, 0x8b, 0xb4, 0x88, 0x21, 0x10, 0xcc, 0x33, 0xf4, 0x3a, 0x2c, 0x34, 0x4c, 0xdb, 0xa6,
+	0x1d, 0xc2, 0x74, 0xd3, 0xf0, 0x1c, 0x14, 0x59, 0x9e, 0xb9, 0x12, 0x2b, 0xa0, 0xfe, 0x61, 0x3a,
+	0x59, 0x1c, 0x92, 0xdc, 0xc7, 0x27, 0x47, 0x58, 0x4b, 0x9a, 0x73, 0x23, 0xfc, 0xe8, 0x41, 0x5a,
+	0xc8, 0x7c, 0x38, 0x03, 0x0b, 0xab, 0xe6, 0x9e, 0xf1, 0x2c, 0x87, 0x32, 0x0f, 0x71, 0x36, 0x16,
+	0xca, 0x6f, 0x01, 0x08, 0xc2, 0xc7, 0x01, 0x80, 0x0d, 0x03, 0x3a, 0x25, 0x12, 0x73, 0x67, 0x8c,
+	0xc4, 0xbf, 0x43, 0x20, 0xd5, 0xf7, 0xf3, 0x8d, 0xb6, 0x61, 0xee, 0x75, 0xa8, 0xd6, 0xea, 0x52,
+	0x63, 0x6a, 0x84, 0xc5, 0xd3, 0xe2, 0xa2, 0x9b, 0x30, 0x67, 0x53, 0xa7, 0xd7, 0x61, 0x5e, 0x94,
+	0x92, 0x57, 0x5f, 0x3c, 0xf9, 0xa4, 0x71, 0x75, 0x59, 0xec, 0xb1, 0x63, 0x2e, 0x96, 0xf9, 0xa7,
+	0x08, 0x73, 0xfe, 0x15, 0x8a, 0x43, 0xa4, 0x76, 0xbb, 0x58, 0x54, 0x6a, 0x35, 0x49, 0x40, 0xcf,
+	0xc1, 0xfc, 0xed, 0xf2, 0x66, 0xb9, 0xf2, 0x56, 0x59, 0x55, 0x30, 0xae, 0x60, 0x49, 0x44, 0x09,
+	0x88, 0xd6, 0x2b, 0x15, 0x75, 0x2b, 0x5f, 0x57, 0xa4, 0x10, 0x9a, 0x87, 0x98, 0x7b, 0x52, 0xf2,
+	0x78, 0xeb, 0xae, 0x34, 0x83, 0x16, 0x41, 0x2a, 0x56, 0xb6, 0xb6, 0x4a, 0xb5, 0x52, 0xa5, 0xac,
+	0x56, 0xf3, 0xc5, 0x4d, 0xa5, 0x2e, 0x85, 0xc7, 0x6f, 0x0b, 0x4a, 0xbe, 0x58, 0x29, 0x4b, 0xb3,
+	0xae, 0xa2, 0xfa, 0x1d, 0x75, 0x0d, 0x2b, 0x6f, 0x48, 0x73, 0x1e, 0xea, 0x1d, 0xb5, 0x5a, 0x79,
+	0x4b, 0xc1, 0x52, 0x04, 0x49, 0x90, 0x58, 0xaf, 0xd6, 0xd4, 0xdb, 0xe5, 0xad, 0x4a, 0x71, 0x53,
+	0x59, 0x95, 0xa2, 0x99, 0x27, 0x21, 0x78, 0x2e, 0x6f, 0x59, 0x1d, 0xbd, 0xe1, 0x3d, 0xda, 0xef,
+	0x48, 0x48, 0x85, 0xa4, 0x43, 0x1d, 0xc7, 0x75, 0x58, 0x9b, 0x1e, 0xa8, 0xba, 0x9f, 0xc2, 0xb1,
+	0xc2, 0x6b, 0x6e, 0x16, 0xd5, 0x7c, 0xca, 0x26, 0x3d, 0x28, 0xad, 0xf6, 0xbf, 0x48, 0x5f, 0x86,
+	0x8b, 0xef, 0xbe, 0x4d, 0x56, 0xfe, 0xf4, 0x8b, 0x95, 0xd7, 0xde, 0xb9, 0x72, 0xf3, 0xc6, 0xdb,
+	0x2b, 0xef, 0xdc, 0x0c, 0x8e, 0x2f, 0xfd, 0xf9, 0x95, 0x97, 0xaf, 0xfd, 0xf2, 0xaf, 0x97, 0xfe,
+	0xf2, 0xee, 0x25, 0x9c, 0x70, 0x86, 0x62, 0x1a, 0x3a, 0x07, 0x73, 0x4d, 0xd5, 0x32, 0x6d, 0xdf,
+	0xb1, 0xf3, 0x78, 0xb6, 0x59, 0x35, 0x6d, 0x86, 0x9e, 0x87, 0xd9, 0xa6, 0xda, 0x30, 0x98, 0x97,
+	0xda, 0xf3, 0x38, 0xdc, 0x2c, 0x1a, 0x0c, 0xe5, 0x20, 0xde, 0xb4, 0xbb, 0x83, 0x62, 0x72, 0xb3,
+	0x33, 0x51, 0x48, 0xf6, 0x0f, 0xd3, 0xb0, 0x86, 0xb7, 0x79, 0x41, 0x61, 0x68, 0xda, 0xdd, 0xa0,
+	0xb8, 0x7e, 0x0f, 0x0b, 0x1a, 0x6d, 0x98, 0x1a, 0xd5, 0x06, 0x42, 0xb3, 0xbc, 0xc8, 0x26, 0xfb,
+	0x43, 0xcd, 0x1b, 0x2c, 0x38, 0xc9, 0xf9, 0x03, 0x84, 0x89, 0xd6, 0x34, 0x77, 0x96, 0xd6, 0x94,
+	0xf9, 0x5b, 0x08, 0x9e, 0x1f, 0x71, 0xe9, 0x96, 0xe9, 0xff, 0x45, 0x29, 0x88, 0x38, 0xd4, 0x76,
+	0x0b, 0xce, 0xf7, 0x26, 0x0e, 0x8e, 0xe8, 0x77, 0x10, 0xed, 0x70, 0x2e, 0xde, 0x0e, 0x52, 0x93,
+	0xba, 0x02, 0x14, 0xbf, 0x8f, 0x3d, 0x39, 0x4c, 0x8b, 0x78, 0x20, 0x83, 0x6a, 0x00, 0x84, 0x31,
+	0x5b, 0xdf, 0xe9, 0x31, 0xea, 0xb6, 0x05, 0xd7, 0xda, 0x6b, 0x93, 0x08, 0x53, 0x4c, 0xca, 0xe6,
+	0x07, 0x52, 0x8a, 0xc1, 0xec, 0x03, 0x3c, 0x02, 0xb3, 0xf4, 0x5b, 0x58, 0x98, 0x20, 0x23, 0x09,
+	0x66, 0xda, 0xf4, 0x80, 0x5b, 0xef, 0x7e, 0xa2, 0x45, 0x98, 0xdd, 0x25, 0x9d, 0x1e, 0xf5, 0xcc,
+	0x8e, 0x61, 0xff, 0x70, 0x23, 0x74, 0x5d, 0xcc, 0x7c, 0x1a, 0x82, 0x73, 0x23, 0x2a, 0x6f, 0x99,
+	0xba, 0x91, 0x6f, 0x34, 0xa8, 0xc5, 0x7e, 0xf8, 0xe4, 0xfa, 0x35, 0xc4, 0x88, 0x65, 0xa9, 0x8e,
+	0x0b, 0xcf, 0xfd, 0xf9, 0xe3, 0x49, 0x6f, 0x6c, 0xd2, 0x03, 0xc5, 0xd8, 0xa5, 0x1d, 0xd3, 0xa2,
+	0x38, 0x42, 0x2c, 0xab, 0xb6, 0x49, 0x0f, 0xd0, 0x1d, 0x38, 0xa7, 0x1b, 0x7c, 0x19, 0xa1, 0x9a,
+	0xaa, 0xf1, 0xae, 0x1e, 0xb8, 0xf4, 0xe2, 0x53, 0x5c, 0x1a, 0x4c, 0x00, 0xbc, 0x38, 0x82, 0x10,
+	0x5c, 0x3a, 0xe8, 0x45, 0x58, 0xb0, 0xa8, 0xa1, 0xe9, 0x46, 0x4b, 0xe5, 0xa6, 0x7a, 0x79, 0x1c,
+	0xc5, 0x49, 0x7e, 0xcd, 0xdf, 0x9d, 0xf9, 0xef, 0xec, 0x58, 0xf2, 0x04, 0x08, 0xcf, 0x7c, 0x45,
+	0x5e, 0x80, 0x58, 0xc3, 0x34, 0x9a, 0xba, 0xdd, 0xa5, 0x9a, 0x37, 0xed, 0xa3, 0x78, 0x78, 0x81,
+	0xd6, 0x21, 0xd6, 0xe8, 0x10, 0xc7, 0x51, 0x77, 0xd4, 0x46, 0x2a, 0xe2, 0x21, 0xff, 0xfc, 0x14,
+	0xc1, 0xca, 0x16, 0x5d, 0xa1, 0x42, 0x11, 0x47, 0x1a, 0xfe, 0xc7, 0xb4, 0x69, 0x11, 0x3d, 0xed,
+	0xb4, 0x58, 0xfa, 0x34, 0x04, 0x11, 0x8e, 0x88, 0x08, 0x44, 0x5b, 0x84, 0xd1, 0x3d, 0x72, 0xe0,
+	0x6f, 0x14, 0xf1, 0xab, 0xca, 0x19, 0x0c, 0xca, 0xae, 0xfb, 0xb2, 0x79, 0x83, 0x51, 0xc3, 0x20,
+	0x23, 0x83, 0x1c, 0x0f, 0x60, 0xd1, 0xab, 0x10, 0x76, 0x37, 0xdf, 0x54, 0xf4, 0x3b, 0x77, 0x9f,
+	0xb0, 0xb7, 0xf7, 0x78, 0xdc, 0x4b, 0xff, 0x10, 0xe1, 0x85, 0x6f, 0x45, 0x47, 0xdb, 0x10, 0xe7,
+	0xf8, 0x7c, 0x52, 0xba, 0xd0, 0x99, 0x49, 0xcb, 0xb9, 0xfc, 0xe8, 0x7e, 0x31, 0x6c, 0x4b, 0xd0,
+	0x0a, 0xa8, 0x0e, 0xba, 0x08, 0xf3, 0xc4, 0x57, 0xa2, 0xea, 0x86, 0x46, 0xf7, 0x79, 0x6e, 0x25,
+	0xf8, 0x65, 0xc9, 0xbd, 0xe3, 0xc3, 0xfb, 0x2e, 0x2c, 0x4e, 0x71, 0x88, 0xbb, 0x5a, 0xc4, 0x86,
+	0x75, 0x28, 0x9e, 0xbe, 0x0e, 0x87, 0x52, 0x99, 0x07, 0x22, 0xbc, 0x30, 0x85, 0x65, 0x8d, 0xe8,
+	0x1d, 0xaa, 0xa1, 0x12, 0x44, 0x03, 0x56, 0xfe, 0xde, 0xd3, 0xe0, 0x8f, 0xf6, 0xe1, 0x40, 0x1c,
+	0x5d, 0x87, 0x59, 0xef, 0x87, 0x06, 0x6f, 0x3a, 0x17, 0x4e, 0x6c, 0x66, 0x2e, 0x71, 0x95, 0x32,
+	0xa2, 0x77, 0x82, 0x1d, 0xca, 0x17, 0xc8, 0xfc, 0x5d, 0x84, 0xf4, 0x88, 0x96, 0xd2, 0xb4, 0x1e,
+	0xf2, 0xff, 0x7b, 0x02, 0x5d, 0x86, 0x85, 0x0e, 0x71, 0x98, 0xea, 0x95, 0xb4, 0xd7, 0xdf, 0x82,
+	0x88, 0xb8, 0xd7, 0x6b, 0x45, 0x83, 0xb9, 0x52, 0x99, 0x0f, 0x23, 0x30, 0x3f, 0xb6, 0x14, 0xa0,
+	0xfa, 0x89, 0xe5, 0x53, 0x3c, 0xc3, 0xf2, 0x39, 0xf4, 0xd5, 0xf8, 0xd2, 0x39, 0xa5, 0xda, 0x42,
+	0xa7, 0xde, 0xcd, 0x6e, 0x41, 0xb2, 0xe7, 0x6d, 0x2b, 0x2a, 0xff, 0xd1, 0xca, 0xf7, 0xe1, 0x9f,
+	0x3e, 0xc5, 0x27, 0xfe, 0x7a, 0xb3, 0x21, 0xe0, 0xf9, 0xde, 0xd8, 0x4f, 0xaf, 0x0d, 0x88, 0xbf,
+	0x67, 0xea, 0x86, 0x4a, 0xbc, 0x09, 0xc5, 0x17, 0xe0, 0xcb, 0x4f, 0x01, 0x1a, 0x8e, 0xb3, 0x0d,
+	0x01, 0xc3, 0x7b, 0xc3, 0xe1, 0xb6, 0x01, 0x89, 0xc0, 0xdd, 0x2a, 0x69, 0xb4, 0x79, 0x9b, 0x3b,
+	0x4d, 0x9c, 0x36, 0x04, 0x1c, 0x0f, 0x44, 0xf3, 0x8d, 0x36, 0xba, 0x05, 0xf3, 0x03, 0x24, 0xc3,
+	0x85, 0x9a, 0x3b, 0x0b, 0xd4, 0xc0, 0x8a, 0x32, 0x99, 0xc0, 0x72, 0xa8, 0xc1, 0x78, 0x8f, 0x3c,
+	0x2b, 0x56, 0xcd, 0x5d, 0xa8, 0xeb, 0xb0, 0x30, 0xc0, 0x6a, 0x7a, 0x25, 0xc4, 0x3b, 0xd0, 0x4b,
+	0xa7, 0x40, 0xf3, 0x6b, 0x6e, 0x43, 0xc0, 0x49, 0x6d, 0xbc, 0x0a, 0xcb, 0x23, 0xa8, 0xef, 0xf7,
+	0x68, 0x8f, 0x6a, 0xa9, 0xd8, 0x59, 0x6c, 0x1c, 0xe0, 0xbd, 0xe1, 0x09, 0x23, 0x13, 0x96, 0xc6,
+	0xf1, 0xd4, 0x91, 0xb9, 0x9c, 0x02, 0x0f, 0x3a, 0xf7, 0x14, 0xe8, 0x69, 0x15, 0xb8, 0x21, 0xe0,
+	0xd4, 0x98, 0x9a, 0x11, 0x26, 0xf7, 0x01, 0xc1, 0x3e, 0xa6, 0x3a, 0x66, 0x67, 0x97, 0x6a, 0xa9,
+	0xf8, 0x77, 0x3e, 0x20, 0x58, 0xc4, 0xdc, 0x07, 0x04, 0xd2, 0x35, 0x4f, 0xb8, 0x10, 0x86, 0x50,
+	0xcf, 0xca, 0x7c, 0x1c, 0x82, 0x14, 0x4f, 0x52, 0x3e, 0x09, 0xd7, 0x4c, 0xbb, 0x4b, 0x18, 0x73,
+	0x9b, 0x75, 0x11, 0x12, 0x3d, 0x4b, 0x6d, 0x06, 0x17, 0x5e, 0x49, 0x26, 0xaf, 0x2e, 0x4f, 0xea,
+	0x9b, 0x14, 0xc4, 0xf1, 0x9e, 0x35, 0x38, 0xa0, 0x57, 0xe1, 0xfc, 0x28, 0x88, 0x6a, 0x11, 0x9b,
+	0x74, 0xa9, 0x0b, 0xe7, 0xaf, 0x74, 0x8b, 0x23, 0xcc, 0xd5, 0x80, 0x86, 0xd6, 0xc1, 0x73, 0xf8,
+	0x88, 0xf2, 0x99, 0x53, 0x2a, 0xf7, 0x12, 0x71, 0xa8, 0xfe, 0x3a, 0xa4, 0xc6, 0x81, 0x46, 0x0c,
+	0x08, 0x7b, 0x06, 0x9c, 0x1f, 0x13, 0x18, 0x98, 0x90, 0x79, 0x28, 0xc2, 0xe2, 0xea, 0x68, 0x34,
+	0x30, 0x7d, 0xbf, 0x47, 0x1d, 0x86, 0xb6, 0x01, 0x86, 0xbd, 0xea, 0x7b, 0xf6, 0xa9, 0xd8, 0xa0,
+	0x4f, 0x8d, 0xb7, 0xdd, 0xd0, 0xf7, 0x69, 0xbb, 0x3f, 0xbb, 0x2f, 0x82, 0x34, 0xe9, 0x08, 0x84,
+	0x20, 0xb9, 0x56, 0xc1, 0xdb, 0xf9, 0x7a, 0x5d, 0xc1, 0x6a, 0xb9, 0x52, 0x56, 0x24, 0x01, 0xa5,
+	0x60, 0x71, 0x78, 0x87, 0x95, 0x6a, 0xa5, 0x56, 0xaa, 0x57, 0xf0, 0x5d, 0x49, 0x44, 0x4b, 0x70,
+	0x7e, 0x48, 0x59, 0xc7, 0xd5, 0xa2, 0x5a, 0x53, 0xf0, 0x9b, 0xa5, 0xa2, 0xfb, 0x5b, 0x71, 0x4c,
+	0xea, 0x56, 0xfe, 0xcd, 0x7c, 0xad, 0x88, 0x4b, 0xd5, 0xba, 0x34, 0x33, 0x4e, 0x29, 0xe6, 0xef,
+	0x2a, 0xe5, 0xb2, 0xb2, 0x55, 0xad, 0x4a, 0xe1, 0xc2, 0xbf, 0xc4, 0xc7, 0x47, 0xb2, 0xf8, 0xe4,
+	0x48, 0x16, 0x3f, 0x3f, 0x92, 0x85, 0x2f, 0x8f, 0x64, 0xe1, 0xab, 0x23, 0x59, 0xf8, 0xfa, 0x48,
+	0x16, 0xbe, 0x39, 0x92, 0xc5, 0x0f, 0xfa, 0xb2, 0xf8, 0x51, 0x5f, 0x16, 0x1e, 0xf6, 0x65, 0xf1,
+	0x93, 0xbe, 0x2c, 0x3c, 0xea, 0xcb, 0xc2, 0x67, 0x7d, 0x59, 0x78, 0xdc, 0x97, 0xc5, 0x27, 0x7d,
+	0x59, 0xfc, 0xbc, 0x2f, 0x0b, 0x5f, 0xf6, 0x65, 0xf1, 0xab, 0xbe, 0x2c, 0x7c, 0xdd, 0x97, 0xc5,
+	0x6f, 0xfa, 0xb2, 0xf0, 0xc1, 0xb1, 0x2c, 0x7c, 0x74, 0x2c, 0x8b, 0xf7, 0x8f, 0x65, 0xe1, 0xe3,
+	0x63, 0x59, 0x7c, 0x70, 0x2c, 0x0b, 0x0f, 0x8f, 0x65, 0xe1, 0x93, 0x63, 0x59, 0x7c, 0x74, 0x2c,
+	0x8b, 0x9f, 0x1d, 0xcb, 0xe2, 0x1f, 0x5e, 0x6e, 0x99, 0x59, 0x76, 0x8f, 0xb2, 0x7b, 0xba, 0xd1,
+	0x72, 0xb2, 0x06, 0x65, 0x7b, 0xa6, 0xdd, 0xce, 0x8d, 0xff, 0xb3, 0xcc, 0x6a, 0xb7, 0x72, 0x8c,
+	0x19, 0xd6, 0xce, 0xce, 0x9c, 0xb7, 0xcb, 0x5c, 0xfb, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x54,
+	0x68, 0x65, 0x7a, 0xa9, 0x14, 0x00, 0x00,
 }
