@@ -203,6 +203,12 @@ export default {
           collapseWhitespace: true,
         },
       }),
+      new HtmlWebpackPlugin({
+        inject: false,
+        filename: path.resolve(PUBLIC_DIR, 'manifest.go'),
+        showErrors: false,
+        template: path.resolve('config', 'manifest-template.txt'),
+      }),
       new MiniCssExtractPlugin({
         filename: env({
           development: '[name].css',
