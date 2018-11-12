@@ -57,6 +57,7 @@ func init() {
 			{}, {}, {}, {}, {}, {}, {}, // RFU
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
+		MaxADRDataRateIndex: 5,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -76,6 +77,7 @@ func init() {
 			}
 			return offset
 		}(),
+		MaxTxPowerIndex: 10,
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {

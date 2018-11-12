@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package band contains structs to handle regional bands
+// Package band contains structs to handle regional bands.
 package band
 
 import (
@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-// PayloadSizer abstracts the acceptable payload size depending on contextual parameters
+// PayloadSizer abstracts the acceptable payload size depending on contextual parameters.
 type PayloadSizer interface {
 	PayloadSize(emptyFOpt, dwellTime bool) uint16
 }
@@ -53,22 +53,22 @@ func (p dwellTimePayloadSize) PayloadSize(_, dwellTime bool) uint16 {
 	return p.NoDwellTime
 }
 
-// DataRate indicates the properties of a band's data rate
+// DataRate indicates the properties of a band's data rate.
 type DataRate struct {
 	Rate              types.DataRate
 	DefaultMaxSize    PayloadSizer
 	NoRepeaterMaxSize PayloadSizer
 }
 
-// Channel abstracts a band's channel properties
+// Channel abstracts a band's channel properties.
 type Channel struct {
-	// Frequency indicates the frequency of the channel
+	// Frequency indicates the frequency of the channel.
 	Frequency uint64
-	// DataRateIndexes indicates the data rates accepted on this channel
+	// DataRateIndexes indicates the data rates accepted on this channel.
 	DataRateIndexes []int
 }
 
-// Rx2Parameters contains downlink datarate index and channel
+// Rx2Parameters contains downlink datarate index and channel.
 type Rx2Parameters struct {
 	DataRateIndex ttnpb.DataRateIndex
 	Frequency     uint64
@@ -102,15 +102,15 @@ type Beacon struct {
 	PingSlotChannels []uint32
 }
 
-// Band contains a band's properties
+// Band contains a band's properties.
 type Band struct {
 	ID string
 
 	Beacon Beacon
 
-	// UplinkChannels by default
+	// UplinkChannels by default.
 	UplinkChannels []Channel
-	// DownlinkChannels by default
+	// DownlinkChannels by default.
 	DownlinkChannels []Channel
 
 	BandDutyCycles []DutyCycle
@@ -120,14 +120,14 @@ type Band struct {
 	ImplementsCFList bool
 	CFListType       ttnpb.CFListType
 
-	// ReceiveDelay1 is the default Rx1 window timing in seconds
+	// ReceiveDelay1 is the default Rx1 window timing in seconds.
 	ReceiveDelay1 time.Duration
-	// ReceiveDelay2 is the default Rx2 window timing in seconds (ReceiveDelay1 + 1s)
+	// ReceiveDelay2 is the default Rx2 window timing in seconds (ReceiveDelay1 + 1s).
 	ReceiveDelay2 time.Duration
 
-	// ReceiveDelay1 is the default join-accept window timing in seconds
+	// ReceiveDelay1 is the default join-accept window timing in seconds.
 	JoinAcceptDelay1 time.Duration
-	// ReceiveDelay2 is the join-accept window timing in seconds
+	// ReceiveDelay2 is the join-accept window timing in seconds.
 	JoinAcceptDelay2 time.Duration
 	// MaxFCntGap
 	MaxFCntGap uint
@@ -138,8 +138,12 @@ type Band struct {
 	MinAckTimeout time.Duration
 	MaxAckTimeout time.Duration
 
-	// TxOffset in dB: A Tx's power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset
+	// TxOffset in dB: A Tx's power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset.
 	TxOffset [16]float32
+	// MaxTxPowerIndex represents the maximum non-RFU TxPowerIndex, which can be used according to the band's spec.
+	MaxTxPowerIndex uint8
+	// MaxADRDataRateIndex represents the maximum non-RFU DataRateIndex suitable for ADR, which can be used according to the band's spec.
+	MaxADRDataRateIndex uint8
 
 	TxParamSetupReqSupport bool
 
@@ -159,7 +163,7 @@ type Band struct {
 	// ParseChMask computes the channels that have to be masked given ChMask mask and ChMaskCntl cntl.
 	ParseChMask func(mask [16]bool, cntl uint8) (map[uint8]bool, error)
 
-	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
+	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2.
 	DefaultRx2Parameters Rx2Parameters
 
 	regionalParameters1_0       versionSwap
@@ -169,14 +173,14 @@ type Band struct {
 	regionalParameters1_1RevA   versionSwap
 }
 
-// DutyCycle for the [MinFrequency;MaxFrequency] sub-band
+// DutyCycle for the [MinFrequency;MaxFrequency] sub-band.
 type DutyCycle struct {
 	MinFrequency uint64
 	MaxFrequency uint64
 	DutyCycle    float32
 }
 
-// Comprises returns whether the duty cycle applies to that channel
+// Comprises returns whether the duty cycle applies to that channel.
 func (d DutyCycle) Comprises(channel uint64) bool {
 	return channel >= d.MinFrequency && channel < d.MaxFrequency
 }
@@ -186,10 +190,10 @@ func (d DutyCycle) MaxEmissionDuring(period time.Duration) time.Duration {
 	return time.Duration(d.DutyCycle * float32(period))
 }
 
-// All contains all the bands available
+// All contains all the bands available.
 var All = make(map[string]Band)
 
-// GetByID returns the band if it was found, and returns an error otherwise
+// GetByID returns the band if it was found, and returns an error otherwise.
 func GetByID(id string) (Band, error) {
 	if band, ok := All[id]; ok {
 		return band, nil

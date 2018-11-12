@@ -78,6 +78,7 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF7BW500"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU for previous versions
 		},
+		MaxADRDataRateIndex: 5,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -97,6 +98,7 @@ func init() {
 			}
 			return offset
 		}(),
+		MaxTxPowerIndex: 14,
 
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,

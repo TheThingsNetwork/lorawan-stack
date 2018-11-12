@@ -76,6 +76,7 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF7BW500"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
+		MaxADRDataRateIndex: 3,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -95,6 +96,7 @@ func init() {
 			}
 			return offset
 		}(),
+		MaxTxPowerIndex: 14,
 
 		Rx1Channel: channelIndexModulo(8),
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
