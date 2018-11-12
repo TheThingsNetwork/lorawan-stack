@@ -106,7 +106,9 @@ func (s *srv) read() {
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
 		if err != nil {
-			log.FromContext(s.ctx).WithError(err).Warn("Read failed")
+			if s.ctx.Err() == nil {
+				log.FromContext(s.ctx).WithError(err).Warn("Read failed")
+			}
 			return
 		}
 

@@ -239,11 +239,11 @@ func (c *Component) Close() {
 
 	for _, l := range c.tcpListeners {
 		err := l.lis.Close()
-		if err == nil {
-			c.logger.Debugf("Stopped listening on %s", l.lis.Addr())
-		} else {
+		if err != nil && c.ctx.Err() == nil {
 			c.logger.WithError(err).Errorf("Error while stopping to listen on %s", l.lis.Addr())
+			continue
 		}
+		c.logger.Debugf("Stopped listening on %s", l.lis.Addr())
 	}
 
 	if c.grpc != nil {

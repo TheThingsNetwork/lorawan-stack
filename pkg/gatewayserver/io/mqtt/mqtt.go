@@ -60,7 +60,9 @@ func (s *srv) accept() {
 	for {
 		mqttConn, err := s.lis.Accept()
 		if err != nil {
-			log.FromContext(s.ctx).WithError(err).Warn("Accept failed")
+			if s.ctx.Err() == nil {
+				log.FromContext(s.ctx).WithError(err).Warn("Accept failed")
+			}
 			return
 		}
 
