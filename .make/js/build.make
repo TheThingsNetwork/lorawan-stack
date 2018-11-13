@@ -23,7 +23,7 @@ CACHE_DIR ?= .cache
 # Webpack
 WEBPACK ?= $(BINARIES_DIR)/webpack
 WEBPACK_FLAGS ?= --colors $(if $(CI),,--progress)
-WEBPACK_SERVE ?= $(BINARIES_DIR)/webpack-serve
+WEBPACK_SERVE ?= $(BINARIES_DIR)/webpack-dev-server
 
 # The config file to use for client
 WEBPACK_CONFIG ?= $(CONFIG_DIR)/webpack.config.js
@@ -48,7 +48,8 @@ DLL_OUTPUT ?= $(PUBLIC_DIR)/libs.bundle.js
 DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
 
 # Run webpack main bundle (webpack.config.js)
-js.build-main: $(PUBLIC_DIR)/console.html
+js.build-main: $(DLL_OUTPUT) $(shell $(JS_SRC_FILES)) yarn.lock
+	$(MAKE) js.webpack-main
 
 js.build-watch: NODE_ENV = development
 js.build-watch: WEBPACK_FLAGS += -w
@@ -60,15 +61,12 @@ js.watch: js.build-dll js.build-watch
 
 js.serve: DEV_SERVER_BUILD = true
 js.serve: $(WEBPACK_CONFIG_BUILT) $(DEFAULT_LOCALE_FILE) $(BACKEND_LOCALES_DIR) $(DLL_OUTPUT)
-	@$(log) "Serving via webpack-serve, make sure stack is running for the api proxy to work"
-	@$(JS_ENV) $(WEBPACK_SERVE) $(WEBPACK_CONFIG_BUILT)
+	@$(log) "Serving via webpack-dev-server, make sure stack is running for the api proxy to work"
+	@$(JS_ENV) $(WEBPACK_SERVE) --config $(WEBPACK_CONFIG_BUILT)
 
 js.webpack-main: $(WEBPACK_CONFIG_BUILT) $(DEFAULT_LOCALE_FILE) $(XX_LOCALE_FILE) $(BACKEND_LOCALES_DIR)
 	@$(log) "Building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
 	@$(JS_ENV) $(WEBPACK) --config $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)
-
-$(PUBLIC_DIR)/console.html: $(DLL_OUTPUT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html yarn.lock
-	$(MAKE) js.webpack-main
 
 # build in dev mode
 js.build-dev: NODE_ENV =
@@ -84,7 +82,7 @@ js.webpack-dll:
 
 
 # build dll for faster rebuilds
-js.build-dll: $(DLL_OUTPUT)
+js.build-dll: $(DLL_CONFIG_BUILT) $(DLL_OUTPUT)
 
 $(CACHE_DIR)/make/%.js: .make/js/%.js
 	@$(log) "Pre-building translation scripts [babel $<]"
