@@ -23,7 +23,7 @@ import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 import CleanWebpackPlugin from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-
+import HashOutput from 'webpack-plugin-hash-output'
 
 import convert from 'koa-connect'
 import history from 'connect-history-api-fallback'
@@ -76,8 +76,8 @@ export default {
     ],
   },
   output: {
-    filename: '[name].[hash].js',
-    chunkFilename: '[name].[hash].js',
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[chunkhash].js',
     path: path.resolve(context, PUBLIC_DIR),
     crossOriginLoading: 'anonymous',
     publicPath,
@@ -205,7 +205,7 @@ export default {
       }),
       new HtmlWebpackPlugin({
         inject: false,
-        filename: path.resolve(PUBLIC_DIR, 'manifest.go'),
+        filename: `${src}/manifest.go`,
         showErrors: false,
         template: path.resolve('config', 'manifest-template.txt'),
       }),
@@ -229,6 +229,7 @@ export default {
       }),
       // Copy static assets to output directory
       new CopyWebpackPlugin([ `${src}/assets/static` ]),
+      new HashOutput(),
     ],
     development: [
       new webpack.DllReferencePlugin({
