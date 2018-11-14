@@ -21,7 +21,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -69,7 +68,7 @@ var (
 		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
 
-	timeout = 10 * test.Delay
+	timeout = 50 * test.Delay
 
 	deviceRepositoryData = map[string][]byte{
 		"brands.yml": []byte(`version: '3'
@@ -129,182 +128,6 @@ func devAddrPtr(devAddr types.DevAddr) *types.DevAddr {
 func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) ttnpb.EndDeviceIdentifiers {
 	ids.DevAddr = &devAddr
 	return ids
-}
-
-type memStore struct {
-	mu    sync.RWMutex
-	items map[string][]byte
-	New   func() proto.Unmarshaler
-}
-
-var errNotFound = errors.DefineNotFound("not_found", "not found")
-
-func (s *memStore) Get(uid string) (proto.Unmarshaler, error) {
-	s.mu.RLock()
-	buf, ok := s.items[uid]
-	s.mu.RUnlock()
-	if !ok {
-		return nil, errNotFound
-	}
-	v := s.New()
-	if err := v.Unmarshal(buf); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-func (s *memStore) Set(uid string, f func(proto.Unmarshaler) (proto.Marshaler, error)) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	var v proto.Unmarshaler
-	buf, ok := s.items[uid]
-	if ok {
-		v = s.New()
-		if err := v.Unmarshal(buf); err != nil {
-			return err
-		}
-	}
-	n, err := f(v)
-	if err != nil {
-		return err
-	}
-	if n == nil {
-		delete(s.items, uid)
-	} else if buf, err := n.Marshal(); err != nil {
-		return err
-	} else {
-		s.items[uid] = buf
-	}
-	return nil
-}
-
-func (s *memStore) Range(f func(string, proto.Unmarshaler) bool) error {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	for uid, buf := range s.items {
-		v := s.New()
-		if err := v.Unmarshal(buf); err != nil {
-			return err
-		}
-		if !f(uid, v) {
-			break
-		}
-	}
-	return nil
-}
-
-func (s *memStore) Reset() {
-	s.mu.Lock()
-	s.items = map[string][]byte{}
-	s.mu.Unlock()
-}
-
-type memDeviceRegistry struct {
-	store memStore
-}
-
-func newMemDeviceRegistry() *memDeviceRegistry {
-	return &memDeviceRegistry{
-		store: memStore{
-			items: make(map[string][]byte),
-			New:   func() proto.Unmarshaler { return new(ttnpb.EndDevice) },
-		},
-	}
-}
-
-func (r *memDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
-	v, err := r.store.Get(unique.ID(ctx, ids))
-	if err != nil {
-		return nil, err
-	}
-	return v.(*ttnpb.EndDevice), nil
-}
-
-func (r *memDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	var set *ttnpb.EndDevice
-	err := r.store.Set(unique.ID(ctx, ids), func(v proto.Unmarshaler) (proto.Marshaler, error) {
-		var dev *ttnpb.EndDevice
-		if v != nil {
-			dev = v.(*ttnpb.EndDevice)
-		}
-		if dev, _, err := f(dev); err != nil {
-			return nil, err
-		} else if dev == nil {
-			return nil, nil
-		} else {
-			set = dev
-			return dev, nil
-		}
-	})
-	if err != nil {
-		return nil, err
-	}
-	return set, nil
-}
-
-func (r *memDeviceRegistry) Reset() {
-	r.store.Reset()
-}
-
-type memLinkRegistry struct {
-	store memStore
-}
-
-func newMemLinkRegistry() *memLinkRegistry {
-	return &memLinkRegistry{
-		store: memStore{
-			items: make(map[string][]byte),
-			New:   func() proto.Unmarshaler { return new(ttnpb.ApplicationLink) },
-		},
-	}
-}
-
-func (r *memLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
-	v, err := r.store.Get(unique.ID(ctx, ids))
-	if err != nil {
-		return nil, err
-	}
-	return v.(*ttnpb.ApplicationLink), nil
-}
-
-func (r *memLinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
-	var set *ttnpb.ApplicationLink
-	err := r.store.Set(unique.ID(ctx, ids), func(v proto.Unmarshaler) (proto.Marshaler, error) {
-		var l *ttnpb.ApplicationLink
-		if v != nil {
-			l = v.(*ttnpb.ApplicationLink)
-		}
-		if l, _, err := f(l); err != nil {
-			return nil, err
-		} else if l == nil {
-			return nil, nil
-		} else {
-			set = l
-			return l, nil
-		}
-	})
-	if err != nil {
-		return nil, err
-	}
-	return set, nil
-}
-
-func (r *memLinkRegistry) Range(ctx context.Context, paths []string, f func(ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
-	var ferr error
-	err := r.store.Range(func(uid string, v proto.Unmarshaler) bool {
-		ids, ferr := unique.ToApplicationID(uid)
-		if ferr != nil {
-			return false
-		}
-		return f(ids, v.(*ttnpb.ApplicationLink))
-	})
-	if err != nil {
-		return err
-	}
-	if ferr != nil {
-		return ferr
-	}
-	return nil
 }
 
 type mockNS struct {
@@ -423,6 +246,8 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key
 		is.applicationAuths[uid] = []string{fmt.Sprintf("Key %v", key)}
 	}
 }
+
+var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
 	uid := unique.ID(ctx, req.ApplicationIdentifiers)

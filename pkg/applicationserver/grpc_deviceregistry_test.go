@@ -20,6 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -39,7 +40,10 @@ func TestDeviceRegistry(t *testing.T) {
 	// Register the application in the Entity Registry.
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	deviceRegistry := newMemDeviceRegistry()
+	redisClient, flush := test.NewRedis(t, "applicationserver_test")
+	defer flush()
+	defer redisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: redisClient}
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -154,7 +158,9 @@ func TestDeviceRegistry(t *testing.T) {
 			},
 		}, creds)
 		a.So(err, should.BeNil)
-		a.So(dev, should.Resemble, registeredDevice)
+		registeredDevice.CreatedAt = dev.CreatedAt
+		registeredDevice.UpdatedAt = dev.UpdatedAt
+		a.So(dev, should.ResembleDiff, registeredDevice)
 
 		// Update and assert new value.
 		registeredDevice.Formatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
@@ -172,7 +178,9 @@ func TestDeviceRegistry(t *testing.T) {
 			},
 		}, creds)
 		a.So(err, should.BeNil)
-		a.So(dev, should.Resemble, registeredDevice)
+		registeredDevice.CreatedAt = dev.CreatedAt
+		registeredDevice.UpdatedAt = dev.UpdatedAt
+		a.So(dev, should.ResembleDiff, registeredDevice)
 
 		// Delete and assert it's gone.
 		_, err = client.Delete(ctx, &registeredDevice.EndDeviceIdentifiers, creds)

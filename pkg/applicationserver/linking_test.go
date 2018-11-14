@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -46,7 +47,10 @@ func TestLink(t *testing.T) {
 	// app1 is added to the link registry, app2 will be linked at runtime.
 	app1 := ttnpb.ApplicationIdentifiers{ApplicationID: "app1"}
 	app2 := ttnpb.ApplicationIdentifiers{ApplicationID: "app2"}
-	linkRegistry := newMemLinkRegistry()
+	redisClient, flush := test.NewRedis(t, "applicationserver_test")
+	defer flush()
+	defer redisClient.Close()
+	linkRegistry := &redis.LinkRegistry{Redis: redisClient}
 	linkRegistry.Set(ctx, app1, mask, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{}, mask, nil
 	})

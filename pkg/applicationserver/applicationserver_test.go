@@ -24,6 +24,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -82,8 +83,15 @@ func TestApplicationServer(t *testing.T) {
 		KEKLabel: "test",
 	})
 
-	deviceRegistry := newMemDeviceRegistry()
-	linkRegistry := newMemLinkRegistry()
+	devsRedisClient, devsFlush := test.NewRedis(t, "applicationserver_test", "devices")
+	defer devsFlush()
+	defer devsRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+
+	linksRedisClient, linksFlush := test.NewRedis(t, "applicationserver_test", "links")
+	defer linksFlush()
+	defer linksRedisClient.Close()
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
 	linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
@@ -260,7 +268,7 @@ func TestApplicationServer(t *testing.T) {
 
 			t.Run("Upstream", func(t *testing.T) {
 				ns.reset()
-				deviceRegistry.Reset()
+				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 					return registeredDevice, []string{"ids", "version_ids", "formatters"}, nil
 				})
@@ -1040,7 +1048,7 @@ func TestApplicationServer(t *testing.T) {
 
 			t.Run("Downstream", func(t *testing.T) {
 				ns.reset()
-				deviceRegistry.Reset()
+				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 					dev := *registeredDevice
 					dev.Session = &ttnpb.Session{
