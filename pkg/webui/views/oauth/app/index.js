@@ -30,7 +30,11 @@ import Init from '../../../lib/components/init'
 
 const history = createBrowserHistory()
 const store = createStore(history)
-const env = window.ENV || {}
+const env = {
+  app_root: window.APP_ROOT,
+  assets_root: window.ASSETS_ROOT,
+  config: window.APP_CONFIG,
+}
 
 export default class OAuthApp extends React.PureComponent {
   render () {

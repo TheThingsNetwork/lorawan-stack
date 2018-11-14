@@ -28,7 +28,11 @@ import App from './views/console/app'
 
 const history = createBrowserHistory()
 const store = createStore(history)
-const env = window.ENV || {}
+const env = {
+  app_root: window.APP_ROOT,
+  assets_root: window.ASSETS_ROOT,
+  config: window.APP_CONFIG,
+}
 
 const Console = () => (
   <EnvProvider env={env}>
