@@ -39,7 +39,7 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 			"api_key",
 			"default_formatters",
 		},
-		func(ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
+		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
 			as.startLinkTask(ctx, ids, target)
 			return true
 		},

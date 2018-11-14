@@ -1124,6 +1124,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/applicationserver/redis:application_uid": {
+    "translations": {
+      "en": "invalid application UID `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/applicationserver:already_linked": {
     "translations": {
       "en": "already linked to `{application_uid}`"
@@ -1149,6 +1158,15 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:duplicate_identifiers": {
+    "translations": {
+      "en": "identifiers already exists"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "registry.go"
     }
   },
   "error:pkg/applicationserver:formatter_not_configured": {
