@@ -28,6 +28,14 @@ about: Create a report to help us improve
 
 ...
 
+**How do you propose to implement this?**
+<!--
+If unsure, add the discussion label and (temporarily) assign the expert
+If you cannot assign people, please @mention the experts
+-->
+
+...
+
 **Environment:**
 <!-- Your environment: OS/Browser/Gateway/Device/...? Versions? IDs/EUIs? -->
 
