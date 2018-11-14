@@ -1250,42 +1250,6 @@
       "file": "payload.go"
     }
   },
-  "error:pkg/assets:http": {
-    "translations": {
-      "en": "HTTP error: {message}"
-    },
-    "description": {
-      "package": "pkg/assets",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/assets:local_not_found": {
-    "translations": {
-      "en": "assets not found in search path `{search_path}` and no CDN specified"
-    },
-    "description": {
-      "package": "pkg/assets",
-      "file": "assets.go"
-    }
-  },
-  "error:pkg/assets:no_location": {
-    "translations": {
-      "en": "no assets location specified; specify local search path or CDN"
-    },
-    "description": {
-      "package": "pkg/assets",
-      "file": "assets.go"
-    }
-  },
-  "error:pkg/assets:template_not_found": {
-    "translations": {
-      "en": "template `{name}` not found"
-    },
-    "description": {
-      "package": "pkg/assets",
-      "file": "assets.go"
-    }
-  },
   "error:pkg/auth/cluster:auth_type": {
     "translations": {
       "en": "cluster auth type `{auth_type}` is not supported"
@@ -1529,18 +1493,9 @@
       "file": "hooks.go"
     }
   },
-  "error:pkg/console:extract_path_from_public_url": {
+  "error:pkg/console:no_oauth_config": {
     "translations": {
-      "en": "could not extract path from public URL `{url}`"
-    },
-    "description": {
-      "package": "pkg/console",
-      "file": "console.go"
-    }
-  },
-  "error:pkg/console:no_oauth": {
-    "translations": {
-      "en": "no OAuth client ID and/or secret configured for the Console"
+      "en": "no OAuth configuration found for the Console"
     },
     "description": {
       "package": "pkg/console",

@@ -19,84 +19,90 @@ import (
 	"net/url"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/assets"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"go.thethings.network/lorawan-stack/pkg/webui"
 	"golang.org/x/oauth2"
 )
 
-var (
-	errNoOAuth     = errors.DefineInvalidArgument("no_oauth", "no OAuth client ID and/or secret configured for the Console")
-	errExtractPath = errors.DefineInvalidArgument("extract_path_from_public_url", "could not extract path from public URL `{url}`")
-)
+// APIConfig for upstream APIs.
+type APIConfig struct {
+	Enabled bool   `json:"enabled" name:"enabled" description:"Enable this API"`
+	BaseURL string `json:"base_url" name:"base-url" description:"Base URL to the HTTP API"`
+}
+
+// UIConfig is the combined configuration for the Console UI.
+type UIConfig struct {
+	webui.TemplateData `name:",squash"`
+	FrontendConfig     `name:",squash"`
+}
+
+// FrontendConfig is the configuration for the Console frontend.
+type FrontendConfig struct {
+	Language string    `json:"language" name:"-"`
+	IS       APIConfig `json:"is" name:"is"`
+	GS       APIConfig `json:"gs" name:"gs"`
+	NS       APIConfig `json:"ns" name:"ns"`
+	AS       APIConfig `json:"as" name:"as"`
+	JS       APIConfig `json:"js" name:"js"`
+}
 
 // Config is the configuration for the Console.
 type Config struct {
-	// PublicURL is the public URL of the Console.
-	PublicURL string `name:"public-url" description:"Public URL of the Console"`
-
-	// DefaultLanguage is the default language of the Console.
-	DefaultLanguage string `name:"language" description:"Default language of the Console"`
-
-	// OAuthURL is the location of the OAuth provider.
-	OAuthURL string `name:"oauth-url" description:"URL of the OAuth provider"`
-
-	// OAuth is the OAuth config for the Console.
-	OAuth OAuth `name:"oauth"`
-
-	// mount is the location where the Console is mounted.
-	mount string `name:"-"`
+	OAuth OAuth    `name:"oauth"`
+	Mount string   `name:"mount" description:"Path on the server where the Console will be served"`
+	UI    UIConfig `name:"ui"`
 }
 
 // OAuth is the OAuth config for the Console.
 type OAuth struct {
-	// ID is the client ID for the Console.
-	ID string `name:"client-id" description:"The OAuth client ID for the Console"`
+	AuthorizeURL string `name:"authorize-url" description:"The OAuth Authorize URL"`
+	TokenURL     string `name:"token-url" description:"The OAuth Token Exchange URL"`
 
-	// Secret is the client secret for the Console.
-	Secret string `name:"client-secret" description:"The OAuth client secret for the Console" json:"-"`
+	ClientID     string `name:"client-id" description:"The OAuth client ID for the Console"`
+	ClientSecret string `name:"client-secret" description:"The OAuth client secret for the Console" json:"-"`
 }
 
+var errNoOAuthConfig = errors.DefineInvalidArgument("no_oauth_config", "no OAuth configuration found for the Console")
+
 func (o OAuth) isZero() bool {
-	return o.ID == "" && o.Secret == ""
+	return o.AuthorizeURL == "" || o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == ""
 }
 
 // Console is the Console component.
 type Console struct {
 	*component.Component
-	assets *assets.Assets
 	config Config
 	oauth  *oauth2.Config
 }
 
 // New returns a new Console.
-func New(c *component.Component, assets *assets.Assets, config Config) (*Console, error) {
+func New(c *component.Component, config Config) (*Console, error) {
 	if config.OAuth.isZero() {
-		return nil, errNoOAuth
+		return nil, errNoOAuthConfig
 	}
 
 	console := &Console{
 		Component: c,
-		assets:    assets,
 		config:    config,
 	}
 
-	mount, err := path(console.config.PublicURL)
-	if err != nil {
-		return nil, errExtractPath.WithAttributes("url", console.config.PublicURL).WithCause(err)
+	if console.config.Mount == "" {
+		console.config.Mount = console.config.UI.MountPath()
 	}
-	console.config.mount = mount
 
 	console.oauth = &oauth2.Config{
-		ClientID:     console.config.OAuth.ID,
-		ClientSecret: console.config.OAuth.Secret,
-		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(console.config.PublicURL, "/")),
+		ClientID:     console.config.OAuth.ClientID,
+		ClientSecret: console.config.OAuth.ClientSecret,
+		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(console.config.UI.CanonicalURL, "/")),
 		Endpoint: oauth2.Endpoint{
-			TokenURL: fmt.Sprintf("%s/token", strings.TrimSuffix(console.config.OAuthURL, "/")),
-			AuthURL:  fmt.Sprintf("%s/authorize", strings.TrimSuffix(console.config.OAuthURL, "/")),
+			TokenURL: console.config.OAuth.TokenURL,
+			AuthURL:  console.config.OAuth.AuthorizeURL,
 		},
 	}
 
@@ -123,14 +129,21 @@ func path(u string) (string, error) {
 
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.
 func (console *Console) RegisterRoutes(server *web.Server) {
-	env := map[string]interface{}{
-		"console":          true,
-		"mount":            console.config.mount,
-		"default_language": console.config.DefaultLanguage,
-	}
-
-	group := server.Group(console.config.mount)
-	group.Use(console.assets.Errors("error.html", env))
+	group := server.Group(console.config.Mount, webui.RenderErrors, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("template_data", console.config.UI.TemplateData)
+			frontendConfig := console.config.UI.FrontendConfig
+			frontendConfig.Language = console.config.UI.TemplateData.Language
+			c.Set("app_config", struct {
+				Console bool `json:"console"`
+				FrontendConfig
+			}{
+				Console:        true,
+				FrontendConfig: frontendConfig,
+			})
+			return next(c)
+		}
+	}, middleware.CSRF())
 
 	group.GET("/oauth/callback", console.Callback)
 
@@ -140,11 +153,8 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 	api.GET("/auth/login", console.Login)
 	api.POST("/auth/logout", console.Logout)
 
-	// Set up HTML routes.
-	index := console.assets.AppHandler("console.html", env)
-
-	if console.config.mount != "" && console.config.mount != "/" {
-		group.GET("", index)
+	if console.config.Mount != "" && console.config.Mount != "/" {
+		group.GET("", webui.Render)
 	}
-	group.GET("/*", index)
+	group.GET("/*", webui.Render)
 }

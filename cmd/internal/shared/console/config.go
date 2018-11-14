@@ -17,15 +17,35 @@ package console
 import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/console"
+	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
 // DefaultConsoleConfig is the default configuration for the Console.
 var DefaultConsoleConfig = console.Config{
-	DefaultLanguage: "en",
-	OAuthURL:        shared.DefaultOAuthPublicURL,
-	PublicURL:       shared.DefaultConsolePublicURL,
 	OAuth: console.OAuth{
-		ID:     "console",
-		Secret: "console",
+		AuthorizeURL: shared.DefaultOAuthPublicURL + "/authorize",
+		TokenURL:     shared.DefaultOAuthPublicURL + "/token",
+		ClientID:     "console",
+		ClientSecret: "console",
+	},
+	UI: console.UIConfig{
+		TemplateData: webui.TemplateData{
+			SiteName:      "The Things Network",
+			Title:         "Console",
+			SubTitle:      "The official configuration platform for The Things Network",
+			Language:      "en",
+			CanonicalURL:  shared.DefaultConsolePublicURL,
+			AssetsBaseURL: shared.DefaultAssetsBaseURL,
+			IconPrefix:    "console-",
+			CSSFiles:      []string{"console.css"},
+			JSFiles:       []string{"console.js"},
+		},
+		FrontendConfig: console.FrontendConfig{
+			IS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			GS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			NS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			AS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			JS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+		},
 	},
 }

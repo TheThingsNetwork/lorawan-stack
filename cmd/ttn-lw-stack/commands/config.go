@@ -23,7 +23,6 @@ import (
 	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
 	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/console"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -40,7 +39,6 @@ type Config struct {
 	NS               networkserver.Config     `name:"ns"`
 	AS               applicationserver.Config `name:"as"`
 	JS               joinserver.Config        `name:"js"`
-	Assets           assets.Config            `name:"assets"`
 	Console          console.Config           `name:"console"`
 }
 
@@ -52,6 +50,5 @@ var DefaultConfig = Config{
 	NS:          shared_networkserver.DefaultNetworkServerConfig,
 	AS:          shared_applicationserver.DefaultApplicationServerConfig,
 	JS:          shared_joinserver.DefaultJoinServerConfig,
-	Assets:      shared.DefaultAssetsConfig,
 	Console:     shared_console.DefaultConsoleConfig,
 }

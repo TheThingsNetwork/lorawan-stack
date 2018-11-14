@@ -89,13 +89,20 @@ type Metrics struct {
 	Password string `name:"password" description:"Password to protect metrics endpoint (username is metrics)"`
 }
 
+// HTTPStaticConfig represents the HTTP static file server configuration.
+type HTTPStaticConfig struct {
+	Mount      string   `name:"mount" description:"Path on the server where static assets will be served"`
+	SearchPath []string `name:"search-path" description:"List of paths for finding the directory to serve static assets from"`
+}
+
 // HTTP represents the HTTP and HTTPS server configuration.
 type HTTP struct {
-	Listen    string  `name:"listen" description:"Address for the HTTP server to listen on"`
-	ListenTLS string  `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
-	Cookie    Cookie  `name:"cookie"`
-	PProf     PProf   `name:"pprof"`
-	Metrics   Metrics `name:"metrics"`
+	Listen    string           `name:"listen" description:"Address for the HTTP server to listen on"`
+	ListenTLS string           `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
+	Static    HTTPStaticConfig `name:"static"`
+	Cookie    Cookie           `name:"cookie"`
+	PProf     PProf            `name:"pprof"`
+	Metrics   Metrics          `name:"metrics"`
 }
 
 // Redis represents Redis configuration.

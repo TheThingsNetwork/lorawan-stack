@@ -34,7 +34,7 @@ const stateCookieName = "_console_state"
 func (console *Console) StateCookie() *cookie.Cookie {
 	return &cookie.Cookie{
 		Name:     stateCookieName,
-		Path:     console.config.mount,
+		Path:     console.config.UI.MountPath(),
 		MaxAge:   10 * time.Minute,
 		HTTPOnly: true,
 	}

@@ -17,7 +17,6 @@ package shared
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
@@ -45,6 +44,10 @@ var DefaultClusterConfig = config.Cluster{}
 var DefaultHTTPConfig = config.HTTP{
 	Listen:    ":1885",
 	ListenTLS: ":8885",
+	Static: config.HTTPStaticConfig{
+		Mount:      "/assets",
+		SearchPath: []string{"public", "/srv/ttn-lorawan/public"},
+	},
 	PProf: config.PProf{
 		Enable: true,
 	},
@@ -69,12 +72,6 @@ var DefaultRedisConfig = config.Redis{
 // DefaultEventsConfig is the default config for Events.
 var DefaultEventsConfig = config.Events{
 	Backend: "internal",
-}
-
-// DefaultAssetsConfig is the default config for the assets server.
-var DefaultAssetsConfig = assets.Config{
-	Mount:      "/assets",
-	SearchPath: []string{"public", "/srv/ttn-lorawan/public"},
 }
 
 // DefaultBlobConfig is the default config for the blob store.
@@ -110,8 +107,14 @@ var DefaultServiceBase = config.ServiceBase{
 	KeyVault:       DefaultKeyVaultConfig,
 }
 
+// DefaultPublicURL is the default public URL where the stack is served.
+var DefaultPublicURL = "http://localhost:1885"
+
+// DefaultAssetsBaseURL is the default public URL where the assets are served.
+var DefaultAssetsBaseURL = DefaultPublicURL + DefaultHTTPConfig.Static.Mount
+
 // DefaultOAuthPublicURL is the default public URL where OAuth is served.
-var DefaultOAuthPublicURL = "http://localhost:1885/oauth"
+var DefaultOAuthPublicURL = DefaultPublicURL + "/oauth"
 
 // DefaultConsolePublicURL is the default public URL where the Console is served.
-var DefaultConsolePublicURL = "http://localhost:1885/console"
+var DefaultConsolePublicURL = DefaultPublicURL + "/console"

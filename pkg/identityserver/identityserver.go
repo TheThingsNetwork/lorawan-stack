@@ -14,10 +14,7 @@
 
 package identityserver
 
-import (
-	"go.thethings.network/lorawan-stack/pkg/assets"
-	"go.thethings.network/lorawan-stack/pkg/component"
-)
+import "go.thethings.network/lorawan-stack/pkg/component"
 
 // Config for the Identity Server.
 type Config struct {
@@ -31,7 +28,7 @@ type IdentityServer struct {
 }
 
 // New returns new *IdentityServer.
-func New(c *component.Component, assets *assets.Assets, config *Config) (is *IdentityServer, err error) {
+func New(c *component.Component, config *Config) (is *IdentityServer, err error) {
 	is = &IdentityServer{
 		Component: c,
 		config:    config,

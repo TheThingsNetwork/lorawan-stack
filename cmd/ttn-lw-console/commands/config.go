@@ -17,7 +17,6 @@ package commands
 import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	shared_console "go.thethings.network/lorawan-stack/cmd/internal/shared/console"
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/console"
 )
@@ -25,13 +24,11 @@ import (
 // Config represents the Console configuration.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
-	Assets           assets.Config  `name:"assets"`
 	Console          console.Config `name:"console"`
 }
 
 // DefaultConfig contains the default Console configuration.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
-	Assets:      shared.DefaultAssetsConfig,
 	Console:     shared_console.DefaultConsoleConfig,
 }

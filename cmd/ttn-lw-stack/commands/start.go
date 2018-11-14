@@ -19,7 +19,6 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -65,15 +64,11 @@ var (
 				Namespace: []string{"js", "keys"},
 			})}
 
-			assets, err := assets.New(c, config.Assets)
-			if err != nil {
-				return shared.ErrInitializeBaseComponent.WithCause(err)
-			}
-
-			_, err = identityserver.New(c, assets, &config.IS)
+			is, err := identityserver.New(c, &config.IS)
 			if err != nil {
 				return shared.ErrInitializeIdentityServer.WithCause(err)
 			}
+			_ = is
 
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
@@ -99,7 +94,7 @@ var (
 			}
 			_ = js
 
-			console, err := console.New(c, assets, config.Console)
+			console, err := console.New(c, config.Console)
 			if err != nil {
 				return shared.ErrInitializeConsole.WithCause(err)
 			}

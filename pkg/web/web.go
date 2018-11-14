@@ -17,6 +17,7 @@ package web
 import (
 	"context"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 
@@ -79,19 +80,33 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 		cookie.Cookies(blockKey, hashKey),
 	)
 
-	group := server.Group(
-		"",
-		middleware.Log(logger),
-		middleware.Normalize(middleware.RedirectPermanent),
-	)
-
-	return &Server{
+	s := &Server{
 		rootGroup: &rootGroup{
-			Group: group,
+			Group: server.Group(
+				"",
+				middleware.Log(logger),
+				middleware.Normalize(middleware.RedirectPermanent),
+			),
 		},
 		config: config,
 		server: server,
-	}, nil
+	}
+
+	var staticDir http.Dir
+	for _, path := range config.Static.SearchPath {
+		if s, err := os.Stat(path); err == nil && s.IsDir() {
+			staticDir = http.Dir(path)
+			break
+		}
+	}
+	if staticDir != "" {
+		logger.WithFields(log.Fields("path", staticDir, "mount", config.Static.Mount)).Debug("Serving static assets")
+		s.Static(config.Static.Mount, staticDir, middleware.Immutable)
+	} else {
+		logger.WithField("search_path", config.Static.SearchPath).Warn("No static assets found in any search path")
+	}
+
+	return s, nil
 }
 
 func isZeros(buf []byte) bool {

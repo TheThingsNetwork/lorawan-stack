@@ -34,7 +34,7 @@ func (console *Console) AuthCookie() *cookie.Cookie {
 	return &cookie.Cookie{
 		Name:     authCookieName,
 		HTTPOnly: true,
-		Path:     console.config.mount,
+		Path:     console.config.UI.MountPath(),
 	}
 }
 

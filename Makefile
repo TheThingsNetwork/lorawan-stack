@@ -92,10 +92,4 @@ build-all-platforms:
 	GOOS=windows GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=386 make build-all
 
-assets: js.build
-	@$(log) "building assets package"
-	@mkdir -p pkg/assets
-	@go-bindata-assetfs -pkg assets -ignore libs.bundle.js $(PUBLIC_DIR)
-	@mv bindata_assetfs.go pkg/webui/assets
-
 translations: messages js.translations

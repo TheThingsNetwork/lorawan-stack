@@ -17,7 +17,6 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
 )
@@ -34,12 +33,7 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
-			assets, err := assets.New(c, config.Assets)
-			if err != nil {
-				return shared.ErrInitializeConsole.WithCause(err)
-			}
-
-			_, err = console.New(c, assets, config.Console)
+			_, err = console.New(c, config.Console)
 			if err != nil {
 				return shared.ErrInitializeConsole.WithCause(err)
 			}

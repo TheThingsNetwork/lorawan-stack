@@ -17,7 +17,6 @@ package commands
 import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	shared_identityserver "go.thethings.network/lorawan-stack/cmd/internal/shared/identityserver"
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 )
@@ -26,12 +25,10 @@ import (
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	IS               identityserver.Config `name:"is"`
-	Assets           assets.Config         `name:"assets"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-identity-server binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	IS:          shared_identityserver.DefaultIdentityServerConfig,
-	Assets:      shared.DefaultAssetsConfig,
 }

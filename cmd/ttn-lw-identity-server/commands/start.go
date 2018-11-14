@@ -17,7 +17,6 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 )
@@ -32,12 +31,7 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
-			assets, err := assets.New(c, config.Assets)
-			if err != nil {
-				return shared.ErrInitializeBaseComponent.WithCause(err)
-			}
-
-			_, err = identityserver.New(c, assets, &config.IS)
+			_, err = identityserver.New(c, &config.IS)
 			if err != nil {
 				return shared.ErrInitializeIdentityServer.WithCause(err)
 			}
