@@ -1,14 +1,14 @@
 **Summary:**
 <!--
-A summary, possibly referencing related issues:
-Closes #0000, References #00000, etc.
+A summary, always referencing related issues:
+Closes #0000, References #0000, etc.
 -->
 
 ...
 
 <!--
-If not related to an issue, please motivate why we need this pull request.
-What is the current situation? What does this pull request improve?
+Please motivate briefly why it is implemented this way, if that deviates
+from the implementation proposal in the referenced issues.
 -->
 
 **Changes:**
