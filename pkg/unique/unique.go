@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+const separator = ":"
+
 // ID returns the unique identifier of the specified identifiers.
 // This function panics if id is nil, if it's zero, or if it's is not a
 // built-in identifiers type: ttnpb.ApplicationIdentifiers,
@@ -44,11 +46,11 @@ func ID(ctx context.Context, id ttnpb.Identifiers) (res string) {
 		res = val.ClientID
 	case ttnpb.EndDeviceIdentifiers:
 		if val.ApplicationID != "" && val.DeviceID != "" {
-			res = fmt.Sprintf("%v:%v", val.ApplicationID, val.DeviceID)
+			res = fmt.Sprintf("%v%v%v", val.ApplicationID, separator, val.DeviceID)
 		}
 	case *ttnpb.EndDeviceIdentifiers:
 		if val.ApplicationID != "" && val.DeviceID != "" {
-			res = fmt.Sprintf("%v:%v", val.ApplicationID, val.DeviceID)
+			res = fmt.Sprintf("%v%v%v", val.ApplicationID, separator, val.DeviceID)
 		}
 	case ttnpb.GatewayIdentifiers:
 		res = val.GatewayID
@@ -94,7 +96,7 @@ func ToClientID(uid string) (ttnpb.ClientIdentifiers, error) {
 
 // ToDeviceID returns the end device identifier of the specified unique ID.
 func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
-	if parts := strings.SplitN(uid, ":", 2); len(parts) == 2 {
+	if parts := strings.SplitN(uid, separator, 2); len(parts) == 2 {
 		id.ApplicationID = parts[0]
 		id.DeviceID = parts[1]
 	} else {
