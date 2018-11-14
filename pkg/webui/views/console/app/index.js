@@ -19,6 +19,7 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Helmet } from 'react-helmet'
 
+import { withEnv } from '../../../lib/components/env'
 import Header from '../../../components/header'
 import Footer from '../../../components/footer'
 import Landing from '../landing'
@@ -29,6 +30,7 @@ import { logout } from '../../../actions/user'
 import style from './app.styl'
 
 @withRouter
+@withEnv
 @connect(state => ({
   user: state.user.user,
 }))
@@ -43,6 +45,7 @@ export default class ConsoleApp extends React.Component {
   render () {
     const {
       user,
+      env,
     } = this.props
 
     return (
@@ -59,8 +62,8 @@ export default class ConsoleApp extends React.Component {
           <div className={style.content}>
             <Switch>
               {/* routes for registration, privacy policy, other public pages */}
-              <Route path="/console/login" component={Login} />
-              <Route path="/console" component={Landing} />
+              <Route path={`${env.app_root}/login`} component={Login} />
+              <Route path={env.app_root} component={Landing} />
             </Switch>
           </div>
         </main>

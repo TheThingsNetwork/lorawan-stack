@@ -19,6 +19,7 @@ import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
 
+import { withEnv } from '../../../lib/components/env'
 import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -32,6 +33,7 @@ const m = defineMessages({
   loginViaTTN: 'Login via TTN Account',
 })
 
+@withEnv
 @connect(state => ({
   user: state.user.user,
 }))
@@ -39,16 +41,17 @@ const m = defineMessages({
 export default class Login extends React.PureComponent {
 
   redirectToLogin () {
-    const { from } = this.props.location.state || { from: { pathname: '/console' }}
-    window.location = `/console/api/auth/login?path=${from}`
+    const { env, location } = this.props
+    const { from } = location.state || { from: { pathname: env.app_root }}
+    window.location = `${env.app_root}/api/auth/login?path=${from}`
   }
 
   render () {
-    const { user } = this.props
+    const { user, env } = this.props
 
     // dont show the login page if the user is already logged in
     if (Boolean(user)) {
-      return <Redirect to="/console" />
+      return <Redirect to={env.app_root} />
     }
 
     return (
