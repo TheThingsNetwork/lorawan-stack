@@ -9,6 +9,11 @@ about: Suggest an idea for this project
 
 ...
 
+**Why do we need this?**
+<!-- Please explain the motivation, how it will be used, etc -->
+
+...
+
 **What is already there? What do you see now?**
 <!-- Please attach (or link to) screenshots and logs if applicable -->
 
