@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-const separator = ":"
+const separator = "."
 
 // ID returns the unique identifier of the specified identifiers.
 // This function panics if id is nil, if it's zero, or if it's is not a

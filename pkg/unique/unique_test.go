@@ -108,7 +108,7 @@ func TestRoundtrip(t *testing.T) {
 				},
 				DeviceID: "foo-device",
 			},
-			"foo-app:foo-device",
+			"foo-app.foo-device",
 			func(uid string) (ttnpb.Identifiers, error) { return ToDeviceID(uid) },
 		},
 		{
@@ -118,7 +118,7 @@ func TestRoundtrip(t *testing.T) {
 				},
 				DeviceID: "foo-device",
 			},
-			"foo-app:foo-device",
+			"foo-app.foo-device",
 			func(uid string) (ttnpb.Identifiers, error) { return ToDeviceID(uid) },
 		},
 		{
