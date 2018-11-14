@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package redistest provides a Redis client for testing.
 package test
 
 import (
