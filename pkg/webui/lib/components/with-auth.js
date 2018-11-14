@@ -46,7 +46,7 @@ class Auth extends React.PureComponent {
       return (
         <Redirect
           to={{
-            pathname: `/${window.ENV.console ? 'console' : 'oauth'}/login`,
+            pathname: `/${window.APP_CONFIG.console ? 'console' : 'oauth'}/login`,
             state: { from: this.props.location.pathname },
           }}
         />

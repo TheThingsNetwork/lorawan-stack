@@ -26,7 +26,7 @@ const consoleLogic = createLogic({
   async process ({ getState, action }, dispatch, done) {
     try {
       try {
-        const result = window.ENV.console
+        const result = window.APP_CONFIG.console
           ? await api.v3.is.users.me()
           : await api.oauth.me()
         dispatch(user.getUserMeSuccess(result.data))

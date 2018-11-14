@@ -23,7 +23,7 @@ export default [
     type: user.GET_USER_ME,
     async process ({ getState, action }, dispatch, done) {
       try {
-        const result = window.ENV.console
+        const result = window.APP_CONFIG.console
           ? await api.v3.is.users.me()
           : await api.oauth.me()
         dispatch(user.getUserMeSuccess(result.data))
@@ -37,7 +37,7 @@ export default [
     type: user.LOGOUT,
     async process ({ getState, action }, dispatch, done) {
       try {
-        if (window.ENV.console) {
+        if (window.APP_CONFIG.console) {
           await api.console.auth.logout()
         } else {
           await api.oauth.logout()
