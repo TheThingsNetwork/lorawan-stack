@@ -118,15 +118,21 @@ type appTemplate struct {
 	template *template.Template
 }
 
+var hashedFiles = map[string]string{}
+
+func registerHashedFile(original, hashed string) {
+	hashedFiles[original] = hashed
+}
+
 func (t *appTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
 	templateData := c.Get("template_data").(TemplateData)
 	for i, cssFile := range templateData.CSSFiles {
-		if hashedFile, ok := Files[cssFile]; ok {
+		if hashedFile, ok := hashedFiles[cssFile]; ok {
 			templateData.CSSFiles[i] = hashedFile
 		}
 	}
 	for i, jsFile := range templateData.JSFiles {
-		if hashedFile, ok := Files[jsFile]; ok {
+		if hashedFile, ok := hashedFiles[jsFile]; ok {
 			templateData.JSFiles[i] = hashedFile
 		}
 	}
