@@ -76,8 +76,8 @@ export default {
     ],
   },
   output: {
-    filename: '[name].[chunkhash].js',
-    chunkFilename: '[name].[chunkhash].js',
+    filename: production ? '[name].[chunkhash].js' : '[name].[hash].js',
+    chunkFilename: production ? '[name].[chunkhash].js' : '[name].[hash].js',
     path: path.resolve(context, PUBLIC_DIR),
     crossOriginLoading: 'anonymous',
     publicPath,

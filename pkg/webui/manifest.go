@@ -4,11 +4,8 @@ package webui
 
 // Files maps source file names to hashed file names.
 var Files = map[string]string{
-	"vendor.js":   "vendor.${hash}.js",
-	"common.js":   "common.${hash}.js",
-	"shared.css":  "shared.${hash}.css",
-	"console.js":  "console.${hash}.js",
-	"console.css": "console.${hash}.css",
-	"oauth.js":    "oauth.${hash}.js",
-	"oauth.css":   "oauth.${hash}.css",
+  "console.js": "console.7a37fdbdaac319b47af8.js",
+  "oauth.js": "oauth.7a37fdbdaac319b47af8.js",
+  "console.css": "console.57507562f444a78ef91f.css",
+  "oauth.css": "oauth.0f8e8e927552aa27b0e2.css",
 }
