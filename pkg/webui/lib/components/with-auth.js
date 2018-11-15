@@ -18,12 +18,15 @@ import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import PropTypes from '../prop-types'
 
+import { withEnv } from '../../lib/components/env'
+
 /**
  * Auth is a component that wraps a tree that requires the user
  * to be authenticated.
  *
  * If no user is authenticated, it renders the Landing view.
  */
+@withEnv
 @withRouter
 @connect(state => ({
   fetching: state.user.fetching,
@@ -36,6 +39,7 @@ class Auth extends React.PureComponent {
       user,
       fetching,
       children,
+      env,
     } = this.props
 
     if (fetching) {
@@ -46,7 +50,7 @@ class Auth extends React.PureComponent {
       return (
         <Redirect
           to={{
-            pathname: `/${window.APP_CONFIG.console ? 'console' : 'oauth'}/login`,
+            pathname: `${env.app_root}/login`,
             state: { from: this.props.location.pathname },
           }}
         />
