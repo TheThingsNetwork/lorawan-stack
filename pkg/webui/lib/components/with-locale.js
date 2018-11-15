@@ -30,7 +30,7 @@ const dev = '../../dev'
 
 /**
  * WithLocale is a component that fetches the user's preferred language and
- * sets the langauge in th react-intl provider context. It will asynchronously fetch
+ * sets the language in th react-intl provider context. It will asynchronously fetch
  * translated messages and polyfills window.Intl.
  *
  * The default language will be fetched from the env.

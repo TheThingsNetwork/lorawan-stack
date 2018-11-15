@@ -103,7 +103,7 @@ SideNavigationList.propTypes = {
   depth: PropTypes.number,
   /** Function to be called when an side navigation item gets selected */
   onItemExpand: PropTypes.func,
-  /** A list of items to be displayed withing the side navigation list */
+  /** A list of items to be displayed within the side navigation list */
   items: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.link,

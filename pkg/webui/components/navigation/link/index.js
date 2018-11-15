@@ -46,7 +46,7 @@ const NavigationLink = function ({
 NavigationLink.propTypes = {
   /** The path for a link */
   path: PropTypes.string.isRequired,
-  /** The name of a css class to be aplied on the active tab */
+  /** The name of a css class to be applied on the active tab */
   activeClassName: PropTypes.string,
   /**
    * Boolean flag identifying whether the path should
