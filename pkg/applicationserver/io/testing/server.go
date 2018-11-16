@@ -25,7 +25,7 @@ import (
 )
 
 type server struct {
-	connectionsCh   chan *io.Connection
+	subscriptionsCh chan *io.Subscription
 	downlinkQueueMu sync.RWMutex
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
 }
@@ -34,28 +34,28 @@ type server struct {
 type Server interface {
 	io.Server
 
-	Connections() <-chan *io.Connection
+	Subscriptions() <-chan *io.Subscription
 }
 
 // NewServer instantiates a new Server.
 func NewServer() Server {
 	return &server{
-		connectionsCh: make(chan *io.Connection, 10),
-		downlinkQueue: make(map[string][]*ttnpb.ApplicationDownlink),
+		subscriptionsCh: make(chan *io.Subscription, 10),
+		downlinkQueue:   make(map[string][]*ttnpb.ApplicationDownlink),
 	}
 }
 
-// Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Connection, error) {
+// Subscribe implements io.Server.
+func (s *server) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, protocol, &ids)
+	sub := io.NewSubscription(ctx, protocol, &ids)
 	select {
-	case s.connectionsCh <- conn:
+	case s.subscriptionsCh <- sub:
 	default:
 	}
-	return conn, nil
+	return sub, nil
 }
 
 // DownlinkQueuePush implements io.Server.
@@ -83,6 +83,6 @@ func (s *server) DownlinkQueueList(ctx context.Context, ids ttnpb.EndDeviceIdent
 	return queue, nil
 }
 
-func (s *server) Connections() <-chan *io.Connection {
-	return s.connectionsCh
+func (s *server) Subscriptions() <-chan *io.Subscription {
+	return s.subscriptionsCh
 }

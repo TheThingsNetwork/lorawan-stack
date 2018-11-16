@@ -52,7 +52,7 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 	logger := log.FromContext(ctx)
 
-	conn, err := s.server.Connect(ctx, "grpc", *ids)
+	sub, err := s.server.Subscribe(ctx, "grpc", *ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("application_uid", uid)
@@ -63,10 +63,10 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case up := <-conn.Up():
+		case up := <-sub.Up():
 			if err := stream.Send(up); err != nil {
 				logger.WithError(err).Warn("Failed to send message")
-				conn.Disconnect(err)
+				sub.Disconnect(err)
 				return err
 			}
 		}

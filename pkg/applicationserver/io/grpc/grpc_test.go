@@ -130,11 +130,11 @@ func TestTraffic(t *testing.T) {
 		}
 	}()
 
-	var conn *io.Connection
+	var sub *io.Subscription
 	select {
-	case conn = <-as.Connections():
+	case sub = <-as.Subscriptions():
 	case <-time.After(timeout):
-		t.Fatal("Connection timeout")
+		t.Fatal("Subscription timeout")
 	}
 
 	t.Run("Upstream", func(t *testing.T) {
@@ -151,7 +151,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 		}
-		if err := conn.SendUp(up); !a.So(err, should.BeNil) {
+		if err := sub.SendUp(up); !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
 

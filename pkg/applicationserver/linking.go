@@ -74,8 +74,8 @@ type link struct {
 	connCallOpts []grpc.CallOption
 	connReady    chan struct{}
 
-	subscribeCh   chan *io.Connection
-	unsubscribeCh chan *io.Connection
+	subscribeCh   chan *io.Subscription
+	unsubscribeCh chan *io.Subscription
 	upCh          chan *ttnpb.ApplicationUp
 }
 
@@ -133,8 +133,8 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		ctx:             ctx,
 		cancel:          cancel,
 		connReady:       make(chan struct{}),
-		subscribeCh:     make(chan *io.Connection, 1),
-		unsubscribeCh:   make(chan *io.Connection, 1),
+		subscribeCh:     make(chan *io.Subscription, 1),
+		unsubscribeCh:   make(chan *io.Subscription, 1),
 		upCh:            make(chan *ttnpb.ApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
@@ -219,26 +219,26 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 }
 
 func (l *link) run() {
-	subscribers := make(map[*io.Connection]string)
+	subscribers := make(map[*io.Subscription]string)
 	for {
 		select {
 		case <-l.ctx.Done():
 			return
-		case conn := <-l.subscribeCh:
+		case sub := <-l.subscribeCh:
 			correlationID := fmt.Sprintf("subscriber:%s", events.NewCorrelationID())
-			subscribers[conn] = correlationID
-			registerSubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), conn)
-			log.FromContext(conn.Context()).Debug("Subscribed")
-		case conn := <-l.unsubscribeCh:
-			if correlationID, ok := subscribers[conn]; ok {
-				delete(subscribers, conn)
-				registerUnsubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), conn)
-				log.FromContext(conn.Context()).Debug("Unsubscribed")
+			subscribers[sub] = correlationID
+			registerSubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
+			log.FromContext(sub.Context()).Debug("Subscribed")
+		case sub := <-l.unsubscribeCh:
+			if correlationID, ok := subscribers[sub]; ok {
+				delete(subscribers, sub)
+				registerUnsubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
+				log.FromContext(sub.Context()).Debug("Unsubscribed")
 			}
 		case up := <-l.upCh:
-			for conn := range subscribers {
-				if err := conn.SendUp(up); err != nil {
-					log.FromContext(conn.Context()).WithError(err).Warn("Send upstream message failed")
+			for sub := range subscribers {
+				if err := sub.SendUp(up); err != nil {
+					log.FromContext(sub.Context()).WithError(err).Warn("Send upstream message failed")
 				}
 			}
 		}

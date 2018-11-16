@@ -51,7 +51,7 @@ type ApplicationServer struct {
 	formatter      payloadFormatter
 
 	links              sync.Map
-	defaultSubscribers []*io.Connection
+	defaultSubscribers []*io.Subscription
 }
 
 // New returns new *ApplicationServer.
@@ -105,9 +105,9 @@ func (as *ApplicationServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_APPLICATION_SERVER}
 }
 
-// Connect connects an application or integration by its identifiers to the Application Server, and returns a
-// io.Connection for traffic and control.
-func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Connection, error) {
+// Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
+// io.Subscription for traffic and control.
+func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
@@ -120,14 +120,14 @@ func (as *ApplicationServer) Connect(ctx context.Context, protocol string, ids t
 	if err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, protocol, &ids)
-	l.subscribeCh <- conn
+	sub := io.NewSubscription(ctx, protocol, &ids)
+	l.subscribeCh <- sub
 	go func() {
 		<-ctx.Done()
-		l.unsubscribeCh <- conn
+		l.unsubscribeCh <- sub
 	}()
-	logger.Info("Application connected")
-	return conn, nil
+	logger.Info("Application subscribed")
+	return sub, nil
 }
 
 var errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")

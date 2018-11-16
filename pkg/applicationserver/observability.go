@@ -159,14 +159,14 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.downlinkDropped.Collect(ch)
 }
 
-func registerSubscribe(ctx context.Context, conn *io.Connection) {
-	events.Publish(evtApplicationSubscribe(ctx, conn.ApplicationIDs(), nil))
-	asMetrics.subscriptionsStarted.WithLabelValues(ctx, conn.Protocol()).Inc()
+func registerSubscribe(ctx context.Context, sub *io.Subscription) {
+	events.Publish(evtApplicationSubscribe(ctx, sub.ApplicationIDs(), nil))
+	asMetrics.subscriptionsStarted.WithLabelValues(ctx, sub.Protocol()).Inc()
 }
 
-func registerUnsubscribe(ctx context.Context, conn *io.Connection) {
-	events.Publish(evtApplicationUnsubscribe(ctx, conn.ApplicationIDs(), nil))
-	asMetrics.subscriptionsEnded.WithLabelValues(ctx, conn.Protocol()).Inc()
+func registerUnsubscribe(ctx context.Context, sub *io.Subscription) {
+	events.Publish(evtApplicationUnsubscribe(ctx, sub.ApplicationIDs(), nil))
+	asMetrics.subscriptionsEnded.WithLabelValues(ctx, sub.Protocol()).Inc()
 }
 
 func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {

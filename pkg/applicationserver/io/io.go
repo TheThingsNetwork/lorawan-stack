@@ -26,9 +26,9 @@ const bufferSize = 32
 
 // Server represents the Application Server to gateway frontends.
 type Server interface {
-	// Connect connects an application or integration by its identifiers to the Application Server, and returns a
-	// Connection for traffic and control.
-	Connect(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Connection, error)
+	// Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
+	// Subscription for traffic and control.
+	Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Subscription, error)
 	// DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
 	DownlinkQueuePush(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	// DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
@@ -37,8 +37,8 @@ type Server interface {
 	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
-// Connection is a connection to an application or integration managed by a frontend.
-type Connection struct {
+// Subscription is a subscription to an application or integration managed by a frontend.
+type Subscription struct {
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
@@ -48,10 +48,10 @@ type Connection struct {
 	upCh chan *ttnpb.ApplicationUp
 }
 
-// NewConnection instantiates a new application or integration connection.
-func NewConnection(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) *Connection {
+// NewSubscription instantiates a new application or integration subscription.
+func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) *Subscription {
 	ctx, cancelCtx := errorcontext.New(ctx)
-	return &Connection{
+	return &Subscription{
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
 		protocol:  protocol,
@@ -60,29 +60,29 @@ func NewConnection(ctx context.Context, protocol string, ids *ttnpb.ApplicationI
 	}
 }
 
-// Context returns the connection context.
-func (c *Connection) Context() context.Context { return c.ctx }
+// Context returns the subscription context.
+func (s *Subscription) Context() context.Context { return s.ctx }
 
-// Disconnect marks the connection as disconnected and cancels the context.
-func (c *Connection) Disconnect(err error) {
-	c.cancelCtx(err)
+// Disconnect marks the subscription as disconnected and cancels the context.
+func (s *Subscription) Disconnect(err error) {
+	s.cancelCtx(err)
 }
 
-// Protocol returns the protocol used for the connection, i.e. grpc, mqtt or http.
-func (c *Connection) Protocol() string { return c.protocol }
+// Protocol returns the protocol used for the subscription, i.e. grpc, mqtt or http.
+func (s *Subscription) Protocol() string { return s.protocol }
 
-// ApplicationIDs returns the application identifiers, if the connection represents any specific.
-func (c *Connection) ApplicationIDs() *ttnpb.ApplicationIdentifiers { return c.ids }
+// ApplicationIDs returns the application identifiers, if the subscription represents any specific.
+func (s *Subscription) ApplicationIDs() *ttnpb.ApplicationIdentifiers { return s.ids }
 
 var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is full")
 
 // SendUp sends an upstream message.
 // This method returns immediately, returning nil if the message is buffered, or with an error when the buffer is full.
-func (c *Connection) SendUp(up *ttnpb.ApplicationUp) error {
+func (s *Subscription) SendUp(up *ttnpb.ApplicationUp) error {
 	select {
-	case <-c.ctx.Done():
-		return c.ctx.Err()
-	case c.upCh <- up:
+	case <-s.ctx.Done():
+		return s.ctx.Err()
+	case s.upCh <- up:
 	default:
 		return errBufferFull
 	}
@@ -90,6 +90,6 @@ func (c *Connection) SendUp(up *ttnpb.ApplicationUp) error {
 }
 
 // Up returns the upstream channel.
-func (c *Connection) Up() <-chan *ttnpb.ApplicationUp {
-	return c.upCh
+func (s *Subscription) Up() <-chan *ttnpb.ApplicationUp {
+	return s.upCh
 }
