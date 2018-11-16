@@ -37,7 +37,7 @@ var errTest = errors.DefineInternal("test", "test error")
 func TestErrors(t *testing.T) {
 	a := assertions.New(t)
 
-	httpAddress := "0.0.0.0:9184"
+	httpAddress := "0.0.0.0:9187"
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{HTTP: config.HTTP{Listen: httpAddress}},
 	})
