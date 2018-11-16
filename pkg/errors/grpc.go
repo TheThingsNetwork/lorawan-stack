@@ -71,6 +71,9 @@ func FromGRPCStatus(status *status.Status) Error {
 		}
 		if attributes := details.PublicAttributes(); len(attributes) != 0 {
 			err.attributes = attributes
+			for attr := range attributes {
+				err.publicAttributes = append(err.publicAttributes, attr)
+			}
 		}
 		if correlationID := details.CorrelationID(); correlationID != "" {
 			err.correlationID = correlationID
