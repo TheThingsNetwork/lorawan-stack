@@ -94,7 +94,9 @@ func TestErrors(t *testing.T) {
 			req.Header.Set("Accept", tc.Accept)
 
 			resp, err := http.DefaultClient.Do(req)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 			a.So(resp.StatusCode, should.Equal, http.StatusInternalServerError)
 
 			buf, err := ioutil.ReadAll(resp.Body)
