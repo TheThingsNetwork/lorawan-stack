@@ -45,6 +45,10 @@ func From(err error) (out *Error, ok bool) {
 		}
 		e := build(*err, 0)
 		return &e, true
+	case ErrorDetails: // Received over an API.
+		var e Error
+		setErrorDetails(&e, err)
+		return &e, true
 	default:
 		if se, ok := err.(interface{ GRPCStatus() *status.Status }); ok {
 			err := FromGRPCStatus(se.GRPCStatus())
@@ -52,4 +56,41 @@ func From(err error) (out *Error, ok bool) {
 		}
 	}
 	return nil, false
+}
+
+// ErrorDetails that can be carried over API.
+type ErrorDetails interface {
+	Error() string
+	Namespace() string
+	Name() string
+	MessageFormat() string
+	PublicAttributes() map[string]interface{}
+	CorrelationID() string
+	Cause() error
+}
+
+func setErrorDetails(err *Error, details ErrorDetails) {
+	if namespace := details.Namespace(); namespace != "" {
+		err.namespace = namespace
+	}
+	if name := details.Name(); name != "" {
+		err.name = name
+	}
+	if messageFormat := details.MessageFormat(); messageFormat != "" {
+		err.messageFormat = messageFormat
+		err.messageFormatArguments = messageFormatArguments(messageFormat)
+		err.parsedMessageFormat, _ = formatter.Parse(messageFormat)
+	}
+	if attributes := details.PublicAttributes(); len(attributes) != 0 {
+		err.attributes = attributes
+		for attr := range attributes {
+			err.publicAttributes = append(err.publicAttributes, attr)
+		}
+	}
+	if correlationID := details.CorrelationID(); correlationID != "" {
+		err.correlationID = correlationID
+	}
+	if cause := details.Cause(); cause != nil {
+		err.cause, _ = From(cause)
+	}
 }

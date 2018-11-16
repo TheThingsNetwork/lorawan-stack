@@ -25,15 +25,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// ErrorDetails that can be carried over API.
-type ErrorDetails interface {
-	Namespace() string
-	Name() string
-	MessageFormat() string
-	PublicAttributes() map[string]interface{}
-	CorrelationID() string
-}
-
 // FromGRPCStatus converts the gRPC status message into an Error.
 func FromGRPCStatus(status *status.Status) Error {
 	err := build(Definition{
@@ -59,25 +50,7 @@ func FromGRPCStatus(status *status.Status) Error {
 		err.details = detailIfaces
 	}
 	if details != nil {
-		if namespace := details.Namespace(); namespace != "" {
-			err.namespace = namespace
-		}
-		if name := details.Name(); name != "" {
-			err.name = name
-		}
-		if messageFormat := details.MessageFormat(); messageFormat != "" {
-			err.messageFormat = messageFormat
-			err.parsedMessageFormat, _ = formatter.Parse(messageFormat)
-		}
-		if attributes := details.PublicAttributes(); len(attributes) != 0 {
-			err.attributes = attributes
-			for attr := range attributes {
-				err.publicAttributes = append(err.publicAttributes, attr)
-			}
-		}
-		if correlationID := details.CorrelationID(); correlationID != "" {
-			err.correlationID = correlationID
-		}
+		setErrorDetails(&err, details)
 	}
 	return err
 }

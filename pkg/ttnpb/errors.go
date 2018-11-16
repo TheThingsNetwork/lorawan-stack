@@ -28,6 +28,9 @@ type errorDetails struct {
 	*ErrorDetails
 }
 
+func (e errorDetails) Error() string {
+	return fmt.Sprintf("error:%s:%s (%s)", e.Namespace(), e.Name(), e.MessageFormat())
+}
 func (e errorDetails) Namespace() string     { return e.GetNamespace() }
 func (e errorDetails) Name() string          { return e.GetName() }
 func (e errorDetails) MessageFormat() string { return e.GetMessageFormat() }
@@ -39,20 +42,37 @@ func (e errorDetails) PublicAttributes() map[string]interface{} {
 	return attributes
 }
 func (e errorDetails) CorrelationID() string { return e.GetCorrelationID() }
+func (e errorDetails) Cause() error {
+	cause := e.GetCause()
+	if cause == nil {
+		return nil
+	}
+	return errorDetails{cause}
+}
+
+func errorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
+	attributes, err := gogoproto.Struct(e.PublicAttributes())
+	if err != nil {
+		panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
+	}
+	proto := &ErrorDetails{
+		Namespace:     e.Namespace(),
+		Name:          e.Name(),
+		MessageFormat: e.MessageFormat(),
+		Attributes:    attributes,
+		CorrelationID: e.CorrelationID(),
+	}
+	if cause := e.Cause(); cause != nil {
+		if ttnErr, ok := errors.From(cause); ok {
+			proto.Cause = errorDetailsToProto(ttnErr)
+		}
+	}
+	return proto
+}
 
 func init() {
 	errors.ErrorDetailsToProto = func(e errors.ErrorDetails) proto.Message {
-		attributes, err := gogoproto.Struct(e.PublicAttributes())
-		if err != nil {
-			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
-		}
-		return &ErrorDetails{
-			Namespace:     e.Namespace(),
-			Name:          e.Name(),
-			MessageFormat: e.MessageFormat(),
-			Attributes:    attributes,
-			CorrelationID: e.CorrelationID(),
-		}
+		return errorDetailsToProto(e)
 	}
 	errors.ErrorDetailsFromProto = func(msg ...proto.Message) (details errors.ErrorDetails, rest []proto.Message) {
 		var detailsMsg *ErrorDetails
@@ -64,7 +84,7 @@ func init() {
 				rest = append(rest, msg)
 			}
 		}
-		details = errorDetails{detailsMsg}
+		details, _ = errors.From(errorDetails{detailsMsg})
 		return
 	}
 }
