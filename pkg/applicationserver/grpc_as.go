@@ -48,7 +48,8 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := as.cancelLink(ctx, req.ApplicationIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
 	}
-	as.startLinkTask(ctx, req.ApplicationIdentifiers, &req.ApplicationLink)
+	linkCtx := as.Context()
+	as.startLinkTask(linkCtx, req.ApplicationIdentifiers, &req.ApplicationLink)
 	return link, nil
 }
 
