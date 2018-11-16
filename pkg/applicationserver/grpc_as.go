@@ -45,7 +45,6 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Restart link only when `network_server_address` is in field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1177)
 	if err := as.cancelLink(ctx, req.ApplicationIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
 	}
