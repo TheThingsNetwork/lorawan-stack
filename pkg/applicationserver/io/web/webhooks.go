@@ -117,24 +117,39 @@ func (b *BufferedSink) Process(req *http.Request) error {
 	}
 }
 
-// Webhooks can be used to create a webhooks subscription.
-type Webhooks struct {
-	Registry WebhookRegistry
-	Target   Sink
+// Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
+// webhooks for upstream data.
+type Webhooks interface {
+	// NewSubscription returns a new webhooks integration subscription.
+	NewSubscription() *io.Subscription
 }
 
-// NewSubscription returns a new webhooks integration subscription.
-func (w *Webhooks) NewSubscription(ctx context.Context) *io.Subscription {
+type webhooks struct {
+	ctx      context.Context
+	registry WebhookRegistry
+	target   Sink
+}
+
+// NewWebhooks returns a new Webhooks.
+func NewWebhooks(ctx context.Context, registry WebhookRegistry, target Sink) Webhooks {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
-	sub := io.NewSubscription(ctx, "webhook", nil)
+	return &webhooks{
+		ctx:      ctx,
+		registry: registry,
+		target:   target,
+	}
+}
+
+func (w *webhooks) NewSubscription() *io.Subscription {
+	sub := io.NewSubscription(w.ctx, "webhook", nil)
 	go func() {
 		for {
 			select {
-			case <-ctx.Done():
+			case <-w.ctx.Done():
 				return
 			case msg := <-sub.Up():
-				if err := w.handleUp(ctx, msg); err != nil {
-					log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
+				if err := w.handleUp(w.ctx, msg); err != nil {
+					log.FromContext(w.ctx).WithError(err).Warn("Failed to handle message")
 				}
 			}
 		}
@@ -142,8 +157,8 @@ func (w *Webhooks) NewSubscription(ctx context.Context) *io.Subscription {
 	return sub
 }
 
-func (w *Webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
-	hooks, err := w.Registry.List(ctx, msg.ApplicationIdentifiers,
+func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
+	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
 			"headers",
@@ -177,7 +192,7 @@ func (w *Webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 				return
 			}
 			logger.WithField("url", req.URL).Debug("Processing message")
-			if err := w.Target.Process(req); err != nil {
+			if err := w.target.Process(req); err != nil {
 				logger.WithError(err).Warn("Failed to process message")
 			}
 		}()
@@ -186,7 +201,7 @@ func (w *Webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	return nil
 }
 
-func (w *Webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook) (*http.Request, error) {
+func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook) (*http.Request, error) {
 	var cfg *ttnpb.ApplicationWebhook_Message
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:

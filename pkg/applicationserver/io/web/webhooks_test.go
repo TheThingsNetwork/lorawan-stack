@@ -143,11 +143,8 @@ func TestWebhooks(t *testing.T) {
 			if controllable, ok := sink.(web.ControllableSink); ok {
 				go controllable.Run(ctx)
 			}
-			w := &web.Webhooks{
-				Registry: registry,
-				Target:   sink,
-			}
-			sub := w.NewSubscription(ctx)
+			w := web.NewWebhooks(ctx, registry, sink)
+			sub := w.NewSubscription()
 
 			for _, tc := range []struct {
 				Name    string
