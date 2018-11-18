@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	asiowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
@@ -53,6 +54,12 @@ var (
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
 			})}
+			if config.AS.Webhooks.Target != "" {
+				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"as", "io", "webhooks"},
+				})}
+			}
 
 			config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
