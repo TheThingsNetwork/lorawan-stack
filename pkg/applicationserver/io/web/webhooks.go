@@ -20,12 +20,17 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 	"sync"
 
+	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
+	"google.golang.org/grpc/metadata"
 )
 
 // Sink processes HTTP requests.
@@ -120,6 +125,7 @@ func (b *BufferedSink) Process(req *http.Request) error {
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
 // webhooks for upstream data.
 type Webhooks interface {
+	ttnweb.Registerer
 	// NewSubscription returns a new webhooks integration subscription.
 	NewSubscription() *io.Subscription
 }
@@ -137,6 +143,111 @@ func NewWebhooks(ctx context.Context, registry WebhookRegistry, target Sink) Web
 		ctx:      ctx,
 		registry: registry,
 		target:   target,
+	}
+}
+
+// RegisterRoutes registers the webhooks to the web server to handle downlink requests.
+func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
+	middleware := []echo.MiddlewareFunc{
+		w.handleError(),
+		w.validateAndFillIDs(),
+		w.requireApplicationRights(ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE),
+	}
+	group := server.Group("/as/applications/:application_id/webhooks/:webhook_id/down/:device_id", middleware...)
+	_ = group
+}
+
+var errHTTP = errors.Define("http", "HTTP error: {message}")
+
+func (w *webhooks) handleError() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			err := next(c)
+			if err == nil || c.Response().Committed {
+				return err
+			}
+			log.FromContext(w.ctx).WithError(err).Debug("HTTP request failed")
+			status := http.StatusInternalServerError
+			if echoErr, ok := err.(*echo.HTTPError); ok {
+				status = echoErr.Code
+				if ttnErr, ok := errors.From(echoErr.Internal); ok {
+					if status == http.StatusInternalServerError {
+						status = errors.ToHTTPStatusCode(ttnErr)
+					}
+					err = ttnErr
+				}
+			} else if ttnErr, ok := errors.From(err); ok {
+				status = errors.ToHTTPStatusCode(ttnErr)
+				err = ttnErr
+			} else {
+				err = errHTTP.WithCause(err).WithAttributes("message", err.Error())
+			}
+			if strings.Contains(c.Request().Header.Get(echo.HeaderAccept), "application/json") {
+				return c.JSON(status, err)
+			}
+			return c.String(status, err.Error())
+		}
+	}
+}
+
+const (
+	applicationIDKey = "application_id"
+	deviceIDKey      = "device_id"
+	webhookIDKey     = "webhook_id"
+)
+
+func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			appID := ttnpb.ApplicationIdentifiers{
+				ApplicationID: c.Param(applicationIDKey),
+			}
+			if err := appID.Validate(); err != nil {
+				return err
+			}
+			c.Set(applicationIDKey, appID)
+
+			devID := ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID,
+				DeviceID:               c.Param(deviceIDKey),
+			}
+			if err := devID.Validate(); err != nil {
+				return err
+			}
+			c.Set(deviceIDKey, devID)
+
+			hookID := ttnpb.ApplicationWebhookIdentifiers{
+				ApplicationIdentifiers: appID,
+				WebhookID:              c.Param(webhookIDKey),
+			}
+			if err := hookID.Validate(); err != nil {
+				return err
+			}
+			c.Set(webhookIDKey, hookID)
+
+			return next(c)
+		}
+	}
+}
+
+func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			ctx := w.ctx
+			appID := c.Get(applicationIDKey).(ttnpb.ApplicationIdentifiers)
+			md := metadata.New(map[string]string{
+				"id":            appID.ApplicationID,
+				"authorization": c.Request().Header.Get(echo.HeaderAuthorization),
+			})
+			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+				md = metadata.Join(ctxMd, md)
+			}
+			ctx = metadata.NewIncomingContext(ctx, md)
+			if err := rights.RequireApplication(ctx, appID, required...); err != nil {
+				return err
+			}
+			return next(c)
+		}
 	}
 }
 
