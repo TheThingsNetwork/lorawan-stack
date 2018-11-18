@@ -69,6 +69,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				return nil
 			}
 		} else {
+			pb.EndDeviceIdentifiers = ids
 			pb.UpdatedAt = time.Now().UTC()
 			if create {
 				pb.CreatedAt = pb.UpdatedAt

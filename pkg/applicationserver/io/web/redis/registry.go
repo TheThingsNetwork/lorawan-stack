@@ -94,6 +94,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 				return nil
 			}
 		} else {
+			pb.ApplicationWebhookIdentifiers = ids
 			pb.UpdatedAt = time.Now().UTC()
 			if create {
 				pb.CreatedAt = pb.UpdatedAt
