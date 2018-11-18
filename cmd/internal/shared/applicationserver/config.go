@@ -15,10 +15,18 @@
 package shared
 
 import (
+	"time"
+
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 )
 
-// DefaultApplicationServerConfig is the default configuration for the ApplicationServer
+// DefaultApplicationServerConfig is the default configuration for the Application Server.
 var DefaultApplicationServerConfig = applicationserver.Config{
 	LinkMode: "all",
+	Webhooks: applicationserver.WebhooksConfig{
+		Target:     "direct",
+		Timeout:    5 * time.Second,
+		BufferSize: 16,
+		Workers:    4,
+	},
 }

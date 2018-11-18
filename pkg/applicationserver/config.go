@@ -15,9 +15,16 @@
 package applicationserver
 
 import (
+	"context"
+	"net/http"
+	"time"
+
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // LinkMode defines how applications are linked to their Network Server.
@@ -36,6 +43,7 @@ type Config struct {
 	Devices          DeviceRegistry         `name:"-"`
 	Links            LinkRegistry           `name:"-"`
 	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
+	Webhooks         WebhooksConfig         `name:"webhooks" description:"Webhooks configuration"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
@@ -61,7 +69,7 @@ type DeviceRepositoryConfig struct {
 
 // Client instantiates a new devicerepository.Client with a fetcher based on the configuration.
 // The order of precedence is Static, Directory and URL.
-// If neither Static, Directory nor a URL is set, this function returns nil.
+// If neither Static, Directory nor a URL is set, this method returns nil.
 func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
 	var fetcher fetch.Interface
 	switch {
@@ -77,4 +85,58 @@ func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
 	return &devicerepository.Client{
 		Fetcher: fetcher,
 	}
+}
+
+var (
+	errWebhooksRegistry = errors.DefineInvalidArgument("webhooks_registry", "invalid webhooks registry")
+	errWebhooksTarget   = errors.DefineInvalidArgument("webhooks_target", "invalid webhooks target `{target}`")
+)
+
+// WebhooksConfig defines the configuration of the webhooks integration.
+type WebhooksConfig struct {
+	Registry   web.WebhookRegistry `name:"-"`
+	Target     string              `name:"target" description:"Target of the integration (direct)"`
+	Timeout    time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
+	BufferSize int                 `name:"buffer-size" description:"Number of requests to buffer"`
+	Workers    int                 `name:"workers" description:"Number of workers to process requests"`
+}
+
+// NewSubscription returns a new *io.Subscription based on the configuration.
+// If Target is empty, this method returns nil.
+func (c WebhooksConfig) NewSubscription(ctx context.Context) (*io.Subscription, error) {
+	var target web.Sink
+	switch c.Target {
+	case "":
+		return nil, nil
+	case "direct":
+		target = &web.HTTPClientSink{
+			Client: &http.Client{
+				Timeout: c.Timeout,
+			},
+		}
+	default:
+		return nil, errWebhooksTarget.WithAttributes("target", c.Target)
+	}
+	if c.Registry == nil {
+		return nil, errWebhooksRegistry
+	}
+	if c.BufferSize > 0 || c.Workers > 0 {
+		target = &web.BufferedSink{
+			Target:  target,
+			Buffer:  make(chan *http.Request, c.BufferSize),
+			Workers: c.Workers,
+		}
+	}
+	if controllable, ok := target.(web.ControllableSink); ok {
+		go func() {
+			if err := controllable.Run(ctx); err != nil && !errors.IsCanceled(err) {
+				log.FromContext(ctx).WithError(err).Error("Webhooks target sink failed")
+			}
+		}()
+	}
+	w := web.Webhooks{
+		Registry: c.Registry,
+		Target:   target,
+	}
+	return w.NewSubscription(ctx), nil
 }
