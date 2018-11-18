@@ -15,6 +15,8 @@
 package web_test
 
 import (
+	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -114,200 +116,226 @@ func TestWebhooks(t *testing.T) {
 		return hook, paths, nil
 	})
 
-	sink := &mockSink{
+	testSink := &mockSink{
 		ch: make(chan *http.Request, 1),
 	}
-	w := &web.Webhooks{
-		Registry: registry,
-		Target:   sink,
-	}
-	sub := w.NewSubscription(ctx)
 
-	for _, tc := range []struct {
-		Name    string
-		Message *ttnpb.ApplicationUp
-		OK      bool
-		URL     string
-	}{
-		{
-			Name: "UplinkMessage/RegisteredDevice",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_UplinkMessage{
-					UplinkMessage: &ttnpb.ApplicationUplink{
-						SessionKeyID: "session1",
-						FPort:        42,
-						FCnt:         42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/up",
+	for _, sink := range []web.Sink{
+		testSink,
+		&web.BufferedSink{
+			Target:  testSink,
+			Buffer:  make(chan *http.Request, 4),
+			Workers: 1,
 		},
-		{
-			Name: "UplinkMessage/UnregisteredDevice",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: unregisteredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_UplinkMessage{
-					UplinkMessage: &ttnpb.ApplicationUplink{
-						SessionKeyID: "session2",
-						FPort:        42,
-						FCnt:         42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
-					},
-				},
+		&web.BufferedSink{
+			Target: &web.BufferedSink{
+				Target:  testSink,
+				Buffer:  make(chan *http.Request, 4),
+				Workers: 1,
 			},
-			OK: false,
-		},
-		{
-			Name: "JoinAccept",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_JoinAccept{
-					JoinAccept: &ttnpb.ApplicationJoinAccept{
-						SessionKeyID: "session2",
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/join",
-		},
-		{
-			Name: "DownlinkMessage/Ack",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkAck{
-					DownlinkAck: &ttnpb.ApplicationDownlink{
-						SessionKeyID: "session2",
-						FCnt:         42,
-						FPort:        42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/down/ack",
-		},
-		{
-			Name: "DownlinkMessage/Nack",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkNack{
-					DownlinkNack: &ttnpb.ApplicationDownlink{
-						SessionKeyID: "session2",
-						FCnt:         42,
-						FPort:        42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/down/nack",
-		},
-		{
-			Name: "DownlinkMessage/Sent",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkSent{
-					DownlinkSent: &ttnpb.ApplicationDownlink{
-						SessionKeyID: "session2",
-						FCnt:         42,
-						FPort:        42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/down/sent",
-		},
-		{
-			Name: "DownlinkMessage/Queued",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkQueued{
-					DownlinkQueued: &ttnpb.ApplicationDownlink{
-						SessionKeyID: "session2",
-						FCnt:         42,
-						FPort:        42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/down/queued",
-		},
-		{
-			Name: "DownlinkMessage/Failed",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkFailed{
-					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-						ApplicationDownlink: ttnpb.ApplicationDownlink{
-							SessionKeyID: "session2",
-							FCnt:         42,
-							FPort:        42,
-							FRMPayload:   []byte{0x1, 0x2, 0x3},
-						},
-						Error: ttnpb.ErrorDetails{
-							Name: "test",
-						},
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/down/failed",
-		},
-		{
-			Name: "LocationSolved",
-			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: registeredDeviceIDs,
-				Up: &ttnpb.ApplicationUp_LocationSolved{
-					LocationSolved: &ttnpb.ApplicationLocation{
-						Location: ttnpb.Location{
-							Latitude:  10,
-							Longitude: 20,
-							Altitude:  30,
-						},
-						Service: "test",
-					},
-				},
-			},
-			OK:  true,
-			URL: "https://myapp.com/api/ttn/v3/location",
+			Buffer:  make(chan *http.Request, 4),
+			Workers: 1,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			err := sub.SendUp(tc.Message)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
+		t.Run(fmt.Sprintf("%T", sink), func(t *testing.T) {
+			ctx, cancel := context.WithCancel(ctx)
+			defer cancel()
+			if controllable, ok := sink.(web.ControllableSink); ok {
+				go controllable.Run(ctx)
 			}
-			var req *http.Request
-			select {
-			case req = <-sink.ch:
-				if !tc.OK {
-					t.Fatalf("Did not expect message but received: %v", req)
-				}
-			case <-time.After(timeout):
-				if tc.OK {
-					t.Fatal("Expected message but nothing received")
-				} else {
-					return
-				}
+			w := &web.Webhooks{
+				Registry: registry,
+				Target:   sink,
 			}
-			a.So(req.URL.String(), should.Equal, tc.URL)
-			a.So(req.Header.Get("Authorization"), should.Equal, "key secret")
-			a.So(req.Header.Get("Content-Type"), should.Equal, "application/json")
-			actualBody, err := ioutil.ReadAll(req.Body)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
+			sub := w.NewSubscription(ctx)
+
+			for _, tc := range []struct {
+				Name    string
+				Message *ttnpb.ApplicationUp
+				OK      bool
+				URL     string
+			}{
+				{
+					Name: "UplinkMessage/RegisteredDevice",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_UplinkMessage{
+							UplinkMessage: &ttnpb.ApplicationUplink{
+								SessionKeyID: "session1",
+								FPort:        42,
+								FCnt:         42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/up",
+				},
+				{
+					Name: "UplinkMessage/UnregisteredDevice",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: unregisteredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_UplinkMessage{
+							UplinkMessage: &ttnpb.ApplicationUplink{
+								SessionKeyID: "session2",
+								FPort:        42,
+								FCnt:         42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+						},
+					},
+					OK: false,
+				},
+				{
+					Name: "JoinAccept",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: &ttnpb.ApplicationJoinAccept{
+								SessionKeyID: "session2",
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/join",
+				},
+				{
+					Name: "DownlinkMessage/Ack",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_DownlinkAck{
+							DownlinkAck: &ttnpb.ApplicationDownlink{
+								SessionKeyID: "session2",
+								FCnt:         42,
+								FPort:        42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/down/ack",
+				},
+				{
+					Name: "DownlinkMessage/Nack",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_DownlinkNack{
+							DownlinkNack: &ttnpb.ApplicationDownlink{
+								SessionKeyID: "session2",
+								FCnt:         42,
+								FPort:        42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/down/nack",
+				},
+				{
+					Name: "DownlinkMessage/Sent",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_DownlinkSent{
+							DownlinkSent: &ttnpb.ApplicationDownlink{
+								SessionKeyID: "session2",
+								FCnt:         42,
+								FPort:        42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/down/sent",
+				},
+				{
+					Name: "DownlinkMessage/Queued",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_DownlinkQueued{
+							DownlinkQueued: &ttnpb.ApplicationDownlink{
+								SessionKeyID: "session2",
+								FCnt:         42,
+								FPort:        42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/down/queued",
+				},
+				{
+					Name: "DownlinkMessage/Failed",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_DownlinkFailed{
+							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+								ApplicationDownlink: ttnpb.ApplicationDownlink{
+									SessionKeyID: "session2",
+									FCnt:         42,
+									FPort:        42,
+									FRMPayload:   []byte{0x1, 0x2, 0x3},
+								},
+								Error: ttnpb.ErrorDetails{
+									Name: "test",
+								},
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/down/failed",
+				},
+				{
+					Name: "LocationSolved",
+					Message: &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: registeredDeviceIDs,
+						Up: &ttnpb.ApplicationUp_LocationSolved{
+							LocationSolved: &ttnpb.ApplicationLocation{
+								Location: ttnpb.Location{
+									Latitude:  10,
+									Longitude: 20,
+									Altitude:  30,
+								},
+								Service: "test",
+							},
+						},
+					},
+					OK:  true,
+					URL: "https://myapp.com/api/ttn/v3/location",
+				},
+			} {
+				t.Run(tc.Name, func(t *testing.T) {
+					a := assertions.New(t)
+					err := sub.SendUp(tc.Message)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+					var req *http.Request
+					select {
+					case req = <-testSink.ch:
+						if !tc.OK {
+							t.Fatalf("Did not expect message but received: %v", req)
+						}
+					case <-time.After(timeout):
+						if tc.OK {
+							t.Fatal("Expected message but nothing received")
+						} else {
+							return
+						}
+					}
+					a.So(req.URL.String(), should.Equal, tc.URL)
+					a.So(req.Header.Get("Authorization"), should.Equal, "key secret")
+					a.So(req.Header.Get("Content-Type"), should.Equal, "application/json")
+					actualBody, err := ioutil.ReadAll(req.Body)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+					expectedBody, err := web.Formatters["json"].Encode(ctx, tc.Message)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+					a.So(actualBody, should.Resemble, expectedBody)
+				})
 			}
-			expectedBody, err := web.Formatters["json"].Encode(ctx, tc.Message)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(actualBody, should.Resemble, expectedBody)
 		})
 	}
 }

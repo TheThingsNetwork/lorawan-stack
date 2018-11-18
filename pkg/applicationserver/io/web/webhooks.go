@@ -28,9 +28,15 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// WebhookSink processes HTTP requests.
-type WebhookSink interface {
+// Sink processes HTTP requests.
+type Sink interface {
 	Process(*http.Request) error
+}
+
+// ControllableSink is a controllable Sink.
+type ControllableSink interface {
+	Sink
+	Run(context.Context) error
 }
 
 // HTTPClientSink contains an HTTP client to make outgoing requests.
@@ -53,10 +59,68 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 	return errRequest.WithAttributes("code", res.StatusCode)
 }
 
+// BufferedSink is a ControllableSink with buffer.
+type BufferedSink struct {
+	Target  Sink
+	Buffer  chan *http.Request
+	Workers int
+}
+
+// Run starts concurrent workers to process messages from the buffer.
+// If Target is a ControllableSink, this method runs the target.
+// This method blocks until the target (if controllable) and all workers are done.
+func (b *BufferedSink) Run(ctx context.Context) error {
+	if b.Workers < 1 {
+		b.Workers = 1
+	}
+	wg := sync.WaitGroup{}
+	if controllable, ok := b.Target.(ControllableSink); ok {
+		wg.Add(1)
+		go func() {
+			if err := controllable.Run(ctx); err != nil && !errors.IsCanceled(err) {
+				log.FromContext(ctx).WithError(err).Error("Target sink failed")
+			}
+			wg.Done()
+		}()
+	}
+	for i := 0; i < b.Workers; i++ {
+		wg.Add(1)
+		go func() {
+			for {
+				select {
+				case <-ctx.Done():
+					wg.Done()
+					return
+				case req := <-b.Buffer:
+					if err := b.Target.Process(req); err != nil {
+						log.FromContext(ctx).WithError(err).Warn("Failed to process message")
+					}
+				}
+			}
+		}()
+	}
+	<-ctx.Done()
+	wg.Wait()
+	return ctx.Err()
+}
+
+var errBufferFull = errors.DefineResourceExhausted("buffer_full", "the buffer is full")
+
+// Process sends the request to the buffer.
+// This method returns immediately. An error is returned when the buffer is full.
+func (b *BufferedSink) Process(req *http.Request) error {
+	select {
+	case b.Buffer <- req:
+		return nil
+	default:
+		return errBufferFull
+	}
+}
+
 // Webhooks can be used to create a webhooks subscription.
 type Webhooks struct {
 	Registry WebhookRegistry
-	Target   WebhookSink
+	Target   Sink
 }
 
 // NewSubscription returns a new webhooks integration subscription.
