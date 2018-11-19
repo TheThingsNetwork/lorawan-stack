@@ -25,10 +25,6 @@ import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HashOutput from 'webpack-plugin-hash-output'
 
-import convert from 'koa-connect'
-import history from 'connect-history-api-fallback'
-import proxy from 'http-proxy-middleware'
-
 import nib from 'nib'
 
 const {
@@ -249,31 +245,6 @@ export default {
       }),
     ],
   }),
-  serve: {
-    content: 'public',
-    devMiddleware: { stats: 'minimal' },
-    hotClient: { allEntries: true },
-    add (app, middleware, options) {
-      // Add new api routes here, to proxy them
-      app.use(convert(proxy([
-        '/api',
-        '/console/api',
-        '/console/oauth',
-        '/console/auth',
-        '/oauth/api',
-        '/oauth/authorize',
-        '/oauth/token',
-      ],
-      { target: 'http://localhost:1885' })))
-      app.use(convert(history({
-        rewrites: [
-          { from: publicPathScheme, to: ({ parsedUrl }) => (`${parsedUrl.pathname.replace(publicPathReplace, '')}`) },
-          { from: /\/console(\/[a-zA-Z0-9_/.-]*)?$/, to: '/console.html' },
-          { from: /\/oauth(\/[a-zA-Z0-9_/.-]*)?$/, to: '/oauth.html' },
-        ],
-      })))
-    },
-  },
 }
 
 function filterLocales (context, request, callback) {
