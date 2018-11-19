@@ -15,13 +15,12 @@
 import axios from 'axios'
 import token from '../lib/access-token'
 import getCookieValue from '../lib/cookie'
+import stubs from './stubs/.'
 
 const csrf = getCookieValue('_csrf')
 const oauthInstance = axios.create({
   headers: { 'X-CSRF-Token': csrf },
 })
-
-import fakeData from './fake-data'
 
 export default {
   v3: {
@@ -41,69 +40,15 @@ export default {
         },
       },
       applications: {
-        list (params) {
-          const start = (params.page - 1) * params.pageSize
-          const end = start + params.pageSize
-
-          const res = fakeData.applications.filter(app => app.application_id)
-          const total = res.length
-
-          return new Promise(resolve => setTimeout(() => resolve(
-            { applications: res.slice(start, end), totalCount: total }
-          ), 1000))
-        },
-        search (params) {
-          const start = (params.page - 1) * params.pageSize
-          const end = start + params.pageSize
-          const query = params.query || ''
-
-          const res = fakeData.applications.filter(app => app.application_id.includes(query))
-          const total = res.length
-
-          return new Promise(resolve => setTimeout(() => resolve(
-            { applications: res.slice(start, end), totalCount: total }
-          ), 1000))
-        },
+        list: stubs.applications.list,
+        search: stubs.applications.search,
       },
       application: {
-        get (id) {
-          const app = fakeData.applications.find(a => a.application_id === id)
-
-          return new Promise((resolve, reject) => setTimeout(function () {
-            if (app) {
-              resolve(app)
-            } else {
-              reject(new Error())
-            }
-          }, 750))
-        },
+        get: stubs.application.get,
       },
       devices: {
-        list (appId, params) {
-          const start = (params.page - 1) * params.pageSize
-          const end = start + params.pageSize
-
-          const res = fakeData.devices.filter(d => d.application_id === appId)
-          const total = res.length
-
-          return new Promise(resolve => setTimeout(() => resolve(
-            { devices: res.slice(start, end), totalCount: total }
-          ), 1000))
-        },
-        search (appId, params) {
-          const start = (params.page - 1) * params.pageSize
-          const end = start + params.pageSize
-          const query = params.query || ''
-
-          const res = fakeData.devices
-            .filter(d => d.application_id === appId)
-            .filter(d => d.device_id.includes(query))
-          const total = res.length
-
-          return new Promise(resolve => setTimeout(() => resolve(
-            { devices: res.slice(start, end), totalCount: total }
-          ), 1000))
-        },
+        list: stubs.devices.list,
+        search: stubs.devices.search,
       },
     },
   },
