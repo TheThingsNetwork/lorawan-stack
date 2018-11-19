@@ -15,23 +15,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
-import { push } from 'connected-react-router'
 
-import debounce from '../../lib/debounce'
 import sharedMessages from '../../lib/shared-messages'
 import Message from '../../lib/components/message'
-import Tabular from '../../components/table'
-import Input from '../../components/input'
-import Button from '../../components/button'
+import FetchTable from '../fetch-table'
 
 import { getDevicesList, searchDevicesList } from '../../actions/devices'
 
-import style from './devices-table.styl'
-
 const m = defineMessages({
   deviceId: 'Device ID',
-  connectedDevices: 'Connected Devices {deviceCount}',
+  connectedDevices: 'Connected Devices ({deviceCount})',
   add: 'Add Device',
 })
 
@@ -46,132 +39,32 @@ const headers = [
   },
 ]
 
-@connect(function ({ devices, application }, props) {
+@connect(function ({ application, devices }, props) {
   return {
-    devices: devices.devices,
-    totalCount: devices.totalCount,
-    fetching: devices.fetching,
-    fetchingSearch: devices.fetchingSearch,
     appId: application.application.application_id,
-    pathname: location.pathname,
+    totalCount: devices.totalCount,
   }
 })
-@bind
 export default class DevicesTable extends React.Component {
-
   constructor (props) {
     super(props)
 
-    this.state = {
-      query: '',
-      page: 1,
-      order: undefined,
-      orderBy: undefined,
-    }
-
-    this.requestSearch = debounce(this.requestSearch, 350)
-  }
-
-  fetchDevices () {
-    const { appId, dispatch, pageSize } = this.props
-    const filters = { ...this.state, pageSize }
-
-    if (filters.query) {
-      dispatch(searchDevicesList(appId, filters))
-    } else {
-      dispatch(getDevicesList(appId, filters))
-    }
-  }
-
-  onPageChange (page) {
-    this.setState({ page }, () => this.fetchDevices())
-  }
-
-  requestSearch () {
-    this.fetchDevices()
-  }
-
-  onQueryChange (query) {
-    this.setState({ query }, () => this.requestSearch())
-  }
-
-  onOrderChange (order, orderBy) {
-    this.setState({ order, orderBy }, () => this.fetchDevices())
-  }
-
-  onDeviceAdd () {
-    const { dispatch, pathname } = this.props
-
-    dispatch(push(`${pathname}/devices/add`))
-  }
-
-  onDeviceClick (id) {
-    const { dispatch, pathname, devices } = this.props
-    const { device_id } = devices[id]
-
-    dispatch(push(`${pathname}/devices/${device_id}`))
-  }
-
-  componentDidMount () {
-    this.fetchDevices()
+    this.searchDevicesList = filters => searchDevicesList(props.appId, filters)
+    this.getDevicesList = filters => getDevicesList(props.appId, filters)
   }
 
   render () {
-    const {
-      devices,
-      totalCount,
-      fetching,
-      fetchingSearch,
-      pageSize,
-    } = this.props
-    const { page, query } = this.state
-
-    const deviceCount = `(${totalCount})`
-    const devs = devices.map(device => ({ ...device, clickable: true }))
-
+    const { totalCount } = this.props
     return (
-      <div>
-        <div className={style.filters}>
-          <div className={style.filtersLeft}>
-            <Message
-              component="h3"
-              content={m.connectedDevices}
-              values={{ deviceCount }}
-            />
-          </div>
-          <div className={style.filtersRight}>
-            <Input
-              value={query}
-              icon="search"
-              loading={fetchingSearch}
-              onChange={this.onQueryChange}
-            />
-            <Button
-              onClick={this.onDeviceAdd}
-              className={style.addButton}
-              message={m.add}
-              icon="add"
-            />
-          </div>
-        </div>
-        <Tabular
-          paginated
-          page={page}
-          totalCount={totalCount}
-          pageSize={pageSize}
-          onRowClick={this.onDeviceClick}
-          onPageChange={this.onPageChange}
-          loading={fetching}
-          headers={headers}
-          data={devs}
-          emptyMessage={sharedMessages.noMatch}
-        />
-      </div>
+      <FetchTable
+        entity="devices"
+        headers={headers}
+        addMessage={m.add}
+        tableTitle={<Message content={m.connectedDevices} values={{ deviceCount: totalCount }} />}
+        getItemsAction={this.getDevicesList}
+        searchItemsAction={this.searchDevicesList}
+        {...this.props}
+      />
     )
   }
 }
-
-
-
-
-
