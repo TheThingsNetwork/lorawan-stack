@@ -39,17 +39,13 @@ const {
 } = process.env
 
 const DEV_SERVER_BUILD = process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_BUILD === 'true'
-const ASSETS_ROOT = DEV_SERVER_BUILD ? '/assets' : '{{.Root}}'
+const ASSETS_ROOT = '/assets'
 
 const context = path.resolve(CONTEXT)
 const production = NODE_ENV === 'production'
 const src = path.resolve('.', 'pkg/webui')
 const include = [ src ]
 const modules = [ path.resolve(context, 'node_modules') ]
-const publicPath = ASSETS_ROOT
-const publicPathRegExp = publicPath.replace('/', '\\/')
-const publicPathScheme = new RegExp(`${publicPathRegExp}\\/.*$`)
-const publicPathReplace = new RegExp(`^${publicPathRegExp}`)
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
@@ -59,7 +55,23 @@ export default {
   externals: [ filterLocales ],
   stats: 'minimal',
   devServer: {
+    port: 8080,
+    inline: true,
+    hot: true,
     stats: 'minimal',
+    proxy: {
+      // proxy /console and /oauth requests to the actual backend for both
+      // api calls and fetching the generated html
+      '/console': {
+        target: 'http://localhost:1885',
+        bypass: () => false,
+      },
+      '/oauth': {
+        target: 'http://localhost:1885',
+        bypass: () => false,
+      },
+    },
+    historyApiFallback: true,
   },
   entry: {
     console: [
@@ -72,11 +84,11 @@ export default {
     ],
   },
   output: {
-    filename: production ? '[name].[chunkhash].js' : '[name].[hash].js',
-    chunkFilename: production ? '[name].[chunkhash].js' : '[name].[hash].js',
+    filename: production ? '[name].[chunkhash].js' : '[name].js',
+    chunkFilename: production ? '[name].[chunkhash].js' : '[name].js',
     path: path.resolve(context, PUBLIC_DIR),
     crossOriginLoading: 'anonymous',
-    publicPath,
+    publicPath: ASSETS_ROOT,
   },
   optimization: {
     splitChunks: {
@@ -176,30 +188,6 @@ export default {
           }),
       }),
       new HtmlWebpackPlugin({
-        chunks: [ 'vendor', 'console' ],
-        title: 'console',
-        filename: path.resolve(PUBLIC_DIR, 'console.html'),
-        showErrors: false,
-        template: path.resolve(src, 'index.html'),
-        devServerBuild: DEV_SERVER_BUILD,
-        minify: {
-          html5: true,
-          collapseWhitespace: true,
-        },
-      }),
-      new HtmlWebpackPlugin({
-        chunks: [ 'vendor', 'oauth' ],
-        title: 'oauth',
-        filename: path.resolve(PUBLIC_DIR, 'oauth.html'),
-        showErrors: false,
-        template: path.resolve(src, 'index.html'),
-        devServerBuild: DEV_SERVER_BUILD,
-        minify: {
-          html5: true,
-          collapseWhitespace: true,
-        },
-      }),
-      new HtmlWebpackPlugin({
         inject: false,
         filename: `${src}/manifest.go`,
         showErrors: false,
@@ -228,6 +216,7 @@ export default {
       new HashOutput(),
     ],
     development: [
+      new webpack.HotModuleReplacementPlugin(),
       new webpack.DllReferencePlugin({
         context,
         manifest: require(path.resolve(context, CACHE_DIR, 'dll.json')),
