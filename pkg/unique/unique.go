@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
 const separator = "."
@@ -86,11 +87,17 @@ func WithContext(ctx context.Context, uid string) (context.Context, error) {
 
 // ToApplicationID returns the application identifier of the specified unique ID.
 func ToApplicationID(uid string) (ttnpb.ApplicationIdentifiers, error) {
+	if err := validate.ID(uid); err != nil {
+		return ttnpb.ApplicationIdentifiers{}, err
+	}
 	return ttnpb.ApplicationIdentifiers{ApplicationID: uid}, nil
 }
 
 // ToClientID returns the client identifier of the specified unique ID.
 func ToClientID(uid string) (ttnpb.ClientIdentifiers, error) {
+	if err := validate.ID(uid); err != nil {
+		return ttnpb.ClientIdentifiers{}, err
+	}
 	return ttnpb.ClientIdentifiers{ClientID: uid}, nil
 }
 
@@ -107,15 +114,24 @@ func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
 
 // ToGatewayID returns the gateway identifier of the specified unique ID.
 func ToGatewayID(uid string) (ttnpb.GatewayIdentifiers, error) {
+	if err := validate.ID(uid); err != nil {
+		return ttnpb.GatewayIdentifiers{}, err
+	}
 	return ttnpb.GatewayIdentifiers{GatewayID: uid}, nil
 }
 
 // ToOrganizationID returns the organization identifier of the specified unique ID.
 func ToOrganizationID(uid string) (ttnpb.OrganizationIdentifiers, error) {
+	if err := validate.ID(uid); err != nil {
+		return ttnpb.OrganizationIdentifiers{}, err
+	}
 	return ttnpb.OrganizationIdentifiers{OrganizationID: uid}, nil
 }
 
 // ToUserID returns the user identifier of the specified unique ID.
 func ToUserID(uid string) (ttnpb.UserIdentifiers, error) {
+	if err := validate.ID(uid); err != nil {
+		return ttnpb.UserIdentifiers{}, err
+	}
 	return ttnpb.UserIdentifiers{UserID: uid}, nil
 }
