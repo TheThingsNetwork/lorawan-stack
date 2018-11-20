@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -121,7 +122,7 @@ func TestWebhooks(t *testing.T) {
 				if controllable, ok := sink.(web.ControllableSink); ok {
 					go controllable.Run(ctx)
 				}
-				w := web.NewWebhooks(ctx, registry, sink)
+				w := web.NewWebhooks(ctx, nil, registry, sink)
 				sub := w.NewSubscription()
 				for _, tc := range []struct {
 					Name    string
@@ -316,7 +317,8 @@ func TestWebhooks(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		httpAddress := "0.0.0.0:8098"
-		w := web.NewWebhooks(newContextWithRightsFetcher(ctx), registry, &mockSink{})
+		testSink := &mockSink{}
+		w := web.NewWebhooks(newContextWithRightsFetcher(ctx), testSink, registry, testSink)
 		conf := &component.Config{
 			ServiceBase: config.ServiceBase{
 				HTTP: config.HTTP{
@@ -379,10 +381,19 @@ func TestWebhooks(t *testing.T) {
 }
 
 type mockSink struct {
+	io.Server
 	ch chan *http.Request
 }
 
 func (s *mockSink) Process(req *http.Request) error {
 	s.ch <- req
+	return nil
+}
+
+func (s *mockSink) DownlinkQueuePush(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
+	return nil
+}
+
+func (s *mockSink) DownlinkQueueReplace(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
 	return nil
 }

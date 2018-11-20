@@ -133,15 +133,17 @@ type Webhooks interface {
 
 type webhooks struct {
 	ctx      context.Context
+	server   io.Server
 	registry WebhookRegistry
 	target   Sink
 }
 
 // NewWebhooks returns a new Webhooks.
-func NewWebhooks(ctx context.Context, registry WebhookRegistry, target Sink) Webhooks {
+func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink) Webhooks {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
 	return &webhooks{
 		ctx:      ctx,
+		server:   server,
 		registry: registry,
 		target:   target,
 	}

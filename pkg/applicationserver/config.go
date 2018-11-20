@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -102,7 +103,7 @@ type WebhooksConfig struct {
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
 // If Target is empty, this method returns nil.
-func (c WebhooksConfig) NewWebhooks(ctx context.Context) (web.Webhooks, error) {
+func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.Webhooks, error) {
 	var target web.Sink
 	switch c.Target {
 	case "":
@@ -133,5 +134,5 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context) (web.Webhooks, error) {
 			}
 		}()
 	}
-	return web.NewWebhooks(ctx, c.Registry, target), nil
+	return web.NewWebhooks(ctx, server, c.Registry, target), nil
 }
