@@ -179,6 +179,10 @@ func RenderErrors(next echo.HandlerFunc) echo.HandlerFunc {
 			err = ttnErr
 		}
 
+		if strings.Contains(c.Request().Header.Get("accept"), "application/json") {
+			return c.JSON(status, err)
+		}
+
 		buf := new(bytes.Buffer)
 		if err := Template.Render(buf, "", map[string]interface{}{
 			"error": err,
