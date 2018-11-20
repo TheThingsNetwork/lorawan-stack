@@ -2735,9 +2735,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:join": {
+  "error:pkg/networkserver:join_server_not_found": {
     "translations": {
-      "en": "all Join Servers failed to handle join"
+      "en": "Join Server not found"
     },
     "description": {
       "package": "pkg/networkserver",
