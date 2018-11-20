@@ -26,33 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
-
-var (
-	registeredDeviceIDs = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "foo-app",
-		},
-		DeviceID: "foo-device",
-		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
-	}
-	unregisteredDeviceIDs = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "bar-app",
-		},
-		DeviceID: "bar-device",
-		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0x42, 0x42, 0x42}),
-	}
-
-	timeout = 10 * test.Delay
-)
-
-func devAddrPtr(devAddr types.DevAddr) *types.DevAddr {
-	return &devAddr
-}
 
 func TestWebhooks(t *testing.T) {
 	ctx := test.Context()
@@ -155,7 +131,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "UplinkMessage/RegisteredDevice",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
 								SessionKeyID: "session1",
@@ -171,7 +147,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "UplinkMessage/UnregisteredDevice",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: unregisteredDeviceIDs,
+						EndDeviceIdentifiers: unregisteredDeviceID,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
 								SessionKeyID: "session2",
@@ -186,7 +162,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "JoinAccept",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								SessionKeyID: "session2",
@@ -199,7 +175,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "DownlinkMessage/Ack",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_DownlinkAck{
 							DownlinkAck: &ttnpb.ApplicationDownlink{
 								SessionKeyID: "session2",
@@ -215,7 +191,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "DownlinkMessage/Nack",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_DownlinkNack{
 							DownlinkNack: &ttnpb.ApplicationDownlink{
 								SessionKeyID: "session2",
@@ -231,7 +207,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "DownlinkMessage/Sent",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_DownlinkSent{
 							DownlinkSent: &ttnpb.ApplicationDownlink{
 								SessionKeyID: "session2",
@@ -247,7 +223,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "DownlinkMessage/Queued",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_DownlinkQueued{
 							DownlinkQueued: &ttnpb.ApplicationDownlink{
 								SessionKeyID: "session2",
@@ -263,7 +239,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "DownlinkMessage/Failed",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								ApplicationDownlink: ttnpb.ApplicationDownlink{
@@ -284,7 +260,7 @@ func TestWebhooks(t *testing.T) {
 				{
 					Name: "LocationSolved",
 					Message: &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: registeredDeviceIDs,
+						EndDeviceIdentifiers: registeredDeviceID,
 						Up: &ttnpb.ApplicationUp_LocationSolved{
 							LocationSolved: &ttnpb.ApplicationLocation{
 								Location: ttnpb.Location{

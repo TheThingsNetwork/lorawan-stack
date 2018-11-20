@@ -21,21 +21,45 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/metadata"
 )
 
-const (
-	registeredApplicationID  = "foo-app"
+var (
+	registeredApplicationUID = "foo-app"
+	registeredApplicationID  = ttnpb.ApplicationIdentifiers{
+		ApplicationID: "foo-app",
+	}
 	registeredApplicationKey = "secret"
+	registeredDeviceID       = ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: registeredApplicationID,
+		DeviceID:               "foo-device",
+		DevAddr:                devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+	}
+	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: "bar-app",
+		},
+		DeviceID: "bar-device",
+		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0x42, 0x42, 0x42}),
+	}
+	registeredWebhookID = "foo-hook"
+
+	timeout = 10 * test.Delay
 )
+
+func devAddrPtr(addr types.DevAddr) *types.DevAddr {
+	return &addr
+}
 
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
 	return rights.NewContextWithFetcher(
 		ctx,
 		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set *ttnpb.Rights, err error) {
 			uid := unique.ID(ctx, ids)
-			if uid != unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}) {
+			if uid != registeredApplicationUID {
 				return
 			}
 			md := rpcmetadata.FromIncomingContext(ctx)
