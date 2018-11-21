@@ -46,7 +46,7 @@ message User {
   google.protobuf.Timestamp primary_email_address_validated_at = 9 [(gogoproto.stdtime) = true];
 
   // Only used on create; never returned on API calls.
-  string password = 10 [(validator.field) = {regex: "^.{8,}$"}];
+  string password = 10;
   google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   bool require_password_update = 12;
 
@@ -107,8 +107,8 @@ message CreateTemporaryPasswordRequest {
 
 message UpdateUserPasswordRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string new = 2 [(validator.field) = {regex: "^.{8,}$"}];
-  string old = 3 [(validator.field) = {regex: "^.{8,}$"}];
+  string new = 2;
+  string old = 3;
 }
 
 message CreateUserAPIKeyRequest {
