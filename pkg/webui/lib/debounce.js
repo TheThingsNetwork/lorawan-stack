@@ -14,14 +14,22 @@
 
 export default function debounce (f, ms) {
   let timer = null
-  return function (...args) {
-    const onComplete = function () {
-      f(...args)
-      timer = null
-    }
-    if (timer) {
-      clearTimeout(timer)
-    }
-    timer = setTimeout(onComplete, ms)
+  let cancelled = false
+  return {
+    debouncedFunction (...args) {
+      const onComplete = function () {
+        if (!cancelled) {
+          f(...args)
+        }
+        timer = null
+      }
+      if (timer) {
+        clearTimeout(timer)
+      }
+      timer = setTimeout(onComplete, ms)
+    },
+    cancel () {
+      cancelled = true
+    },
   }
 }
