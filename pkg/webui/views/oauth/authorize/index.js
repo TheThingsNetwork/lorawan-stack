@@ -14,19 +14,17 @@
 
 import React, { PureComponent, Fragment } from 'react'
 import Query from 'query-string'
-import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import api from '../../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
 import Modal from '../../../components/modal'
-import Spinner from '../../../components/spinner'
 import Icon from '../../../components/icon'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-
-import { getClient } from '../../../actions/client'
+import { withEnv } from '../../../lib/components/env'
+import getCookieValue from '../../../lib/cookie'
 
 import style from './authorize.styl'
 
@@ -38,25 +36,8 @@ const m = defineMessages({
   authorize: 'Authorize',
 })
 
-@connect(function (state, props) {
-  const { client_id, redirect_uri } = Query.parse(props.location.search)
-
-  return {
-    user: state.user.user,
-    client_id,
-    redirectUri: redirect_uri,
-    client: state.client[client_id] && state.client[client_id].client,
-    fetching: state.client[client_id] && state.client[client_id].fetching,
-  }
-}
-)
+@withEnv
 export default class Authorize extends PureComponent {
-
-  componentDidMount () {
-    const { dispatch, client_id } = this.props
-
-    dispatch(getClient(client_id))
-  }
 
   async handleLogout () {
     await api.oauth.logout()
@@ -64,25 +45,30 @@ export default class Authorize extends PureComponent {
   }
 
   render () {
-    const {
-      client,
-      client_id,
-      redirectUri,
-      user,
-    } = this.props
+    const { env: { page_data: { client, user }}, location } = this.props
+    const { redirect_uri } = Query.parse(location.search)
 
-    const clientName = capitalize(client_id)
+    const redirectUri = redirect_uri || client.redirect_uris[0]
+    const clientName = capitalize(client.ids.client_id)
 
     const bottomLine = (
       <div>
-        <span><Message className={style.loginInfo} content={m.loginInfo} values={{ userId: user.user_id }} /> <Message content={sharedMessages.logout} component="a" href="#" onClick={this.handleLogout} /></span>
+        <span>
+          <Message
+            className={style.loginInfo}
+            content={m.loginInfo}
+            values={{ userId: user.ids.user_id }}
+          />
+          <Message
+            content={sharedMessages.logout}
+            component="a"
+            href="#"
+            onClick={this.handleLogout}
+          />
+        </span>
         <Message content={m.redirectInfo} values={{ redirectUri }} />
       </div>
     )
-
-    if (!client || client.fetching) {
-      return <Spinner center children="Please wait…" />
-    }
 
     return (
       <Fragment>
@@ -100,16 +86,20 @@ export default class Authorize extends PureComponent {
           logo
         >
           <Fragment>
+            <input type="hidden" name="csrf" value={getCookieValue('_csrf')} />
             <div className={style.left}>
               <ul>
                 { client.rights.map(right => (
-                  <li key={right}><Icon icon="check" className={style.icon} /><Message content={{ id: `enum:${right}` }} /></li>
+                  <li key={right}>
+                    <Icon icon="check" className={style.icon} />
+                    <Message content={{ id: `enum:${right}` }} />
+                  </li>
                 )
                 )}
               </ul>
             </div>
             <div className={style.right}>
-              <h3>{capitalize(client_id)}</h3>
+              <h3>{capitalize(client.ids.client_id)}</h3>
               <p>{client.description}</p>
             </div>
           </Fragment>
