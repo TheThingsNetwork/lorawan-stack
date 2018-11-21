@@ -43,7 +43,7 @@ export default class Login extends React.PureComponent {
   redirectToLogin () {
     const { env, location } = this.props
     const { from } = location.state || { from: { pathname: env.app_root }}
-    window.location = `${env.app_root}/api/auth/login?path=${from}`
+    window.location = `${env.app_root}/api/auth/login?path=${from.pathname}`
   }
 
   render () {
