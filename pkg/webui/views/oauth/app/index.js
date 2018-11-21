@@ -34,6 +34,7 @@ const env = {
   app_root: window.APP_ROOT,
   assets_root: window.ASSETS_ROOT,
   config: window.APP_CONFIG,
+  page_data: window.PAGE_DATA,
 }
 
 export default class OAuthApp extends React.PureComponent {
