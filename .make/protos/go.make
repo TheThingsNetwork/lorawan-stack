@@ -16,6 +16,7 @@
 GO_PROTO_TYPES := any duration empty field_mask struct timestamp wrappers
 GO_PROTO_TYPE_CONVERSIONS = $(subst $(SPACE),$(COMMA),$(foreach type,$(GO_PROTO_TYPES),Mgoogle/protobuf/$(type).proto=github.com/gogo/protobuf/types))
 GO_PROTOC_FLAGS ?= \
+	--fieldmask_out=$(PROTOC_OUT) \
 	--gogottn_out=plugins=grpc,$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT) \
 	--grpc-gateway_out=$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT)
 
