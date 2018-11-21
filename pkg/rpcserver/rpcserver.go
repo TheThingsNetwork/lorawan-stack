@@ -26,7 +26,6 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -40,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/sentry"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/validator"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -139,7 +139,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		metrics.StreamServerInterceptor,
 		sentry.StreamServerInterceptor(options.sentry),
 		errors.StreamServerInterceptor(),
-		grpc_validator.StreamServerInterceptor(),
+		validator.StreamServerInterceptor(),
 		hooks.StreamServerInterceptor(),
 	}
 
@@ -152,7 +152,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		metrics.UnaryServerInterceptor,
 		sentry.UnaryServerInterceptor(options.sentry),
 		errors.UnaryServerInterceptor(),
-		grpc_validator.UnaryServerInterceptor(),
+		validator.UnaryServerInterceptor(),
 		hooks.UnaryServerInterceptor(),
 	}
 

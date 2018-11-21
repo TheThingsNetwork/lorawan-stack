@@ -356,7 +356,6 @@
     "logging",
     "recovery",
     "tags",
-    "validator",
   ]
   pruneopts = ""
   revision = "498ae206fc3cfe81cd82e48c1d4354026fa5f9ec"
@@ -1056,7 +1055,6 @@
     "github.com/grpc-ecosystem/go-grpc-middleware/logging",
     "github.com/grpc-ecosystem/go-grpc-middleware/recovery",
     "github.com/grpc-ecosystem/go-grpc-middleware/tags",
-    "github.com/grpc-ecosystem/go-grpc-middleware/validator",
     "github.com/grpc-ecosystem/go-grpc-prometheus",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
