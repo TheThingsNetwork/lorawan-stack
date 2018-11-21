@@ -80,11 +80,18 @@ class FetchTable extends Component {
       orderBy: undefined,
     }
 
-    this.requestSearch = debounce(this.requestSearch, 350)
+    const { debouncedFunction, cancel } = debounce(this.requestSearch, 350)
+
+    this.debouncedRequestSearch = debouncedFunction
+    this.debounceCancel = cancel
   }
 
   componentDidMount () {
     this.fetchItems()
+  }
+
+  componentWillUnmount () {
+    this.debounceCancel()
   }
 
   fetchItems () {
@@ -104,7 +111,7 @@ class FetchTable extends Component {
     }
   }
 
-  async onPageChange (page) {
+  onPageChange (page) {
     this.setState(this.props.filterValidator({
       ...this.state,
       page,
@@ -129,7 +136,7 @@ class FetchTable extends Component {
       query,
     }))
 
-    this.requestSearch()
+    this.debouncedRequestSearch()
   }
 
   async onOrderChange (order, orderBy) {
