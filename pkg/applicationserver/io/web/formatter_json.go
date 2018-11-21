@@ -16,8 +16,8 @@ package web
 
 import (
 	"context"
-	enc "encoding/json"
 
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -33,13 +33,13 @@ func (json) Name() string { return "JSON" }
 func (json) ContentType() string { return "application/json" }
 
 func (json) Encode(ctx context.Context, msg *ttnpb.ApplicationUp) ([]byte, error) {
-	return enc.Marshal(msg)
+	return jsonpb.TTN().Marshal(msg)
 }
 
-func (json) Decode(ctx context.Context, data []byte) (*ttnpb.ApplicationDownlink, error) {
-	msg := new(ttnpb.ApplicationDownlink)
-	if err := enc.Unmarshal(data, msg); err != nil {
+func (json) Decode(ctx context.Context, data []byte) (*ttnpb.ApplicationDownlinks, error) {
+	res := &ttnpb.ApplicationDownlinks{}
+	if err := jsonpb.TTN().Unmarshal(data, &res); err != nil {
 		return nil, err
 	}
-	return msg, nil
+	return res, nil
 }

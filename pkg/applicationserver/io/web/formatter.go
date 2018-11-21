@@ -27,7 +27,7 @@ type Formatter interface {
 	Name() string
 	ContentType() string
 	Encode(context.Context, *ttnpb.ApplicationUp) ([]byte, error)
-	Decode(context.Context, []byte) (*ttnpb.ApplicationDownlink, error)
+	Decode(context.Context, []byte) (*ttnpb.ApplicationDownlinks, error)
 }
 
 var errFormatterNotFound = errors.DefineNotFound("formatter_not_found", "formatter `{formatter}` not found")
