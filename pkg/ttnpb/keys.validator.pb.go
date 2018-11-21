@@ -39,14 +39,11 @@ func (this *RootKeys) Validate() error {
 	return nil
 }
 
-var _regex_SessionKeys_SessionKeyID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+var _regex_SessionKeys_SessionKeyID = regexp.MustCompile(`(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$`)
 
 func (this *SessionKeys) Validate() error {
 	if !_regex_SessionKeys_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionKeyID))
-	}
-	if this.SessionKeyID == "" {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.SessionKeyID))
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
 	}
 	if this.FNwkSIntKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.FNwkSIntKey); err != nil {

@@ -21,14 +21,11 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-var _regex_SessionKeyRequest_SessionKeyID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+var _regex_SessionKeyRequest_SessionKeyID = regexp.MustCompile(`(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$`)
 
 func (this *SessionKeyRequest) Validate() error {
 	if !_regex_SessionKeyRequest_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.SessionKeyID))
-	}
-	if this.SessionKeyID == "" {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must not be an empty string`, this.SessionKeyID))
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
 	}
 	return nil
 }

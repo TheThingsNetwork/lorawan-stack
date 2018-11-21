@@ -52,15 +52,15 @@ func (this *EndDeviceModel) Validate() error {
 	return nil
 }
 
-var _regex_EndDeviceVersionIdentifiers_BrandID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
-var _regex_EndDeviceVersionIdentifiers_ModelID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+var _regex_EndDeviceVersionIdentifiers_BrandID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$`)
+var _regex_EndDeviceVersionIdentifiers_ModelID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$`)
 
 func (this *EndDeviceVersionIdentifiers) Validate() error {
 	if !_regex_EndDeviceVersionIdentifiers_BrandID.MatchString(this.BrandID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("BrandID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.BrandID))
+		return github_com_mwitkow_go_proto_validators.FieldError("BrandID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"`, this.BrandID))
 	}
 	if !_regex_EndDeviceVersionIdentifiers_ModelID.MatchString(this.ModelID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("ModelID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.ModelID))
+		return github_com_mwitkow_go_proto_validators.FieldError("ModelID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"`, this.ModelID))
 	}
 	return nil
 }

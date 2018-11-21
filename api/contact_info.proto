@@ -50,7 +50,7 @@ message ContactInfo {
 }
 
 message ContactInfoValidation {
-  string id = 1;
+  string id = 1 [(gogoproto.customname) = "ID"];
   string token = 2;
   EntityIdentifiers entity = 3;
   repeated ContactInfo contact_info = 4;
