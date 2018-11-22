@@ -143,11 +143,6 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 		}
 	})
 
-	if console.config.Mount != "" && console.config.Mount != "/" {
-		group.GET("", webui.Render)
-	}
-	group.GET("/*", webui.Render)
-
 	api := group.Group("/api", middleware.CSRF())
 	api.GET("/auth/token", console.Token)
 	api.PUT("/auth/refresh", console.RefreshToken)
@@ -158,4 +153,9 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 		TokenLookup: "form:csrf",
 	}))
 	page.GET("/oauth/callback", console.Callback)
+
+	if console.config.Mount != "" && console.config.Mount != "/" {
+		group.GET("", webui.Render)
+	}
+	group.GET("/*", webui.Render)
 }
