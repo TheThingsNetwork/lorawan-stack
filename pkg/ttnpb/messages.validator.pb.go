@@ -70,11 +70,11 @@ func (this *TxAcknowledgment) Validate() error {
 	return nil
 }
 
-var _regex_ApplicationUplink_SessionKeyID = regexp.MustCompile(`(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$`)
+var _regex_ApplicationUplink_SessionKeyID = regexp.MustCompile(`(?:0[xX])?([0-9a-fA-F]{2})+$|^$`)
 
 func (this *ApplicationUplink) Validate() error {
 	if !_regex_ApplicationUplink_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
 	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
@@ -98,11 +98,11 @@ func (this *ApplicationLocation) Validate() error {
 	return nil
 }
 
-var _regex_ApplicationJoinAccept_SessionKeyID = regexp.MustCompile(`(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$`)
+var _regex_ApplicationJoinAccept_SessionKeyID = regexp.MustCompile(`(?:0[xX])?([0-9a-fA-F]{2})+$|^$`)
 
 func (this *ApplicationJoinAccept) Validate() error {
 	if !_regex_ApplicationJoinAccept_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
 	}
 	if this.AppSKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AppSKey); err != nil {
@@ -119,11 +119,11 @@ func (this *ApplicationJoinAccept) Validate() error {
 	return nil
 }
 
-var _regex_ApplicationDownlink_SessionKeyID = regexp.MustCompile(`(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$`)
+var _regex_ApplicationDownlink_SessionKeyID = regexp.MustCompile(`(?:0[xX])?([0-9a-fA-F]{2})+$|^$`)
 
 func (this *ApplicationDownlink) Validate() error {
 	if !_regex_ApplicationDownlink_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])(?:[0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$|^$"`, this.SessionKeyID))
 	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
