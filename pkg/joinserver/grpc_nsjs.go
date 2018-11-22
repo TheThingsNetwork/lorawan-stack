@@ -218,7 +218,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errEncodePayload.WithCause(err)
 			}
 
-			if dev.RootKeys.AppKey == nil || len(dev.RootKeys.AppKey.Key) == 0 {
+			if dev.RootKeys.AppKey == nil {
 				return nil, nil, errNoAppKey
 			}
 
@@ -238,7 +238,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 			switch req.SelectedMACVersion {
 			case ttnpb.MAC_V1_1:
-				if dev.RootKeys.NwkKey == nil || len(dev.RootKeys.NwkKey.Key) == 0 {
+				if dev.RootKeys.NwkKey == nil {
 					return nil, nil, errNoNwkKey
 				}
 
