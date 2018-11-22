@@ -17,6 +17,7 @@ package joinserver
 import (
 	"context"
 
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -26,6 +27,11 @@ type asJsServer struct {
 
 // GetAppSKey returns the AppSKey associated with session keys identified by the supplied request.
 func (srv asJsServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	// TODO: Authorize using ApplicationIdentifiers. (https://github.com/TheThingsIndustries/lorawan-stack/issues/505)
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
 	ks, err := srv.JS.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
 		[]string{
 			"app_s_key",

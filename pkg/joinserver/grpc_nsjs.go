@@ -355,6 +355,10 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 // GetNwkSKeys returns the NwkSKeys associated with session keys identified by the supplied request.
 func (srv nsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
 	ks, err := srv.JS.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
 		[]string{
 			"f_nwk_s_int_key",
