@@ -180,17 +180,17 @@ func (this *MACCommand) Validate() error {
 			}
 		}
 	}
-	if oneOfNester, ok := this.GetPayload().(*MACCommand_DlChannelReq); ok {
-		if oneOfNester.DlChannelReq != nil {
-			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.DlChannelReq); err != nil {
-				return github_com_mwitkow_go_proto_validators.FieldError("DlChannelReq", err)
+	if oneOfNester, ok := this.GetPayload().(*MACCommand_DLChannelReq_); ok {
+		if oneOfNester.DLChannelReq != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.DLChannelReq); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("DLChannelReq", err)
 			}
 		}
 	}
-	if oneOfNester, ok := this.GetPayload().(*MACCommand_DlChannelAns); ok {
-		if oneOfNester.DlChannelAns != nil {
-			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.DlChannelAns); err != nil {
-				return github_com_mwitkow_go_proto_validators.FieldError("DlChannelAns", err)
+	if oneOfNester, ok := this.GetPayload().(*MACCommand_DLChannelAns_); ok {
+		if oneOfNester.DLChannelAns != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.DLChannelAns); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("DLChannelAns", err)
 			}
 		}
 	}
