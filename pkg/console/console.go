@@ -135,26 +135,27 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 			frontendConfig := console.config.UI.FrontendConfig
 			frontendConfig.Language = console.config.UI.TemplateData.Language
 			c.Set("app_config", struct {
-				Console bool `json:"console"`
 				FrontendConfig
 			}{
-				Console:        true,
 				FrontendConfig: frontendConfig,
 			})
 			return next(c)
 		}
-	}, middleware.CSRF())
-
-	group.GET("/oauth/callback", console.Callback)
-
-	api := group.Group("/api")
-	api.GET("/auth/token", console.Token)
-	api.PUT("/auth/refresh", console.RefreshToken)
-	api.GET("/auth/login", console.Login)
-	api.POST("/auth/logout", console.Logout)
+	})
 
 	if console.config.Mount != "" && console.config.Mount != "/" {
 		group.GET("", webui.Render)
 	}
 	group.GET("/*", webui.Render)
+
+	api := group.Group("/api", middleware.CSRF())
+	api.GET("/auth/token", console.Token)
+	api.PUT("/auth/refresh", console.RefreshToken)
+	api.GET("/auth/login", console.Login)
+	api.POST("/auth/logout", console.Logout)
+
+	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:csrf",
+	}))
+	page.GET("/oauth/callback", console.Callback)
 }
