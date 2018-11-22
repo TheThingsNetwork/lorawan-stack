@@ -1371,8 +1371,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		CorrelationIDs:       up.CorrelationIDs,
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 			AppSKey:              resp.SessionKeys.AppSKey,
-			SessionKeyID:         dev.Session.SessionKeyID,
 			InvalidatedDownlinks: invalidatedQueue,
+			SessionKeyID:         dev.Session.SessionKeyID,
+			SessionStartedAt:     dev.Session.StartedAt,
 		}},
 	}); err != nil {
 		logger.WithField(

@@ -2093,6 +2093,83 @@ func HandleJoinTest() func(t *testing.T) {
 
 				select {
 				case up := <-asSendCh:
+					if !t.Run("device update", func(t *testing.T) {
+						a := assertions.New(t)
+
+						ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
+						if !a.So(err, should.BeNil) ||
+							!a.So(ret, should.NotBeNil) {
+							t.FailNow()
+						}
+						if a.So(ret.Session, should.NotBeNil) {
+							ses := ret.Session
+							a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
+							a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
+							if tc.Device.Session != nil {
+								a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
+							}
+						}
+
+						if !a.So(ret.RecentUplinks, should.NotBeEmpty) {
+							t.FailNow()
+						}
+
+						if !a.So(ret.RecentDownlinks, should.NotBeEmpty) {
+							t.FailNow()
+						}
+
+						a.So(ret.RecentDownlinks[len(ret.RecentDownlinks)-1].RawPayload, should.HaveEmptyDiff, resp.RawPayload)
+
+						err = ResetMACState(ns.Component.FrequencyPlans, pb)
+						if !a.So(err, should.BeNil) {
+							t.FailNow()
+						}
+
+						pb.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
+						pb.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
+						pb.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
+
+						pb.MACState.DesiredParameters.Rx1Delay = pb.MACState.CurrentParameters.Rx1Delay
+						pb.MACState.DesiredParameters.Rx1DataRateOffset = pb.MACState.CurrentParameters.Rx1DataRateOffset
+						pb.MACState.DesiredParameters.Rx2DataRateIndex = pb.MACState.CurrentParameters.Rx2DataRateIndex
+
+						pb.EndDeviceIdentifiers.DevAddr = ret.EndDeviceIdentifiers.DevAddr
+						pb.Session = &ttnpb.Session{
+							SessionKeys: *keys,
+							StartedAt:   ret.Session.StartedAt,
+							DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
+						}
+						pb.CreatedAt = ret.CreatedAt
+						pb.UpdatedAt = ret.UpdatedAt
+						pb.RecentDownlinks = ret.RecentDownlinks
+
+						pb.QueuedApplicationDownlinks = nil
+
+						msg := CopyUplinkMessage(tc.UplinkMessage)
+						msg.RxMetadata = md
+
+						pb.RecentUplinks = append(pb.RecentUplinks, msg)
+						if len(pb.RecentUplinks) > RecentUplinkCount {
+							pb.RecentUplinks = pb.RecentUplinks[len(pb.RecentUplinks)-RecentUplinkCount:]
+						}
+
+						retUp := ret.RecentUplinks[len(ret.RecentUplinks)-1]
+						pbUp := pb.RecentUplinks[len(pb.RecentUplinks)-1]
+
+						a.So(retUp.ReceivedAt, should.HappenBetween, start, time.Now())
+						pbUp.ReceivedAt = retUp.ReceivedAt
+
+						a.So(retUp.CorrelationIDs, should.NotBeEmpty)
+						pbUp.CorrelationIDs = retUp.CorrelationIDs
+
+						a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata)
+						pbUp.RxMetadata = retUp.RxMetadata
+
+						a.So(ret, should.HaveEmptyDiff, pb)
+					}) {
+						t.FailNow()
+					}
+
 					a.So(up.CorrelationIDs, should.NotBeEmpty)
 
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
@@ -2108,88 +2185,12 @@ func HandleJoinTest() func(t *testing.T) {
 							AppSKey:              resp.SessionKeys.AppSKey,
 							SessionKeyID:         test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
 							InvalidatedDownlinks: tc.Device.QueuedApplicationDownlinks,
+							SessionStartedAt:     pb.Session.StartedAt,
 						}},
 					})
 
 				case <-time.After(Timeout):
 					t.Fatal("Timed out while waiting for join to be sent to AS")
-				}
-
-				if !t.Run("device update", func(t *testing.T) {
-					a := assertions.New(t)
-
-					ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
-					if !a.So(err, should.BeNil) ||
-						!a.So(ret, should.NotBeNil) {
-						t.FailNow()
-					}
-					if a.So(ret.Session, should.NotBeNil) {
-						ses := ret.Session
-						a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
-						a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
-						if tc.Device.Session != nil {
-							a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
-						}
-					}
-
-					if !a.So(ret.RecentUplinks, should.NotBeEmpty) {
-						t.FailNow()
-					}
-
-					if !a.So(ret.RecentDownlinks, should.NotBeEmpty) {
-						t.FailNow()
-					}
-
-					a.So(ret.RecentDownlinks[len(ret.RecentDownlinks)-1].RawPayload, should.HaveEmptyDiff, resp.RawPayload)
-
-					err = ResetMACState(ns.Component.FrequencyPlans, pb)
-					if !a.So(err, should.BeNil) {
-						t.FailNow()
-					}
-
-					pb.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
-					pb.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
-					pb.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
-
-					pb.MACState.DesiredParameters.Rx1Delay = pb.MACState.CurrentParameters.Rx1Delay
-					pb.MACState.DesiredParameters.Rx1DataRateOffset = pb.MACState.CurrentParameters.Rx1DataRateOffset
-					pb.MACState.DesiredParameters.Rx2DataRateIndex = pb.MACState.CurrentParameters.Rx2DataRateIndex
-
-					pb.EndDeviceIdentifiers.DevAddr = ret.EndDeviceIdentifiers.DevAddr
-					pb.Session = &ttnpb.Session{
-						SessionKeys: *keys,
-						StartedAt:   ret.Session.StartedAt,
-						DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
-					}
-					pb.CreatedAt = ret.CreatedAt
-					pb.UpdatedAt = ret.UpdatedAt
-					pb.RecentDownlinks = ret.RecentDownlinks
-
-					pb.QueuedApplicationDownlinks = nil
-
-					msg := CopyUplinkMessage(tc.UplinkMessage)
-					msg.RxMetadata = md
-
-					pb.RecentUplinks = append(pb.RecentUplinks, msg)
-					if len(pb.RecentUplinks) > RecentUplinkCount {
-						pb.RecentUplinks = pb.RecentUplinks[len(pb.RecentUplinks)-RecentUplinkCount:]
-					}
-
-					retUp := ret.RecentUplinks[len(ret.RecentUplinks)-1]
-					pbUp := pb.RecentUplinks[len(pb.RecentUplinks)-1]
-
-					a.So(retUp.ReceivedAt, should.HappenBetween, start, time.Now())
-					pbUp.ReceivedAt = retUp.ReceivedAt
-
-					a.So(retUp.CorrelationIDs, should.NotBeEmpty)
-					pbUp.CorrelationIDs = retUp.CorrelationIDs
-
-					a.So(retUp.RxMetadata, should.HaveSameElementsDiff, pbUp.RxMetadata)
-					pbUp.RxMetadata = retUp.RxMetadata
-
-					a.So(ret, should.HaveEmptyDiff, pb)
-				}) {
-					t.FailNow()
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
@@ -2260,8 +2261,9 @@ func HandleJoinTest() func(t *testing.T) {
 								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey:      resp.SessionKeys.AppSKey,
-								SessionKeyID: test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+								AppSKey:          resp.SessionKeys.AppSKey,
+								SessionKeyID:     test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+								SessionStartedAt: up.GetJoinAccept().SessionStartedAt,
 							}},
 						})
 
