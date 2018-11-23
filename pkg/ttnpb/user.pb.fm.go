@@ -2,9 +2,13 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	time "time"
+)
 
-var _UserFieldPaths = [...]string{
+var UserFieldPathsNested = []string{
 	"admin",
 	"attributes",
 	"contact_info",
@@ -31,193 +35,406 @@ var _UserFieldPaths = [...]string{
 	"updated_at",
 }
 
-func (*User) FieldMaskPaths() []string {
-	ret := make([]string, len(_UserFieldPaths))
-	copy(ret, _UserFieldPaths[:])
-	return ret
+var UserFieldPathsTopLevel = []string{
+	"admin",
+	"attributes",
+	"contact_info",
+	"created_at",
+	"description",
+	"ids",
+	"name",
+	"password",
+	"password_updated_at",
+	"primary_email_address",
+	"primary_email_address_validated_at",
+	"profile_picture",
+	"require_password_update",
+	"state",
+	"temporary_password",
+	"temporary_password_created_at",
+	"temporary_password_expires_at",
+	"updated_at",
 }
 
-func (dst *User) SetFields(src *User, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "admin":
-			dst.Admin = src.Admin
-		case "attributes":
-			dst.Attributes = src.Attributes
-		case "contact_info":
-			dst.ContactInfo = src.ContactInfo
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "description":
-			dst.Description = src.Description
+func (dst *User) SetFields(src *User, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "name":
-			dst.Name = src.Name
-		case "password":
-			dst.Password = src.Password
-		case "password_updated_at":
-			dst.PasswordUpdatedAt = src.PasswordUpdatedAt
-		case "primary_email_address":
-			dst.PrimaryEmailAddress = src.PrimaryEmailAddress
-		case "primary_email_address_validated_at":
-			dst.PrimaryEmailAddressValidatedAt = src.PrimaryEmailAddressValidatedAt
-		case "profile_picture":
-			dst.ProfilePicture = src.ProfilePicture
-		case "profile_picture.embedded":
-			if dst.ProfilePicture == nil {
-				dst.ProfilePicture = &Picture{}
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
 			}
-			dst.ProfilePicture.SetFields(src.ProfilePicture, _pathsWithoutPrefix("profile_picture", paths)...)
-		case "profile_picture.embedded.data":
-			if dst.ProfilePicture == nil {
-				dst.ProfilePicture = &Picture{}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
 			}
-			dst.ProfilePicture.SetFields(src.ProfilePicture, _pathsWithoutPrefix("profile_picture", paths)...)
-		case "profile_picture.embedded.mime_type":
-			if dst.ProfilePicture == nil {
-				dst.ProfilePicture = &Picture{}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
 			}
-			dst.ProfilePicture.SetFields(src.ProfilePicture, _pathsWithoutPrefix("profile_picture", paths)...)
-		case "profile_picture.sizes":
-			if dst.ProfilePicture == nil {
-				dst.ProfilePicture = &Picture{}
-			}
-			dst.ProfilePicture.SetFields(src.ProfilePicture, _pathsWithoutPrefix("profile_picture", paths)...)
-		case "require_password_update":
-			dst.RequirePasswordUpdate = src.RequirePasswordUpdate
-		case "state":
-			dst.State = src.State
-		case "temporary_password":
-			dst.TemporaryPassword = src.TemporaryPassword
-		case "temporary_password_created_at":
-			dst.TemporaryPasswordCreatedAt = src.TemporaryPasswordCreatedAt
-		case "temporary_password_expires_at":
-			dst.TemporaryPasswordExpiresAt = src.TemporaryPasswordExpiresAt
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "attributes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attributes = src.Attributes
+			} else {
+				dst.Attributes = nil
+			}
+		case "contact_info":
+			if len(subs) > 0 {
+				return fmt.Errorf("'contact_info' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ContactInfo = src.ContactInfo
+			} else {
+				dst.ContactInfo = nil
+			}
+		case "primary_email_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'primary_email_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PrimaryEmailAddress = src.PrimaryEmailAddress
+			} else {
+				var zero string
+				dst.PrimaryEmailAddress = zero
+			}
+		case "primary_email_address_validated_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'primary_email_address_validated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PrimaryEmailAddressValidatedAt = src.PrimaryEmailAddressValidatedAt
+			} else {
+				dst.PrimaryEmailAddressValidatedAt = nil
+			}
+		case "password":
+			if len(subs) > 0 {
+				return fmt.Errorf("'password' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Password = src.Password
+			} else {
+				var zero string
+				dst.Password = zero
+			}
+		case "password_updated_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'password_updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PasswordUpdatedAt = src.PasswordUpdatedAt
+			} else {
+				var zero time.Time
+				dst.PasswordUpdatedAt = zero
+			}
+		case "require_password_update":
+			if len(subs) > 0 {
+				return fmt.Errorf("'require_password_update' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RequirePasswordUpdate = src.RequirePasswordUpdate
+			} else {
+				var zero bool
+				dst.RequirePasswordUpdate = zero
+			}
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				var zero State
+				dst.State = zero
+			}
+		case "admin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'admin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Admin = src.Admin
+			} else {
+				var zero bool
+				dst.Admin = zero
+			}
+		case "temporary_password":
+			if len(subs) > 0 {
+				return fmt.Errorf("'temporary_password' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TemporaryPassword = src.TemporaryPassword
+			} else {
+				var zero string
+				dst.TemporaryPassword = zero
+			}
+		case "temporary_password_created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'temporary_password_created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TemporaryPasswordCreatedAt = src.TemporaryPasswordCreatedAt
+			} else {
+				dst.TemporaryPasswordCreatedAt = nil
+			}
+		case "temporary_password_expires_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'temporary_password_expires_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TemporaryPasswordExpiresAt = src.TemporaryPasswordExpiresAt
+			} else {
+				dst.TemporaryPasswordExpiresAt = nil
+			}
+		case "profile_picture":
+			if len(subs) > 0 {
+				newDst := dst.ProfilePicture
+				if newDst == nil {
+					newDst = &Picture{}
+					dst.ProfilePicture = newDst
+				}
+				var newSrc *Picture
+				if src != nil {
+					newSrc = src.ProfilePicture
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ProfilePicture = src.ProfilePicture
+				} else {
+					dst.ProfilePicture = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _PictureFieldPaths = [...]string{
+var PictureFieldPathsNested = []string{
 	"embedded",
 	"embedded.data",
 	"embedded.mime_type",
 	"sizes",
 }
 
-func (*Picture) FieldMaskPaths() []string {
-	ret := make([]string, len(_PictureFieldPaths))
-	copy(ret, _PictureFieldPaths[:])
-	return ret
+var PictureFieldPathsTopLevel = []string{
+	"embedded",
+	"sizes",
 }
 
-func (dst *Picture) SetFields(src *Picture, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Picture) SetFields(src *Picture, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "embedded":
-			dst.Embedded = src.Embedded
-		case "embedded.data":
-			if dst.Embedded == nil {
-				dst.Embedded = &Picture_Embedded{}
+			if len(subs) > 0 {
+				newDst := dst.Embedded
+				if newDst == nil {
+					newDst = &Picture_Embedded{}
+					dst.Embedded = newDst
+				}
+				var newSrc *Picture_Embedded
+				if src != nil {
+					newSrc = src.Embedded
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Embedded = src.Embedded
+				} else {
+					dst.Embedded = nil
+				}
 			}
-			dst.Embedded.SetFields(src.Embedded, _pathsWithoutPrefix("embedded", paths)...)
-		case "embedded.mime_type":
-			if dst.Embedded == nil {
-				dst.Embedded = &Picture_Embedded{}
-			}
-			dst.Embedded.SetFields(src.Embedded, _pathsWithoutPrefix("embedded", paths)...)
 		case "sizes":
-			dst.Sizes = src.Sizes
+			if len(subs) > 0 {
+				return fmt.Errorf("'sizes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Sizes = src.Sizes
+			} else {
+				dst.Sizes = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _Picture_EmbeddedFieldPaths = [...]string{
+var Picture_EmbeddedFieldPathsNested = []string{
 	"data",
 	"mime_type",
 }
 
-func (*Picture_Embedded) FieldMaskPaths() []string {
-	ret := make([]string, len(_Picture_EmbeddedFieldPaths))
-	copy(ret, _Picture_EmbeddedFieldPaths[:])
-	return ret
+var Picture_EmbeddedFieldPathsTopLevel = []string{
+	"data",
+	"mime_type",
 }
 
-func (dst *Picture_Embedded) SetFields(src *Picture_Embedded, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "data":
-			dst.Data = src.Data
+func (dst *Picture_Embedded) SetFields(src *Picture_Embedded, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "mime_type":
-			dst.MimeType = src.MimeType
+			if len(subs) > 0 {
+				return fmt.Errorf("'mime_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MimeType = src.MimeType
+			} else {
+				var zero string
+				dst.MimeType = zero
+			}
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				var zero []byte
+				dst.Data = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UsersFieldPaths = [...]string{
+var UsersFieldPathsNested = []string{
 	"users",
 }
 
-func (*Users) FieldMaskPaths() []string {
-	ret := make([]string, len(_UsersFieldPaths))
-	copy(ret, _UsersFieldPaths[:])
-	return ret
+var UsersFieldPathsTopLevel = []string{
+	"users",
 }
 
-func (dst *Users) SetFields(src *Users, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Users) SetFields(src *Users, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "users":
-			dst.Users = src.Users
+			if len(subs) > 0 {
+				return fmt.Errorf("'users' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Users = src.Users
+			} else {
+				dst.Users = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetUserRequestFieldPaths = [...]string{
+var GetUserRequestFieldPathsNested = []string{
 	"field_mask",
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
 }
 
-func (*GetUserRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetUserRequestFieldPaths))
-	copy(ret, _GetUserRequestFieldPaths[:])
-	return ret
+var GetUserRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"user_ids",
 }
 
-func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateUserRequestFieldPaths = [...]string{
+var CreateUserRequestFieldPathsNested = []string{
 	"invitation_token",
 	"user",
 	"user.admin",
@@ -246,74 +463,51 @@ var _CreateUserRequestFieldPaths = [...]string{
 	"user.updated_at",
 }
 
-func (*CreateUserRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateUserRequestFieldPaths))
-	copy(ret, _CreateUserRequestFieldPaths[:])
-	return ret
+var CreateUserRequestFieldPathsTopLevel = []string{
+	"invitation_token",
+	"user",
 }
 
-func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "invitation_token":
-			dst.InvitationToken = src.InvitationToken
+func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user":
-			dst.User = src.User
-		case "user.admin":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.attributes":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.contact_info":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.created_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.description":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.ids":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.ids.email":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.ids.user_id":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.name":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.password":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.password_updated_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.primary_email_address":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.primary_email_address_validated_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.embedded":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.embedded.data":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.embedded.mime_type":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.sizes":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.require_password_update":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.state":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.temporary_password":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.temporary_password_created_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.temporary_password_expires_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.updated_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.User
+				var newSrc *User
+				if src != nil {
+					newSrc = &src.User
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.User = src.User
+				} else {
+					var zero User
+					dst.User = zero
+				}
+			}
+		case "invitation_token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'invitation_token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.InvitationToken = src.InvitationToken
+			} else {
+				var zero string
+				dst.InvitationToken = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateUserRequestFieldPaths = [...]string{
+var UpdateUserRequestFieldPathsNested = []string{
 	"field_mask",
 	"user",
 	"user.admin",
@@ -342,101 +536,90 @@ var _UpdateUserRequestFieldPaths = [...]string{
 	"user.updated_at",
 }
 
-func (*UpdateUserRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateUserRequestFieldPaths))
-	copy(ret, _UpdateUserRequestFieldPaths[:])
-	return ret
+var UpdateUserRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"user",
 }
 
-func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user":
-			dst.User = src.User
-		case "user.admin":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.attributes":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.contact_info":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.created_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.description":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.ids":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.ids.email":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.ids.user_id":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.name":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.password":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.password_updated_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.primary_email_address":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.primary_email_address_validated_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.embedded":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.embedded.data":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.embedded.mime_type":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.profile_picture.sizes":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.require_password_update":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.state":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.temporary_password":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.temporary_password_created_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.temporary_password_expires_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
-		case "user.updated_at":
-			dst.User.SetFields(&src.User, _pathsWithoutPrefix("user", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.User
+				var newSrc *User
+				if src != nil {
+					newSrc = &src.User
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.User = src.User
+				} else {
+					var zero User
+					dst.User = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateTemporaryPasswordRequestFieldPaths = [...]string{
+var CreateTemporaryPasswordRequestFieldPathsNested = []string{
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
 }
 
-func (*CreateTemporaryPasswordRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateTemporaryPasswordRequestFieldPaths))
-	copy(ret, _CreateTemporaryPasswordRequestFieldPaths[:])
-	return ret
+var CreateTemporaryPasswordRequestFieldPathsTopLevel = []string{
+	"user_ids",
 }
 
-func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswordRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswordRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateUserPasswordRequestFieldPaths = [...]string{
+var UpdateUserPasswordRequestFieldPathsNested = []string{
 	"new",
 	"old",
 	"user_ids",
@@ -444,32 +627,62 @@ var _UpdateUserPasswordRequestFieldPaths = [...]string{
 	"user_ids.user_id",
 }
 
-func (*UpdateUserPasswordRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateUserPasswordRequestFieldPaths))
-	copy(ret, _UpdateUserPasswordRequestFieldPaths[:])
-	return ret
+var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
+	"new",
+	"old",
+	"user_ids",
 }
 
-func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "new":
-			dst.New = src.New
-		case "old":
-			dst.Old = src.Old
+func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "new":
+			if len(subs) > 0 {
+				return fmt.Errorf("'new' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.New = src.New
+			} else {
+				var zero string
+				dst.New = zero
+			}
+		case "old":
+			if len(subs) > 0 {
+				return fmt.Errorf("'old' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Old = src.Old
+			} else {
+				var zero string
+				dst.Old = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateUserAPIKeyRequestFieldPaths = [...]string{
+var CreateUserAPIKeyRequestFieldPathsNested = []string{
 	"name",
 	"rights",
 	"user_ids",
@@ -477,32 +690,61 @@ var _CreateUserAPIKeyRequestFieldPaths = [...]string{
 	"user_ids.user_id",
 }
 
-func (*CreateUserAPIKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateUserAPIKeyRequestFieldPaths))
-	copy(ret, _CreateUserAPIKeyRequestFieldPaths[:])
-	return ret
+var CreateUserAPIKeyRequestFieldPathsTopLevel = []string{
+	"name",
+	"rights",
+	"user_ids",
 }
 
-func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "name":
-			dst.Name = src.Name
-		case "rights":
-			dst.Rights = src.Rights
+func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "rights":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateUserAPIKeyRequestFieldPaths = [...]string{
+var UpdateUserAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
 	"api_key.id",
 	"api_key.key",
@@ -513,38 +755,59 @@ var _UpdateUserAPIKeyRequestFieldPaths = [...]string{
 	"user_ids.user_id",
 }
 
-func (*UpdateUserAPIKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateUserAPIKeyRequestFieldPaths))
-	copy(ret, _UpdateUserAPIKeyRequestFieldPaths[:])
-	return ret
+var UpdateUserAPIKeyRequestFieldPathsTopLevel = []string{
+	"api_key",
+	"user_ids",
 }
 
-func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "api_key":
-			dst.APIKey = src.APIKey
-		case "api_key.id":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.key":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.name":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.rights":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
+func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "api_key":
+			if len(subs) > 0 {
+				newDst := &dst.APIKey
+				var newSrc *APIKey
+				if src != nil {
+					newSrc = &src.APIKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.APIKey = src.APIKey
+				} else {
+					var zero APIKey
+					dst.APIKey = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _InvitationFieldPaths = [...]string{
+var InvitationFieldPathsNested = []string{
 	"accepted_at",
 	"accepted_by",
 	"accepted_by.email",
@@ -556,139 +819,245 @@ var _InvitationFieldPaths = [...]string{
 	"updated_at",
 }
 
-func (*Invitation) FieldMaskPaths() []string {
-	ret := make([]string, len(_InvitationFieldPaths))
-	copy(ret, _InvitationFieldPaths[:])
-	return ret
+var InvitationFieldPathsTopLevel = []string{
+	"accepted_at",
+	"accepted_by",
+	"created_at",
+	"email",
+	"expires_at",
+	"token",
+	"updated_at",
 }
 
-func (dst *Invitation) SetFields(src *Invitation, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "accepted_at":
-			dst.AcceptedAt = src.AcceptedAt
-		case "accepted_by":
-			dst.AcceptedBy = src.AcceptedBy
-		case "accepted_by.email":
-			if dst.AcceptedBy == nil {
-				dst.AcceptedBy = &UserIdentifiers{}
-			}
-			dst.AcceptedBy.SetFields(src.AcceptedBy, _pathsWithoutPrefix("accepted_by", paths)...)
-		case "accepted_by.user_id":
-			if dst.AcceptedBy == nil {
-				dst.AcceptedBy = &UserIdentifiers{}
-			}
-			dst.AcceptedBy.SetFields(src.AcceptedBy, _pathsWithoutPrefix("accepted_by", paths)...)
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
+func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "email":
-			dst.Email = src.Email
-		case "expires_at":
-			dst.ExpiresAt = src.ExpiresAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Email = src.Email
+			} else {
+				var zero string
+				dst.Email = zero
+			}
 		case "token":
-			dst.Token = src.Token
+			if len(subs) > 0 {
+				return fmt.Errorf("'token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Token = src.Token
+			} else {
+				var zero string
+				dst.Token = zero
+			}
+		case "expires_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'expires_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ExpiresAt = src.ExpiresAt
+			} else {
+				var zero time.Time
+				dst.ExpiresAt = zero
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "accepted_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'accepted_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AcceptedAt = src.AcceptedAt
+			} else {
+				dst.AcceptedAt = nil
+			}
+		case "accepted_by":
+			if len(subs) > 0 {
+				newDst := dst.AcceptedBy
+				if newDst == nil {
+					newDst = &UserIdentifiers{}
+					dst.AcceptedBy = newDst
+				}
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = src.AcceptedBy
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AcceptedBy = src.AcceptedBy
+				} else {
+					dst.AcceptedBy = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _InvitationsFieldPaths = [...]string{
+var InvitationsFieldPathsNested = []string{
 	"invitations",
 }
 
-func (*Invitations) FieldMaskPaths() []string {
-	ret := make([]string, len(_InvitationsFieldPaths))
-	copy(ret, _InvitationsFieldPaths[:])
-	return ret
+var InvitationsFieldPathsTopLevel = []string{
+	"invitations",
 }
 
-func (dst *Invitations) SetFields(src *Invitations, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Invitations) SetFields(src *Invitations, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "invitations":
-			dst.Invitations = src.Invitations
+			if len(subs) > 0 {
+				return fmt.Errorf("'invitations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Invitations = src.Invitations
+			} else {
+				dst.Invitations = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SendInvitationRequestFieldPaths = [...]string{
+var SendInvitationRequestFieldPathsNested = []string{
 	"email",
 }
 
-func (*SendInvitationRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SendInvitationRequestFieldPaths))
-	copy(ret, _SendInvitationRequestFieldPaths[:])
-	return ret
-}
-
-func (dst *SendInvitationRequest) SetFields(src *SendInvitationRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "email":
-			dst.Email = src.Email
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _DeleteInvitationRequestFieldPaths = [...]string{
+var SendInvitationRequestFieldPathsTopLevel = []string{
 	"email",
 }
 
-func (*DeleteInvitationRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_DeleteInvitationRequestFieldPaths))
-	copy(ret, _DeleteInvitationRequestFieldPaths[:])
-	return ret
-}
-
-func (dst *DeleteInvitationRequest) SetFields(src *DeleteInvitationRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *SendInvitationRequest) SetFields(src *SendInvitationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "email":
-			dst.Email = src.Email
+			if len(subs) > 0 {
+				return fmt.Errorf("'email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Email = src.Email
+			} else {
+				var zero string
+				dst.Email = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UserSessionIdentifiersFieldPaths = [...]string{
+var DeleteInvitationRequestFieldPathsNested = []string{
+	"email",
+}
+
+var DeleteInvitationRequestFieldPathsTopLevel = []string{
+	"email",
+}
+
+func (dst *DeleteInvitationRequest) SetFields(src *DeleteInvitationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "email":
+			if len(subs) > 0 {
+				return fmt.Errorf("'email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Email = src.Email
+			} else {
+				var zero string
+				dst.Email = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var UserSessionIdentifiersFieldPathsNested = []string{
 	"session_id",
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
 }
 
-func (*UserSessionIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_UserSessionIdentifiersFieldPaths))
-	copy(ret, _UserSessionIdentifiersFieldPaths[:])
-	return ret
+var UserSessionIdentifiersFieldPathsTopLevel = []string{
+	"session_id",
+	"user_ids",
 }
 
-func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "session_id":
-			dst.SessionID = src.SessionID
+func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "session_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionID = src.SessionID
+			} else {
+				var zero string
+				dst.SessionID = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UserSessionFieldPaths = [...]string{
+var UserSessionFieldPathsNested = []string{
 	"created_at",
 	"expires_at",
 	"ids",
@@ -699,59 +1068,100 @@ var _UserSessionFieldPaths = [...]string{
 	"updated_at",
 }
 
-func (*UserSession) FieldMaskPaths() []string {
-	ret := make([]string, len(_UserSessionFieldPaths))
-	copy(ret, _UserSessionFieldPaths[:])
-	return ret
+var UserSessionFieldPathsTopLevel = []string{
+	"created_at",
+	"expires_at",
+	"ids",
+	"updated_at",
 }
 
-func (dst *UserSession) SetFields(src *UserSession, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "expires_at":
-			dst.ExpiresAt = src.ExpiresAt
+func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.UserSessionIdentifiers = src.UserSessionIdentifiers
-		case "ids.session_id":
-			dst.UserSessionIdentifiers.SetFields(&src.UserSessionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_ids":
-			dst.UserSessionIdentifiers.SetFields(&src.UserSessionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_ids.email":
-			dst.UserSessionIdentifiers.SetFields(&src.UserSessionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_ids.user_id":
-			dst.UserSessionIdentifiers.SetFields(&src.UserSessionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserSessionIdentifiers
+				var newSrc *UserSessionIdentifiers
+				if src != nil {
+					newSrc = &src.UserSessionIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserSessionIdentifiers = src.UserSessionIdentifiers
+				} else {
+					var zero UserSessionIdentifiers
+					dst.UserSessionIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "expires_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'expires_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ExpiresAt = src.ExpiresAt
+			} else {
+				dst.ExpiresAt = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UserSessionsFieldPaths = [...]string{
+var UserSessionsFieldPathsNested = []string{
 	"sessions",
 }
 
-func (*UserSessions) FieldMaskPaths() []string {
-	ret := make([]string, len(_UserSessionsFieldPaths))
-	copy(ret, _UserSessionsFieldPaths[:])
-	return ret
+var UserSessionsFieldPathsTopLevel = []string{
+	"sessions",
 }
 
-func (dst *UserSessions) SetFields(src *UserSessions, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *UserSessions) SetFields(src *UserSessions, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "sessions":
-			dst.Sessions = src.Sessions
+			if len(subs) > 0 {
+				return fmt.Errorf("'sessions' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Sessions = src.Sessions
+			} else {
+				dst.Sessions = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ListUserSessionsRequestFieldPaths = [...]string{
+var ListUserSessionsRequestFieldPathsNested = []string{
 	"limit",
 	"order",
 	"page",
@@ -760,29 +1170,68 @@ var _ListUserSessionsRequestFieldPaths = [...]string{
 	"user_ids.user_id",
 }
 
-func (*ListUserSessionsRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ListUserSessionsRequestFieldPaths))
-	copy(ret, _ListUserSessionsRequestFieldPaths[:])
-	return ret
+var ListUserSessionsRequestFieldPathsTopLevel = []string{
+	"limit",
+	"order",
+	"page",
+	"user_ids",
 }
 
-func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "limit":
-			dst.Limit = src.Limit
-		case "order":
-			dst.Order = src.Order
-		case "page":
-			dst.Page = src.Page
+func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_ids":
-			dst.UserIdentifiers = src.UserIdentifiers
-		case "user_ids.email":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			dst.UserIdentifiers.SetFields(&src.UserIdentifiers, _pathsWithoutPrefix("user_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

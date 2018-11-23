@@ -2,9 +2,14 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+	time "time"
+)
 
-var _SessionFieldPaths = [...]string{
+var SessionFieldPathsNested = []string{
 	"dev_addr",
 	"keys",
 	"keys.app_s_key",
@@ -27,62 +32,106 @@ var _SessionFieldPaths = [...]string{
 	"started_at",
 }
 
-func (*Session) FieldMaskPaths() []string {
-	ret := make([]string, len(_SessionFieldPaths))
-	copy(ret, _SessionFieldPaths[:])
-	return ret
+var SessionFieldPathsTopLevel = []string{
+	"dev_addr",
+	"keys",
+	"last_a_f_cnt_down",
+	"last_conf_f_cnt_down",
+	"last_f_cnt_up",
+	"last_n_f_cnt_down",
+	"started_at",
 }
 
-func (dst *Session) SetFields(src *Session, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Session) SetFields(src *Session, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "dev_addr":
-			dst.DevAddr = src.DevAddr
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevAddr
+				dst.DevAddr = zero
+			}
 		case "keys":
-			dst.SessionKeys = src.SessionKeys
-		case "keys.app_s_key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.app_s_key.kek_label":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.app_s_key.key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.f_nwk_s_int_key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.f_nwk_s_int_key.kek_label":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.f_nwk_s_int_key.key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.nwk_s_enc_key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.nwk_s_enc_key.kek_label":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.nwk_s_enc_key.key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.s_nwk_s_int_key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.s_nwk_s_int_key.kek_label":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.s_nwk_s_int_key.key":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "keys.session_key_id":
-			dst.SessionKeys.SetFields(&src.SessionKeys, _pathsWithoutPrefix("keys", paths)...)
-		case "last_a_f_cnt_down":
-			dst.LastAFCntDown = src.LastAFCntDown
-		case "last_conf_f_cnt_down":
-			dst.LastConfFCntDown = src.LastConfFCntDown
+			if len(subs) > 0 {
+				newDst := &dst.SessionKeys
+				var newSrc *SessionKeys
+				if src != nil {
+					newSrc = &src.SessionKeys
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.SessionKeys = src.SessionKeys
+				} else {
+					var zero SessionKeys
+					dst.SessionKeys = zero
+				}
+			}
 		case "last_f_cnt_up":
-			dst.LastFCntUp = src.LastFCntUp
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_f_cnt_up' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastFCntUp = src.LastFCntUp
+			} else {
+				var zero uint32
+				dst.LastFCntUp = zero
+			}
 		case "last_n_f_cnt_down":
-			dst.LastNFCntDown = src.LastNFCntDown
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_n_f_cnt_down' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastNFCntDown = src.LastNFCntDown
+			} else {
+				var zero uint32
+				dst.LastNFCntDown = zero
+			}
+		case "last_a_f_cnt_down":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_a_f_cnt_down' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastAFCntDown = src.LastAFCntDown
+			} else {
+				var zero uint32
+				dst.LastAFCntDown = zero
+			}
+		case "last_conf_f_cnt_down":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_conf_f_cnt_down' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastConfFCntDown = src.LastConfFCntDown
+			} else {
+				var zero uint32
+				dst.LastConfFCntDown = zero
+			}
 		case "started_at":
-			dst.StartedAt = src.StartedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'started_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StartedAt = src.StartedAt
+			} else {
+				var zero time.Time
+				dst.StartedAt = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACParametersFieldPaths = [...]string{
+var MACParametersFieldPathsNested = []string{
 	"adr_ack_delay",
 	"adr_ack_limit",
 	"adr_data_rate_index",
@@ -104,60 +153,229 @@ var _MACParametersFieldPaths = [...]string{
 	"uplink_dwell_time",
 }
 
-func (*MACParameters) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACParametersFieldPaths))
-	copy(ret, _MACParametersFieldPaths[:])
-	return ret
+var MACParametersFieldPathsTopLevel = []string{
+	"adr_ack_delay",
+	"adr_ack_limit",
+	"adr_data_rate_index",
+	"adr_nb_trans",
+	"adr_tx_power_index",
+	"beacon_frequency",
+	"channels",
+	"downlink_dwell_time",
+	"max_duty_cycle",
+	"max_eirp",
+	"ping_slot_data_rate_index",
+	"ping_slot_frequency",
+	"rejoin_count_periodicity",
+	"rejoin_time_periodicity",
+	"rx1_data_rate_offset",
+	"rx1_delay",
+	"rx2_data_rate_index",
+	"rx2_frequency",
+	"uplink_dwell_time",
 }
 
-func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "adr_ack_delay":
-			dst.ADRAckDelay = src.ADRAckDelay
-		case "adr_ack_limit":
-			dst.ADRAckLimit = src.ADRAckLimit
-		case "adr_data_rate_index":
-			dst.ADRDataRateIndex = src.ADRDataRateIndex
-		case "adr_nb_trans":
-			dst.ADRNbTrans = src.ADRNbTrans
-		case "adr_tx_power_index":
-			dst.ADRTxPowerIndex = src.ADRTxPowerIndex
-		case "beacon_frequency":
-			dst.BeaconFrequency = src.BeaconFrequency
-		case "channels":
-			dst.Channels = src.Channels
-		case "downlink_dwell_time":
-			dst.DownlinkDwellTime = src.DownlinkDwellTime
-		case "max_duty_cycle":
-			dst.MaxDutyCycle = src.MaxDutyCycle
+func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "max_eirp":
-			dst.MaxEIRP = src.MaxEIRP
-		case "ping_slot_data_rate_index":
-			dst.PingSlotDataRateIndex = src.PingSlotDataRateIndex
-		case "ping_slot_frequency":
-			dst.PingSlotFrequency = src.PingSlotFrequency
-		case "rejoin_count_periodicity":
-			dst.RejoinCountPeriodicity = src.RejoinCountPeriodicity
-		case "rejoin_time_periodicity":
-			dst.RejoinTimePeriodicity = src.RejoinTimePeriodicity
-		case "rx1_data_rate_offset":
-			dst.Rx1DataRateOffset = src.Rx1DataRateOffset
-		case "rx1_delay":
-			dst.Rx1Delay = src.Rx1Delay
-		case "rx2_data_rate_index":
-			dst.Rx2DataRateIndex = src.Rx2DataRateIndex
-		case "rx2_frequency":
-			dst.Rx2Frequency = src.Rx2Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_eirp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxEIRP = src.MaxEIRP
+			} else {
+				var zero float32
+				dst.MaxEIRP = zero
+			}
 		case "uplink_dwell_time":
-			dst.UplinkDwellTime = src.UplinkDwellTime
+			if len(subs) > 0 {
+				return fmt.Errorf("'uplink_dwell_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UplinkDwellTime = src.UplinkDwellTime
+			} else {
+				var zero bool
+				dst.UplinkDwellTime = zero
+			}
+		case "downlink_dwell_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_dwell_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkDwellTime = src.DownlinkDwellTime
+			} else {
+				var zero bool
+				dst.DownlinkDwellTime = zero
+			}
+		case "adr_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRDataRateIndex = src.ADRDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.ADRDataRateIndex = zero
+			}
+		case "adr_tx_power_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_tx_power_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRTxPowerIndex = src.ADRTxPowerIndex
+			} else {
+				var zero uint32
+				dst.ADRTxPowerIndex = zero
+			}
+		case "adr_nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRNbTrans = src.ADRNbTrans
+			} else {
+				var zero uint32
+				dst.ADRNbTrans = zero
+			}
+		case "adr_ack_limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_ack_limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRAckLimit = src.ADRAckLimit
+			} else {
+				var zero uint32
+				dst.ADRAckLimit = zero
+			}
+		case "adr_ack_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_ack_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRAckDelay = src.ADRAckDelay
+			} else {
+				var zero uint32
+				dst.ADRAckDelay = zero
+			}
+		case "rx1_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1Delay = src.Rx1Delay
+			} else {
+				var zero RxDelay
+				dst.Rx1Delay = zero
+			}
+		case "rx1_data_rate_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_data_rate_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
+			} else {
+				var zero uint32
+				dst.Rx1DataRateOffset = zero
+			}
+		case "rx2_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.Rx2DataRateIndex = zero
+			}
+		case "rx2_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2Frequency = src.Rx2Frequency
+			} else {
+				var zero uint64
+				dst.Rx2Frequency = zero
+			}
+		case "rejoin_time_periodicity":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejoin_time_periodicity' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejoinTimePeriodicity = src.RejoinTimePeriodicity
+			} else {
+				var zero RejoinTimeExponent
+				dst.RejoinTimePeriodicity = zero
+			}
+		case "rejoin_count_periodicity":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejoin_count_periodicity' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejoinCountPeriodicity = src.RejoinCountPeriodicity
+			} else {
+				var zero RejoinCountExponent
+				dst.RejoinCountPeriodicity = zero
+			}
+		case "max_duty_cycle":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_duty_cycle' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxDutyCycle = src.MaxDutyCycle
+			} else {
+				var zero AggregatedDutyCycle
+				dst.MaxDutyCycle = zero
+			}
+		case "channels":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channels' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Channels = src.Channels
+			} else {
+				dst.Channels = nil
+			}
+		case "ping_slot_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ping_slot_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PingSlotFrequency = src.PingSlotFrequency
+			} else {
+				var zero uint64
+				dst.PingSlotFrequency = zero
+			}
+		case "ping_slot_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ping_slot_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PingSlotDataRateIndex = src.PingSlotDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.PingSlotDataRateIndex = zero
+			}
+		case "beacon_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'beacon_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BeaconFrequency = src.BeaconFrequency
+			} else {
+				var zero uint64
+				dst.BeaconFrequency = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACParameters_ChannelFieldPaths = [...]string{
+var MACParameters_ChannelFieldPathsNested = []string{
 	"downlink_frequency",
 	"enable_uplink",
 	"max_data_rate_index",
@@ -165,119 +383,258 @@ var _MACParameters_ChannelFieldPaths = [...]string{
 	"uplink_frequency",
 }
 
-func (*MACParameters_Channel) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACParameters_ChannelFieldPaths))
-	copy(ret, _MACParameters_ChannelFieldPaths[:])
-	return ret
+var MACParameters_ChannelFieldPathsTopLevel = []string{
+	"downlink_frequency",
+	"enable_uplink",
+	"max_data_rate_index",
+	"min_data_rate_index",
+	"uplink_frequency",
 }
 
-func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "downlink_frequency":
-			dst.DownlinkFrequency = src.DownlinkFrequency
-		case "enable_uplink":
-			dst.EnableUplink = src.EnableUplink
-		case "max_data_rate_index":
-			dst.MaxDataRateIndex = src.MaxDataRateIndex
-		case "min_data_rate_index":
-			dst.MinDataRateIndex = src.MinDataRateIndex
+func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "uplink_frequency":
-			dst.UplinkFrequency = src.UplinkFrequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'uplink_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UplinkFrequency = src.UplinkFrequency
+			} else {
+				var zero uint64
+				dst.UplinkFrequency = zero
+			}
+		case "downlink_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkFrequency = src.DownlinkFrequency
+			} else {
+				var zero uint64
+				dst.DownlinkFrequency = zero
+			}
+		case "min_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinDataRateIndex = src.MinDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MinDataRateIndex = zero
+			}
+		case "max_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxDataRateIndex = src.MaxDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MaxDataRateIndex = zero
+			}
+		case "enable_uplink":
+			if len(subs) > 0 {
+				return fmt.Errorf("'enable_uplink' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EnableUplink = src.EnableUplink
+			} else {
+				var zero bool
+				dst.EnableUplink = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDeviceBrandFieldPaths = [...]string{
+var EndDeviceBrandFieldPathsNested = []string{
 	"id",
 	"logos",
 	"name",
 	"url",
 }
 
-func (*EndDeviceBrand) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDeviceBrandFieldPaths))
-	copy(ret, _EndDeviceBrandFieldPaths[:])
-	return ret
+var EndDeviceBrandFieldPathsTopLevel = []string{
+	"id",
+	"logos",
+	"name",
+	"url",
 }
 
-func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "id":
-			dst.ID = src.ID
-		case "logos":
-			dst.Logos = src.Logos
+			if len(subs) > 0 {
+				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ID = src.ID
+			} else {
+				var zero string
+				dst.ID = zero
+			}
 		case "name":
-			dst.Name = src.Name
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
 		case "url":
-			dst.URL = src.URL
+			if len(subs) > 0 {
+				return fmt.Errorf("'url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.URL = src.URL
+			} else {
+				var zero string
+				dst.URL = zero
+			}
+		case "logos":
+			if len(subs) > 0 {
+				return fmt.Errorf("'logos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Logos = src.Logos
+			} else {
+				dst.Logos = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDeviceModelFieldPaths = [...]string{
+var EndDeviceModelFieldPathsNested = []string{
 	"brand_id",
 	"id",
 	"name",
 }
 
-func (*EndDeviceModel) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDeviceModelFieldPaths))
-	copy(ret, _EndDeviceModelFieldPaths[:])
-	return ret
+var EndDeviceModelFieldPathsTopLevel = []string{
+	"brand_id",
+	"id",
+	"name",
 }
 
-func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "brand_id":
-			dst.BrandID = src.BrandID
+			if len(subs) > 0 {
+				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BrandID = src.BrandID
+			} else {
+				var zero string
+				dst.BrandID = zero
+			}
 		case "id":
-			dst.ID = src.ID
+			if len(subs) > 0 {
+				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ID = src.ID
+			} else {
+				var zero string
+				dst.ID = zero
+			}
 		case "name":
-			dst.Name = src.Name
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDeviceVersionIdentifiersFieldPaths = [...]string{
+var EndDeviceVersionIdentifiersFieldPathsNested = []string{
 	"brand_id",
 	"firmware_version",
 	"hardware_version",
 	"model_id",
 }
 
-func (*EndDeviceVersionIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDeviceVersionIdentifiersFieldPaths))
-	copy(ret, _EndDeviceVersionIdentifiersFieldPaths[:])
-	return ret
+var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
+	"brand_id",
+	"firmware_version",
+	"hardware_version",
+	"model_id",
 }
 
-func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "brand_id":
-			dst.BrandID = src.BrandID
-		case "firmware_version":
-			dst.FirmwareVersion = src.FirmwareVersion
-		case "hardware_version":
-			dst.HardwareVersion = src.HardwareVersion
+			if len(subs) > 0 {
+				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BrandID = src.BrandID
+			} else {
+				var zero string
+				dst.BrandID = zero
+			}
 		case "model_id":
-			dst.ModelID = src.ModelID
+			if len(subs) > 0 {
+				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ModelID = src.ModelID
+			} else {
+				var zero string
+				dst.ModelID = zero
+			}
+		case "hardware_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'hardware_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HardwareVersion = src.HardwareVersion
+			} else {
+				var zero string
+				dst.HardwareVersion = zero
+			}
+		case "firmware_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'firmware_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FirmwareVersion = src.FirmwareVersion
+			} else {
+				var zero string
+				dst.FirmwareVersion = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDeviceVersionFieldPaths = [...]string{
+var EndDeviceVersionFieldPathsNested = []string{
 	"default_formatters",
 	"default_formatters.down_formatter",
 	"default_formatters.down_formatter_parameter",
@@ -322,163 +679,212 @@ var _EndDeviceVersionFieldPaths = [...]string{
 	"uses_32_bit_f_cnt",
 }
 
-func (*EndDeviceVersion) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDeviceVersionFieldPaths))
-	copy(ret, _EndDeviceVersionFieldPaths[:])
-	return ret
+var EndDeviceVersionFieldPathsTopLevel = []string{
+	"default_formatters",
+	"default_mac_parameters",
+	"frequency_plan_id",
+	"ids",
+	"lorawan_phy_version",
+	"lorawan_version",
+	"max_frequency",
+	"min_frequency",
+	"photos",
+	"resets_f_cnt",
+	"resets_join_nonces",
+	"supports_class_b",
+	"supports_class_c",
+	"supports_join",
+	"uses_32_bit_f_cnt",
 }
 
-func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "default_formatters":
-			dst.DefaultFormatters = src.DefaultFormatters
-		case "default_formatters.down_formatter":
-			dst.DefaultFormatters.SetFields(&src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_formatters.down_formatter_parameter":
-			dst.DefaultFormatters.SetFields(&src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_formatters.up_formatter":
-			dst.DefaultFormatters.SetFields(&src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_formatters.up_formatter_parameter":
-			dst.DefaultFormatters.SetFields(&src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_mac_parameters":
-			dst.DefaultMACParameters = src.DefaultMACParameters
-		case "default_mac_parameters.adr_ack_delay":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_ack_limit":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_data_rate_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_nb_trans":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_tx_power_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.beacon_frequency":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.channels":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.downlink_dwell_time":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.max_duty_cycle":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.max_eirp":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.ping_slot_data_rate_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.ping_slot_frequency":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rejoin_count_periodicity":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rejoin_time_periodicity":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx1_data_rate_offset":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx1_delay":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx2_data_rate_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx2_frequency":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.uplink_dwell_time":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "frequency_plan_id":
-			dst.FrequencyPlanID = src.FrequencyPlanID
+func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.EndDeviceVersionIdentifiers = src.EndDeviceVersionIdentifiers
-		case "ids.brand_id":
-			dst.EndDeviceVersionIdentifiers.SetFields(&src.EndDeviceVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.firmware_version":
-			dst.EndDeviceVersionIdentifiers.SetFields(&src.EndDeviceVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.hardware_version":
-			dst.EndDeviceVersionIdentifiers.SetFields(&src.EndDeviceVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.model_id":
-			dst.EndDeviceVersionIdentifiers.SetFields(&src.EndDeviceVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "lorawan_phy_version":
-			dst.LoRaWANPHYVersion = src.LoRaWANPHYVersion
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceVersionIdentifiers
+				var newSrc *EndDeviceVersionIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceVersionIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceVersionIdentifiers = src.EndDeviceVersionIdentifiers
+				} else {
+					var zero EndDeviceVersionIdentifiers
+					dst.EndDeviceVersionIdentifiers = zero
+				}
+			}
 		case "lorawan_version":
-			dst.LoRaWANVersion = src.LoRaWANVersion
-		case "max_frequency":
-			dst.MaxFrequency = src.MaxFrequency
-		case "min_frequency":
-			dst.MinFrequency = src.MinFrequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LoRaWANVersion = src.LoRaWANVersion
+			} else {
+				var zero MACVersion
+				dst.LoRaWANVersion = zero
+			}
+		case "lorawan_phy_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LoRaWANPHYVersion = src.LoRaWANPHYVersion
+			} else {
+				var zero PHYVersion
+				dst.LoRaWANPHYVersion = zero
+			}
+		case "frequency_plan_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyPlanID = src.FrequencyPlanID
+			} else {
+				var zero string
+				dst.FrequencyPlanID = zero
+			}
 		case "photos":
-			dst.Photos = src.Photos
-		case "resets_f_cnt":
-			dst.ResetsFCnt = src.ResetsFCnt
-		case "resets_join_nonces":
-			dst.ResetsJoinNonces = src.ResetsJoinNonces
+			if len(subs) > 0 {
+				return fmt.Errorf("'photos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Photos = src.Photos
+			} else {
+				dst.Photos = nil
+			}
 		case "supports_class_b":
-			dst.SupportsClassB = src.SupportsClassB
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_class_b' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsClassB = src.SupportsClassB
+			} else {
+				var zero bool
+				dst.SupportsClassB = zero
+			}
 		case "supports_class_c":
-			dst.SupportsClassC = src.SupportsClassC
-		case "supports_join":
-			dst.SupportsJoin = src.SupportsJoin
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_class_c' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsClassC = src.SupportsClassC
+			} else {
+				var zero bool
+				dst.SupportsClassC = zero
+			}
+		case "default_mac_parameters":
+			if len(subs) > 0 {
+				newDst := dst.DefaultMACParameters
+				if newDst == nil {
+					newDst = &MACParameters{}
+					dst.DefaultMACParameters = newDst
+				}
+				var newSrc *MACParameters
+				if src != nil {
+					newSrc = src.DefaultMACParameters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DefaultMACParameters = src.DefaultMACParameters
+				} else {
+					dst.DefaultMACParameters = nil
+				}
+			}
+		case "min_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinFrequency = src.MinFrequency
+			} else {
+				var zero uint64
+				dst.MinFrequency = zero
+			}
+		case "max_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxFrequency = src.MaxFrequency
+			} else {
+				var zero uint64
+				dst.MaxFrequency = zero
+			}
+		case "resets_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'resets_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetsFCnt = src.ResetsFCnt
+			} else {
+				var zero bool
+				dst.ResetsFCnt = zero
+			}
 		case "uses_32_bit_f_cnt":
-			dst.Uses32BitFCnt = src.Uses32BitFCnt
+			if len(subs) > 0 {
+				return fmt.Errorf("'uses_32_bit_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Uses32BitFCnt = src.Uses32BitFCnt
+			} else {
+				var zero bool
+				dst.Uses32BitFCnt = zero
+			}
+		case "supports_join":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_join' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsJoin = src.SupportsJoin
+			} else {
+				var zero bool
+				dst.SupportsJoin = zero
+			}
+		case "resets_join_nonces":
+			if len(subs) > 0 {
+				return fmt.Errorf("'resets_join_nonces' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetsJoinNonces = src.ResetsJoinNonces
+			} else {
+				var zero bool
+				dst.ResetsJoinNonces = zero
+			}
+		case "default_formatters":
+			if len(subs) > 0 {
+				newDst := &dst.DefaultFormatters
+				var newSrc *MessagePayloadFormatters
+				if src != nil {
+					newSrc = &src.DefaultFormatters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DefaultFormatters = src.DefaultFormatters
+				} else {
+					var zero MessagePayloadFormatters
+					dst.DefaultFormatters = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACSettingsFieldPaths = [...]string{
+var MACSettingsFieldPathsNested = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
@@ -487,34 +893,87 @@ var _MACSettingsFieldPaths = [...]string{
 	"use_adr",
 }
 
-func (*MACSettings) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACSettingsFieldPaths))
-	copy(ret, _MACSettingsFieldPaths[:])
-	return ret
+var MACSettingsFieldPathsTopLevel = []string{
+	"adr_margin",
+	"class_b_timeout",
+	"class_c_timeout",
+	"status_count_periodicity",
+	"status_time_periodicity",
+	"use_adr",
 }
 
-func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "adr_margin":
-			dst.ADRMargin = src.ADRMargin
-		case "class_b_timeout":
-			dst.ClassBTimeout = src.ClassBTimeout
-		case "class_c_timeout":
-			dst.ClassCTimeout = src.ClassCTimeout
-		case "status_count_periodicity":
-			dst.StatusCountPeriodicity = src.StatusCountPeriodicity
-		case "status_time_periodicity":
-			dst.StatusTimePeriodicity = src.StatusTimePeriodicity
+func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "use_adr":
-			dst.UseADR = src.UseADR
+			if len(subs) > 0 {
+				return fmt.Errorf("'use_adr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UseADR = src.UseADR
+			} else {
+				var zero bool
+				dst.UseADR = zero
+			}
+		case "adr_margin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_margin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRMargin = src.ADRMargin
+			} else {
+				var zero uint32
+				dst.ADRMargin = zero
+			}
+		case "class_b_timeout":
+			if len(subs) > 0 {
+				return fmt.Errorf("'class_b_timeout' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClassBTimeout = src.ClassBTimeout
+			} else {
+				var zero time.Duration
+				dst.ClassBTimeout = zero
+			}
+		case "class_c_timeout":
+			if len(subs) > 0 {
+				return fmt.Errorf("'class_c_timeout' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClassCTimeout = src.ClassCTimeout
+			} else {
+				var zero time.Duration
+				dst.ClassCTimeout = zero
+			}
+		case "status_time_periodicity":
+			if len(subs) > 0 {
+				return fmt.Errorf("'status_time_periodicity' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StatusTimePeriodicity = src.StatusTimePeriodicity
+			} else {
+				var zero time.Duration
+				dst.StatusTimePeriodicity = zero
+			}
+		case "status_count_periodicity":
+			if len(subs) > 0 {
+				return fmt.Errorf("'status_count_periodicity' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StatusCountPeriodicity = src.StatusCountPeriodicity
+			} else {
+				var zero uint32
+				dst.StatusCountPeriodicity = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACStateFieldPaths = [...]string{
+var MACStateFieldPathsNested = []string{
 	"current_parameters",
 	"current_parameters.adr_ack_delay",
 	"current_parameters.adr_ack_limit",
@@ -575,168 +1034,155 @@ var _MACStateFieldPaths = [...]string{
 	"queued_responses",
 }
 
-func (*MACState) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACStateFieldPaths))
-	copy(ret, _MACStateFieldPaths[:])
-	return ret
+var MACStateFieldPathsTopLevel = []string{
+	"current_parameters",
+	"desired_parameters",
+	"device_class",
+	"last_confirmed_downlink_at",
+	"last_dev_status_f_cnt_up",
+	"lorawan_version",
+	"pending_application_downlink",
+	"pending_requests",
+	"ping_slot_periodicity",
+	"queued_responses",
 }
 
-func (dst *MACState) SetFields(src *MACState, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACState) SetFields(src *MACState, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "current_parameters":
-			dst.CurrentParameters = src.CurrentParameters
-		case "current_parameters.adr_ack_delay":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.adr_ack_limit":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.adr_data_rate_index":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.adr_nb_trans":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.adr_tx_power_index":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.beacon_frequency":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.channels":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.downlink_dwell_time":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.max_duty_cycle":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.max_eirp":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.ping_slot_data_rate_index":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.ping_slot_frequency":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.rejoin_count_periodicity":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.rejoin_time_periodicity":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.rx1_data_rate_offset":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.rx1_delay":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.rx2_data_rate_index":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.rx2_frequency":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
-		case "current_parameters.uplink_dwell_time":
-			dst.CurrentParameters.SetFields(&src.CurrentParameters, _pathsWithoutPrefix("current_parameters", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.CurrentParameters
+				var newSrc *MACParameters
+				if src != nil {
+					newSrc = &src.CurrentParameters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CurrentParameters = src.CurrentParameters
+				} else {
+					var zero MACParameters
+					dst.CurrentParameters = zero
+				}
+			}
 		case "desired_parameters":
-			dst.DesiredParameters = src.DesiredParameters
-		case "desired_parameters.adr_ack_delay":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.adr_ack_limit":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.adr_data_rate_index":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.adr_nb_trans":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.adr_tx_power_index":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.beacon_frequency":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.channels":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.downlink_dwell_time":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.max_duty_cycle":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.max_eirp":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.ping_slot_data_rate_index":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.ping_slot_frequency":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.rejoin_count_periodicity":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.rejoin_time_periodicity":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.rx1_data_rate_offset":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.rx1_delay":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.rx2_data_rate_index":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.rx2_frequency":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
-		case "desired_parameters.uplink_dwell_time":
-			dst.DesiredParameters.SetFields(&src.DesiredParameters, _pathsWithoutPrefix("desired_parameters", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.DesiredParameters
+				var newSrc *MACParameters
+				if src != nil {
+					newSrc = &src.DesiredParameters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredParameters = src.DesiredParameters
+				} else {
+					var zero MACParameters
+					dst.DesiredParameters = zero
+				}
+			}
 		case "device_class":
-			dst.DeviceClass = src.DeviceClass
-		case "last_confirmed_downlink_at":
-			dst.LastConfirmedDownlinkAt = src.LastConfirmedDownlinkAt
-		case "last_dev_status_f_cnt_up":
-			dst.LastDevStatusFCntUp = src.LastDevStatusFCntUp
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_class' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceClass = src.DeviceClass
+			} else {
+				var zero Class
+				dst.DeviceClass = zero
+			}
 		case "lorawan_version":
-			dst.LoRaWANVersion = src.LoRaWANVersion
-		case "pending_application_downlink":
-			dst.PendingApplicationDownlink = src.PendingApplicationDownlink
-		case "pending_application_downlink.class_b_c":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.class_b_c.gateways":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
+			if src != nil {
+				dst.LoRaWANVersion = src.LoRaWANVersion
+			} else {
+				var zero MACVersion
+				dst.LoRaWANVersion = zero
 			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.class_b_c.time":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
+		case "last_confirmed_downlink_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_confirmed_downlink_at' has no subfields, but %s were specified", subs)
 			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.confirmed":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
+			if src != nil {
+				dst.LastConfirmedDownlinkAt = src.LastConfirmedDownlinkAt
+			} else {
+				dst.LastConfirmedDownlinkAt = nil
 			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.correlation_ids":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
+		case "last_dev_status_f_cnt_up":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_dev_status_f_cnt_up' has no subfields, but %s were specified", subs)
 			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.decoded_payload":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
+			if src != nil {
+				dst.LastDevStatusFCntUp = src.LastDevStatusFCntUp
+			} else {
+				var zero uint32
+				dst.LastDevStatusFCntUp = zero
 			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.f_cnt":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
-			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.f_port":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
-			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.frm_payload":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
-			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_application_downlink.session_key_id":
-			if dst.PendingApplicationDownlink == nil {
-				dst.PendingApplicationDownlink = &ApplicationDownlink{}
-			}
-			dst.PendingApplicationDownlink.SetFields(src.PendingApplicationDownlink, _pathsWithoutPrefix("pending_application_downlink", paths)...)
-		case "pending_requests":
-			dst.PendingRequests = src.PendingRequests
 		case "ping_slot_periodicity":
-			dst.PingSlotPeriodicity = src.PingSlotPeriodicity
+			if len(subs) > 0 {
+				return fmt.Errorf("'ping_slot_periodicity' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PingSlotPeriodicity = src.PingSlotPeriodicity
+			} else {
+				var zero PingSlotPeriod
+				dst.PingSlotPeriodicity = zero
+			}
+		case "pending_application_downlink":
+			if len(subs) > 0 {
+				newDst := dst.PendingApplicationDownlink
+				if newDst == nil {
+					newDst = &ApplicationDownlink{}
+					dst.PendingApplicationDownlink = newDst
+				}
+				var newSrc *ApplicationDownlink
+				if src != nil {
+					newSrc = src.PendingApplicationDownlink
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PendingApplicationDownlink = src.PendingApplicationDownlink
+				} else {
+					dst.PendingApplicationDownlink = nil
+				}
+			}
 		case "queued_responses":
-			dst.QueuedResponses = src.QueuedResponses
+			if len(subs) > 0 {
+				return fmt.Errorf("'queued_responses' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.QueuedResponses = src.QueuedResponses
+			} else {
+				dst.QueuedResponses = nil
+			}
+		case "pending_requests":
+			if len(subs) > 0 {
+				return fmt.Errorf("'pending_requests' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PendingRequests = src.PendingRequests
+			} else {
+				dst.PendingRequests = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDeviceFieldPaths = [...]string{
+var EndDeviceFieldPathsNested = []string{
 	"application_server_address",
 	"attributes",
 	"battery_percentage",
@@ -926,831 +1372,610 @@ var _EndDeviceFieldPaths = [...]string{
 	"version_ids.model_id",
 }
 
-func (*EndDevice) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDeviceFieldPaths))
-	copy(ret, _EndDeviceFieldPaths[:])
-	return ret
+var EndDeviceFieldPathsTopLevel = []string{
+	"application_server_address",
+	"attributes",
+	"battery_percentage",
+	"created_at",
+	"default_mac_parameters",
+	"description",
+	"downlink_margin",
+	"formatters",
+	"frequency_plan_id",
+	"ids",
+	"join_server_address",
+	"last_dev_nonce",
+	"last_dev_status_received_at",
+	"last_join_nonce",
+	"last_rj_count_0",
+	"last_rj_count_1",
+	"locations",
+	"lorawan_phy_version",
+	"lorawan_version",
+	"mac_settings",
+	"mac_state",
+	"max_frequency",
+	"min_frequency",
+	"name",
+	"net_id",
+	"network_server_address",
+	"pending_session",
+	"power_state",
+	"queued_application_downlinks",
+	"recent_downlinks",
+	"recent_uplinks",
+	"resets_f_cnt",
+	"resets_join_nonces",
+	"root_keys",
+	"service_profile_id",
+	"session",
+	"supports_class_b",
+	"supports_class_c",
+	"supports_join",
+	"updated_at",
+	"used_dev_nonces",
+	"uses_32_bit_f_cnt",
+	"version_ids",
 }
 
-func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "application_server_address":
-			dst.ApplicationServerAddress = src.ApplicationServerAddress
-		case "attributes":
-			dst.Attributes = src.Attributes
-		case "battery_percentage":
-			dst.BatteryPercentage = src.BatteryPercentage
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "default_mac_parameters":
-			dst.DefaultMACParameters = src.DefaultMACParameters
-		case "default_mac_parameters.adr_ack_delay":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_ack_limit":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_data_rate_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_nb_trans":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.adr_tx_power_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.beacon_frequency":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.channels":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.downlink_dwell_time":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.max_duty_cycle":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.max_eirp":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.ping_slot_data_rate_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.ping_slot_frequency":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rejoin_count_periodicity":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rejoin_time_periodicity":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx1_data_rate_offset":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx1_delay":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx2_data_rate_index":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.rx2_frequency":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "default_mac_parameters.uplink_dwell_time":
-			if dst.DefaultMACParameters == nil {
-				dst.DefaultMACParameters = &MACParameters{}
-			}
-			dst.DefaultMACParameters.SetFields(src.DefaultMACParameters, _pathsWithoutPrefix("default_mac_parameters", paths)...)
-		case "description":
-			dst.Description = src.Description
-		case "downlink_margin":
-			dst.DownlinkMargin = src.DownlinkMargin
-		case "formatters":
-			dst.Formatters = src.Formatters
-		case "formatters.down_formatter":
-			if dst.Formatters == nil {
-				dst.Formatters = &MessagePayloadFormatters{}
-			}
-			dst.Formatters.SetFields(src.Formatters, _pathsWithoutPrefix("formatters", paths)...)
-		case "formatters.down_formatter_parameter":
-			if dst.Formatters == nil {
-				dst.Formatters = &MessagePayloadFormatters{}
-			}
-			dst.Formatters.SetFields(src.Formatters, _pathsWithoutPrefix("formatters", paths)...)
-		case "formatters.up_formatter":
-			if dst.Formatters == nil {
-				dst.Formatters = &MessagePayloadFormatters{}
-			}
-			dst.Formatters.SetFields(src.Formatters, _pathsWithoutPrefix("formatters", paths)...)
-		case "formatters.up_formatter_parameter":
-			if dst.Formatters == nil {
-				dst.Formatters = &MessagePayloadFormatters{}
-			}
-			dst.Formatters.SetFields(src.Formatters, _pathsWithoutPrefix("formatters", paths)...)
-		case "frequency_plan_id":
-			dst.FrequencyPlanID = src.FrequencyPlanID
+func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
-		case "ids.application_ids":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.application_ids.application_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.dev_addr":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.dev_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.device_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.join_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "join_server_address":
-			dst.JoinServerAddress = src.JoinServerAddress
-		case "last_dev_nonce":
-			dst.LastDevNonce = src.LastDevNonce
-		case "last_dev_status_received_at":
-			dst.LastDevStatusReceivedAt = src.LastDevStatusReceivedAt
-		case "last_join_nonce":
-			dst.LastJoinNonce = src.LastJoinNonce
-		case "last_rj_count_0":
-			dst.LastRJCount0 = src.LastRJCount0
-		case "last_rj_count_1":
-			dst.LastRJCount1 = src.LastRJCount1
-		case "locations":
-			dst.Locations = src.Locations
-		case "lorawan_phy_version":
-			dst.LoRaWANPHYVersion = src.LoRaWANPHYVersion
-		case "lorawan_version":
-			dst.LoRaWANVersion = src.LoRaWANVersion
-		case "mac_settings":
-			dst.MACSettings = src.MACSettings
-		case "mac_settings.adr_margin":
-			if dst.MACSettings == nil {
-				dst.MACSettings = &MACSettings{}
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
 			}
-			dst.MACSettings.SetFields(src.MACSettings, _pathsWithoutPrefix("mac_settings", paths)...)
-		case "mac_settings.class_b_timeout":
-			if dst.MACSettings == nil {
-				dst.MACSettings = &MACSettings{}
-			}
-			dst.MACSettings.SetFields(src.MACSettings, _pathsWithoutPrefix("mac_settings", paths)...)
-		case "mac_settings.class_c_timeout":
-			if dst.MACSettings == nil {
-				dst.MACSettings = &MACSettings{}
-			}
-			dst.MACSettings.SetFields(src.MACSettings, _pathsWithoutPrefix("mac_settings", paths)...)
-		case "mac_settings.status_count_periodicity":
-			if dst.MACSettings == nil {
-				dst.MACSettings = &MACSettings{}
-			}
-			dst.MACSettings.SetFields(src.MACSettings, _pathsWithoutPrefix("mac_settings", paths)...)
-		case "mac_settings.status_time_periodicity":
-			if dst.MACSettings == nil {
-				dst.MACSettings = &MACSettings{}
-			}
-			dst.MACSettings.SetFields(src.MACSettings, _pathsWithoutPrefix("mac_settings", paths)...)
-		case "mac_settings.use_adr":
-			if dst.MACSettings == nil {
-				dst.MACSettings = &MACSettings{}
-			}
-			dst.MACSettings.SetFields(src.MACSettings, _pathsWithoutPrefix("mac_settings", paths)...)
-		case "mac_state":
-			dst.MACState = src.MACState
-		case "mac_state.current_parameters":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.adr_ack_delay":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.adr_ack_limit":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.adr_data_rate_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.adr_nb_trans":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.adr_tx_power_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.beacon_frequency":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.channels":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.downlink_dwell_time":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.max_duty_cycle":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.max_eirp":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.ping_slot_data_rate_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.ping_slot_frequency":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.rejoin_count_periodicity":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.rejoin_time_periodicity":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.rx1_data_rate_offset":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.rx1_delay":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.rx2_data_rate_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.rx2_frequency":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.current_parameters.uplink_dwell_time":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.adr_ack_delay":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.adr_ack_limit":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.adr_data_rate_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.adr_nb_trans":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.adr_tx_power_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.beacon_frequency":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.channels":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.downlink_dwell_time":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.max_duty_cycle":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.max_eirp":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.ping_slot_data_rate_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.ping_slot_frequency":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.rejoin_count_periodicity":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.rejoin_time_periodicity":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.rx1_data_rate_offset":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.rx1_delay":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.rx2_data_rate_index":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.rx2_frequency":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.desired_parameters.uplink_dwell_time":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.device_class":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.last_confirmed_downlink_at":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.last_dev_status_f_cnt_up":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.lorawan_version":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.class_b_c":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.class_b_c.gateways":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.class_b_c.time":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.confirmed":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.correlation_ids":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.decoded_payload":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.f_cnt":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.f_port":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.frm_payload":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_application_downlink.session_key_id":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.pending_requests":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.ping_slot_periodicity":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "mac_state.queued_responses":
-			if dst.MACState == nil {
-				dst.MACState = &MACState{}
-			}
-			dst.MACState.SetFields(src.MACState, _pathsWithoutPrefix("mac_state", paths)...)
-		case "max_frequency":
-			dst.MaxFrequency = src.MaxFrequency
-		case "min_frequency":
-			dst.MinFrequency = src.MinFrequency
-		case "name":
-			dst.Name = src.Name
-		case "net_id":
-			dst.NetID = src.NetID
-		case "network_server_address":
-			dst.NetworkServerAddress = src.NetworkServerAddress
-		case "pending_session":
-			dst.PendingSession = src.PendingSession
-		case "pending_session.dev_addr":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.app_s_key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.app_s_key.kek_label":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.app_s_key.key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.f_nwk_s_int_key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.f_nwk_s_int_key.kek_label":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.f_nwk_s_int_key.key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.nwk_s_enc_key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.nwk_s_enc_key.kek_label":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.nwk_s_enc_key.key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.s_nwk_s_int_key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.s_nwk_s_int_key.kek_label":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.s_nwk_s_int_key.key":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.keys.session_key_id":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.last_a_f_cnt_down":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.last_conf_f_cnt_down":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.last_f_cnt_up":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.last_n_f_cnt_down":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "pending_session.started_at":
-			if dst.PendingSession == nil {
-				dst.PendingSession = &Session{}
-			}
-			dst.PendingSession.SetFields(src.PendingSession, _pathsWithoutPrefix("pending_session", paths)...)
-		case "power_state":
-			dst.PowerState = src.PowerState
-		case "queued_application_downlinks":
-			dst.QueuedApplicationDownlinks = src.QueuedApplicationDownlinks
-		case "recent_downlinks":
-			dst.RecentDownlinks = src.RecentDownlinks
-		case "recent_uplinks":
-			dst.RecentUplinks = src.RecentUplinks
-		case "resets_f_cnt":
-			dst.ResetsFCnt = src.ResetsFCnt
-		case "resets_join_nonces":
-			dst.ResetsJoinNonces = src.ResetsJoinNonces
-		case "root_keys":
-			dst.RootKeys = src.RootKeys
-		case "root_keys.app_key":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "root_keys.app_key.kek_label":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "root_keys.app_key.key":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "root_keys.nwk_key":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "root_keys.nwk_key.kek_label":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "root_keys.nwk_key.key":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "root_keys.root_key_id":
-			if dst.RootKeys == nil {
-				dst.RootKeys = &RootKeys{}
-			}
-			dst.RootKeys.SetFields(src.RootKeys, _pathsWithoutPrefix("root_keys", paths)...)
-		case "service_profile_id":
-			dst.ServiceProfileID = src.ServiceProfileID
-		case "session":
-			dst.Session = src.Session
-		case "session.dev_addr":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.app_s_key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.app_s_key.kek_label":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.app_s_key.key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.f_nwk_s_int_key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.f_nwk_s_int_key.kek_label":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.f_nwk_s_int_key.key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.nwk_s_enc_key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.nwk_s_enc_key.kek_label":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.nwk_s_enc_key.key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.s_nwk_s_int_key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.s_nwk_s_int_key.kek_label":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.s_nwk_s_int_key.key":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.keys.session_key_id":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.last_a_f_cnt_down":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.last_conf_f_cnt_down":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.last_f_cnt_up":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.last_n_f_cnt_down":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "session.started_at":
-			if dst.Session == nil {
-				dst.Session = &Session{}
-			}
-			dst.Session.SetFields(src.Session, _pathsWithoutPrefix("session", paths)...)
-		case "supports_class_b":
-			dst.SupportsClassB = src.SupportsClassB
-		case "supports_class_c":
-			dst.SupportsClassC = src.SupportsClassC
-		case "supports_join":
-			dst.SupportsJoin = src.SupportsJoin
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
-		case "used_dev_nonces":
-			dst.UsedDevNonces = src.UsedDevNonces
-		case "uses_32_bit_f_cnt":
-			dst.Uses32BitFCnt = src.Uses32BitFCnt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "attributes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attributes = src.Attributes
+			} else {
+				dst.Attributes = nil
+			}
 		case "version_ids":
-			dst.VersionIDs = src.VersionIDs
-		case "version_ids.brand_id":
-			if dst.VersionIDs == nil {
-				dst.VersionIDs = &EndDeviceVersionIdentifiers{}
+			if len(subs) > 0 {
+				newDst := dst.VersionIDs
+				if newDst == nil {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIDs = newDst
+				}
+				var newSrc *EndDeviceVersionIdentifiers
+				if src != nil {
+					newSrc = src.VersionIDs
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIDs = src.VersionIDs
+				} else {
+					dst.VersionIDs = nil
+				}
 			}
-			dst.VersionIDs.SetFields(src.VersionIDs, _pathsWithoutPrefix("version_ids", paths)...)
-		case "version_ids.firmware_version":
-			if dst.VersionIDs == nil {
-				dst.VersionIDs = &EndDeviceVersionIdentifiers{}
+		case "service_profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'service_profile_id' has no subfields, but %s were specified", subs)
 			}
-			dst.VersionIDs.SetFields(src.VersionIDs, _pathsWithoutPrefix("version_ids", paths)...)
-		case "version_ids.hardware_version":
-			if dst.VersionIDs == nil {
-				dst.VersionIDs = &EndDeviceVersionIdentifiers{}
+			if src != nil {
+				dst.ServiceProfileID = src.ServiceProfileID
+			} else {
+				var zero string
+				dst.ServiceProfileID = zero
 			}
-			dst.VersionIDs.SetFields(src.VersionIDs, _pathsWithoutPrefix("version_ids", paths)...)
-		case "version_ids.model_id":
-			if dst.VersionIDs == nil {
-				dst.VersionIDs = &EndDeviceVersionIdentifiers{}
+		case "network_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'network_server_address' has no subfields, but %s were specified", subs)
 			}
-			dst.VersionIDs.SetFields(src.VersionIDs, _pathsWithoutPrefix("version_ids", paths)...)
+			if src != nil {
+				dst.NetworkServerAddress = src.NetworkServerAddress
+			} else {
+				var zero string
+				dst.NetworkServerAddress = zero
+			}
+		case "application_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'application_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ApplicationServerAddress = src.ApplicationServerAddress
+			} else {
+				var zero string
+				dst.ApplicationServerAddress = zero
+			}
+		case "join_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinServerAddress = src.JoinServerAddress
+			} else {
+				var zero string
+				dst.JoinServerAddress = zero
+			}
+		case "locations":
+			if len(subs) > 0 {
+				return fmt.Errorf("'locations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Locations = src.Locations
+			} else {
+				dst.Locations = nil
+			}
+		case "supports_class_b":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_class_b' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsClassB = src.SupportsClassB
+			} else {
+				var zero bool
+				dst.SupportsClassB = zero
+			}
+		case "supports_class_c":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_class_c' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsClassC = src.SupportsClassC
+			} else {
+				var zero bool
+				dst.SupportsClassC = zero
+			}
+		case "lorawan_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LoRaWANVersion = src.LoRaWANVersion
+			} else {
+				var zero MACVersion
+				dst.LoRaWANVersion = zero
+			}
+		case "lorawan_phy_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LoRaWANPHYVersion = src.LoRaWANPHYVersion
+			} else {
+				var zero PHYVersion
+				dst.LoRaWANPHYVersion = zero
+			}
+		case "frequency_plan_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyPlanID = src.FrequencyPlanID
+			} else {
+				var zero string
+				dst.FrequencyPlanID = zero
+			}
+		case "default_mac_parameters":
+			if len(subs) > 0 {
+				newDst := dst.DefaultMACParameters
+				if newDst == nil {
+					newDst = &MACParameters{}
+					dst.DefaultMACParameters = newDst
+				}
+				var newSrc *MACParameters
+				if src != nil {
+					newSrc = src.DefaultMACParameters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DefaultMACParameters = src.DefaultMACParameters
+				} else {
+					dst.DefaultMACParameters = nil
+				}
+			}
+		case "min_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinFrequency = src.MinFrequency
+			} else {
+				var zero uint64
+				dst.MinFrequency = zero
+			}
+		case "max_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxFrequency = src.MaxFrequency
+			} else {
+				var zero uint64
+				dst.MaxFrequency = zero
+			}
+		case "resets_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'resets_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetsFCnt = src.ResetsFCnt
+			} else {
+				var zero bool
+				dst.ResetsFCnt = zero
+			}
+		case "uses_32_bit_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'uses_32_bit_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Uses32BitFCnt = src.Uses32BitFCnt
+			} else {
+				var zero bool
+				dst.Uses32BitFCnt = zero
+			}
+		case "supports_join":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_join' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsJoin = src.SupportsJoin
+			} else {
+				var zero bool
+				dst.SupportsJoin = zero
+			}
+		case "resets_join_nonces":
+			if len(subs) > 0 {
+				return fmt.Errorf("'resets_join_nonces' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetsJoinNonces = src.ResetsJoinNonces
+			} else {
+				var zero bool
+				dst.ResetsJoinNonces = zero
+			}
+		case "root_keys":
+			if len(subs) > 0 {
+				newDst := dst.RootKeys
+				if newDst == nil {
+					newDst = &RootKeys{}
+					dst.RootKeys = newDst
+				}
+				var newSrc *RootKeys
+				if src != nil {
+					newSrc = src.RootKeys
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.RootKeys = src.RootKeys
+				} else {
+					dst.RootKeys = nil
+				}
+			}
+		case "net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetID = src.NetID
+			} else {
+				dst.NetID = nil
+			}
+		case "mac_settings":
+			if len(subs) > 0 {
+				newDst := dst.MACSettings
+				if newDst == nil {
+					newDst = &MACSettings{}
+					dst.MACSettings = newDst
+				}
+				var newSrc *MACSettings
+				if src != nil {
+					newSrc = src.MACSettings
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MACSettings = src.MACSettings
+				} else {
+					dst.MACSettings = nil
+				}
+			}
+		case "mac_state":
+			if len(subs) > 0 {
+				newDst := dst.MACState
+				if newDst == nil {
+					newDst = &MACState{}
+					dst.MACState = newDst
+				}
+				var newSrc *MACState
+				if src != nil {
+					newSrc = src.MACState
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MACState = src.MACState
+				} else {
+					dst.MACState = nil
+				}
+			}
+		case "session":
+			if len(subs) > 0 {
+				newDst := dst.Session
+				if newDst == nil {
+					newDst = &Session{}
+					dst.Session = newDst
+				}
+				var newSrc *Session
+				if src != nil {
+					newSrc = src.Session
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Session = src.Session
+				} else {
+					dst.Session = nil
+				}
+			}
+		case "pending_session":
+			if len(subs) > 0 {
+				newDst := dst.PendingSession
+				if newDst == nil {
+					newDst = &Session{}
+					dst.PendingSession = newDst
+				}
+				var newSrc *Session
+				if src != nil {
+					newSrc = src.PendingSession
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PendingSession = src.PendingSession
+				} else {
+					dst.PendingSession = nil
+				}
+			}
+		case "last_dev_nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_dev_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastDevNonce = src.LastDevNonce
+			} else {
+				var zero uint32
+				dst.LastDevNonce = zero
+			}
+		case "used_dev_nonces":
+			if len(subs) > 0 {
+				return fmt.Errorf("'used_dev_nonces' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UsedDevNonces = src.UsedDevNonces
+			} else {
+				dst.UsedDevNonces = nil
+			}
+		case "last_join_nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_join_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastJoinNonce = src.LastJoinNonce
+			} else {
+				var zero uint32
+				dst.LastJoinNonce = zero
+			}
+		case "last_rj_count_0":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_rj_count_0' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastRJCount0 = src.LastRJCount0
+			} else {
+				var zero uint32
+				dst.LastRJCount0 = zero
+			}
+		case "last_rj_count_1":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_rj_count_1' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastRJCount1 = src.LastRJCount1
+			} else {
+				var zero uint32
+				dst.LastRJCount1 = zero
+			}
+		case "last_dev_status_received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_dev_status_received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastDevStatusReceivedAt = src.LastDevStatusReceivedAt
+			} else {
+				dst.LastDevStatusReceivedAt = nil
+			}
+		case "power_state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'power_state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PowerState = src.PowerState
+			} else {
+				var zero PowerState
+				dst.PowerState = zero
+			}
+		case "battery_percentage":
+			if len(subs) > 0 {
+				return fmt.Errorf("'battery_percentage' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BatteryPercentage = src.BatteryPercentage
+			} else {
+				var zero float32
+				dst.BatteryPercentage = zero
+			}
+		case "downlink_margin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_margin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkMargin = src.DownlinkMargin
+			} else {
+				var zero int32
+				dst.DownlinkMargin = zero
+			}
+		case "recent_uplinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'recent_uplinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RecentUplinks = src.RecentUplinks
+			} else {
+				dst.RecentUplinks = nil
+			}
+		case "recent_downlinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'recent_downlinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RecentDownlinks = src.RecentDownlinks
+			} else {
+				dst.RecentDownlinks = nil
+			}
+		case "queued_application_downlinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'queued_application_downlinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.QueuedApplicationDownlinks = src.QueuedApplicationDownlinks
+			} else {
+				dst.QueuedApplicationDownlinks = nil
+			}
+		case "formatters":
+			if len(subs) > 0 {
+				newDst := dst.Formatters
+				if newDst == nil {
+					newDst = &MessagePayloadFormatters{}
+					dst.Formatters = newDst
+				}
+				var newSrc *MessagePayloadFormatters
+				if src != nil {
+					newSrc = src.Formatters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Formatters = src.Formatters
+				} else {
+					dst.Formatters = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDevicesFieldPaths = [...]string{
+var EndDevicesFieldPathsNested = []string{
 	"end_devices",
 }
 
-func (*EndDevices) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDevicesFieldPaths))
-	copy(ret, _EndDevicesFieldPaths[:])
-	return ret
+var EndDevicesFieldPathsTopLevel = []string{
+	"end_devices",
 }
 
-func (dst *EndDevices) SetFields(src *EndDevices, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *EndDevices) SetFields(src *EndDevices, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "end_devices":
-			dst.EndDevices = src.EndDevices
+			if len(subs) > 0 {
+				return fmt.Errorf("'end_devices' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EndDevices = src.EndDevices
+			} else {
+				dst.EndDevices = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateEndDeviceRequestFieldPaths = [...]string{
+var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",
 	"end_device.attributes",
@@ -1941,398 +2166,40 @@ var _CreateEndDeviceRequestFieldPaths = [...]string{
 	"end_device.version_ids.model_id",
 }
 
-func (*CreateEndDeviceRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateEndDeviceRequestFieldPaths))
-	copy(ret, _CreateEndDeviceRequestFieldPaths[:])
-	return ret
+var CreateEndDeviceRequestFieldPathsTopLevel = []string{
+	"end_device",
 }
 
-func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "end_device":
-			dst.EndDevice = src.EndDevice
-		case "end_device.application_server_address":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.attributes":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.battery_percentage":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.created_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_ack_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_ack_limit":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_nb_trans":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_tx_power_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.beacon_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.channels":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.downlink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.max_duty_cycle":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.max_eirp":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.ping_slot_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.ping_slot_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rejoin_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rejoin_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx1_data_rate_offset":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx1_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx2_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx2_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.uplink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.description":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.downlink_margin":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.down_formatter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.down_formatter_parameter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.up_formatter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.up_formatter_parameter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.frequency_plan_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.application_ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.application_ids.application_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.dev_addr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.dev_eui":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.device_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.join_eui":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.join_server_address":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_dev_nonce":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_dev_status_received_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_join_nonce":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_rj_count_0":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_rj_count_1":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.locations":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.lorawan_phy_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.lorawan_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.adr_margin":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.class_b_timeout":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.class_c_timeout":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.status_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.status_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.use_adr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_ack_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_ack_limit":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_nb_trans":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_tx_power_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.beacon_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.channels":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.downlink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.max_duty_cycle":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.max_eirp":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.ping_slot_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.ping_slot_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rejoin_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rejoin_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx1_data_rate_offset":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx1_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx2_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx2_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.uplink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_ack_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_ack_limit":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_nb_trans":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_tx_power_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.beacon_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.channels":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.downlink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.max_duty_cycle":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.max_eirp":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.ping_slot_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.ping_slot_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rejoin_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rejoin_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx1_data_rate_offset":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx1_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx2_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx2_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.uplink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.device_class":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.last_confirmed_downlink_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.last_dev_status_f_cnt_up":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.lorawan_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.class_b_c":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.class_b_c.gateways":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.class_b_c.time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.confirmed":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.correlation_ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.decoded_payload":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.f_cnt":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.f_port":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.frm_payload":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.session_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_requests":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.ping_slot_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.queued_responses":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.max_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.min_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.name":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.net_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.network_server_address":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.dev_addr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.app_s_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.app_s_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.app_s_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.f_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.f_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.f_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.nwk_s_enc_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.nwk_s_enc_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.nwk_s_enc_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.s_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.s_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.s_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.session_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_a_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_conf_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_f_cnt_up":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_n_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.started_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.power_state":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.queued_application_downlinks":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.recent_downlinks":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.recent_uplinks":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.resets_f_cnt":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.resets_join_nonces":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.app_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.app_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.app_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.nwk_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.nwk_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.nwk_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.root_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.service_profile_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.dev_addr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.app_s_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.app_s_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.app_s_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.f_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.f_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.f_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.nwk_s_enc_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.nwk_s_enc_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.nwk_s_enc_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.s_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.s_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.s_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.session_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_a_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_conf_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_f_cnt_up":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_n_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.started_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.supports_class_b":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.supports_class_c":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.supports_join":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.updated_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.used_dev_nonces":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.uses_32_bit_f_cnt":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.brand_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.firmware_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.hardware_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.model_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.EndDevice
+				var newSrc *EndDevice
+				if src != nil {
+					newSrc = &src.EndDevice
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDevice = src.EndDevice
+				} else {
+					var zero EndDevice
+					dst.EndDevice = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateEndDeviceRequestFieldPaths = [...]string{
+var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",
 	"end_device.attributes",
@@ -2524,400 +2391,51 @@ var _UpdateEndDeviceRequestFieldPaths = [...]string{
 	"field_mask",
 }
 
-func (*UpdateEndDeviceRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateEndDeviceRequestFieldPaths))
-	copy(ret, _UpdateEndDeviceRequestFieldPaths[:])
-	return ret
+var UpdateEndDeviceRequestFieldPathsTopLevel = []string{
+	"end_device",
+	"field_mask",
 }
 
-func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "end_device":
-			dst.EndDevice = src.EndDevice
-		case "end_device.application_server_address":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.attributes":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.battery_percentage":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.created_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_ack_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_ack_limit":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_nb_trans":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.adr_tx_power_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.beacon_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.channels":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.downlink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.max_duty_cycle":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.max_eirp":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.ping_slot_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.ping_slot_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rejoin_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rejoin_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx1_data_rate_offset":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx1_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx2_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.rx2_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.default_mac_parameters.uplink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.description":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.downlink_margin":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.down_formatter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.down_formatter_parameter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.up_formatter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.formatters.up_formatter_parameter":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.frequency_plan_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.application_ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.application_ids.application_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.dev_addr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.dev_eui":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.device_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.ids.join_eui":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.join_server_address":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_dev_nonce":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_dev_status_received_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_join_nonce":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_rj_count_0":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.last_rj_count_1":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.locations":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.lorawan_phy_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.lorawan_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.adr_margin":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.class_b_timeout":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.class_c_timeout":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.status_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.status_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_settings.use_adr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_ack_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_ack_limit":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_nb_trans":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.adr_tx_power_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.beacon_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.channels":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.downlink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.max_duty_cycle":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.max_eirp":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.ping_slot_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.ping_slot_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rejoin_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rejoin_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx1_data_rate_offset":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx1_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx2_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.rx2_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.current_parameters.uplink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_ack_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_ack_limit":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_nb_trans":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.adr_tx_power_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.beacon_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.channels":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.downlink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.max_duty_cycle":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.max_eirp":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.ping_slot_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.ping_slot_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rejoin_count_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rejoin_time_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx1_data_rate_offset":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx1_delay":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx2_data_rate_index":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.rx2_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.desired_parameters.uplink_dwell_time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.device_class":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.last_confirmed_downlink_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.last_dev_status_f_cnt_up":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.lorawan_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.class_b_c":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.class_b_c.gateways":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.class_b_c.time":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.confirmed":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.correlation_ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.decoded_payload":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.f_cnt":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.f_port":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.frm_payload":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_application_downlink.session_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.pending_requests":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.ping_slot_periodicity":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.mac_state.queued_responses":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.max_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.min_frequency":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.name":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.net_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.network_server_address":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.dev_addr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.app_s_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.app_s_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.app_s_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.f_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.f_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.f_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.nwk_s_enc_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.nwk_s_enc_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.nwk_s_enc_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.s_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.s_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.s_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.keys.session_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_a_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_conf_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_f_cnt_up":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.last_n_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.pending_session.started_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.power_state":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.queued_application_downlinks":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.recent_downlinks":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.recent_uplinks":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.resets_f_cnt":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.resets_join_nonces":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.app_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.app_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.app_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.nwk_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.nwk_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.nwk_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.root_keys.root_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.service_profile_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.dev_addr":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.app_s_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.app_s_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.app_s_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.f_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.f_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.f_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.nwk_s_enc_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.nwk_s_enc_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.nwk_s_enc_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.s_nwk_s_int_key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.s_nwk_s_int_key.kek_label":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.s_nwk_s_int_key.key":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.keys.session_key_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_a_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_conf_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_f_cnt_up":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.last_n_f_cnt_down":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.session.started_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.supports_class_b":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.supports_class_c":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.supports_join":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.updated_at":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.used_dev_nonces":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.uses_32_bit_f_cnt":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.brand_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.firmware_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.hardware_version":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.version_ids.model_id":
-			dst.EndDevice.SetFields(&src.EndDevice, _pathsWithoutPrefix("end_device", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.EndDevice
+				var newSrc *EndDevice
+				if src != nil {
+					newSrc = &src.EndDevice
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDevice = src.EndDevice
+				} else {
+					var zero EndDevice
+					dst.EndDevice = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetEndDeviceRequestFieldPaths = [...]string{
+var GetEndDeviceRequestFieldPathsNested = []string{
 	"end_device_ids",
 	"end_device_ids.application_ids",
 	"end_device_ids.application_ids.application_id",
@@ -2928,38 +2446,51 @@ var _GetEndDeviceRequestFieldPaths = [...]string{
 	"field_mask",
 }
 
-func (*GetEndDeviceRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetEndDeviceRequestFieldPaths))
-	copy(ret, _GetEndDeviceRequestFieldPaths[:])
-	return ret
+var GetEndDeviceRequestFieldPathsTopLevel = []string{
+	"end_device_ids",
+	"field_mask",
 }
 
-func (dst *GetEndDeviceRequest) SetFields(src *GetEndDeviceRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GetEndDeviceRequest) SetFields(src *GetEndDeviceRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "end_device_ids":
-			dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
-		case "end_device_ids.application_ids":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
-		case "end_device_ids.application_ids.application_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
-		case "end_device_ids.dev_addr":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
-		case "end_device_ids.dev_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
-		case "end_device_ids.device_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
-		case "end_device_ids.join_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ListEndDevicesRequestFieldPaths = [...]string{
+var ListEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"field_mask",
@@ -2968,34 +2499,84 @@ var _ListEndDevicesRequestFieldPaths = [...]string{
 	"page",
 }
 
-func (*ListEndDevicesRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ListEndDevicesRequestFieldPaths))
-	copy(ret, _ListEndDevicesRequestFieldPaths[:])
-	return ret
+var ListEndDevicesRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"field_mask",
+	"limit",
+	"order",
+	"page",
 }
 
-func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
-		case "limit":
-			dst.Limit = src.Limit
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
 		case "order":
-			dst.Order = src.Order
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
 		case "page":
-			dst.Page = src.Page
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SetEndDeviceRequestFieldPaths = [...]string{
+var SetEndDeviceRequestFieldPathsNested = []string{
 	"device",
 	"device.application_server_address",
 	"device.attributes",
@@ -3187,395 +2768,46 @@ var _SetEndDeviceRequestFieldPaths = [...]string{
 	"field_mask",
 }
 
-func (*SetEndDeviceRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SetEndDeviceRequestFieldPaths))
-	copy(ret, _SetEndDeviceRequestFieldPaths[:])
-	return ret
+var SetEndDeviceRequestFieldPathsTopLevel = []string{
+	"device",
+	"field_mask",
 }
 
-func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "device":
-			dst.Device = src.Device
-		case "device.application_server_address":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.attributes":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.battery_percentage":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.created_at":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.adr_ack_delay":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.adr_ack_limit":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.adr_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.adr_nb_trans":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.adr_tx_power_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.beacon_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.channels":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.downlink_dwell_time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.max_duty_cycle":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.max_eirp":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.ping_slot_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.ping_slot_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.rejoin_count_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.rejoin_time_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.rx1_data_rate_offset":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.rx1_delay":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.rx2_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.rx2_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.default_mac_parameters.uplink_dwell_time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.description":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.downlink_margin":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.formatters":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.formatters.down_formatter":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.formatters.down_formatter_parameter":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.formatters.up_formatter":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.formatters.up_formatter_parameter":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.frequency_plan_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids.application_ids":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids.application_ids.application_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids.dev_addr":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids.dev_eui":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids.device_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.ids.join_eui":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.join_server_address":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.last_dev_nonce":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.last_dev_status_received_at":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.last_join_nonce":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.last_rj_count_0":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.last_rj_count_1":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.locations":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.lorawan_phy_version":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.lorawan_version":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings.adr_margin":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings.class_b_timeout":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings.class_c_timeout":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings.status_count_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings.status_time_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_settings.use_adr":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.adr_ack_delay":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.adr_ack_limit":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.adr_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.adr_nb_trans":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.adr_tx_power_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.beacon_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.channels":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.downlink_dwell_time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.max_duty_cycle":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.max_eirp":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.ping_slot_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.ping_slot_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.rejoin_count_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.rejoin_time_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.rx1_data_rate_offset":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.rx1_delay":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.rx2_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.rx2_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.current_parameters.uplink_dwell_time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.adr_ack_delay":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.adr_ack_limit":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.adr_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.adr_nb_trans":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.adr_tx_power_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.beacon_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.channels":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.downlink_dwell_time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.max_duty_cycle":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.max_eirp":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.ping_slot_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.ping_slot_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.rejoin_count_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.rejoin_time_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.rx1_data_rate_offset":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.rx1_delay":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.rx2_data_rate_index":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.rx2_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.desired_parameters.uplink_dwell_time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.device_class":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.last_confirmed_downlink_at":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.last_dev_status_f_cnt_up":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.lorawan_version":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.class_b_c":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.class_b_c.gateways":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.class_b_c.time":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.confirmed":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.correlation_ids":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.decoded_payload":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.f_cnt":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.f_port":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.frm_payload":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_application_downlink.session_key_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.pending_requests":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.ping_slot_periodicity":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.mac_state.queued_responses":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.max_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.min_frequency":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.name":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.net_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.network_server_address":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.dev_addr":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.app_s_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.app_s_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.app_s_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.f_nwk_s_int_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.f_nwk_s_int_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.f_nwk_s_int_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.nwk_s_enc_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.nwk_s_enc_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.nwk_s_enc_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.s_nwk_s_int_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.s_nwk_s_int_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.s_nwk_s_int_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.keys.session_key_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.last_a_f_cnt_down":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.last_conf_f_cnt_down":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.last_f_cnt_up":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.last_n_f_cnt_down":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.pending_session.started_at":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.power_state":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.queued_application_downlinks":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.recent_downlinks":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.recent_uplinks":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.resets_f_cnt":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.resets_join_nonces":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.app_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.app_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.app_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.nwk_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.nwk_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.nwk_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.root_keys.root_key_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.service_profile_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.dev_addr":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.app_s_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.app_s_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.app_s_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.f_nwk_s_int_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.f_nwk_s_int_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.f_nwk_s_int_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.nwk_s_enc_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.nwk_s_enc_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.nwk_s_enc_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.s_nwk_s_int_key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.s_nwk_s_int_key.kek_label":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.s_nwk_s_int_key.key":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.keys.session_key_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.last_a_f_cnt_down":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.last_conf_f_cnt_down":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.last_f_cnt_up":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.last_n_f_cnt_down":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.session.started_at":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.supports_class_b":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.supports_class_c":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.supports_join":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.updated_at":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.used_dev_nonces":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.uses_32_bit_f_cnt":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.version_ids":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.version_ids.brand_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.version_ids.firmware_version":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.version_ids.hardware_version":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
-		case "device.version_ids.model_id":
-			dst.Device.SetFields(&src.Device, _pathsWithoutPrefix("device", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Device
+				var newSrc *EndDevice
+				if src != nil {
+					newSrc = &src.Device
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Device = src.Device
+				} else {
+					var zero EndDevice
+					dst.Device = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

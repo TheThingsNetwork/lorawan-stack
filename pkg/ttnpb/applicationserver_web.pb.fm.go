@@ -2,36 +2,63 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	time "time"
+)
 
-var _ApplicationWebhookIdentifiersFieldPaths = [...]string{
+var ApplicationWebhookIdentifiersFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"webhook_id",
 }
 
-func (*ApplicationWebhookIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationWebhookIdentifiersFieldPaths))
-	copy(ret, _ApplicationWebhookIdentifiersFieldPaths[:])
-	return ret
+var ApplicationWebhookIdentifiersFieldPathsTopLevel = []string{
+	"application_ids",
+	"webhook_id",
 }
 
-func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
 		case "webhook_id":
-			dst.WebhookID = src.WebhookID
+			if len(subs) > 0 {
+				return fmt.Errorf("'webhook_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WebhookID = src.WebhookID
+			} else {
+				var zero string
+				dst.WebhookID = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ApplicationWebhookFieldPaths = [...]string{
+var ApplicationWebhookFieldPathsNested = []string{
 	"base_url",
 	"created_at",
 	"downlink_ack",
@@ -59,159 +86,355 @@ var _ApplicationWebhookFieldPaths = [...]string{
 	"uplink_message.path",
 }
 
-func (*ApplicationWebhook) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationWebhookFieldPaths))
-	copy(ret, _ApplicationWebhookFieldPaths[:])
-	return ret
+var ApplicationWebhookFieldPathsTopLevel = []string{
+	"base_url",
+	"created_at",
+	"downlink_ack",
+	"downlink_failed",
+	"downlink_nack",
+	"downlink_queued",
+	"downlink_sent",
+	"format",
+	"headers",
+	"ids",
+	"join_accept",
+	"location_solved",
+	"updated_at",
+	"uplink_message",
 }
 
-func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "base_url":
-			dst.BaseURL = src.BaseURL
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "downlink_ack":
-			dst.DownlinkAck = src.DownlinkAck
-		case "downlink_ack.path":
-			if dst.DownlinkAck == nil {
-				dst.DownlinkAck = &ApplicationWebhook_Message{}
-			}
-			dst.DownlinkAck.SetFields(src.DownlinkAck, _pathsWithoutPrefix("downlink_ack", paths)...)
-		case "downlink_failed":
-			dst.DownlinkFailed = src.DownlinkFailed
-		case "downlink_failed.path":
-			if dst.DownlinkFailed == nil {
-				dst.DownlinkFailed = &ApplicationWebhook_Message{}
-			}
-			dst.DownlinkFailed.SetFields(src.DownlinkFailed, _pathsWithoutPrefix("downlink_failed", paths)...)
-		case "downlink_nack":
-			dst.DownlinkNack = src.DownlinkNack
-		case "downlink_nack.path":
-			if dst.DownlinkNack == nil {
-				dst.DownlinkNack = &ApplicationWebhook_Message{}
-			}
-			dst.DownlinkNack.SetFields(src.DownlinkNack, _pathsWithoutPrefix("downlink_nack", paths)...)
-		case "downlink_queued":
-			dst.DownlinkQueued = src.DownlinkQueued
-		case "downlink_queued.path":
-			if dst.DownlinkQueued == nil {
-				dst.DownlinkQueued = &ApplicationWebhook_Message{}
-			}
-			dst.DownlinkQueued.SetFields(src.DownlinkQueued, _pathsWithoutPrefix("downlink_queued", paths)...)
-		case "downlink_sent":
-			dst.DownlinkSent = src.DownlinkSent
-		case "downlink_sent.path":
-			if dst.DownlinkSent == nil {
-				dst.DownlinkSent = &ApplicationWebhook_Message{}
-			}
-			dst.DownlinkSent.SetFields(src.DownlinkSent, _pathsWithoutPrefix("downlink_sent", paths)...)
-		case "format":
-			dst.Format = src.Format
-		case "headers":
-			dst.Headers = src.Headers
+func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.ApplicationWebhookIdentifiers = src.ApplicationWebhookIdentifiers
-		case "ids.application_ids":
-			dst.ApplicationWebhookIdentifiers.SetFields(&src.ApplicationWebhookIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.application_ids.application_id":
-			dst.ApplicationWebhookIdentifiers.SetFields(&src.ApplicationWebhookIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.webhook_id":
-			dst.ApplicationWebhookIdentifiers.SetFields(&src.ApplicationWebhookIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "join_accept":
-			dst.JoinAccept = src.JoinAccept
-		case "join_accept.path":
-			if dst.JoinAccept == nil {
-				dst.JoinAccept = &ApplicationWebhook_Message{}
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationWebhookIdentifiers
+				var newSrc *ApplicationWebhookIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationWebhookIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationWebhookIdentifiers = src.ApplicationWebhookIdentifiers
+				} else {
+					var zero ApplicationWebhookIdentifiers
+					dst.ApplicationWebhookIdentifiers = zero
+				}
 			}
-			dst.JoinAccept.SetFields(src.JoinAccept, _pathsWithoutPrefix("join_accept", paths)...)
-		case "location_solved":
-			dst.LocationSolved = src.LocationSolved
-		case "location_solved.path":
-			if dst.LocationSolved == nil {
-				dst.LocationSolved = &ApplicationWebhook_Message{}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
 			}
-			dst.LocationSolved.SetFields(src.LocationSolved, _pathsWithoutPrefix("location_solved", paths)...)
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
-		case "uplink_message":
-			dst.UplinkMessage = src.UplinkMessage
-		case "uplink_message.path":
-			if dst.UplinkMessage == nil {
-				dst.UplinkMessage = &ApplicationWebhook_Message{}
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
 			}
-			dst.UplinkMessage.SetFields(src.UplinkMessage, _pathsWithoutPrefix("uplink_message", paths)...)
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "base_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'base_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BaseURL = src.BaseURL
+			} else {
+				var zero string
+				dst.BaseURL = zero
+			}
+		case "headers":
+			if len(subs) > 0 {
+				return fmt.Errorf("'headers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Headers = src.Headers
+			} else {
+				dst.Headers = nil
+			}
+		case "format":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Format = src.Format
+			} else {
+				var zero string
+				dst.Format = zero
+			}
+		case "uplink_message":
+			if len(subs) > 0 {
+				newDst := dst.UplinkMessage
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.UplinkMessage = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.UplinkMessage
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkMessage = src.UplinkMessage
+				} else {
+					dst.UplinkMessage = nil
+				}
+			}
+		case "join_accept":
+			if len(subs) > 0 {
+				newDst := dst.JoinAccept
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.JoinAccept = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.JoinAccept
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.JoinAccept = src.JoinAccept
+				} else {
+					dst.JoinAccept = nil
+				}
+			}
+		case "downlink_ack":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkAck
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkAck = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.DownlinkAck
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkAck = src.DownlinkAck
+				} else {
+					dst.DownlinkAck = nil
+				}
+			}
+		case "downlink_nack":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkNack
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkNack = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.DownlinkNack
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkNack = src.DownlinkNack
+				} else {
+					dst.DownlinkNack = nil
+				}
+			}
+		case "downlink_sent":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkSent
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkSent = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.DownlinkSent
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkSent = src.DownlinkSent
+				} else {
+					dst.DownlinkSent = nil
+				}
+			}
+		case "downlink_failed":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkFailed
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkFailed = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.DownlinkFailed
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkFailed = src.DownlinkFailed
+				} else {
+					dst.DownlinkFailed = nil
+				}
+			}
+		case "downlink_queued":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkQueued
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkQueued = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.DownlinkQueued
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkQueued = src.DownlinkQueued
+				} else {
+					dst.DownlinkQueued = nil
+				}
+			}
+		case "location_solved":
+			if len(subs) > 0 {
+				newDst := dst.LocationSolved
+				if newDst == nil {
+					newDst = &ApplicationWebhook_Message{}
+					dst.LocationSolved = newDst
+				}
+				var newSrc *ApplicationWebhook_Message
+				if src != nil {
+					newSrc = src.LocationSolved
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LocationSolved = src.LocationSolved
+				} else {
+					dst.LocationSolved = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ApplicationWebhook_MessageFieldPaths = [...]string{
+var ApplicationWebhook_MessageFieldPathsNested = []string{
 	"path",
 }
 
-func (*ApplicationWebhook_Message) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationWebhook_MessageFieldPaths))
-	copy(ret, _ApplicationWebhook_MessageFieldPaths[:])
-	return ret
+var ApplicationWebhook_MessageFieldPathsTopLevel = []string{
+	"path",
 }
 
-func (dst *ApplicationWebhook_Message) SetFields(src *ApplicationWebhook_Message, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ApplicationWebhook_Message) SetFields(src *ApplicationWebhook_Message, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "path":
-			dst.Path = src.Path
+			if len(subs) > 0 {
+				return fmt.Errorf("'path' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Path = src.Path
+			} else {
+				var zero string
+				dst.Path = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ApplicationWebhooksFieldPaths = [...]string{
+var ApplicationWebhooksFieldPathsNested = []string{
 	"webhooks",
 }
 
-func (*ApplicationWebhooks) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationWebhooksFieldPaths))
-	copy(ret, _ApplicationWebhooksFieldPaths[:])
-	return ret
+var ApplicationWebhooksFieldPathsTopLevel = []string{
+	"webhooks",
 }
 
-func (dst *ApplicationWebhooks) SetFields(src *ApplicationWebhooks, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ApplicationWebhooks) SetFields(src *ApplicationWebhooks, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "webhooks":
-			dst.Webhooks = src.Webhooks
+			if len(subs) > 0 {
+				return fmt.Errorf("'webhooks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Webhooks = src.Webhooks
+			} else {
+				dst.Webhooks = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ApplicationWebhookFormatsFieldPaths = [...]string{
+var ApplicationWebhookFormatsFieldPathsNested = []string{
 	"formats",
 }
 
-func (*ApplicationWebhookFormats) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationWebhookFormatsFieldPaths))
-	copy(ret, _ApplicationWebhookFormatsFieldPaths[:])
-	return ret
+var ApplicationWebhookFormatsFieldPathsTopLevel = []string{
+	"formats",
 }
 
-func (dst *ApplicationWebhookFormats) SetFields(src *ApplicationWebhookFormats, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ApplicationWebhookFormats) SetFields(src *ApplicationWebhookFormats, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "formats":
-			dst.Formats = src.Formats
+			if len(subs) > 0 {
+				return fmt.Errorf("'formats' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Formats = src.Formats
+			} else {
+				dst.Formats = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetApplicationWebhookRequestFieldPaths = [...]string{
+var GetApplicationWebhookRequestFieldPathsNested = []string{
 	"field_mask",
 	"ids",
 	"ids.application_ids",
@@ -219,59 +442,101 @@ var _GetApplicationWebhookRequestFieldPaths = [...]string{
 	"ids.webhook_id",
 }
 
-func (*GetApplicationWebhookRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetApplicationWebhookRequestFieldPaths))
-	copy(ret, _GetApplicationWebhookRequestFieldPaths[:])
-	return ret
+var GetApplicationWebhookRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"ids",
 }
 
-func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.ApplicationWebhookIdentifiers = src.ApplicationWebhookIdentifiers
-		case "ids.application_ids":
-			dst.ApplicationWebhookIdentifiers.SetFields(&src.ApplicationWebhookIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.application_ids.application_id":
-			dst.ApplicationWebhookIdentifiers.SetFields(&src.ApplicationWebhookIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.webhook_id":
-			dst.ApplicationWebhookIdentifiers.SetFields(&src.ApplicationWebhookIdentifiers, _pathsWithoutPrefix("ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationWebhookIdentifiers
+				var newSrc *ApplicationWebhookIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationWebhookIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationWebhookIdentifiers = src.ApplicationWebhookIdentifiers
+				} else {
+					var zero ApplicationWebhookIdentifiers
+					dst.ApplicationWebhookIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ListApplicationWebhooksRequestFieldPaths = [...]string{
+var ListApplicationWebhooksRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"field_mask",
 }
 
-func (*ListApplicationWebhooksRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ListApplicationWebhooksRequestFieldPaths))
-	copy(ret, _ListApplicationWebhooksRequestFieldPaths[:])
-	return ret
+var ListApplicationWebhooksRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"field_mask",
 }
 
-func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhooksRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhooksRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SetApplicationWebhookRequestFieldPaths = [...]string{
+var SetApplicationWebhookRequestFieldPathsNested = []string{
 	"field_mask",
 	"webhook",
 	"webhook.base_url",
@@ -301,71 +566,46 @@ var _SetApplicationWebhookRequestFieldPaths = [...]string{
 	"webhook.uplink_message.path",
 }
 
-func (*SetApplicationWebhookRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SetApplicationWebhookRequestFieldPaths))
-	copy(ret, _SetApplicationWebhookRequestFieldPaths[:])
-	return ret
+var SetApplicationWebhookRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"webhook",
 }
 
-func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "webhook":
-			dst.ApplicationWebhook = src.ApplicationWebhook
-		case "webhook.base_url":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.created_at":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_ack":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_ack.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_failed":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_failed.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_nack":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_nack.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_queued":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_queued.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_sent":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.downlink_sent.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.format":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.headers":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.ids":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.ids.application_ids":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.ids.application_ids.application_id":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.ids.webhook_id":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.join_accept":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.join_accept.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.location_solved":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.location_solved.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.updated_at":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.uplink_message":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
-		case "webhook.uplink_message.path":
-			dst.ApplicationWebhook.SetFields(&src.ApplicationWebhook, _pathsWithoutPrefix("webhook", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationWebhook
+				var newSrc *ApplicationWebhook
+				if src != nil {
+					newSrc = &src.ApplicationWebhook
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationWebhook = src.ApplicationWebhook
+				} else {
+					var zero ApplicationWebhook
+					dst.ApplicationWebhook = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

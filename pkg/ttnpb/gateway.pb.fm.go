@@ -2,96 +2,195 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	time "time"
+)
 
-var _GatewayBrandFieldPaths = [...]string{
+var GatewayBrandFieldPathsNested = []string{
 	"id",
 	"logos",
 	"name",
 	"url",
 }
 
-func (*GatewayBrand) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayBrandFieldPaths))
-	copy(ret, _GatewayBrandFieldPaths[:])
-	return ret
+var GatewayBrandFieldPathsTopLevel = []string{
+	"id",
+	"logos",
+	"name",
+	"url",
 }
 
-func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "id":
-			dst.ID = src.ID
-		case "logos":
-			dst.Logos = src.Logos
+			if len(subs) > 0 {
+				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ID = src.ID
+			} else {
+				var zero string
+				dst.ID = zero
+			}
 		case "name":
-			dst.Name = src.Name
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
 		case "url":
-			dst.URL = src.URL
+			if len(subs) > 0 {
+				return fmt.Errorf("'url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.URL = src.URL
+			} else {
+				var zero string
+				dst.URL = zero
+			}
+		case "logos":
+			if len(subs) > 0 {
+				return fmt.Errorf("'logos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Logos = src.Logos
+			} else {
+				dst.Logos = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayModelFieldPaths = [...]string{
+var GatewayModelFieldPathsNested = []string{
 	"brand_id",
 	"id",
 	"name",
 }
 
-func (*GatewayModel) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayModelFieldPaths))
-	copy(ret, _GatewayModelFieldPaths[:])
-	return ret
+var GatewayModelFieldPathsTopLevel = []string{
+	"brand_id",
+	"id",
+	"name",
 }
 
-func (dst *GatewayModel) SetFields(src *GatewayModel, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GatewayModel) SetFields(src *GatewayModel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "brand_id":
-			dst.BrandID = src.BrandID
+			if len(subs) > 0 {
+				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BrandID = src.BrandID
+			} else {
+				var zero string
+				dst.BrandID = zero
+			}
 		case "id":
-			dst.ID = src.ID
+			if len(subs) > 0 {
+				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ID = src.ID
+			} else {
+				var zero string
+				dst.ID = zero
+			}
 		case "name":
-			dst.Name = src.Name
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayVersionIdentifiersFieldPaths = [...]string{
+var GatewayVersionIdentifiersFieldPathsNested = []string{
 	"brand_id",
 	"firmware_version",
 	"hardware_version",
 	"model_id",
 }
 
-func (*GatewayVersionIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayVersionIdentifiersFieldPaths))
-	copy(ret, _GatewayVersionIdentifiersFieldPaths[:])
-	return ret
+var GatewayVersionIdentifiersFieldPathsTopLevel = []string{
+	"brand_id",
+	"firmware_version",
+	"hardware_version",
+	"model_id",
 }
 
-func (dst *GatewayVersionIdentifiers) SetFields(src *GatewayVersionIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GatewayVersionIdentifiers) SetFields(src *GatewayVersionIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "brand_id":
-			dst.BrandID = src.BrandID
-		case "firmware_version":
-			dst.FirmwareVersion = src.FirmwareVersion
-		case "hardware_version":
-			dst.HardwareVersion = src.HardwareVersion
+			if len(subs) > 0 {
+				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BrandID = src.BrandID
+			} else {
+				var zero string
+				dst.BrandID = zero
+			}
 		case "model_id":
-			dst.ModelID = src.ModelID
+			if len(subs) > 0 {
+				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ModelID = src.ModelID
+			} else {
+				var zero string
+				dst.ModelID = zero
+			}
+		case "hardware_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'hardware_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HardwareVersion = src.HardwareVersion
+			} else {
+				var zero string
+				dst.HardwareVersion = zero
+			}
+		case "firmware_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'firmware_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FirmwareVersion = src.FirmwareVersion
+			} else {
+				var zero string
+				dst.FirmwareVersion = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayRadioFieldPaths = [...]string{
+var GatewayRadioFieldPathsNested = []string{
 	"chip_type",
 	"enable",
 	"frequency",
@@ -102,74 +201,140 @@ var _GatewayRadioFieldPaths = [...]string{
 	"tx_configuration.notch_frequency",
 }
 
-func (*GatewayRadio) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayRadioFieldPaths))
-	copy(ret, _GatewayRadioFieldPaths[:])
-	return ret
+var GatewayRadioFieldPathsTopLevel = []string{
+	"chip_type",
+	"enable",
+	"frequency",
+	"rssi_offset",
+	"tx_configuration",
 }
 
-func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "chip_type":
-			dst.ChipType = src.ChipType
+func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "enable":
-			dst.Enable = src.Enable
+			if len(subs) > 0 {
+				return fmt.Errorf("'enable' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Enable = src.Enable
+			} else {
+				var zero bool
+				dst.Enable = zero
+			}
+		case "chip_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'chip_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChipType = src.ChipType
+			} else {
+				var zero string
+				dst.ChipType = zero
+			}
 		case "frequency":
-			dst.Frequency = src.Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
 		case "rssi_offset":
-			dst.RSSIOffset = src.RSSIOffset
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RSSIOffset = src.RSSIOffset
+			} else {
+				var zero float32
+				dst.RSSIOffset = zero
+			}
 		case "tx_configuration":
-			dst.TxConfiguration = src.TxConfiguration
-		case "tx_configuration.max_frequency":
-			if dst.TxConfiguration == nil {
-				dst.TxConfiguration = &GatewayRadio_TxConfiguration{}
+			if len(subs) > 0 {
+				newDst := dst.TxConfiguration
+				if newDst == nil {
+					newDst = &GatewayRadio_TxConfiguration{}
+					dst.TxConfiguration = newDst
+				}
+				var newSrc *GatewayRadio_TxConfiguration
+				if src != nil {
+					newSrc = src.TxConfiguration
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.TxConfiguration = src.TxConfiguration
+				} else {
+					dst.TxConfiguration = nil
+				}
 			}
-			dst.TxConfiguration.SetFields(src.TxConfiguration, _pathsWithoutPrefix("tx_configuration", paths)...)
-		case "tx_configuration.min_frequency":
-			if dst.TxConfiguration == nil {
-				dst.TxConfiguration = &GatewayRadio_TxConfiguration{}
-			}
-			dst.TxConfiguration.SetFields(src.TxConfiguration, _pathsWithoutPrefix("tx_configuration", paths)...)
-		case "tx_configuration.notch_frequency":
-			if dst.TxConfiguration == nil {
-				dst.TxConfiguration = &GatewayRadio_TxConfiguration{}
-			}
-			dst.TxConfiguration.SetFields(src.TxConfiguration, _pathsWithoutPrefix("tx_configuration", paths)...)
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayRadio_TxConfigurationFieldPaths = [...]string{
+var GatewayRadio_TxConfigurationFieldPathsNested = []string{
 	"max_frequency",
 	"min_frequency",
 	"notch_frequency",
 }
 
-func (*GatewayRadio_TxConfiguration) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayRadio_TxConfigurationFieldPaths))
-	copy(ret, _GatewayRadio_TxConfigurationFieldPaths[:])
-	return ret
+var GatewayRadio_TxConfigurationFieldPathsTopLevel = []string{
+	"max_frequency",
+	"min_frequency",
+	"notch_frequency",
 }
 
-func (dst *GatewayRadio_TxConfiguration) SetFields(src *GatewayRadio_TxConfiguration, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "max_frequency":
-			dst.MaxFrequency = src.MaxFrequency
+func (dst *GatewayRadio_TxConfiguration) SetFields(src *GatewayRadio_TxConfiguration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "min_frequency":
-			dst.MinFrequency = src.MinFrequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinFrequency = src.MinFrequency
+			} else {
+				var zero uint64
+				dst.MinFrequency = zero
+			}
+		case "max_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxFrequency = src.MaxFrequency
+			} else {
+				var zero uint64
+				dst.MaxFrequency = zero
+			}
 		case "notch_frequency":
-			dst.NotchFrequency = src.NotchFrequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'notch_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NotchFrequency = src.NotchFrequency
+			} else {
+				var zero uint64
+				dst.NotchFrequency = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayVersionFieldPaths = [...]string{
+var GatewayVersionFieldPathsNested = []string{
 	"clock_source",
 	"ids",
 	"ids.brand_id",
@@ -180,38 +345,71 @@ var _GatewayVersionFieldPaths = [...]string{
 	"radios",
 }
 
-func (*GatewayVersion) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayVersionFieldPaths))
-	copy(ret, _GatewayVersionFieldPaths[:])
-	return ret
+var GatewayVersionFieldPathsTopLevel = []string{
+	"clock_source",
+	"ids",
+	"photos",
+	"radios",
 }
 
-func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "clock_source":
-			dst.ClockSource = src.ClockSource
+func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.GatewayVersionIdentifiers = src.GatewayVersionIdentifiers
-		case "ids.brand_id":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.firmware_version":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.hardware_version":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.model_id":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayVersionIdentifiers
+				var newSrc *GatewayVersionIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayVersionIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayVersionIdentifiers = src.GatewayVersionIdentifiers
+				} else {
+					var zero GatewayVersionIdentifiers
+					dst.GatewayVersionIdentifiers = zero
+				}
+			}
 		case "photos":
-			dst.Photos = src.Photos
+			if len(subs) > 0 {
+				return fmt.Errorf("'photos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Photos = src.Photos
+			} else {
+				dst.Photos = nil
+			}
 		case "radios":
-			dst.Radios = src.Radios
+			if len(subs) > 0 {
+				return fmt.Errorf("'radios' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Radios = src.Radios
+			} else {
+				dst.Radios = nil
+			}
+		case "clock_source":
+			if len(subs) > 0 {
+				return fmt.Errorf("'clock_source' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClockSource = src.ClockSource
+			} else {
+				var zero uint32
+				dst.ClockSource = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayFieldPaths = [...]string{
+var GatewayFieldPathsNested = []string{
 	"antennas",
 	"attributes",
 	"auto_update",
@@ -238,190 +436,412 @@ var _GatewayFieldPaths = [...]string{
 	"version_ids.model_id",
 }
 
-func (*Gateway) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayFieldPaths))
-	copy(ret, _GatewayFieldPaths[:])
-	return ret
+var GatewayFieldPathsTopLevel = []string{
+	"antennas",
+	"attributes",
+	"auto_update",
+	"contact_info",
+	"created_at",
+	"description",
+	"downlink_path_constraint",
+	"enforce_duty_cycle",
+	"frequency_plan_id",
+	"gateway_server_address",
+	"ids",
+	"location_public",
+	"name",
+	"schedule_downlink_late",
+	"status_public",
+	"update_channel",
+	"updated_at",
+	"version_ids",
 }
 
-func (dst *Gateway) SetFields(src *Gateway, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "antennas":
-			dst.Antennas = src.Antennas
-		case "attributes":
-			dst.Attributes = src.Attributes
-		case "auto_update":
-			dst.AutoUpdate = src.AutoUpdate
-		case "contact_info":
-			dst.ContactInfo = src.ContactInfo
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "description":
-			dst.Description = src.Description
-		case "downlink_path_constraint":
-			dst.DownlinkPathConstraint = src.DownlinkPathConstraint
-		case "enforce_duty_cycle":
-			dst.EnforceDutyCycle = src.EnforceDutyCycle
-		case "frequency_plan_id":
-			dst.FrequencyPlanID = src.FrequencyPlanID
-		case "gateway_server_address":
-			dst.GatewayServerAddress = src.GatewayServerAddress
+func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "location_public":
-			dst.LocationPublic = src.LocationPublic
-		case "name":
-			dst.Name = src.Name
-		case "schedule_downlink_late":
-			dst.ScheduleDownlinkLate = src.ScheduleDownlinkLate
-		case "status_public":
-			dst.StatusPublic = src.StatusPublic
-		case "update_channel":
-			dst.UpdateChannel = src.UpdateChannel
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "attributes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attributes = src.Attributes
+			} else {
+				dst.Attributes = nil
+			}
+		case "contact_info":
+			if len(subs) > 0 {
+				return fmt.Errorf("'contact_info' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ContactInfo = src.ContactInfo
+			} else {
+				dst.ContactInfo = nil
+			}
 		case "version_ids":
-			dst.GatewayVersionIdentifiers = src.GatewayVersionIdentifiers
-		case "version_ids.brand_id":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("version_ids", paths)...)
-		case "version_ids.firmware_version":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("version_ids", paths)...)
-		case "version_ids.hardware_version":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("version_ids", paths)...)
-		case "version_ids.model_id":
-			dst.GatewayVersionIdentifiers.SetFields(&src.GatewayVersionIdentifiers, _pathsWithoutPrefix("version_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayVersionIdentifiers
+				var newSrc *GatewayVersionIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayVersionIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayVersionIdentifiers = src.GatewayVersionIdentifiers
+				} else {
+					var zero GatewayVersionIdentifiers
+					dst.GatewayVersionIdentifiers = zero
+				}
+			}
+		case "gateway_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayServerAddress = src.GatewayServerAddress
+			} else {
+				var zero string
+				dst.GatewayServerAddress = zero
+			}
+		case "auto_update":
+			if len(subs) > 0 {
+				return fmt.Errorf("'auto_update' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AutoUpdate = src.AutoUpdate
+			} else {
+				var zero bool
+				dst.AutoUpdate = zero
+			}
+		case "update_channel":
+			if len(subs) > 0 {
+				return fmt.Errorf("'update_channel' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdateChannel = src.UpdateChannel
+			} else {
+				var zero string
+				dst.UpdateChannel = zero
+			}
+		case "frequency_plan_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyPlanID = src.FrequencyPlanID
+			} else {
+				var zero string
+				dst.FrequencyPlanID = zero
+			}
+		case "antennas":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antennas' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Antennas = src.Antennas
+			} else {
+				dst.Antennas = nil
+			}
+		case "status_public":
+			if len(subs) > 0 {
+				return fmt.Errorf("'status_public' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StatusPublic = src.StatusPublic
+			} else {
+				var zero bool
+				dst.StatusPublic = zero
+			}
+		case "location_public":
+			if len(subs) > 0 {
+				return fmt.Errorf("'location_public' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LocationPublic = src.LocationPublic
+			} else {
+				var zero bool
+				dst.LocationPublic = zero
+			}
+		case "schedule_downlink_late":
+			if len(subs) > 0 {
+				return fmt.Errorf("'schedule_downlink_late' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ScheduleDownlinkLate = src.ScheduleDownlinkLate
+			} else {
+				var zero bool
+				dst.ScheduleDownlinkLate = zero
+			}
+		case "enforce_duty_cycle":
+			if len(subs) > 0 {
+				return fmt.Errorf("'enforce_duty_cycle' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EnforceDutyCycle = src.EnforceDutyCycle
+			} else {
+				var zero bool
+				dst.EnforceDutyCycle = zero
+			}
+		case "downlink_path_constraint":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_path_constraint' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkPathConstraint = src.DownlinkPathConstraint
+			} else {
+				var zero DownlinkPathConstraint
+				dst.DownlinkPathConstraint = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewaysFieldPaths = [...]string{
+var GatewaysFieldPathsNested = []string{
 	"gateways",
 }
 
-func (*Gateways) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewaysFieldPaths))
-	copy(ret, _GatewaysFieldPaths[:])
-	return ret
+var GatewaysFieldPathsTopLevel = []string{
+	"gateways",
 }
 
-func (dst *Gateways) SetFields(src *Gateways, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Gateways) SetFields(src *Gateways, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateways":
-			dst.Gateways = src.Gateways
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateways' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Gateways = src.Gateways
+			} else {
+				dst.Gateways = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetGatewayRequestFieldPaths = [...]string{
+var GetGatewayRequestFieldPathsNested = []string{
 	"field_mask",
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
 }
 
-func (*GetGatewayRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetGatewayRequestFieldPaths))
-	copy(ret, _GetGatewayRequestFieldPaths[:])
-	return ret
+var GetGatewayRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"gateway_ids",
 }
 
-func (dst *GetGatewayRequest) SetFields(src *GetGatewayRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *GetGatewayRequest) SetFields(src *GetGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "gateway_ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ListGatewaysRequestFieldPaths = [...]string{
+var ListGatewaysRequestFieldPathsNested = []string{
 	"collaborator",
-	"collaborator.organization_ids",
-	"collaborator.organization_ids.organization_id",
-	"collaborator.user_ids",
-	"collaborator.user_ids.email",
-	"collaborator.user_ids.user_id",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
 	"field_mask",
+	"ids",
 	"limit",
 	"order",
 	"page",
 }
 
-func (*ListGatewaysRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ListGatewaysRequestFieldPaths))
-	copy(ret, _ListGatewaysRequestFieldPaths[:])
-	return ret
+var ListGatewaysRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"field_mask",
+	"ids",
+	"limit",
+	"order",
+	"page",
 }
 
-func (dst *ListGatewaysRequest) SetFields(src *ListGatewaysRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ListGatewaysRequest) SetFields(src *ListGatewaysRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.organization_ids":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
+			if len(subs) > 0 {
+				newDst := dst.Collaborator
+				if newDst == nil {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
 			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.organization_ids.organization_id":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.email":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.user_id":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
-		case "limit":
-			dst.Limit = src.Limit
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
 		case "order":
-			dst.Order = src.Order
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
 		case "page":
-			dst.Page = src.Page
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateGatewayRequestFieldPaths = [...]string{
+var CreateGatewayRequestFieldPathsNested = []string{
 	"collaborator",
-	"collaborator.organization_ids",
-	"collaborator.organization_ids.organization_id",
-	"collaborator.user_ids",
-	"collaborator.user_ids.email",
-	"collaborator.user_ids.user_id",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
 	"gateway",
 	"gateway.antennas",
 	"gateway.attributes",
@@ -447,86 +867,63 @@ var _CreateGatewayRequestFieldPaths = [...]string{
 	"gateway.version_ids.firmware_version",
 	"gateway.version_ids.hardware_version",
 	"gateway.version_ids.model_id",
+	"ids",
 }
 
-func (*CreateGatewayRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateGatewayRequestFieldPaths))
-	copy(ret, _CreateGatewayRequestFieldPaths[:])
-	return ret
+var CreateGatewayRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"gateway",
+	"ids",
 }
 
-func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.organization_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.organization_ids.organization_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.email":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.user_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
+func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway":
-			dst.Gateway = src.Gateway
-		case "gateway.antennas":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.attributes":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.auto_update":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.contact_info":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.created_at":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.description":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.downlink_path_constraint":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.enforce_duty_cycle":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.frequency_plan_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.gateway_server_address":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.ids":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.ids.eui":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.ids.gateway_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.location_public":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.name":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.schedule_downlink_late":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.status_public":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.update_channel":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.updated_at":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.brand_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.firmware_version":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.hardware_version":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.model_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Gateway
+				var newSrc *Gateway
+				if src != nil {
+					newSrc = &src.Gateway
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Gateway = src.Gateway
+				} else {
+					var zero Gateway
+					dst.Gateway = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.Collaborator
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.Collaborator = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateGatewayRequestFieldPaths = [...]string{
+var UpdateGatewayRequestFieldPathsNested = []string{
 	"field_mask",
 	"gateway",
 	"gateway.antennas",
@@ -555,74 +952,51 @@ var _UpdateGatewayRequestFieldPaths = [...]string{
 	"gateway.version_ids.model_id",
 }
 
-func (*UpdateGatewayRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateGatewayRequestFieldPaths))
-	copy(ret, _UpdateGatewayRequestFieldPaths[:])
-	return ret
+var UpdateGatewayRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"gateway",
 }
 
-func (dst *UpdateGatewayRequest) SetFields(src *UpdateGatewayRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *UpdateGatewayRequest) SetFields(src *UpdateGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway":
-			dst.Gateway = src.Gateway
-		case "gateway.antennas":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.attributes":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.auto_update":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.contact_info":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.created_at":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.description":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.downlink_path_constraint":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.enforce_duty_cycle":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.frequency_plan_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.gateway_server_address":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.ids":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.ids.eui":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.ids.gateway_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.location_public":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.name":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.schedule_downlink_late":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.status_public":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.update_channel":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.updated_at":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.brand_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.firmware_version":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.hardware_version":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
-		case "gateway.version_ids.model_id":
-			dst.Gateway.SetFields(&src.Gateway, _pathsWithoutPrefix("gateway", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Gateway
+				var newSrc *Gateway
+				if src != nil {
+					newSrc = &src.Gateway
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Gateway = src.Gateway
+				} else {
+					var zero Gateway
+					dst.Gateway = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateGatewayAPIKeyRequestFieldPaths = [...]string{
+var CreateGatewayAPIKeyRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
@@ -630,32 +1004,61 @@ var _CreateGatewayAPIKeyRequestFieldPaths = [...]string{
 	"rights",
 }
 
-func (*CreateGatewayAPIKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateGatewayAPIKeyRequestFieldPaths))
-	copy(ret, _CreateGatewayAPIKeyRequestFieldPaths[:])
-	return ret
+var CreateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
+	"gateway_ids",
+	"name",
+	"rights",
 }
 
-func (dst *CreateGatewayAPIKeyRequest) SetFields(src *CreateGatewayAPIKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *CreateGatewayAPIKeyRequest) SetFields(src *CreateGatewayAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "gateway_ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
 		case "name":
-			dst.Name = src.Name
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
 		case "rights":
-			dst.Rights = src.Rights
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateGatewayAPIKeyRequestFieldPaths = [...]string{
+var UpdateGatewayAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
 	"api_key.id",
 	"api_key.key",
@@ -666,89 +1069,127 @@ var _UpdateGatewayAPIKeyRequestFieldPaths = [...]string{
 	"gateway_ids.gateway_id",
 }
 
-func (*UpdateGatewayAPIKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateGatewayAPIKeyRequestFieldPaths))
-	copy(ret, _UpdateGatewayAPIKeyRequestFieldPaths[:])
-	return ret
+var UpdateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
+	"api_key",
+	"gateway_ids",
 }
 
-func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "api_key":
-			dst.APIKey = src.APIKey
-		case "api_key.id":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.key":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.name":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.rights":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
+func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "gateway_ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "api_key":
+			if len(subs) > 0 {
+				newDst := &dst.APIKey
+				var newSrc *APIKey
+				if src != nil {
+					newSrc = &src.APIKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.APIKey = src.APIKey
+				} else {
+					var zero APIKey
+					dst.APIKey = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SetGatewayCollaboratorRequestFieldPaths = [...]string{
+var SetGatewayCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",
 	"collaborator.ids",
-	"collaborator.ids.organization_ids",
-	"collaborator.ids.organization_ids.organization_id",
-	"collaborator.ids.user_ids",
-	"collaborator.ids.user_ids.email",
-	"collaborator.ids.user_ids.user_id",
+	"collaborator.ids.ids.organization_ids",
+	"collaborator.ids.ids.organization_ids.organization_id",
+	"collaborator.ids.ids.user_ids",
+	"collaborator.ids.ids.user_ids.email",
+	"collaborator.ids.ids.user_ids.user_id",
 	"collaborator.rights",
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
+	"ids",
 }
 
-func (*SetGatewayCollaboratorRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SetGatewayCollaboratorRequestFieldPaths))
-	copy(ret, _SetGatewayCollaboratorRequestFieldPaths[:])
-	return ret
+var SetGatewayCollaboratorRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"gateway_ids",
+	"ids",
 }
 
-func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.organization_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.organization_ids.organization_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids.email":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids.user_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.rights":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
+func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "gateway_ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.Collaborator
+				var newSrc *Collaborator
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero Collaborator
+					dst.Collaborator = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayAntennaFieldPaths = [...]string{
+var GatewayAntennaFieldPathsNested = []string{
 	"attributes",
 	"gain",
 	"location",
@@ -759,38 +1200,61 @@ var _GatewayAntennaFieldPaths = [...]string{
 	"location.source",
 }
 
-func (*GatewayAntenna) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayAntennaFieldPaths))
-	copy(ret, _GatewayAntennaFieldPaths[:])
-	return ret
+var GatewayAntennaFieldPathsTopLevel = []string{
+	"attributes",
+	"gain",
+	"location",
 }
 
-func (dst *GatewayAntenna) SetFields(src *GatewayAntenna, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "attributes":
-			dst.Attributes = src.Attributes
+func (dst *GatewayAntenna) SetFields(src *GatewayAntenna, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gain":
-			dst.Gain = src.Gain
+			if len(subs) > 0 {
+				return fmt.Errorf("'gain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Gain = src.Gain
+			} else {
+				var zero float32
+				dst.Gain = zero
+			}
 		case "location":
-			dst.Location = src.Location
-		case "location.accuracy":
-			dst.Location.SetFields(&src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.altitude":
-			dst.Location.SetFields(&src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.latitude":
-			dst.Location.SetFields(&src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.longitude":
-			dst.Location.SetFields(&src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.source":
-			dst.Location.SetFields(&src.Location, _pathsWithoutPrefix("location", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Location
+				var newSrc *Location
+				if src != nil {
+					newSrc = &src.Location
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Location = src.Location
+				} else {
+					var zero Location
+					dst.Location = zero
+				}
+			}
+		case "attributes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attributes = src.Attributes
+			} else {
+				dst.Attributes = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayStatusFieldPaths = [...]string{
+var GatewayStatusFieldPathsNested = []string{
 	"advanced",
 	"antenna_locations",
 	"boot_time",
@@ -800,36 +1264,93 @@ var _GatewayStatusFieldPaths = [...]string{
 	"versions",
 }
 
-func (*GatewayStatus) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayStatusFieldPaths))
-	copy(ret, _GatewayStatusFieldPaths[:])
-	return ret
+var GatewayStatusFieldPathsTopLevel = []string{
+	"advanced",
+	"antenna_locations",
+	"boot_time",
+	"ip",
+	"metrics",
+	"time",
+	"versions",
 }
 
-func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "advanced":
-			dst.Advanced = src.Advanced
-		case "antenna_locations":
-			dst.AntennaLocations = src.AntennaLocations
-		case "boot_time":
-			dst.BootTime = src.BootTime
-		case "ip":
-			dst.IP = src.IP
-		case "metrics":
-			dst.Metrics = src.Metrics
+func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "time":
-			dst.Time = src.Time
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				var zero time.Time
+				dst.Time = zero
+			}
+		case "boot_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'boot_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BootTime = src.BootTime
+			} else {
+				var zero time.Time
+				dst.BootTime = zero
+			}
 		case "versions":
-			dst.Versions = src.Versions
+			if len(subs) > 0 {
+				return fmt.Errorf("'versions' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Versions = src.Versions
+			} else {
+				dst.Versions = nil
+			}
+		case "antenna_locations":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_locations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AntennaLocations = src.AntennaLocations
+			} else {
+				dst.AntennaLocations = nil
+			}
+		case "ip":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ip' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IP = src.IP
+			} else {
+				dst.IP = nil
+			}
+		case "metrics":
+			if len(subs) > 0 {
+				return fmt.Errorf("'metrics' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Metrics = src.Metrics
+			} else {
+				dst.Metrics = nil
+			}
+		case "advanced":
+			if len(subs) > 0 {
+				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Advanced = src.Advanced
+			} else {
+				dst.Advanced = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayConnectionStatsFieldPaths = [...]string{
+var GatewayConnectionStatsFieldPathsNested = []string{
 	"connected_at",
 	"downlink_count",
 	"last_downlink_received_at",
@@ -847,68 +1368,111 @@ var _GatewayConnectionStatsFieldPaths = [...]string{
 	"uplink_count",
 }
 
-func (*GatewayConnectionStats) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayConnectionStatsFieldPaths))
-	copy(ret, _GatewayConnectionStatsFieldPaths[:])
-	return ret
+var GatewayConnectionStatsFieldPathsTopLevel = []string{
+	"connected_at",
+	"downlink_count",
+	"last_downlink_received_at",
+	"last_status",
+	"last_status_received_at",
+	"last_uplink_received_at",
+	"protocol",
+	"uplink_count",
 }
 
-func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "connected_at":
-			dst.ConnectedAt = src.ConnectedAt
-		case "downlink_count":
-			dst.DownlinkCount = src.DownlinkCount
-		case "last_downlink_received_at":
-			dst.LastDownlinkReceivedAt = src.LastDownlinkReceivedAt
-		case "last_status":
-			dst.LastStatus = src.LastStatus
-		case "last_status.advanced":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
+			if len(subs) > 0 {
+				return fmt.Errorf("'connected_at' has no subfields, but %s were specified", subs)
 			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status.antenna_locations":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
+			if src != nil {
+				dst.ConnectedAt = src.ConnectedAt
+			} else {
+				dst.ConnectedAt = nil
 			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status.boot_time":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
-			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status.ip":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
-			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status.metrics":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
-			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status.time":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
-			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status.versions":
-			if dst.LastStatus == nil {
-				dst.LastStatus = &GatewayStatus{}
-			}
-			dst.LastStatus.SetFields(src.LastStatus, _pathsWithoutPrefix("last_status", paths)...)
-		case "last_status_received_at":
-			dst.LastStatusReceivedAt = src.LastStatusReceivedAt
-		case "last_uplink_received_at":
-			dst.LastUplinkReceivedAt = src.LastUplinkReceivedAt
 		case "protocol":
-			dst.Protocol = src.Protocol
+			if len(subs) > 0 {
+				return fmt.Errorf("'protocol' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Protocol = src.Protocol
+			} else {
+				var zero string
+				dst.Protocol = zero
+			}
+		case "last_status_received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_status_received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastStatusReceivedAt = src.LastStatusReceivedAt
+			} else {
+				dst.LastStatusReceivedAt = nil
+			}
+		case "last_status":
+			if len(subs) > 0 {
+				newDst := dst.LastStatus
+				if newDst == nil {
+					newDst = &GatewayStatus{}
+					dst.LastStatus = newDst
+				}
+				var newSrc *GatewayStatus
+				if src != nil {
+					newSrc = src.LastStatus
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LastStatus = src.LastStatus
+				} else {
+					dst.LastStatus = nil
+				}
+			}
+		case "last_uplink_received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_uplink_received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastUplinkReceivedAt = src.LastUplinkReceivedAt
+			} else {
+				dst.LastUplinkReceivedAt = nil
+			}
 		case "uplink_count":
-			dst.UplinkCount = src.UplinkCount
+			if len(subs) > 0 {
+				return fmt.Errorf("'uplink_count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UplinkCount = src.UplinkCount
+			} else {
+				var zero uint64
+				dst.UplinkCount = zero
+			}
+		case "last_downlink_received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_downlink_received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastDownlinkReceivedAt = src.LastDownlinkReceivedAt
+			} else {
+				dst.LastDownlinkReceivedAt = nil
+			}
+		case "downlink_count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkCount = src.DownlinkCount
+			} else {
+				var zero uint64
+				dst.DownlinkCount = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

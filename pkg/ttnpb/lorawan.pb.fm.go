@@ -2,393 +2,262 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+	time "time"
+)
 
-var _MessageFieldPaths = [...]string{
-	"join_accept_payload",
-	"join_accept_payload.cf_list",
-	"join_accept_payload.cf_list.ch_masks",
-	"join_accept_payload.cf_list.freq",
-	"join_accept_payload.cf_list.type",
-	"join_accept_payload.dev_addr",
-	"join_accept_payload.dl_settings",
-	"join_accept_payload.dl_settings.opt_neg",
-	"join_accept_payload.dl_settings.rx1_dr_offset",
-	"join_accept_payload.dl_settings.rx2_dr",
-	"join_accept_payload.encrypted",
-	"join_accept_payload.join_nonce",
-	"join_accept_payload.net_id",
-	"join_accept_payload.rx_delay",
-	"join_request_payload",
-	"join_request_payload.dev_eui",
-	"join_request_payload.dev_nonce",
-	"join_request_payload.join_eui",
+var MessageFieldPathsNested = []string{
+	"Payload",
+	"Payload.join_accept_payload",
+	"Payload.join_accept_payload.cf_list",
+	"Payload.join_accept_payload.cf_list.ch_masks",
+	"Payload.join_accept_payload.cf_list.freq",
+	"Payload.join_accept_payload.cf_list.type",
+	"Payload.join_accept_payload.dev_addr",
+	"Payload.join_accept_payload.dl_settings",
+	"Payload.join_accept_payload.dl_settings.opt_neg",
+	"Payload.join_accept_payload.dl_settings.rx1_dr_offset",
+	"Payload.join_accept_payload.dl_settings.rx2_dr",
+	"Payload.join_accept_payload.encrypted",
+	"Payload.join_accept_payload.join_nonce",
+	"Payload.join_accept_payload.net_id",
+	"Payload.join_accept_payload.rx_delay",
+	"Payload.join_request_payload",
+	"Payload.join_request_payload.dev_eui",
+	"Payload.join_request_payload.dev_nonce",
+	"Payload.join_request_payload.join_eui",
+	"Payload.mac_payload",
+	"Payload.mac_payload.decoded_payload",
+	"Payload.mac_payload.f_hdr",
+	"Payload.mac_payload.f_hdr.dev_addr",
+	"Payload.mac_payload.f_hdr.f_cnt",
+	"Payload.mac_payload.f_hdr.f_ctrl",
+	"Payload.mac_payload.f_hdr.f_ctrl.ack",
+	"Payload.mac_payload.f_hdr.f_ctrl.adr",
+	"Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req",
+	"Payload.mac_payload.f_hdr.f_ctrl.class_b",
+	"Payload.mac_payload.f_hdr.f_ctrl.f_pending",
+	"Payload.mac_payload.f_hdr.f_opts",
+	"Payload.mac_payload.f_port",
+	"Payload.mac_payload.frm_payload",
+	"Payload.rejoin_request_payload",
+	"Payload.rejoin_request_payload.dev_eui",
+	"Payload.rejoin_request_payload.join_eui",
+	"Payload.rejoin_request_payload.net_id",
+	"Payload.rejoin_request_payload.rejoin_cnt",
+	"Payload.rejoin_request_payload.rejoin_type",
 	"m_hdr",
 	"m_hdr.m_type",
 	"m_hdr.major",
-	"mac_payload",
-	"mac_payload.decoded_payload",
-	"mac_payload.f_hdr",
-	"mac_payload.f_hdr.dev_addr",
-	"mac_payload.f_hdr.f_cnt",
-	"mac_payload.f_hdr.f_ctrl",
-	"mac_payload.f_hdr.f_ctrl.ack",
-	"mac_payload.f_hdr.f_ctrl.adr",
-	"mac_payload.f_hdr.f_ctrl.adr_ack_req",
-	"mac_payload.f_hdr.f_ctrl.class_b",
-	"mac_payload.f_hdr.f_ctrl.f_pending",
-	"mac_payload.f_hdr.f_opts",
-	"mac_payload.f_port",
-	"mac_payload.frm_payload",
 	"mic",
-	"rejoin_request_payload",
-	"rejoin_request_payload.dev_eui",
-	"rejoin_request_payload.join_eui",
-	"rejoin_request_payload.net_id",
-	"rejoin_request_payload.rejoin_cnt",
-	"rejoin_request_payload.rejoin_type",
 }
 
-func (*Message) FieldMaskPaths() []string {
-	ret := make([]string, len(_MessageFieldPaths))
-	copy(ret, _MessageFieldPaths[:])
-	return ret
+var MessageFieldPathsTopLevel = []string{
+	"Payload",
+	"m_hdr",
+	"mic",
 }
 
-func (dst *Message) SetFields(src *Message, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "join_accept_payload":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = src.GetJoinAcceptPayload()
-		case "join_accept_payload.cf_list":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.cf_list.ch_masks":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.cf_list.freq":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.cf_list.type":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.dev_addr":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.dl_settings":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.dl_settings.opt_neg":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.dl_settings.rx1_dr_offset":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.dl_settings.rx2_dr":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.encrypted":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.join_nonce":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.net_id":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_accept_payload.rx_delay":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinAcceptPayload{}
-			}
-			if dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload == nil {
-				dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = &JoinAcceptPayload{}
-			}
-			dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload.SetFields(src.GetJoinAcceptPayload(), _pathsWithoutPrefix("join_accept_payload", paths)...)
-		case "join_request_payload":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinRequestPayload{}
-			}
-			dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = src.GetJoinRequestPayload()
-		case "join_request_payload.dev_eui":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinRequestPayload{}
-			}
-			if dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload == nil {
-				dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = &JoinRequestPayload{}
-			}
-			dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload.SetFields(src.GetJoinRequestPayload(), _pathsWithoutPrefix("join_request_payload", paths)...)
-		case "join_request_payload.dev_nonce":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinRequestPayload{}
-			}
-			if dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload == nil {
-				dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = &JoinRequestPayload{}
-			}
-			dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload.SetFields(src.GetJoinRequestPayload(), _pathsWithoutPrefix("join_request_payload", paths)...)
-		case "join_request_payload.join_eui":
-			if dst.Payload == nil {
-				dst.Payload = &Message_JoinRequestPayload{}
-			}
-			if dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload == nil {
-				dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = &JoinRequestPayload{}
-			}
-			dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload.SetFields(src.GetJoinRequestPayload(), _pathsWithoutPrefix("join_request_payload", paths)...)
+func (dst *Message) SetFields(src *Message, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "m_hdr":
-			dst.MHDR = src.MHDR
-		case "m_hdr.m_type":
-			dst.MHDR.SetFields(&src.MHDR, _pathsWithoutPrefix("m_hdr", paths)...)
-		case "m_hdr.major":
-			dst.MHDR.SetFields(&src.MHDR, _pathsWithoutPrefix("m_hdr", paths)...)
-		case "mac_payload":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
+			if len(subs) > 0 {
+				newDst := &dst.MHDR
+				var newSrc *MHDR
+				if src != nil {
+					newSrc = &src.MHDR
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MHDR = src.MHDR
+				} else {
+					var zero MHDR
+					dst.MHDR = zero
+				}
 			}
-			dst.Payload.(*Message_MACPayload).MACPayload = src.GetMACPayload()
-		case "mac_payload.decoded_payload":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.dev_addr":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_cnt":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_ctrl":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_ctrl.ack":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_ctrl.adr":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_ctrl.adr_ack_req":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_ctrl.class_b":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_ctrl.f_pending":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_hdr.f_opts":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.f_port":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
-		case "mac_payload.frm_payload":
-			if dst.Payload == nil {
-				dst.Payload = &Message_MACPayload{}
-			}
-			if dst.Payload.(*Message_MACPayload).MACPayload == nil {
-				dst.Payload.(*Message_MACPayload).MACPayload = &MACPayload{}
-			}
-			dst.Payload.(*Message_MACPayload).MACPayload.SetFields(src.GetMACPayload(), _pathsWithoutPrefix("mac_payload", paths)...)
 		case "mic":
-			dst.MIC = src.MIC
-		case "rejoin_request_payload":
-			if dst.Payload == nil {
-				dst.Payload = &Message_RejoinRequestPayload{}
+			if len(subs) > 0 {
+				return fmt.Errorf("'mic' has no subfields, but %s were specified", subs)
 			}
-			dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = src.GetRejoinRequestPayload()
-		case "rejoin_request_payload.dev_eui":
-			if dst.Payload == nil {
-				dst.Payload = &Message_RejoinRequestPayload{}
+			if src != nil {
+				dst.MIC = src.MIC
+			} else {
+				var zero []byte
+				dst.MIC = zero
 			}
-			if dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload == nil {
-				dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = &RejoinRequestPayload{}
+
+		case "Payload":
+			if len(subs) == 0 && src == nil {
+				dst.Payload = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Payload = src.Payload
+				continue
 			}
-			dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload.SetFields(src.GetRejoinRequestPayload(), _pathsWithoutPrefix("rejoin_request_payload", paths)...)
-		case "rejoin_request_payload.join_eui":
-			if dst.Payload == nil {
-				dst.Payload = &Message_RejoinRequestPayload{}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
 			}
-			if dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload == nil {
-				dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = &RejoinRequestPayload{}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "mac_payload":
+					if _, ok := dst.Payload.(*Message_MACPayload); !ok {
+						dst.Payload = &Message_MACPayload{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*Message_MACPayload).MACPayload
+						if newDst == nil {
+							newDst = &MACPayload{}
+							dst.Payload.(*Message_MACPayload).MACPayload = newDst
+						}
+						var newSrc *MACPayload
+						if src != nil {
+							newSrc = src.GetMACPayload()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*Message_MACPayload).MACPayload = src.GetMACPayload()
+						} else {
+							dst.Payload.(*Message_MACPayload).MACPayload = nil
+						}
+					}
+				case "join_request_payload":
+					if _, ok := dst.Payload.(*Message_JoinRequestPayload); !ok {
+						dst.Payload = &Message_JoinRequestPayload{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload
+						if newDst == nil {
+							newDst = &JoinRequestPayload{}
+							dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = newDst
+						}
+						var newSrc *JoinRequestPayload
+						if src != nil {
+							newSrc = src.GetJoinRequestPayload()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = src.GetJoinRequestPayload()
+						} else {
+							dst.Payload.(*Message_JoinRequestPayload).JoinRequestPayload = nil
+						}
+					}
+				case "join_accept_payload":
+					if _, ok := dst.Payload.(*Message_JoinAcceptPayload); !ok {
+						dst.Payload = &Message_JoinAcceptPayload{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload
+						if newDst == nil {
+							newDst = &JoinAcceptPayload{}
+							dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = newDst
+						}
+						var newSrc *JoinAcceptPayload
+						if src != nil {
+							newSrc = src.GetJoinAcceptPayload()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = src.GetJoinAcceptPayload()
+						} else {
+							dst.Payload.(*Message_JoinAcceptPayload).JoinAcceptPayload = nil
+						}
+					}
+				case "rejoin_request_payload":
+					if _, ok := dst.Payload.(*Message_RejoinRequestPayload); !ok {
+						dst.Payload = &Message_RejoinRequestPayload{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload
+						if newDst == nil {
+							newDst = &RejoinRequestPayload{}
+							dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = newDst
+						}
+						var newSrc *RejoinRequestPayload
+						if src != nil {
+							newSrc = src.GetRejoinRequestPayload()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = src.GetRejoinRequestPayload()
+						} else {
+							dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
 			}
-			dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload.SetFields(src.GetRejoinRequestPayload(), _pathsWithoutPrefix("rejoin_request_payload", paths)...)
-		case "rejoin_request_payload.net_id":
-			if dst.Payload == nil {
-				dst.Payload = &Message_RejoinRequestPayload{}
-			}
-			if dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload == nil {
-				dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = &RejoinRequestPayload{}
-			}
-			dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload.SetFields(src.GetRejoinRequestPayload(), _pathsWithoutPrefix("rejoin_request_payload", paths)...)
-		case "rejoin_request_payload.rejoin_cnt":
-			if dst.Payload == nil {
-				dst.Payload = &Message_RejoinRequestPayload{}
-			}
-			if dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload == nil {
-				dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = &RejoinRequestPayload{}
-			}
-			dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload.SetFields(src.GetRejoinRequestPayload(), _pathsWithoutPrefix("rejoin_request_payload", paths)...)
-		case "rejoin_request_payload.rejoin_type":
-			if dst.Payload == nil {
-				dst.Payload = &Message_RejoinRequestPayload{}
-			}
-			if dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload == nil {
-				dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload = &RejoinRequestPayload{}
-			}
-			dst.Payload.(*Message_RejoinRequestPayload).RejoinRequestPayload.SetFields(src.GetRejoinRequestPayload(), _pathsWithoutPrefix("rejoin_request_payload", paths)...)
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MHDRFieldPaths = [...]string{
+var MHDRFieldPathsNested = []string{
 	"m_type",
 	"major",
 }
 
-func (*MHDR) FieldMaskPaths() []string {
-	ret := make([]string, len(_MHDRFieldPaths))
-	copy(ret, _MHDRFieldPaths[:])
-	return ret
+var MHDRFieldPathsTopLevel = []string{
+	"m_type",
+	"major",
 }
 
-func (dst *MHDR) SetFields(src *MHDR, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MHDR) SetFields(src *MHDR, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "m_type":
-			dst.MType = src.MType
+			if len(subs) > 0 {
+				return fmt.Errorf("'m_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MType = src.MType
+			} else {
+				var zero MType
+				dst.MType = zero
+			}
 		case "major":
-			dst.Major = src.Major
+			if len(subs) > 0 {
+				return fmt.Errorf("'major' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Major = src.Major
+			} else {
+				var zero Major
+				dst.Major = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACPayloadFieldPaths = [...]string{
+var MACPayloadFieldPathsNested = []string{
 	"decoded_payload",
 	"f_hdr",
 	"f_hdr.dev_addr",
@@ -404,48 +273,72 @@ var _MACPayloadFieldPaths = [...]string{
 	"frm_payload",
 }
 
-func (*MACPayload) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACPayloadFieldPaths))
-	copy(ret, _MACPayloadFieldPaths[:])
-	return ret
+var MACPayloadFieldPathsTopLevel = []string{
+	"decoded_payload",
+	"f_hdr",
+	"f_port",
+	"frm_payload",
 }
 
-func (dst *MACPayload) SetFields(src *MACPayload, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "decoded_payload":
-			dst.DecodedPayload = src.DecodedPayload
+func (dst *MACPayload) SetFields(src *MACPayload, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "f_hdr":
-			dst.FHDR = src.FHDR
-		case "f_hdr.dev_addr":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_cnt":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_ctrl":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_ctrl.ack":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_ctrl.adr":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_ctrl.adr_ack_req":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_ctrl.class_b":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_ctrl.f_pending":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
-		case "f_hdr.f_opts":
-			dst.FHDR.SetFields(&src.FHDR, _pathsWithoutPrefix("f_hdr", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.FHDR
+				var newSrc *FHDR
+				if src != nil {
+					newSrc = &src.FHDR
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.FHDR = src.FHDR
+				} else {
+					var zero FHDR
+					dst.FHDR = zero
+				}
+			}
 		case "f_port":
-			dst.FPort = src.FPort
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FPort = src.FPort
+			} else {
+				var zero uint32
+				dst.FPort = zero
+			}
 		case "frm_payload":
-			dst.FRMPayload = src.FRMPayload
+			if len(subs) > 0 {
+				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FRMPayload = src.FRMPayload
+			} else {
+				var zero []byte
+				dst.FRMPayload = zero
+			}
+		case "decoded_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'decoded_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DecodedPayload = src.DecodedPayload
+			} else {
+				dst.DecodedPayload = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _FHDRFieldPaths = [...]string{
+var FHDRFieldPathsNested = []string{
 	"dev_addr",
 	"f_cnt",
 	"f_ctrl",
@@ -457,40 +350,73 @@ var _FHDRFieldPaths = [...]string{
 	"f_opts",
 }
 
-func (*FHDR) FieldMaskPaths() []string {
-	ret := make([]string, len(_FHDRFieldPaths))
-	copy(ret, _FHDRFieldPaths[:])
-	return ret
+var FHDRFieldPathsTopLevel = []string{
+	"dev_addr",
+	"f_cnt",
+	"f_ctrl",
+	"f_opts",
 }
 
-func (dst *FHDR) SetFields(src *FHDR, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *FHDR) SetFields(src *FHDR, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "dev_addr":
-			dst.DevAddr = src.DevAddr
-		case "f_cnt":
-			dst.FCnt = src.FCnt
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevAddr
+				dst.DevAddr = zero
+			}
 		case "f_ctrl":
-			dst.FCtrl = src.FCtrl
-		case "f_ctrl.ack":
-			dst.FCtrl.SetFields(&src.FCtrl, _pathsWithoutPrefix("f_ctrl", paths)...)
-		case "f_ctrl.adr":
-			dst.FCtrl.SetFields(&src.FCtrl, _pathsWithoutPrefix("f_ctrl", paths)...)
-		case "f_ctrl.adr_ack_req":
-			dst.FCtrl.SetFields(&src.FCtrl, _pathsWithoutPrefix("f_ctrl", paths)...)
-		case "f_ctrl.class_b":
-			dst.FCtrl.SetFields(&src.FCtrl, _pathsWithoutPrefix("f_ctrl", paths)...)
-		case "f_ctrl.f_pending":
-			dst.FCtrl.SetFields(&src.FCtrl, _pathsWithoutPrefix("f_ctrl", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.FCtrl
+				var newSrc *FCtrl
+				if src != nil {
+					newSrc = &src.FCtrl
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.FCtrl = src.FCtrl
+				} else {
+					var zero FCtrl
+					dst.FCtrl = zero
+				}
+			}
+		case "f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FCnt = src.FCnt
+			} else {
+				var zero uint32
+				dst.FCnt = zero
+			}
 		case "f_opts":
-			dst.FOpts = src.FOpts
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_opts' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FOpts = src.FOpts
+			} else {
+				var zero []byte
+				dst.FOpts = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _FCtrlFieldPaths = [...]string{
+var FCtrlFieldPathsNested = []string{
 	"ack",
 	"adr",
 	"adr_ack_req",
@@ -498,59 +424,129 @@ var _FCtrlFieldPaths = [...]string{
 	"f_pending",
 }
 
-func (*FCtrl) FieldMaskPaths() []string {
-	ret := make([]string, len(_FCtrlFieldPaths))
-	copy(ret, _FCtrlFieldPaths[:])
-	return ret
+var FCtrlFieldPathsTopLevel = []string{
+	"ack",
+	"adr",
+	"adr_ack_req",
+	"class_b",
+	"f_pending",
 }
 
-func (dst *FCtrl) SetFields(src *FCtrl, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "ack":
-			dst.Ack = src.Ack
+func (dst *FCtrl) SetFields(src *FCtrl, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "adr":
-			dst.ADR = src.ADR
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADR = src.ADR
+			} else {
+				var zero bool
+				dst.ADR = zero
+			}
 		case "adr_ack_req":
-			dst.ADRAckReq = src.ADRAckReq
-		case "class_b":
-			dst.ClassB = src.ClassB
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_ack_req' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRAckReq = src.ADRAckReq
+			} else {
+				var zero bool
+				dst.ADRAckReq = zero
+			}
+		case "ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ack = src.Ack
+			} else {
+				var zero bool
+				dst.Ack = zero
+			}
 		case "f_pending":
-			dst.FPending = src.FPending
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_pending' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FPending = src.FPending
+			} else {
+				var zero bool
+				dst.FPending = zero
+			}
+		case "class_b":
+			if len(subs) > 0 {
+				return fmt.Errorf("'class_b' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClassB = src.ClassB
+			} else {
+				var zero bool
+				dst.ClassB = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _JoinRequestPayloadFieldPaths = [...]string{
+var JoinRequestPayloadFieldPathsNested = []string{
 	"dev_eui",
 	"dev_nonce",
 	"join_eui",
 }
 
-func (*JoinRequestPayload) FieldMaskPaths() []string {
-	ret := make([]string, len(_JoinRequestPayloadFieldPaths))
-	copy(ret, _JoinRequestPayloadFieldPaths[:])
-	return ret
+var JoinRequestPayloadFieldPathsTopLevel = []string{
+	"dev_eui",
+	"dev_nonce",
+	"join_eui",
 }
 
-func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "dev_eui":
-			dst.DevEUI = src.DevEUI
-		case "dev_nonce":
-			dst.DevNonce = src.DevNonce
+func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "join_eui":
-			dst.JoinEUI = src.JoinEUI
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.JoinEUI = zero
+			}
+		case "dev_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEUI = src.DevEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.DevEUI = zero
+			}
+		case "dev_nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevNonce = src.DevNonce
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevNonce
+				dst.DevNonce = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _RejoinRequestPayloadFieldPaths = [...]string{
+var RejoinRequestPayloadFieldPathsNested = []string{
 	"dev_eui",
 	"join_eui",
 	"net_id",
@@ -558,32 +554,76 @@ var _RejoinRequestPayloadFieldPaths = [...]string{
 	"rejoin_type",
 }
 
-func (*RejoinRequestPayload) FieldMaskPaths() []string {
-	ret := make([]string, len(_RejoinRequestPayloadFieldPaths))
-	copy(ret, _RejoinRequestPayloadFieldPaths[:])
-	return ret
+var RejoinRequestPayloadFieldPathsTopLevel = []string{
+	"dev_eui",
+	"join_eui",
+	"net_id",
+	"rejoin_cnt",
+	"rejoin_type",
 }
 
-func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "dev_eui":
-			dst.DevEUI = src.DevEUI
-		case "join_eui":
-			dst.JoinEUI = src.JoinEUI
-		case "net_id":
-			dst.NetID = src.NetID
-		case "rejoin_cnt":
-			dst.RejoinCnt = src.RejoinCnt
+func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rejoin_type":
-			dst.RejoinType = src.RejoinType
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejoin_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejoinType = src.RejoinType
+			} else {
+				var zero RejoinType
+				dst.RejoinType = zero
+			}
+		case "net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetID = src.NetID
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
+				dst.NetID = zero
+			}
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.JoinEUI = zero
+			}
+		case "dev_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEUI = src.DevEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.DevEUI = zero
+			}
+		case "rejoin_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejoin_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejoinCnt = src.RejoinCnt
+			} else {
+				var zero uint32
+				dst.RejoinCnt = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _JoinAcceptPayloadFieldPaths = [...]string{
+var JoinAcceptPayloadFieldPathsNested = []string{
 	"cf_list",
 	"cf_list.ch_masks",
 	"cf_list.freq",
@@ -599,111 +639,221 @@ var _JoinAcceptPayloadFieldPaths = [...]string{
 	"rx_delay",
 }
 
-func (*JoinAcceptPayload) FieldMaskPaths() []string {
-	ret := make([]string, len(_JoinAcceptPayloadFieldPaths))
-	copy(ret, _JoinAcceptPayloadFieldPaths[:])
-	return ret
+var JoinAcceptPayloadFieldPathsTopLevel = []string{
+	"cf_list",
+	"dev_addr",
+	"dl_settings",
+	"encrypted",
+	"join_nonce",
+	"net_id",
+	"rx_delay",
 }
 
-func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "cf_list":
-			dst.CFList = src.CFList
-		case "cf_list.ch_masks":
-			if dst.CFList == nil {
-				dst.CFList = &CFList{}
-			}
-			dst.CFList.SetFields(src.CFList, _pathsWithoutPrefix("cf_list", paths)...)
-		case "cf_list.freq":
-			if dst.CFList == nil {
-				dst.CFList = &CFList{}
-			}
-			dst.CFList.SetFields(src.CFList, _pathsWithoutPrefix("cf_list", paths)...)
-		case "cf_list.type":
-			if dst.CFList == nil {
-				dst.CFList = &CFList{}
-			}
-			dst.CFList.SetFields(src.CFList, _pathsWithoutPrefix("cf_list", paths)...)
-		case "dev_addr":
-			dst.DevAddr = src.DevAddr
-		case "dl_settings":
-			dst.DLSettings = src.DLSettings
-		case "dl_settings.opt_neg":
-			dst.DLSettings.SetFields(&src.DLSettings, _pathsWithoutPrefix("dl_settings", paths)...)
-		case "dl_settings.rx1_dr_offset":
-			dst.DLSettings.SetFields(&src.DLSettings, _pathsWithoutPrefix("dl_settings", paths)...)
-		case "dl_settings.rx2_dr":
-			dst.DLSettings.SetFields(&src.DLSettings, _pathsWithoutPrefix("dl_settings", paths)...)
+func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "encrypted":
-			dst.Encrypted = src.Encrypted
+			if len(subs) > 0 {
+				return fmt.Errorf("'encrypted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Encrypted = src.Encrypted
+			} else {
+				var zero []byte
+				dst.Encrypted = zero
+			}
 		case "join_nonce":
-			dst.JoinNonce = src.JoinNonce
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinNonce = src.JoinNonce
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.JoinNonce
+				dst.JoinNonce = zero
+			}
 		case "net_id":
-			dst.NetID = src.NetID
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetID = src.NetID
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
+				dst.NetID = zero
+			}
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevAddr
+				dst.DevAddr = zero
+			}
+		case "dl_settings":
+			if len(subs) > 0 {
+				newDst := &dst.DLSettings
+				var newSrc *DLSettings
+				if src != nil {
+					newSrc = &src.DLSettings
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DLSettings = src.DLSettings
+				} else {
+					var zero DLSettings
+					dst.DLSettings = zero
+				}
+			}
 		case "rx_delay":
-			dst.RxDelay = src.RxDelay
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RxDelay = src.RxDelay
+			} else {
+				var zero RxDelay
+				dst.RxDelay = zero
+			}
+		case "cf_list":
+			if len(subs) > 0 {
+				newDst := dst.CFList
+				if newDst == nil {
+					newDst = &CFList{}
+					dst.CFList = newDst
+				}
+				var newSrc *CFList
+				if src != nil {
+					newSrc = src.CFList
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CFList = src.CFList
+				} else {
+					dst.CFList = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _DLSettingsFieldPaths = [...]string{
+var DLSettingsFieldPathsNested = []string{
 	"opt_neg",
 	"rx1_dr_offset",
 	"rx2_dr",
 }
 
-func (*DLSettings) FieldMaskPaths() []string {
-	ret := make([]string, len(_DLSettingsFieldPaths))
-	copy(ret, _DLSettingsFieldPaths[:])
-	return ret
+var DLSettingsFieldPathsTopLevel = []string{
+	"opt_neg",
+	"rx1_dr_offset",
+	"rx2_dr",
 }
 
-func (dst *DLSettings) SetFields(src *DLSettings, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "opt_neg":
-			dst.OptNeg = src.OptNeg
+func (dst *DLSettings) SetFields(src *DLSettings, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rx1_dr_offset":
-			dst.Rx1DROffset = src.Rx1DROffset
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_dr_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1DROffset = src.Rx1DROffset
+			} else {
+				var zero uint32
+				dst.Rx1DROffset = zero
+			}
 		case "rx2_dr":
-			dst.Rx2DR = src.Rx2DR
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_dr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2DR = src.Rx2DR
+			} else {
+				var zero DataRateIndex
+				dst.Rx2DR = zero
+			}
+		case "opt_neg":
+			if len(subs) > 0 {
+				return fmt.Errorf("'opt_neg' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OptNeg = src.OptNeg
+			} else {
+				var zero bool
+				dst.OptNeg = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CFListFieldPaths = [...]string{
+var CFListFieldPathsNested = []string{
 	"ch_masks",
 	"freq",
 	"type",
 }
 
-func (*CFList) FieldMaskPaths() []string {
-	ret := make([]string, len(_CFListFieldPaths))
-	copy(ret, _CFListFieldPaths[:])
-	return ret
+var CFListFieldPathsTopLevel = []string{
+	"ch_masks",
+	"freq",
+	"type",
 }
 
-func (dst *CFList) SetFields(src *CFList, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "ch_masks":
-			dst.ChMasks = src.ChMasks
-		case "freq":
-			dst.Freq = src.Freq
+func (dst *CFList) SetFields(src *CFList, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "type":
-			dst.Type = src.Type
+			if len(subs) > 0 {
+				return fmt.Errorf("'type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Type = src.Type
+			} else {
+				var zero CFListType
+				dst.Type = zero
+			}
+		case "freq":
+			if len(subs) > 0 {
+				return fmt.Errorf("'freq' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Freq = src.Freq
+			} else {
+				dst.Freq = nil
+			}
+		case "ch_masks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ch_masks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChMasks = src.ChMasks
+			} else {
+				dst.ChMasks = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _TxSettingsFieldPaths = [...]string{
+var TxSettingsFieldPathsNested = []string{
 	"bandwidth",
 	"bit_rate",
 	"channel_index",
@@ -717,839 +867,1115 @@ var _TxSettingsFieldPaths = [...]string{
 	"tx_power",
 }
 
-func (*TxSettings) FieldMaskPaths() []string {
-	ret := make([]string, len(_TxSettingsFieldPaths))
-	copy(ret, _TxSettingsFieldPaths[:])
-	return ret
+var TxSettingsFieldPathsTopLevel = []string{
+	"bandwidth",
+	"bit_rate",
+	"channel_index",
+	"coding_rate",
+	"data_rate_index",
+	"enable_crc",
+	"frequency",
+	"invert_polarization",
+	"modulation",
+	"spreading_factor",
+	"tx_power",
 }
 
-func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "bandwidth":
-			dst.Bandwidth = src.Bandwidth
-		case "bit_rate":
-			dst.BitRate = src.BitRate
-		case "channel_index":
-			dst.ChannelIndex = src.ChannelIndex
-		case "coding_rate":
-			dst.CodingRate = src.CodingRate
-		case "data_rate_index":
-			dst.DataRateIndex = src.DataRateIndex
-		case "enable_crc":
-			dst.EnableCRC = src.EnableCRC
-		case "frequency":
-			dst.Frequency = src.Frequency
-		case "invert_polarization":
-			dst.InvertPolarization = src.InvertPolarization
+func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "modulation":
-			dst.Modulation = src.Modulation
+			if len(subs) > 0 {
+				return fmt.Errorf("'modulation' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Modulation = src.Modulation
+			} else {
+				var zero Modulation
+				dst.Modulation = zero
+			}
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.DataRateIndex = zero
+			}
+		case "bandwidth":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bandwidth' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bandwidth = src.Bandwidth
+			} else {
+				var zero uint32
+				dst.Bandwidth = zero
+			}
 		case "spreading_factor":
-			dst.SpreadingFactor = src.SpreadingFactor
+			if len(subs) > 0 {
+				return fmt.Errorf("'spreading_factor' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SpreadingFactor = src.SpreadingFactor
+			} else {
+				var zero uint32
+				dst.SpreadingFactor = zero
+			}
+		case "bit_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bit_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BitRate = src.BitRate
+			} else {
+				var zero uint32
+				dst.BitRate = zero
+			}
+		case "coding_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'coding_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CodingRate = src.CodingRate
+			} else {
+				var zero string
+				dst.CodingRate = zero
+			}
+		case "frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
 		case "tx_power":
-			dst.TxPower = src.TxPower
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_power' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxPower = src.TxPower
+			} else {
+				var zero int32
+				dst.TxPower = zero
+			}
+		case "invert_polarization":
+			if len(subs) > 0 {
+				return fmt.Errorf("'invert_polarization' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.InvertPolarization = src.InvertPolarization
+			} else {
+				var zero bool
+				dst.InvertPolarization = zero
+			}
+		case "channel_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelIndex = src.ChannelIndex
+			} else {
+				var zero uint32
+				dst.ChannelIndex = zero
+			}
+		case "enable_crc":
+			if len(subs) > 0 {
+				return fmt.Errorf("'enable_crc' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EnableCRC = src.EnableCRC
+			} else {
+				var zero bool
+				dst.EnableCRC = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommandFieldPaths = [...]string{
-	"adr_param_setup_req",
-	"adr_param_setup_req.adr_ack_delay_exponent",
-	"adr_param_setup_req.adr_ack_limit_exponent",
-	"beacon_freq_ans",
-	"beacon_freq_ans.frequency_ack",
-	"beacon_freq_req",
-	"beacon_freq_req.frequency",
-	"beacon_timing_ans",
-	"beacon_timing_ans.channel_index",
-	"beacon_timing_ans.delay",
+var MACCommandFieldPathsNested = []string{
 	"cid",
-	"dev_status_ans",
-	"dev_status_ans.battery",
-	"dev_status_ans.margin",
-	"device_mode_conf",
-	"device_mode_conf.class",
-	"device_mode_ind",
-	"device_mode_ind.class",
-	"device_time_ans",
-	"device_time_ans.time",
-	"dl_channel_ans",
-	"dl_channel_ans.channel_index_ack",
-	"dl_channel_ans.frequency_ack",
-	"dl_channel_req",
-	"dl_channel_req.channel_index",
-	"dl_channel_req.frequency",
-	"duty_cycle_req",
-	"duty_cycle_req.max_duty_cycle",
-	"force_rejoin_req",
-	"force_rejoin_req.data_rate_index",
-	"force_rejoin_req.max_retries",
-	"force_rejoin_req.period_exponent",
-	"force_rejoin_req.rejoin_type",
-	"link_adr_ans",
-	"link_adr_ans.channel_mask_ack",
-	"link_adr_ans.data_rate_index_ack",
-	"link_adr_ans.tx_power_index_ack",
-	"link_adr_req",
-	"link_adr_req.channel_mask",
-	"link_adr_req.channel_mask_control",
-	"link_adr_req.data_rate_index",
-	"link_adr_req.nb_trans",
-	"link_adr_req.tx_power_index",
-	"link_check_ans",
-	"link_check_ans.gateway_count",
-	"link_check_ans.margin",
-	"new_channel_ans",
-	"new_channel_ans.data_rate_ack",
-	"new_channel_ans.frequency_ack",
-	"new_channel_req",
-	"new_channel_req.channel_index",
-	"new_channel_req.frequency",
-	"new_channel_req.max_data_rate_index",
-	"new_channel_req.min_data_rate_index",
-	"ping_slot_channel_ans",
-	"ping_slot_channel_ans.data_rate_index_ack",
-	"ping_slot_channel_ans.frequency_ack",
-	"ping_slot_channel_req",
-	"ping_slot_channel_req.data_rate_index",
-	"ping_slot_channel_req.frequency",
-	"ping_slot_info_req",
-	"ping_slot_info_req.period",
-	"raw_payload",
-	"rejoin_param_setup_ans",
-	"rejoin_param_setup_ans.max_time_exponent_ack",
-	"rejoin_param_setup_req",
-	"rejoin_param_setup_req.max_count_exponent",
-	"rejoin_param_setup_req.max_time_exponent",
-	"rekey_conf",
-	"rekey_conf.minor_version",
-	"rekey_ind",
-	"rekey_ind.minor_version",
-	"reset_conf",
-	"reset_conf.minor_version",
-	"reset_ind",
-	"reset_ind.minor_version",
-	"rx_param_setup_ans",
-	"rx_param_setup_ans.rx1_data_rate_offset_ack",
-	"rx_param_setup_ans.rx2_data_rate_index_ack",
-	"rx_param_setup_ans.rx2_frequency_ack",
-	"rx_param_setup_req",
-	"rx_param_setup_req.rx1_data_rate_offset",
-	"rx_param_setup_req.rx2_data_rate_index",
-	"rx_param_setup_req.rx2_frequency",
-	"rx_timing_setup_req",
-	"rx_timing_setup_req.delay",
-	"tx_param_setup_req",
-	"tx_param_setup_req.downlink_dwell_time",
-	"tx_param_setup_req.max_eirp_index",
-	"tx_param_setup_req.uplink_dwell_time",
+	"payload",
+	"payload.adr_param_setup_req",
+	"payload.adr_param_setup_req.adr_ack_delay_exponent",
+	"payload.adr_param_setup_req.adr_ack_limit_exponent",
+	"payload.beacon_freq_ans",
+	"payload.beacon_freq_ans.frequency_ack",
+	"payload.beacon_freq_req",
+	"payload.beacon_freq_req.frequency",
+	"payload.beacon_timing_ans",
+	"payload.beacon_timing_ans.channel_index",
+	"payload.beacon_timing_ans.delay",
+	"payload.dev_status_ans",
+	"payload.dev_status_ans.battery",
+	"payload.dev_status_ans.margin",
+	"payload.device_mode_conf",
+	"payload.device_mode_conf.class",
+	"payload.device_mode_ind",
+	"payload.device_mode_ind.class",
+	"payload.device_time_ans",
+	"payload.device_time_ans.time",
+	"payload.dl_channel_ans",
+	"payload.dl_channel_ans.channel_index_ack",
+	"payload.dl_channel_ans.frequency_ack",
+	"payload.dl_channel_req",
+	"payload.dl_channel_req.channel_index",
+	"payload.dl_channel_req.frequency",
+	"payload.duty_cycle_req",
+	"payload.duty_cycle_req.max_duty_cycle",
+	"payload.force_rejoin_req",
+	"payload.force_rejoin_req.data_rate_index",
+	"payload.force_rejoin_req.max_retries",
+	"payload.force_rejoin_req.period_exponent",
+	"payload.force_rejoin_req.rejoin_type",
+	"payload.link_adr_ans",
+	"payload.link_adr_ans.channel_mask_ack",
+	"payload.link_adr_ans.data_rate_index_ack",
+	"payload.link_adr_ans.tx_power_index_ack",
+	"payload.link_adr_req",
+	"payload.link_adr_req.channel_mask",
+	"payload.link_adr_req.channel_mask_control",
+	"payload.link_adr_req.data_rate_index",
+	"payload.link_adr_req.nb_trans",
+	"payload.link_adr_req.tx_power_index",
+	"payload.link_check_ans",
+	"payload.link_check_ans.gateway_count",
+	"payload.link_check_ans.margin",
+	"payload.new_channel_ans",
+	"payload.new_channel_ans.data_rate_ack",
+	"payload.new_channel_ans.frequency_ack",
+	"payload.new_channel_req",
+	"payload.new_channel_req.channel_index",
+	"payload.new_channel_req.frequency",
+	"payload.new_channel_req.max_data_rate_index",
+	"payload.new_channel_req.min_data_rate_index",
+	"payload.ping_slot_channel_ans",
+	"payload.ping_slot_channel_ans.data_rate_index_ack",
+	"payload.ping_slot_channel_ans.frequency_ack",
+	"payload.ping_slot_channel_req",
+	"payload.ping_slot_channel_req.data_rate_index",
+	"payload.ping_slot_channel_req.frequency",
+	"payload.ping_slot_info_req",
+	"payload.ping_slot_info_req.period",
+	"payload.raw_payload",
+	"payload.rejoin_param_setup_ans",
+	"payload.rejoin_param_setup_ans.max_time_exponent_ack",
+	"payload.rejoin_param_setup_req",
+	"payload.rejoin_param_setup_req.max_count_exponent",
+	"payload.rejoin_param_setup_req.max_time_exponent",
+	"payload.rekey_conf",
+	"payload.rekey_conf.minor_version",
+	"payload.rekey_ind",
+	"payload.rekey_ind.minor_version",
+	"payload.reset_conf",
+	"payload.reset_conf.minor_version",
+	"payload.reset_ind",
+	"payload.reset_ind.minor_version",
+	"payload.rx_param_setup_ans",
+	"payload.rx_param_setup_ans.rx1_data_rate_offset_ack",
+	"payload.rx_param_setup_ans.rx2_data_rate_index_ack",
+	"payload.rx_param_setup_ans.rx2_frequency_ack",
+	"payload.rx_param_setup_req",
+	"payload.rx_param_setup_req.rx1_data_rate_offset",
+	"payload.rx_param_setup_req.rx2_data_rate_index",
+	"payload.rx_param_setup_req.rx2_frequency",
+	"payload.rx_timing_setup_req",
+	"payload.rx_timing_setup_req.delay",
+	"payload.tx_param_setup_req",
+	"payload.tx_param_setup_req.downlink_dwell_time",
+	"payload.tx_param_setup_req.max_eirp_index",
+	"payload.tx_param_setup_req.uplink_dwell_time",
 }
 
-func (*MACCommand) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommandFieldPaths))
-	copy(ret, _MACCommandFieldPaths[:])
-	return ret
+var MACCommandFieldPathsTopLevel = []string{
+	"cid",
+	"payload",
 }
 
-func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "adr_param_setup_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ADRParamSetupReq_{}
-			}
-			dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq = src.GetADRParamSetupReq()
-		case "adr_param_setup_req.adr_ack_delay_exponent":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ADRParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq == nil {
-				dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq = &MACCommand_ADRParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq.SetFields(src.GetADRParamSetupReq(), _pathsWithoutPrefix("adr_param_setup_req", paths)...)
-		case "adr_param_setup_req.adr_ack_limit_exponent":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ADRParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq == nil {
-				dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq = &MACCommand_ADRParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq.SetFields(src.GetADRParamSetupReq(), _pathsWithoutPrefix("adr_param_setup_req", paths)...)
-		case "beacon_freq_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconFreqAns_{}
-			}
-			dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns = src.GetBeaconFreqAns()
-		case "beacon_freq_ans.frequency_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconFreqAns_{}
-			}
-			if dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns == nil {
-				dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns = &MACCommand_BeaconFreqAns{}
-			}
-			dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns.SetFields(src.GetBeaconFreqAns(), _pathsWithoutPrefix("beacon_freq_ans", paths)...)
-		case "beacon_freq_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconFreqReq_{}
-			}
-			dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq = src.GetBeaconFreqReq()
-		case "beacon_freq_req.frequency":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconFreqReq_{}
-			}
-			if dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq == nil {
-				dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq = &MACCommand_BeaconFreqReq{}
-			}
-			dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq.SetFields(src.GetBeaconFreqReq(), _pathsWithoutPrefix("beacon_freq_req", paths)...)
-		case "beacon_timing_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconTimingAns_{}
-			}
-			dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns = src.GetBeaconTimingAns()
-		case "beacon_timing_ans.channel_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconTimingAns_{}
-			}
-			if dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns == nil {
-				dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns = &MACCommand_BeaconTimingAns{}
-			}
-			dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns.SetFields(src.GetBeaconTimingAns(), _pathsWithoutPrefix("beacon_timing_ans", paths)...)
-		case "beacon_timing_ans.delay":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_BeaconTimingAns_{}
-			}
-			if dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns == nil {
-				dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns = &MACCommand_BeaconTimingAns{}
-			}
-			dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns.SetFields(src.GetBeaconTimingAns(), _pathsWithoutPrefix("beacon_timing_ans", paths)...)
+func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "cid":
-			dst.CID = src.CID
-		case "dev_status_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DevStatusAns_{}
-			}
-			dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns = src.GetDevStatusAns()
-		case "dev_status_ans.battery":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DevStatusAns_{}
-			}
-			if dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns == nil {
-				dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns = &MACCommand_DevStatusAns{}
-			}
-			dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns.SetFields(src.GetDevStatusAns(), _pathsWithoutPrefix("dev_status_ans", paths)...)
-		case "dev_status_ans.margin":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DevStatusAns_{}
-			}
-			if dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns == nil {
-				dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns = &MACCommand_DevStatusAns{}
-			}
-			dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns.SetFields(src.GetDevStatusAns(), _pathsWithoutPrefix("dev_status_ans", paths)...)
-		case "device_mode_conf":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DeviceModeConf_{}
-			}
-			dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf = src.GetDeviceModeConf()
-		case "device_mode_conf.class":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DeviceModeConf_{}
-			}
-			if dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf == nil {
-				dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf = &MACCommand_DeviceModeConf{}
-			}
-			dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf.SetFields(src.GetDeviceModeConf(), _pathsWithoutPrefix("device_mode_conf", paths)...)
-		case "device_mode_ind":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DeviceModeInd_{}
-			}
-			dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd = src.GetDeviceModeInd()
-		case "device_mode_ind.class":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DeviceModeInd_{}
-			}
-			if dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd == nil {
-				dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd = &MACCommand_DeviceModeInd{}
-			}
-			dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd.SetFields(src.GetDeviceModeInd(), _pathsWithoutPrefix("device_mode_ind", paths)...)
-		case "device_time_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DeviceTimeAns_{}
-			}
-			dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns = src.GetDeviceTimeAns()
-		case "device_time_ans.time":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DeviceTimeAns_{}
-			}
-			if dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns == nil {
-				dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns = &MACCommand_DeviceTimeAns{}
-			}
-			dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns.SetFields(src.GetDeviceTimeAns(), _pathsWithoutPrefix("device_time_ans", paths)...)
-		case "dl_channel_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DLChannelAns_{}
-			}
-			dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = src.GetDLChannelAns()
-		case "dl_channel_ans.channel_index_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DLChannelAns_{}
-			}
-			if dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns == nil {
-				dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = &MACCommand_DLChannelAns{}
-			}
-			dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns.SetFields(src.GetDLChannelAns(), _pathsWithoutPrefix("dl_channel_ans", paths)...)
-		case "dl_channel_ans.frequency_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DLChannelAns_{}
-			}
-			if dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns == nil {
-				dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = &MACCommand_DLChannelAns{}
-			}
-			dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns.SetFields(src.GetDLChannelAns(), _pathsWithoutPrefix("dl_channel_ans", paths)...)
-		case "dl_channel_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DLChannelReq_{}
-			}
-			dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = src.GetDLChannelReq()
-		case "dl_channel_req.channel_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DLChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq == nil {
-				dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = &MACCommand_DLChannelReq{}
-			}
-			dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq.SetFields(src.GetDLChannelReq(), _pathsWithoutPrefix("dl_channel_req", paths)...)
-		case "dl_channel_req.frequency":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DLChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq == nil {
-				dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = &MACCommand_DLChannelReq{}
-			}
-			dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq.SetFields(src.GetDLChannelReq(), _pathsWithoutPrefix("dl_channel_req", paths)...)
-		case "duty_cycle_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DutyCycleReq_{}
-			}
-			dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq = src.GetDutyCycleReq()
-		case "duty_cycle_req.max_duty_cycle":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_DutyCycleReq_{}
-			}
-			if dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq == nil {
-				dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq = &MACCommand_DutyCycleReq{}
-			}
-			dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq.SetFields(src.GetDutyCycleReq(), _pathsWithoutPrefix("duty_cycle_req", paths)...)
-		case "force_rejoin_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ForceRejoinReq_{}
-			}
-			dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = src.GetForceRejoinReq()
-		case "force_rejoin_req.data_rate_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ForceRejoinReq_{}
-			}
-			if dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq == nil {
-				dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = &MACCommand_ForceRejoinReq{}
-			}
-			dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq.SetFields(src.GetForceRejoinReq(), _pathsWithoutPrefix("force_rejoin_req", paths)...)
-		case "force_rejoin_req.max_retries":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ForceRejoinReq_{}
-			}
-			if dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq == nil {
-				dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = &MACCommand_ForceRejoinReq{}
-			}
-			dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq.SetFields(src.GetForceRejoinReq(), _pathsWithoutPrefix("force_rejoin_req", paths)...)
-		case "force_rejoin_req.period_exponent":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ForceRejoinReq_{}
-			}
-			if dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq == nil {
-				dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = &MACCommand_ForceRejoinReq{}
-			}
-			dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq.SetFields(src.GetForceRejoinReq(), _pathsWithoutPrefix("force_rejoin_req", paths)...)
-		case "force_rejoin_req.rejoin_type":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ForceRejoinReq_{}
-			}
-			if dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq == nil {
-				dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = &MACCommand_ForceRejoinReq{}
-			}
-			dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq.SetFields(src.GetForceRejoinReq(), _pathsWithoutPrefix("force_rejoin_req", paths)...)
-		case "link_adr_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRAns_{}
-			}
-			dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = src.GetLinkADRAns()
-		case "link_adr_ans.channel_mask_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRAns_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns == nil {
-				dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = &MACCommand_LinkADRAns{}
-			}
-			dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns.SetFields(src.GetLinkADRAns(), _pathsWithoutPrefix("link_adr_ans", paths)...)
-		case "link_adr_ans.data_rate_index_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRAns_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns == nil {
-				dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = &MACCommand_LinkADRAns{}
-			}
-			dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns.SetFields(src.GetLinkADRAns(), _pathsWithoutPrefix("link_adr_ans", paths)...)
-		case "link_adr_ans.tx_power_index_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRAns_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns == nil {
-				dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = &MACCommand_LinkADRAns{}
-			}
-			dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns.SetFields(src.GetLinkADRAns(), _pathsWithoutPrefix("link_adr_ans", paths)...)
-		case "link_adr_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRReq_{}
-			}
-			dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = src.GetLinkADRReq()
-		case "link_adr_req.channel_mask":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRReq_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq == nil {
-				dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = &MACCommand_LinkADRReq{}
-			}
-			dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq.SetFields(src.GetLinkADRReq(), _pathsWithoutPrefix("link_adr_req", paths)...)
-		case "link_adr_req.channel_mask_control":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRReq_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq == nil {
-				dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = &MACCommand_LinkADRReq{}
-			}
-			dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq.SetFields(src.GetLinkADRReq(), _pathsWithoutPrefix("link_adr_req", paths)...)
-		case "link_adr_req.data_rate_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRReq_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq == nil {
-				dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = &MACCommand_LinkADRReq{}
-			}
-			dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq.SetFields(src.GetLinkADRReq(), _pathsWithoutPrefix("link_adr_req", paths)...)
-		case "link_adr_req.nb_trans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRReq_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq == nil {
-				dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = &MACCommand_LinkADRReq{}
-			}
-			dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq.SetFields(src.GetLinkADRReq(), _pathsWithoutPrefix("link_adr_req", paths)...)
-		case "link_adr_req.tx_power_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkADRReq_{}
-			}
-			if dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq == nil {
-				dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = &MACCommand_LinkADRReq{}
-			}
-			dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq.SetFields(src.GetLinkADRReq(), _pathsWithoutPrefix("link_adr_req", paths)...)
-		case "link_check_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkCheckAns_{}
-			}
-			dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns = src.GetLinkCheckAns()
-		case "link_check_ans.gateway_count":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkCheckAns_{}
-			}
-			if dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns == nil {
-				dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns = &MACCommand_LinkCheckAns{}
-			}
-			dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns.SetFields(src.GetLinkCheckAns(), _pathsWithoutPrefix("link_check_ans", paths)...)
-		case "link_check_ans.margin":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_LinkCheckAns_{}
-			}
-			if dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns == nil {
-				dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns = &MACCommand_LinkCheckAns{}
-			}
-			dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns.SetFields(src.GetLinkCheckAns(), _pathsWithoutPrefix("link_check_ans", paths)...)
-		case "new_channel_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelAns_{}
-			}
-			dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns = src.GetNewChannelAns()
-		case "new_channel_ans.data_rate_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelAns_{}
-			}
-			if dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns == nil {
-				dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns = &MACCommand_NewChannelAns{}
-			}
-			dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns.SetFields(src.GetNewChannelAns(), _pathsWithoutPrefix("new_channel_ans", paths)...)
-		case "new_channel_ans.frequency_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelAns_{}
-			}
-			if dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns == nil {
-				dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns = &MACCommand_NewChannelAns{}
-			}
-			dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns.SetFields(src.GetNewChannelAns(), _pathsWithoutPrefix("new_channel_ans", paths)...)
-		case "new_channel_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelReq_{}
-			}
-			dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = src.GetNewChannelReq()
-		case "new_channel_req.channel_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq == nil {
-				dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = &MACCommand_NewChannelReq{}
-			}
-			dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq.SetFields(src.GetNewChannelReq(), _pathsWithoutPrefix("new_channel_req", paths)...)
-		case "new_channel_req.frequency":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq == nil {
-				dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = &MACCommand_NewChannelReq{}
-			}
-			dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq.SetFields(src.GetNewChannelReq(), _pathsWithoutPrefix("new_channel_req", paths)...)
-		case "new_channel_req.max_data_rate_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq == nil {
-				dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = &MACCommand_NewChannelReq{}
-			}
-			dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq.SetFields(src.GetNewChannelReq(), _pathsWithoutPrefix("new_channel_req", paths)...)
-		case "new_channel_req.min_data_rate_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_NewChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq == nil {
-				dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = &MACCommand_NewChannelReq{}
-			}
-			dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq.SetFields(src.GetNewChannelReq(), _pathsWithoutPrefix("new_channel_req", paths)...)
-		case "ping_slot_channel_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotChannelAns_{}
-			}
-			dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns = src.GetPingSlotChannelAns()
-		case "ping_slot_channel_ans.data_rate_index_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotChannelAns_{}
-			}
-			if dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns == nil {
-				dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns = &MACCommand_PingSlotChannelAns{}
-			}
-			dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns.SetFields(src.GetPingSlotChannelAns(), _pathsWithoutPrefix("ping_slot_channel_ans", paths)...)
-		case "ping_slot_channel_ans.frequency_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotChannelAns_{}
-			}
-			if dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns == nil {
-				dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns = &MACCommand_PingSlotChannelAns{}
-			}
-			dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns.SetFields(src.GetPingSlotChannelAns(), _pathsWithoutPrefix("ping_slot_channel_ans", paths)...)
-		case "ping_slot_channel_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotChannelReq_{}
-			}
-			dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq = src.GetPingSlotChannelReq()
-		case "ping_slot_channel_req.data_rate_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq == nil {
-				dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq = &MACCommand_PingSlotChannelReq{}
-			}
-			dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq.SetFields(src.GetPingSlotChannelReq(), _pathsWithoutPrefix("ping_slot_channel_req", paths)...)
-		case "ping_slot_channel_req.frequency":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotChannelReq_{}
-			}
-			if dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq == nil {
-				dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq = &MACCommand_PingSlotChannelReq{}
-			}
-			dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq.SetFields(src.GetPingSlotChannelReq(), _pathsWithoutPrefix("ping_slot_channel_req", paths)...)
-		case "ping_slot_info_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotInfoReq_{}
-			}
-			dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq = src.GetPingSlotInfoReq()
-		case "ping_slot_info_req.period":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_PingSlotInfoReq_{}
-			}
-			if dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq == nil {
-				dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq = &MACCommand_PingSlotInfoReq{}
-			}
-			dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq.SetFields(src.GetPingSlotInfoReq(), _pathsWithoutPrefix("ping_slot_info_req", paths)...)
-		case "raw_payload":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RawPayload{}
-			}
-			dst.Payload.(*MACCommand_RawPayload).RawPayload = src.GetRawPayload()
-		case "rejoin_param_setup_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RejoinParamSetupAns_{}
-			}
-			dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns = src.GetRejoinParamSetupAns()
-		case "rejoin_param_setup_ans.max_time_exponent_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RejoinParamSetupAns_{}
-			}
-			if dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns == nil {
-				dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns = &MACCommand_RejoinParamSetupAns{}
-			}
-			dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns.SetFields(src.GetRejoinParamSetupAns(), _pathsWithoutPrefix("rejoin_param_setup_ans", paths)...)
-		case "rejoin_param_setup_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RejoinParamSetupReq_{}
-			}
-			dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq = src.GetRejoinParamSetupReq()
-		case "rejoin_param_setup_req.max_count_exponent":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RejoinParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq == nil {
-				dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq = &MACCommand_RejoinParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq.SetFields(src.GetRejoinParamSetupReq(), _pathsWithoutPrefix("rejoin_param_setup_req", paths)...)
-		case "rejoin_param_setup_req.max_time_exponent":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RejoinParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq == nil {
-				dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq = &MACCommand_RejoinParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq.SetFields(src.GetRejoinParamSetupReq(), _pathsWithoutPrefix("rejoin_param_setup_req", paths)...)
-		case "rekey_conf":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RekeyConf_{}
-			}
-			dst.Payload.(*MACCommand_RekeyConf_).RekeyConf = src.GetRekeyConf()
-		case "rekey_conf.minor_version":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RekeyConf_{}
-			}
-			if dst.Payload.(*MACCommand_RekeyConf_).RekeyConf == nil {
-				dst.Payload.(*MACCommand_RekeyConf_).RekeyConf = &MACCommand_RekeyConf{}
-			}
-			dst.Payload.(*MACCommand_RekeyConf_).RekeyConf.SetFields(src.GetRekeyConf(), _pathsWithoutPrefix("rekey_conf", paths)...)
-		case "rekey_ind":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RekeyInd_{}
-			}
-			dst.Payload.(*MACCommand_RekeyInd_).RekeyInd = src.GetRekeyInd()
-		case "rekey_ind.minor_version":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RekeyInd_{}
-			}
-			if dst.Payload.(*MACCommand_RekeyInd_).RekeyInd == nil {
-				dst.Payload.(*MACCommand_RekeyInd_).RekeyInd = &MACCommand_RekeyInd{}
-			}
-			dst.Payload.(*MACCommand_RekeyInd_).RekeyInd.SetFields(src.GetRekeyInd(), _pathsWithoutPrefix("rekey_ind", paths)...)
-		case "reset_conf":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ResetConf_{}
-			}
-			dst.Payload.(*MACCommand_ResetConf_).ResetConf = src.GetResetConf()
-		case "reset_conf.minor_version":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ResetConf_{}
-			}
-			if dst.Payload.(*MACCommand_ResetConf_).ResetConf == nil {
-				dst.Payload.(*MACCommand_ResetConf_).ResetConf = &MACCommand_ResetConf{}
-			}
-			dst.Payload.(*MACCommand_ResetConf_).ResetConf.SetFields(src.GetResetConf(), _pathsWithoutPrefix("reset_conf", paths)...)
-		case "reset_ind":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ResetInd_{}
-			}
-			dst.Payload.(*MACCommand_ResetInd_).ResetInd = src.GetResetInd()
-		case "reset_ind.minor_version":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_ResetInd_{}
-			}
-			if dst.Payload.(*MACCommand_ResetInd_).ResetInd == nil {
-				dst.Payload.(*MACCommand_ResetInd_).ResetInd = &MACCommand_ResetInd{}
-			}
-			dst.Payload.(*MACCommand_ResetInd_).ResetInd.SetFields(src.GetResetInd(), _pathsWithoutPrefix("reset_ind", paths)...)
-		case "rx_param_setup_ans":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupAns_{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = src.GetRxParamSetupAns()
-		case "rx_param_setup_ans.rx1_data_rate_offset_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupAns_{}
-			}
-			if dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns == nil {
-				dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = &MACCommand_RxParamSetupAns{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns.SetFields(src.GetRxParamSetupAns(), _pathsWithoutPrefix("rx_param_setup_ans", paths)...)
-		case "rx_param_setup_ans.rx2_data_rate_index_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupAns_{}
-			}
-			if dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns == nil {
-				dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = &MACCommand_RxParamSetupAns{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns.SetFields(src.GetRxParamSetupAns(), _pathsWithoutPrefix("rx_param_setup_ans", paths)...)
-		case "rx_param_setup_ans.rx2_frequency_ack":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupAns_{}
-			}
-			if dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns == nil {
-				dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = &MACCommand_RxParamSetupAns{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns.SetFields(src.GetRxParamSetupAns(), _pathsWithoutPrefix("rx_param_setup_ans", paths)...)
-		case "rx_param_setup_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupReq_{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = src.GetRxParamSetupReq()
-		case "rx_param_setup_req.rx1_data_rate_offset":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq == nil {
-				dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = &MACCommand_RxParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq.SetFields(src.GetRxParamSetupReq(), _pathsWithoutPrefix("rx_param_setup_req", paths)...)
-		case "rx_param_setup_req.rx2_data_rate_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq == nil {
-				dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = &MACCommand_RxParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq.SetFields(src.GetRxParamSetupReq(), _pathsWithoutPrefix("rx_param_setup_req", paths)...)
-		case "rx_param_setup_req.rx2_frequency":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq == nil {
-				dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = &MACCommand_RxParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq.SetFields(src.GetRxParamSetupReq(), _pathsWithoutPrefix("rx_param_setup_req", paths)...)
-		case "rx_timing_setup_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxTimingSetupReq_{}
-			}
-			dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq = src.GetRxTimingSetupReq()
-		case "rx_timing_setup_req.delay":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_RxTimingSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq == nil {
-				dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq = &MACCommand_RxTimingSetupReq{}
-			}
-			dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq.SetFields(src.GetRxTimingSetupReq(), _pathsWithoutPrefix("rx_timing_setup_req", paths)...)
-		case "tx_param_setup_req":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_TxParamSetupReq_{}
-			}
-			dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = src.GetTxParamSetupReq()
-		case "tx_param_setup_req.downlink_dwell_time":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_TxParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq == nil {
-				dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = &MACCommand_TxParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq.SetFields(src.GetTxParamSetupReq(), _pathsWithoutPrefix("tx_param_setup_req", paths)...)
-		case "tx_param_setup_req.max_eirp_index":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_TxParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq == nil {
-				dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = &MACCommand_TxParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq.SetFields(src.GetTxParamSetupReq(), _pathsWithoutPrefix("tx_param_setup_req", paths)...)
-		case "tx_param_setup_req.uplink_dwell_time":
-			if dst.Payload == nil {
-				dst.Payload = &MACCommand_TxParamSetupReq_{}
-			}
-			if dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq == nil {
-				dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = &MACCommand_TxParamSetupReq{}
-			}
-			dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq.SetFields(src.GetTxParamSetupReq(), _pathsWithoutPrefix("tx_param_setup_req", paths)...)
+			if len(subs) > 0 {
+				return fmt.Errorf("'cid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CID = src.CID
+			} else {
+				var zero MACCommandIdentifier
+				dst.CID = zero
+			}
+
+		case "payload":
+			if len(subs) == 0 && src == nil {
+				dst.Payload = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Payload = src.Payload
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "raw_payload":
+					if _, ok := dst.Payload.(*MACCommand_RawPayload); !ok {
+						dst.Payload = &MACCommand_RawPayload{}
+					}
+					if len(oneofSubs) > 0 {
+						return fmt.Errorf("'raw_payload' has no subfields, but %s were specified", oneofSubs)
+					}
+					if src != nil {
+						dst.Payload.(*MACCommand_RawPayload).RawPayload = src.GetRawPayload()
+					} else {
+						var zero []byte
+						dst.Payload.(*MACCommand_RawPayload).RawPayload = zero
+					}
+				case "reset_ind":
+					if _, ok := dst.Payload.(*MACCommand_ResetInd_); !ok {
+						dst.Payload = &MACCommand_ResetInd_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_ResetInd_).ResetInd
+						if newDst == nil {
+							newDst = &MACCommand_ResetInd{}
+							dst.Payload.(*MACCommand_ResetInd_).ResetInd = newDst
+						}
+						var newSrc *MACCommand_ResetInd
+						if src != nil {
+							newSrc = src.GetResetInd()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_ResetInd_).ResetInd = src.GetResetInd()
+						} else {
+							dst.Payload.(*MACCommand_ResetInd_).ResetInd = nil
+						}
+					}
+				case "reset_conf":
+					if _, ok := dst.Payload.(*MACCommand_ResetConf_); !ok {
+						dst.Payload = &MACCommand_ResetConf_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_ResetConf_).ResetConf
+						if newDst == nil {
+							newDst = &MACCommand_ResetConf{}
+							dst.Payload.(*MACCommand_ResetConf_).ResetConf = newDst
+						}
+						var newSrc *MACCommand_ResetConf
+						if src != nil {
+							newSrc = src.GetResetConf()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_ResetConf_).ResetConf = src.GetResetConf()
+						} else {
+							dst.Payload.(*MACCommand_ResetConf_).ResetConf = nil
+						}
+					}
+				case "link_check_ans":
+					if _, ok := dst.Payload.(*MACCommand_LinkCheckAns_); !ok {
+						dst.Payload = &MACCommand_LinkCheckAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns
+						if newDst == nil {
+							newDst = &MACCommand_LinkCheckAns{}
+							dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns = newDst
+						}
+						var newSrc *MACCommand_LinkCheckAns
+						if src != nil {
+							newSrc = src.GetLinkCheckAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns = src.GetLinkCheckAns()
+						} else {
+							dst.Payload.(*MACCommand_LinkCheckAns_).LinkCheckAns = nil
+						}
+					}
+				case "link_adr_req":
+					if _, ok := dst.Payload.(*MACCommand_LinkADRReq_); !ok {
+						dst.Payload = &MACCommand_LinkADRReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq
+						if newDst == nil {
+							newDst = &MACCommand_LinkADRReq{}
+							dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = newDst
+						}
+						var newSrc *MACCommand_LinkADRReq
+						if src != nil {
+							newSrc = src.GetLinkADRReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = src.GetLinkADRReq()
+						} else {
+							dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq = nil
+						}
+					}
+				case "link_adr_ans":
+					if _, ok := dst.Payload.(*MACCommand_LinkADRAns_); !ok {
+						dst.Payload = &MACCommand_LinkADRAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns
+						if newDst == nil {
+							newDst = &MACCommand_LinkADRAns{}
+							dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = newDst
+						}
+						var newSrc *MACCommand_LinkADRAns
+						if src != nil {
+							newSrc = src.GetLinkADRAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = src.GetLinkADRAns()
+						} else {
+							dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns = nil
+						}
+					}
+				case "duty_cycle_req":
+					if _, ok := dst.Payload.(*MACCommand_DutyCycleReq_); !ok {
+						dst.Payload = &MACCommand_DutyCycleReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq
+						if newDst == nil {
+							newDst = &MACCommand_DutyCycleReq{}
+							dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq = newDst
+						}
+						var newSrc *MACCommand_DutyCycleReq
+						if src != nil {
+							newSrc = src.GetDutyCycleReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq = src.GetDutyCycleReq()
+						} else {
+							dst.Payload.(*MACCommand_DutyCycleReq_).DutyCycleReq = nil
+						}
+					}
+				case "rx_param_setup_req":
+					if _, ok := dst.Payload.(*MACCommand_RxParamSetupReq_); !ok {
+						dst.Payload = &MACCommand_RxParamSetupReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq
+						if newDst == nil {
+							newDst = &MACCommand_RxParamSetupReq{}
+							dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = newDst
+						}
+						var newSrc *MACCommand_RxParamSetupReq
+						if src != nil {
+							newSrc = src.GetRxParamSetupReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = src.GetRxParamSetupReq()
+						} else {
+							dst.Payload.(*MACCommand_RxParamSetupReq_).RxParamSetupReq = nil
+						}
+					}
+				case "rx_param_setup_ans":
+					if _, ok := dst.Payload.(*MACCommand_RxParamSetupAns_); !ok {
+						dst.Payload = &MACCommand_RxParamSetupAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns
+						if newDst == nil {
+							newDst = &MACCommand_RxParamSetupAns{}
+							dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = newDst
+						}
+						var newSrc *MACCommand_RxParamSetupAns
+						if src != nil {
+							newSrc = src.GetRxParamSetupAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = src.GetRxParamSetupAns()
+						} else {
+							dst.Payload.(*MACCommand_RxParamSetupAns_).RxParamSetupAns = nil
+						}
+					}
+				case "dev_status_ans":
+					if _, ok := dst.Payload.(*MACCommand_DevStatusAns_); !ok {
+						dst.Payload = &MACCommand_DevStatusAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns
+						if newDst == nil {
+							newDst = &MACCommand_DevStatusAns{}
+							dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns = newDst
+						}
+						var newSrc *MACCommand_DevStatusAns
+						if src != nil {
+							newSrc = src.GetDevStatusAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns = src.GetDevStatusAns()
+						} else {
+							dst.Payload.(*MACCommand_DevStatusAns_).DevStatusAns = nil
+						}
+					}
+				case "new_channel_req":
+					if _, ok := dst.Payload.(*MACCommand_NewChannelReq_); !ok {
+						dst.Payload = &MACCommand_NewChannelReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq
+						if newDst == nil {
+							newDst = &MACCommand_NewChannelReq{}
+							dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = newDst
+						}
+						var newSrc *MACCommand_NewChannelReq
+						if src != nil {
+							newSrc = src.GetNewChannelReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = src.GetNewChannelReq()
+						} else {
+							dst.Payload.(*MACCommand_NewChannelReq_).NewChannelReq = nil
+						}
+					}
+				case "new_channel_ans":
+					if _, ok := dst.Payload.(*MACCommand_NewChannelAns_); !ok {
+						dst.Payload = &MACCommand_NewChannelAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns
+						if newDst == nil {
+							newDst = &MACCommand_NewChannelAns{}
+							dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns = newDst
+						}
+						var newSrc *MACCommand_NewChannelAns
+						if src != nil {
+							newSrc = src.GetNewChannelAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns = src.GetNewChannelAns()
+						} else {
+							dst.Payload.(*MACCommand_NewChannelAns_).NewChannelAns = nil
+						}
+					}
+				case "dl_channel_req":
+					if _, ok := dst.Payload.(*MACCommand_DLChannelReq_); !ok {
+						dst.Payload = &MACCommand_DLChannelReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq
+						if newDst == nil {
+							newDst = &MACCommand_DLChannelReq{}
+							dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = newDst
+						}
+						var newSrc *MACCommand_DLChannelReq
+						if src != nil {
+							newSrc = src.GetDLChannelReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = src.GetDLChannelReq()
+						} else {
+							dst.Payload.(*MACCommand_DLChannelReq_).DLChannelReq = nil
+						}
+					}
+				case "dl_channel_ans":
+					if _, ok := dst.Payload.(*MACCommand_DLChannelAns_); !ok {
+						dst.Payload = &MACCommand_DLChannelAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns
+						if newDst == nil {
+							newDst = &MACCommand_DLChannelAns{}
+							dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = newDst
+						}
+						var newSrc *MACCommand_DLChannelAns
+						if src != nil {
+							newSrc = src.GetDLChannelAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = src.GetDLChannelAns()
+						} else {
+							dst.Payload.(*MACCommand_DLChannelAns_).DLChannelAns = nil
+						}
+					}
+				case "rx_timing_setup_req":
+					if _, ok := dst.Payload.(*MACCommand_RxTimingSetupReq_); !ok {
+						dst.Payload = &MACCommand_RxTimingSetupReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq
+						if newDst == nil {
+							newDst = &MACCommand_RxTimingSetupReq{}
+							dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq = newDst
+						}
+						var newSrc *MACCommand_RxTimingSetupReq
+						if src != nil {
+							newSrc = src.GetRxTimingSetupReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq = src.GetRxTimingSetupReq()
+						} else {
+							dst.Payload.(*MACCommand_RxTimingSetupReq_).RxTimingSetupReq = nil
+						}
+					}
+				case "tx_param_setup_req":
+					if _, ok := dst.Payload.(*MACCommand_TxParamSetupReq_); !ok {
+						dst.Payload = &MACCommand_TxParamSetupReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq
+						if newDst == nil {
+							newDst = &MACCommand_TxParamSetupReq{}
+							dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = newDst
+						}
+						var newSrc *MACCommand_TxParamSetupReq
+						if src != nil {
+							newSrc = src.GetTxParamSetupReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = src.GetTxParamSetupReq()
+						} else {
+							dst.Payload.(*MACCommand_TxParamSetupReq_).TxParamSetupReq = nil
+						}
+					}
+				case "rekey_ind":
+					if _, ok := dst.Payload.(*MACCommand_RekeyInd_); !ok {
+						dst.Payload = &MACCommand_RekeyInd_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RekeyInd_).RekeyInd
+						if newDst == nil {
+							newDst = &MACCommand_RekeyInd{}
+							dst.Payload.(*MACCommand_RekeyInd_).RekeyInd = newDst
+						}
+						var newSrc *MACCommand_RekeyInd
+						if src != nil {
+							newSrc = src.GetRekeyInd()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RekeyInd_).RekeyInd = src.GetRekeyInd()
+						} else {
+							dst.Payload.(*MACCommand_RekeyInd_).RekeyInd = nil
+						}
+					}
+				case "rekey_conf":
+					if _, ok := dst.Payload.(*MACCommand_RekeyConf_); !ok {
+						dst.Payload = &MACCommand_RekeyConf_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RekeyConf_).RekeyConf
+						if newDst == nil {
+							newDst = &MACCommand_RekeyConf{}
+							dst.Payload.(*MACCommand_RekeyConf_).RekeyConf = newDst
+						}
+						var newSrc *MACCommand_RekeyConf
+						if src != nil {
+							newSrc = src.GetRekeyConf()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RekeyConf_).RekeyConf = src.GetRekeyConf()
+						} else {
+							dst.Payload.(*MACCommand_RekeyConf_).RekeyConf = nil
+						}
+					}
+				case "adr_param_setup_req":
+					if _, ok := dst.Payload.(*MACCommand_ADRParamSetupReq_); !ok {
+						dst.Payload = &MACCommand_ADRParamSetupReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq
+						if newDst == nil {
+							newDst = &MACCommand_ADRParamSetupReq{}
+							dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq = newDst
+						}
+						var newSrc *MACCommand_ADRParamSetupReq
+						if src != nil {
+							newSrc = src.GetADRParamSetupReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq = src.GetADRParamSetupReq()
+						} else {
+							dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq = nil
+						}
+					}
+				case "device_time_ans":
+					if _, ok := dst.Payload.(*MACCommand_DeviceTimeAns_); !ok {
+						dst.Payload = &MACCommand_DeviceTimeAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns
+						if newDst == nil {
+							newDst = &MACCommand_DeviceTimeAns{}
+							dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns = newDst
+						}
+						var newSrc *MACCommand_DeviceTimeAns
+						if src != nil {
+							newSrc = src.GetDeviceTimeAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns = src.GetDeviceTimeAns()
+						} else {
+							dst.Payload.(*MACCommand_DeviceTimeAns_).DeviceTimeAns = nil
+						}
+					}
+				case "force_rejoin_req":
+					if _, ok := dst.Payload.(*MACCommand_ForceRejoinReq_); !ok {
+						dst.Payload = &MACCommand_ForceRejoinReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq
+						if newDst == nil {
+							newDst = &MACCommand_ForceRejoinReq{}
+							dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = newDst
+						}
+						var newSrc *MACCommand_ForceRejoinReq
+						if src != nil {
+							newSrc = src.GetForceRejoinReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = src.GetForceRejoinReq()
+						} else {
+							dst.Payload.(*MACCommand_ForceRejoinReq_).ForceRejoinReq = nil
+						}
+					}
+				case "rejoin_param_setup_req":
+					if _, ok := dst.Payload.(*MACCommand_RejoinParamSetupReq_); !ok {
+						dst.Payload = &MACCommand_RejoinParamSetupReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq
+						if newDst == nil {
+							newDst = &MACCommand_RejoinParamSetupReq{}
+							dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq = newDst
+						}
+						var newSrc *MACCommand_RejoinParamSetupReq
+						if src != nil {
+							newSrc = src.GetRejoinParamSetupReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq = src.GetRejoinParamSetupReq()
+						} else {
+							dst.Payload.(*MACCommand_RejoinParamSetupReq_).RejoinParamSetupReq = nil
+						}
+					}
+				case "rejoin_param_setup_ans":
+					if _, ok := dst.Payload.(*MACCommand_RejoinParamSetupAns_); !ok {
+						dst.Payload = &MACCommand_RejoinParamSetupAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns
+						if newDst == nil {
+							newDst = &MACCommand_RejoinParamSetupAns{}
+							dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns = newDst
+						}
+						var newSrc *MACCommand_RejoinParamSetupAns
+						if src != nil {
+							newSrc = src.GetRejoinParamSetupAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns = src.GetRejoinParamSetupAns()
+						} else {
+							dst.Payload.(*MACCommand_RejoinParamSetupAns_).RejoinParamSetupAns = nil
+						}
+					}
+				case "ping_slot_info_req":
+					if _, ok := dst.Payload.(*MACCommand_PingSlotInfoReq_); !ok {
+						dst.Payload = &MACCommand_PingSlotInfoReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq
+						if newDst == nil {
+							newDst = &MACCommand_PingSlotInfoReq{}
+							dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq = newDst
+						}
+						var newSrc *MACCommand_PingSlotInfoReq
+						if src != nil {
+							newSrc = src.GetPingSlotInfoReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq = src.GetPingSlotInfoReq()
+						} else {
+							dst.Payload.(*MACCommand_PingSlotInfoReq_).PingSlotInfoReq = nil
+						}
+					}
+				case "ping_slot_channel_req":
+					if _, ok := dst.Payload.(*MACCommand_PingSlotChannelReq_); !ok {
+						dst.Payload = &MACCommand_PingSlotChannelReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq
+						if newDst == nil {
+							newDst = &MACCommand_PingSlotChannelReq{}
+							dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq = newDst
+						}
+						var newSrc *MACCommand_PingSlotChannelReq
+						if src != nil {
+							newSrc = src.GetPingSlotChannelReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq = src.GetPingSlotChannelReq()
+						} else {
+							dst.Payload.(*MACCommand_PingSlotChannelReq_).PingSlotChannelReq = nil
+						}
+					}
+				case "ping_slot_channel_ans":
+					if _, ok := dst.Payload.(*MACCommand_PingSlotChannelAns_); !ok {
+						dst.Payload = &MACCommand_PingSlotChannelAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns
+						if newDst == nil {
+							newDst = &MACCommand_PingSlotChannelAns{}
+							dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns = newDst
+						}
+						var newSrc *MACCommand_PingSlotChannelAns
+						if src != nil {
+							newSrc = src.GetPingSlotChannelAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns = src.GetPingSlotChannelAns()
+						} else {
+							dst.Payload.(*MACCommand_PingSlotChannelAns_).PingSlotChannelAns = nil
+						}
+					}
+				case "beacon_timing_ans":
+					if _, ok := dst.Payload.(*MACCommand_BeaconTimingAns_); !ok {
+						dst.Payload = &MACCommand_BeaconTimingAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns
+						if newDst == nil {
+							newDst = &MACCommand_BeaconTimingAns{}
+							dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns = newDst
+						}
+						var newSrc *MACCommand_BeaconTimingAns
+						if src != nil {
+							newSrc = src.GetBeaconTimingAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns = src.GetBeaconTimingAns()
+						} else {
+							dst.Payload.(*MACCommand_BeaconTimingAns_).BeaconTimingAns = nil
+						}
+					}
+				case "beacon_freq_req":
+					if _, ok := dst.Payload.(*MACCommand_BeaconFreqReq_); !ok {
+						dst.Payload = &MACCommand_BeaconFreqReq_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq
+						if newDst == nil {
+							newDst = &MACCommand_BeaconFreqReq{}
+							dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq = newDst
+						}
+						var newSrc *MACCommand_BeaconFreqReq
+						if src != nil {
+							newSrc = src.GetBeaconFreqReq()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq = src.GetBeaconFreqReq()
+						} else {
+							dst.Payload.(*MACCommand_BeaconFreqReq_).BeaconFreqReq = nil
+						}
+					}
+				case "beacon_freq_ans":
+					if _, ok := dst.Payload.(*MACCommand_BeaconFreqAns_); !ok {
+						dst.Payload = &MACCommand_BeaconFreqAns_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns
+						if newDst == nil {
+							newDst = &MACCommand_BeaconFreqAns{}
+							dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns = newDst
+						}
+						var newSrc *MACCommand_BeaconFreqAns
+						if src != nil {
+							newSrc = src.GetBeaconFreqAns()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns = src.GetBeaconFreqAns()
+						} else {
+							dst.Payload.(*MACCommand_BeaconFreqAns_).BeaconFreqAns = nil
+						}
+					}
+				case "device_mode_ind":
+					if _, ok := dst.Payload.(*MACCommand_DeviceModeInd_); !ok {
+						dst.Payload = &MACCommand_DeviceModeInd_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd
+						if newDst == nil {
+							newDst = &MACCommand_DeviceModeInd{}
+							dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd = newDst
+						}
+						var newSrc *MACCommand_DeviceModeInd
+						if src != nil {
+							newSrc = src.GetDeviceModeInd()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd = src.GetDeviceModeInd()
+						} else {
+							dst.Payload.(*MACCommand_DeviceModeInd_).DeviceModeInd = nil
+						}
+					}
+				case "device_mode_conf":
+					if _, ok := dst.Payload.(*MACCommand_DeviceModeConf_); !ok {
+						dst.Payload = &MACCommand_DeviceModeConf_{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf
+						if newDst == nil {
+							newDst = &MACCommand_DeviceModeConf{}
+							dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf = newDst
+						}
+						var newSrc *MACCommand_DeviceModeConf
+						if src != nil {
+							newSrc = src.GetDeviceModeConf()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf = src.GetDeviceModeConf()
+						} else {
+							dst.Payload.(*MACCommand_DeviceModeConf_).DeviceModeConf = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_ResetIndFieldPaths = [...]string{
+var MACCommand_ResetIndFieldPathsNested = []string{
 	"minor_version",
 }
 
-func (*MACCommand_ResetInd) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_ResetIndFieldPaths))
-	copy(ret, _MACCommand_ResetIndFieldPaths[:])
-	return ret
-}
-
-func (dst *MACCommand_ResetInd) SetFields(src *MACCommand_ResetInd, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "minor_version":
-			dst.MinorVersion = src.MinorVersion
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _MACCommand_ResetConfFieldPaths = [...]string{
+var MACCommand_ResetIndFieldPathsTopLevel = []string{
 	"minor_version",
 }
 
-func (*MACCommand_ResetConf) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_ResetConfFieldPaths))
-	copy(ret, _MACCommand_ResetConfFieldPaths[:])
-	return ret
-}
-
-func (dst *MACCommand_ResetConf) SetFields(src *MACCommand_ResetConf, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_ResetInd) SetFields(src *MACCommand_ResetInd, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "minor_version":
-			dst.MinorVersion = src.MinorVersion
+			if len(subs) > 0 {
+				return fmt.Errorf("'minor_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinorVersion = src.MinorVersion
+			} else {
+				var zero Minor
+				dst.MinorVersion = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_LinkCheckAnsFieldPaths = [...]string{
+var MACCommand_ResetConfFieldPathsNested = []string{
+	"minor_version",
+}
+
+var MACCommand_ResetConfFieldPathsTopLevel = []string{
+	"minor_version",
+}
+
+func (dst *MACCommand_ResetConf) SetFields(src *MACCommand_ResetConf, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "minor_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'minor_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinorVersion = src.MinorVersion
+			} else {
+				var zero Minor
+				dst.MinorVersion = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACCommand_LinkCheckAnsFieldPathsNested = []string{
 	"gateway_count",
 	"margin",
 }
 
-func (*MACCommand_LinkCheckAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_LinkCheckAnsFieldPaths))
-	copy(ret, _MACCommand_LinkCheckAnsFieldPaths[:])
-	return ret
+var MACCommand_LinkCheckAnsFieldPathsTopLevel = []string{
+	"gateway_count",
+	"margin",
 }
 
-func (dst *MACCommand_LinkCheckAns) SetFields(src *MACCommand_LinkCheckAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "gateway_count":
-			dst.GatewayCount = src.GatewayCount
+func (dst *MACCommand_LinkCheckAns) SetFields(src *MACCommand_LinkCheckAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "margin":
-			dst.Margin = src.Margin
+			if len(subs) > 0 {
+				return fmt.Errorf("'margin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Margin = src.Margin
+			} else {
+				var zero uint32
+				dst.Margin = zero
+			}
+		case "gateway_count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayCount = src.GatewayCount
+			} else {
+				var zero uint32
+				dst.GatewayCount = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_LinkADRReqFieldPaths = [...]string{
+var MACCommand_LinkADRReqFieldPathsNested = []string{
 	"channel_mask",
 	"channel_mask_control",
 	"data_rate_index",
@@ -1557,642 +1983,1100 @@ var _MACCommand_LinkADRReqFieldPaths = [...]string{
 	"tx_power_index",
 }
 
-func (*MACCommand_LinkADRReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_LinkADRReqFieldPaths))
-	copy(ret, _MACCommand_LinkADRReqFieldPaths[:])
-	return ret
+var MACCommand_LinkADRReqFieldPathsTopLevel = []string{
+	"channel_mask",
+	"channel_mask_control",
+	"data_rate_index",
+	"nb_trans",
+	"tx_power_index",
 }
 
-func (dst *MACCommand_LinkADRReq) SetFields(src *MACCommand_LinkADRReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "channel_mask":
-			dst.ChannelMask = src.ChannelMask
-		case "channel_mask_control":
-			dst.ChannelMaskControl = src.ChannelMaskControl
+func (dst *MACCommand_LinkADRReq) SetFields(src *MACCommand_LinkADRReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "data_rate_index":
-			dst.DataRateIndex = src.DataRateIndex
-		case "nb_trans":
-			dst.NbTrans = src.NbTrans
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.DataRateIndex = zero
+			}
 		case "tx_power_index":
-			dst.TxPowerIndex = src.TxPowerIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_power_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxPowerIndex = src.TxPowerIndex
+			} else {
+				var zero uint32
+				dst.TxPowerIndex = zero
+			}
+		case "channel_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelMask = src.ChannelMask
+			} else {
+				dst.ChannelMask = nil
+			}
+		case "channel_mask_control":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_mask_control' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelMaskControl = src.ChannelMaskControl
+			} else {
+				var zero uint32
+				dst.ChannelMaskControl = zero
+			}
+		case "nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NbTrans = src.NbTrans
+			} else {
+				var zero uint32
+				dst.NbTrans = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_LinkADRAnsFieldPaths = [...]string{
+var MACCommand_LinkADRAnsFieldPathsNested = []string{
 	"channel_mask_ack",
 	"data_rate_index_ack",
 	"tx_power_index_ack",
 }
 
-func (*MACCommand_LinkADRAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_LinkADRAnsFieldPaths))
-	copy(ret, _MACCommand_LinkADRAnsFieldPaths[:])
-	return ret
+var MACCommand_LinkADRAnsFieldPathsTopLevel = []string{
+	"channel_mask_ack",
+	"data_rate_index_ack",
+	"tx_power_index_ack",
 }
 
-func (dst *MACCommand_LinkADRAns) SetFields(src *MACCommand_LinkADRAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_LinkADRAns) SetFields(src *MACCommand_LinkADRAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channel_mask_ack":
-			dst.ChannelMaskAck = src.ChannelMaskAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_mask_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelMaskAck = src.ChannelMaskAck
+			} else {
+				var zero bool
+				dst.ChannelMaskAck = zero
+			}
 		case "data_rate_index_ack":
-			dst.DataRateIndexAck = src.DataRateIndexAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndexAck = src.DataRateIndexAck
+			} else {
+				var zero bool
+				dst.DataRateIndexAck = zero
+			}
 		case "tx_power_index_ack":
-			dst.TxPowerIndexAck = src.TxPowerIndexAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_power_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxPowerIndexAck = src.TxPowerIndexAck
+			} else {
+				var zero bool
+				dst.TxPowerIndexAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_DutyCycleReqFieldPaths = [...]string{
+var MACCommand_DutyCycleReqFieldPathsNested = []string{
 	"max_duty_cycle",
 }
 
-func (*MACCommand_DutyCycleReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DutyCycleReqFieldPaths))
-	copy(ret, _MACCommand_DutyCycleReqFieldPaths[:])
-	return ret
+var MACCommand_DutyCycleReqFieldPathsTopLevel = []string{
+	"max_duty_cycle",
 }
 
-func (dst *MACCommand_DutyCycleReq) SetFields(src *MACCommand_DutyCycleReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_DutyCycleReq) SetFields(src *MACCommand_DutyCycleReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "max_duty_cycle":
-			dst.MaxDutyCycle = src.MaxDutyCycle
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_duty_cycle' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxDutyCycle = src.MaxDutyCycle
+			} else {
+				var zero AggregatedDutyCycle
+				dst.MaxDutyCycle = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_RxParamSetupReqFieldPaths = [...]string{
+var MACCommand_RxParamSetupReqFieldPathsNested = []string{
 	"rx1_data_rate_offset",
 	"rx2_data_rate_index",
 	"rx2_frequency",
 }
 
-func (*MACCommand_RxParamSetupReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RxParamSetupReqFieldPaths))
-	copy(ret, _MACCommand_RxParamSetupReqFieldPaths[:])
-	return ret
+var MACCommand_RxParamSetupReqFieldPathsTopLevel = []string{
+	"rx1_data_rate_offset",
+	"rx2_data_rate_index",
+	"rx2_frequency",
 }
 
-func (dst *MACCommand_RxParamSetupReq) SetFields(src *MACCommand_RxParamSetupReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "rx1_data_rate_offset":
-			dst.Rx1DataRateOffset = src.Rx1DataRateOffset
+func (dst *MACCommand_RxParamSetupReq) SetFields(src *MACCommand_RxParamSetupReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rx2_data_rate_index":
-			dst.Rx2DataRateIndex = src.Rx2DataRateIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.Rx2DataRateIndex = zero
+			}
+		case "rx1_data_rate_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_data_rate_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
+			} else {
+				var zero uint32
+				dst.Rx1DataRateOffset = zero
+			}
 		case "rx2_frequency":
-			dst.Rx2Frequency = src.Rx2Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2Frequency = src.Rx2Frequency
+			} else {
+				var zero uint64
+				dst.Rx2Frequency = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_RxParamSetupAnsFieldPaths = [...]string{
+var MACCommand_RxParamSetupAnsFieldPathsNested = []string{
 	"rx1_data_rate_offset_ack",
 	"rx2_data_rate_index_ack",
 	"rx2_frequency_ack",
 }
 
-func (*MACCommand_RxParamSetupAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RxParamSetupAnsFieldPaths))
-	copy(ret, _MACCommand_RxParamSetupAnsFieldPaths[:])
-	return ret
+var MACCommand_RxParamSetupAnsFieldPathsTopLevel = []string{
+	"rx1_data_rate_offset_ack",
+	"rx2_data_rate_index_ack",
+	"rx2_frequency_ack",
 }
 
-func (dst *MACCommand_RxParamSetupAns) SetFields(src *MACCommand_RxParamSetupAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "rx1_data_rate_offset_ack":
-			dst.Rx1DataRateOffsetAck = src.Rx1DataRateOffsetAck
+func (dst *MACCommand_RxParamSetupAns) SetFields(src *MACCommand_RxParamSetupAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rx2_data_rate_index_ack":
-			dst.Rx2DataRateIndexAck = src.Rx2DataRateIndexAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_data_rate_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2DataRateIndexAck = src.Rx2DataRateIndexAck
+			} else {
+				var zero bool
+				dst.Rx2DataRateIndexAck = zero
+			}
+		case "rx1_data_rate_offset_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_data_rate_offset_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1DataRateOffsetAck = src.Rx1DataRateOffsetAck
+			} else {
+				var zero bool
+				dst.Rx1DataRateOffsetAck = zero
+			}
 		case "rx2_frequency_ack":
-			dst.Rx2FrequencyAck = src.Rx2FrequencyAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2FrequencyAck = src.Rx2FrequencyAck
+			} else {
+				var zero bool
+				dst.Rx2FrequencyAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_DevStatusAnsFieldPaths = [...]string{
+var MACCommand_DevStatusAnsFieldPathsNested = []string{
 	"battery",
 	"margin",
 }
 
-func (*MACCommand_DevStatusAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DevStatusAnsFieldPaths))
-	copy(ret, _MACCommand_DevStatusAnsFieldPaths[:])
-	return ret
+var MACCommand_DevStatusAnsFieldPathsTopLevel = []string{
+	"battery",
+	"margin",
 }
 
-func (dst *MACCommand_DevStatusAns) SetFields(src *MACCommand_DevStatusAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_DevStatusAns) SetFields(src *MACCommand_DevStatusAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "battery":
-			dst.Battery = src.Battery
+			if len(subs) > 0 {
+				return fmt.Errorf("'battery' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Battery = src.Battery
+			} else {
+				var zero uint32
+				dst.Battery = zero
+			}
 		case "margin":
-			dst.Margin = src.Margin
+			if len(subs) > 0 {
+				return fmt.Errorf("'margin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Margin = src.Margin
+			} else {
+				var zero int32
+				dst.Margin = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_NewChannelReqFieldPaths = [...]string{
+var MACCommand_NewChannelReqFieldPathsNested = []string{
 	"channel_index",
 	"frequency",
 	"max_data_rate_index",
 	"min_data_rate_index",
 }
 
-func (*MACCommand_NewChannelReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_NewChannelReqFieldPaths))
-	copy(ret, _MACCommand_NewChannelReqFieldPaths[:])
-	return ret
+var MACCommand_NewChannelReqFieldPathsTopLevel = []string{
+	"channel_index",
+	"frequency",
+	"max_data_rate_index",
+	"min_data_rate_index",
 }
 
-func (dst *MACCommand_NewChannelReq) SetFields(src *MACCommand_NewChannelReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_NewChannelReq) SetFields(src *MACCommand_NewChannelReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channel_index":
-			dst.ChannelIndex = src.ChannelIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelIndex = src.ChannelIndex
+			} else {
+				var zero uint32
+				dst.ChannelIndex = zero
+			}
 		case "frequency":
-			dst.Frequency = src.Frequency
-		case "max_data_rate_index":
-			dst.MaxDataRateIndex = src.MaxDataRateIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
 		case "min_data_rate_index":
-			dst.MinDataRateIndex = src.MinDataRateIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinDataRateIndex = src.MinDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MinDataRateIndex = zero
+			}
+		case "max_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxDataRateIndex = src.MaxDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MaxDataRateIndex = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_NewChannelAnsFieldPaths = [...]string{
+var MACCommand_NewChannelAnsFieldPathsNested = []string{
 	"data_rate_ack",
 	"frequency_ack",
 }
 
-func (*MACCommand_NewChannelAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_NewChannelAnsFieldPaths))
-	copy(ret, _MACCommand_NewChannelAnsFieldPaths[:])
-	return ret
+var MACCommand_NewChannelAnsFieldPathsTopLevel = []string{
+	"data_rate_ack",
+	"frequency_ack",
 }
 
-func (dst *MACCommand_NewChannelAns) SetFields(src *MACCommand_NewChannelAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "data_rate_ack":
-			dst.DataRateAck = src.DataRateAck
+func (dst *MACCommand_NewChannelAns) SetFields(src *MACCommand_NewChannelAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "frequency_ack":
-			dst.FrequencyAck = src.FrequencyAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyAck = src.FrequencyAck
+			} else {
+				var zero bool
+				dst.FrequencyAck = zero
+			}
+		case "data_rate_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateAck = src.DataRateAck
+			} else {
+				var zero bool
+				dst.DataRateAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_DLChannelReqFieldPaths = [...]string{
+var MACCommand_DLChannelReqFieldPathsNested = []string{
 	"channel_index",
 	"frequency",
 }
 
-func (*MACCommand_DLChannelReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DLChannelReqFieldPaths))
-	copy(ret, _MACCommand_DLChannelReqFieldPaths[:])
-	return ret
+var MACCommand_DLChannelReqFieldPathsTopLevel = []string{
+	"channel_index",
+	"frequency",
 }
 
-func (dst *MACCommand_DLChannelReq) SetFields(src *MACCommand_DLChannelReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_DLChannelReq) SetFields(src *MACCommand_DLChannelReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channel_index":
-			dst.ChannelIndex = src.ChannelIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelIndex = src.ChannelIndex
+			} else {
+				var zero uint32
+				dst.ChannelIndex = zero
+			}
 		case "frequency":
-			dst.Frequency = src.Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_DLChannelAnsFieldPaths = [...]string{
+var MACCommand_DLChannelAnsFieldPathsNested = []string{
 	"channel_index_ack",
 	"frequency_ack",
 }
 
-func (*MACCommand_DLChannelAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DLChannelAnsFieldPaths))
-	copy(ret, _MACCommand_DLChannelAnsFieldPaths[:])
-	return ret
+var MACCommand_DLChannelAnsFieldPathsTopLevel = []string{
+	"channel_index_ack",
+	"frequency_ack",
 }
 
-func (dst *MACCommand_DLChannelAns) SetFields(src *MACCommand_DLChannelAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_DLChannelAns) SetFields(src *MACCommand_DLChannelAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channel_index_ack":
-			dst.ChannelIndexAck = src.ChannelIndexAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelIndexAck = src.ChannelIndexAck
+			} else {
+				var zero bool
+				dst.ChannelIndexAck = zero
+			}
 		case "frequency_ack":
-			dst.FrequencyAck = src.FrequencyAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyAck = src.FrequencyAck
+			} else {
+				var zero bool
+				dst.FrequencyAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_RxTimingSetupReqFieldPaths = [...]string{
+var MACCommand_RxTimingSetupReqFieldPathsNested = []string{
 	"delay",
 }
 
-func (*MACCommand_RxTimingSetupReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RxTimingSetupReqFieldPaths))
-	copy(ret, _MACCommand_RxTimingSetupReqFieldPaths[:])
-	return ret
+var MACCommand_RxTimingSetupReqFieldPathsTopLevel = []string{
+	"delay",
 }
 
-func (dst *MACCommand_RxTimingSetupReq) SetFields(src *MACCommand_RxTimingSetupReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_RxTimingSetupReq) SetFields(src *MACCommand_RxTimingSetupReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "delay":
-			dst.Delay = src.Delay
+			if len(subs) > 0 {
+				return fmt.Errorf("'delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Delay = src.Delay
+			} else {
+				var zero RxDelay
+				dst.Delay = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_TxParamSetupReqFieldPaths = [...]string{
+var MACCommand_TxParamSetupReqFieldPathsNested = []string{
 	"downlink_dwell_time",
 	"max_eirp_index",
 	"uplink_dwell_time",
 }
 
-func (*MACCommand_TxParamSetupReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_TxParamSetupReqFieldPaths))
-	copy(ret, _MACCommand_TxParamSetupReqFieldPaths[:])
-	return ret
+var MACCommand_TxParamSetupReqFieldPathsTopLevel = []string{
+	"downlink_dwell_time",
+	"max_eirp_index",
+	"uplink_dwell_time",
 }
 
-func (dst *MACCommand_TxParamSetupReq) SetFields(src *MACCommand_TxParamSetupReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "downlink_dwell_time":
-			dst.DownlinkDwellTime = src.DownlinkDwellTime
+func (dst *MACCommand_TxParamSetupReq) SetFields(src *MACCommand_TxParamSetupReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "max_eirp_index":
-			dst.MaxEIRPIndex = src.MaxEIRPIndex
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_eirp_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxEIRPIndex = src.MaxEIRPIndex
+			} else {
+				var zero DeviceEIRP
+				dst.MaxEIRPIndex = zero
+			}
 		case "uplink_dwell_time":
-			dst.UplinkDwellTime = src.UplinkDwellTime
+			if len(subs) > 0 {
+				return fmt.Errorf("'uplink_dwell_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UplinkDwellTime = src.UplinkDwellTime
+			} else {
+				var zero bool
+				dst.UplinkDwellTime = zero
+			}
+		case "downlink_dwell_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_dwell_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkDwellTime = src.DownlinkDwellTime
+			} else {
+				var zero bool
+				dst.DownlinkDwellTime = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_RekeyIndFieldPaths = [...]string{
+var MACCommand_RekeyIndFieldPathsNested = []string{
 	"minor_version",
 }
 
-func (*MACCommand_RekeyInd) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RekeyIndFieldPaths))
-	copy(ret, _MACCommand_RekeyIndFieldPaths[:])
-	return ret
-}
-
-func (dst *MACCommand_RekeyInd) SetFields(src *MACCommand_RekeyInd, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "minor_version":
-			dst.MinorVersion = src.MinorVersion
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _MACCommand_RekeyConfFieldPaths = [...]string{
+var MACCommand_RekeyIndFieldPathsTopLevel = []string{
 	"minor_version",
 }
 
-func (*MACCommand_RekeyConf) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RekeyConfFieldPaths))
-	copy(ret, _MACCommand_RekeyConfFieldPaths[:])
-	return ret
-}
-
-func (dst *MACCommand_RekeyConf) SetFields(src *MACCommand_RekeyConf, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_RekeyInd) SetFields(src *MACCommand_RekeyInd, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "minor_version":
-			dst.MinorVersion = src.MinorVersion
+			if len(subs) > 0 {
+				return fmt.Errorf("'minor_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinorVersion = src.MinorVersion
+			} else {
+				var zero Minor
+				dst.MinorVersion = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_ADRParamSetupReqFieldPaths = [...]string{
+var MACCommand_RekeyConfFieldPathsNested = []string{
+	"minor_version",
+}
+
+var MACCommand_RekeyConfFieldPathsTopLevel = []string{
+	"minor_version",
+}
+
+func (dst *MACCommand_RekeyConf) SetFields(src *MACCommand_RekeyConf, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "minor_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'minor_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinorVersion = src.MinorVersion
+			} else {
+				var zero Minor
+				dst.MinorVersion = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACCommand_ADRParamSetupReqFieldPathsNested = []string{
 	"adr_ack_delay_exponent",
 	"adr_ack_limit_exponent",
 }
 
-func (*MACCommand_ADRParamSetupReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_ADRParamSetupReqFieldPaths))
-	copy(ret, _MACCommand_ADRParamSetupReqFieldPaths[:])
-	return ret
+var MACCommand_ADRParamSetupReqFieldPathsTopLevel = []string{
+	"adr_ack_delay_exponent",
+	"adr_ack_limit_exponent",
 }
 
-func (dst *MACCommand_ADRParamSetupReq) SetFields(src *MACCommand_ADRParamSetupReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "adr_ack_delay_exponent":
-			dst.ADRAckDelayExponent = src.ADRAckDelayExponent
+func (dst *MACCommand_ADRParamSetupReq) SetFields(src *MACCommand_ADRParamSetupReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "adr_ack_limit_exponent":
-			dst.ADRAckLimitExponent = src.ADRAckLimitExponent
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_ack_limit_exponent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRAckLimitExponent = src.ADRAckLimitExponent
+			} else {
+				var zero ADRAckLimitExponent
+				dst.ADRAckLimitExponent = zero
+			}
+		case "adr_ack_delay_exponent":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_ack_delay_exponent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRAckDelayExponent = src.ADRAckDelayExponent
+			} else {
+				var zero ADRAckDelayExponent
+				dst.ADRAckDelayExponent = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_DeviceTimeAnsFieldPaths = [...]string{
+var MACCommand_DeviceTimeAnsFieldPathsNested = []string{
 	"time",
 }
 
-func (*MACCommand_DeviceTimeAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DeviceTimeAnsFieldPaths))
-	copy(ret, _MACCommand_DeviceTimeAnsFieldPaths[:])
-	return ret
+var MACCommand_DeviceTimeAnsFieldPathsTopLevel = []string{
+	"time",
 }
 
-func (dst *MACCommand_DeviceTimeAns) SetFields(src *MACCommand_DeviceTimeAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_DeviceTimeAns) SetFields(src *MACCommand_DeviceTimeAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "time":
-			dst.Time = src.Time
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				var zero time.Time
+				dst.Time = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_ForceRejoinReqFieldPaths = [...]string{
+var MACCommand_ForceRejoinReqFieldPathsNested = []string{
 	"data_rate_index",
 	"max_retries",
 	"period_exponent",
 	"rejoin_type",
 }
 
-func (*MACCommand_ForceRejoinReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_ForceRejoinReqFieldPaths))
-	copy(ret, _MACCommand_ForceRejoinReqFieldPaths[:])
-	return ret
+var MACCommand_ForceRejoinReqFieldPathsTopLevel = []string{
+	"data_rate_index",
+	"max_retries",
+	"period_exponent",
+	"rejoin_type",
 }
 
-func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "data_rate_index":
-			dst.DataRateIndex = src.DataRateIndex
-		case "max_retries":
-			dst.MaxRetries = src.MaxRetries
-		case "period_exponent":
-			dst.PeriodExponent = src.PeriodExponent
+func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rejoin_type":
-			dst.RejoinType = src.RejoinType
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejoin_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejoinType = src.RejoinType
+			} else {
+				var zero uint32
+				dst.RejoinType = zero
+			}
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.DataRateIndex = zero
+			}
+		case "max_retries":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_retries' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxRetries = src.MaxRetries
+			} else {
+				var zero uint32
+				dst.MaxRetries = zero
+			}
+		case "period_exponent":
+			if len(subs) > 0 {
+				return fmt.Errorf("'period_exponent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PeriodExponent = src.PeriodExponent
+			} else {
+				var zero RejoinPeriodExponent
+				dst.PeriodExponent = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_RejoinParamSetupReqFieldPaths = [...]string{
+var MACCommand_RejoinParamSetupReqFieldPathsNested = []string{
 	"max_count_exponent",
 	"max_time_exponent",
 }
 
-func (*MACCommand_RejoinParamSetupReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RejoinParamSetupReqFieldPaths))
-	copy(ret, _MACCommand_RejoinParamSetupReqFieldPaths[:])
-	return ret
+var MACCommand_RejoinParamSetupReqFieldPathsTopLevel = []string{
+	"max_count_exponent",
+	"max_time_exponent",
 }
 
-func (dst *MACCommand_RejoinParamSetupReq) SetFields(src *MACCommand_RejoinParamSetupReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_RejoinParamSetupReq) SetFields(src *MACCommand_RejoinParamSetupReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "max_count_exponent":
-			dst.MaxCountExponent = src.MaxCountExponent
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_count_exponent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxCountExponent = src.MaxCountExponent
+			} else {
+				var zero RejoinCountExponent
+				dst.MaxCountExponent = zero
+			}
 		case "max_time_exponent":
-			dst.MaxTimeExponent = src.MaxTimeExponent
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_time_exponent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxTimeExponent = src.MaxTimeExponent
+			} else {
+				var zero RejoinTimeExponent
+				dst.MaxTimeExponent = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_RejoinParamSetupAnsFieldPaths = [...]string{
+var MACCommand_RejoinParamSetupAnsFieldPathsNested = []string{
 	"max_time_exponent_ack",
 }
 
-func (*MACCommand_RejoinParamSetupAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_RejoinParamSetupAnsFieldPaths))
-	copy(ret, _MACCommand_RejoinParamSetupAnsFieldPaths[:])
-	return ret
+var MACCommand_RejoinParamSetupAnsFieldPathsTopLevel = []string{
+	"max_time_exponent_ack",
 }
 
-func (dst *MACCommand_RejoinParamSetupAns) SetFields(src *MACCommand_RejoinParamSetupAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_RejoinParamSetupAns) SetFields(src *MACCommand_RejoinParamSetupAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "max_time_exponent_ack":
-			dst.MaxTimeExponentAck = src.MaxTimeExponentAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_time_exponent_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxTimeExponentAck = src.MaxTimeExponentAck
+			} else {
+				var zero bool
+				dst.MaxTimeExponentAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_PingSlotInfoReqFieldPaths = [...]string{
+var MACCommand_PingSlotInfoReqFieldPathsNested = []string{
 	"period",
 }
 
-func (*MACCommand_PingSlotInfoReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_PingSlotInfoReqFieldPaths))
-	copy(ret, _MACCommand_PingSlotInfoReqFieldPaths[:])
-	return ret
+var MACCommand_PingSlotInfoReqFieldPathsTopLevel = []string{
+	"period",
 }
 
-func (dst *MACCommand_PingSlotInfoReq) SetFields(src *MACCommand_PingSlotInfoReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_PingSlotInfoReq) SetFields(src *MACCommand_PingSlotInfoReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "period":
-			dst.Period = src.Period
+			if len(subs) > 0 {
+				return fmt.Errorf("'period' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Period = src.Period
+			} else {
+				var zero PingSlotPeriod
+				dst.Period = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_PingSlotChannelReqFieldPaths = [...]string{
+var MACCommand_PingSlotChannelReqFieldPathsNested = []string{
 	"data_rate_index",
 	"frequency",
 }
 
-func (*MACCommand_PingSlotChannelReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_PingSlotChannelReqFieldPaths))
-	copy(ret, _MACCommand_PingSlotChannelReqFieldPaths[:])
-	return ret
+var MACCommand_PingSlotChannelReqFieldPathsTopLevel = []string{
+	"data_rate_index",
+	"frequency",
 }
 
-func (dst *MACCommand_PingSlotChannelReq) SetFields(src *MACCommand_PingSlotChannelReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "data_rate_index":
-			dst.DataRateIndex = src.DataRateIndex
+func (dst *MACCommand_PingSlotChannelReq) SetFields(src *MACCommand_PingSlotChannelReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "frequency":
-			dst.Frequency = src.Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.DataRateIndex = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_PingSlotChannelAnsFieldPaths = [...]string{
+var MACCommand_PingSlotChannelAnsFieldPathsNested = []string{
 	"data_rate_index_ack",
 	"frequency_ack",
 }
 
-func (*MACCommand_PingSlotChannelAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_PingSlotChannelAnsFieldPaths))
-	copy(ret, _MACCommand_PingSlotChannelAnsFieldPaths[:])
-	return ret
+var MACCommand_PingSlotChannelAnsFieldPathsTopLevel = []string{
+	"data_rate_index_ack",
+	"frequency_ack",
 }
 
-func (dst *MACCommand_PingSlotChannelAns) SetFields(src *MACCommand_PingSlotChannelAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "data_rate_index_ack":
-			dst.DataRateIndexAck = src.DataRateIndexAck
+func (dst *MACCommand_PingSlotChannelAns) SetFields(src *MACCommand_PingSlotChannelAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "frequency_ack":
-			dst.FrequencyAck = src.FrequencyAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyAck = src.FrequencyAck
+			} else {
+				var zero bool
+				dst.FrequencyAck = zero
+			}
+		case "data_rate_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndexAck = src.DataRateIndexAck
+			} else {
+				var zero bool
+				dst.DataRateIndexAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_BeaconTimingAnsFieldPaths = [...]string{
+var MACCommand_BeaconTimingAnsFieldPathsNested = []string{
 	"channel_index",
 	"delay",
 }
 
-func (*MACCommand_BeaconTimingAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_BeaconTimingAnsFieldPaths))
-	copy(ret, _MACCommand_BeaconTimingAnsFieldPaths[:])
-	return ret
+var MACCommand_BeaconTimingAnsFieldPathsTopLevel = []string{
+	"channel_index",
+	"delay",
 }
 
-func (dst *MACCommand_BeaconTimingAns) SetFields(src *MACCommand_BeaconTimingAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "channel_index":
-			dst.ChannelIndex = src.ChannelIndex
+func (dst *MACCommand_BeaconTimingAns) SetFields(src *MACCommand_BeaconTimingAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "delay":
-			dst.Delay = src.Delay
+			if len(subs) > 0 {
+				return fmt.Errorf("'delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Delay = src.Delay
+			} else {
+				var zero uint32
+				dst.Delay = zero
+			}
+		case "channel_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelIndex = src.ChannelIndex
+			} else {
+				var zero uint32
+				dst.ChannelIndex = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_BeaconFreqReqFieldPaths = [...]string{
+var MACCommand_BeaconFreqReqFieldPathsNested = []string{
 	"frequency",
 }
 
-func (*MACCommand_BeaconFreqReq) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_BeaconFreqReqFieldPaths))
-	copy(ret, _MACCommand_BeaconFreqReqFieldPaths[:])
-	return ret
+var MACCommand_BeaconFreqReqFieldPathsTopLevel = []string{
+	"frequency",
 }
 
-func (dst *MACCommand_BeaconFreqReq) SetFields(src *MACCommand_BeaconFreqReq, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_BeaconFreqReq) SetFields(src *MACCommand_BeaconFreqReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "frequency":
-			dst.Frequency = src.Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_BeaconFreqAnsFieldPaths = [...]string{
+var MACCommand_BeaconFreqAnsFieldPathsNested = []string{
 	"frequency_ack",
 }
 
-func (*MACCommand_BeaconFreqAns) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_BeaconFreqAnsFieldPaths))
-	copy(ret, _MACCommand_BeaconFreqAnsFieldPaths[:])
-	return ret
+var MACCommand_BeaconFreqAnsFieldPathsTopLevel = []string{
+	"frequency_ack",
 }
 
-func (dst *MACCommand_BeaconFreqAns) SetFields(src *MACCommand_BeaconFreqAns, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_BeaconFreqAns) SetFields(src *MACCommand_BeaconFreqAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "frequency_ack":
-			dst.FrequencyAck = src.FrequencyAck
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyAck = src.FrequencyAck
+			} else {
+				var zero bool
+				dst.FrequencyAck = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _MACCommand_DeviceModeIndFieldPaths = [...]string{
+var MACCommand_DeviceModeIndFieldPathsNested = []string{
 	"class",
 }
 
-func (*MACCommand_DeviceModeInd) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DeviceModeIndFieldPaths))
-	copy(ret, _MACCommand_DeviceModeIndFieldPaths[:])
-	return ret
-}
-
-func (dst *MACCommand_DeviceModeInd) SetFields(src *MACCommand_DeviceModeInd, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "class":
-			dst.Class = src.Class
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _MACCommand_DeviceModeConfFieldPaths = [...]string{
+var MACCommand_DeviceModeIndFieldPathsTopLevel = []string{
 	"class",
 }
 
-func (*MACCommand_DeviceModeConf) FieldMaskPaths() []string {
-	ret := make([]string, len(_MACCommand_DeviceModeConfFieldPaths))
-	copy(ret, _MACCommand_DeviceModeConfFieldPaths[:])
-	return ret
-}
-
-func (dst *MACCommand_DeviceModeConf) SetFields(src *MACCommand_DeviceModeConf, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *MACCommand_DeviceModeInd) SetFields(src *MACCommand_DeviceModeInd, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "class":
-			dst.Class = src.Class
+			if len(subs) > 0 {
+				return fmt.Errorf("'class' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Class = src.Class
+			} else {
+				var zero Class
+				dst.Class = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
+}
+
+var MACCommand_DeviceModeConfFieldPathsNested = []string{
+	"class",
+}
+
+var MACCommand_DeviceModeConfFieldPathsTopLevel = []string{
+	"class",
+}
+
+func (dst *MACCommand_DeviceModeConf) SetFields(src *MACCommand_DeviceModeConf, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "class":
+			if len(subs) > 0 {
+				return fmt.Errorf("'class' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Class = src.Class
+			} else {
+				var zero Class
+				dst.Class = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
 }

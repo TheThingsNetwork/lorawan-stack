@@ -4,458 +4,236 @@ package ttnpb
 
 import fmt "fmt"
 
-var _AuthInfoResponseFieldPaths = [...]string{
-	"api_key",
-	"api_key.api_key",
-	"api_key.api_key.id",
-	"api_key.api_key.key",
-	"api_key.api_key.name",
-	"api_key.api_key.rights",
-	"api_key.entity_ids",
-	"api_key.entity_ids.application_ids",
-	"api_key.entity_ids.application_ids.application_id",
-	"api_key.entity_ids.client_ids",
-	"api_key.entity_ids.client_ids.client_id",
-	"api_key.entity_ids.device_ids",
-	"api_key.entity_ids.device_ids.application_ids",
-	"api_key.entity_ids.device_ids.application_ids.application_id",
-	"api_key.entity_ids.device_ids.dev_addr",
-	"api_key.entity_ids.device_ids.dev_eui",
-	"api_key.entity_ids.device_ids.device_id",
-	"api_key.entity_ids.device_ids.join_eui",
-	"api_key.entity_ids.gateway_ids",
-	"api_key.entity_ids.gateway_ids.eui",
-	"api_key.entity_ids.gateway_ids.gateway_id",
-	"api_key.entity_ids.organization_ids",
-	"api_key.entity_ids.organization_ids.organization_id",
-	"api_key.entity_ids.user_ids",
-	"api_key.entity_ids.user_ids.email",
-	"api_key.entity_ids.user_ids.user_id",
-	"oauth_access_token",
-	"oauth_access_token.access_token",
-	"oauth_access_token.client_ids",
-	"oauth_access_token.client_ids.client_id",
-	"oauth_access_token.created_at",
-	"oauth_access_token.expires_at",
-	"oauth_access_token.id",
-	"oauth_access_token.refresh_token",
-	"oauth_access_token.rights",
-	"oauth_access_token.user_ids",
-	"oauth_access_token.user_ids.email",
-	"oauth_access_token.user_ids.user_id",
+var AuthInfoResponseFieldPathsNested = []string{
+	"access_method",
+	"access_method.api_key",
+	"access_method.api_key.api_key",
+	"access_method.api_key.api_key.id",
+	"access_method.api_key.api_key.key",
+	"access_method.api_key.api_key.name",
+	"access_method.api_key.api_key.rights",
+	"access_method.api_key.entity_ids",
+	"access_method.api_key.entity_ids.ids.application_ids",
+	"access_method.api_key.entity_ids.ids.application_ids.application_id",
+	"access_method.api_key.entity_ids.ids.client_ids",
+	"access_method.api_key.entity_ids.ids.client_ids.client_id",
+	"access_method.api_key.entity_ids.ids.device_ids",
+	"access_method.api_key.entity_ids.ids.device_ids.application_ids",
+	"access_method.api_key.entity_ids.ids.device_ids.application_ids.application_id",
+	"access_method.api_key.entity_ids.ids.device_ids.dev_addr",
+	"access_method.api_key.entity_ids.ids.device_ids.dev_eui",
+	"access_method.api_key.entity_ids.ids.device_ids.device_id",
+	"access_method.api_key.entity_ids.ids.device_ids.join_eui",
+	"access_method.api_key.entity_ids.ids.gateway_ids",
+	"access_method.api_key.entity_ids.ids.gateway_ids.eui",
+	"access_method.api_key.entity_ids.ids.gateway_ids.gateway_id",
+	"access_method.api_key.entity_ids.ids.organization_ids",
+	"access_method.api_key.entity_ids.ids.organization_ids.organization_id",
+	"access_method.api_key.entity_ids.ids.user_ids",
+	"access_method.api_key.entity_ids.ids.user_ids.email",
+	"access_method.api_key.entity_ids.ids.user_ids.user_id",
+	"access_method.oauth_access_token",
+	"access_method.oauth_access_token.access_token",
+	"access_method.oauth_access_token.client_ids",
+	"access_method.oauth_access_token.client_ids.client_id",
+	"access_method.oauth_access_token.created_at",
+	"access_method.oauth_access_token.expires_at",
+	"access_method.oauth_access_token.id",
+	"access_method.oauth_access_token.refresh_token",
+	"access_method.oauth_access_token.rights",
+	"access_method.oauth_access_token.user_ids",
+	"access_method.oauth_access_token.user_ids.email",
+	"access_method.oauth_access_token.user_ids.user_id",
+	"ids",
 	"universal_rights",
 	"universal_rights.rights",
 }
 
-func (*AuthInfoResponse) FieldMaskPaths() []string {
-	ret := make([]string, len(_AuthInfoResponseFieldPaths))
-	copy(ret, _AuthInfoResponseFieldPaths[:])
-	return ret
+var AuthInfoResponseFieldPathsTopLevel = []string{
+	"access_method",
+	"ids",
+	"universal_rights",
 }
 
-func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "api_key":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = src.GetAPIKey()
-		case "api_key.api_key":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.api_key.id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.api_key.key":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.api_key.name":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.api_key.rights":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.application_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.application_ids.application_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.client_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.client_ids.client_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids.application_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids.application_ids.application_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids.dev_addr":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids.dev_eui":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids.device_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.device_ids.join_eui":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.gateway_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.gateway_ids.eui":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.gateway_ids.gateway_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.organization_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.organization_ids.organization_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.user_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.user_ids.email":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.entity_ids.user_ids.user_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_APIKey{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey == nil {
-				dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = &AuthInfoResponse_APIKeyAccess{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey.SetFields(src.GetAPIKey(), _pathsWithoutPrefix("api_key", paths)...)
-		case "oauth_access_token":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = src.GetOAuthAccessToken()
-		case "oauth_access_token.access_token":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.client_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.client_ids.client_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.created_at":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.expires_at":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.refresh_token":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.rights":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.user_ids":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.user_ids.email":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
-		case "oauth_access_token.user_ids.user_id":
-			if dst.AccessMethod == nil {
-				dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
-			}
-			if dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken == nil {
-				dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = &OAuthAccessToken{}
-			}
-			dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken.SetFields(src.GetOAuthAccessToken(), _pathsWithoutPrefix("oauth_access_token", paths)...)
+func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "universal_rights":
-			dst.UniversalRights = src.UniversalRights
-		case "universal_rights.rights":
-			if dst.UniversalRights == nil {
-				dst.UniversalRights = &Rights{}
+			if len(subs) > 0 {
+				newDst := dst.UniversalRights
+				if newDst == nil {
+					newDst = &Rights{}
+					dst.UniversalRights = newDst
+				}
+				var newSrc *Rights
+				if src != nil {
+					newSrc = src.UniversalRights
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UniversalRights = src.UniversalRights
+				} else {
+					dst.UniversalRights = nil
+				}
 			}
-			dst.UniversalRights.SetFields(src.UniversalRights, _pathsWithoutPrefix("universal_rights", paths)...)
+
+		case "access_method":
+			if len(subs) == 0 && src == nil {
+				dst.AccessMethod = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.AccessMethod = src.AccessMethod
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "api_key":
+					if _, ok := dst.AccessMethod.(*AuthInfoResponse_APIKey); !ok {
+						dst.AccessMethod = &AuthInfoResponse_APIKey{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey
+						if newDst == nil {
+							newDst = &AuthInfoResponse_APIKeyAccess{}
+							dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = newDst
+						}
+						var newSrc *AuthInfoResponse_APIKeyAccess
+						if src != nil {
+							newSrc = src.GetAPIKey()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = src.GetAPIKey()
+						} else {
+							dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = nil
+						}
+					}
+				case "oauth_access_token":
+					if _, ok := dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken); !ok {
+						dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken
+						if newDst == nil {
+							newDst = &OAuthAccessToken{}
+							dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = newDst
+						}
+						var newSrc *OAuthAccessToken
+						if src != nil {
+							newSrc = src.GetOAuthAccessToken()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = src.GetOAuthAccessToken()
+						} else {
+							dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _AuthInfoResponse_APIKeyAccessFieldPaths = [...]string{
+var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 	"api_key",
 	"api_key.id",
 	"api_key.key",
 	"api_key.name",
 	"api_key.rights",
 	"entity_ids",
-	"entity_ids.application_ids",
-	"entity_ids.application_ids.application_id",
-	"entity_ids.client_ids",
-	"entity_ids.client_ids.client_id",
-	"entity_ids.device_ids",
-	"entity_ids.device_ids.application_ids",
-	"entity_ids.device_ids.application_ids.application_id",
-	"entity_ids.device_ids.dev_addr",
-	"entity_ids.device_ids.dev_eui",
-	"entity_ids.device_ids.device_id",
-	"entity_ids.device_ids.join_eui",
-	"entity_ids.gateway_ids",
-	"entity_ids.gateway_ids.eui",
-	"entity_ids.gateway_ids.gateway_id",
-	"entity_ids.organization_ids",
-	"entity_ids.organization_ids.organization_id",
-	"entity_ids.user_ids",
-	"entity_ids.user_ids.email",
-	"entity_ids.user_ids.user_id",
+	"entity_ids.ids.application_ids",
+	"entity_ids.ids.application_ids.application_id",
+	"entity_ids.ids.client_ids",
+	"entity_ids.ids.client_ids.client_id",
+	"entity_ids.ids.device_ids",
+	"entity_ids.ids.device_ids.application_ids",
+	"entity_ids.ids.device_ids.application_ids.application_id",
+	"entity_ids.ids.device_ids.dev_addr",
+	"entity_ids.ids.device_ids.dev_eui",
+	"entity_ids.ids.device_ids.device_id",
+	"entity_ids.ids.device_ids.join_eui",
+	"entity_ids.ids.gateway_ids",
+	"entity_ids.ids.gateway_ids.eui",
+	"entity_ids.ids.gateway_ids.gateway_id",
+	"entity_ids.ids.organization_ids",
+	"entity_ids.ids.organization_ids.organization_id",
+	"entity_ids.ids.user_ids",
+	"entity_ids.ids.user_ids.email",
+	"entity_ids.ids.user_ids.user_id",
+	"ids",
 }
 
-func (*AuthInfoResponse_APIKeyAccess) FieldMaskPaths() []string {
-	ret := make([]string, len(_AuthInfoResponse_APIKeyAccessFieldPaths))
-	copy(ret, _AuthInfoResponse_APIKeyAccessFieldPaths[:])
-	return ret
+var AuthInfoResponse_APIKeyAccessFieldPathsTopLevel = []string{
+	"api_key",
+	"entity_ids",
+	"ids",
 }
 
-func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKeyAccess, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKeyAccess, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "api_key":
-			dst.APIKey = src.APIKey
-		case "api_key.id":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.key":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.name":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.rights":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.APIKey
+				var newSrc *APIKey
+				if src != nil {
+					newSrc = &src.APIKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.APIKey = src.APIKey
+				} else {
+					var zero APIKey
+					dst.APIKey = zero
+				}
+			}
 		case "entity_ids":
-			dst.EntityIDs = src.EntityIDs
-		case "entity_ids.application_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.application_ids.application_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.client_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.client_ids.client_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids.application_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids.application_ids.application_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids.dev_addr":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids.dev_eui":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids.device_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.device_ids.join_eui":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.gateway_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.gateway_ids.eui":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.gateway_ids.gateway_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.organization_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.organization_ids.organization_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.user_ids":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.user_ids.email":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
-		case "entity_ids.user_ids.user_id":
-			dst.EntityIDs.SetFields(&src.EntityIDs, _pathsWithoutPrefix("entity_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.EntityIDs
+				var newSrc *EntityIdentifiers
+				if src != nil {
+					newSrc = &src.EntityIDs
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIDs = src.EntityIDs
+				} else {
+					var zero EntityIdentifiers
+					dst.EntityIDs = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

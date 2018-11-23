@@ -2,9 +2,13 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	time "time"
+)
 
-var _ClientFieldPaths = [...]string{
+var ClientFieldPathsNested = []string{
 	"attributes",
 	"contact_info",
 	"created_at",
@@ -22,359 +26,556 @@ var _ClientFieldPaths = [...]string{
 	"updated_at",
 }
 
-func (*Client) FieldMaskPaths() []string {
-	ret := make([]string, len(_ClientFieldPaths))
-	copy(ret, _ClientFieldPaths[:])
-	return ret
+var ClientFieldPathsTopLevel = []string{
+	"attributes",
+	"contact_info",
+	"created_at",
+	"description",
+	"endorsed",
+	"grants",
+	"ids",
+	"name",
+	"redirect_uris",
+	"rights",
+	"secret",
+	"skip_authorization",
+	"state",
+	"updated_at",
 }
 
-func (dst *Client) SetFields(src *Client, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "attributes":
-			dst.Attributes = src.Attributes
-		case "contact_info":
-			dst.ContactInfo = src.ContactInfo
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "description":
-			dst.Description = src.Description
-		case "endorsed":
-			dst.Endorsed = src.Endorsed
-		case "grants":
-			dst.Grants = src.Grants
+func (dst *Client) SetFields(src *Client, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.ClientIdentifiers = src.ClientIdentifiers
-		case "ids.client_id":
-			dst.ClientIdentifiers.SetFields(&src.ClientIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "name":
-			dst.Name = src.Name
-		case "redirect_uris":
-			dst.RedirectURIs = src.RedirectURIs
-		case "rights":
-			dst.Rights = src.Rights
-		case "secret":
-			dst.Secret = src.Secret
-		case "skip_authorization":
-			dst.SkipAuthorization = src.SkipAuthorization
-		case "state":
-			dst.State = src.State
+			if len(subs) > 0 {
+				newDst := &dst.ClientIdentifiers
+				var newSrc *ClientIdentifiers
+				if src != nil {
+					newSrc = &src.ClientIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClientIdentifiers = src.ClientIdentifiers
+				} else {
+					var zero ClientIdentifiers
+					dst.ClientIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "attributes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attributes = src.Attributes
+			} else {
+				dst.Attributes = nil
+			}
+		case "contact_info":
+			if len(subs) > 0 {
+				return fmt.Errorf("'contact_info' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ContactInfo = src.ContactInfo
+			} else {
+				dst.ContactInfo = nil
+			}
+		case "secret":
+			if len(subs) > 0 {
+				return fmt.Errorf("'secret' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Secret = src.Secret
+			} else {
+				var zero string
+				dst.Secret = zero
+			}
+		case "redirect_uris":
+			if len(subs) > 0 {
+				return fmt.Errorf("'redirect_uris' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RedirectURIs = src.RedirectURIs
+			} else {
+				dst.RedirectURIs = nil
+			}
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				var zero State
+				dst.State = zero
+			}
+		case "skip_authorization":
+			if len(subs) > 0 {
+				return fmt.Errorf("'skip_authorization' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SkipAuthorization = src.SkipAuthorization
+			} else {
+				var zero bool
+				dst.SkipAuthorization = zero
+			}
+		case "endorsed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'endorsed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Endorsed = src.Endorsed
+			} else {
+				var zero bool
+				dst.Endorsed = zero
+			}
+		case "grants":
+			if len(subs) > 0 {
+				return fmt.Errorf("'grants' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Grants = src.Grants
+			} else {
+				dst.Grants = nil
+			}
+		case "rights":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ClientsFieldPaths = [...]string{
+var ClientsFieldPathsNested = []string{
 	"clients",
 }
 
-func (*Clients) FieldMaskPaths() []string {
-	ret := make([]string, len(_ClientsFieldPaths))
-	copy(ret, _ClientsFieldPaths[:])
-	return ret
+var ClientsFieldPathsTopLevel = []string{
+	"clients",
 }
 
-func (dst *Clients) SetFields(src *Clients, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Clients) SetFields(src *Clients, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "clients":
-			dst.Clients = src.Clients
+			if len(subs) > 0 {
+				return fmt.Errorf("'clients' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Clients = src.Clients
+			} else {
+				dst.Clients = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetClientRequestFieldPaths = [...]string{
+var GetClientRequestFieldPathsNested = []string{
 	"client_ids",
 	"client_ids.client_id",
 	"field_mask",
 }
 
-func (*GetClientRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetClientRequestFieldPaths))
-	copy(ret, _GetClientRequestFieldPaths[:])
-	return ret
+var GetClientRequestFieldPathsTopLevel = []string{
+	"client_ids",
+	"field_mask",
 }
 
-func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "client_ids":
-			dst.ClientIdentifiers = src.ClientIdentifiers
-		case "client_ids.client_id":
-			dst.ClientIdentifiers.SetFields(&src.ClientIdentifiers, _pathsWithoutPrefix("client_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ClientIdentifiers
+				var newSrc *ClientIdentifiers
+				if src != nil {
+					newSrc = &src.ClientIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClientIdentifiers = src.ClientIdentifiers
+				} else {
+					var zero ClientIdentifiers
+					dst.ClientIdentifiers = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ListClientsRequestFieldPaths = [...]string{
+var ListClientsRequestFieldPathsNested = []string{
 	"collaborator",
-	"collaborator.organization_ids",
-	"collaborator.organization_ids.organization_id",
-	"collaborator.user_ids",
-	"collaborator.user_ids.email",
-	"collaborator.user_ids.user_id",
-	"field_mask",
-	"limit",
-	"order",
-	"page",
-}
-
-func (*ListClientsRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ListClientsRequestFieldPaths))
-	copy(ret, _ListClientsRequestFieldPaths[:])
-	return ret
-}
-
-func (dst *ListClientsRequest) SetFields(src *ListClientsRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.organization_ids":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.organization_ids.organization_id":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.email":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.user_id":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
-		case "limit":
-			dst.Limit = src.Limit
-		case "order":
-			dst.Order = src.Order
-		case "page":
-			dst.Page = src.Page
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _CreateClientRequestFieldPaths = [...]string{
-	"client",
-	"client.attributes",
-	"client.contact_info",
-	"client.created_at",
-	"client.description",
-	"client.endorsed",
-	"client.grants",
-	"client.ids",
-	"client.ids.client_id",
-	"client.name",
-	"client.redirect_uris",
-	"client.rights",
-	"client.secret",
-	"client.skip_authorization",
-	"client.state",
-	"client.updated_at",
-	"collaborator",
-	"collaborator.organization_ids",
-	"collaborator.organization_ids.organization_id",
-	"collaborator.user_ids",
-	"collaborator.user_ids.email",
-	"collaborator.user_ids.user_id",
-}
-
-func (*CreateClientRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateClientRequestFieldPaths))
-	copy(ret, _CreateClientRequestFieldPaths[:])
-	return ret
-}
-
-func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "client":
-			dst.Client = src.Client
-		case "client.attributes":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.contact_info":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.created_at":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.description":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.endorsed":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.grants":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.ids":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.ids.client_id":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.name":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.redirect_uris":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.rights":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.secret":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.skip_authorization":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.state":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.updated_at":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.organization_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.organization_ids.organization_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.email":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.user_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _UpdateClientRequestFieldPaths = [...]string{
-	"client",
-	"client.attributes",
-	"client.contact_info",
-	"client.created_at",
-	"client.description",
-	"client.endorsed",
-	"client.grants",
-	"client.ids",
-	"client.ids.client_id",
-	"client.name",
-	"client.redirect_uris",
-	"client.rights",
-	"client.secret",
-	"client.skip_authorization",
-	"client.state",
-	"client.updated_at",
-	"field_mask",
-}
-
-func (*UpdateClientRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateClientRequestFieldPaths))
-	copy(ret, _UpdateClientRequestFieldPaths[:])
-	return ret
-}
-
-func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "client":
-			dst.Client = src.Client
-		case "client.attributes":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.contact_info":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.created_at":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.description":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.endorsed":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.grants":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.ids":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.ids.client_id":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.name":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.redirect_uris":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.rights":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.secret":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.skip_authorization":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.state":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "client.updated_at":
-			dst.Client.SetFields(&src.Client, _pathsWithoutPrefix("client", paths)...)
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _SetClientCollaboratorRequestFieldPaths = [...]string{
-	"client_ids",
-	"client_ids.client_id",
-	"collaborator",
-	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
-	"collaborator.rights",
+	"field_mask",
+	"ids",
+	"limit",
+	"order",
+	"page",
 }
 
-func (*SetClientCollaboratorRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SetClientCollaboratorRequestFieldPaths))
-	copy(ret, _SetClientCollaboratorRequestFieldPaths[:])
-	return ret
+var ListClientsRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"field_mask",
+	"ids",
+	"limit",
+	"order",
+	"page",
 }
 
-func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "client_ids":
-			dst.ClientIdentifiers = src.ClientIdentifiers
-		case "client_ids.client_id":
-			dst.ClientIdentifiers.SetFields(&src.ClientIdentifiers, _pathsWithoutPrefix("client_ids", paths)...)
+func (dst *ListClientsRequest) SetFields(src *ListClientsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.organization_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.organization_ids.organization_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids.email":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids.user_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.rights":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
+			if len(subs) > 0 {
+				newDst := dst.Collaborator
+				if newDst == nil {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
+}
+
+var CreateClientRequestFieldPathsNested = []string{
+	"client",
+	"client.attributes",
+	"client.contact_info",
+	"client.created_at",
+	"client.description",
+	"client.endorsed",
+	"client.grants",
+	"client.ids",
+	"client.ids.client_id",
+	"client.name",
+	"client.redirect_uris",
+	"client.rights",
+	"client.secret",
+	"client.skip_authorization",
+	"client.state",
+	"client.updated_at",
+	"collaborator",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
+	"ids",
+}
+
+var CreateClientRequestFieldPathsTopLevel = []string{
+	"client",
+	"collaborator",
+	"ids",
+}
+
+func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "client":
+			if len(subs) > 0 {
+				newDst := &dst.Client
+				var newSrc *Client
+				if src != nil {
+					newSrc = &src.Client
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Client = src.Client
+				} else {
+					var zero Client
+					dst.Client = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.Collaborator
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.Collaborator = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var UpdateClientRequestFieldPathsNested = []string{
+	"client",
+	"client.attributes",
+	"client.contact_info",
+	"client.created_at",
+	"client.description",
+	"client.endorsed",
+	"client.grants",
+	"client.ids",
+	"client.ids.client_id",
+	"client.name",
+	"client.redirect_uris",
+	"client.rights",
+	"client.secret",
+	"client.skip_authorization",
+	"client.state",
+	"client.updated_at",
+	"field_mask",
+}
+
+var UpdateClientRequestFieldPathsTopLevel = []string{
+	"client",
+	"field_mask",
+}
+
+func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "client":
+			if len(subs) > 0 {
+				newDst := &dst.Client
+				var newSrc *Client
+				if src != nil {
+					newSrc = &src.Client
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Client = src.Client
+				} else {
+					var zero Client
+					dst.Client = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var SetClientCollaboratorRequestFieldPathsNested = []string{
+	"client_ids",
+	"client_ids.client_id",
+	"collaborator",
+	"collaborator.ids",
+	"collaborator.ids.ids.organization_ids",
+	"collaborator.ids.ids.organization_ids.organization_id",
+	"collaborator.ids.ids.user_ids",
+	"collaborator.ids.ids.user_ids.email",
+	"collaborator.ids.ids.user_ids.user_id",
+	"collaborator.rights",
+	"ids",
+}
+
+var SetClientCollaboratorRequestFieldPathsTopLevel = []string{
+	"client_ids",
+	"collaborator",
+	"ids",
+}
+
+func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "client_ids":
+			if len(subs) > 0 {
+				newDst := &dst.ClientIdentifiers
+				var newSrc *ClientIdentifiers
+				if src != nil {
+					newSrc = &src.ClientIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClientIdentifiers = src.ClientIdentifiers
+				} else {
+					var zero ClientIdentifiers
+					dst.ClientIdentifiers = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.Collaborator
+				var newSrc *Collaborator
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero Collaborator
+					dst.Collaborator = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
 }

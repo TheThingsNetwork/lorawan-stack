@@ -4,31 +4,48 @@ package ttnpb
 
 import fmt "fmt"
 
-var _KeyEnvelopeFieldPaths = [...]string{
+var KeyEnvelopeFieldPathsNested = []string{
 	"kek_label",
 	"key",
 }
 
-func (*KeyEnvelope) FieldMaskPaths() []string {
-	ret := make([]string, len(_KeyEnvelopeFieldPaths))
-	copy(ret, _KeyEnvelopeFieldPaths[:])
-	return ret
+var KeyEnvelopeFieldPathsTopLevel = []string{
+	"kek_label",
+	"key",
 }
 
-func (dst *KeyEnvelope) SetFields(src *KeyEnvelope, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "kek_label":
-			dst.KEKLabel = src.KEKLabel
+func (dst *KeyEnvelope) SetFields(src *KeyEnvelope, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "key":
-			dst.Key = src.Key
+			if len(subs) > 0 {
+				return fmt.Errorf("'key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Key = src.Key
+			} else {
+				var zero []byte
+				dst.Key = zero
+			}
+		case "kek_label":
+			if len(subs) > 0 {
+				return fmt.Errorf("'kek_label' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.KEKLabel = src.KEKLabel
+			} else {
+				var zero string
+				dst.KEKLabel = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _RootKeysFieldPaths = [...]string{
+var RootKeysFieldPathsNested = []string{
 	"app_key",
 	"app_key.kek_label",
 	"app_key.key",
@@ -38,48 +55,76 @@ var _RootKeysFieldPaths = [...]string{
 	"root_key_id",
 }
 
-func (*RootKeys) FieldMaskPaths() []string {
-	ret := make([]string, len(_RootKeysFieldPaths))
-	copy(ret, _RootKeysFieldPaths[:])
-	return ret
+var RootKeysFieldPathsTopLevel = []string{
+	"app_key",
+	"nwk_key",
+	"root_key_id",
 }
 
-func (dst *RootKeys) SetFields(src *RootKeys, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "app_key":
-			dst.AppKey = src.AppKey
-		case "app_key.kek_label":
-			if dst.AppKey == nil {
-				dst.AppKey = &KeyEnvelope{}
-			}
-			dst.AppKey.SetFields(src.AppKey, _pathsWithoutPrefix("app_key", paths)...)
-		case "app_key.key":
-			if dst.AppKey == nil {
-				dst.AppKey = &KeyEnvelope{}
-			}
-			dst.AppKey.SetFields(src.AppKey, _pathsWithoutPrefix("app_key", paths)...)
-		case "nwk_key":
-			dst.NwkKey = src.NwkKey
-		case "nwk_key.kek_label":
-			if dst.NwkKey == nil {
-				dst.NwkKey = &KeyEnvelope{}
-			}
-			dst.NwkKey.SetFields(src.NwkKey, _pathsWithoutPrefix("nwk_key", paths)...)
-		case "nwk_key.key":
-			if dst.NwkKey == nil {
-				dst.NwkKey = &KeyEnvelope{}
-			}
-			dst.NwkKey.SetFields(src.NwkKey, _pathsWithoutPrefix("nwk_key", paths)...)
+func (dst *RootKeys) SetFields(src *RootKeys, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "root_key_id":
-			dst.RootKeyID = src.RootKeyID
+			if len(subs) > 0 {
+				return fmt.Errorf("'root_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RootKeyID = src.RootKeyID
+			} else {
+				var zero string
+				dst.RootKeyID = zero
+			}
+		case "app_key":
+			if len(subs) > 0 {
+				newDst := dst.AppKey
+				if newDst == nil {
+					newDst = &KeyEnvelope{}
+					dst.AppKey = newDst
+				}
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = src.AppKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AppKey = src.AppKey
+				} else {
+					dst.AppKey = nil
+				}
+			}
+		case "nwk_key":
+			if len(subs) > 0 {
+				newDst := dst.NwkKey
+				if newDst == nil {
+					newDst = &KeyEnvelope{}
+					dst.NwkKey = newDst
+				}
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = src.NwkKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NwkKey = src.NwkKey
+				} else {
+					dst.NwkKey = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SessionKeysFieldPaths = [...]string{
+var SessionKeysFieldPathsNested = []string{
 	"app_s_key",
 	"app_s_key.kek_label",
 	"app_s_key.key",
@@ -95,67 +140,115 @@ var _SessionKeysFieldPaths = [...]string{
 	"session_key_id",
 }
 
-func (*SessionKeys) FieldMaskPaths() []string {
-	ret := make([]string, len(_SessionKeysFieldPaths))
-	copy(ret, _SessionKeysFieldPaths[:])
-	return ret
+var SessionKeysFieldPathsTopLevel = []string{
+	"app_s_key",
+	"f_nwk_s_int_key",
+	"nwk_s_enc_key",
+	"s_nwk_s_int_key",
+	"session_key_id",
 }
 
-func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "app_s_key":
-			dst.AppSKey = src.AppSKey
-		case "app_s_key.kek_label":
-			if dst.AppSKey == nil {
-				dst.AppSKey = &KeyEnvelope{}
-			}
-			dst.AppSKey.SetFields(src.AppSKey, _pathsWithoutPrefix("app_s_key", paths)...)
-		case "app_s_key.key":
-			if dst.AppSKey == nil {
-				dst.AppSKey = &KeyEnvelope{}
-			}
-			dst.AppSKey.SetFields(src.AppSKey, _pathsWithoutPrefix("app_s_key", paths)...)
-		case "f_nwk_s_int_key":
-			dst.FNwkSIntKey = src.FNwkSIntKey
-		case "f_nwk_s_int_key.kek_label":
-			if dst.FNwkSIntKey == nil {
-				dst.FNwkSIntKey = &KeyEnvelope{}
-			}
-			dst.FNwkSIntKey.SetFields(src.FNwkSIntKey, _pathsWithoutPrefix("f_nwk_s_int_key", paths)...)
-		case "f_nwk_s_int_key.key":
-			if dst.FNwkSIntKey == nil {
-				dst.FNwkSIntKey = &KeyEnvelope{}
-			}
-			dst.FNwkSIntKey.SetFields(src.FNwkSIntKey, _pathsWithoutPrefix("f_nwk_s_int_key", paths)...)
-		case "nwk_s_enc_key":
-			dst.NwkSEncKey = src.NwkSEncKey
-		case "nwk_s_enc_key.kek_label":
-			if dst.NwkSEncKey == nil {
-				dst.NwkSEncKey = &KeyEnvelope{}
-			}
-			dst.NwkSEncKey.SetFields(src.NwkSEncKey, _pathsWithoutPrefix("nwk_s_enc_key", paths)...)
-		case "nwk_s_enc_key.key":
-			if dst.NwkSEncKey == nil {
-				dst.NwkSEncKey = &KeyEnvelope{}
-			}
-			dst.NwkSEncKey.SetFields(src.NwkSEncKey, _pathsWithoutPrefix("nwk_s_enc_key", paths)...)
-		case "s_nwk_s_int_key":
-			dst.SNwkSIntKey = src.SNwkSIntKey
-		case "s_nwk_s_int_key.kek_label":
-			if dst.SNwkSIntKey == nil {
-				dst.SNwkSIntKey = &KeyEnvelope{}
-			}
-			dst.SNwkSIntKey.SetFields(src.SNwkSIntKey, _pathsWithoutPrefix("s_nwk_s_int_key", paths)...)
-		case "s_nwk_s_int_key.key":
-			if dst.SNwkSIntKey == nil {
-				dst.SNwkSIntKey = &KeyEnvelope{}
-			}
-			dst.SNwkSIntKey.SetFields(src.SNwkSIntKey, _pathsWithoutPrefix("s_nwk_s_int_key", paths)...)
+func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "session_key_id":
-			dst.SessionKeyID = src.SessionKeyID
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyID = src.SessionKeyID
+			} else {
+				var zero string
+				dst.SessionKeyID = zero
+			}
+		case "f_nwk_s_int_key":
+			if len(subs) > 0 {
+				newDst := dst.FNwkSIntKey
+				if newDst == nil {
+					newDst = &KeyEnvelope{}
+					dst.FNwkSIntKey = newDst
+				}
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = src.FNwkSIntKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.FNwkSIntKey = src.FNwkSIntKey
+				} else {
+					dst.FNwkSIntKey = nil
+				}
+			}
+		case "s_nwk_s_int_key":
+			if len(subs) > 0 {
+				newDst := dst.SNwkSIntKey
+				if newDst == nil {
+					newDst = &KeyEnvelope{}
+					dst.SNwkSIntKey = newDst
+				}
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = src.SNwkSIntKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.SNwkSIntKey = src.SNwkSIntKey
+				} else {
+					dst.SNwkSIntKey = nil
+				}
+			}
+		case "nwk_s_enc_key":
+			if len(subs) > 0 {
+				newDst := dst.NwkSEncKey
+				if newDst == nil {
+					newDst = &KeyEnvelope{}
+					dst.NwkSEncKey = newDst
+				}
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = src.NwkSEncKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NwkSEncKey = src.NwkSEncKey
+				} else {
+					dst.NwkSEncKey = nil
+				}
+			}
+		case "app_s_key":
+			if len(subs) > 0 {
+				newDst := dst.AppSKey
+				if newDst == nil {
+					newDst = &KeyEnvelope{}
+					dst.AppSKey = newDst
+				}
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = src.AppSKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AppSKey = src.AppSKey
+				} else {
+					dst.AppSKey = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

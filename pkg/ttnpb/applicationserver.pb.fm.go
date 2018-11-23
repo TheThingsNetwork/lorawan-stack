@@ -2,9 +2,12 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+)
 
-var _ApplicationLinkFieldPaths = [...]string{
+var ApplicationLinkFieldPathsNested = []string{
 	"allow_insecure",
 	"api_key",
 	"default_formatters",
@@ -15,77 +18,126 @@ var _ApplicationLinkFieldPaths = [...]string{
 	"network_server_address",
 }
 
-func (*ApplicationLink) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationLinkFieldPaths))
-	copy(ret, _ApplicationLinkFieldPaths[:])
-	return ret
+var ApplicationLinkFieldPathsTopLevel = []string{
+	"allow_insecure",
+	"api_key",
+	"default_formatters",
+	"network_server_address",
 }
 
-func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "allow_insecure":
-			dst.AllowInsecure = src.AllowInsecure
-		case "api_key":
-			dst.APIKey = src.APIKey
-		case "default_formatters":
-			dst.DefaultFormatters = src.DefaultFormatters
-		case "default_formatters.down_formatter":
-			if dst.DefaultFormatters == nil {
-				dst.DefaultFormatters = &MessagePayloadFormatters{}
-			}
-			dst.DefaultFormatters.SetFields(src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_formatters.down_formatter_parameter":
-			if dst.DefaultFormatters == nil {
-				dst.DefaultFormatters = &MessagePayloadFormatters{}
-			}
-			dst.DefaultFormatters.SetFields(src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_formatters.up_formatter":
-			if dst.DefaultFormatters == nil {
-				dst.DefaultFormatters = &MessagePayloadFormatters{}
-			}
-			dst.DefaultFormatters.SetFields(src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
-		case "default_formatters.up_formatter_parameter":
-			if dst.DefaultFormatters == nil {
-				dst.DefaultFormatters = &MessagePayloadFormatters{}
-			}
-			dst.DefaultFormatters.SetFields(src.DefaultFormatters, _pathsWithoutPrefix("default_formatters", paths)...)
+func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "network_server_address":
-			dst.NetworkServerAddress = src.NetworkServerAddress
+			if len(subs) > 0 {
+				return fmt.Errorf("'network_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetworkServerAddress = src.NetworkServerAddress
+			} else {
+				var zero string
+				dst.NetworkServerAddress = zero
+			}
+		case "api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.APIKey = src.APIKey
+			} else {
+				var zero string
+				dst.APIKey = zero
+			}
+		case "default_formatters":
+			if len(subs) > 0 {
+				newDst := dst.DefaultFormatters
+				if newDst == nil {
+					newDst = &MessagePayloadFormatters{}
+					dst.DefaultFormatters = newDst
+				}
+				var newSrc *MessagePayloadFormatters
+				if src != nil {
+					newSrc = src.DefaultFormatters
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DefaultFormatters = src.DefaultFormatters
+				} else {
+					dst.DefaultFormatters = nil
+				}
+			}
+		case "allow_insecure":
+			if len(subs) > 0 {
+				return fmt.Errorf("'allow_insecure' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AllowInsecure = src.AllowInsecure
+			} else {
+				var zero bool
+				dst.AllowInsecure = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetApplicationLinkRequestFieldPaths = [...]string{
+var GetApplicationLinkRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"field_mask",
 }
 
-func (*GetApplicationLinkRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetApplicationLinkRequestFieldPaths))
-	copy(ret, _GetApplicationLinkRequestFieldPaths[:])
-	return ret
+var GetApplicationLinkRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"field_mask",
 }
 
-func (dst *GetApplicationLinkRequest) SetFields(src *GetApplicationLinkRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GetApplicationLinkRequest) SetFields(src *GetApplicationLinkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SetApplicationLinkRequestFieldPaths = [...]string{
+var SetApplicationLinkRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"field_mask",
@@ -100,41 +152,65 @@ var _SetApplicationLinkRequestFieldPaths = [...]string{
 	"link.network_server_address",
 }
 
-func (*SetApplicationLinkRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SetApplicationLinkRequestFieldPaths))
-	copy(ret, _SetApplicationLinkRequestFieldPaths[:])
-	return ret
+var SetApplicationLinkRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"field_mask",
+	"link",
 }
 
-func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
 		case "link":
-			dst.ApplicationLink = src.ApplicationLink
-		case "link.allow_insecure":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.api_key":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.default_formatters":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.default_formatters.down_formatter":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.default_formatters.down_formatter_parameter":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.default_formatters.up_formatter":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.default_formatters.up_formatter_parameter":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
-		case "link.network_server_address":
-			dst.ApplicationLink.SetFields(&src.ApplicationLink, _pathsWithoutPrefix("link", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationLink
+				var newSrc *ApplicationLink
+				if src != nil {
+					newSrc = &src.ApplicationLink
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationLink = src.ApplicationLink
+				} else {
+					var zero ApplicationLink
+					dst.ApplicationLink = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

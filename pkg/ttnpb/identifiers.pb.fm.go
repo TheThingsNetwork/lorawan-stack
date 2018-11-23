@@ -4,49 +4,65 @@ package ttnpb
 
 import fmt "fmt"
 
-var _ApplicationIdentifiersFieldPaths = [...]string{
+var ApplicationIdentifiersFieldPathsNested = []string{
 	"application_id",
 }
 
-func (*ApplicationIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_ApplicationIdentifiersFieldPaths))
-	copy(ret, _ApplicationIdentifiersFieldPaths[:])
-	return ret
+var ApplicationIdentifiersFieldPathsTopLevel = []string{
+	"application_id",
 }
 
-func (dst *ApplicationIdentifiers) SetFields(src *ApplicationIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ApplicationIdentifiers) SetFields(src *ApplicationIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_id":
-			dst.ApplicationID = src.ApplicationID
+			if len(subs) > 0 {
+				return fmt.Errorf("'application_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ApplicationID = src.ApplicationID
+			} else {
+				var zero string
+				dst.ApplicationID = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ClientIdentifiersFieldPaths = [...]string{
+var ClientIdentifiersFieldPathsNested = []string{
 	"client_id",
 }
 
-func (*ClientIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_ClientIdentifiersFieldPaths))
-	copy(ret, _ClientIdentifiersFieldPaths[:])
-	return ret
+var ClientIdentifiersFieldPathsTopLevel = []string{
+	"client_id",
 }
 
-func (dst *ClientIdentifiers) SetFields(src *ClientIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ClientIdentifiers) SetFields(src *ClientIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "client_id":
-			dst.ClientID = src.ClientID
+			if len(subs) > 0 {
+				return fmt.Errorf("'client_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClientID = src.ClientID
+			} else {
+				var zero string
+				dst.ClientID = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EndDeviceIdentifiersFieldPaths = [...]string{
+var EndDeviceIdentifiersFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"dev_addr",
@@ -55,347 +71,510 @@ var _EndDeviceIdentifiersFieldPaths = [...]string{
 	"join_eui",
 }
 
-func (*EndDeviceIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_EndDeviceIdentifiersFieldPaths))
-	copy(ret, _EndDeviceIdentifiersFieldPaths[:])
-	return ret
+var EndDeviceIdentifiersFieldPathsTopLevel = []string{
+	"application_ids",
+	"dev_addr",
+	"dev_eui",
+	"device_id",
+	"join_eui",
 }
 
-func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
-		case "dev_addr":
-			dst.DevAddr = src.DevAddr
-		case "dev_eui":
-			dst.DevEUI = src.DevEUI
+func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "device_id":
-			dst.DeviceID = src.DeviceID
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceID = src.DeviceID
+			} else {
+				var zero string
+				dst.DeviceID = zero
+			}
+		case "application_ids":
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
+		case "dev_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEUI = src.DevEUI
+			} else {
+				dst.DevEUI = nil
+			}
 		case "join_eui":
-			dst.JoinEUI = src.JoinEUI
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				dst.JoinEUI = nil
+			}
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				dst.DevAddr = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayIdentifiersFieldPaths = [...]string{
+var GatewayIdentifiersFieldPathsNested = []string{
 	"eui",
 	"gateway_id",
 }
 
-func (*GatewayIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayIdentifiersFieldPaths))
-	copy(ret, _GatewayIdentifiersFieldPaths[:])
-	return ret
+var GatewayIdentifiersFieldPathsTopLevel = []string{
+	"eui",
+	"gateway_id",
 }
 
-func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "eui":
-			dst.EUI = src.EUI
+func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_id":
-			dst.GatewayID = src.GatewayID
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayID = src.GatewayID
+			} else {
+				var zero string
+				dst.GatewayID = zero
+			}
+		case "eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EUI = src.EUI
+			} else {
+				dst.EUI = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _OrganizationIdentifiersFieldPaths = [...]string{
+var OrganizationIdentifiersFieldPathsNested = []string{
 	"organization_id",
 }
 
-func (*OrganizationIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_OrganizationIdentifiersFieldPaths))
-	copy(ret, _OrganizationIdentifiersFieldPaths[:])
-	return ret
+var OrganizationIdentifiersFieldPathsTopLevel = []string{
+	"organization_id",
 }
 
-func (dst *OrganizationIdentifiers) SetFields(src *OrganizationIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *OrganizationIdentifiers) SetFields(src *OrganizationIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization_id":
-			dst.OrganizationID = src.OrganizationID
+			if len(subs) > 0 {
+				return fmt.Errorf("'organization_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OrganizationID = src.OrganizationID
+			} else {
+				var zero string
+				dst.OrganizationID = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UserIdentifiersFieldPaths = [...]string{
+var UserIdentifiersFieldPathsNested = []string{
 	"email",
 	"user_id",
 }
 
-func (*UserIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_UserIdentifiersFieldPaths))
-	copy(ret, _UserIdentifiersFieldPaths[:])
-	return ret
+var UserIdentifiersFieldPathsTopLevel = []string{
+	"email",
+	"user_id",
 }
 
-func (dst *UserIdentifiers) SetFields(src *UserIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "email":
-			dst.Email = src.Email
+func (dst *UserIdentifiers) SetFields(src *UserIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "user_id":
-			dst.UserID = src.UserID
+			if len(subs) > 0 {
+				return fmt.Errorf("'user_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UserID = src.UserID
+			} else {
+				var zero string
+				dst.UserID = zero
+			}
+		case "email":
+			if len(subs) > 0 {
+				return fmt.Errorf("'email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Email = src.Email
+			} else {
+				var zero string
+				dst.Email = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _OrganizationOrUserIdentifiersFieldPaths = [...]string{
-	"organization_ids",
-	"organization_ids.organization_id",
-	"user_ids",
-	"user_ids.email",
-	"user_ids.user_id",
+var OrganizationOrUserIdentifiersFieldPathsNested = []string{
+	"ids",
+	"ids.organization_ids",
+	"ids.organization_ids.organization_id",
+	"ids.user_ids",
+	"ids.user_ids.email",
+	"ids.user_ids.user_id",
 }
 
-func (*OrganizationOrUserIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_OrganizationOrUserIdentifiersFieldPaths))
-	copy(ret, _OrganizationOrUserIdentifiersFieldPaths[:])
-	return ret
+var OrganizationOrUserIdentifiersFieldPathsTopLevel = []string{
+	"ids",
 }
 
-func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "organization_ids":
-			if dst.Ids == nil {
-				dst.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{}
+func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "ids":
+			if len(subs) == 0 && src == nil {
+				dst.Ids = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Ids = src.Ids
+				continue
 			}
-			dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs = src.GetOrganizationIDs()
-		case "organization_ids.organization_id":
-			if dst.Ids == nil {
-				dst.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
 			}
-			if dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs == nil {
-				dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs = &OrganizationIdentifiers{}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "organization_ids":
+					if _, ok := dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs); !ok {
+						dst.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs
+						if newDst == nil {
+							newDst = &OrganizationIdentifiers{}
+							dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs = newDst
+						}
+						var newSrc *OrganizationIdentifiers
+						if src != nil {
+							newSrc = src.GetOrganizationIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs = src.GetOrganizationIDs()
+						} else {
+							dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs = nil
+						}
+					}
+				case "user_ids":
+					if _, ok := dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs); !ok {
+						dst.Ids = &OrganizationOrUserIdentifiers_UserIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs
+						if newDst == nil {
+							newDst = &UserIdentifiers{}
+							dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs = newDst
+						}
+						var newSrc *UserIdentifiers
+						if src != nil {
+							newSrc = src.GetUserIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs = src.GetUserIDs()
+						} else {
+							dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
 			}
-			dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs.SetFields(src.GetOrganizationIDs(), _pathsWithoutPrefix("organization_ids", paths)...)
-		case "user_ids":
-			if dst.Ids == nil {
-				dst.Ids = &OrganizationOrUserIdentifiers_UserIDs{}
-			}
-			dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs = src.GetUserIDs()
-		case "user_ids.email":
-			if dst.Ids == nil {
-				dst.Ids = &OrganizationOrUserIdentifiers_UserIDs{}
-			}
-			if dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs == nil {
-				dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs = &UserIdentifiers{}
-			}
-			dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs.SetFields(src.GetUserIDs(), _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			if dst.Ids == nil {
-				dst.Ids = &OrganizationOrUserIdentifiers_UserIDs{}
-			}
-			if dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs == nil {
-				dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs = &UserIdentifiers{}
-			}
-			dst.Ids.(*OrganizationOrUserIdentifiers_UserIDs).UserIDs.SetFields(src.GetUserIDs(), _pathsWithoutPrefix("user_ids", paths)...)
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _EntityIdentifiersFieldPaths = [...]string{
-	"application_ids",
-	"application_ids.application_id",
-	"client_ids",
-	"client_ids.client_id",
-	"device_ids",
-	"device_ids.application_ids",
-	"device_ids.application_ids.application_id",
-	"device_ids.dev_addr",
-	"device_ids.dev_eui",
-	"device_ids.device_id",
-	"device_ids.join_eui",
-	"gateway_ids",
-	"gateway_ids.eui",
-	"gateway_ids.gateway_id",
-	"organization_ids",
-	"organization_ids.organization_id",
-	"user_ids",
-	"user_ids.email",
-	"user_ids.user_id",
+var EntityIdentifiersFieldPathsNested = []string{
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.client_ids",
+	"ids.client_ids.client_id",
+	"ids.device_ids",
+	"ids.device_ids.application_ids",
+	"ids.device_ids.application_ids.application_id",
+	"ids.device_ids.dev_addr",
+	"ids.device_ids.dev_eui",
+	"ids.device_ids.device_id",
+	"ids.device_ids.join_eui",
+	"ids.gateway_ids",
+	"ids.gateway_ids.eui",
+	"ids.gateway_ids.gateway_id",
+	"ids.organization_ids",
+	"ids.organization_ids.organization_id",
+	"ids.user_ids",
+	"ids.user_ids.email",
+	"ids.user_ids.user_id",
 }
 
-func (*EntityIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_EntityIdentifiersFieldPaths))
-	copy(ret, _EntityIdentifiersFieldPaths[:])
-	return ret
+var EntityIdentifiersFieldPathsTopLevel = []string{
+	"ids",
 }
 
-func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "application_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_ApplicationIDs{}
+func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "ids":
+			if len(subs) == 0 && src == nil {
+				dst.Ids = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Ids = src.Ids
+				continue
 			}
-			dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs = src.GetApplicationIDs()
-		case "application_ids.application_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_ApplicationIDs{}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
 			}
-			if dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs == nil {
-				dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs = &ApplicationIdentifiers{}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "application_ids":
+					if _, ok := dst.Ids.(*EntityIdentifiers_ApplicationIDs); !ok {
+						dst.Ids = &EntityIdentifiers_ApplicationIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs
+						if newDst == nil {
+							newDst = &ApplicationIdentifiers{}
+							dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs = newDst
+						}
+						var newSrc *ApplicationIdentifiers
+						if src != nil {
+							newSrc = src.GetApplicationIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs = src.GetApplicationIDs()
+						} else {
+							dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs = nil
+						}
+					}
+				case "client_ids":
+					if _, ok := dst.Ids.(*EntityIdentifiers_ClientIDs); !ok {
+						dst.Ids = &EntityIdentifiers_ClientIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs
+						if newDst == nil {
+							newDst = &ClientIdentifiers{}
+							dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs = newDst
+						}
+						var newSrc *ClientIdentifiers
+						if src != nil {
+							newSrc = src.GetClientIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs = src.GetClientIDs()
+						} else {
+							dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs = nil
+						}
+					}
+				case "device_ids":
+					if _, ok := dst.Ids.(*EntityIdentifiers_DeviceIDs); !ok {
+						dst.Ids = &EntityIdentifiers_DeviceIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs
+						if newDst == nil {
+							newDst = &EndDeviceIdentifiers{}
+							dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = newDst
+						}
+						var newSrc *EndDeviceIdentifiers
+						if src != nil {
+							newSrc = src.GetDeviceIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = src.GetDeviceIDs()
+						} else {
+							dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = nil
+						}
+					}
+				case "gateway_ids":
+					if _, ok := dst.Ids.(*EntityIdentifiers_GatewayIDs); !ok {
+						dst.Ids = &EntityIdentifiers_GatewayIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs
+						if newDst == nil {
+							newDst = &GatewayIdentifiers{}
+							dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs = newDst
+						}
+						var newSrc *GatewayIdentifiers
+						if src != nil {
+							newSrc = src.GetGatewayIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs = src.GetGatewayIDs()
+						} else {
+							dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs = nil
+						}
+					}
+				case "organization_ids":
+					if _, ok := dst.Ids.(*EntityIdentifiers_OrganizationIDs); !ok {
+						dst.Ids = &EntityIdentifiers_OrganizationIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs
+						if newDst == nil {
+							newDst = &OrganizationIdentifiers{}
+							dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs = newDst
+						}
+						var newSrc *OrganizationIdentifiers
+						if src != nil {
+							newSrc = src.GetOrganizationIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs = src.GetOrganizationIDs()
+						} else {
+							dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs = nil
+						}
+					}
+				case "user_ids":
+					if _, ok := dst.Ids.(*EntityIdentifiers_UserIDs); !ok {
+						dst.Ids = &EntityIdentifiers_UserIDs{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs
+						if newDst == nil {
+							newDst = &UserIdentifiers{}
+							dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs = newDst
+						}
+						var newSrc *UserIdentifiers
+						if src != nil {
+							newSrc = src.GetUserIDs()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs = src.GetUserIDs()
+						} else {
+							dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
 			}
-			dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs.SetFields(src.GetApplicationIDs(), _pathsWithoutPrefix("application_ids", paths)...)
-		case "client_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_ClientIDs{}
-			}
-			dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs = src.GetClientIDs()
-		case "client_ids.client_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_ClientIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs == nil {
-				dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs = &ClientIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs.SetFields(src.GetClientIDs(), _pathsWithoutPrefix("client_ids", paths)...)
-		case "device_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = src.GetDeviceIDs()
-		case "device_ids.application_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs == nil {
-				dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = &EndDeviceIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs.SetFields(src.GetDeviceIDs(), _pathsWithoutPrefix("device_ids", paths)...)
-		case "device_ids.application_ids.application_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs == nil {
-				dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = &EndDeviceIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs.SetFields(src.GetDeviceIDs(), _pathsWithoutPrefix("device_ids", paths)...)
-		case "device_ids.dev_addr":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs == nil {
-				dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = &EndDeviceIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs.SetFields(src.GetDeviceIDs(), _pathsWithoutPrefix("device_ids", paths)...)
-		case "device_ids.dev_eui":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs == nil {
-				dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = &EndDeviceIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs.SetFields(src.GetDeviceIDs(), _pathsWithoutPrefix("device_ids", paths)...)
-		case "device_ids.device_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs == nil {
-				dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = &EndDeviceIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs.SetFields(src.GetDeviceIDs(), _pathsWithoutPrefix("device_ids", paths)...)
-		case "device_ids.join_eui":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_DeviceIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs == nil {
-				dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs = &EndDeviceIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs.SetFields(src.GetDeviceIDs(), _pathsWithoutPrefix("device_ids", paths)...)
-		case "gateway_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_GatewayIDs{}
-			}
-			dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs = src.GetGatewayIDs()
-		case "gateway_ids.eui":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_GatewayIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs == nil {
-				dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs = &GatewayIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs.SetFields(src.GetGatewayIDs(), _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_GatewayIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs == nil {
-				dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs = &GatewayIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs.SetFields(src.GetGatewayIDs(), _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "organization_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_OrganizationIDs{}
-			}
-			dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs = src.GetOrganizationIDs()
-		case "organization_ids.organization_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_OrganizationIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs == nil {
-				dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs = &OrganizationIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs.SetFields(src.GetOrganizationIDs(), _pathsWithoutPrefix("organization_ids", paths)...)
-		case "user_ids":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_UserIDs{}
-			}
-			dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs = src.GetUserIDs()
-		case "user_ids.email":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_UserIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs == nil {
-				dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs = &UserIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs.SetFields(src.GetUserIDs(), _pathsWithoutPrefix("user_ids", paths)...)
-		case "user_ids.user_id":
-			if dst.Ids == nil {
-				dst.Ids = &EntityIdentifiers_UserIDs{}
-			}
-			if dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs == nil {
-				dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs = &UserIdentifiers{}
-			}
-			dst.Ids.(*EntityIdentifiers_UserIDs).UserIDs.SetFields(src.GetUserIDs(), _pathsWithoutPrefix("user_ids", paths)...)
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CombinedIdentifiersFieldPaths = [...]string{
+var CombinedIdentifiersFieldPathsNested = []string{
 	"entity_identifiers",
 }
 
-func (*CombinedIdentifiers) FieldMaskPaths() []string {
-	ret := make([]string, len(_CombinedIdentifiersFieldPaths))
-	copy(ret, _CombinedIdentifiersFieldPaths[:])
-	return ret
+var CombinedIdentifiersFieldPathsTopLevel = []string{
+	"entity_identifiers",
 }
 
-func (dst *CombinedIdentifiers) SetFields(src *CombinedIdentifiers, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *CombinedIdentifiers) SetFields(src *CombinedIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "entity_identifiers":
-			dst.EntityIdentifiers = src.EntityIdentifiers
+			if len(subs) > 0 {
+				return fmt.Errorf("'entity_identifiers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EntityIdentifiers = src.EntityIdentifiers
+			} else {
+				dst.EntityIdentifiers = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

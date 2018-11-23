@@ -2,9 +2,13 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	time "time"
+)
 
-var _OrganizationFieldPaths = [...]string{
+var OrganizationFieldPathsNested = []string{
 	"attributes",
 	"contact_info",
 	"created_at",
@@ -15,155 +19,284 @@ var _OrganizationFieldPaths = [...]string{
 	"updated_at",
 }
 
-func (*Organization) FieldMaskPaths() []string {
-	ret := make([]string, len(_OrganizationFieldPaths))
-	copy(ret, _OrganizationFieldPaths[:])
-	return ret
+var OrganizationFieldPathsTopLevel = []string{
+	"attributes",
+	"contact_info",
+	"created_at",
+	"description",
+	"ids",
+	"name",
+	"updated_at",
 }
 
-func (dst *Organization) SetFields(src *Organization, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "attributes":
-			dst.Attributes = src.Attributes
-		case "contact_info":
-			dst.ContactInfo = src.ContactInfo
-		case "created_at":
-			dst.CreatedAt = src.CreatedAt
-		case "description":
-			dst.Description = src.Description
+func (dst *Organization) SetFields(src *Organization, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.OrganizationIdentifiers = src.OrganizationIdentifiers
-		case "ids.organization_id":
-			dst.OrganizationIdentifiers.SetFields(&src.OrganizationIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "name":
-			dst.Name = src.Name
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
 		case "updated_at":
-			dst.UpdatedAt = src.UpdatedAt
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "attributes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attributes = src.Attributes
+			} else {
+				dst.Attributes = nil
+			}
+		case "contact_info":
+			if len(subs) > 0 {
+				return fmt.Errorf("'contact_info' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ContactInfo = src.ContactInfo
+			} else {
+				dst.ContactInfo = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _OrganizationsFieldPaths = [...]string{
+var OrganizationsFieldPathsNested = []string{
 	"organizations",
 }
 
-func (*Organizations) FieldMaskPaths() []string {
-	ret := make([]string, len(_OrganizationsFieldPaths))
-	copy(ret, _OrganizationsFieldPaths[:])
-	return ret
+var OrganizationsFieldPathsTopLevel = []string{
+	"organizations",
 }
 
-func (dst *Organizations) SetFields(src *Organizations, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Organizations) SetFields(src *Organizations, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organizations":
-			dst.Organizations = src.Organizations
+			if len(subs) > 0 {
+				return fmt.Errorf("'organizations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Organizations = src.Organizations
+			} else {
+				dst.Organizations = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GetOrganizationRequestFieldPaths = [...]string{
+var GetOrganizationRequestFieldPathsNested = []string{
 	"field_mask",
 	"organization_ids",
 	"organization_ids.organization_id",
 }
 
-func (*GetOrganizationRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_GetOrganizationRequestFieldPaths))
-	copy(ret, _GetOrganizationRequestFieldPaths[:])
-	return ret
+var GetOrganizationRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"organization_ids",
 }
 
-func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization_ids":
-			dst.OrganizationIdentifiers = src.OrganizationIdentifiers
-		case "organization_ids.organization_id":
-			dst.OrganizationIdentifiers.SetFields(&src.OrganizationIdentifiers, _pathsWithoutPrefix("organization_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ListOrganizationsRequestFieldPaths = [...]string{
+var ListOrganizationsRequestFieldPathsNested = []string{
 	"collaborator",
-	"collaborator.organization_ids",
-	"collaborator.organization_ids.organization_id",
-	"collaborator.user_ids",
-	"collaborator.user_ids.email",
-	"collaborator.user_ids.user_id",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
 	"field_mask",
+	"ids",
 	"limit",
 	"order",
 	"page",
 }
 
-func (*ListOrganizationsRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ListOrganizationsRequestFieldPaths))
-	copy(ret, _ListOrganizationsRequestFieldPaths[:])
-	return ret
+var ListOrganizationsRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"field_mask",
+	"ids",
+	"limit",
+	"order",
+	"page",
 }
 
-func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.organization_ids":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
+			if len(subs) > 0 {
+				newDst := dst.Collaborator
+				if newDst == nil {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
 			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.organization_ids.organization_id":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.email":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.user_id":
-			if dst.Collaborator == nil {
-				dst.Collaborator = &OrganizationOrUserIdentifiers{}
-			}
-			dst.Collaborator.SetFields(src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
 		case "field_mask":
-			dst.FieldMask = src.FieldMask
-		case "limit":
-			dst.Limit = src.Limit
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
 		case "order":
-			dst.Order = src.Order
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
 		case "page":
-			dst.Page = src.Page
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateOrganizationRequestFieldPaths = [...]string{
+var CreateOrganizationRequestFieldPathsNested = []string{
 	"collaborator",
-	"collaborator.organization_ids",
-	"collaborator.organization_ids.organization_id",
-	"collaborator.user_ids",
-	"collaborator.user_ids.email",
-	"collaborator.user_ids.user_id",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
+	"ids",
 	"organization",
 	"organization.attributes",
 	"organization.contact_info",
@@ -175,52 +308,60 @@ var _CreateOrganizationRequestFieldPaths = [...]string{
 	"organization.updated_at",
 }
 
-func (*CreateOrganizationRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateOrganizationRequestFieldPaths))
-	copy(ret, _CreateOrganizationRequestFieldPaths[:])
-	return ret
+var CreateOrganizationRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"ids",
+	"organization",
 }
 
-func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.organization_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.organization_ids.organization_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.email":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.user_ids.user_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
+func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization":
-			dst.Organization = src.Organization
-		case "organization.attributes":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.contact_info":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.created_at":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.description":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.ids":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.ids.organization_id":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.name":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.updated_at":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Organization
+				var newSrc *Organization
+				if src != nil {
+					newSrc = &src.Organization
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Organization = src.Organization
+				} else {
+					var zero Organization
+					dst.Organization = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.Collaborator
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.Collaborator = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateOrganizationRequestFieldPaths = [...]string{
+var UpdateOrganizationRequestFieldPathsNested = []string{
 	"field_mask",
 	"organization",
 	"organization.attributes",
@@ -233,72 +374,112 @@ var _UpdateOrganizationRequestFieldPaths = [...]string{
 	"organization.updated_at",
 }
 
-func (*UpdateOrganizationRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateOrganizationRequestFieldPaths))
-	copy(ret, _UpdateOrganizationRequestFieldPaths[:])
-	return ret
+var UpdateOrganizationRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"organization",
 }
 
-func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization":
-			dst.Organization = src.Organization
-		case "organization.attributes":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.contact_info":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.created_at":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.description":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.ids":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.ids.organization_id":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.name":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
-		case "organization.updated_at":
-			dst.Organization.SetFields(&src.Organization, _pathsWithoutPrefix("organization", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Organization
+				var newSrc *Organization
+				if src != nil {
+					newSrc = &src.Organization
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Organization = src.Organization
+				} else {
+					var zero Organization
+					dst.Organization = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CreateOrganizationAPIKeyRequestFieldPaths = [...]string{
+var CreateOrganizationAPIKeyRequestFieldPathsNested = []string{
 	"name",
 	"organization_ids",
 	"organization_ids.organization_id",
 	"rights",
 }
 
-func (*CreateOrganizationAPIKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_CreateOrganizationAPIKeyRequestFieldPaths))
-	copy(ret, _CreateOrganizationAPIKeyRequestFieldPaths[:])
-	return ret
+var CreateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
+	"name",
+	"organization_ids",
+	"rights",
 }
 
-func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPIKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "name":
-			dst.Name = src.Name
+func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization_ids":
-			dst.OrganizationIdentifiers = src.OrganizationIdentifiers
-		case "organization_ids.organization_id":
-			dst.OrganizationIdentifiers.SetFields(&src.OrganizationIdentifiers, _pathsWithoutPrefix("organization_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
 		case "rights":
-			dst.Rights = src.Rights
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _UpdateOrganizationAPIKeyRequestFieldPaths = [...]string{
+var UpdateOrganizationAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
 	"api_key.id",
 	"api_key.key",
@@ -308,79 +489,121 @@ var _UpdateOrganizationAPIKeyRequestFieldPaths = [...]string{
 	"organization_ids.organization_id",
 }
 
-func (*UpdateOrganizationAPIKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_UpdateOrganizationAPIKeyRequestFieldPaths))
-	copy(ret, _UpdateOrganizationAPIKeyRequestFieldPaths[:])
-	return ret
+var UpdateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
+	"api_key",
+	"organization_ids",
 }
 
-func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPIKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "api_key":
-			dst.APIKey = src.APIKey
-		case "api_key.id":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.key":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.name":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
-		case "api_key.rights":
-			dst.APIKey.SetFields(&src.APIKey, _pathsWithoutPrefix("api_key", paths)...)
+func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization_ids":
-			dst.OrganizationIdentifiers = src.OrganizationIdentifiers
-		case "organization_ids.organization_id":
-			dst.OrganizationIdentifiers.SetFields(&src.OrganizationIdentifiers, _pathsWithoutPrefix("organization_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "api_key":
+			if len(subs) > 0 {
+				newDst := &dst.APIKey
+				var newSrc *APIKey
+				if src != nil {
+					newSrc = &src.APIKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.APIKey = src.APIKey
+				} else {
+					var zero APIKey
+					dst.APIKey = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SetOrganizationCollaboratorRequestFieldPaths = [...]string{
+var SetOrganizationCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",
 	"collaborator.ids",
-	"collaborator.ids.organization_ids",
-	"collaborator.ids.organization_ids.organization_id",
-	"collaborator.ids.user_ids",
-	"collaborator.ids.user_ids.email",
-	"collaborator.ids.user_ids.user_id",
+	"collaborator.ids.ids.organization_ids",
+	"collaborator.ids.ids.organization_ids.organization_id",
+	"collaborator.ids.ids.user_ids",
+	"collaborator.ids.ids.user_ids.email",
+	"collaborator.ids.ids.user_ids.user_id",
 	"collaborator.rights",
+	"ids",
 	"organization_ids",
 	"organization_ids.organization_id",
 }
 
-func (*SetOrganizationCollaboratorRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SetOrganizationCollaboratorRequestFieldPaths))
-	copy(ret, _SetOrganizationCollaboratorRequestFieldPaths[:])
-	return ret
+var SetOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"ids",
+	"organization_ids",
 }
 
-func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCollaboratorRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "collaborator":
-			dst.Collaborator = src.Collaborator
-		case "collaborator.ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.organization_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.organization_ids.organization_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids.email":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.ids.user_ids.user_id":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
-		case "collaborator.rights":
-			dst.Collaborator.SetFields(&src.Collaborator, _pathsWithoutPrefix("collaborator", paths)...)
+func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCollaboratorRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "organization_ids":
-			dst.OrganizationIdentifiers = src.OrganizationIdentifiers
-		case "organization_ids.organization_id":
-			dst.OrganizationIdentifiers.SetFields(&src.OrganizationIdentifiers, _pathsWithoutPrefix("organization_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.Collaborator
+				var newSrc *Collaborator
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero Collaborator
+					dst.Collaborator = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

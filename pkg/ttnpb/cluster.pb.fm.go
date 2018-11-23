@@ -4,32 +4,65 @@ package ttnpb
 
 import fmt "fmt"
 
-var _PeerInfoFieldPaths = [...]string{
+var PeerInfoFieldPathsNested = []string{
 	"grpc_port",
 	"roles",
 	"tags",
 	"tls",
 }
 
-func (*PeerInfo) FieldMaskPaths() []string {
-	ret := make([]string, len(_PeerInfoFieldPaths))
-	copy(ret, _PeerInfoFieldPaths[:])
-	return ret
+var PeerInfoFieldPathsTopLevel = []string{
+	"grpc_port",
+	"roles",
+	"tags",
+	"tls",
 }
 
-func (dst *PeerInfo) SetFields(src *PeerInfo, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *PeerInfo) SetFields(src *PeerInfo, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "grpc_port":
-			dst.GRPCPort = src.GRPCPort
-		case "roles":
-			dst.Roles = src.Roles
-		case "tags":
-			dst.Tags = src.Tags
+			if len(subs) > 0 {
+				return fmt.Errorf("'grpc_port' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GRPCPort = src.GRPCPort
+			} else {
+				var zero uint32
+				dst.GRPCPort = zero
+			}
 		case "tls":
-			dst.TLS = src.TLS
+			if len(subs) > 0 {
+				return fmt.Errorf("'tls' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TLS = src.TLS
+			} else {
+				var zero bool
+				dst.TLS = zero
+			}
+		case "roles":
+			if len(subs) > 0 {
+				return fmt.Errorf("'roles' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Roles = src.Roles
+			} else {
+				dst.Roles = nil
+			}
+		case "tags":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tags' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Tags = src.Tags
+			} else {
+				dst.Tags = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

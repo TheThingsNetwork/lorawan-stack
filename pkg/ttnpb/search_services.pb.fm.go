@@ -2,9 +2,12 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+)
 
-var _SearchEntitiesRequestFieldPaths = [...]string{
+var SearchEntitiesRequestFieldPathsNested = []string{
 	"attributes_contain",
 	"description_contains",
 	"field_mask",
@@ -12,32 +15,75 @@ var _SearchEntitiesRequestFieldPaths = [...]string{
 	"name_contains",
 }
 
-func (*SearchEntitiesRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SearchEntitiesRequestFieldPaths))
-	copy(ret, _SearchEntitiesRequestFieldPaths[:])
-	return ret
+var SearchEntitiesRequestFieldPathsTopLevel = []string{
+	"attributes_contain",
+	"description_contains",
+	"field_mask",
+	"id_contains",
+	"name_contains",
 }
 
-func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "attributes_contain":
-			dst.AttributesContain = src.AttributesContain
-		case "description_contains":
-			dst.DescriptionContains = src.DescriptionContains
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "id_contains":
-			dst.IDContains = src.IDContains
+			if len(subs) > 0 {
+				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IDContains = src.IDContains
+			} else {
+				var zero string
+				dst.IDContains = zero
+			}
 		case "name_contains":
-			dst.NameContains = src.NameContains
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+		case "description_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DescriptionContains = src.DescriptionContains
+			} else {
+				var zero string
+				dst.DescriptionContains = zero
+			}
+		case "attributes_contain":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes_contain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AttributesContain = src.AttributesContain
+			} else {
+				dst.AttributesContain = nil
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _SearchEndDevicesRequestFieldPaths = [...]string{
+var SearchEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"attributes_contain",
@@ -50,37 +96,122 @@ var _SearchEndDevicesRequestFieldPaths = [...]string{
 	"name_contains",
 }
 
-func (*SearchEndDevicesRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SearchEndDevicesRequestFieldPaths))
-	copy(ret, _SearchEndDevicesRequestFieldPaths[:])
-	return ret
+var SearchEndDevicesRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"attributes_contain",
+	"description_contains",
+	"dev_addr_contains",
+	"dev_eui_contains",
+	"field_mask",
+	"id_contains",
+	"join_eui_contains",
+	"name_contains",
 }
 
-func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "application_ids":
-			dst.ApplicationIdentifiers = src.ApplicationIdentifiers
-		case "application_ids.application_id":
-			dst.ApplicationIdentifiers.SetFields(&src.ApplicationIdentifiers, _pathsWithoutPrefix("application_ids", paths)...)
-		case "attributes_contain":
-			dst.AttributesContain = src.AttributesContain
-		case "description_contains":
-			dst.DescriptionContains = src.DescriptionContains
-		case "dev_addr_contains":
-			dst.DevAddrContains = src.DevAddrContains
-		case "dev_eui_contains":
-			dst.DevEUIContains = src.DevEUIContains
-		case "field_mask":
-			dst.FieldMask = src.FieldMask
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
 		case "id_contains":
-			dst.IDContains = src.IDContains
-		case "join_eui_contains":
-			dst.JoinEUIContains = src.JoinEUIContains
+			if len(subs) > 0 {
+				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IDContains = src.IDContains
+			} else {
+				var zero string
+				dst.IDContains = zero
+			}
 		case "name_contains":
-			dst.NameContains = src.NameContains
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+		case "description_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DescriptionContains = src.DescriptionContains
+			} else {
+				var zero string
+				dst.DescriptionContains = zero
+			}
+		case "attributes_contain":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes_contain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AttributesContain = src.AttributesContain
+			} else {
+				dst.AttributesContain = nil
+			}
+		case "dev_eui_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEUIContains = src.DevEUIContains
+			} else {
+				var zero string
+				dst.DevEUIContains = zero
+			}
+		case "join_eui_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUIContains = src.JoinEUIContains
+			} else {
+				var zero string
+				dst.JoinEUIContains = zero
+			}
+		case "dev_addr_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddrContains = src.DevAddrContains
+			} else {
+				var zero string
+				dst.DevAddrContains = zero
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero github_com_gogo_protobuf_types.FieldMask
+				dst.FieldMask = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

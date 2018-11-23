@@ -2,33 +2,53 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+)
 
-var _SessionKeyRequestFieldPaths = [...]string{
+var SessionKeyRequestFieldPathsNested = []string{
 	"dev_eui",
 	"session_key_id",
 }
 
-func (*SessionKeyRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_SessionKeyRequestFieldPaths))
-	copy(ret, _SessionKeyRequestFieldPaths[:])
-	return ret
+var SessionKeyRequestFieldPathsTopLevel = []string{
+	"dev_eui",
+	"session_key_id",
 }
 
-func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "dev_eui":
-			dst.DevEUI = src.DevEUI
+func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "session_key_id":
-			dst.SessionKeyID = src.SessionKeyID
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyID = src.SessionKeyID
+			} else {
+				var zero string
+				dst.SessionKeyID = zero
+			}
+		case "dev_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEUI = src.DevEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.DevEUI = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _NwkSKeysResponseFieldPaths = [...]string{
+var NwkSKeysResponseFieldPathsNested = []string{
 	"f_nwk_s_int_key",
 	"f_nwk_s_int_key.kek_label",
 	"f_nwk_s_int_key.key",
@@ -40,62 +60,112 @@ var _NwkSKeysResponseFieldPaths = [...]string{
 	"s_nwk_s_int_key.key",
 }
 
-func (*NwkSKeysResponse) FieldMaskPaths() []string {
-	ret := make([]string, len(_NwkSKeysResponseFieldPaths))
-	copy(ret, _NwkSKeysResponseFieldPaths[:])
-	return ret
+var NwkSKeysResponseFieldPathsTopLevel = []string{
+	"f_nwk_s_int_key",
+	"nwk_s_enc_key",
+	"s_nwk_s_int_key",
 }
 
-func (dst *NwkSKeysResponse) SetFields(src *NwkSKeysResponse, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *NwkSKeysResponse) SetFields(src *NwkSKeysResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "f_nwk_s_int_key":
-			dst.FNwkSIntKey = src.FNwkSIntKey
-		case "f_nwk_s_int_key.kek_label":
-			dst.FNwkSIntKey.SetFields(&src.FNwkSIntKey, _pathsWithoutPrefix("f_nwk_s_int_key", paths)...)
-		case "f_nwk_s_int_key.key":
-			dst.FNwkSIntKey.SetFields(&src.FNwkSIntKey, _pathsWithoutPrefix("f_nwk_s_int_key", paths)...)
-		case "nwk_s_enc_key":
-			dst.NwkSEncKey = src.NwkSEncKey
-		case "nwk_s_enc_key.kek_label":
-			dst.NwkSEncKey.SetFields(&src.NwkSEncKey, _pathsWithoutPrefix("nwk_s_enc_key", paths)...)
-		case "nwk_s_enc_key.key":
-			dst.NwkSEncKey.SetFields(&src.NwkSEncKey, _pathsWithoutPrefix("nwk_s_enc_key", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.FNwkSIntKey
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = &src.FNwkSIntKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.FNwkSIntKey = src.FNwkSIntKey
+				} else {
+					var zero KeyEnvelope
+					dst.FNwkSIntKey = zero
+				}
+			}
 		case "s_nwk_s_int_key":
-			dst.SNwkSIntKey = src.SNwkSIntKey
-		case "s_nwk_s_int_key.kek_label":
-			dst.SNwkSIntKey.SetFields(&src.SNwkSIntKey, _pathsWithoutPrefix("s_nwk_s_int_key", paths)...)
-		case "s_nwk_s_int_key.key":
-			dst.SNwkSIntKey.SetFields(&src.SNwkSIntKey, _pathsWithoutPrefix("s_nwk_s_int_key", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.SNwkSIntKey
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = &src.SNwkSIntKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.SNwkSIntKey = src.SNwkSIntKey
+				} else {
+					var zero KeyEnvelope
+					dst.SNwkSIntKey = zero
+				}
+			}
+		case "nwk_s_enc_key":
+			if len(subs) > 0 {
+				newDst := &dst.NwkSEncKey
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = &src.NwkSEncKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NwkSEncKey = src.NwkSEncKey
+				} else {
+					var zero KeyEnvelope
+					dst.NwkSEncKey = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _AppSKeyResponseFieldPaths = [...]string{
+var AppSKeyResponseFieldPathsNested = []string{
 	"app_s_key",
 	"app_s_key.kek_label",
 	"app_s_key.key",
 }
 
-func (*AppSKeyResponse) FieldMaskPaths() []string {
-	ret := make([]string, len(_AppSKeyResponseFieldPaths))
-	copy(ret, _AppSKeyResponseFieldPaths[:])
-	return ret
+var AppSKeyResponseFieldPathsTopLevel = []string{
+	"app_s_key",
 }
 
-func (dst *AppSKeyResponse) SetFields(src *AppSKeyResponse, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *AppSKeyResponse) SetFields(src *AppSKeyResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "app_s_key":
-			dst.AppSKey = src.AppSKey
-		case "app_s_key.kek_label":
-			dst.AppSKey.SetFields(&src.AppSKey, _pathsWithoutPrefix("app_s_key", paths)...)
-		case "app_s_key.key":
-			dst.AppSKey.SetFields(&src.AppSKey, _pathsWithoutPrefix("app_s_key", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.AppSKey
+				var newSrc *KeyEnvelope
+				if src != nil {
+					newSrc = &src.AppSKey
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AppSKey = src.AppSKey
+				} else {
+					var zero KeyEnvelope
+					dst.AppSKey = zero
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

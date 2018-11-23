@@ -4,134 +4,205 @@ package ttnpb
 
 import fmt "fmt"
 
-var _RightsFieldPaths = [...]string{
+var RightsFieldPathsNested = []string{
 	"rights",
 }
 
-func (*Rights) FieldMaskPaths() []string {
-	ret := make([]string, len(_RightsFieldPaths))
-	copy(ret, _RightsFieldPaths[:])
-	return ret
+var RightsFieldPathsTopLevel = []string{
+	"rights",
 }
 
-func (dst *Rights) SetFields(src *Rights, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Rights) SetFields(src *Rights, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rights":
-			dst.Rights = src.Rights
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _APIKeyFieldPaths = [...]string{
+var APIKeyFieldPathsNested = []string{
 	"id",
 	"key",
 	"name",
 	"rights",
 }
 
-func (*APIKey) FieldMaskPaths() []string {
-	ret := make([]string, len(_APIKeyFieldPaths))
-	copy(ret, _APIKeyFieldPaths[:])
-	return ret
-}
-
-func (dst *APIKey) SetFields(src *APIKey, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "id":
-			dst.ID = src.ID
-		case "key":
-			dst.Key = src.Key
-		case "name":
-			dst.Name = src.Name
-		case "rights":
-			dst.Rights = src.Rights
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _APIKeysFieldPaths = [...]string{
-	"api_keys",
-}
-
-func (*APIKeys) FieldMaskPaths() []string {
-	ret := make([]string, len(_APIKeysFieldPaths))
-	copy(ret, _APIKeysFieldPaths[:])
-	return ret
-}
-
-func (dst *APIKeys) SetFields(src *APIKeys, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "api_keys":
-			dst.APIKeys = src.APIKeys
-		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
-		}
-	}
-}
-
-var _CollaboratorFieldPaths = [...]string{
-	"ids",
-	"ids.organization_ids",
-	"ids.organization_ids.organization_id",
-	"ids.user_ids",
-	"ids.user_ids.email",
-	"ids.user_ids.user_id",
+var APIKeyFieldPathsTopLevel = []string{
+	"id",
+	"key",
+	"name",
 	"rights",
 }
 
-func (*Collaborator) FieldMaskPaths() []string {
-	ret := make([]string, len(_CollaboratorFieldPaths))
-	copy(ret, _CollaboratorFieldPaths[:])
-	return ret
-}
-
-func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "ids":
-			dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
-		case "ids.organization_ids":
-			dst.OrganizationOrUserIdentifiers.SetFields(&src.OrganizationOrUserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.organization_ids.organization_id":
-			dst.OrganizationOrUserIdentifiers.SetFields(&src.OrganizationOrUserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_ids":
-			dst.OrganizationOrUserIdentifiers.SetFields(&src.OrganizationOrUserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_ids.email":
-			dst.OrganizationOrUserIdentifiers.SetFields(&src.OrganizationOrUserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.user_ids.user_id":
-			dst.OrganizationOrUserIdentifiers.SetFields(&src.OrganizationOrUserIdentifiers, _pathsWithoutPrefix("ids", paths)...)
+func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ID = src.ID
+			} else {
+				var zero string
+				dst.ID = zero
+			}
+		case "key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Key = src.Key
+			} else {
+				var zero string
+				dst.Key = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
 		case "rights":
-			dst.Rights = src.Rights
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _CollaboratorsFieldPaths = [...]string{
+var APIKeysFieldPathsNested = []string{
+	"api_keys",
+}
+
+var APIKeysFieldPathsTopLevel = []string{
+	"api_keys",
+}
+
+func (dst *APIKeys) SetFields(src *APIKeys, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "api_keys":
+			if len(subs) > 0 {
+				return fmt.Errorf("'api_keys' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.APIKeys = src.APIKeys
+			} else {
+				dst.APIKeys = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var CollaboratorFieldPathsNested = []string{
+	"ids",
+	"ids",
+	"ids.ids.organization_ids",
+	"ids.ids.organization_ids.organization_id",
+	"ids.ids.user_ids",
+	"ids.ids.user_ids.email",
+	"ids.ids.user_ids.user_id",
+	"rights",
+}
+
+var CollaboratorFieldPathsTopLevel = []string{
+	"ids",
+	"ids",
+	"rights",
+}
+
+func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationOrUserIdentifiers
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationOrUserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.OrganizationOrUserIdentifiers = zero
+				}
+			}
+		case "rights":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var CollaboratorsFieldPathsNested = []string{
 	"collaborators",
 }
 
-func (*Collaborators) FieldMaskPaths() []string {
-	ret := make([]string, len(_CollaboratorsFieldPaths))
-	copy(ret, _CollaboratorsFieldPaths[:])
-	return ret
+var CollaboratorsFieldPathsTopLevel = []string{
+	"collaborators",
 }
 
-func (dst *Collaborators) SetFields(src *Collaborators, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *Collaborators) SetFields(src *Collaborators, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "collaborators":
-			dst.Collaborators = src.Collaborators
+			if len(subs) > 0 {
+				return fmt.Errorf("'collaborators' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Collaborators = src.Collaborators
+			} else {
+				dst.Collaborators = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

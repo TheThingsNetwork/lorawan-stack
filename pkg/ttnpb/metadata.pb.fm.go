@@ -4,7 +4,7 @@ package ttnpb
 
 import fmt "fmt"
 
-var _RxMetadataFieldPaths = [...]string{
+var RxMetadataFieldPathsNested = []string{
 	"advanced",
 	"antenna_index",
 	"channel_rssi",
@@ -29,81 +29,203 @@ var _RxMetadataFieldPaths = [...]string{
 	"timestamp",
 }
 
-func (*RxMetadata) FieldMaskPaths() []string {
-	ret := make([]string, len(_RxMetadataFieldPaths))
-	copy(ret, _RxMetadataFieldPaths[:])
-	return ret
+var RxMetadataFieldPathsTopLevel = []string{
+	"advanced",
+	"antenna_index",
+	"channel_rssi",
+	"downlink_path_constraint",
+	"encrypted_fine_timestamp",
+	"encrypted_fine_timestamp_key_id",
+	"fine_timestamp",
+	"frequency_offset",
+	"gateway_ids",
+	"location",
+	"rssi",
+	"rssi_standard_deviation",
+	"snr",
+	"time",
+	"timestamp",
 }
 
-func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "advanced":
-			dst.Advanced = src.Advanced
-		case "antenna_index":
-			dst.AntennaIndex = src.AntennaIndex
-		case "channel_rssi":
-			dst.ChannelRSSI = src.ChannelRSSI
-		case "downlink_path_constraint":
-			dst.DownlinkPathConstraint = src.DownlinkPathConstraint
-		case "encrypted_fine_timestamp":
-			dst.EncryptedFineTimestamp = src.EncryptedFineTimestamp
-		case "encrypted_fine_timestamp_key_id":
-			dst.EncryptedFineTimestampKeyID = src.EncryptedFineTimestampKeyID
-		case "fine_timestamp":
-			dst.FineTimestamp = src.FineTimestamp
-		case "frequency_offset":
-			dst.FrequencyOffset = src.FrequencyOffset
+func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "gateway_ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "location":
-			dst.Location = src.Location
-		case "location.accuracy":
-			if dst.Location == nil {
-				dst.Location = &Location{}
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
 			}
-			dst.Location.SetFields(src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.altitude":
-			if dst.Location == nil {
-				dst.Location = &Location{}
+		case "antenna_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
 			}
-			dst.Location.SetFields(src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.latitude":
-			if dst.Location == nil {
-				dst.Location = &Location{}
+			if src != nil {
+				dst.AntennaIndex = src.AntennaIndex
+			} else {
+				var zero uint32
+				dst.AntennaIndex = zero
 			}
-			dst.Location.SetFields(src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.longitude":
-			if dst.Location == nil {
-				dst.Location = &Location{}
-			}
-			dst.Location.SetFields(src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "location.source":
-			if dst.Location == nil {
-				dst.Location = &Location{}
-			}
-			dst.Location.SetFields(src.Location, _pathsWithoutPrefix("location", paths)...)
-		case "rssi":
-			dst.RSSI = src.RSSI
-		case "rssi_standard_deviation":
-			dst.RSSIStandardDeviation = src.RSSIStandardDeviation
-		case "snr":
-			dst.SNR = src.SNR
 		case "time":
-			dst.Time = src.Time
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				dst.Time = nil
+			}
 		case "timestamp":
-			dst.Timestamp = src.Timestamp
+			if len(subs) > 0 {
+				return fmt.Errorf("'timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Timestamp = src.Timestamp
+			} else {
+				var zero uint64
+				dst.Timestamp = zero
+			}
+		case "fine_timestamp":
+			if len(subs) > 0 {
+				return fmt.Errorf("'fine_timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FineTimestamp = src.FineTimestamp
+			} else {
+				var zero uint64
+				dst.FineTimestamp = zero
+			}
+		case "encrypted_fine_timestamp":
+			if len(subs) > 0 {
+				return fmt.Errorf("'encrypted_fine_timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EncryptedFineTimestamp = src.EncryptedFineTimestamp
+			} else {
+				var zero []byte
+				dst.EncryptedFineTimestamp = zero
+			}
+		case "encrypted_fine_timestamp_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'encrypted_fine_timestamp_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EncryptedFineTimestampKeyID = src.EncryptedFineTimestampKeyID
+			} else {
+				var zero string
+				dst.EncryptedFineTimestampKeyID = zero
+			}
+		case "rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RSSI = src.RSSI
+			} else {
+				var zero float32
+				dst.RSSI = zero
+			}
+		case "channel_rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelRSSI = src.ChannelRSSI
+			} else {
+				var zero float32
+				dst.ChannelRSSI = zero
+			}
+		case "rssi_standard_deviation":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi_standard_deviation' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RSSIStandardDeviation = src.RSSIStandardDeviation
+			} else {
+				var zero float32
+				dst.RSSIStandardDeviation = zero
+			}
+		case "snr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'snr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SNR = src.SNR
+			} else {
+				var zero float32
+				dst.SNR = zero
+			}
+		case "frequency_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyOffset = src.FrequencyOffset
+			} else {
+				var zero int64
+				dst.FrequencyOffset = zero
+			}
+		case "location":
+			if len(subs) > 0 {
+				newDst := dst.Location
+				if newDst == nil {
+					newDst = &Location{}
+					dst.Location = newDst
+				}
+				var newSrc *Location
+				if src != nil {
+					newSrc = src.Location
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Location = src.Location
+				} else {
+					dst.Location = nil
+				}
+			}
+		case "downlink_path_constraint":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_path_constraint' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkPathConstraint = src.DownlinkPathConstraint
+			} else {
+				var zero DownlinkPathConstraint
+				dst.DownlinkPathConstraint = zero
+			}
+		case "advanced":
+			if len(subs) > 0 {
+				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Advanced = src.Advanced
+			} else {
+				dst.Advanced = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _TxMetadataFieldPaths = [...]string{
+var TxMetadataFieldPathsNested = []string{
 	"advanced",
 	"antenna_index",
 	"gateway_ids",
@@ -113,36 +235,82 @@ var _TxMetadataFieldPaths = [...]string{
 	"timestamp",
 }
 
-func (*TxMetadata) FieldMaskPaths() []string {
-	ret := make([]string, len(_TxMetadataFieldPaths))
-	copy(ret, _TxMetadataFieldPaths[:])
-	return ret
+var TxMetadataFieldPathsTopLevel = []string{
+	"advanced",
+	"antenna_index",
+	"gateway_ids",
+	"time",
+	"timestamp",
 }
 
-func (dst *TxMetadata) SetFields(src *TxMetadata, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "advanced":
-			dst.Advanced = src.Advanced
-		case "antenna_index":
-			dst.AntennaIndex = src.AntennaIndex
+func (dst *TxMetadata) SetFields(src *TxMetadata, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "gateway_ids":
-			dst.GatewayIdentifiers = src.GatewayIdentifiers
-		case "gateway_ids.eui":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
-		case "gateway_ids.gateway_id":
-			dst.GatewayIdentifiers.SetFields(&src.GatewayIdentifiers, _pathsWithoutPrefix("gateway_ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "antenna_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AntennaIndex = src.AntennaIndex
+			} else {
+				var zero uint32
+				dst.AntennaIndex = zero
+			}
 		case "time":
-			dst.Time = src.Time
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				dst.Time = nil
+			}
 		case "timestamp":
-			dst.Timestamp = src.Timestamp
+			if len(subs) > 0 {
+				return fmt.Errorf("'timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Timestamp = src.Timestamp
+			} else {
+				var zero uint64
+				dst.Timestamp = zero
+			}
+		case "advanced":
+			if len(subs) > 0 {
+				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Advanced = src.Advanced
+			} else {
+				dst.Advanced = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _LocationFieldPaths = [...]string{
+var LocationFieldPathsNested = []string{
 	"accuracy",
 	"altitude",
 	"latitude",
@@ -150,27 +318,71 @@ var _LocationFieldPaths = [...]string{
 	"source",
 }
 
-func (*Location) FieldMaskPaths() []string {
-	ret := make([]string, len(_LocationFieldPaths))
-	copy(ret, _LocationFieldPaths[:])
-	return ret
+var LocationFieldPathsTopLevel = []string{
+	"accuracy",
+	"altitude",
+	"latitude",
+	"longitude",
+	"source",
 }
 
-func (dst *Location) SetFields(src *Location, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "accuracy":
-			dst.Accuracy = src.Accuracy
-		case "altitude":
-			dst.Altitude = src.Altitude
+func (dst *Location) SetFields(src *Location, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "latitude":
-			dst.Latitude = src.Latitude
+			if len(subs) > 0 {
+				return fmt.Errorf("'latitude' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Latitude = src.Latitude
+			} else {
+				var zero float64
+				dst.Latitude = zero
+			}
 		case "longitude":
-			dst.Longitude = src.Longitude
+			if len(subs) > 0 {
+				return fmt.Errorf("'longitude' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Longitude = src.Longitude
+			} else {
+				var zero float64
+				dst.Longitude = zero
+			}
+		case "altitude":
+			if len(subs) > 0 {
+				return fmt.Errorf("'altitude' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Altitude = src.Altitude
+			} else {
+				var zero int32
+				dst.Altitude = zero
+			}
+		case "accuracy":
+			if len(subs) > 0 {
+				return fmt.Errorf("'accuracy' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Accuracy = src.Accuracy
+			} else {
+				var zero int32
+				dst.Accuracy = zero
+			}
 		case "source":
-			dst.Source = src.Source
+			if len(subs) > 0 {
+				return fmt.Errorf("'source' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Source = src.Source
+			} else {
+				var zero LocationSource
+				dst.Source = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

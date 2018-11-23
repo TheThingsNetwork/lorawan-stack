@@ -4,7 +4,7 @@ package ttnpb
 
 import fmt "fmt"
 
-var _ProcessUplinkMessageRequestFieldPaths = [...]string{
+var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
@@ -39,86 +39,89 @@ var _ProcessUplinkMessageRequestFieldPaths = [...]string{
 	"parameter",
 }
 
-func (*ProcessUplinkMessageRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ProcessUplinkMessageRequestFieldPaths))
-	copy(ret, _ProcessUplinkMessageRequestFieldPaths[:])
-	return ret
+var ProcessUplinkMessageRequestFieldPathsTopLevel = []string{
+	"end_device_version_ids",
+	"ids",
+	"message",
+	"parameter",
 }
 
-func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "end_device_version_ids":
-			dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
-		case "end_device_version_ids.brand_id":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
-		case "end_device_version_ids.firmware_version":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
-		case "end_device_version_ids.hardware_version":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
-		case "end_device_version_ids.model_id":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
+func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
-		case "ids.application_ids":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.application_ids.application_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.dev_addr":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.dev_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.device_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.join_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "end_device_version_ids":
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceVersionIDs
+				var newSrc *EndDeviceVersionIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceVersionIDs
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
+				} else {
+					var zero EndDeviceVersionIdentifiers
+					dst.EndDeviceVersionIDs = zero
+				}
+			}
 		case "message":
-			dst.Message = src.Message
-		case "message.decoded_payload":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.f_cnt":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.f_port":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.frm_payload":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.rx_metadata":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.session_key_id":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.bandwidth":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.bit_rate":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.channel_index":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.coding_rate":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.data_rate_index":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.enable_crc":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.frequency":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.invert_polarization":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.modulation":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.spreading_factor":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.settings.tx_power":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Message
+				var newSrc *ApplicationUplink
+				if src != nil {
+					newSrc = &src.Message
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Message = src.Message
+				} else {
+					var zero ApplicationUplink
+					dst.Message = zero
+				}
+			}
 		case "parameter":
-			dst.Parameter = src.Parameter
+			if len(subs) > 0 {
+				return fmt.Errorf("'parameter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Parameter = src.Parameter
+			} else {
+				var zero string
+				dst.Parameter = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ProcessDownlinkMessageRequestFieldPaths = [...]string{
+var ProcessDownlinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
@@ -145,65 +148,84 @@ var _ProcessDownlinkMessageRequestFieldPaths = [...]string{
 	"parameter",
 }
 
-func (*ProcessDownlinkMessageRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_ProcessDownlinkMessageRequestFieldPaths))
-	copy(ret, _ProcessDownlinkMessageRequestFieldPaths[:])
-	return ret
+var ProcessDownlinkMessageRequestFieldPathsTopLevel = []string{
+	"end_device_version_ids",
+	"ids",
+	"message",
+	"parameter",
 }
 
-func (dst *ProcessDownlinkMessageRequest) SetFields(src *ProcessDownlinkMessageRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "end_device_version_ids":
-			dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
-		case "end_device_version_ids.brand_id":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
-		case "end_device_version_ids.firmware_version":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
-		case "end_device_version_ids.hardware_version":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
-		case "end_device_version_ids.model_id":
-			dst.EndDeviceVersionIDs.SetFields(&src.EndDeviceVersionIDs, _pathsWithoutPrefix("end_device_version_ids", paths)...)
+func (dst *ProcessDownlinkMessageRequest) SetFields(src *ProcessDownlinkMessageRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "ids":
-			dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
-		case "ids.application_ids":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.application_ids.application_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.dev_addr":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.dev_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.device_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
-		case "ids.join_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("ids", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "end_device_version_ids":
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceVersionIDs
+				var newSrc *EndDeviceVersionIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceVersionIDs
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
+				} else {
+					var zero EndDeviceVersionIdentifiers
+					dst.EndDeviceVersionIDs = zero
+				}
+			}
 		case "message":
-			dst.Message = src.Message
-		case "message.class_b_c":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.class_b_c.gateways":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.class_b_c.time":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.confirmed":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.correlation_ids":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.decoded_payload":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.f_cnt":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.f_port":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.frm_payload":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
-		case "message.session_key_id":
-			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Message
+				var newSrc *ApplicationDownlink
+				if src != nil {
+					newSrc = &src.Message
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Message = src.Message
+				} else {
+					var zero ApplicationDownlink
+					dst.Message = zero
+				}
+			}
 		case "parameter":
-			dst.Parameter = src.Parameter
+			if len(subs) > 0 {
+				return fmt.Errorf("'parameter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Parameter = src.Parameter
+			} else {
+				var zero string
+				dst.Parameter = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

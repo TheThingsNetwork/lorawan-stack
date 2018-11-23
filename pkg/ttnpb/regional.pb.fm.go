@@ -2,9 +2,12 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	time "time"
+)
 
-var _ConcentratorConfigFieldPaths = [...]string{
+var ConcentratorConfigFieldPathsNested = []string{
 	"channels",
 	"clock_source",
 	"fsk_channel",
@@ -29,135 +32,181 @@ var _ConcentratorConfigFieldPaths = [...]string{
 	"radios",
 }
 
-func (*ConcentratorConfig) FieldMaskPaths() []string {
-	ret := make([]string, len(_ConcentratorConfigFieldPaths))
-	copy(ret, _ConcentratorConfigFieldPaths[:])
-	return ret
+var ConcentratorConfigFieldPathsTopLevel = []string{
+	"channels",
+	"clock_source",
+	"fsk_channel",
+	"lbt",
+	"lora_standard_channel",
+	"ping_slot",
+	"radios",
 }
 
-func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channels":
-			dst.Channels = src.Channels
-		case "clock_source":
-			dst.ClockSource = src.ClockSource
-		case "fsk_channel":
-			dst.FSKChannel = src.FSKChannel
-		case "fsk_channel.bandwidth":
-			if dst.FSKChannel == nil {
-				dst.FSKChannel = &ConcentratorConfig_FSKChannel{}
+			if len(subs) > 0 {
+				return fmt.Errorf("'channels' has no subfields, but %s were specified", subs)
 			}
-			dst.FSKChannel.SetFields(src.FSKChannel, _pathsWithoutPrefix("fsk_channel", paths)...)
-		case "fsk_channel.bit_rate":
-			if dst.FSKChannel == nil {
-				dst.FSKChannel = &ConcentratorConfig_FSKChannel{}
+			if src != nil {
+				dst.Channels = src.Channels
+			} else {
+				dst.Channels = nil
 			}
-			dst.FSKChannel.SetFields(src.FSKChannel, _pathsWithoutPrefix("fsk_channel", paths)...)
-		case "fsk_channel.channel":
-			if dst.FSKChannel == nil {
-				dst.FSKChannel = &ConcentratorConfig_FSKChannel{}
-			}
-			dst.FSKChannel.SetFields(src.FSKChannel, _pathsWithoutPrefix("fsk_channel", paths)...)
-		case "fsk_channel.channel.frequency":
-			if dst.FSKChannel == nil {
-				dst.FSKChannel = &ConcentratorConfig_FSKChannel{}
-			}
-			dst.FSKChannel.SetFields(src.FSKChannel, _pathsWithoutPrefix("fsk_channel", paths)...)
-		case "fsk_channel.channel.radio":
-			if dst.FSKChannel == nil {
-				dst.FSKChannel = &ConcentratorConfig_FSKChannel{}
-			}
-			dst.FSKChannel.SetFields(src.FSKChannel, _pathsWithoutPrefix("fsk_channel", paths)...)
-		case "lbt":
-			dst.LBT = src.LBT
-		case "lbt.rssi_offset":
-			if dst.LBT == nil {
-				dst.LBT = &ConcentratorConfig_LBTConfiguration{}
-			}
-			dst.LBT.SetFields(src.LBT, _pathsWithoutPrefix("lbt", paths)...)
-		case "lbt.rssi_target":
-			if dst.LBT == nil {
-				dst.LBT = &ConcentratorConfig_LBTConfiguration{}
-			}
-			dst.LBT.SetFields(src.LBT, _pathsWithoutPrefix("lbt", paths)...)
-		case "lbt.scan_time":
-			if dst.LBT == nil {
-				dst.LBT = &ConcentratorConfig_LBTConfiguration{}
-			}
-			dst.LBT.SetFields(src.LBT, _pathsWithoutPrefix("lbt", paths)...)
 		case "lora_standard_channel":
-			dst.LoRaStandardChannel = src.LoRaStandardChannel
-		case "lora_standard_channel.bandwidth":
-			if dst.LoRaStandardChannel == nil {
-				dst.LoRaStandardChannel = &ConcentratorConfig_LoRaStandardChannel{}
+			if len(subs) > 0 {
+				newDst := dst.LoRaStandardChannel
+				if newDst == nil {
+					newDst = &ConcentratorConfig_LoRaStandardChannel{}
+					dst.LoRaStandardChannel = newDst
+				}
+				var newSrc *ConcentratorConfig_LoRaStandardChannel
+				if src != nil {
+					newSrc = src.LoRaStandardChannel
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LoRaStandardChannel = src.LoRaStandardChannel
+				} else {
+					dst.LoRaStandardChannel = nil
+				}
 			}
-			dst.LoRaStandardChannel.SetFields(src.LoRaStandardChannel, _pathsWithoutPrefix("lora_standard_channel", paths)...)
-		case "lora_standard_channel.channel":
-			if dst.LoRaStandardChannel == nil {
-				dst.LoRaStandardChannel = &ConcentratorConfig_LoRaStandardChannel{}
+		case "fsk_channel":
+			if len(subs) > 0 {
+				newDst := dst.FSKChannel
+				if newDst == nil {
+					newDst = &ConcentratorConfig_FSKChannel{}
+					dst.FSKChannel = newDst
+				}
+				var newSrc *ConcentratorConfig_FSKChannel
+				if src != nil {
+					newSrc = src.FSKChannel
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.FSKChannel = src.FSKChannel
+				} else {
+					dst.FSKChannel = nil
+				}
 			}
-			dst.LoRaStandardChannel.SetFields(src.LoRaStandardChannel, _pathsWithoutPrefix("lora_standard_channel", paths)...)
-		case "lora_standard_channel.channel.frequency":
-			if dst.LoRaStandardChannel == nil {
-				dst.LoRaStandardChannel = &ConcentratorConfig_LoRaStandardChannel{}
+		case "lbt":
+			if len(subs) > 0 {
+				newDst := dst.LBT
+				if newDst == nil {
+					newDst = &ConcentratorConfig_LBTConfiguration{}
+					dst.LBT = newDst
+				}
+				var newSrc *ConcentratorConfig_LBTConfiguration
+				if src != nil {
+					newSrc = src.LBT
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LBT = src.LBT
+				} else {
+					dst.LBT = nil
+				}
 			}
-			dst.LoRaStandardChannel.SetFields(src.LoRaStandardChannel, _pathsWithoutPrefix("lora_standard_channel", paths)...)
-		case "lora_standard_channel.channel.radio":
-			if dst.LoRaStandardChannel == nil {
-				dst.LoRaStandardChannel = &ConcentratorConfig_LoRaStandardChannel{}
-			}
-			dst.LoRaStandardChannel.SetFields(src.LoRaStandardChannel, _pathsWithoutPrefix("lora_standard_channel", paths)...)
-		case "lora_standard_channel.spreading_factor":
-			if dst.LoRaStandardChannel == nil {
-				dst.LoRaStandardChannel = &ConcentratorConfig_LoRaStandardChannel{}
-			}
-			dst.LoRaStandardChannel.SetFields(src.LoRaStandardChannel, _pathsWithoutPrefix("lora_standard_channel", paths)...)
 		case "ping_slot":
-			dst.PingSlot = src.PingSlot
-		case "ping_slot.frequency":
-			if dst.PingSlot == nil {
-				dst.PingSlot = &ConcentratorConfig_Channel{}
+			if len(subs) > 0 {
+				newDst := dst.PingSlot
+				if newDst == nil {
+					newDst = &ConcentratorConfig_Channel{}
+					dst.PingSlot = newDst
+				}
+				var newSrc *ConcentratorConfig_Channel
+				if src != nil {
+					newSrc = src.PingSlot
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PingSlot = src.PingSlot
+				} else {
+					dst.PingSlot = nil
+				}
 			}
-			dst.PingSlot.SetFields(src.PingSlot, _pathsWithoutPrefix("ping_slot", paths)...)
-		case "ping_slot.radio":
-			if dst.PingSlot == nil {
-				dst.PingSlot = &ConcentratorConfig_Channel{}
-			}
-			dst.PingSlot.SetFields(src.PingSlot, _pathsWithoutPrefix("ping_slot", paths)...)
 		case "radios":
-			dst.Radios = src.Radios
+			if len(subs) > 0 {
+				return fmt.Errorf("'radios' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Radios = src.Radios
+			} else {
+				dst.Radios = nil
+			}
+		case "clock_source":
+			if len(subs) > 0 {
+				return fmt.Errorf("'clock_source' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClockSource = src.ClockSource
+			} else {
+				var zero uint32
+				dst.ClockSource = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ConcentratorConfig_ChannelFieldPaths = [...]string{
+var ConcentratorConfig_ChannelFieldPathsNested = []string{
 	"frequency",
 	"radio",
 }
 
-func (*ConcentratorConfig_Channel) FieldMaskPaths() []string {
-	ret := make([]string, len(_ConcentratorConfig_ChannelFieldPaths))
-	copy(ret, _ConcentratorConfig_ChannelFieldPaths[:])
-	return ret
+var ConcentratorConfig_ChannelFieldPathsTopLevel = []string{
+	"frequency",
+	"radio",
 }
 
-func (dst *ConcentratorConfig_Channel) SetFields(src *ConcentratorConfig_Channel, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *ConcentratorConfig_Channel) SetFields(src *ConcentratorConfig_Channel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "frequency":
-			dst.Frequency = src.Frequency
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
 		case "radio":
-			dst.Radio = src.Radio
+			if len(subs) > 0 {
+				return fmt.Errorf("'radio' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Radio = src.Radio
+			} else {
+				var zero uint32
+				dst.Radio = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ConcentratorConfig_LoRaStandardChannelFieldPaths = [...]string{
+var ConcentratorConfig_LoRaStandardChannelFieldPathsNested = []string{
 	"bandwidth",
 	"channel",
 	"channel.frequency",
@@ -165,32 +214,62 @@ var _ConcentratorConfig_LoRaStandardChannelFieldPaths = [...]string{
 	"spreading_factor",
 }
 
-func (*ConcentratorConfig_LoRaStandardChannel) FieldMaskPaths() []string {
-	ret := make([]string, len(_ConcentratorConfig_LoRaStandardChannelFieldPaths))
-	copy(ret, _ConcentratorConfig_LoRaStandardChannelFieldPaths[:])
-	return ret
+var ConcentratorConfig_LoRaStandardChannelFieldPathsTopLevel = []string{
+	"bandwidth",
+	"channel",
+	"spreading_factor",
 }
 
-func (dst *ConcentratorConfig_LoRaStandardChannel) SetFields(src *ConcentratorConfig_LoRaStandardChannel, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "bandwidth":
-			dst.Bandwidth = src.Bandwidth
+func (dst *ConcentratorConfig_LoRaStandardChannel) SetFields(src *ConcentratorConfig_LoRaStandardChannel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channel":
-			dst.ConcentratorConfig_Channel = src.ConcentratorConfig_Channel
-		case "channel.frequency":
-			dst.ConcentratorConfig_Channel.SetFields(&src.ConcentratorConfig_Channel, _pathsWithoutPrefix("channel", paths)...)
-		case "channel.radio":
-			dst.ConcentratorConfig_Channel.SetFields(&src.ConcentratorConfig_Channel, _pathsWithoutPrefix("channel", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ConcentratorConfig_Channel
+				var newSrc *ConcentratorConfig_Channel
+				if src != nil {
+					newSrc = &src.ConcentratorConfig_Channel
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ConcentratorConfig_Channel = src.ConcentratorConfig_Channel
+				} else {
+					var zero ConcentratorConfig_Channel
+					dst.ConcentratorConfig_Channel = zero
+				}
+			}
+		case "bandwidth":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bandwidth' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bandwidth = src.Bandwidth
+			} else {
+				var zero uint32
+				dst.Bandwidth = zero
+			}
 		case "spreading_factor":
-			dst.SpreadingFactor = src.SpreadingFactor
+			if len(subs) > 0 {
+				return fmt.Errorf("'spreading_factor' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SpreadingFactor = src.SpreadingFactor
+			} else {
+				var zero uint32
+				dst.SpreadingFactor = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ConcentratorConfig_FSKChannelFieldPaths = [...]string{
+var ConcentratorConfig_FSKChannelFieldPathsNested = []string{
 	"bandwidth",
 	"bit_rate",
 	"channel",
@@ -198,54 +277,110 @@ var _ConcentratorConfig_FSKChannelFieldPaths = [...]string{
 	"channel.radio",
 }
 
-func (*ConcentratorConfig_FSKChannel) FieldMaskPaths() []string {
-	ret := make([]string, len(_ConcentratorConfig_FSKChannelFieldPaths))
-	copy(ret, _ConcentratorConfig_FSKChannelFieldPaths[:])
-	return ret
+var ConcentratorConfig_FSKChannelFieldPathsTopLevel = []string{
+	"bandwidth",
+	"bit_rate",
+	"channel",
 }
 
-func (dst *ConcentratorConfig_FSKChannel) SetFields(src *ConcentratorConfig_FSKChannel, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "bandwidth":
-			dst.Bandwidth = src.Bandwidth
-		case "bit_rate":
-			dst.BitRate = src.BitRate
+func (dst *ConcentratorConfig_FSKChannel) SetFields(src *ConcentratorConfig_FSKChannel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "channel":
-			dst.ConcentratorConfig_Channel = src.ConcentratorConfig_Channel
-		case "channel.frequency":
-			dst.ConcentratorConfig_Channel.SetFields(&src.ConcentratorConfig_Channel, _pathsWithoutPrefix("channel", paths)...)
-		case "channel.radio":
-			dst.ConcentratorConfig_Channel.SetFields(&src.ConcentratorConfig_Channel, _pathsWithoutPrefix("channel", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.ConcentratorConfig_Channel
+				var newSrc *ConcentratorConfig_Channel
+				if src != nil {
+					newSrc = &src.ConcentratorConfig_Channel
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ConcentratorConfig_Channel = src.ConcentratorConfig_Channel
+				} else {
+					var zero ConcentratorConfig_Channel
+					dst.ConcentratorConfig_Channel = zero
+				}
+			}
+		case "bandwidth":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bandwidth' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bandwidth = src.Bandwidth
+			} else {
+				var zero uint32
+				dst.Bandwidth = zero
+			}
+		case "bit_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bit_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BitRate = src.BitRate
+			} else {
+				var zero uint32
+				dst.BitRate = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _ConcentratorConfig_LBTConfigurationFieldPaths = [...]string{
+var ConcentratorConfig_LBTConfigurationFieldPathsNested = []string{
 	"rssi_offset",
 	"rssi_target",
 	"scan_time",
 }
 
-func (*ConcentratorConfig_LBTConfiguration) FieldMaskPaths() []string {
-	ret := make([]string, len(_ConcentratorConfig_LBTConfigurationFieldPaths))
-	copy(ret, _ConcentratorConfig_LBTConfigurationFieldPaths[:])
-	return ret
+var ConcentratorConfig_LBTConfigurationFieldPathsTopLevel = []string{
+	"rssi_offset",
+	"rssi_target",
+	"scan_time",
 }
 
-func (dst *ConcentratorConfig_LBTConfiguration) SetFields(src *ConcentratorConfig_LBTConfiguration, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "rssi_offset":
-			dst.RSSIOffset = src.RSSIOffset
+func (dst *ConcentratorConfig_LBTConfiguration) SetFields(src *ConcentratorConfig_LBTConfiguration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "rssi_target":
-			dst.RSSITarget = src.RSSITarget
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi_target' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RSSITarget = src.RSSITarget
+			} else {
+				var zero float32
+				dst.RSSITarget = zero
+			}
+		case "rssi_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RSSIOffset = src.RSSIOffset
+			} else {
+				var zero float32
+				dst.RSSIOffset = zero
+			}
 		case "scan_time":
-			dst.ScanTime = src.ScanTime
+			if len(subs) > 0 {
+				return fmt.Errorf("'scan_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ScanTime = src.ScanTime
+			} else {
+				var zero time.Duration
+				dst.ScanTime = zero
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

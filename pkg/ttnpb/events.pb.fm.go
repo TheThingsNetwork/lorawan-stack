@@ -2,9 +2,12 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	time "time"
+)
 
-var _EventFieldPaths = [...]string{
+var EventFieldPathsNested = []string{
 	"context",
 	"correlation_ids",
 	"data",
@@ -15,66 +18,162 @@ var _EventFieldPaths = [...]string{
 	"time",
 }
 
-func (*Event) FieldMaskPaths() []string {
-	ret := make([]string, len(_EventFieldPaths))
-	copy(ret, _EventFieldPaths[:])
-	return ret
+var EventFieldPathsTopLevel = []string{
+	"context",
+	"correlation_ids",
+	"data",
+	"identifiers",
+	"name",
+	"origin",
+	"time",
 }
 
-func (dst *Event) SetFields(src *Event, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "context":
-			dst.Context = src.Context
-		case "correlation_ids":
-			dst.CorrelationIDs = src.CorrelationIDs
-		case "data":
-			dst.Data = src.Data
-		case "identifiers":
-			dst.Identifiers = src.Identifiers
-		case "identifiers.entity_identifiers":
-			if dst.Identifiers == nil {
-				dst.Identifiers = &CombinedIdentifiers{}
-			}
-			dst.Identifiers.SetFields(src.Identifiers, _pathsWithoutPrefix("identifiers", paths)...)
+func (dst *Event) SetFields(src *Event, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "name":
-			dst.Name = src.Name
-		case "origin":
-			dst.Origin = src.Origin
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
 		case "time":
-			dst.Time = src.Time
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				var zero time.Time
+				dst.Time = zero
+			}
+		case "identifiers":
+			if len(subs) > 0 {
+				newDst := dst.Identifiers
+				if newDst == nil {
+					newDst = &CombinedIdentifiers{}
+					dst.Identifiers = newDst
+				}
+				var newSrc *CombinedIdentifiers
+				if src != nil {
+					newSrc = src.Identifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Identifiers = src.Identifiers
+				} else {
+					dst.Identifiers = nil
+				}
+			}
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				dst.Data = nil
+			}
+		case "correlation_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CorrelationIDs = src.CorrelationIDs
+			} else {
+				dst.CorrelationIDs = nil
+			}
+		case "origin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'origin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Origin = src.Origin
+			} else {
+				var zero string
+				dst.Origin = zero
+			}
+		case "context":
+			if len(subs) > 0 {
+				return fmt.Errorf("'context' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Context = src.Context
+			} else {
+				dst.Context = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _StreamEventsRequestFieldPaths = [...]string{
+var StreamEventsRequestFieldPathsNested = []string{
 	"after",
 	"identifiers",
 	"identifiers.entity_identifiers",
 	"tail",
 }
 
-func (*StreamEventsRequest) FieldMaskPaths() []string {
-	ret := make([]string, len(_StreamEventsRequestFieldPaths))
-	copy(ret, _StreamEventsRequestFieldPaths[:])
-	return ret
+var StreamEventsRequestFieldPathsTopLevel = []string{
+	"after",
+	"identifiers",
+	"tail",
 }
 
-func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "after":
-			dst.After = src.After
+func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "identifiers":
-			dst.Identifiers = src.Identifiers
-		case "identifiers.entity_identifiers":
-			dst.Identifiers.SetFields(&src.Identifiers, _pathsWithoutPrefix("identifiers", paths)...)
+			if len(subs) > 0 {
+				newDst := &dst.Identifiers
+				var newSrc *CombinedIdentifiers
+				if src != nil {
+					newSrc = &src.Identifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Identifiers = src.Identifiers
+				} else {
+					var zero CombinedIdentifiers
+					dst.Identifiers = zero
+				}
+			}
 		case "tail":
-			dst.Tail = src.Tail
+			if len(subs) > 0 {
+				return fmt.Errorf("'tail' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Tail = src.Tail
+			} else {
+				var zero uint32
+				dst.Tail = zero
+			}
+		case "after":
+			if len(subs) > 0 {
+				return fmt.Errorf("'after' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.After = src.After
+			} else {
+				dst.After = nil
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }

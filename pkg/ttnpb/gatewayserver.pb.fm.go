@@ -4,7 +4,7 @@ package ttnpb
 
 import fmt "fmt"
 
-var _GatewayUpFieldPaths = [...]string{
+var GatewayUpFieldPathsNested = []string{
 	"gateway_status",
 	"gateway_status.advanced",
 	"gateway_status.antenna_locations",
@@ -19,73 +19,76 @@ var _GatewayUpFieldPaths = [...]string{
 	"uplink_messages",
 }
 
-func (*GatewayUp) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayUpFieldPaths))
-	copy(ret, _GatewayUpFieldPaths[:])
-	return ret
+var GatewayUpFieldPathsTopLevel = []string{
+	"gateway_status",
+	"tx_acknowledgment",
+	"uplink_messages",
 }
 
-func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
-		case "gateway_status":
-			dst.GatewayStatus = src.GatewayStatus
-		case "gateway_status.advanced":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "gateway_status.antenna_locations":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "gateway_status.boot_time":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "gateway_status.ip":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "gateway_status.metrics":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "gateway_status.time":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "gateway_status.versions":
-			if dst.GatewayStatus == nil {
-				dst.GatewayStatus = &GatewayStatus{}
-			}
-			dst.GatewayStatus.SetFields(src.GatewayStatus, _pathsWithoutPrefix("gateway_status", paths)...)
-		case "tx_acknowledgment":
-			dst.TxAcknowledgment = src.TxAcknowledgment
-		case "tx_acknowledgment.correlation_ids":
-			if dst.TxAcknowledgment == nil {
-				dst.TxAcknowledgment = &TxAcknowledgment{}
-			}
-			dst.TxAcknowledgment.SetFields(src.TxAcknowledgment, _pathsWithoutPrefix("tx_acknowledgment", paths)...)
-		case "tx_acknowledgment.result":
-			if dst.TxAcknowledgment == nil {
-				dst.TxAcknowledgment = &TxAcknowledgment{}
-			}
-			dst.TxAcknowledgment.SetFields(src.TxAcknowledgment, _pathsWithoutPrefix("tx_acknowledgment", paths)...)
+func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "uplink_messages":
-			dst.UplinkMessages = src.UplinkMessages
+			if len(subs) > 0 {
+				return fmt.Errorf("'uplink_messages' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UplinkMessages = src.UplinkMessages
+			} else {
+				dst.UplinkMessages = nil
+			}
+		case "gateway_status":
+			if len(subs) > 0 {
+				newDst := dst.GatewayStatus
+				if newDst == nil {
+					newDst = &GatewayStatus{}
+					dst.GatewayStatus = newDst
+				}
+				var newSrc *GatewayStatus
+				if src != nil {
+					newSrc = src.GatewayStatus
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayStatus = src.GatewayStatus
+				} else {
+					dst.GatewayStatus = nil
+				}
+			}
+		case "tx_acknowledgment":
+			if len(subs) > 0 {
+				newDst := dst.TxAcknowledgment
+				if newDst == nil {
+					newDst = &TxAcknowledgment{}
+					dst.TxAcknowledgment = newDst
+				}
+				var newSrc *TxAcknowledgment
+				if src != nil {
+					newSrc = src.TxAcknowledgment
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.TxAcknowledgment = src.TxAcknowledgment
+				} else {
+					dst.TxAcknowledgment = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
 
-var _GatewayDownFieldPaths = [...]string{
+var GatewayDownFieldPathsNested = []string{
+	"Payload",
 	"downlink_message",
 	"downlink_message.correlation_ids",
 	"downlink_message.end_device_ids",
@@ -96,48 +99,48 @@ var _GatewayDownFieldPaths = [...]string{
 	"downlink_message.end_device_ids.device_id",
 	"downlink_message.end_device_ids.join_eui",
 	"downlink_message.payload",
-	"downlink_message.payload.join_accept_payload",
-	"downlink_message.payload.join_accept_payload.cf_list",
-	"downlink_message.payload.join_accept_payload.cf_list.ch_masks",
-	"downlink_message.payload.join_accept_payload.cf_list.freq",
-	"downlink_message.payload.join_accept_payload.cf_list.type",
-	"downlink_message.payload.join_accept_payload.dev_addr",
-	"downlink_message.payload.join_accept_payload.dl_settings",
-	"downlink_message.payload.join_accept_payload.dl_settings.opt_neg",
-	"downlink_message.payload.join_accept_payload.dl_settings.rx1_dr_offset",
-	"downlink_message.payload.join_accept_payload.dl_settings.rx2_dr",
-	"downlink_message.payload.join_accept_payload.encrypted",
-	"downlink_message.payload.join_accept_payload.join_nonce",
-	"downlink_message.payload.join_accept_payload.net_id",
-	"downlink_message.payload.join_accept_payload.rx_delay",
-	"downlink_message.payload.join_request_payload",
-	"downlink_message.payload.join_request_payload.dev_eui",
-	"downlink_message.payload.join_request_payload.dev_nonce",
-	"downlink_message.payload.join_request_payload.join_eui",
+	"downlink_message.payload.Payload.join_accept_payload",
+	"downlink_message.payload.Payload.join_accept_payload.cf_list",
+	"downlink_message.payload.Payload.join_accept_payload.cf_list.ch_masks",
+	"downlink_message.payload.Payload.join_accept_payload.cf_list.freq",
+	"downlink_message.payload.Payload.join_accept_payload.cf_list.type",
+	"downlink_message.payload.Payload.join_accept_payload.dev_addr",
+	"downlink_message.payload.Payload.join_accept_payload.dl_settings",
+	"downlink_message.payload.Payload.join_accept_payload.dl_settings.opt_neg",
+	"downlink_message.payload.Payload.join_accept_payload.dl_settings.rx1_dr_offset",
+	"downlink_message.payload.Payload.join_accept_payload.dl_settings.rx2_dr",
+	"downlink_message.payload.Payload.join_accept_payload.encrypted",
+	"downlink_message.payload.Payload.join_accept_payload.join_nonce",
+	"downlink_message.payload.Payload.join_accept_payload.net_id",
+	"downlink_message.payload.Payload.join_accept_payload.rx_delay",
+	"downlink_message.payload.Payload.join_request_payload",
+	"downlink_message.payload.Payload.join_request_payload.dev_eui",
+	"downlink_message.payload.Payload.join_request_payload.dev_nonce",
+	"downlink_message.payload.Payload.join_request_payload.join_eui",
+	"downlink_message.payload.Payload.mac_payload",
+	"downlink_message.payload.Payload.mac_payload.decoded_payload",
+	"downlink_message.payload.Payload.mac_payload.f_hdr",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.dev_addr",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_cnt",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_ctrl",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_ctrl.ack",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_ctrl.adr",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_ctrl.class_b",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_ctrl.f_pending",
+	"downlink_message.payload.Payload.mac_payload.f_hdr.f_opts",
+	"downlink_message.payload.Payload.mac_payload.f_port",
+	"downlink_message.payload.Payload.mac_payload.frm_payload",
+	"downlink_message.payload.Payload.rejoin_request_payload",
+	"downlink_message.payload.Payload.rejoin_request_payload.dev_eui",
+	"downlink_message.payload.Payload.rejoin_request_payload.join_eui",
+	"downlink_message.payload.Payload.rejoin_request_payload.net_id",
+	"downlink_message.payload.Payload.rejoin_request_payload.rejoin_cnt",
+	"downlink_message.payload.Payload.rejoin_request_payload.rejoin_type",
 	"downlink_message.payload.m_hdr",
 	"downlink_message.payload.m_hdr.m_type",
 	"downlink_message.payload.m_hdr.major",
-	"downlink_message.payload.mac_payload",
-	"downlink_message.payload.mac_payload.decoded_payload",
-	"downlink_message.payload.mac_payload.f_hdr",
-	"downlink_message.payload.mac_payload.f_hdr.dev_addr",
-	"downlink_message.payload.mac_payload.f_hdr.f_cnt",
-	"downlink_message.payload.mac_payload.f_hdr.f_ctrl",
-	"downlink_message.payload.mac_payload.f_hdr.f_ctrl.ack",
-	"downlink_message.payload.mac_payload.f_hdr.f_ctrl.adr",
-	"downlink_message.payload.mac_payload.f_hdr.f_ctrl.adr_ack_req",
-	"downlink_message.payload.mac_payload.f_hdr.f_ctrl.class_b",
-	"downlink_message.payload.mac_payload.f_hdr.f_ctrl.f_pending",
-	"downlink_message.payload.mac_payload.f_hdr.f_opts",
-	"downlink_message.payload.mac_payload.f_port",
-	"downlink_message.payload.mac_payload.frm_payload",
 	"downlink_message.payload.mic",
-	"downlink_message.payload.rejoin_request_payload",
-	"downlink_message.payload.rejoin_request_payload.dev_eui",
-	"downlink_message.payload.rejoin_request_payload.join_eui",
-	"downlink_message.payload.rejoin_request_payload.net_id",
-	"downlink_message.payload.rejoin_request_payload.rejoin_cnt",
-	"downlink_message.payload.rejoin_request_payload.rejoin_type",
 	"downlink_message.raw_payload",
 	"downlink_message.settings",
 	"downlink_message.settings.bandwidth",
@@ -161,379 +164,39 @@ var _GatewayDownFieldPaths = [...]string{
 	"downlink_message.tx_metadata.timestamp",
 }
 
-func (*GatewayDown) FieldMaskPaths() []string {
-	ret := make([]string, len(_GatewayDownFieldPaths))
-	copy(ret, _GatewayDownFieldPaths[:])
-	return ret
+var GatewayDownFieldPathsTopLevel = []string{
+	"Payload",
+	"downlink_message",
 }
 
-func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) {
-	for _, path := range _cleanPaths(paths) {
-		switch path {
+func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
 		case "downlink_message":
-			dst.DownlinkMessage = src.DownlinkMessage
-		case "downlink_message.correlation_ids":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids.application_ids":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids.application_ids.application_id":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids.dev_addr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids.dev_eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids.device_id":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.end_device_ids.join_eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.cf_list":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.cf_list.ch_masks":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.cf_list.freq":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.cf_list.type":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.dev_addr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.dl_settings":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.dl_settings.opt_neg":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.dl_settings.rx1_dr_offset":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.dl_settings.rx2_dr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.encrypted":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.join_nonce":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.net_id":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_accept_payload.rx_delay":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_request_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_request_payload.dev_eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_request_payload.dev_nonce":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.join_request_payload.join_eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.m_hdr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.m_hdr.m_type":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.m_hdr.major":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.decoded_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.dev_addr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_cnt":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_ctrl":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_ctrl.ack":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_ctrl.adr":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_ctrl.adr_ack_req":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_ctrl.class_b":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_ctrl.f_pending":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_hdr.f_opts":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.f_port":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mac_payload.frm_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.mic":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.rejoin_request_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.rejoin_request_payload.dev_eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.rejoin_request_payload.join_eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.rejoin_request_payload.net_id":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.rejoin_request_payload.rejoin_cnt":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.payload.rejoin_request_payload.rejoin_type":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.raw_payload":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.bandwidth":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.bit_rate":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.channel_index":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.coding_rate":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.data_rate_index":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.enable_crc":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.frequency":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.invert_polarization":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.modulation":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.spreading_factor":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.settings.tx_power":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.advanced":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.antenna_index":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.gateway_ids":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.gateway_ids.eui":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.gateway_ids.gateway_id":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.time":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
-		case "downlink_message.tx_metadata.timestamp":
-			if dst.DownlinkMessage == nil {
-				dst.DownlinkMessage = &DownlinkMessage{}
-			}
-			dst.DownlinkMessage.SetFields(src.DownlinkMessage, _pathsWithoutPrefix("downlink_message", paths)...)
+			if len(subs) > 0 {
+				newDst := dst.DownlinkMessage
+				if newDst == nil {
+					newDst = &DownlinkMessage{}
+					dst.DownlinkMessage = newDst
+				}
+				var newSrc *DownlinkMessage
+				if src != nil {
+					newSrc = src.DownlinkMessage
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkMessage = src.DownlinkMessage
+				} else {
+					dst.DownlinkMessage = nil
+				}
+			}
+
 		default:
-			panic(fmt.Errorf("invalid field path: '%s'", path))
+			return fmt.Errorf("invalid field: '%s'", name)
 		}
 	}
+	return nil
 }
