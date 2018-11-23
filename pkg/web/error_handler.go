@@ -23,7 +23,7 @@ import (
 
 // ErrorHandler is an echo.HTTPErrorHandler.
 func ErrorHandler(err error, c echo.Context) {
-	status := errors.HTTPStatusCode(err)
+	status := errors.ToHTTPStatusCode(err)
 	msg := err.Error()
 	if h, ok := err.(*echo.HTTPError); ok {
 		status = h.Code

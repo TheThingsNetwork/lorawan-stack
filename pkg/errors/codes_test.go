@@ -55,6 +55,6 @@ func TestCodes(t *testing.T) {
 	// Unknown errors with a non-unknown cause take the cause's code
 	a.So(errors.IsInternal(errUnknown.WithCause(errInternal)), should.BeTrue)
 
-	a.So(errors.HTTPStatusCode(errInternal), should.Equal, http.StatusInternalServerError)
-	a.So(errors.HTTPStatusCode(errStdLib), should.Equal, http.StatusInternalServerError)
+	a.So(errors.ToHTTPStatusCode(errInternal), should.Equal, http.StatusInternalServerError)
+	a.So(errors.ToHTTPStatusCode(errStdLib), should.Equal, http.StatusInternalServerError)
 }

@@ -170,12 +170,12 @@ func RenderErrors(next echo.HandlerFunc) echo.HandlerFunc {
 			status = echoErr.Code
 			if ttnErr, ok := errors.From(echoErr.Internal); ok {
 				if status == http.StatusInternalServerError {
-					status = errors.HTTPStatusCode(ttnErr)
+					status = errors.ToHTTPStatusCode(ttnErr)
 				}
 				err = ttnErr
 			}
 		} else if ttnErr, ok := errors.From(err); ok {
-			status = errors.HTTPStatusCode(ttnErr)
+			status = errors.ToHTTPStatusCode(ttnErr)
 			err = ttnErr
 		}
 
