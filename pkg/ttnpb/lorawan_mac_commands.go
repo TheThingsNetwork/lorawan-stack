@@ -14,18 +14,6 @@
 
 package ttnpb
 
-import (
-	"fmt"
-)
-
-// Validate reports whether cid represents a valid MACCommandIdentifier.
-func (cid MACCommandIdentifier) Validate() error {
-	if cid < 0x00 || cid > 0xff {
-		return errExpectedBetween("CID", "0x00", "0xFF")(fmt.Sprintf("0x%X", int32(cid)))
-	}
-	return nil
-}
-
 // MACCommand returns a payload-less MAC command with this CID as a *MACCommand.
 func (cid MACCommandIdentifier) MACCommand() *MACCommand {
 	return &MACCommand{

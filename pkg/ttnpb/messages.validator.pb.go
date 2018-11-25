@@ -88,6 +88,9 @@ func (this *ApplicationUplink) Validate() error {
 			}
 		}
 	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Settings)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("Settings", err)
+	}
 	return nil
 }
 func (this *ApplicationLocation) Validate() error {
@@ -115,6 +118,9 @@ func (this *ApplicationJoinAccept) Validate() error {
 				return github_com_mwitkow_go_proto_validators.FieldError("InvalidatedDownlinks", err)
 			}
 		}
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.SessionStartedAt)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionStartedAt", err)
 	}
 	return nil
 }

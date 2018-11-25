@@ -3788,6 +3788,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/ttnpb:expected_uplink_mtype": {
+    "translations": {
+      "en": "MType `{result}` is not an uplink MType"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "message_validators.go"
+    }
+  },
   "error:pkg/ttnpb:field_bound": {
     "translations": {
       "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
@@ -3831,6 +3840,15 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "lorawan.go"
+    }
+  },
+  "error:pkg/ttnpb:raw_payload": {
+    "translations": {
+      "en": "missing raw payload"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "message_validators.go"
     }
   },
   "error:pkg/ttnpb:unknown_field": {

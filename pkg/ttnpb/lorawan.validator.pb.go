@@ -3,13 +3,14 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/struct"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 
@@ -60,6 +61,9 @@ func (this *MACPayload) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FHDR)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FHDR", err)
 	}
+	if !(this.FPort < 256) {
+		return github_com_mwitkow_go_proto_validators.FieldError("FPort", fmt.Errorf(`value '%v' must be less than '256'`, this.FPort))
+	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("DecodedPayload", err)
@@ -70,6 +74,9 @@ func (this *MACPayload) Validate() error {
 func (this *FHDR) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FCtrl)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FCtrl", err)
+	}
+	if !(this.FCnt < 65536) {
+		return github_com_mwitkow_go_proto_validators.FieldError("FCnt", fmt.Errorf(`value '%v' must be less than '65536'`, this.FCnt))
 	}
 	return nil
 }
@@ -100,6 +107,9 @@ func (this *CFList) Validate() error {
 	return nil
 }
 func (this *TxSettings) Validate() error {
+	if !(this.ChannelIndex < 256) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ChannelIndex", fmt.Errorf(`value '%v' must be less than '256'`, this.ChannelIndex))
+	}
 	return nil
 }
 func (this *MACCommand) Validate() error {
