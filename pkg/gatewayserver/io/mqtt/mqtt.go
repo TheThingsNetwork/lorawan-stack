@@ -176,11 +176,10 @@ func (c *connection) setup(ctx context.Context) error {
 	return nil
 }
 
-type gatewayTopicFilters struct {
-	downlink []string
-	uplink   []string
-	status   []string
-	ack      []string
+type topicAccess struct {
+	gtwUID string
+	reads  [][]string
+	writes [][]string
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
@@ -214,12 +213,18 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		return nil, err
 	}
 
-	info.Metadata = gatewayTopicFilters{
-		downlink: c.formatter.DownlinkTopic(uid),
-		uplink:   c.formatter.UplinkTopic(uid),
-		status:   c.formatter.StatusTopic(uid),
-		ack:      c.formatter.TxAckTopic(uid),
+	access := topicAccess{
+		gtwUID: uid,
+		reads: [][]string{
+			c.formatter.DownlinkTopic(uid),
+		},
+		writes: [][]string{
+			c.formatter.UplinkTopic(uid),
+			c.formatter.StatusTopic(uid),
+			c.formatter.TxAckTopic(uid),
+		},
 	}
+	info.Metadata = access
 	info.Interface = c
 	return c.io.Context(), nil
 }
@@ -227,23 +232,34 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 var errNotAuthorized = errors.DefinePermissionDenied("not_authorized", "not authorized")
 
 func (c *connection) Subscribe(info *auth.Info, requestedTopic string, requestedQoS byte) (acceptedTopic string, acceptedQoS byte, err error) {
-	gt := info.Metadata.(gatewayTopicFilters)
-	if !topic.MatchPath(gt.downlink, topic.Split(requestedTopic)) {
+	access := info.Metadata.(topicAccess)
+	acceptedTopicParts := c.formatter.DownlinkTopic(access.gtwUID)
+	if !topic.MatchPath(acceptedTopicParts, topic.Split(requestedTopic)) {
 		return "", 0, errNotAuthorized
 	}
-	acceptedTopic = topic.Join(gt.downlink)
+	acceptedTopic = topic.Join(acceptedTopicParts)
 	acceptedQoS = requestedQoS
 	return
 }
 
 func (c *connection) CanRead(info *auth.Info, topicParts ...string) bool {
-	gt := info.Metadata.(gatewayTopicFilters)
-	return topic.MatchPath(topicParts, gt.downlink)
+	access := info.Metadata.(topicAccess)
+	for _, reads := range access.reads {
+		if topic.MatchPath(topicParts, reads) {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
-	gt := info.Metadata.(gatewayTopicFilters)
-	return topic.MatchPath(topicParts, gt.uplink) || topic.MatchPath(topicParts, gt.status) || topic.MatchPath(topicParts, gt.ack)
+	access := info.Metadata.(topicAccess)
+	for _, writes := range access.writes {
+		if topic.MatchPath(topicParts, writes) {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
