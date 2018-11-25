@@ -92,15 +92,15 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pb.CreatedAt = ret.CreatedAt
 	pb.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	ret, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	err = reg.RangeByAddr(pb.Session.DevAddr, pb.FieldMaskPaths(), func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
@@ -142,7 +142,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pbOther.CreatedAt = ret.CreatedAt
 	pbOther.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.ResembleDiff, pbOther)
+	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	ret, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, pbOther.FieldMaskPaths())
 	a.So(err, should.BeNil)
