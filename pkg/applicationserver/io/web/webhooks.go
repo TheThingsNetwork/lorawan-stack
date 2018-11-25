@@ -127,6 +127,7 @@ func (b *BufferedSink) Process(req *http.Request) error {
 // webhooks for upstream data.
 type Webhooks interface {
 	ttnweb.Registerer
+	Registry() WebhookRegistry
 	// NewSubscription returns a new webhooks integration subscription.
 	NewSubscription() *io.Subscription
 }
@@ -148,6 +149,8 @@ func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry
 		target:   target,
 	}
 }
+
+func (w *webhooks) Registry() WebhookRegistry { return w.registry }
 
 // RegisterRoutes registers the webhooks to the web server to handle downlink requests.
 func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
