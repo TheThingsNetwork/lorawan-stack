@@ -23,15 +23,11 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestJSONEncode(t *testing.T) {
-	a := assertions.New(t)
-	formatter := fmt.Formatters["json"]
-	a.So(formatter.Name(), should.Equal, "JSON")
-	a.So(formatter.ContentType(), should.Equal, "application/json")
+	formatter := fmt.JSON
 
 	for i, tc := range []struct {
 		Message *ttnpb.ApplicationUp
@@ -86,7 +82,7 @@ func TestJSONEncode(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			buf, err := formatter.Encode(test.Context(), tc.Message)
+			buf, err := formatter.Encode(tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -96,10 +92,7 @@ func TestJSONEncode(t *testing.T) {
 }
 
 func TestJSONDecode(t *testing.T) {
-	a := assertions.New(t)
-	formatter := fmt.Formatters["json"]
-	a.So(formatter.Name(), should.Equal, "JSON")
-	a.So(formatter.ContentType(), should.Equal, "application/json")
+	formatter := fmt.JSON
 
 	for i, tc := range []struct {
 		Input []byte
@@ -125,7 +118,7 @@ func TestJSONDecode(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			res, err := formatter.Decode(test.Context(), tc.Input)
+			res, err := formatter.Decode(tc.Input)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

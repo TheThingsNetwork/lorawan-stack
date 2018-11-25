@@ -18,7 +18,6 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -38,9 +37,9 @@ func (s webhookRegistryRPC) GetFormats(ctx context.Context, ids *ttnpb.Applicati
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	formats := make(map[string]string, len(fmt.Formatters))
-	for format, formatter := range fmt.Formatters {
-		formats[format] = formatter.Name()
+	formats := make(map[string]string, len(formatters))
+	for format, formatter := range formatters {
+		formats[format] = formatter.Name
 	}
 	return &ttnpb.ApplicationWebhookFormats{
 		Formats: formats,

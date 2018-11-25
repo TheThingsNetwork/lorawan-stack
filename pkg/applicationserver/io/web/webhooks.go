@@ -26,7 +26,6 @@ import (
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -352,11 +351,11 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		return nil, err
 	}
 	url.Path = path.Join(url.Path, cfg.Path)
-	formatter, ok := fmt.Formatters[hook.Formatter]
+	formatter, ok := formatters[hook.Formatter]
 	if !ok {
 		return nil, errFormatterNotFound.WithAttributes("formatter", hook.Formatter)
 	}
-	buf, err := formatter.Encode(ctx, msg)
+	buf, err := formatter.Encode(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -364,7 +363,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", formatter.ContentType())
+	req.Header.Set("Content-Type", formatter.ContentType)
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
 	}
@@ -392,7 +391,7 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 	if hook == nil {
 		return errWebhookNotFound
 	}
-	formatter, ok := fmt.Formatters[hook.Formatter]
+	formatter, ok := formatters[hook.Formatter]
 	if !ok {
 		return errFormatterNotFound
 	}
@@ -400,7 +399,7 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 	if err != nil {
 		return err
 	}
-	items, err := formatter.Decode(ctx, body)
+	items, err := formatter.Decode(body)
 	if err != nil {
 		return err
 	}

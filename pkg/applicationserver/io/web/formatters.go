@@ -12,27 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fmt
+package web
 
-import (
-	"go.thethings.network/lorawan-stack/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
+import "go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 
-type json struct {
+type Formatter struct {
+	fmt.Formatter
+	Name        string
+	ContentType string
 }
 
-func (json) Encode(msg *ttnpb.ApplicationUp) ([]byte, error) {
-	return jsonpb.TTN().Marshal(msg)
+var formatters = map[string]Formatter{
+	"json": {
+		Formatter:   fmt.JSON,
+		Name:        "JSON",
+		ContentType: "application/json",
+	},
 }
-
-func (json) Decode(data []byte) (*ttnpb.ApplicationDownlinks, error) {
-	res := &ttnpb.ApplicationDownlinks{}
-	if err := jsonpb.TTN().Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-// JSON is a formatter that uses JSON marshaling.
-var JSON Formatter = &json{}

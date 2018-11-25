@@ -305,7 +305,7 @@ func TestWebhooks(t *testing.T) {
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
-						expectedBody, err := iofmt.Formatters["json"].Encode(ctx, tc.Message)
+						expectedBody, err := iofmt.JSON.Encode(tc.Message)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}

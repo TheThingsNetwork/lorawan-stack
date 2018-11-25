@@ -15,17 +15,11 @@
 package fmt
 
 import (
-	"context"
-
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Formatter encodes up and decodes downlink messages.
 type Formatter interface {
-	Name() string
-	ContentType() string
-	Encode(context.Context, *ttnpb.ApplicationUp) ([]byte, error)
-	Decode(context.Context, []byte) (*ttnpb.ApplicationDownlinks, error)
+	Encode(*ttnpb.ApplicationUp) ([]byte, error)
+	Decode([]byte) (*ttnpb.ApplicationDownlinks, error)
 }
-
-var Formatters = make(map[string]Formatter)
