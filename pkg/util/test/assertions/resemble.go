@@ -23,7 +23,8 @@ import (
 )
 
 const (
-	shouldHaveResembledDiff = "Expected: '%s'\nActual:   '%s'\nDiff:  '%s'(Should resemble diff)!"
+	shouldHaveEmptyDiff    = "Expected: '%#v'\nActual:   '%#v'\nDiff:  '%s'\n(should resemble diff)!"
+	shouldNotHaveEmptyDiff = "Expected '%#v'\nto diff  '%#v'\n(but it did)!"
 )
 
 func lastLine(s string) string {
@@ -54,15 +55,26 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 	return strings.Join(append(lines, lastLine(message)), "\n")
 }
 
-// ShouldResembleDiff compares the pretty.Diff of values.
-func ShouldResembleDiff(actual interface{}, expected ...interface{}) (message string) {
+// ShouldHaveEmptyDiff compares the pretty.Diff of values.
+func ShouldHaveEmptyDiff(actual interface{}, expected ...interface{}) (message string) {
 	if message = need(1, expected); message != success {
 		return
 	}
-
 	diff := pretty.Diff(expected[0], actual)
 	if len(diff) != 0 {
-		return fmt.Sprintf(shouldHaveResembledDiff, expected[0], actual, diff)
+		return fmt.Sprintf(shouldHaveEmptyDiff, expected[0], actual, diff)
+	}
+	return success
+}
+
+// ShouldNotHaveEmptyDiff compares the pretty.Diff of values.
+func ShouldNotHaveEmptyDiff(actual interface{}, expected ...interface{}) (message string) {
+	if message = need(1, expected); message != success {
+		return
+	}
+	diff := pretty.Diff(expected[0], actual)
+	if len(diff) == 0 {
+		return fmt.Sprintf(shouldNotHaveEmptyDiff, expected[0], actual)
 	}
 	return success
 }

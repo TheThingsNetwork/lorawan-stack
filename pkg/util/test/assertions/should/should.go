@@ -158,6 +158,8 @@ var (
 	// EqualErrorOrDefinition asserts that the actual and expected arguments are of the same type (error or definition),
 	// and that they have the same underlying definition, as well as arguments if they are both errors.
 	EqualErrorOrDefinition = testassertions.ShouldEqualErrorOrDefinition
-	// ResembleDiff receives exactly two parameters and does an equality check using pretty.Diff.
-	ResembleDiff = testassertions.ShouldResembleDiff
+	// HaveEmptyDiff receives exactly two parameters and does an equality check using pretty.Diff.
+	HaveEmptyDiff = testassertions.ShouldHaveEmptyDiff
+	// NotHaveEmptyDiff receives exactly two parameters and does an inequality check using pretty.Diff.
+	NotHaveEmptyDiff = testassertions.ShouldNotHaveEmptyDiff
 )

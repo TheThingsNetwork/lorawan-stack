@@ -23,31 +23,36 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/util/test/assertions"
 )
 
-func TestResembleDiff(t *testing.T) {
+func TestHaveEmptyDiff(t *testing.T) {
 	for _, tc := range []struct {
-		A         interface{}
-		B         interface{}
-		Assertion func(interface{}, ...interface{}) string
+		A                interface{}
+		B                interface{}
+		Assertion        func(interface{}, ...interface{}) string
+		InverseAssertion func(interface{}, ...interface{}) string
 	}{
 		{
-			A:         "test",
-			B:         "test",
-			Assertion: should.BeEmpty,
+			A:                "test",
+			B:                "test",
+			Assertion:        should.BeEmpty,
+			InverseAssertion: should.NotBeEmpty,
 		},
 		{
-			A:         "test",
-			B:         "test1",
-			Assertion: should.NotBeEmpty,
+			A:                "test",
+			B:                "test1",
+			Assertion:        should.NotBeEmpty,
+			InverseAssertion: should.BeEmpty,
 		},
 		{
-			A:         42,
-			B:         42,
-			Assertion: should.BeEmpty,
+			A:                42,
+			B:                42,
+			Assertion:        should.BeEmpty,
+			InverseAssertion: should.NotBeEmpty,
 		},
 		{
-			A:         1,
-			B:         2,
-			Assertion: should.NotBeEmpty,
+			A:                1,
+			B:                2,
+			Assertion:        should.NotBeEmpty,
+			InverseAssertion: should.BeEmpty,
 		},
 		{
 			A: struct {
@@ -58,31 +63,38 @@ func TestResembleDiff(t *testing.T) {
 				Foo int
 				Bar int
 			}{42, 43},
-			Assertion: should.BeEmpty,
+			Assertion:        should.BeEmpty,
+			InverseAssertion: should.NotBeEmpty,
 		},
 		{
-			A:         nil,
-			B:         0,
-			Assertion: should.NotBeEmpty,
+			A:                nil,
+			B:                0,
+			Assertion:        should.NotBeEmpty,
+			InverseAssertion: should.BeEmpty,
 		},
 		{
-			A:         nil,
-			B:         "test",
-			Assertion: should.NotBeEmpty,
+			A:                nil,
+			B:                "test",
+			Assertion:        should.NotBeEmpty,
+			InverseAssertion: should.BeEmpty,
 		},
 		{
-			A:         []string{},
-			B:         []string(nil),
-			Assertion: should.BeEmpty,
+			A:                []string{},
+			B:                []string(nil),
+			Assertion:        should.BeEmpty,
+			InverseAssertion: should.NotBeEmpty,
 		},
 		{
-			A:         map[int]int{},
-			B:         map[int]int(nil),
-			Assertion: should.BeEmpty,
+			A:                map[int]int{},
+			B:                map[int]int(nil),
+			Assertion:        should.BeEmpty,
+			InverseAssertion: should.NotBeEmpty,
 		},
 	} {
 		t.Run(fmt.Sprintf("%v/%v", tc.A, tc.B), func(t *testing.T) {
-			assertions.New(t).So(ShouldResembleDiff(tc.A, tc.B), tc.Assertion)
+			a := assertions.New(t)
+			a.So(ShouldHaveEmptyDiff(tc.A, tc.B), tc.Assertion)
+			a.So(ShouldNotHaveEmptyDiff(tc.A, tc.B), tc.InverseAssertion)
 		})
 	}
 }
