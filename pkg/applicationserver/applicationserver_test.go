@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
@@ -37,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -140,6 +142,9 @@ func TestApplicationServer(t *testing.T) {
 		DeviceRepository: applicationserver.DeviceRepositoryConfig{
 			Static: deviceRepositoryData,
 		},
+		MQTT: applicationserver.MQTTConfig{
+			Listen: ":1883",
+		},
 		Webhooks: applicationserver.WebhooksConfig{
 			Registry:  webhookRegistry,
 			Target:    "direct",
@@ -163,9 +168,10 @@ func TestApplicationServer(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
 	for _, ptc := range []struct {
-		Protocol  string
-		ValidAuth func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool
-		Connect   func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error
+		Protocol         string
+		ValidAuth        func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool
+		Connect          func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error
+		SkipCheckDownErr bool
 	}{
 		{
 			Protocol: "grpc",
@@ -205,6 +211,8 @@ func TestApplicationServer(t *testing.T) {
 					for {
 						var err error
 						select {
+						case <-ctx.Done():
+							return
 						case req := <-chs.downPush:
 							_, err = client.DownlinkQueuePush(ctx, req, creds)
 						case req := <-chs.downReplace:
@@ -220,6 +228,73 @@ func TestApplicationServer(t *testing.T) {
 					return ctx.Err()
 				}
 			},
+		},
+		{
+			Protocol: "mqtt",
+			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+				return ids == registeredApplicationID && key == registeredApplicationKey
+			},
+			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+				clientOpts := mqtt.NewClientOptions()
+				clientOpts.AddBroker("tcp://0.0.0.0:1883")
+				clientOpts.SetUsername(unique.ID(ctx, ids))
+				clientOpts.SetPassword(key)
+				client := mqtt.NewClient(clientOpts)
+				if token := client.Connect(); !token.WaitTimeout(timeout) {
+					return errors.New("connect timeout")
+				} else if token.Error() != nil {
+					return token.Error()
+				}
+				defer client.Disconnect(uint(timeout / time.Millisecond))
+				errCh := make(chan error, 1)
+				// Write downstream.
+				go func() {
+					for {
+						for {
+							var req *ttnpb.DownlinkQueueRequest
+							var topicFmt string
+							select {
+							case <-ctx.Done():
+								return
+							case req = <-chs.downPush:
+								topicFmt = "v3/%v/devices/%v/down/push"
+							case req = <-chs.downReplace:
+								topicFmt = "v3/%v/devices/%v/down/replace"
+							}
+							msg := &ttnpb.ApplicationDownlinks{
+								Downlinks: req.Downlinks,
+							}
+							buf, err := jsonpb.TTN().Marshal(msg)
+							if err != nil {
+								chs.downErr <- err
+								continue
+							}
+							token := client.Publish(fmt.Sprintf(topicFmt, req.ApplicationID, req.DeviceID), 1, false, buf)
+							token.Wait()
+							chs.downErr <- token.Error()
+						}
+					}
+				}()
+				// Read upstream.
+				token := client.Subscribe(fmt.Sprintf("v3/%v/devices/#", ids.ApplicationID), 1, func(_ mqtt.Client, raw mqtt.Message) {
+					msg := &ttnpb.ApplicationUp{}
+					if err := jsonpb.TTN().Unmarshal(raw.Payload(), msg); err != nil {
+						errCh <- err
+						return
+					}
+					chs.up <- msg
+				})
+				if token.Wait() && token.Error() != nil {
+					return token.Error()
+				}
+				select {
+				case err := <-errCh:
+					return err
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			},
+			SkipCheckDownErr: true, // There is no direct error response in MQTT.
 		},
 		{
 			Protocol: "webhooks",
@@ -1197,7 +1272,7 @@ func TestApplicationServer(t *testing.T) {
 					}
 					select {
 					case err := <-chs.downErr:
-						if a.So(err, should.NotBeNil) {
+						if !ptc.SkipCheckDownErr && a.So(err, should.NotBeNil) {
 							a.So(errors.IsNotFound(err), should.BeTrue)
 						}
 					case <-time.After(timeout):

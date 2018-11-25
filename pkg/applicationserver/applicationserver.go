@@ -17,6 +17,7 @@ package applicationserver
 import (
 	"context"
 	"fmt"
+	"net"
 	"sync"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -56,13 +58,20 @@ type ApplicationServer struct {
 	defaultSubscribers []*io.Subscription
 }
 
+var (
+	errListenFrontend = errors.DefineFailedPrecondition(
+		"listen_frontend",
+		"failed to start frontend listener `{protocol}` on address `{address}`",
+	)
+)
+
 // New returns new *ApplicationServer.
-func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
+func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
 	linkMode, err := conf.GetLinkMode()
 	if err != nil {
 		return nil, err
 	}
-	as := &ApplicationServer{
+	as = &ApplicationServer{
 		Component:      c,
 		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
@@ -79,6 +88,58 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 			},
 		},
 	}
+
+	ctx, cancel := context.WithCancel(c.Context())
+	defer func() {
+		if err != nil {
+			cancel()
+		}
+	}()
+
+	for _, version := range []struct {
+		Format mqtt.Format
+		Config MQTTConfig
+	}{
+		{
+			Format: mqtt.JSON,
+			Config: conf.MQTT,
+		},
+	} {
+		for _, lis := range []struct {
+			Listen   string
+			Protocol string
+			Net      func(component.Listener) (net.Listener, error)
+		}{
+			{
+				Listen:   version.Config.Listen,
+				Protocol: "tcp",
+				Net:      component.Listener.TCP,
+			},
+			{
+				Listen:   version.Config.ListenTLS,
+				Protocol: "tls",
+				Net:      component.Listener.TLS,
+			},
+		} {
+			if lis.Listen == "" {
+				continue
+			}
+			var componentLis component.Listener
+			var netLis net.Listener
+			componentLis, err = as.ListenTCP(lis.Listen)
+			if err == nil {
+				netLis, err = lis.Net(componentLis)
+			}
+			if err != nil {
+				return nil, errListenFrontend.WithCause(err).WithAttributes(
+					"protocol", lis.Protocol,
+					"address", lis.Listen,
+				)
+			}
+			mqtt.Start(ctx, as, netLis, version.Format, lis.Protocol)
+		}
+	}
+
 	if webhooks, err := conf.Webhooks.NewWebhooks(as.FillContext(as.Context()), as); err != nil {
 		return nil, err
 	} else if webhooks != nil {

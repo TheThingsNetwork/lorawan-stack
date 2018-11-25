@@ -1115,6 +1115,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/applicationserver/io/mqtt:not_authorized": {
+    "translations": {
+      "en": "not authorized"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/mqtt",
+      "file": "mqtt.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:format_not_found": {
     "translations": {
       "en": "format `{format}` not found"
@@ -1239,6 +1248,15 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "config.go"
+    }
+  },
+  "error:pkg/applicationserver:listen_frontend": {
+    "translations": {
+      "en": "failed to start frontend listener `{protocol}` on address `{address}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
     }
   },
   "error:pkg/applicationserver:network_server_not_found": {
