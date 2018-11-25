@@ -24,6 +24,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -49,6 +50,7 @@ type ApplicationServer struct {
 	linkRegistry   LinkRegistry
 	deviceRegistry DeviceRegistry
 	formatter      payloadFormatter
+	webhooks       web.Webhooks
 
 	links              sync.Map
 	defaultSubscribers []*io.Subscription
@@ -77,6 +79,13 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 			},
 		},
 	}
+	if webhooks, err := conf.Webhooks.NewWebhooks(as.FillContext(as.Context()), as); err != nil {
+		return nil, err
+	} else if webhooks != nil {
+		as.webhooks = webhooks
+		as.defaultSubscribers = append(as.defaultSubscribers, webhooks.NewSubscription())
+		c.RegisterWeb(webhooks)
+	}
 
 	c.RegisterGRPC(as)
 	if as.linkMode == LinkAll {
@@ -92,12 +101,18 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 		registry: as.deviceRegistry,
 	})
 	ttnpb.RegisterAppAsServer(s, iogrpc.New(as))
+	if as.webhooks != nil {
+		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry()))
+	}
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
+	if as.webhooks != nil {
+		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
+	}
 }
 
 // Roles returns the roles that the Application Server fulfills.

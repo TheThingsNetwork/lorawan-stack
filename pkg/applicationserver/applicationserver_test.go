@@ -15,8 +15,12 @@
 package applicationserver_test
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"sync"
 	"testing"
 	"time"
@@ -24,10 +28,12 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	iowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -101,11 +107,19 @@ func TestApplicationServer(t *testing.T) {
 		}, []string{"default_formatters"}, nil
 	})
 
+	webhooksRedisClient, webhooksFlush := test.NewRedis(t, "applicationserver_test", "webhooks")
+	defer webhooksFlush()
+	defer webhooksRedisClient.Close()
+	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient}
+
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":9184",
 				AllowInsecureForCredentials: true,
+			},
+			HTTP: config.HTTP{
+				Listen: ":8099",
 			},
 			Cluster: config.Cluster{
 				IdentityServer: isAddr,
@@ -125,6 +139,12 @@ func TestApplicationServer(t *testing.T) {
 		Links:    linkRegistry,
 		DeviceRepository: applicationserver.DeviceRepositoryConfig{
 			Static: deviceRepositoryData,
+		},
+		Webhooks: applicationserver.WebhooksConfig{
+			Registry:   webhookRegistry,
+			Target:     "direct",
+			Timeout:    timeout,
+			BufferSize: 1,
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -199,6 +219,107 @@ func TestApplicationServer(t *testing.T) {
 				case <-ctx.Done():
 					return ctx.Err()
 				}
+			},
+		},
+		{
+			Protocol: "webhooks",
+			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+				return ids == registeredApplicationID && key == registeredApplicationKey
+			},
+			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+				// Start web server to read upstream.
+				webhookTarget := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+					buf, err := ioutil.ReadAll(req.Body)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+					msg := &ttnpb.ApplicationUp{}
+					if err := jsonpb.TTN().Unmarshal(buf, msg); !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+					chs.up <- msg
+					res.WriteHeader(http.StatusAccepted)
+				}))
+				defer webhookTarget.Close()
+				// Configure webhook.
+				conn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
+				if err != nil {
+					return err
+				}
+				defer conn.Close()
+				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+					AuthType:      "Key",
+					AuthValue:     key,
+					AllowInsecure: true,
+				})
+				client := ttnpb.NewApplicationWebhookRegistryClient(conn)
+				req := &ttnpb.SetApplicationWebhookRequest{
+					ApplicationWebhook: ttnpb.ApplicationWebhook{
+						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
+						BaseURL:                       webhookTarget.URL,
+						Formatter:                     "json",
+						UplinkMessage:                 &ttnpb.ApplicationWebhook_Message{Path: ""},
+						JoinAccept:                    &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkAck:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkNack:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkQueued:                &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkSent:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkFailed:                &ttnpb.ApplicationWebhook_Message{Path: ""},
+						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
+					},
+					FieldMask: pbtypes.FieldMask{
+						Paths: []string{
+							"base_url",
+							"formatter",
+							"uplink_message",
+							"join_accept",
+							"downlink_ack",
+							"downlink_nack",
+							"downlink_queued",
+							"downlink_sent",
+							"downlink_failed",
+							"location_solved",
+						},
+					},
+				}
+				if _, err := client.Set(ctx, req, creds); err != nil {
+					return err
+				}
+				// Write downstream.
+				go func() {
+					for {
+						var data *ttnpb.DownlinkQueueRequest
+						var action string
+						select {
+						case data = <-chs.downPush:
+							action = "push"
+						case data = <-chs.downReplace:
+							action = "replace"
+						}
+						buf, err := jsonpb.TTN().Marshal(&ttnpb.ApplicationDownlinks{Downlinks: data.Downlinks})
+						if err != nil {
+							chs.downErr <- err
+							continue
+						}
+						url := fmt.Sprintf("http://127.0.0.1:8099/as/applications/%s/webhooks/%s/down/%s/%s",
+							data.ApplicationID, registeredApplicationWebhookID.WebhookID, data.DeviceID, action,
+						)
+						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
+						if err != nil {
+							chs.downErr <- err
+							continue
+						}
+						req.Header.Set("Content-Type", "application/json")
+						req.Header.Set("Authorization", fmt.Sprintf("Key %s", key))
+						res, err := http.DefaultClient.Do(req)
+						if err == nil && (res.StatusCode < 200 || res.StatusCode > 299) {
+							err = errors.FromHTTPStatusCode(res.StatusCode)
+						}
+						chs.downErr <- err
+					}
+				}()
+				<-ctx.Done()
+				return ctx.Err()
 			},
 		},
 	} {
@@ -1126,7 +1247,6 @@ func TestApplicationServer(t *testing.T) {
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)
 					a.So(err, should.BeNil)
-					a.So(res, should.HaveLength, 3)
 					a.So(res, should.Resemble, []*ttnpb.ApplicationDownlink{
 						{
 							SessionKeyID:   "session1",
@@ -1176,7 +1296,6 @@ func TestApplicationServer(t *testing.T) {
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)
 					a.So(err, should.BeNil)
-					a.So(res, should.HaveLength, 2)
 					a.So(res, should.Resemble, []*ttnpb.ApplicationDownlink{
 						{
 							SessionKeyID:   "session1",

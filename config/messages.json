@@ -1115,6 +1115,51 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/applicationserver/io/web:buffer_full": {
+    "translations": {
+      "en": "the buffer is full"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:formatter_not_found": {
+    "translations": {
+      "en": "formatter `{formatter}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:http": {
+    "translations": {
+      "en": "HTTP error: {message}"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:request": {
+    "translations": {
+      "en": "request failed with status `{code}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:webhook_not_found": {
+    "translations": {
+      "en": "webhook not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
   "error:pkg/applicationserver/io:buffer_full": {
     "translations": {
       "en": "buffer is full"
@@ -1248,6 +1293,24 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "payload.go"
+    }
+  },
+  "error:pkg/applicationserver:webhooks_registry": {
+    "translations": {
+      "en": "invalid webhooks registry"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/applicationserver:webhooks_target": {
+    "translations": {
+      "en": "invalid webhooks target `{value}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
     }
   },
   "error:pkg/auth/cluster:auth_type": {

@@ -38,6 +38,10 @@ var (
 	registeredApplicationID        = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
 	registeredApplicationKey       = "secret"
 	registeredApplicationFormatter = ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
+	registeredApplicationWebhookID = ttnpb.ApplicationWebhookIdentifiers{
+		ApplicationIdentifiers: registeredApplicationID,
+		WebhookID:              "test",
+	}
 
 	// This device gets registered in the device registry of the Application Server.
 	registeredDevice = &ttnpb.EndDevice{
