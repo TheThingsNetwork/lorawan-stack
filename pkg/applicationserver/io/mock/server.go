@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package testing
+package mock
 
 import (
 	"context"
@@ -30,7 +30,7 @@ type server struct {
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
 }
 
-// Server represents a testing io.Server.
+// Server represents a mock io.Server.
 type Server interface {
 	io.Server
 

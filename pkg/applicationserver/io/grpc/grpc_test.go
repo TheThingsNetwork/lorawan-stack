@@ -24,7 +24,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
-	iotesting "go.thethings.network/lorawan-stack/pkg/applicationserver/io/testing"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -44,7 +44,7 @@ func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
 
-	as := iotesting.NewServer()
+	as := mock.NewServer()
 	srv := New(as)
 
 	for _, tc := range []struct {
@@ -105,7 +105,7 @@ func TestTraffic(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
 
-	as := iotesting.NewServer()
+	as := mock.NewServer()
 	srv := New(as)
 
 	upCh := make(chan *ttnpb.ApplicationUp)
