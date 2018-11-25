@@ -25,6 +25,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	iofmt "go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -304,7 +305,7 @@ func TestWebhooks(t *testing.T) {
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
-						expectedBody, err := web.Formatters["json"].Encode(ctx, tc.Message)
+						expectedBody, err := iofmt.Formatters["json"].Encode(ctx, tc.Message)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}

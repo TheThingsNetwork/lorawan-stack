@@ -26,6 +26,7 @@ import (
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -351,7 +352,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		return nil, err
 	}
 	url.Path = path.Join(url.Path, cfg.Path)
-	formatter, ok := formatters[hook.Formatter]
+	formatter, ok := fmt.Formatters[hook.Formatter]
 	if !ok {
 		return nil, errFormatterNotFound.WithAttributes("formatter", hook.Formatter)
 	}
@@ -370,7 +371,10 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	return req, nil
 }
 
-var errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
+var (
+	errWebhookNotFound   = errors.DefineNotFound("webhook_not_found", "webhook not found")
+	errFormatterNotFound = errors.DefineNotFound("formatter_not_found", "formatter `{formatter}` not found")
+)
 
 func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) error {
 	ctx := w.ctx
@@ -388,7 +392,7 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 	if hook == nil {
 		return errWebhookNotFound
 	}
-	formatter, ok := formatters[hook.Formatter]
+	formatter, ok := fmt.Formatters[hook.Formatter]
 	if !ok {
 		return errFormatterNotFound
 	}

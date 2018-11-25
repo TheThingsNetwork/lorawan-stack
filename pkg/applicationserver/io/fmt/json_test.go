@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web_test
+package fmt_test
 
 import (
 	"strconv"
@@ -21,14 +21,17 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestJSONFormatterEncode(t *testing.T) {
-	formatter := web.Formatters["json"]
+func TestJSONEncode(t *testing.T) {
+	a := assertions.New(t)
+	formatter := fmt.Formatters["json"]
+	a.So(formatter.Name(), should.Equal, "JSON")
+	a.So(formatter.ContentType(), should.Equal, "application/json")
 
 	for i, tc := range []struct {
 		Message *ttnpb.ApplicationUp
@@ -88,6 +91,45 @@ func TestJSONFormatterEncode(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(string(buf), should.Equal, tc.Result)
+		})
+	}
+}
+
+func TestJSONDecode(t *testing.T) {
+	a := assertions.New(t)
+	formatter := fmt.Formatters["json"]
+	a.So(formatter.Name(), should.Equal, "JSON")
+	a.So(formatter.ContentType(), should.Equal, "application/json")
+
+	for i, tc := range []struct {
+		Input []byte
+		Items *ttnpb.ApplicationDownlinks
+	}{
+		{
+			Input: []byte(`{"downlinks":[{"f_port":42,"frm_payload":"AQEB","confirmed":true},{"f_port":42,"frm_payload":"AgIC","confirmed":true}]}`),
+			Items: &ttnpb.ApplicationDownlinks{
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      42,
+						FRMPayload: []byte{0x1, 0x1, 0x1},
+						Confirmed:  true,
+					},
+					{
+						FPort:      42,
+						FRMPayload: []byte{0x2, 0x2, 0x2},
+						Confirmed:  true,
+					},
+				},
+			},
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			res, err := formatter.Decode(test.Context(), tc.Input)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(res, should.Resemble, tc.Items)
 		})
 	}
 }
