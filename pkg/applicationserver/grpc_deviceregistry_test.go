@@ -160,7 +160,7 @@ func TestDeviceRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 		registeredDevice.CreatedAt = dev.CreatedAt
 		registeredDevice.UpdatedAt = dev.UpdatedAt
-		a.So(dev, should.ResembleDiff, registeredDevice)
+		a.So(dev, should.HaveEmptyDiff, registeredDevice)
 
 		// Update and assert new value.
 		registeredDevice.Formatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
@@ -180,7 +180,7 @@ func TestDeviceRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 		registeredDevice.CreatedAt = dev.CreatedAt
 		registeredDevice.UpdatedAt = dev.UpdatedAt
-		a.So(dev, should.ResembleDiff, registeredDevice)
+		a.So(dev, should.HaveEmptyDiff, registeredDevice)
 
 		// Delete and assert it's gone.
 		_, err = client.Delete(ctx, &registeredDevice.EndDeviceIdentifiers, creds)

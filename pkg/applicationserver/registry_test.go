@@ -66,7 +66,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
-		a.So(pb, should.ResembleDiff, link)
+		a.So(pb, should.HaveEmptyDiff, link)
 	}
 
 	seen := make(map[string]*ttnpb.ApplicationLink)
@@ -75,7 +75,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		seen[uid] = pb
 		return true
 	})
-	ok := a.So(seen, should.ResembleDiff, map[string]*ttnpb.ApplicationLink{
+	ok := a.So(seen, should.HaveEmptyDiff, map[string]*ttnpb.ApplicationLink{
 		unique.ID(ctx, app1IDs): app1,
 		unique.ID(ctx, app2IDs): app2,
 	})
