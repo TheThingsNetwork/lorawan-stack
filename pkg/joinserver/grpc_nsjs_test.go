@@ -1151,7 +1151,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: res.SessionKeys,
 				StartedAt:   ret.GetSession().GetStartedAt(),
 			}
-			a.So(ret, should.ResembleDiff, pb)
+			a.So(ret, should.HaveEmptyDiff, pb)
 
 			res, err = js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			a.So(err, should.BeError)

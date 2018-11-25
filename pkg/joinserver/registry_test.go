@@ -64,11 +64,11 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pb.CreatedAt = ret.CreatedAt
 	pb.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	pbOther := CopyEndDevice(pb)
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -88,11 +88,11 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pbOther.CreatedAt = ret.CreatedAt
 	pbOther.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.ResembleDiff, pbOther)
+	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
-	a.So(ret, should.ResembleDiff, pbOther)
+	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	err = DeleteDevice(ctx, reg, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
 	if !a.So(err, should.BeNil) {
@@ -189,11 +189,11 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
-	a.So(ret, should.ResembleDiff, pb)
+	a.So(ret, should.HaveEmptyDiff, pb)
 
 	pbOther := CopySessionKeys(pb)
 	devEUIOther := types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -208,11 +208,11 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(ret, should.ResembleDiff, pbOther)
+	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID, pb.FieldMaskPaths())
 	a.So(err, should.BeNil)
-	a.So(ret, should.ResembleDiff, pbOther)
+	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	err = DeleteKeys(ctx, reg, devEUI, pb.SessionKeyID)
 	if !a.So(err, should.BeNil) {
