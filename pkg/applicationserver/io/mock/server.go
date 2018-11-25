@@ -45,6 +45,11 @@ func NewServer() Server {
 	}
 }
 
+// FillApplicationContext implements io.Server.
+func (s *server) FillApplicationContext(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (context.Context, ttnpb.ApplicationIdentifiers, error) {
+	return ctx, ids, nil
+}
+
 // Subscribe implements io.Server.
 func (s *server) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {

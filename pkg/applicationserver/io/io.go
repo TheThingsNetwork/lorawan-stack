@@ -26,6 +26,8 @@ const bufferSize = 32
 
 // Server represents the Application Server to gateway frontends.
 type Server interface {
+	// FillApplicationContext fills the given context and identifiers.
+	FillApplicationContext(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (context.Context, ttnpb.ApplicationIdentifiers, error)
 	// Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
 	// Subscription for traffic and control.
 	Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Subscription, error)
