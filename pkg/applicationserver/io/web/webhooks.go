@@ -17,6 +17,7 @@ package web
 import (
 	"bytes"
 	"context"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -154,7 +155,12 @@ func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
 		w.requireApplicationRights(ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE),
 	}
 	group := server.Group("/as/applications/:application_id/webhooks/:webhook_id/down/:device_id", middleware...)
-	_ = group
+	group.POST("/push", func(c echo.Context) error {
+		return w.handleDown(c, io.Server.DownlinkQueuePush)
+	})
+	group.POST("/replace", func(c echo.Context) error {
+		return w.handleDown(c, io.Server.DownlinkQueueReplace)
+	})
 }
 
 var errHTTP = errors.Define("http", "HTTP error: {message}")
@@ -357,4 +363,41 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		req.Header.Set(key, value)
 	}
 	return req, nil
+}
+
+var errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
+
+func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) error {
+	ctx := w.ctx
+	devID := c.Get(deviceIDKey).(ttnpb.EndDeviceIdentifiers)
+	hookID := c.Get(webhookIDKey).(ttnpb.ApplicationWebhookIdentifiers)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"application_id", devID.ApplicationID,
+		"device_id", devID.DeviceID,
+		"webhook_id", hookID.WebhookID,
+	))
+	hook, err := w.registry.Get(ctx, hookID, []string{"formatter"})
+	if err != nil {
+		return err
+	}
+	if hook == nil {
+		return errWebhookNotFound
+	}
+	formatter, ok := formatters[hook.Formatter]
+	if !ok {
+		return errFormatterNotFound
+	}
+	body, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+	items, err := formatter.Decode(ctx, body)
+	if err != nil {
+		return err
+	}
+	logger.Debug("Performing downlink queue operation")
+	if err := op(w.server, ctx, devID, items.Downlinks); err != nil {
+		return err
+	}
+	return nil
 }
