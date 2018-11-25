@@ -43,6 +43,7 @@ type Config struct {
 	Devices          DeviceRegistry         `name:"-"`
 	Links            LinkRegistry           `name:"-"`
 	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
+	MQTT             MQTTConfig             `name:"mqtt" description:"MQTT configuration"`
 	Webhooks         WebhooksConfig         `name:"webhooks" description:"Webhooks configuration"`
 }
 
@@ -85,6 +86,12 @@ func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
 	return &devicerepository.Client{
 		Fetcher: fetcher,
 	}
+}
+
+// MQTTConfig contains MQTT configuration of the Application Server.
+type MQTTConfig struct {
+	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
 }
 
 var (
