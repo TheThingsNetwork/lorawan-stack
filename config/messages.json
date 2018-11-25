@@ -1904,7 +1904,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "v2.go"
+      "file": "pbv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:frequency_plan": {
@@ -1913,7 +1913,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "v2.go"
+      "file": "pbv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:lorawan_metadata": {
@@ -1922,7 +1922,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "v2.go"
+      "file": "pbv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:lorawan_payload": {
@@ -1931,7 +1931,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "v2.go"
+      "file": "pbv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:modulation": {
@@ -1940,7 +1940,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "v2.go"
+      "file": "pbv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
@@ -1950,6 +1950,15 @@
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
       "file": "mqtt.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:not_supported": {
+    "translations": {
+      "en": "not supported"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "fmt.go"
     }
   },
   "error:pkg/gatewayserver/io/udp:connection_expired": {

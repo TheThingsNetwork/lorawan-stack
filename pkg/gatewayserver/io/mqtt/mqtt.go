@@ -28,36 +28,26 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/mqtt"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc/metadata"
 )
 
 const qosDownlink byte = 0
 
-type Marshaler interface {
-	Version() topics.Version
-
-	MarshalDownlink(down *ttnpb.DownlinkMessage) ([]byte, error)
-	UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error)
-	UnmarshalStatus(message []byte) (*ttnpb.GatewayStatus, error)
-}
-
 type srv struct {
 	ctx       context.Context
 	server    io.Server
-	marshaler Marshaler
+	formatter Formatter
 	lis       mqttnet.Listener
 }
 
 // Start starts the MQTT frontend.
-func Start(ctx context.Context, server io.Server, listener net.Listener, marshaler Marshaler, protocol string) {
+func Start(ctx context.Context, server io.Server, listener net.Listener, formatter Formatter, protocol string) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/mqtt")
 	ctx = mqttlog.NewContext(ctx, mqtt.Logger(log.FromContext(ctx)))
-	s := &srv{ctx, server, marshaler, mqttnet.NewListener(listener, protocol)}
+	s := &srv{ctx, server, formatter, mqttnet.NewListener(listener, protocol)}
 	go s.accept()
 	go func() {
 		<-ctx.Done()
@@ -77,7 +67,7 @@ func (s *srv) accept() {
 
 		go func() {
 			ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", mqttConn.RemoteAddr().String()))
-			conn := &connection{server: s.server, mqtt: mqttConn, marshaler: s.marshaler}
+			conn := &connection{server: s.server, mqtt: mqttConn, formatter: s.formatter}
 			if conn.setup(ctx); err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Failed to setup connection")
 				mqttConn.Close()
@@ -88,7 +78,7 @@ func (s *srv) accept() {
 }
 
 type connection struct {
-	marshaler Marshaler
+	formatter Formatter
 	server    io.Server
 	mqtt      mqttnet.Conn
 	session   session.Session
@@ -133,13 +123,13 @@ func (c *connection) setup(ctx context.Context) error {
 				logger.WithError(c.io.Context().Err()).Debug("Done sending downlink")
 				return
 			case down := <-c.io.Down():
-				buf, err := c.marshaler.MarshalDownlink(down)
+				buf, err := c.formatter.EncodeDownlink(down)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
 				}
 				logger.Info("Publishing downlink message")
-				topicParts := topics.Downlink(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers), c.marshaler.Version())
+				topicParts := c.formatter.DownlinkTopic(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers))
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
@@ -186,11 +176,11 @@ func (c *connection) setup(ctx context.Context) error {
 	return nil
 }
 
-type gatewayTopics struct {
-	downlinkTopic []string
-	uplinkTopic   []string
-	statusTopic   []string
-	ackTopic      []string
+type gatewayTopicFilters struct {
+	downlink []string
+	uplink   []string
+	status   []string
+	ack      []string
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
@@ -224,11 +214,11 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		return nil, err
 	}
 
-	info.Metadata = gatewayTopics{
-		downlinkTopic: topics.Downlink(uid, c.marshaler.Version()),
-		uplinkTopic:   topics.Uplink(uid, c.marshaler.Version()),
-		statusTopic:   topics.Status(uid, c.marshaler.Version()),
-		ackTopic:      topics.TxAck(uid, c.marshaler.Version()),
+	info.Metadata = gatewayTopicFilters{
+		downlink: c.formatter.DownlinkTopic(uid),
+		uplink:   c.formatter.UplinkTopic(uid),
+		status:   c.formatter.StatusTopic(uid),
+		ack:      c.formatter.TxAckTopic(uid),
 	}
 	info.Interface = c
 	return c.io.Context(), nil
@@ -237,31 +227,30 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 var errNotAuthorized = errors.DefinePermissionDenied("not_authorized", "not authorized")
 
 func (c *connection) Subscribe(info *auth.Info, requestedTopic string, requestedQoS byte) (acceptedTopic string, acceptedQoS byte, err error) {
-	gt := info.Metadata.(gatewayTopics)
-	if !topic.MatchPath(gt.downlinkTopic, topic.Split(requestedTopic)) {
+	gt := info.Metadata.(gatewayTopicFilters)
+	if !topic.MatchPath(gt.downlink, topic.Split(requestedTopic)) {
 		return "", 0, errNotAuthorized
 	}
-
-	acceptedTopic = topic.Join(gt.downlinkTopic)
+	acceptedTopic = topic.Join(gt.downlink)
 	acceptedQoS = requestedQoS
 	return
 }
 
 func (c *connection) CanRead(info *auth.Info, topicParts ...string) bool {
-	gt := info.Metadata.(gatewayTopics)
-	return topic.MatchPath(topicParts, gt.downlinkTopic)
+	gt := info.Metadata.(gatewayTopicFilters)
+	return topic.MatchPath(topicParts, gt.downlink)
 }
 
 func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
-	gt := info.Metadata.(gatewayTopics)
-	return topic.MatchPath(topicParts, gt.uplinkTopic) || topic.MatchPath(topicParts, gt.statusTopic) || topic.MatchPath(topicParts, gt.ackTopic)
+	gt := info.Metadata.(gatewayTopicFilters)
+	return topic.MatchPath(topicParts, gt.uplink) || topic.MatchPath(topicParts, gt.status) || topic.MatchPath(topicParts, gt.ack)
 }
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
 	switch {
-	case topics.IsUplink(pkt.TopicParts):
-		up, err := c.marshaler.UnmarshalUplink(pkt.Message)
+	case c.formatter.IsUplinkTopic(pkt.TopicParts):
+		up, err := c.formatter.DecodeUplink(pkt.Message)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
@@ -269,8 +258,8 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		if err := c.io.HandleUp(up); err != nil {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
-	case topics.IsStatus(pkt.TopicParts):
-		status, err := c.marshaler.UnmarshalStatus(pkt.Message)
+	case c.formatter.IsStatusTopic(pkt.TopicParts):
+		status, err := c.formatter.DecodeStatus(pkt.Message)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal status message")
 			return
@@ -278,9 +267,9 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		if err := c.io.HandleStatus(status); err != nil {
 			logger.WithError(err).Warn("Failed to handle status message")
 		}
-	case topics.IsTxAck(pkt.TopicParts):
-		ack := &ttnpb.TxAcknowledgment{}
-		if err := ack.Unmarshal(pkt.Message); err != nil {
+	case c.formatter.IsTxAckTopic(pkt.TopicParts):
+		ack, err := c.formatter.DecodeTxAck(pkt.Message)
+		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return
 		}

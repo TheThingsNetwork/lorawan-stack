@@ -93,11 +93,17 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 	}
 
 	for _, version := range []struct {
-		Marshaler mqtt.Marshaler
+		Formatter mqtt.Formatter
 		Config    MQTTConfig
 	}{
-		{Marshaler: mqtt.V3{}, Config: conf.MQTT},
-		{Marshaler: mqtt.V2{}, Config: conf.MQTTV2},
+		{
+			Formatter: mqtt.Protobuf,
+			Config:    conf.MQTT,
+		},
+		{
+			Formatter: mqtt.ProtobufV2,
+			Config:    conf.MQTTV2,
+		},
 	} {
 		for _, lis := range []struct {
 			Listen   string
@@ -130,7 +136,7 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 					"address", lis.Listen,
 				)
 			}
-			mqtt.Start(ctx, gs, netLis, version.Marshaler, lis.Protocol)
+			mqtt.Start(ctx, gs, netLis, version.Formatter, lis.Protocol)
 		}
 	}
 

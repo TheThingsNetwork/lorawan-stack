@@ -19,25 +19,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	legacyttnpb "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var v2Converter = mqtt.V2{}
-
-func TestV2Converter(t *testing.T) {
-	a := assertions.New(t)
-	a.So(v2Converter.Version(), should.Equal, topics.V2)
-}
-
-func TestV2Downlink(t *testing.T) {
+func TestProtobufV2Downlink(t *testing.T) {
 	a := assertions.New(t)
 	pld, _ := base64.RawStdEncoding.DecodeString("YHBhYUoAAgABj9/clY414A")
 	input := &ttnpb.DownlinkMessage{
@@ -62,7 +53,7 @@ func TestV2Downlink(t *testing.T) {
 		t.Fatal("Could not unmarshal the downlink payload in the v3 payload struct")
 	}
 
-	expected := &legacyttnpb.DownlinkMessage{
+	Expected := &legacyttnpb.DownlinkMessage{
 		Payload: pld,
 		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
 			Frequency:             863000000,
@@ -79,19 +70,19 @@ func TestV2Downlink(t *testing.T) {
 			},
 		},
 	}
-	expectedBytes, err := expected.Marshal()
+	expectedBuf, err := Expected.Marshal()
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Could not marshal the v2 struct")
 	}
 
-	result, err := v2Converter.MarshalDownlink(input)
+	actualBuf, err := mqtt.ProtobufV2.EncodeDownlink(input)
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Could not marshal the input v3 struct")
 	}
-	a.So(result, should.Resemble, expectedBytes)
+	a.So(actualBuf, should.Resemble, expectedBuf)
 }
 
-func TestV2Uplinks(t *testing.T) {
+func TestProtobufV2Uplinks(t *testing.T) {
 	validV2Settings := legacyttnpb.ProtocolRxMetadata{
 		LoRaWAN: &legacyttnpb.LoRaWANMetadata{
 			CodingRate:    "4/5",
@@ -138,45 +129,44 @@ func TestV2Uplinks(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		name string
-
-		input        *legacyttnpb.UplinkMessage
-		inputPayload []byte
-		expected     *ttnpb.UplinkMessage
-		shouldErr    func(error) bool
+		Name         string
+		Input        *legacyttnpb.UplinkMessage
+		InputPayload []byte
+		Expected     *ttnpb.UplinkMessage
+		AssertError  func(error) bool
 	}{
 		{
-			name:      "empty input",
-			input:     &legacyttnpb.UplinkMessage{},
-			shouldErr: func(err error) bool { return err != nil },
+			Name:        "empty Input",
+			Input:       &legacyttnpb.UplinkMessage{},
+			AssertError: func(err error) bool { return err != nil },
 		},
 		{
-			name: "correct input",
-			input: &legacyttnpb.UplinkMessage{
+			Name: "correct Input",
+			Input: &legacyttnpb.UplinkMessage{
 				GatewayMetadata:  validV2Metadata,
 				ProtocolMetadata: validV2Settings,
 			},
-			inputPayload: validRawPayload,
-			expected: &ttnpb.UplinkMessage{
+			InputPayload: validRawPayload,
+			Expected: &ttnpb.UplinkMessage{
 				Settings:   validV3Settings,
 				RxMetadata: validV3Metadata,
 			},
 		},
 		{
-			name: "correct input with Rsig",
-			input: &legacyttnpb.UplinkMessage{
+			Name: "correct Input with Rsig",
+			Input: &legacyttnpb.UplinkMessage{
 				GatewayMetadata:  validV2RSigMetadata,
 				ProtocolMetadata: validV2Settings,
 			},
-			inputPayload: validRawPayload,
-			expected: &ttnpb.UplinkMessage{
+			InputPayload: validRawPayload,
+			Expected: &ttnpb.UplinkMessage{
 				Settings:   validV3Settings,
 				RxMetadata: validV3Metadata,
 			},
 		},
 		{
-			name: "incorrect data rate",
-			input: &legacyttnpb.UplinkMessage{
+			Name: "incorrect data rate",
+			Input: &legacyttnpb.UplinkMessage{
 				GatewayMetadata: validV2Metadata,
 				ProtocolMetadata: legacyttnpb.ProtocolRxMetadata{
 					LoRaWAN: &legacyttnpb.LoRaWANMetadata{
@@ -187,11 +177,11 @@ func TestV2Uplinks(t *testing.T) {
 					},
 				},
 			},
-			shouldErr: errors.IsInvalidArgument,
+			AssertError: errors.IsInvalidArgument,
 		},
 		{
-			name: "incorrect modulation",
-			input: &legacyttnpb.UplinkMessage{
+			Name: "incorrect modulation",
+			Input: &legacyttnpb.UplinkMessage{
 				GatewayMetadata: validV2Metadata,
 				ProtocolMetadata: legacyttnpb.ProtocolRxMetadata{
 					LoRaWAN: &legacyttnpb.LoRaWANMetadata{
@@ -202,28 +192,26 @@ func TestV2Uplinks(t *testing.T) {
 					},
 				},
 			},
-			shouldErr: errors.IsInvalidArgument,
+			AssertError: errors.IsInvalidArgument,
 		},
 	} {
-		tcok := t.Run(tc.name, func(t *testing.T) {
+		tcok := t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-
-			inputBytes, err := tc.input.Marshal()
+			buf, err := tc.Input.Marshal()
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			result, err := v2Converter.UnmarshalUplink(inputBytes)
-			if tc.shouldErr != nil {
-				if !tc.shouldErr(err) {
-					t.Log("Unmarshalling the uplink should have returned an error")
-					t.Fail()
+			res, err := mqtt.ProtobufV2.DecodeUplink(buf)
+			if tc.AssertError != nil {
+				if !a.So(tc.AssertError(err), should.BeTrue) {
+					t.FailNow()
 				}
 				return
 			}
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(pretty.Diff(result, tc.expected), should.BeEmpty)
+			a.So(res, should.HaveEmptyDiff, tc.Expected)
 		})
 		if !tcok {
 			t.FailNow()
@@ -231,23 +219,22 @@ func TestV2Uplinks(t *testing.T) {
 	}
 }
 
-func TestV2Status(t *testing.T) {
+func TestProtobufV2Status(t *testing.T) {
 	for _, tc := range []struct {
-		name string
-
-		input     *legacyttnpb.StatusMessage
-		expected  *ttnpb.GatewayStatus
-		shouldErr func(error) bool
+		Name        string
+		input       *legacyttnpb.StatusMessage
+		Expected    *ttnpb.GatewayStatus
+		AssertError func(error) bool
 	}{
 		{
-			name: "Bare-down",
+			Name: "Simple",
 			input: &legacyttnpb.StatusMessage{
 				TxIn: 5,
 				TxOk: 3,
 				RxIn: 15,
 				RxOk: 14,
 			},
-			expected: &ttnpb.GatewayStatus{
+			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),
 				Time:     time.Unix(0, 0),
 				Metrics: map[string]float32{
@@ -263,13 +250,13 @@ func TestV2Status(t *testing.T) {
 			},
 		},
 		{
-			name: "With versions",
+			Name: "With versions",
 			input: &legacyttnpb.StatusMessage{
 				DSP:  3,
 				HAL:  "v1.1",
 				FPGA: 4,
 			},
-			expected: &ttnpb.GatewayStatus{
+			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),
 				Time:     time.Unix(0, 0),
 				Metrics: map[string]float32{
@@ -290,7 +277,7 @@ func TestV2Status(t *testing.T) {
 			},
 		},
 		{
-			name: "With metrics",
+			Name: "With metrics",
 			input: &legacyttnpb.StatusMessage{
 				OS: &legacyttnpb.StatusMessage_OSMetrics{
 					CPUPercentage:    10.0,
@@ -302,7 +289,7 @@ func TestV2Status(t *testing.T) {
 				},
 				RTT: 3,
 			},
-			expected: &ttnpb.GatewayStatus{
+			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),
 				Time:     time.Unix(0, 0),
 				Metrics: map[string]float32{
@@ -325,7 +312,7 @@ func TestV2Status(t *testing.T) {
 			},
 		},
 		{
-			name: "With location",
+			Name: "With location",
 			input: &legacyttnpb.StatusMessage{
 				Location: &legacyttnpb.LocationMetadata{
 					Latitude:  10,
@@ -334,7 +321,7 @@ func TestV2Status(t *testing.T) {
 					Source:    legacyttnpb.LocationMetadata_GPS,
 				},
 			},
-			expected: &ttnpb.GatewayStatus{
+			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),
 				Time:     time.Unix(0, 0),
 				Metrics: map[string]float32{
@@ -358,24 +345,23 @@ func TestV2Status(t *testing.T) {
 			},
 		},
 	} {
-		tcok := t.Run(tc.name, func(t *testing.T) {
+		tcok := t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			inputBytes, err := tc.input.Marshal()
+			buf, err := tc.input.Marshal()
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			result, err := v2Converter.UnmarshalStatus(inputBytes)
-			if tc.shouldErr != nil {
-				if !tc.shouldErr(err) {
-					t.Log("Unmarshalling the status message should have produced an error")
-					t.Fail()
+			res, err := mqtt.ProtobufV2.DecodeStatus(buf)
+			if tc.AssertError != nil {
+				if !a.So(tc.AssertError(err), should.BeTrue) {
+					t.FailNow()
 				}
 				return
 			}
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(pretty.Diff(result, tc.expected), should.BeEmpty)
+			a.So(res, should.HaveEmptyDiff, tc.Expected)
 		})
 		if !tcok {
 			t.FailNow()

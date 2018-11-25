@@ -15,31 +15,19 @@
 package mqtt
 
 import (
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-type V3 struct{}
+// Formatter formats downlink, uplink and status messages.
+type Formatter interface {
+	topics.Layout
 
-func (V3) Version() topics.Version {
-	return topics.V3
+	EncodeDownlink(down *ttnpb.DownlinkMessage) ([]byte, error)
+	DecodeUplink(message []byte) (*ttnpb.UplinkMessage, error)
+	DecodeStatus(message []byte) (*ttnpb.GatewayStatus, error)
+	DecodeTxAck(message []byte) (*ttnpb.TxAcknowledgment, error)
 }
 
-func (V3) MarshalDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
-	gwDown := &ttnpb.GatewayDown{
-		DownlinkMessage: down,
-	}
-	return gwDown.Marshal()
-}
-
-func (V3) UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error) {
-	uplink := &ttnpb.UplinkMessage{}
-	err := uplink.Unmarshal(message)
-	return uplink, err
-}
-
-func (V3) UnmarshalStatus(message []byte) (*ttnpb.GatewayStatus, error) {
-	status := &ttnpb.GatewayStatus{}
-	err := status.Unmarshal(message)
-	return status, err
-}
+var errNotSupported = errors.DefineFailedPrecondition("not_supported", "not supported")

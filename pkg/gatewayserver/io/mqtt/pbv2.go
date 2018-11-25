@@ -28,9 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-const eirpDelta = 2 // Integer-rounded delta between EIRP and ERP
-
-type V2 struct{}
+// eirpDelta is the integer-rounded delta between EIRP and ERP.
+const eirpDelta = 2
 
 var (
 	modulationToV3 = map[legacyttnpb.Modulation]ttnpb.Modulation{
@@ -70,11 +69,11 @@ var (
 	errFrequencyPlan   = errors.DefineNotFound("frequency_plan", "unknown frequency plan `{frequency_plan}`")
 )
 
-func (V2) Version() topics.Version {
-	return topics.V2
+type pbv2 struct {
+	topics.Layout
 }
 
-func (V2) MarshalDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (pbv2) EncodeDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	var fcnt uint32
 	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
 		fcnt = pld.MACPayload.FHDR.FCnt
@@ -105,7 +104,7 @@ func (V2) MarshalDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	return v2downlink.Marshal()
 }
 
-func (V2) UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (pbv2) DecodeUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &legacyttnpb.UplinkMessage{}
 	err := v2uplink.Unmarshal(message)
 	if err != nil {
@@ -140,7 +139,6 @@ func (V2) UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		var drIndex ttnpb.DataRateIndex
 		var found bool
 		dr := types.DataRate{
@@ -175,7 +173,6 @@ func (V2) UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: gwMetadata.GatewayID,
 	}
-	uplink.RxMetadata = make([]*ttnpb.RxMetadata, 0, 1)
 	mdTime := time.Unix(0, gwMetadata.Time)
 	if antennas := gwMetadata.Antennas; len(antennas) > 0 {
 		for _, antenna := range antennas {
@@ -206,7 +203,7 @@ func (V2) UnmarshalUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (V2) UnmarshalStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (pbv2) DecodeStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	v2status := &legacyttnpb.StatusMessage{}
 	err := v2status.Unmarshal(message)
 	if err != nil {
@@ -263,4 +260,13 @@ func (V2) UnmarshalStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 		Time:             time.Unix(0, v2status.Time),
 		Versions:         versions,
 	}, nil
+}
+
+func (pbv2) DecodeTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+	return nil, errNotSupported
+}
+
+// ProtobufV2 is a formatter that uses the legacy The Things Network Stack V2 proto marshaling and unmarshaling.
+var ProtobufV2 Formatter = &pbv2{
+	Layout: topics.V2,
 }

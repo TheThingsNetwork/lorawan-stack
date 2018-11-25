@@ -19,79 +19,43 @@ import (
 
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestTopics(t *testing.T) {
+func TestDefaultTopics(t *testing.T) {
 	for _, tc := range []struct {
 		UID      string
-		Version  Version
-		Func     func(string, Version) []string
+		Func     func(string) []string
 		Expected []string
 		Is       func([]string) bool
 		IsNot    []func([]string) bool
 	}{
 		{
 			UID:      "test",
-			Version:  V3,
-			Func:     Uplink,
+			Func:     topics.Default.UplinkTopic,
 			Expected: []string{"v3", "test", "up"},
-			Is:       IsUplink,
-			IsNot:    []func([]string) bool{IsDownlink, IsStatus, IsTxAck},
+			Is:       topics.Default.IsUplinkTopic,
+			IsNot:    []func([]string) bool{topics.Default.IsStatusTopic, topics.Default.IsTxAckTopic},
 		},
 		{
 			UID:      "test",
-			Version:  V3,
-			Func:     Downlink,
-			Expected: []string{"v3", "test", "down"},
-			Is:       IsDownlink,
-			IsNot:    []func([]string) bool{IsUplink, IsStatus, IsTxAck},
-		},
-		{
-			UID:      "test",
-			Version:  V3,
-			Func:     Status,
+			Func:     topics.Default.StatusTopic,
 			Expected: []string{"v3", "test", "status"},
-			Is:       IsStatus,
-			IsNot:    []func([]string) bool{IsDownlink, IsUplink, IsTxAck},
+			Is:       topics.Default.IsStatusTopic,
+			IsNot:    []func([]string) bool{topics.Default.IsUplinkTopic, topics.Default.IsTxAckTopic},
 		},
 		{
 			UID:      "test",
-			Version:  V3,
-			Func:     TxAck,
+			Func:     topics.Default.TxAckTopic,
 			Expected: []string{"v3", "test", "down", "ack"},
-			Is:       IsTxAck,
-			IsNot:    []func([]string) bool{IsDownlink, IsUplink, IsStatus},
-		},
-		{
-			UID:      "test",
-			Version:  V2,
-			Func:     Uplink,
-			Expected: []string{"test", "up"},
-			Is:       IsUplink,
-			IsNot:    []func([]string) bool{IsDownlink, IsStatus, IsTxAck},
-		},
-		{
-			UID:      "test",
-			Version:  V2,
-			Func:     Downlink,
-			Expected: []string{"test", "down"},
-			Is:       IsDownlink,
-			IsNot:    []func([]string) bool{IsUplink, IsStatus, IsTxAck},
-		},
-		{
-			UID:      "test",
-			Version:  V2,
-			Func:     Status,
-			Expected: []string{"test", "status"},
-			Is:       IsStatus,
-			IsNot:    []func([]string) bool{IsDownlink, IsUplink, IsTxAck},
+			Is:       topics.Default.IsTxAckTopic,
+			IsNot:    []func([]string) bool{topics.Default.IsUplinkTopic, topics.Default.IsStatusTopic},
 		},
 	} {
 		t.Run(topic.Join(tc.Expected), func(t *testing.T) {
 			a := assertions.New(t)
-			actual := tc.Func(tc.UID, tc.Version)
+			actual := tc.Func(tc.UID)
 			a.So(actual, should.Resemble, tc.Expected)
 			a.So(tc.Is(actual), should.BeTrue)
 			for _, isNot := range tc.IsNot {
