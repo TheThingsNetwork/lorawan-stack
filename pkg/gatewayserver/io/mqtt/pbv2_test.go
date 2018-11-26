@@ -75,7 +75,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 		t.Fatal("Could not marshal the v2 struct")
 	}
 
-	actualBuf, err := mqtt.ProtobufV2.EncodeDownlink(input)
+	actualBuf, err := mqtt.ProtobufV2.FromDownlink(input)
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Could not marshal the input v3 struct")
 	}
@@ -201,7 +201,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			res, err := mqtt.ProtobufV2.DecodeUplink(buf)
+			res, err := mqtt.ProtobufV2.ToUplink(buf)
 			if tc.AssertError != nil {
 				if !a.So(tc.AssertError(err), should.BeTrue) {
 					t.FailNow()
@@ -351,7 +351,7 @@ func TestProtobufV2Status(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			res, err := mqtt.ProtobufV2.DecodeStatus(buf)
+			res, err := mqtt.ProtobufV2.ToStatus(buf)
 			if tc.AssertError != nil {
 				if !a.So(tc.AssertError(err), should.BeTrue) {
 					t.FailNow()

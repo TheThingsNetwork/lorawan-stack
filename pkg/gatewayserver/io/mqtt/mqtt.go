@@ -123,7 +123,7 @@ func (c *connection) setup(ctx context.Context) error {
 				logger.WithError(c.io.Context().Err()).Debug("Done sending downlink")
 				return
 			case down := <-c.io.Down():
-				buf, err := c.formatter.EncodeDownlink(down)
+				buf, err := c.formatter.FromDownlink(down)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -266,7 +266,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
 	switch {
 	case c.formatter.IsUplinkTopic(pkt.TopicParts):
-		up, err := c.formatter.DecodeUplink(pkt.Message)
+		up, err := c.formatter.ToUplink(pkt.Message)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
@@ -275,7 +275,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
 	case c.formatter.IsStatusTopic(pkt.TopicParts):
-		status, err := c.formatter.DecodeStatus(pkt.Message)
+		status, err := c.formatter.ToStatus(pkt.Message)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal status message")
 			return
@@ -284,7 +284,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle status message")
 		}
 	case c.formatter.IsTxAckTopic(pkt.TopicParts):
-		ack, err := c.formatter.DecodeTxAck(pkt.Message)
+		ack, err := c.formatter.ToTxAck(pkt.Message)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return

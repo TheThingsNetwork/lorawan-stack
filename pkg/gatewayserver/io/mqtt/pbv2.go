@@ -73,7 +73,7 @@ type pbv2 struct {
 	topics.Layout
 }
 
-func (pbv2) EncodeDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (pbv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	var fcnt uint32
 	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
 		fcnt = pld.MACPayload.FHDR.FCnt
@@ -104,7 +104,7 @@ func (pbv2) EncodeDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	return v2downlink.Marshal()
 }
 
-func (pbv2) DecodeUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (pbv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &legacyttnpb.UplinkMessage{}
 	err := v2uplink.Unmarshal(message)
 	if err != nil {
@@ -203,7 +203,7 @@ func (pbv2) DecodeUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (pbv2) DecodeStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (pbv2) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	v2status := &legacyttnpb.StatusMessage{}
 	err := v2status.Unmarshal(message)
 	if err != nil {
@@ -262,7 +262,7 @@ func (pbv2) DecodeStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	}, nil
 }
 
-func (pbv2) DecodeTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+func (pbv2) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
 	return nil, errNotSupported
 }
 

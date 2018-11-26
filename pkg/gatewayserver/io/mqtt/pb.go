@@ -23,14 +23,14 @@ type pb struct {
 	topics.Layout
 }
 
-func (pb) EncodeDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (pb) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	gwDown := &ttnpb.GatewayDown{
 		DownlinkMessage: down,
 	}
 	return gwDown.Marshal()
 }
 
-func (pb) DecodeUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (pb) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	uplink := &ttnpb.UplinkMessage{}
 	if err := uplink.Unmarshal(message); err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (pb) DecodeUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (pb) DecodeStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (pb) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	status := &ttnpb.GatewayStatus{}
 	if err := status.Unmarshal(message); err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (pb) DecodeStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	return status, nil
 }
 
-func (pb) DecodeTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+func (pb) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
 	ack := &ttnpb.TxAcknowledgment{}
 	if err := ack.Unmarshal(message); err != nil {
 		return nil, err
