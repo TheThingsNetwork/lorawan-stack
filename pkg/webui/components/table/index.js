@@ -95,7 +95,6 @@ class Tabular extends React.Component {
       data.map((row, rowKey) => (
         <Table.Row
           key={rowKey}
-          clickable={row.clickable}
           id={rowKey}
           onClick={onRowClick}
         >

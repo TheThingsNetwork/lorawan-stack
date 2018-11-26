@@ -89,4 +89,8 @@ Row.propTypes = {
   onClick: PropTypes.func,
 }
 
+Row.defaultProps = {
+  clickable: true,
+}
+
 export default Row

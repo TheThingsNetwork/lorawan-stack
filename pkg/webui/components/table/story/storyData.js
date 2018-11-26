@@ -40,6 +40,7 @@ const rows = [{
   devices: '1',
   lastActivity: '10 sec. ago',
   tabs: [ 'all', 'starred' ],
+  clickable: false,
 },
 {
   appId: 'my-app2',
@@ -47,6 +48,7 @@ const rows = [{
   devices: '2',
   lastActivity: '10 sec. ago',
   tabs: [ 'all' ],
+  clickable: false,
 },
 {
   appId: 'my-app3',
@@ -54,6 +56,7 @@ const rows = [{
   devices: '3',
   lastActivity: '10 sec. ago',
   tabs: [ 'all', 'starred' ],
+  clickable: false,
 },
 {
   appId: 'my-app4',
@@ -61,6 +64,7 @@ const rows = [{
   devices: '5',
   lastActivity: '10 sec. ago',
   tabs: [ 'all', 'starred' ],
+  clickable: false,
 },
 {
   appId: 'my-app5',
@@ -68,6 +72,7 @@ const rows = [{
   devices: '4',
   lastActivity: '10 sec. ago',
   tabs: [ 'all', 'starred' ],
+  clickable: false,
 },
 {
   appId: 'my-app6',
@@ -75,6 +80,7 @@ const rows = [{
   devices: '3',
   lastActivity: '10 sec. ago',
   tabs: [ 'all' ],
+  clickable: false,
 }]
 
 export default {
