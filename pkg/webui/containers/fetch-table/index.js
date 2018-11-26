@@ -185,8 +185,6 @@ class FetchTable extends Component {
     } = this.props
     const { page, query, tab } = this.state
 
-    const data = items.map(item => ({ ...item, clickable: true }))
-
     return (
       <div>
         <div className={style.filters}>
@@ -227,7 +225,7 @@ class FetchTable extends Component {
           onPageChange={this.onPageChange}
           loading={fetching}
           headers={headers}
-          data={data}
+          data={items}
           emptyMessage={sharedMessages.noMatch}
         />
       </div>
