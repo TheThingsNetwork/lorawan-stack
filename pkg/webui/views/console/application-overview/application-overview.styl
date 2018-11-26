@@ -14,6 +14,21 @@
 
 .id
   h2()
+  font-weight: bold
+
+.head
+  margin-top: $ls.xs
+
+.table
+  margin-top: $ls.xl
+
+.latest-events
+  border-normal()
+  padding: $ls.xl
+  margin-top: $ls.s
+  text-align: center
+  font-style: italic
+  color: $tc-subtle-gray
 
 .attributes
   list-style: none
@@ -22,6 +37,8 @@
   &-entry
     display: flex
     align-content: center
+    &:not(.last-child)
+      text-margin-bottom($cs.s)
 
   .key
     flex-basis: 50%

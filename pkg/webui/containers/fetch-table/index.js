@@ -16,6 +16,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
 
 import debounce from '../../lib/debounce'
 
@@ -111,8 +112,8 @@ class FetchTable extends Component {
     }
   }
 
-  onPageChange (page) {
-    this.setState(this.props.filterValidator({
+  async onPageChange (page) {
+    await this.setState(this.props.filterValidator({
       ...this.state,
       page,
     }))
@@ -120,8 +121,8 @@ class FetchTable extends Component {
     this.fetchItems()
   }
 
-  requestSearch () {
-    this.setState(this.props.filterValidator({
+  async requestSearch () {
+    await this.setState(this.props.filterValidator({
       ...this.state,
       page: 1,
     }))
@@ -185,9 +186,13 @@ class FetchTable extends Component {
     } = this.props
     const { page, query, tab } = this.state
 
+    const buttonClassNames = classnames(style.filters, {
+      [style.tabbed]: Boolean(tabs),
+    })
+
     return (
       <div>
-        <div className={style.filters}>
+        <div className={buttonClassNames}>
           <div className={style.filtersLeft}>
             { tabs
               && (
@@ -199,7 +204,7 @@ class FetchTable extends Component {
                 />
               )
             }
-            {tableTitle}
+            <div className={style.tableTitle}>{tableTitle}</div>
           </div>
           <div className={style.filtersRight}>
             <Input

@@ -13,10 +13,12 @@
 // limitations under the License.
 
 .filters
-  border-normal('bottom')
   display: flex
   justify-content: space-between
   align-items: center
+
+  &.tabbed
+    border-normal('bottom')
 
   &-left
     flex-basis: auto
@@ -25,7 +27,8 @@
     flex: 1
     display: flex
     align-items: center
-    max-width: 30rem
+    max-width: 26rem
+    min-height: 3.8rem
 
 .add-button
   margin-left: $cs.xs
@@ -35,3 +38,6 @@
 
 .tabs
   margin: 0
+
+.table-title
+  h3()

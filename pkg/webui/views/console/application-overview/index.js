@@ -66,16 +66,18 @@ class ApplicationOverview extends React.Component {
   render () {
     return (
       <React.Fragment>
-        <Row>
+        <Row className={style.head}>
           <Col sm={12} lg={6}>
             {this.applicationInfo}
           </Col>
           <Col sm={12} lg={6}>
-            latests events here
+            <div className={style.latestEvents}>Latest Events Placeholder</div>
           </Col>
         </Row>
-        <Row sm={12}>
-          <DevicesTable pageSize={DEVICES_TABLE_SIZE} />
+        <Row>
+          <Col sm={12} className={style.table}>
+            <DevicesTable pageSize={DEVICES_TABLE_SIZE} />
+          </Col>
         </Row>
       </React.Fragment>
     )
