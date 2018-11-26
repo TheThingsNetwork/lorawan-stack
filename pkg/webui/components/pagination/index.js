@@ -32,7 +32,7 @@ class Pagination extends React.PureComponent {
   render () {
     const {
       className,
-      forcePage,
+      forcePage = 1,
       initialPage = 1,
       pageRangeDisplayed,
       marginPagesDisplayed,

@@ -60,14 +60,14 @@ class PaginatedExample extends React.Component {
     super(props)
 
     this.state = {
-      page: 0,
+      page: 1,
       loading: true,
       data: [],
     }
   }
 
   componentDidMount () {
-    this.requestNextPage(0)
+    this.requestNextPage(1)
   }
 
   componentWillUnmount () {
@@ -84,7 +84,7 @@ class PaginatedExample extends React.Component {
 
   requestNextPage (page) {
     action('requestNextPage')(page)
-    const offset = page * PAGE_SIZE
+    const offset = (page - 1) * PAGE_SIZE
     const delay = this.getDelay(this.props.slow)
     this.timeout = setTimeout(() => this.setState({
       page,
