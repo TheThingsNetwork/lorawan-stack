@@ -159,17 +159,17 @@ class FetchTable extends Component {
   }
 
   onItemAdd () {
-    const { dispatch, pathname, entity } = this.props
+    const { dispatch, pathname, itemPathPrefix } = this.props
 
-    dispatch(push(`${pathname}/${entity}/add`))
+    dispatch(push(`${pathname}${itemPathPrefix}/add`))
   }
 
   onItemClick (id) {
-    const { dispatch, pathname, items, entity } = this.props
+    const { dispatch, pathname, items, entity, itemPathPrefix } = this.props
     const entitySingle = entity.substr(0, entity.length - 1)
     const item_id = items[id][`${entitySingle}_id`]
 
-    dispatch(push(`${pathname}/${item_id}`))
+    dispatch(push(`${pathname}${itemPathPrefix}/${item_id}`))
   }
 
   render () {
@@ -241,6 +241,7 @@ class FetchTable extends Component {
 
 FetchTable.defaultProps = {
   filterValidator,
+  itemPathPrefix: '',
 }
 
 export default FetchTable

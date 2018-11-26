@@ -63,6 +63,7 @@ export default class DevicesTable extends React.Component {
         tableTitle={<Message content={m.connectedDevices} values={{ deviceCount: totalCount }} />}
         getItemsAction={this.getDevicesList}
         searchItemsAction={this.searchDevicesList}
+        itemPathPrefix="/devices"
         {...this.props}
       />
     )
