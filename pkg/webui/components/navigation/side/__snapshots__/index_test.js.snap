@@ -42,7 +42,7 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
     message={
       Object {
         "defaultMessage": "Hide Sidebar",
-        "id": "components.navigation.side.index.hideSidebar",
+        "id": "components.navigation.side.side.hideSidebar",
       }
     }
     naked={true}
@@ -114,7 +114,7 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
     message={
       Object {
         "defaultMessage": "Hide Sidebar",
-        "id": "components.navigation.side.index.hideSidebar",
+        "id": "components.navigation.side.side.hideSidebar",
       }
     }
     naked={true}
