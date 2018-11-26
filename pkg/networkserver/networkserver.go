@@ -1164,6 +1164,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			FRMPayload:   pld.FRMPayload,
 			RxMetadata:   up.RxMetadata,
 			SessionKeyID: dev.Session.SessionKeyID,
+			Settings:     up.Settings,
 		}},
 	})
 }

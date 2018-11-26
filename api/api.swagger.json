@@ -5062,6 +5062,9 @@
           "items": {
             "$ref": "#/definitions/v3RxMetadata"
           }
+        },
+        "settings": {
+          "$ref": "#/definitions/v3TxSettings"
         }
       }
     },

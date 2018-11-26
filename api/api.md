@@ -4248,6 +4248,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | frm_payload | [bytes](#bytes) |  |  |
 | decoded_payload | [google.protobuf.Struct](#google.protobuf.Struct) |  |  |
 | rx_metadata | [RxMetadata](#ttn.lorawan.v3.RxMetadata) | repeated |  |
+| settings | [TxSettings](#ttn.lorawan.v3.TxSettings) |  |  |
 
 
 

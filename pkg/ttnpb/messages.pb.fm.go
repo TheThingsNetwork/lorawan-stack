@@ -773,6 +773,18 @@ var _ApplicationUplinkFieldPaths = [...]string{
 	"frm_payload",
 	"rx_metadata",
 	"session_key_id",
+	"settings",
+	"settings.bandwidth",
+	"settings.bit_rate",
+	"settings.channel_index",
+	"settings.coding_rate",
+	"settings.data_rate_index",
+	"settings.enable_crc",
+	"settings.frequency",
+	"settings.invert_polarization",
+	"settings.modulation",
+	"settings.spreading_factor",
+	"settings.tx_power",
 }
 
 func (*ApplicationUplink) FieldMaskPaths() []string {
@@ -796,6 +808,30 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			dst.RxMetadata = src.RxMetadata
 		case "session_key_id":
 			dst.SessionKeyID = src.SessionKeyID
+		case "settings":
+			dst.Settings = src.Settings
+		case "settings.bandwidth":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.bit_rate":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.channel_index":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.coding_rate":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.data_rate_index":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.enable_crc":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.frequency":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.invert_polarization":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.modulation":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.spreading_factor":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
+		case "settings.tx_power":
+			dst.Settings.SetFields(&src.Settings, _pathsWithoutPrefix("settings", paths)...)
 		default:
 			panic(fmt.Errorf("invalid field path: '%s'", path))
 		}

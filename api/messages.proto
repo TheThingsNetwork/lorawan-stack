@@ -153,6 +153,7 @@ message ApplicationUplink {
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
   repeated RxMetadata rx_metadata = 6;
+  TxSettings settings = 7 [(gogoproto.nullable) = false];
 }
 
 message ApplicationLocation {

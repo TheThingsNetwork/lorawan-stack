@@ -24,6 +24,18 @@ var _ProcessUplinkMessageRequestFieldPaths = [...]string{
 	"message.frm_payload",
 	"message.rx_metadata",
 	"message.session_key_id",
+	"message.settings",
+	"message.settings.bandwidth",
+	"message.settings.bit_rate",
+	"message.settings.channel_index",
+	"message.settings.coding_rate",
+	"message.settings.data_rate_index",
+	"message.settings.enable_crc",
+	"message.settings.frequency",
+	"message.settings.invert_polarization",
+	"message.settings.modulation",
+	"message.settings.spreading_factor",
+	"message.settings.tx_power",
 	"parameter",
 }
 
@@ -73,6 +85,30 @@ func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageReque
 		case "message.rx_metadata":
 			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
 		case "message.session_key_id":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.bandwidth":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.bit_rate":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.channel_index":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.coding_rate":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.data_rate_index":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.enable_crc":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.frequency":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.invert_polarization":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.modulation":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.spreading_factor":
+			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
+		case "message.settings.tx_power":
 			dst.Message.SetFields(&src.Message, _pathsWithoutPrefix("message", paths)...)
 		case "parameter":
 			dst.Parameter = src.Parameter

@@ -1482,6 +1482,7 @@ func HandleUplinkTest() func(t *testing.T) {
 							FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 							RxMetadata:   asUpReq.up.GetUplinkMessage().RxMetadata,
 							SessionKeyID: pb.Session.SessionKeys.SessionKeyID,
+							Settings:     asUpReq.up.GetUplinkMessage().Settings,
 						}},
 					})
 
@@ -1652,6 +1653,7 @@ func HandleUplinkTest() func(t *testing.T) {
 								FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 								RxMetadata:   asUpReq.up.GetUplinkMessage().RxMetadata,
 								SessionKeyID: pb.Session.SessionKeys.SessionKeyID,
+								Settings:     asUpReq.up.GetUplinkMessage().Settings,
 							}},
 						})
 
