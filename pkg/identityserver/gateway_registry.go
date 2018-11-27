@@ -21,11 +21,18 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+)
+
+var (
+	evtCreateGateway = events.Define("gateway.create", "Create gateway")
+	evtUpdateGateway = events.Define("gateway.update", "Update gateway")
+	evtDeleteGateway = events.Define("gateway.delete", "Delete gateway")
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
@@ -55,6 +62,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtCreateGateway(ctx, req.GatewayIdentifiers, nil))
 	return gtw, nil
 }
 
@@ -163,6 +171,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUpdateGateway(ctx, req.GatewayIdentifiers, req.FieldMask.Paths))
 	return gtw, nil
 }
 
@@ -179,6 +188,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtDeleteGateway(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

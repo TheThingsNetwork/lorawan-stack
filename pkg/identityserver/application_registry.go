@@ -21,11 +21,18 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+)
+
+var (
+	evtCreateApplication = events.Define("application.create", "Create application")
+	evtUpdateApplication = events.Define("application.update", "Update application")
+	evtDeleteApplication = events.Define("application.delete", "Delete application")
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
@@ -55,6 +62,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtCreateApplication(ctx, req.ApplicationIdentifiers, nil))
 	return app, nil
 }
 
@@ -163,6 +171,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUpdateApplication(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths))
 	return app, nil
 }
 
@@ -179,6 +188,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtDeleteApplication(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

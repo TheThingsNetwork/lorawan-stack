@@ -22,11 +22,18 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+)
+
+var (
+	evtCreateClient = events.Define("client.create", "Create OAuth client")
+	evtUpdateClient = events.Define("client.update", "Update OAuth client")
+	evtDeleteClient = events.Define("client.delete", "Delete OAuth client")
 )
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
@@ -72,6 +79,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
+	events.Publish(evtCreateClient(ctx, req.ClientIdentifiers, nil))
 	return cli, nil
 }
 
@@ -180,6 +188,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUpdateClient(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
 	return cli, nil
 }
 
@@ -196,6 +205,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtDeleteClient(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

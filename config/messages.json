@@ -3842,6 +3842,33 @@
       "file": "lorawan.go"
     }
   },
+  "event:application.create": {
+    "translations": {
+      "en": "Create application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "event:application.delete": {
+    "translations": {
+      "en": "Delete application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "event:application.update": {
+    "translations": {
+      "en": "Update application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
   "event:as.application.subscribe": {
     "translations": {
       "en": "application subscribe"
@@ -3966,6 +3993,60 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "observability.go"
+    }
+  },
+  "event:client.create": {
+    "translations": {
+      "en": "Create OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
+  "event:client.delete": {
+    "translations": {
+      "en": "Delete OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
+  "event:client.update": {
+    "translations": {
+      "en": "Update OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
+  "event:gateway.create": {
+    "translations": {
+      "en": "Create gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.delete": {
+    "translations": {
+      "en": "Delete gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.update": {
+    "translations": {
+      "en": "Update gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
     }
   },
   "event:gs.down.send": {
@@ -4596,6 +4677,60 @@
     "description": {
       "package": "pkg/oauth",
       "file": "events.go"
+    }
+  },
+  "event:organization.create": {
+    "translations": {
+      "en": "Create organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
+  "event:organization.delete": {
+    "translations": {
+      "en": "Delete organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
+  "event:organization.update": {
+    "translations": {
+      "en": "Update organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
+  "event:user.create": {
+    "translations": {
+      "en": "Create user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "event:user.delete": {
+    "translations": {
+      "en": "Delete user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "event:user.update": {
+    "translations": {
+      "en": "Update user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
     }
   }
 }

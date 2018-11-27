@@ -23,10 +23,17 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+var (
+	evtCreateUser = events.Define("user.create", "Create user")
+	evtUpdateUser = events.Define("user.update", "Update user")
+	evtDeleteUser = events.Define("user.delete", "Delete user")
 )
 
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
@@ -44,6 +51,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	usr.Password = "" // Create doesn't have a FieldMask, so we need to manually remove the password.
+	events.Publish(evtCreateUser(ctx, req.UserIdentifiers, nil))
 	return usr, nil
 }
 
@@ -78,6 +86,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, req.FieldMask.Paths))
 	return usr, nil
 }
 
@@ -139,6 +148,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateMask))
 	return ttnpb.Empty, nil
 }
 
@@ -176,6 +186,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"user_uid", unique.ID(ctx, req.UserIdentifiers),
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
+	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateTemporaryPasswordFieldMask))
 	// TODO: Send Email
 	return ttnpb.Empty, nil
 }
@@ -193,6 +204,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtDeleteUser(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

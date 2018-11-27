@@ -22,11 +22,18 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+)
+
+var (
+	evtCreateOrganization = events.Define("organization.create", "Create organization")
+	evtUpdateOrganization = events.Define("organization.update", "Update organization")
+	evtDeleteOrganization = events.Define("organization.delete", "Delete organization")
 )
 
 var errNestedOrganizations = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")
@@ -55,6 +62,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtCreateOrganization(ctx, req.OrganizationIdentifiers, nil))
 	return org, nil
 }
 
@@ -161,6 +169,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUpdateOrganization(ctx, req.OrganizationIdentifiers, req.FieldMask.Paths))
 	return org, nil
 }
 
@@ -177,6 +186,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtDeleteOrganization(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 
