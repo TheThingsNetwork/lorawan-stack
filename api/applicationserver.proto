@@ -77,9 +77,23 @@ service As {
 // The AppAs service connects an application or integration to an Application Server.
 service AppAs {
   rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
-  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
-  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
-  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
+  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push",
+      body: "*"
+    };
+  };
+  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace",
+      body: "*"
+    };
+  };
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_ids.application_id}/devices/{device_id}/down"
+    };
+  };
 }
 
 // The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.

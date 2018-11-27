@@ -659,6 +659,60 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/devices/{device_id}/down": {
+      "get": {
+        "operationId": "DownlinkQueueList",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationDownlinks"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "join_eui",
+            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
         "operationId": "GetLink",
@@ -966,6 +1020,82 @@
         ],
         "tags": [
           "AsEndDeviceRegistry"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push": {
+      "post": {
+        "operationId": "DownlinkQueuePush",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protobufEmpty"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3DownlinkQueueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace": {
+      "post": {
+        "operationId": "DownlinkQueueReplace",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protobufEmpty"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3DownlinkQueueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppAs"
         ]
       }
     },
@@ -5906,6 +6036,20 @@
       ],
       "default": "DOWNLINK_PATH_CONSTRAINT_NONE",
       "description": " - DOWNLINK_PATH_CONSTRAINT_NONE: Indicates that the gateway can be selected for downlink without constraints by the Network Server.\n - DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER: Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.\n - DOWNLINK_PATH_CONSTRAINT_NEVER: Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path."
+    },
+    "v3DownlinkQueueRequest": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "downlinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationDownlink"
+          }
+        }
+      }
     },
     "v3EndDevice": {
       "type": "object",

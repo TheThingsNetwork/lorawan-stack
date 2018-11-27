@@ -1110,13 +1110,13 @@ func (dst *MessagePayloadFormatters) SetFields(src *MessagePayloadFormatters, pa
 
 var _DownlinkQueueRequestFieldPaths = [...]string{
 	"downlinks",
-	"end_device",
-	"end_device.application_ids",
-	"end_device.application_ids.application_id",
-	"end_device.dev_addr",
-	"end_device.dev_eui",
-	"end_device.device_id",
-	"end_device.join_eui",
+	"end_device_ids",
+	"end_device_ids.application_ids",
+	"end_device_ids.application_ids.application_id",
+	"end_device_ids.dev_addr",
+	"end_device_ids.dev_eui",
+	"end_device_ids.device_id",
+	"end_device_ids.join_eui",
 }
 
 func (*DownlinkQueueRequest) FieldMaskPaths() []string {
@@ -1130,20 +1130,20 @@ func (dst *DownlinkQueueRequest) SetFields(src *DownlinkQueueRequest, paths ...s
 		switch path {
 		case "downlinks":
 			dst.Downlinks = src.Downlinks
-		case "end_device":
+		case "end_device_ids":
 			dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
-		case "end_device.application_ids":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.application_ids.application_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.dev_addr":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.dev_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.device_id":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device", paths)...)
-		case "end_device.join_eui":
-			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device", paths)...)
+		case "end_device_ids.application_ids":
+			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
+		case "end_device_ids.application_ids.application_id":
+			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
+		case "end_device_ids.dev_addr":
+			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
+		case "end_device_ids.dev_eui":
+			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
+		case "end_device_ids.device_id":
+			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
+		case "end_device_ids.join_eui":
+			dst.EndDeviceIdentifiers.SetFields(&src.EndDeviceIdentifiers, _pathsWithoutPrefix("end_device_ids", paths)...)
 		default:
 			panic(fmt.Errorf("invalid field path: '%s'", path))
 		}

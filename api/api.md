@@ -4500,7 +4500,7 @@ Downlink message from the network to the end device
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| end_device | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| end_device_ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | downlinks | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 
 
