@@ -37,8 +37,9 @@ type userStore struct {
 
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
+	query = query.Preload("Account")
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("ContactInfo").Select([]string{"users.*", "accounts.uid"})
+		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var userColumns []string
 	var notFoundPaths []string
@@ -64,7 +65,7 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(append(userColumns, "accounts.uid"))
+	return query.Select(userColumns)
 }
 
 func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.User, error) {
