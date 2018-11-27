@@ -89,7 +89,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	var fetch func(db *gorm.DB) error
 	res := new(ttnpb.AuthInfoResponse)
-	userFieldMask := &types.FieldMask{Paths: []string{"admin", "state"}}
+	userFieldMask := &types.FieldMask{Paths: []string{"admin", "state", "primary_email_address_validated_at"}}
 	clientFieldMask := &types.FieldMask{Paths: []string{"state"}}
 	var user *ttnpb.User
 	var userRights *ttnpb.Rights
@@ -181,6 +181,12 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	if user != nil {
 		if user.Admin {
 			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights.Implied()) // TODO: Use restricted Admin rights.
+		}
+
+		if user.PrimaryEmailAddressValidatedAt == nil {
+			// Go to profile page, edit basic settings (such as email), delete account.
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
+			warning.Add(ctx, "Restricted rights until email address validated")
 		}
 
 		switch user.State {
