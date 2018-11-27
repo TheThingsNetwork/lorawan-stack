@@ -84,6 +84,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			})
+			userIndex++
 		}
 		organizationCollaborators := randy.Intn((len(p.Organizations)/10)+1) + 1
 		for i := 0; i < organizationCollaborators; i++ {
@@ -92,6 +93,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			})
+			organizationIndex++
 		}
 	}
 	for _, client := range p.Clients {
@@ -103,6 +105,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			})
+			userIndex++
 		}
 		organizationCollaborators := randy.Intn((len(p.Organizations)/10)+1) + 1
 		for i := 0; i < organizationCollaborators; i++ {
@@ -111,6 +114,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			})
+			organizationIndex++
 		}
 	}
 	for _, gateway := range p.Gateways {
@@ -122,6 +126,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			})
+			userIndex++
 		}
 		organizationCollaborators := randy.Intn((len(p.Organizations)/10)+1) + 1
 		for i := 0; i < organizationCollaborators; i++ {
@@ -130,6 +135,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			})
+			organizationIndex++
 		}
 	}
 	for _, organization := range p.Organizations {
@@ -141,6 +147,7 @@ func NewPopulator(size int, seed int64) *Populator {
 				OrganizationOrUserIdentifiers: *ouID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
 			})
+			userIndex++
 		}
 	}
 	return p
