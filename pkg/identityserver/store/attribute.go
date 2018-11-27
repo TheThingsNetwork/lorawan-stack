@@ -18,11 +18,11 @@ package store
 type Attribute struct {
 	ID string `gorm:"type:UUID;primary_key;default:gen_random_uuid()"`
 
-	Key   string `gorm:"type:VARCHAR;unique_index:id"`
-	Value string `gorm:"type:VARCHAR"`
+	EntityID   string `gorm:"type:UUID;index:entity"`
+	EntityType string `gorm:"index:entity"`
 
-	EntityID   string `gorm:"type:UUID;unique_index:id"`
-	EntityType string `gorm:"unique_index:id"`
+	Key   string `gorm:"type:VARCHAR"`
+	Value string `gorm:"type:VARCHAR"`
 }
 
 func init() {

@@ -21,12 +21,13 @@ type APIKey struct {
 	Model
 
 	APIKeyID string `gorm:"type:VARCHAR;unique_index:id"`
-	Key      string `gorm:"type:VARCHAR;unique_index"`
-	Rights   Rights `gorm:"type:INT ARRAY"`
-	Name     string `gorm:"type:VARCHAR"`
 
-	EntityID   string `gorm:"type:UUID;unique_index:id"`
-	EntityType string `gorm:"type:VARCHAR;unique_index:id"`
+	Key    string `gorm:"type:VARCHAR"`
+	Rights Rights `gorm:"type:INT ARRAY"`
+	Name   string `gorm:"type:VARCHAR"`
+
+	EntityID   string `gorm:"type:UUID;index:entity"`
+	EntityType string `gorm:"type:VARCHAR;index:entity"`
 }
 
 func init() {

@@ -26,7 +26,7 @@ type Client struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ClientID    string        `gorm:"unique_index;type:VARCHAR(36)"`
+	ClientID    string        `gorm:"unique_index:id;type:VARCHAR(36)"`
 	Name        string        `gorm:"type:VARCHAR"`
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:client"`

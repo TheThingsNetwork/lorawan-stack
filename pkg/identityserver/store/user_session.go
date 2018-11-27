@@ -27,7 +27,7 @@ type UserSession struct {
 	User   *User
 	UserID string `gorm:"type:UUID;index"`
 
-	ExpiresAt *time.Time `gorm:"null;index"`
+	ExpiresAt *time.Time
 }
 
 func init() {
