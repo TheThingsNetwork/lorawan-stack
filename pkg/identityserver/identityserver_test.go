@@ -42,9 +42,9 @@ func init() {
 	population.Users[0].State = ttnpb.STATE_APPROVED
 }
 
-func userCreds() grpc.CallOption {
+func userCreds(idx int) grpc.CallOption {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIDs().GetUserID() == population.Users[0].GetUserID() {
+		if id.GetUserIDs().GetUserID() == population.Users[idx].GetUserID() {
 			return grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      "bearer",
 				AuthValue:     apiKeys[0].Key,
