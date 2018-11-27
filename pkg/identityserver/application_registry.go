@@ -173,8 +173,9 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 			return err
 		}
 		for _, app := range apps.Applications {
-			// TODO: Filter FieldMask by Rights
-			_ = appRights[unique.ID(ctx, app.ApplicationIdentifiers)]
+			if !appRights[unique.ID(ctx, app.ApplicationIdentifiers)].IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
+				app = app.PublicSafe()
+			}
 		}
 		return nil
 	})
@@ -189,7 +190,6 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		appStore := store.GetApplicationStore(db)
 		app, err = appStore.UpdateApplication(ctx, &req.Application, &req.FieldMask)

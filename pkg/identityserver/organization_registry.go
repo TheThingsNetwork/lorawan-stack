@@ -172,8 +172,9 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 			return err
 		}
 		for _, org := range orgs.Organizations {
-			// TODO: Filter FieldMask by Rights
-			_ = orgRights[unique.ID(ctx, org.OrganizationIdentifiers)]
+			if !orgRights[unique.ID(ctx, org.OrganizationIdentifiers)].IncludesAll(ttnpb.RIGHT_ORGANIZATION_INFO) {
+				org = org.PublicSafe()
+			}
 		}
 		return nil
 	})
@@ -188,7 +189,6 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		orgStore := store.GetOrganizationStore(db)
 		org, err = orgStore.UpdateOrganization(ctx, &req.Organization, &req.FieldMask)

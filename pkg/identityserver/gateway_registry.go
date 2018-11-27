@@ -173,8 +173,9 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			return err
 		}
 		for _, gtw := range gtws.Gateways {
-			// TODO: Filter FieldMask by Rights
-			_ = gtwRights[unique.ID(ctx, gtw.GatewayIdentifiers)]
+			if !gtwRights[unique.ID(ctx, gtw.GatewayIdentifiers)].IncludesAll(ttnpb.RIGHT_GATEWAY_INFO) {
+				gtw = gtw.PublicSafe()
+			}
 		}
 		return nil
 	})
@@ -189,7 +190,6 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtwStore := store.GetGatewayStore(db)
 		gtw, err = gtwStore.UpdateGateway(ctx, &req.Gateway, &req.FieldMask)

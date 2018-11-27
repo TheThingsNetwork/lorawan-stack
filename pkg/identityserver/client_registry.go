@@ -191,8 +191,9 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			return err
 		}
 		for _, cli := range clis.Clients {
-			// TODO: Filter FieldMask by Rights
-			_ = cliRights[unique.ID(ctx, cli.ClientIdentifiers)]
+			if !cliRights[unique.ID(ctx, cli.ClientIdentifiers)].IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
+				cli = cli.PublicSafe()
+			}
 		}
 		return nil
 	})
@@ -207,7 +208,6 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
 		cli, err = cliStore.UpdateClient(ctx, &req.Client, &req.FieldMask)
