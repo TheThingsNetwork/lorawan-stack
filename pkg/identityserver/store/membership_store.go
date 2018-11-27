@@ -68,49 +68,6 @@ func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.Organi
 	return identifierRights(s.db, entityRightsForMemberships(memberships))
 }
 
-func (s *membershipStore) FindAllMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
-	account, err := findAccount(ctx, s.db, id)
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
-		return nil, err
-	}
-	memberships, err := reduceAccountMemberships(s.db, account, entityType, "")
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
-		return nil, err
-	}
-	return identifierRights(s.db, entityRightsForMemberships(memberships))
-}
-
-func (s *membershipStore) FindMemberRightsOn(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
-	account, err := findAccount(ctx, s.db, id)
-	if err != nil {
-		return nil, err
-	}
-	entity, err := findEntity(ctx, s.db, entityID, "id")
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
-		return nil, err
-	}
-	memberships, err := reduceAccountMemberships(s.db, account, entityTypeForID(entityID), entity.PrimaryKey())
-	if err != nil {
-		return nil, err
-	}
-	for _, membership := range memberships {
-		if membership.EntityID == entity.PrimaryKey() {
-			rights := ttnpb.Rights(membership.Rights)
-			return &rights, nil
-		}
-	}
-	return &ttnpb.Rights{}, nil
-}
-
 var errAccountType = errors.DefineInvalidArgument(
 	"account_type",
 	"account of type `{account_type}` can not collaborate on `{entity_type}`",

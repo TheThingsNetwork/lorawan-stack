@@ -57,26 +57,31 @@ func TestMembershipStore(t *testing.T) {
 			Name        string
 			Identifiers *ttnpb.EntityIdentifiers
 			Rights      []ttnpb.Right
+			EntityType  string
 		}{
 			{
 				Name:        "User-Application",
 				Identifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC},
+				EntityType:  "application",
 			},
 			{
 				Name:        "User-Client",
 				Identifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				EntityType:  "client",
 			},
 			{
 				Name:        "User-Gateway",
 				Identifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC},
+				EntityType:  "gateway",
 			},
 			{
 				Name:        "User-Organization",
 				Identifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+				EntityType:  "organization",
 			},
 		} {
 			t.Run(tt.Name, func(t *testing.T) {
@@ -89,15 +94,20 @@ func TestMembershipStore(t *testing.T) {
 				)
 				a.So(err, should.BeNil)
 
-				rights, err := store.FindMemberRightsOn(ctx, usrIDs, tt.Identifiers)
-				a.So(err, should.BeNil)
-				a.So(rights.Sorted().GetRights(), should.Resemble, ttnpb.RightsFrom(tt.Rights...).Implied().Sorted().GetRights())
-
 				members, err := store.FindMembers(ctx, tt.Identifiers)
 				a.So(err, should.BeNil)
 				if a.So(members, should.HaveLength, 1) {
 					for ouid, rights := range members {
 						a.So(ouid, should.Resemble, usrIDs)
+						a.So(rights.GetRights(), should.Resemble, tt.Rights)
+					}
+				}
+
+				memberRights, err := store.FindMemberRights(ctx, usrIDs, tt.EntityType)
+				a.So(err, should.BeNil)
+				if a.So(memberRights, should.HaveLength, 1) {
+					for eid, rights := range memberRights {
+						a.So(eid, should.Resemble, tt.Identifiers)
 						a.So(rights.GetRights(), should.Resemble, tt.Rights)
 					}
 				}
@@ -108,21 +118,25 @@ func TestMembershipStore(t *testing.T) {
 			Name        string
 			Identifiers *ttnpb.EntityIdentifiers
 			Rights      []ttnpb.Right
+			EntityType  string
 		}{
 			{
 				Name:        "Organization-Application",
 				Identifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+				EntityType:  "application",
 			},
 			{
 				Name:        "Organization-Client",
 				Identifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				EntityType:  "client",
 			},
 			{
 				Name:        "Organization-Gateway",
 				Identifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}.EntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
+				EntityType:  "gateway",
 			},
 		} {
 			t.Run(tt.Name, func(t *testing.T) {
@@ -135,10 +149,6 @@ func TestMembershipStore(t *testing.T) {
 				)
 				a.So(err, should.BeNil)
 
-				rights, err := store.FindMemberRightsOn(ctx, orgIDs, tt.Identifiers)
-				a.So(err, should.BeNil)
-				a.So(rights.GetRights(), should.Resemble, tt.Rights)
-
 				members, err := store.FindMembers(ctx, tt.Identifiers)
 				a.So(err, should.BeNil)
 				if a.So(members, should.HaveLength, 2) {
@@ -150,51 +160,16 @@ func TestMembershipStore(t *testing.T) {
 						a.So(rights.GetRights(), should.Resemble, tt.Rights)
 					}
 				}
+
+				memberRights, err := store.FindMemberRights(ctx, orgIDs, tt.EntityType)
+				a.So(err, should.BeNil)
+				if a.So(memberRights, should.HaveLength, 1) {
+					for eid, rights := range memberRights {
+						a.So(eid, should.Resemble, tt.Identifiers)
+						a.So(rights.GetRights(), should.Resemble, tt.Rights)
+					}
+				}
 			})
-		}
-
-		a := assertions.New(t)
-
-		memberRights, err := store.FindMemberRights(ctx, usrIDs, "")
-		a.So(err, should.BeNil)
-
-		for id, rights := range memberRights {
-			if id.GetApplicationIDs() != nil {
-				a.So(rights.GetRights(), should.HaveLength, 1)
-				a.So(rights.IncludesAll(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC), should.BeTrue)
-			}
-			if id.GetGatewayIDs() != nil {
-				a.So(rights.GetRights(), should.HaveLength, 1)
-				a.So(rights.IncludesAll(ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC), should.BeTrue)
-			}
-		}
-
-		memberRights, err = store.FindMemberRights(ctx, orgIDs, "")
-		a.So(err, should.BeNil)
-
-		for id, rights := range memberRights {
-			if id.GetApplicationIDs() != nil {
-				a.So(rights.GetRights(), should.HaveLength, 1)
-				a.So(rights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
-			}
-			if id.GetGatewayIDs() != nil {
-				a.So(rights.GetRights(), should.HaveLength, 1)
-				a.So(rights.IncludesAll(ttnpb.RIGHT_GATEWAY_INFO), should.BeTrue)
-			}
-		}
-
-		memberRights, err = store.FindAllMemberRights(ctx, usrIDs, "")
-		a.So(err, should.BeNil)
-
-		for id, rights := range memberRights {
-			if id.GetApplicationIDs() != nil {
-				a.So(rights.GetRights(), should.HaveLength, 2)
-				a.So(rights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC), should.BeTrue)
-			}
-			if id.GetGatewayIDs() != nil {
-				a.So(rights.GetRights(), should.HaveLength, 2)
-				a.So(rights.IncludesAll(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC), should.BeTrue)
-			}
 		}
 
 		// TODO: Try with entities that don't exist
