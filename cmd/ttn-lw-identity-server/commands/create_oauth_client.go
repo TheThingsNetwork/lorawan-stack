@@ -59,14 +59,23 @@ var (
 				return err
 			}
 			if secret == "" {
-				secret, err = auth.GenerateKey(ctx)
+				noSecret, err := cmd.Flags().GetBool("no-secret")
 				if err != nil {
 					return err
 				}
+				if !noSecret {
+					secret, err = auth.GenerateKey(ctx)
+					if err != nil {
+						return err
+					}
+				}
 			}
-			hashedSecret, err := auth.Hash(secret)
-			if err != nil {
-				return err
+			var hashedSecret auth.Password
+			if secret != "" {
+				hashedSecret, err = auth.Hash(secret)
+				if err != nil {
+					return err
+				}
 			}
 			redirectURIs, err := cmd.Flags().GetStringSlice("redirect-uri")
 			if err != nil {
@@ -129,6 +138,7 @@ func init() {
 	createOAuthClient.Flags().String("name", "", "Name of the OAuth client")
 	createOAuthClient.Flags().String("owner", "", "Owner of the OAuth client")
 	createOAuthClient.Flags().String("secret", "", "Secret of the OAuth client")
+	createOAuthClient.Flags().Bool("no-secret", false, "Do not generate a secret for the OAuth client")
 	createOAuthClient.Flags().StringSlice("redirect-uri", []string{}, "Redirect URIs of the OAuth client")
 	createOAuthClient.Flags().Bool("authorized", true, "Mark OAuth client as pre-authorized")
 	createOAuthClient.Flags().Bool("endorsed", true, "Mark OAuth client as endorsed ")

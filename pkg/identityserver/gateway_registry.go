@@ -78,11 +78,16 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
 	var gtwRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		rights, ok := rights.FromContext(ctx)
-		if !ok {
-			return &ttnpb.Gateways{}, nil
+		callerRights, err := is.getRights(ctx)
+		if err != nil {
+			return nil, err
 		}
-		gtwRights = rights.GatewayRights
+		gtwRights = make(map[string]*ttnpb.Rights, len(callerRights))
+		for ids, rights := range callerRights {
+			if ids := ids.GetGatewayIDs(); ids != nil {
+				gtwRights[unique.ID(ctx, ids)] = rights
+			}
+		}
 		if len(gtwRights) == 0 {
 			return &ttnpb.Gateways{}, nil
 		}

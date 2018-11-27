@@ -78,11 +78,16 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (apps *ttnpb.Applications, err error) {
 	var appRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		rights, ok := rights.FromContext(ctx)
-		if !ok {
-			return &ttnpb.Applications{}, nil
+		callerRights, err := is.getRights(ctx)
+		if err != nil {
+			return nil, err
 		}
-		appRights = rights.ApplicationRights
+		appRights = make(map[string]*ttnpb.Rights, len(callerRights))
+		for ids, rights := range callerRights {
+			if ids := ids.GetApplicationIDs(); ids != nil {
+				appRights[unique.ID(ctx, ids)] = rights
+			}
+		}
 		if len(appRights) == 0 {
 			return &ttnpb.Applications{}, nil
 		}

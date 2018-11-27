@@ -40,6 +40,9 @@ func (cli osinClient) GetSecret() string {
 }
 
 func (cli osinClient) ClientSecretMatches(secret string) bool {
+	if cli.Secret == "" {
+		return secret == ""
+	}
 	valid, _ := auth.Password(cli.Secret).Validate(secret)
 	return valid
 }

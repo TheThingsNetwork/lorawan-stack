@@ -78,11 +78,16 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
 	var orgRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		rights, ok := rights.FromContext(ctx)
-		if !ok {
-			return &ttnpb.Organizations{}, nil
+		callerRights, err := is.getRights(ctx)
+		if err != nil {
+			return nil, err
 		}
-		orgRights = rights.OrganizationRights
+		orgRights = make(map[string]*ttnpb.Rights, len(callerRights))
+		for ids, rights := range callerRights {
+			if ids := ids.GetOrganizationIDs(); ids != nil {
+				orgRights[unique.ID(ctx, ids)] = rights
+			}
+		}
 		if len(orgRights) == 0 {
 			return &ttnpb.Organizations{}, nil
 		}

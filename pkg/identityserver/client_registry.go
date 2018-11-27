@@ -95,11 +95,16 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
 	var cliRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		rights, ok := rights.FromContext(ctx)
-		if !ok {
-			return &ttnpb.Clients{}, nil
+		callerRights, err := is.getRights(ctx)
+		if err != nil {
+			return nil, err
 		}
-		cliRights = rights.ClientRights
+		cliRights = make(map[string]*ttnpb.Rights, len(callerRights))
+		for ids, rights := range callerRights {
+			if ids := ids.GetClientIDs(); ids != nil {
+				cliRights[unique.ID(ctx, ids)] = rights
+			}
+		}
 		if len(cliRights) == 0 {
 			return &ttnpb.Clients{}, nil
 		}
