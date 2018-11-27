@@ -68,7 +68,7 @@ var (
 		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
 
-	timeout = 50 * test.Delay
+	timeout = 100 * test.Delay
 
 	deviceRepositoryData = map[string][]byte{
 		"brands.yml": []byte(`version: '3'
