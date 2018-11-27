@@ -17,8 +17,6 @@ import { createLogic } from 'redux-logic'
 import api from '../api'
 import * as applications from '../actions/applications'
 
-const PAGE_SIZE = 3
-
 const getApplicationsLogic = createLogic({
   type: [
     applications.GET_APPS_LIST,
@@ -30,7 +28,6 @@ const getApplicationsLogic = createLogic({
   latest: true,
   async process ({ getState, action }, dispatch, done) {
     const { filters } = action
-    filters.pageSize = PAGE_SIZE
 
     try {
       const data = filters.query
