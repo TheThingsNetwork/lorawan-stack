@@ -25,13 +25,12 @@ type Application struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ApplicationID string        `gorm:"unique_index:id;type:VARCHAR(36);not null"`
-	Name          string        `gorm:"type:VARCHAR"`
-	Description   string        `gorm:"type:TEXT"`
-	Attributes    []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:application"`
-	ContactInfo   []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:application"`
-	APIKeys       []APIKey      `gorm:"polymorphic:Entity;polymorphic_value:application"`
-	Memberships   []Membership  `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	ApplicationID string       `gorm:"unique_index:id;type:VARCHAR(36);not null"`
+	Name          string       `gorm:"type:VARCHAR"`
+	Description   string       `gorm:"type:TEXT"`
+	Attributes    []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	APIKeys       []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	Memberships   []Membership `gorm:"polymorphic:Entity;polymorphic_value:application"`
 	// END common fields
 }
 
@@ -44,7 +43,6 @@ var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
 	nameField:        func(pb *ttnpb.Application, app *Application) { pb.Name = app.Name },
 	descriptionField: func(pb *ttnpb.Application, app *Application) { pb.Description = app.Description },
 	attributesField:  func(pb *ttnpb.Application, app *Application) { pb.Attributes = attributes(app.Attributes).toMap() },
-	contactInfoField: func(pb *ttnpb.Application, app *Application) { pb.ContactInfo = contactInfos(app.ContactInfo).toPB() },
 }
 
 // functions to set fields from the application proto into the application model.
@@ -53,9 +51,6 @@ var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
 	descriptionField: func(app *Application, pb *ttnpb.Application) { app.Description = pb.Description },
 	attributesField: func(app *Application, pb *ttnpb.Application) {
 		app.Attributes = attributes(app.Attributes).updateFromMap(pb.Attributes)
-	},
-	contactInfoField: func(app *Application, pb *ttnpb.Application) {
-		app.ContactInfo = contactInfos(app.ContactInfo).updateFromPB(pb.ContactInfo)
 	},
 }
 
@@ -74,7 +69,6 @@ func init() {
 var applicationColumnNames = map[string]string{
 	"ids.application_id": "application_id",
 	attributesField:      "",
-	contactInfoField:     "",
 	nameField:            nameField,
 	descriptionField:     descriptionField,
 }

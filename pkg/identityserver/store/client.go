@@ -26,12 +26,11 @@ type Client struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ClientID    string        `gorm:"unique_index:id;type:VARCHAR(36);not null"`
-	Name        string        `gorm:"type:VARCHAR"`
-	Description string        `gorm:"type:TEXT"`
-	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:client"`
-	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:client"`
-	Memberships []Membership  `gorm:"polymorphic:Entity;polymorphic_value:client"`
+	ClientID    string       `gorm:"unique_index:id;type:VARCHAR(36);not null"`
+	Name        string       `gorm:"type:VARCHAR"`
+	Description string       `gorm:"type:TEXT"`
+	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:client"`
+	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:client"`
 	// END common fields
 
 	ClientSecret string         `gorm:"type:VARCHAR"`
@@ -55,7 +54,6 @@ var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
 	nameField:              func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
 	descriptionField:       func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
 	attributesField:        func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
-	contactInfoField:       func(pb *ttnpb.Client, cli *Client) { pb.ContactInfo = contactInfos(cli.ContactInfo).toPB() },
 	secretField:            func(pb *ttnpb.Client, cli *Client) { pb.Secret = cli.ClientSecret },
 	redirectURIsField:      func(pb *ttnpb.Client, cli *Client) { pb.RedirectURIs = cli.RedirectURIs },
 	stateField:             func(pb *ttnpb.Client, cli *Client) { pb.State = ttnpb.State(cli.State) },
@@ -71,9 +69,6 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 	descriptionField: func(cli *Client, pb *ttnpb.Client) { cli.Description = pb.Description },
 	attributesField: func(cli *Client, pb *ttnpb.Client) {
 		cli.Attributes = attributes(cli.Attributes).updateFromMap(pb.Attributes)
-	},
-	contactInfoField: func(cli *Client, pb *ttnpb.Client) {
-		cli.ContactInfo = contactInfos(cli.ContactInfo).updateFromPB(pb.ContactInfo)
 	},
 	secretField:            func(cli *Client, pb *ttnpb.Client) { cli.ClientSecret = pb.Secret },
 	redirectURIsField:      func(cli *Client, pb *ttnpb.Client) { cli.RedirectURIs = pq.StringArray(pb.RedirectURIs) },
@@ -99,7 +94,6 @@ func init() {
 var clientColumnNames = map[string]string{
 	"ids.client_id":        "client_id",
 	attributesField:        "Attributes",
-	contactInfoField:       "ContactInfo",
 	nameField:              nameField,
 	descriptionField:       descriptionField,
 	secretField:            "client_secret",

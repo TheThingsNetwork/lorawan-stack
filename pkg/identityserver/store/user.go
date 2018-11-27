@@ -30,11 +30,10 @@ type User struct {
 	Account Account `gorm:"polymorphic:Account;polymorphic_value:user"`
 
 	// BEGIN common fields
-	Name        string        `gorm:"type:VARCHAR"`
-	Description string        `gorm:"type:TEXT"`
-	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:user"`
-	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:user"`
-	APIKeys     []APIKey      `gorm:"polymorphic:Entity;polymorphic_value:user"`
+	Name        string      `gorm:"type:VARCHAR"`
+	Description string      `gorm:"type:TEXT"`
+	Attributes  []Attribute `gorm:"polymorphic:Entity;polymorphic_value:user"`
+	APIKeys     []APIKey    `gorm:"polymorphic:Entity;polymorphic_value:user"`
 	// END common fields
 
 	Sessions []*UserSession
@@ -73,7 +72,6 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 	nameField:                  func(pb *ttnpb.User, usr *User) { pb.Name = usr.Name },
 	descriptionField:           func(pb *ttnpb.User, usr *User) { pb.Description = usr.Description },
 	attributesField:            func(pb *ttnpb.User, usr *User) { pb.Attributes = attributes(usr.Attributes).toMap() },
-	contactInfoField:           func(pb *ttnpb.User, usr *User) { pb.ContactInfo = contactInfos(usr.ContactInfo).toPB() },
 	primaryEmailAddressField:   func(pb *ttnpb.User, usr *User) { pb.PrimaryEmailAddress = usr.PrimaryEmailAddress },
 	passwordField:              func(pb *ttnpb.User, usr *User) { pb.Password = usr.Password },
 	passwordUpdatedAtField:     func(pb *ttnpb.User, usr *User) { pb.PasswordUpdatedAt = cleanTime(usr.PasswordUpdatedAt) },
@@ -104,9 +102,6 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	descriptionField: func(usr *User, pb *ttnpb.User) { usr.Description = pb.Description },
 	attributesField: func(usr *User, pb *ttnpb.User) {
 		usr.Attributes = attributes(usr.Attributes).updateFromMap(pb.Attributes)
-	},
-	contactInfoField: func(usr *User, pb *ttnpb.User) {
-		usr.ContactInfo = contactInfos(usr.ContactInfo).updateFromPB(pb.ContactInfo)
 	},
 	primaryEmailAddressField:   func(usr *User, pb *ttnpb.User) { usr.PrimaryEmailAddress = pb.PrimaryEmailAddress },
 	passwordField:              func(usr *User, pb *ttnpb.User) { usr.Password = pb.Password },
@@ -146,7 +141,6 @@ func init() {
 // fieldmask path to column name in users table.
 var userColumnNames = map[string]string{
 	attributesField:                 "",
-	contactInfoField:                "",
 	nameField:                       nameField,
 	descriptionField:                descriptionField,
 	primaryEmailAddressField:        primaryEmailAddressField,
@@ -188,7 +182,6 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []s
 			if columnName != "" {
 				columns = append(columns, columnName)
 			}
-			// TODO: if changing email, then also set EmailValidatedAt=false
 			continue
 		}
 	}

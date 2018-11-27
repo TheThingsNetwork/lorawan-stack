@@ -38,7 +38,7 @@ type applicationStore struct {
 // selectApplicationFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("ContactInfo")
+		return query.Preload("Attributes")
 	}
 	var applicationColumns []string
 	var notFoundPaths []string
@@ -46,8 +46,6 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 		switch path {
 		case attributesField:
 			query = query.Preload("Attributes")
-		case contactInfoField:
-			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := applicationColumnNames[path]; ok && column != "" {
 				applicationColumns = append(applicationColumns, column)
@@ -136,7 +134,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldContactInfo := appModel.Attributes, appModel.ContactInfo
+	oldAttributes := appModel.Attributes
 	columns := appModel.fromPB(app, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&appModel).Select(columns).Updates(&appModel)
@@ -146,12 +144,6 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	}
 	if !reflect.DeepEqual(oldAttributes, appModel.Attributes) {
 		err = replaceAttributes(s.db, "application", appModel.ID, oldAttributes, appModel.Attributes)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if !reflect.DeepEqual(oldContactInfo, appModel.ContactInfo) {
-		err = replaceContactInfos(s.db, "application", appModel.ID, oldContactInfo, appModel.ContactInfo)
 		if err != nil {
 			return nil, err
 		}

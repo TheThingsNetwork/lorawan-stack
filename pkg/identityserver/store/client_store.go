@@ -38,7 +38,7 @@ type clientStore struct {
 // selectClientFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("ContactInfo")
+		return query.Preload("Attributes")
 	}
 	var clientColumns []string
 	var notFoundPaths []string
@@ -46,8 +46,6 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 		switch path {
 		case attributesField:
 			query = query.Preload("Attributes")
-		case contactInfoField:
-			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := clientColumnNames[path]; ok && column != "" {
 				clientColumns = append(clientColumns, column)
@@ -136,7 +134,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldContactInfo := cliModel.Attributes, cliModel.ContactInfo
+	oldAttributes := cliModel.Attributes
 	columns := cliModel.fromPB(cli, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&cliModel).Select(columns).Updates(&cliModel)
@@ -146,12 +144,6 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	}
 	if !reflect.DeepEqual(oldAttributes, cliModel.Attributes) {
 		err = replaceAttributes(s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if !reflect.DeepEqual(oldContactInfo, cliModel.ContactInfo) {
-		err = replaceContactInfos(s.db, "client", cliModel.ID, oldContactInfo, cliModel.ContactInfo)
 		if err != nil {
 			return nil, err
 		}

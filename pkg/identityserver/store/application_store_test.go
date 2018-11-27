@@ -31,10 +31,8 @@ func TestApplicationStore(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	now := time.Now()
-
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Application{}, &Attribute{}, &ContactInfo{})
+		db.AutoMigrate(&Application{}, &Attribute{})
 		store := GetApplicationStore(db)
 
 		created, err := store.CreateApplication(ctx, &ttnpb.Application{
@@ -46,27 +44,21 @@ func TestApplicationStore(t *testing.T) {
 				"bar": "baz",
 				"baz": "qux",
 			},
-			ContactInfo: []*ttnpb.ContactInfo{
-				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
-				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
-			},
 		})
 		a.So(err, should.BeNil)
 		a.So(created.ApplicationID, should.Equal, "foo")
 		a.So(created.Name, should.Equal, "Foo Application")
 		a.So(created.Description, should.Equal, "The Amazing Foo Application")
 		a.So(created.Attributes, should.HaveLength, 3)
-		a.So(created.ContactInfo, should.HaveLength, 2)
 		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
-		got, err := store.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, &types.FieldMask{Paths: []string{"name", "attributes", "contact_info"}})
+		got, err := store.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, &types.FieldMask{Paths: []string{"name", "attributes"}})
 		a.So(err, should.BeNil)
 		a.So(got.ApplicationID, should.Equal, "foo")
 		a.So(got.Name, should.Equal, "Foo Application")
 		a.So(got.Description, should.BeEmpty)
 		a.So(got.Attributes, should.HaveLength, 3)
-		a.So(got.ContactInfo, should.HaveLength, 2)
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 
@@ -86,17 +78,10 @@ func TestApplicationStore(t *testing.T) {
 				"baz": "baz",
 				"qux": "foo",
 			},
-			ContactInfo: []*ttnpb.ContactInfo{
-				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "bar@example.com"},
-				{ContactType: ttnpb.CONTACT_TYPE_ABUSE, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
-				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
-				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "other_admin@example.com"},
-			},
-		}, &types.FieldMask{Paths: []string{"description", "attributes", "contact_info"}})
+		}, &types.FieldMask{Paths: []string{"description", "attributes"}})
 		a.So(err, should.BeNil)
 		a.So(updated.Description, should.Equal, "The Amazing Foobar Application")
 		a.So(updated.Attributes, should.HaveLength, 3)
-		a.So(updated.ContactInfo, should.HaveLength, 4)
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
@@ -113,7 +98,6 @@ func TestApplicationStore(t *testing.T) {
 		a.So(got.Name, should.Equal, created.Name)
 		a.So(got.Description, should.Equal, updated.Description)
 		a.So(got.Attributes, should.Resemble, updated.Attributes)
-		a.So(got.ContactInfo, should.HaveLength, len(updated.ContactInfo))
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 

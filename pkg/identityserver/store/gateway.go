@@ -30,13 +30,12 @@ type Gateway struct {
 	GatewayEUI *EUI64 `gorm:"unique_index:eui;type:VARCHAR(16);column:gateway_eui"`
 
 	// BEGIN common fields
-	GatewayID   string        `gorm:"unique_index:id;type:VARCHAR(36);not null"`
-	Name        string        `gorm:"type:VARCHAR"`
-	Description string        `gorm:"type:TEXT"`
-	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
-	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
-	APIKeys     []APIKey      `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
-	Memberships []Membership  `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
+	GatewayID   string       `gorm:"unique_index:id;type:VARCHAR(36);not null"`
+	Name        string       `gorm:"type:VARCHAR"`
+	Description string       `gorm:"type:TEXT"`
+	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
+	APIKeys     []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
+	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 	// END common fields
 
 	BrandID         string `gorm:"type:VARCHAR"`
@@ -71,7 +70,6 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	nameField:                 func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
 	descriptionField:          func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
 	attributesField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
-	contactInfoField:          func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ContactInfo = contactInfos(gtw.ContactInfo).toPB() },
 	brandIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.BrandID = gtw.BrandID },
 	modelIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelID = gtw.ModelID },
 	hardwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.HardwareVersion = gtw.HardwareVersion },
@@ -103,9 +101,6 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
 	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
-	},
-	contactInfoField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		gtw.ContactInfo = contactInfos(gtw.ContactInfo).updateFromPB(pb.ContactInfo)
 	},
 	brandIDField:                func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandID },
 	modelIDField:                func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
@@ -150,7 +145,6 @@ var gatewayColumnNames = map[string]string{
 	"ids.gateway_id":            "gateway_id",
 	"ids.eui":                   "gateway_eui",
 	attributesField:             "",
-	contactInfoField:            "",
 	nameField:                   nameField,
 	descriptionField:            descriptionField,
 	gatewayServerAddressField:   gatewayServerAddressField,

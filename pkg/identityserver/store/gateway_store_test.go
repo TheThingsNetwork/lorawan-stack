@@ -32,10 +32,8 @@ func TestGatewayStore(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	now := time.Now()
-
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Gateway{}, &GatewayAntenna{}, &Attribute{}, &ContactInfo{})
+		db.AutoMigrate(&Gateway{}, &GatewayAntenna{}, &Attribute{})
 		store := GetGatewayStore(db)
 
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
@@ -50,10 +48,6 @@ func TestGatewayStore(t *testing.T) {
 				"bar": "baz",
 				"baz": "qux",
 			},
-			ContactInfo: []*ttnpb.ContactInfo{
-				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
-				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
-			},
 			Antennas: []ttnpb.GatewayAntenna{
 				{Gain: 3, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}},
 			},
@@ -63,20 +57,18 @@ func TestGatewayStore(t *testing.T) {
 		a.So(created.Name, should.Equal, "Foo Gateway")
 		a.So(created.Description, should.Equal, "The Amazing Foo Gateway")
 		a.So(created.Attributes, should.HaveLength, 3)
-		a.So(created.ContactInfo, should.HaveLength, 2)
 		if a.So(created.Antennas, should.HaveLength, 1) {
 			a.So(created.Antennas[0].Gain, should.Equal, 3)
 		}
 		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "contact_info"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 		a.So(err, should.BeNil)
 		a.So(got.GatewayID, should.Equal, "foo")
 		a.So(got.Name, should.Equal, "Foo Gateway")
 		a.So(got.Description, should.BeEmpty)
 		a.So(got.Attributes, should.HaveLength, 3)
-		a.So(got.ContactInfo, should.HaveLength, 2)
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 
@@ -100,21 +92,14 @@ func TestGatewayStore(t *testing.T) {
 				"baz": "baz",
 				"qux": "foo",
 			},
-			ContactInfo: []*ttnpb.ContactInfo{
-				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "bar@example.com"},
-				{ContactType: ttnpb.CONTACT_TYPE_ABUSE, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
-				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
-				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "other_admin@example.com"},
-			},
 			Antennas: []ttnpb.GatewayAntenna{
 				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
 				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "east"}},
 			},
-		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "contact_info", "antennas"}})
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas"}})
 		a.So(err, should.BeNil)
 		a.So(updated.Description, should.Equal, "The Amazing Foobar Gateway")
 		a.So(updated.Attributes, should.HaveLength, 3)
-		a.So(updated.ContactInfo, should.HaveLength, 4)
 		if a.So(updated.Antennas, should.HaveLength, 2) {
 			a.So(updated.Antennas[0].Gain, should.Equal, 6)
 			a.So(updated.Antennas[0].Attributes, should.HaveLength, 1)
@@ -137,7 +122,6 @@ func TestGatewayStore(t *testing.T) {
 		a.So(got.Name, should.Equal, created.Name)
 		a.So(got.Description, should.Equal, updated.Description)
 		a.So(got.Attributes, should.Resemble, updated.Attributes)
-		a.So(got.ContactInfo, should.HaveLength, len(updated.ContactInfo))
 		a.So(got.Antennas, should.HaveLength, len(updated.Antennas))
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)

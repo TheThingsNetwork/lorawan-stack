@@ -39,7 +39,7 @@ type organizationStore struct {
 func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	query = query.Preload("Account")
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("ContactInfo")
+		return query.Preload("Attributes")
 	}
 	var organizationColumns []string
 	var notFoundPaths []string
@@ -52,8 +52,6 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *ty
 			// accounts.uid is always selected
 		case attributesField:
 			query = query.Preload("Attributes")
-		case contactInfoField:
-			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := organizationColumnNames[path]; ok && column != "" {
 				organizationColumns = append(organizationColumns, column)
@@ -142,7 +140,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldContactInfo := orgModel.Attributes, orgModel.ContactInfo
+	oldAttributes := orgModel.Attributes
 	columns := orgModel.fromPB(org, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&orgModel).Select(columns).Updates(&orgModel)
@@ -152,12 +150,6 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	}
 	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
 		err = replaceAttributes(s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if !reflect.DeepEqual(oldContactInfo, orgModel.ContactInfo) {
-		err = replaceContactInfos(s.db, "organization", orgModel.ID, oldContactInfo, orgModel.ContactInfo)
 		if err != nil {
 			return nil, err
 		}

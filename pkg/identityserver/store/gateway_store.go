@@ -38,7 +38,7 @@ type gatewayStore struct {
 // selectGatewayFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("ContactInfo").Preload("Antennas")
+		return query.Preload("Attributes").Preload("Antennas")
 	}
 	var gatewayColumns []string
 	var notFoundPaths []string
@@ -46,8 +46,6 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 		switch path {
 		case attributesField:
 			query = query.Preload("Attributes")
-		case contactInfoField:
-			query = query.Preload("ContactInfo")
 		case antennasField:
 			query = query.Preload("Antennas")
 		default:
@@ -141,7 +139,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldContactInfo, oldAntennas := gtwModel.Attributes, gtwModel.ContactInfo, gtwModel.Antennas
+	oldAttributes, oldAntennas := gtwModel.Attributes, gtwModel.Antennas
 	columns := gtwModel.fromPB(gtw, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&gtwModel).Select(columns).Updates(&gtwModel)
@@ -151,12 +149,6 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	}
 	if !reflect.DeepEqual(oldAttributes, gtwModel.Attributes) {
 		err = replaceAttributes(s.db, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if !reflect.DeepEqual(oldContactInfo, gtwModel.ContactInfo) {
-		err = replaceContactInfos(s.db, "gateway", gtwModel.ID, oldContactInfo, gtwModel.ContactInfo)
 		if err != nil {
 			return nil, err
 		}

@@ -29,12 +29,11 @@ type Organization struct {
 	Account Account `gorm:"polymorphic:Account;polymorphic_value:organization"`
 
 	// BEGIN common fields
-	Name        string        `gorm:"type:VARCHAR"`
-	Description string        `gorm:"type:TEXT"`
-	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:organization"`
-	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:organization"`
-	APIKeys     []APIKey      `gorm:"polymorphic:Entity;polymorphic_value:organization"`
-	Memberships []Membership  `gorm:"polymorphic:Entity;polymorphic_value:organization"`
+	Name        string       `gorm:"type:VARCHAR"`
+	Description string       `gorm:"type:TEXT"`
+	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:organization"`
+	APIKeys     []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:organization"`
+	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	// END common fields
 }
 
@@ -53,7 +52,6 @@ var organizationPBSetters = map[string]func(*ttnpb.Organization, *Organization){
 	nameField:        func(pb *ttnpb.Organization, org *Organization) { pb.Name = org.Name },
 	descriptionField: func(pb *ttnpb.Organization, org *Organization) { pb.Description = org.Description },
 	attributesField:  func(pb *ttnpb.Organization, org *Organization) { pb.Attributes = attributes(org.Attributes).toMap() },
-	contactInfoField: func(pb *ttnpb.Organization, org *Organization) { pb.ContactInfo = contactInfos(org.ContactInfo).toPB() },
 }
 
 // functions to set fields from the organization proto into the organization model.
@@ -62,9 +60,6 @@ var organizationModelSetters = map[string]func(*Organization, *ttnpb.Organizatio
 	descriptionField: func(org *Organization, pb *ttnpb.Organization) { org.Description = pb.Description },
 	attributesField: func(org *Organization, pb *ttnpb.Organization) {
 		org.Attributes = attributes(org.Attributes).updateFromMap(pb.Attributes)
-	},
-	contactInfoField: func(org *Organization, pb *ttnpb.Organization) {
-		org.ContactInfo = contactInfos(org.ContactInfo).updateFromPB(pb.ContactInfo)
 	},
 }
 
@@ -82,7 +77,6 @@ func init() {
 // fieldmask path to column name in organizations table.
 var organizationColumnNames = map[string]string{
 	attributesField:  "",
-	contactInfoField: "",
 	nameField:        nameField,
 	descriptionField: descriptionField,
 }
