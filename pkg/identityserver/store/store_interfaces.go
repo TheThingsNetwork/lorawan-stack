@@ -168,3 +168,9 @@ type InvitationStore interface {
 type EntitySearch interface {
 	FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]*ttnpb.EntityIdentifiers, error)
 }
+
+// ContactInfoStore interface for contact info validation.
+type ContactInfoStore interface {
+	GetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error)
+	SetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers, contactInfo []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)
+}

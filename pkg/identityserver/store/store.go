@@ -133,12 +133,7 @@ func findEntity(ctx context.Context, db *gorm.DB, entityID *ttnpb.EntityIdentifi
 	query := db.Scopes(withContext(ctx), withID(entityID))
 	entity := modelForID(entityID)
 	if len(fields) == 1 && fields[0] == "id" {
-		switch entity.(type) {
-		case *Organization:
-			fields[0] = "organizations.id"
-		case *User:
-			fields[0] = "users.id"
-		}
+		fields[0] = entityTypeForID(entityID) + "s.id"
 	}
 	if len(fields) > 0 {
 		query = query.Select(fields)

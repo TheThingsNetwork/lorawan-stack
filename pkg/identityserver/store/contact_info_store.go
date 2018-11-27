@@ -14,55 +14,130 @@
 
 package store
 
-import "github.com/jinzhu/gorm"
+import (
+	"context"
 
-func replaceContactInfos(db *gorm.DB, entityType, entityUUID string, old []ContactInfo, new []ContactInfo) (err error) {
-	oldByUUID := make(map[string]ContactInfo, len(old))
-	for _, info := range old {
-		oldByUUID[info.ID] = info
+	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+// GetContactInfoStore returns an ContactInfoStore on the given db (or transaction).
+func GetContactInfoStore(db *gorm.DB) ContactInfoStore {
+	return &contactInfoStore{db: db}
+}
+
+type contactInfoStore struct {
+	db *gorm.DB
+}
+
+func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error) {
+	entity, err := findEntity(ctx, s.db, entityID, "id")
+	if err != nil {
+		return nil, err
 	}
-	newByUUID := make(map[string]ContactInfo, len(new))
-	for _, info := range new {
-		if info.ID != "" {
-			newByUUID[info.ID] = info
+	var models []ContactInfo
+	err = s.db.Where(&ContactInfo{
+		EntityType: entityTypeForID(entityID),
+		EntityID:   entity.PrimaryKey(),
+	}).Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+	pb := make([]*ttnpb.ContactInfo, len(models))
+	for i, model := range models {
+		pb[i] = model.toPB()
+	}
+	return pb, nil
+}
+
+func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers, pb []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
+	entity, err := findEntity(ctx, s.db, entityID, "id")
+	if err != nil {
+		return nil, err
+	}
+	entityType, entityUUID := entityTypeForID(entityID), entity.PrimaryKey()
+
+	var existing []ContactInfo
+	err = s.db.Where(&ContactInfo{
+		EntityType: entityType,
+		EntityID:   entityUUID,
+	}).Find(&existing).Error
+	if err != nil {
+		return nil, err
+	}
+
+	type contactInfoID struct {
+		contactType   int
+		contactMethod int
+		value         string
+	}
+	type contactInfo struct {
+		ContactInfo
+		deleted bool
+	}
+
+	existingByUUID := make(map[string]ContactInfo, len(existing))
+	existingByInfo := make(map[contactInfoID]*contactInfo, len(existing))
+
+	for _, existing := range existing {
+		existingByUUID[existing.ID] = existing
+		existingByInfo[contactInfoID{existing.ContactType, existing.ContactMethod, existing.Value}] = &contactInfo{
+			ContactInfo: existing,
+			deleted:     true,
 		}
 	}
-	var toCreate, toUpdate []ContactInfo
-	for _, info := range new {
-		if info.ID == "" {
-			toCreate = append(toCreate, info)
-			continue
-		}
-		if _, ok := oldByUUID[info.ID]; ok {
-			toUpdate = append(toUpdate, info)
-			continue
+
+	var toCreate []*ContactInfo
+	for _, pb := range pb {
+		if existing, ok := existingByInfo[contactInfoID{int(pb.ContactType), int(pb.ContactMethod), pb.Value}]; ok {
+			existing.deleted = false
+			existing.fromPB(pb)
+		} else {
+			model := ContactInfo{}
+			model.fromPB(pb)
+			toCreate = append(toCreate, &model)
 		}
 	}
+
+	var toUpdate []*ContactInfo
 	var toDelete []string
-	for _, info := range old {
-		if _, ok := newByUUID[info.ID]; !ok {
-			toDelete = append(toDelete, info.ID)
-			continue
+	for _, existing := range existingByInfo {
+		if existing.deleted {
+			toDelete = append(toDelete, existing.ContactInfo.ID)
+		} else {
+			toUpdate = append(toUpdate, &existing.ContactInfo)
 		}
 	}
+
 	for _, info := range toCreate {
 		info.EntityType, info.EntityID = entityType, entityUUID
-		err = db.Save(&info).Error
+		err = s.db.Save(&info).Error
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
+
 	for _, info := range toUpdate {
-		err = db.Save(&info).Error
+		err = s.db.Save(&info).Error
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
+
 	if len(toDelete) > 0 {
-		err = db.Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error
+		err = s.db.Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+
+	pb = make([]*ttnpb.ContactInfo, 0, len(toUpdate)+len(toCreate))
+	for _, model := range toUpdate {
+		pb = append(pb, model.toPB())
+	}
+	for _, model := range toCreate {
+		pb = append(pb, model.toPB())
+	}
+
+	return pb, nil
 }

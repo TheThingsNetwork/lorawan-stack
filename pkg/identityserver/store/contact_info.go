@@ -40,73 +40,22 @@ func init() {
 	registerModel(&ContactInfo{})
 }
 
-type contactInfos []ContactInfo
-
-func (c contactInfos) toPB() []*ttnpb.ContactInfo {
-	pb := make([]*ttnpb.ContactInfo, len(c))
-	for i, info := range c {
-		pb[i] = &ttnpb.ContactInfo{
-			ContactType:   ttnpb.ContactType(info.ContactType),
-			ContactMethod: ttnpb.ContactMethod(info.ContactMethod),
-			Value:         info.Value,
-			Public:        info.Public,
-			ValidatedAt:   cleanTimePtr(info.ValidatedAt),
-		}
+func (c ContactInfo) toPB() *ttnpb.ContactInfo {
+	return &ttnpb.ContactInfo{
+		ContactType:   ttnpb.ContactType(c.ContactType),
+		ContactMethod: ttnpb.ContactMethod(c.ContactMethod),
+		Value:         c.Value,
+		Public:        c.Public,
+		ValidatedAt:   cleanTimePtr(c.ValidatedAt),
 	}
-	return pb
 }
 
-func (c contactInfos) updateFromPB(pb []*ttnpb.ContactInfo) contactInfos {
-	type contactInfoID struct {
-		contactType   int
-		contactMethod int
-		value         string
+func (c *ContactInfo) fromPB(pb *ttnpb.ContactInfo) {
+	c.ContactType = int(pb.ContactType)
+	c.ContactMethod = int(pb.ContactMethod)
+	c.Value = pb.Value
+	c.Public = pb.Public
+	if c.ValidatedAt == nil || (pb.ValidatedAt != nil && pb.ValidatedAt.After(*c.ValidatedAt)) {
+		c.ValidatedAt = cleanTimePtr(pb.ValidatedAt) // Keep old ValidatedAt.
 	}
-	type contactInfo struct {
-		ContactInfo
-		deleted bool
-	}
-	contactInfos := make(map[contactInfoID]*contactInfo)
-	validatedInfos := make(map[contactInfoID]time.Time)
-	for _, existing := range c {
-		contactInfos[contactInfoID{existing.ContactType, existing.ContactMethod, existing.Value}] = &contactInfo{
-			ContactInfo: existing,
-			deleted:     true,
-		}
-		if existing.ValidatedAt != nil { // Mark this contact as validated.
-			id := contactInfoID{-1, existing.ContactMethod, existing.Value}
-			if existing.ValidatedAt.After(validatedInfos[id]) {
-				validatedInfos[id] = cleanTime(*existing.ValidatedAt)
-			}
-		}
-	}
-	var updated []ContactInfo
-	for _, new := range pb {
-		if existing, ok := contactInfos[contactInfoID{int(new.ContactType), int(new.ContactMethod), new.Value}]; ok {
-			existing.deleted = false
-			existing.Public = new.Public
-			existing.ValidatedAt = cleanTimePtr(new.ValidatedAt)
-		} else {
-			info := ContactInfo{
-				ContactType:   int(new.ContactType),
-				ContactMethod: int(new.ContactMethod),
-				Value:         new.Value,
-				Public:        new.Public,
-				ValidatedAt:   cleanTimePtr(new.ValidatedAt),
-			}
-			if new.ValidatedAt == nil { // See if this contact was previously validated.
-				if validated := validatedInfos[contactInfoID{-1, int(new.ContactMethod), new.Value}]; !validated.IsZero() {
-					info.ValidatedAt = &validated
-				}
-			}
-			updated = append(updated, info)
-		}
-	}
-	for _, existing := range contactInfos {
-		if existing.deleted {
-			continue
-		}
-		updated = append(updated, existing.ContactInfo)
-	}
-	return updated
 }
