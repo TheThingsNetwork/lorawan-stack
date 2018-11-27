@@ -87,7 +87,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	if err := blacklist.Check(ctx, req.UserID); err != nil {
 		return nil, err
 	}
-	if req.InvitationToken == "" && is.configFromContext(ctx).UserInvitation.Required && !createdByAdmin {
+	if req.InvitationToken == "" && is.configFromContext(ctx).UserRegistration.Invitation.Required && !createdByAdmin {
 		return nil, errInvitationTokenRequired
 	}
 
@@ -115,7 +115,11 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	req.User.PasswordUpdatedAt = time.Now()
 
 	if !createdByAdmin {
-		req.User.State = ttnpb.STATE_REQUESTED
+		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
+			req.User.State = ttnpb.STATE_REQUESTED
+		} else {
+			req.User.State = ttnpb.STATE_APPROVED
+		}
 		req.User.Admin = false
 	}
 

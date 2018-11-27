@@ -33,11 +33,16 @@ import (
 
 // Config for the Identity Server
 type Config struct {
-	DatabaseURI    string `name:"database-uri" description:"Database connection URI"`
-	UserInvitation struct {
-		Required bool          `name:"required" description:"Require user invitations"`
-		TokenTTL time.Duration `name:"token-ttl" description:"TTL of invitation tokens"`
-	} `name:"user-invitation"`
+	DatabaseURI      string `name:"database-uri" description:"Database connection URI"`
+	UserRegistration struct {
+		Invitation struct {
+			Required bool          `name:"required" description:"Require invitations for new users"`
+			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`
+		} `name:"invitation"`
+		AdminApproval struct {
+			Required bool `name:"required" description:"Require admin approval for new users"`
+		} `name:"admin-approval"`
+	} `name:"user-registration"`
 	AuthCache struct {
 		TokenTTL      time.Duration `name:"token-ttl" description:"TTL of token caches"`
 		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
