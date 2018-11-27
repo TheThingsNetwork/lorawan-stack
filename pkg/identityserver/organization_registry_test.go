@@ -50,7 +50,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		})
 
 		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
 
 		listRes, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{

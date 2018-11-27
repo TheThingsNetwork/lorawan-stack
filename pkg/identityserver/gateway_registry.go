@@ -78,18 +78,25 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 }
 
 func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayRequest) (gtw *ttnpb.Gateway, err error) {
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO)
+	err = is.RequireAuthenticated(ctx)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
+	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO)
+	if err != nil {
+		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicGatewayFields) {
+			defer func() { gtw = gtw.PublicSafe() }()
+		} else {
+			return nil, err
+		}
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtwStore := store.GetGatewayStore(db)
 		gtw, err = gtwStore.GetGateway(ctx, &req.GatewayIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			gtw.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, gtw.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -189,7 +196,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			gtw.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, gtw.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

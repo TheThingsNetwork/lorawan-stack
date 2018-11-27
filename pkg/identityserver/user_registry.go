@@ -173,18 +173,25 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 }
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
-	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_INFO)
+	err = is.RequireAuthenticated(ctx)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
+	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_INFO)
+	if err != nil {
+		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicUserFields) {
+			defer func() { usr = usr.PublicSafe() }()
+		} else {
+			return nil, err
+		}
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		usrStore := store.GetUserStore(db)
 		usr, err = usrStore.GetUser(ctx, &req.UserIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			usr.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, usr.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -240,7 +247,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		usrStore := store.GetUserStore(db)
-		if fieldMaskContains(&req.FieldMask, "primary_email_address") {
+		if hasField(req.FieldMask.Paths, "primary_email_address") {
 			// TODO: if updating primary_email_address, get existing contact info and set primary_email_address_validated_at
 			// depending on existing contact info. Until then, the primary email address can only be updated by admins.
 			req.PrimaryEmailAddressValidatedAt = nil
@@ -250,7 +257,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

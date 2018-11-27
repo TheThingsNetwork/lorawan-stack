@@ -96,22 +96,17 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 }
 
 func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientRequest) (cli *ttnpb.Client, err error) {
-	err = is.RequireAuthenticated(ctx) // Client info can be seen by all authenticated users.
+	err = is.RequireAuthenticated(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if false { // TODO: If requesting non-public fields.
-		err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
-		if err != nil {
+	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
+	if err != nil {
+		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicClientFields) {
+			defer func() { cli = cli.PublicSafe() }()
+		} else {
 			return nil, err
 		}
-	} else {
-		defer func() {
-			if cli != nil {
-				safe := cli.PublicSafe()
-				cli = &safe
-			}
-		}()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
@@ -119,7 +114,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			cli.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, cli.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -219,7 +214,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

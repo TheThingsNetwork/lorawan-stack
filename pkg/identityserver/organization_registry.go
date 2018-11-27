@@ -79,18 +79,25 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 }
 
 func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrganizationRequest) (org *ttnpb.Organization, err error) {
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO)
+	err = is.RequireAuthenticated(ctx)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
+	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO)
+	if err != nil {
+		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicOrganizationFields) {
+			defer func() { org = org.PublicSafe() }()
+		} else {
+			return nil, err
+		}
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		orgStore := store.GetOrganizationStore(db)
 		org, err = orgStore.GetOrganization(ctx, &req.OrganizationIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			org.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, org.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -188,7 +195,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		if err != nil {
 			return err
 		}
-		if fieldMaskContains(&req.FieldMask, "contact_info") {
+		if hasField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

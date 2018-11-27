@@ -15,12 +15,40 @@
 package identityserver
 
 import (
-	"github.com/gogo/protobuf/types"
+	"strings"
+
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func fieldMaskContains(fieldMask *types.FieldMask, search string) bool {
-	for _, path := range fieldMask.Paths {
+func topLevelFields(paths []string) []string {
+	seen := make(map[string]struct{}, len(paths))
+	out := make([]string, 0, len(paths))
+	for _, path := range paths {
+		parts := strings.SplitN(path, ".", 2)
+		if _, ok := seen[parts[0]]; ok {
+			continue
+		}
+		seen[parts[0]] = struct{}{}
+		out = append(out, parts[0])
+	}
+	return out
+}
+
+func hasOnlyAllowedFields(requested []string, allowed []string) bool {
+nextRequested:
+	for _, requested := range requested {
+		for _, allowed := range allowed {
+			if requested == allowed {
+				continue nextRequested
+			}
+		}
+		return false
+	}
+	return true
+}
+
+func hasField(requested []string, search string) bool {
+	for _, path := range requested {
 		if path == search {
 			return true
 		}
