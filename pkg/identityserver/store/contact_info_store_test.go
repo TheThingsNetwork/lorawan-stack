@@ -77,3 +77,50 @@ func TestContactInfoStore(t *testing.T) {
 		}
 	})
 }
+
+func TestContactInfoValidation(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	WithDB(t, func(t *testing.T, db *gorm.DB) {
+		db.AutoMigrate(&ContactInfo{}, &Account{}, &User{}, &ContactInfoValidation{})
+
+		usrStore := GetUserStore(db)
+
+		usr, err := usrStore.CreateUser(ctx, &ttnpb.User{
+			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "foo"},
+		})
+		a.So(err, should.BeNil)
+
+		s := GetContactInfoStore(db)
+
+		info, err := s.SetContactInfo(ctx, usr.EntityIdentifiers(), []*ttnpb.ContactInfo{
+			{ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
+		})
+		a.So(err, should.BeNil)
+
+		expiresAt := time.Now().Add(time.Hour)
+
+		_, err = s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
+			ID:          "validation-id",
+			Token:       "validation-token",
+			Entity:      usr.EntityIdentifiers(),
+			ContactInfo: info,
+			ExpiresAt:   &expiresAt,
+		})
+		a.So(err, should.BeNil)
+
+		err = s.Validate(ctx, &ttnpb.ContactInfoValidation{
+			ID:    "validation-id",
+			Token: "validation-token",
+		})
+		a.So(err, should.BeNil)
+
+		info, err = s.GetContactInfo(ctx, usr.EntityIdentifiers())
+		a.So(err, should.BeNil)
+		if a.So(info, should.HaveLength, 1) {
+			a.So(info[0].ValidatedAt, should.NotBeNil)
+		}
+
+	})
+}

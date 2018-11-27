@@ -2519,6 +2519,24 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:validation_token": {
+    "translations": {
+      "en": "validation token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:validation_token_expired": {
+    "translations": {
+      "en": "validation token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "contact_info_store.go"
+    }
+  },
   "error:pkg/identityserver:invalid_authorization": {
     "translations": {
       "en": "invalid authorization"

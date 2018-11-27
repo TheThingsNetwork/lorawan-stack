@@ -173,4 +173,7 @@ type EntitySearch interface {
 type ContactInfoStore interface {
 	GetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error)
 	SetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers, contactInfo []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)
+	CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
+	// Confirm a validation. Only the ID and Token need to be set.
+	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 }

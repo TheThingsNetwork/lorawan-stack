@@ -162,6 +162,11 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	if err != nil {
 		return nil, err
 	}
+
+	if _, err := is.requestContactInfoValidation(ctx, req.UserIdentifiers.EntityIdentifiers()); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
+	}
+
 	usr.Password = "" // Create doesn't have a FieldMask, so we need to manually remove the password.
 	events.Publish(evtCreateUser(ctx, req.UserIdentifiers, nil))
 	return usr, nil

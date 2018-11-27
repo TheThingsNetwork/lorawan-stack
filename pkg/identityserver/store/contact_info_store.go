@@ -16,8 +16,10 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -140,4 +142,94 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.E
 	}
 
 	return pb, nil
+}
+
+func (s *contactInfoStore) CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error) {
+	var (
+		contactMethod ttnpb.ContactMethod
+		value         string
+	)
+	for i, info := range validation.ContactInfo {
+		if i == 0 {
+			contactMethod = info.ContactMethod
+			value = info.Value
+			continue
+		}
+		if info.ContactMethod != contactMethod || info.Value != value {
+			panic("inconsistent contact info in validation")
+		}
+	}
+	entity, err := findEntity(ctx, s.db, validation.Entity, "id")
+	if err != nil {
+		return nil, err
+	}
+
+	var model ContactInfoValidation
+	model.fromPB(validation)
+	model.EntityType, model.EntityID = entityTypeForID(validation.Entity), entity.PrimaryKey()
+	model.ContactMethod = int(contactMethod)
+	model.Value = value
+
+	model.SetContext(ctx)
+	query := s.db.Create(&model)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+
+	pb := model.toPB()
+	pb.Entity, pb.ContactInfo = validation.Entity, validation.ContactInfo
+
+	return pb, nil
+}
+
+var (
+	errValidationTokenNotFound = errors.DefineNotFound("validation_token", "validation token not found")
+	errValidationTokenExpired  = errors.DefineNotFound("validation_token_expired", "validation token expired")
+)
+
+func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error {
+	now := cleanTime(time.Now())
+
+	var model ContactInfoValidation
+	err := s.db.Scopes(withContext(ctx)).Where(ContactInfoValidation{
+		Reference: validation.ID,
+		Token:     validation.Token,
+	}).Find(&model).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errValidationTokenNotFound
+		}
+		return err
+	}
+
+	if model.ExpiresAt.Before(time.Now()) {
+		return errValidationTokenExpired
+	}
+
+	err = s.db.Model(&ContactInfo{}).Scopes(withContext(ctx)).Where(ContactInfo{
+		EntityID:      model.EntityID,
+		EntityType:    model.EntityType,
+		ContactMethod: model.ContactMethod,
+		Value:         model.Value,
+	}).Update(ContactInfo{
+		ValidatedAt: &now,
+	}).Error
+	if err != nil {
+		return err
+	}
+
+	if model.EntityType == "user" && model.ContactMethod == int(ttnpb.CONTACT_METHOD_EMAIL) {
+		err = s.db.Model(&User{}).Scopes(withContext(ctx)).Where(Model{
+			ID: model.EntityID,
+		}).Where(User{
+			PrimaryEmailAddress: model.Value,
+		}).Update(User{
+			PrimaryEmailAddressValidatedAt: &now,
+		}).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return s.db.Delete(&model).Error
 }

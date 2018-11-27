@@ -152,6 +152,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
 	ttnpb.RegisterUserInvitationRegistryServer(s, &invitationRegistry{IdentityServer: is})
 	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is})
+	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -170,6 +171,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterUserAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserInvitationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterEntityRegistrySearchHandler(is.Context(), s, conn)
+	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
 }
 
 // Roles returns the roles that the Identity Server fulfills.
