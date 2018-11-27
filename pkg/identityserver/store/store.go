@@ -17,12 +17,15 @@ package store
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -59,7 +62,7 @@ func convertError(err error) error {
 }
 
 // Transact executes f in a db transaction.
-func Transact(db *gorm.DB, f func(db *gorm.DB) error) (err error) {
+func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err error) {
 	tx := db.Begin()
 	defer func() {
 		if p := recover(); p != nil {
@@ -79,6 +82,7 @@ func Transact(db *gorm.DB, f func(db *gorm.DB) error) (err error) {
 		}
 		err = convertError(err)
 	}()
+	SetLogger(tx, log.FromContext(ctx).WithField("namespace", "db"))
 	return f(tx)
 }
 
@@ -181,4 +185,54 @@ func deleteEntity(ctx context.Context, db *gorm.DB, entityID *ttnpb.EntityIdenti
 		return errNotFoundForID(entityID)
 	}
 	return err
+}
+
+// SetLogger sets the database logger.
+func SetLogger(db *gorm.DB, log log.Interface) {
+	db.SetLogger(logger{Interface: log})
+}
+
+type logger struct {
+	log.Interface
+}
+
+// Print implements the gorm.logger interface.
+func (l logger) Print(v ...interface{}) {
+	if len(v) <= 2 {
+		l.Error(fmt.Sprint(v...))
+		return
+	}
+	path := filepath.Base(v[1].(string))
+	logger := l.WithField("source", path)
+	switch v[0] {
+	case "log": // log, typically errors.
+		if len(v) < 3 {
+			return
+		}
+		if err, ok := v[2].(error); ok {
+			err = convertError(err)
+			if errors.IsAlreadyExists(err) {
+				return // no problem.
+			}
+			logger.WithError(err).Warn("Database error")
+		} else {
+			logger.Warn(fmt.Sprint(v[2:]...))
+		}
+	case "sql": // slog, sql debug.
+		if len(v) != 6 {
+			return
+		}
+		duration, _ := v[2].(time.Duration)
+		query := v[3].(string)
+		values := v[4].([]interface{})
+		rows := v[5].(int64)
+		logger.WithFields(log.Fields(
+			"duration", duration,
+			"query", query,
+			"values", values,
+			"rows", rows,
+		)).Debug("Run database query")
+	default:
+		l.Error(fmt.Sprint(v...))
+	}
 }
