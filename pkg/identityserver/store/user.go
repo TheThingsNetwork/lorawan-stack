@@ -50,6 +50,10 @@ type User struct {
 
 	Admin bool `gorm:"not null"`
 
+	TemporaryPassword          string `gorm:"type:VARCHAR"`
+	TemporaryPasswordCreatedAt *time.Time
+	TemporaryPasswordExpiresAt *time.Time
+
 	ProfilePicture   *Picture
 	ProfilePictureID *string `gorm:"type:UUID;index"`
 }
@@ -76,6 +80,15 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 	requirePasswordUpdateField: func(pb *ttnpb.User, usr *User) { pb.RequirePasswordUpdate = usr.RequirePasswordUpdate },
 	stateField:                 func(pb *ttnpb.User, usr *User) { pb.State = ttnpb.State(usr.State) },
 	adminField:                 func(pb *ttnpb.User, usr *User) { pb.Admin = usr.Admin },
+	temporaryPasswordField: func(pb *ttnpb.User, usr *User) {
+		pb.TemporaryPassword = usr.TemporaryPassword
+	},
+	temporaryPasswordCreatedAtField: func(pb *ttnpb.User, usr *User) {
+		pb.TemporaryPasswordCreatedAt = cleanTimePtr(usr.TemporaryPasswordCreatedAt)
+	},
+	temporaryPasswordExpiresAtField: func(pb *ttnpb.User, usr *User) {
+		pb.TemporaryPasswordExpiresAt = cleanTimePtr(usr.TemporaryPasswordExpiresAt)
+	},
 	profilePictureField: func(pb *ttnpb.User, usr *User) {
 		if usr.ProfilePicture == nil {
 			pb.ProfilePicture = nil
@@ -101,6 +114,15 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	requirePasswordUpdateField: func(usr *User, pb *ttnpb.User) { usr.RequirePasswordUpdate = pb.RequirePasswordUpdate },
 	stateField:                 func(usr *User, pb *ttnpb.User) { usr.State = int(pb.State) },
 	adminField:                 func(usr *User, pb *ttnpb.User) { usr.Admin = pb.Admin },
+	temporaryPasswordField: func(usr *User, pb *ttnpb.User) {
+		usr.TemporaryPassword = pb.TemporaryPassword
+	},
+	temporaryPasswordCreatedAtField: func(usr *User, pb *ttnpb.User) {
+		usr.TemporaryPasswordCreatedAt = cleanTimePtr(pb.TemporaryPasswordCreatedAt)
+	},
+	temporaryPasswordExpiresAtField: func(usr *User, pb *ttnpb.User) {
+		usr.TemporaryPasswordExpiresAt = cleanTimePtr(pb.TemporaryPasswordExpiresAt)
+	},
 	profilePictureField: func(usr *User, pb *ttnpb.User) {
 		usr.ProfilePictureID, usr.ProfilePicture = nil, nil
 		if pb.ProfilePicture != nil {
@@ -123,16 +145,19 @@ func init() {
 
 // fieldmask path to column name in users table.
 var userColumnNames = map[string]string{
-	attributesField:            "",
-	contactInfoField:           "",
-	nameField:                  nameField,
-	descriptionField:           descriptionField,
-	primaryEmailAddressField:   primaryEmailAddressField,
-	passwordField:              passwordField,
-	passwordUpdatedAtField:     passwordUpdatedAtField,
-	requirePasswordUpdateField: requirePasswordUpdateField,
-	stateField:                 stateField,
-	adminField:                 adminField,
+	attributesField:                 "",
+	contactInfoField:                "",
+	nameField:                       nameField,
+	descriptionField:                descriptionField,
+	primaryEmailAddressField:        primaryEmailAddressField,
+	passwordField:                   passwordField,
+	passwordUpdatedAtField:          passwordUpdatedAtField,
+	requirePasswordUpdateField:      requirePasswordUpdateField,
+	stateField:                      stateField,
+	adminField:                      adminField,
+	temporaryPasswordField:          temporaryPasswordField,
+	temporaryPasswordCreatedAtField: temporaryPasswordCreatedAtField,
+	temporaryPasswordExpiresAtField: temporaryPasswordExpiresAtField,
 }
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
