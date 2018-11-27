@@ -69,11 +69,11 @@ var (
 	errFrequencyPlan   = errors.DefineNotFound("frequency_plan", "unknown frequency plan `{frequency_plan}`")
 )
 
-type pbv2 struct {
+type protobufv2 struct {
 	topics.Layout
 }
 
-func (pbv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	var fcnt uint32
 	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
 		fcnt = pld.MACPayload.FHDR.FCnt
@@ -104,7 +104,7 @@ func (pbv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	return v2downlink.Marshal()
 }
 
-func (pbv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &legacyttnpb.UplinkMessage{}
 	err := v2uplink.Unmarshal(message)
 	if err != nil {
@@ -203,7 +203,7 @@ func (pbv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (pbv2) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (protobufv2) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	v2status := &legacyttnpb.StatusMessage{}
 	err := v2status.Unmarshal(message)
 	if err != nil {
@@ -262,11 +262,11 @@ func (pbv2) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	}, nil
 }
 
-func (pbv2) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+func (protobufv2) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
 	return nil, errNotSupported
 }
 
-// ProtobufV2 is a formatter that uses the legacy The Things Network Stack V2 proto marshaling and unmarshaling.
-var ProtobufV2 Formatter = &pbv2{
+// ProtobufV2 is a format that uses the legacy The Things Network Stack V2 Protocol Buffers marshaling and unmarshaling.
+var ProtobufV2 Format = &protobufv2{
 	Layout: topics.V2,
 }

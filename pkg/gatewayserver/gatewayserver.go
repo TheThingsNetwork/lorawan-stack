@@ -93,16 +93,16 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 	}
 
 	for _, version := range []struct {
-		Formatter mqtt.Formatter
-		Config    MQTTConfig
+		Format mqtt.Format
+		Config MQTTConfig
 	}{
 		{
-			Formatter: mqtt.Protobuf,
-			Config:    conf.MQTT,
+			Format: mqtt.Protobuf,
+			Config: conf.MQTT,
 		},
 		{
-			Formatter: mqtt.ProtobufV2,
-			Config:    conf.MQTTV2,
+			Format: mqtt.ProtobufV2,
+			Config: conf.MQTTV2,
 		},
 	} {
 		for _, lis := range []struct {
@@ -136,7 +136,7 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 					"address", lis.Listen,
 				)
 			}
-			mqtt.Start(ctx, gs, netLis, version.Formatter, lis.Protocol)
+			mqtt.Start(ctx, gs, netLis, version.Format, lis.Protocol)
 		}
 	}
 

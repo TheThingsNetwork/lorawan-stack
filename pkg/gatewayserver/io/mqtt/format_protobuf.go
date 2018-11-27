@@ -19,18 +19,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-type pb struct {
+type protobuf struct {
 	topics.Layout
 }
 
-func (pb) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (protobuf) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	gwDown := &ttnpb.GatewayDown{
 		DownlinkMessage: down,
 	}
 	return gwDown.Marshal()
 }
 
-func (pb) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (protobuf) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	uplink := &ttnpb.UplinkMessage{}
 	if err := uplink.Unmarshal(message); err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (pb) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (pb) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (protobuf) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	status := &ttnpb.GatewayStatus{}
 	if err := status.Unmarshal(message); err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (pb) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	return status, nil
 }
 
-func (pb) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+func (protobuf) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
 	ack := &ttnpb.TxAcknowledgment{}
 	if err := ack.Unmarshal(message); err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (pb) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
 	return ack, nil
 }
 
-// Protobuf is a formatter that uses proto marshaling and unmarshaling.
-var Protobuf Formatter = &pb{
+// Protobuf is a format that uses Protocol Buffers marshaling and unmarshaling.
+var Protobuf Format = &protobuf{
 	Layout: topics.Default,
 }

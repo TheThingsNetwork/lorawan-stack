@@ -1985,7 +1985,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "pbv2.go"
+      "file": "format_protobufv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:frequency_plan": {
@@ -1994,7 +1994,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "pbv2.go"
+      "file": "format_protobufv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:lorawan_metadata": {
@@ -2003,7 +2003,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "pbv2.go"
+      "file": "format_protobufv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:lorawan_payload": {
@@ -2012,7 +2012,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "pbv2.go"
+      "file": "format_protobufv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:modulation": {
@@ -2021,7 +2021,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "pbv2.go"
+      "file": "format_protobufv2.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
@@ -2039,7 +2039,7 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
-      "file": "fmt.go"
+      "file": "format.go"
     }
   },
   "error:pkg/gatewayserver/io/udp:connection_expired": {

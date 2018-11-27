@@ -20,8 +20,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// Formatter formats downlink, uplink and status messages.
-type Formatter interface {
+// Format formats topics, downlink, uplink and status messages.
+type Format interface {
 	topics.Layout
 
 	FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error)
