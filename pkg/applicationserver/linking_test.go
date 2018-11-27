@@ -139,7 +139,7 @@ func TestLink(t *testing.T) {
 		case ids := <-ns.unlinkCh:
 			a.So(ids, should.Resemble, app2)
 		case <-time.After(timeout):
-			t.Fatal("Expect link timeout")
+			t.Fatal("Expect unlink timeout")
 		}
 		_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
 			ApplicationIdentifiers: app2,
