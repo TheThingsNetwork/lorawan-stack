@@ -3842,6 +3842,51 @@
       "file": "lorawan.go"
     }
   },
+  "event:application.api-key.create": {
+    "translations": {
+      "en": "Create application API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_access.go"
+    }
+  },
+  "event:application.api-key.delete": {
+    "translations": {
+      "en": "Delete application API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_access.go"
+    }
+  },
+  "event:application.api-key.update": {
+    "translations": {
+      "en": "Update application API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_access.go"
+    }
+  },
+  "event:application.collaborator.delete": {
+    "translations": {
+      "en": "Delete application API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_access.go"
+    }
+  },
+  "event:application.collaborator.update": {
+    "translations": {
+      "en": "Update application API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_access.go"
+    }
+  },
   "event:application.create": {
     "translations": {
       "en": "Create application"
@@ -3995,6 +4040,24 @@
       "file": "observability.go"
     }
   },
+  "event:client.collaborator.delete": {
+    "translations": {
+      "en": "Delete client API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_access.go"
+    }
+  },
+  "event:client.collaborator.update": {
+    "translations": {
+      "en": "Update client API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_access.go"
+    }
+  },
   "event:client.create": {
     "translations": {
       "en": "Create OAuth client"
@@ -4020,6 +4083,51 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "client_registry.go"
+    }
+  },
+  "event:gateway.api-key.create": {
+    "translations": {
+      "en": "Create gateway API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
+  "event:gateway.api-key.delete": {
+    "translations": {
+      "en": "Delete gateway API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
+  "event:gateway.api-key.update": {
+    "translations": {
+      "en": "Update gateway API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
+  "event:gateway.collaborator.delete": {
+    "translations": {
+      "en": "Delete gateway API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
+  "event:gateway.collaborator.update": {
+    "translations": {
+      "en": "Update gateway API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
     }
   },
   "event:gateway.create": {
@@ -4679,6 +4787,51 @@
       "file": "events.go"
     }
   },
+  "event:organization.api-key.create": {
+    "translations": {
+      "en": "Create organization API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_access.go"
+    }
+  },
+  "event:organization.api-key.delete": {
+    "translations": {
+      "en": "Delete organization API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_access.go"
+    }
+  },
+  "event:organization.api-key.update": {
+    "translations": {
+      "en": "Update organization API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_access.go"
+    }
+  },
+  "event:organization.collaborator.delete": {
+    "translations": {
+      "en": "Delete organization API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_access.go"
+    }
+  },
+  "event:organization.collaborator.update": {
+    "translations": {
+      "en": "Update organization API collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_access.go"
+    }
+  },
   "event:organization.create": {
     "translations": {
       "en": "Create organization"
@@ -4704,6 +4857,33 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "organization_registry.go"
+    }
+  },
+  "event:user.api-key.create": {
+    "translations": {
+      "en": "Create user API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_access.go"
+    }
+  },
+  "event:user.api-key.delete": {
+    "translations": {
+      "en": "Delete user API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_access.go"
+    }
+  },
+  "event:user.api-key.update": {
+    "translations": {
+      "en": "Update user API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_access.go"
     }
   },
   "event:user.create": {

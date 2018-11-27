@@ -21,9 +21,18 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+var (
+	evtCreateOrganizationAPIKey       = events.Define("organization.api-key.create", "Create organization API key")
+	evtUpdateOrganizationAPIKey       = events.Define("organization.api-key.update", "Update organization API key")
+	evtDeleteOrganizationAPIKey       = events.Define("organization.api-key.delete", "Delete organization API key")
+	evtUpdateOrganizationCollaborator = events.Define("organization.collaborator.update", "Update organization API collaborator")
+	evtDeleteOrganizationCollaborator = events.Define("organization.collaborator.delete", "Delete organization API collaborator")
 )
 
 func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
@@ -71,6 +80,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	key.Key = token
+	events.Publish(evtCreateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
 	return key, nil
 }
 
@@ -115,6 +125,11 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
+	if len(req.Rights) > 0 {
+		events.Publish(evtUpdateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+	}
 	return key, nil
 }
 
@@ -134,6 +149,11 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 	})
 	if err != nil {
 		return nil, err
+	}
+	if len(req.Collaborator.Rights) > 0 {
+		events.Publish(evtUpdateOrganizationCollaborator(ctx, req.OrganizationIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteOrganizationCollaborator(ctx, req.OrganizationIdentifiers, nil))
 	}
 	return ttnpb.Empty, nil
 }

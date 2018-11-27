@@ -20,9 +20,16 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+var (
+	evtCreateUserAPIKey = events.Define("user.api-key.create", "Create user API key")
+	evtUpdateUserAPIKey = events.Define("user.api-key.update", "Update user API key")
+	evtDeleteUserAPIKey = events.Define("user.api-key.delete", "Delete user API key")
 )
 
 func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
@@ -70,6 +77,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		return nil, err
 	}
 	key.Key = token
+	events.Publish(evtCreateUserAPIKey(ctx, req.UserIdentifiers, nil))
 	return key, nil
 }
 
@@ -114,6 +122,11 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
+	if len(req.Rights) > 0 {
+		events.Publish(evtUpdateUserAPIKey(ctx, req.UserIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteUserAPIKey(ctx, req.UserIdentifiers, nil))
+	}
 	return key, nil
 }
 

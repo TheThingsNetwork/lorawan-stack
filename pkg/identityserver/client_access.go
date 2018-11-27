@@ -20,9 +20,15 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+var (
+	evtUpdateClientCollaborator = events.Define("client.collaborator.update", "Update client API collaborator")
+	evtDeleteClientCollaborator = events.Define("client.collaborator.delete", "Delete client API collaborator")
 )
 
 func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
@@ -53,6 +59,11 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	})
 	if err != nil {
 		return nil, err
+	}
+	if len(req.Collaborator.Rights) > 0 {
+		events.Publish(evtUpdateClientCollaborator(ctx, req.ClientIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteClientCollaborator(ctx, req.ClientIdentifiers, nil))
 	}
 	return ttnpb.Empty, nil
 }

@@ -21,9 +21,18 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+var (
+	evtCreateApplicationAPIKey       = events.Define("application.api-key.create", "Create application API key")
+	evtUpdateApplicationAPIKey       = events.Define("application.api-key.update", "Update application API key")
+	evtDeleteApplicationAPIKey       = events.Define("application.api-key.delete", "Delete application API key")
+	evtUpdateApplicationCollaborator = events.Define("application.collaborator.update", "Update application API collaborator")
+	evtDeleteApplicationCollaborator = events.Define("application.collaborator.delete", "Delete application API collaborator")
 )
 
 func (is *IdentityServer) listApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
@@ -71,6 +80,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	key.Key = token
+	events.Publish(evtCreateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
 	return key, nil
 }
 
@@ -115,6 +125,11 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
+	if len(req.Rights) > 0 {
+		events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+	}
 	return key, nil
 }
 
@@ -134,6 +149,11 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	})
 	if err != nil {
 		return nil, err
+	}
+	if len(req.Collaborator.Rights) > 0 {
+		events.Publish(evtUpdateApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
 	}
 	return ttnpb.Empty, nil
 }

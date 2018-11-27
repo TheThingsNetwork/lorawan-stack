@@ -21,9 +21,18 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+var (
+	evtCreateGatewayAPIKey       = events.Define("gateway.api-key.create", "Create gateway API key")
+	evtUpdateGatewayAPIKey       = events.Define("gateway.api-key.update", "Update gateway API key")
+	evtDeleteGatewayAPIKey       = events.Define("gateway.api-key.delete", "Delete gateway API key")
+	evtUpdateGatewayCollaborator = events.Define("gateway.collaborator.update", "Update gateway API collaborator")
+	evtDeleteGatewayCollaborator = events.Define("gateway.collaborator.delete", "Delete gateway API collaborator")
 )
 
 func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
@@ -71,6 +80,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 		return nil, err
 	}
 	key.Key = token
+	events.Publish(evtCreateGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
 	return key, nil
 }
 
@@ -115,6 +125,11 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
+	if len(req.Rights) > 0 {
+		events.Publish(evtUpdateGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
+	}
 	return key, nil
 }
 
@@ -134,6 +149,11 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	})
 	if err != nil {
 		return nil, err
+	}
+	if len(req.Collaborator.Rights) > 0 {
+		events.Publish(evtUpdateGatewayCollaborator(ctx, req.GatewayIdentifiers, nil))
+	} else {
+		events.Publish(evtDeleteGatewayCollaborator(ctx, req.GatewayIdentifiers, nil))
 	}
 	return ttnpb.Empty, nil
 }
