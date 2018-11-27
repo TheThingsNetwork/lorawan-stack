@@ -865,30 +865,6 @@
         ]
       }
     },
-    "/as/applications/{application_id}/webhook-formats": {
-      "get": {
-        "operationId": "GetFormats",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/v3ApplicationWebhookFormats"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ApplicationWebhookRegistry"
-        ]
-      }
-    },
     "/as/applications/{device.ids.application_ids.application_id}/devices": {
       "post": {
         "operationId": "Set2",
@@ -1172,6 +1148,22 @@
             }
           }
         ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/webhook-formats": {
+      "get": {
+        "operationId": "GetFormats",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhookFormats"
+            }
+          }
+        },
         "tags": [
           "ApplicationWebhookRegistry"
         ]

@@ -1046,7 +1046,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetFormats | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationWebhookFormats](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
+| GetFormats | [.google.protobuf.Empty](#google.protobuf.Empty) | [ApplicationWebhookFormats](#google.protobuf.Empty) |  |
 | Get | [GetApplicationWebhookRequest](#ttn.lorawan.v3.GetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.GetApplicationWebhookRequest) |  |
 | List | [ListApplicationWebhooksRequest](#ttn.lorawan.v3.ListApplicationWebhooksRequest) | [ApplicationWebhooks](#ttn.lorawan.v3.ListApplicationWebhooksRequest) |  |
 | Set | [SetApplicationWebhookRequest](#ttn.lorawan.v3.SetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.SetApplicationWebhookRequest) |  |

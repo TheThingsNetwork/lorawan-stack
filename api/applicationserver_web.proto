@@ -82,9 +82,9 @@ message SetApplicationWebhookRequest {
 }
 
 service ApplicationWebhookRegistry {
-  rpc GetFormats(ApplicationIdentifiers) returns (ApplicationWebhookFormats) {
+  rpc GetFormats(google.protobuf.Empty) returns (ApplicationWebhookFormats) {
     option (google.api.http) = {
-      get: "/as/applications/{application_id}/webhook-formats"
+      get: "/as/webhook-formats"
     };
   };
 
