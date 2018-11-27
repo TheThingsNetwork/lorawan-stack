@@ -56,6 +56,12 @@ func (c *Component) setupGRPC() (err error) {
 	return nil
 }
 
+// LoopbackConn returns the loopback gRPC connection to the component.
+// This conn must *not* be closed.
+func (c *Component) LoopbackConn() *grpc.ClientConn {
+	return c.loopback
+}
+
 func (c *Component) serveGRPC(lis net.Listener) error {
 	return c.grpc.Serve(lis)
 }
