@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"net"
 	"sync"
 	"testing"
 	"time"
@@ -37,18 +36,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 var (
 	DuplicateCount = 6
 	DeviceCount    = 100
-	Timeout        = (2 << 16) * test.Delay
+	Timeout        = (1 << 17) * test.Delay
 
 	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
 
@@ -1722,23 +1721,26 @@ func HandleUplinkTest() func(t *testing.T) {
 	}
 }
 
-type MockNsJsServer struct {
-	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
-	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error)
+var _ ttnpb.NsJsClient = &MockNsJsClient{}
+
+type MockNsJsClient struct {
+	*test.MockClientStream
+	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest, ...grpc.CallOption) (*ttnpb.JoinResponse, error)
+	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest, ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
 }
 
-func (js *MockNsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (js *MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
 	if js.HandleJoinFunc == nil {
 		return nil, errors.New("HandleJoinFunc not set")
 	}
-	return js.HandleJoinFunc(ctx, req)
+	return js.HandleJoinFunc(ctx, req, opts...)
 }
 
-func (js *MockNsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+func (js *MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
 	if js.GetNwkSKeysFunc == nil {
 		return nil, errors.New("GetNwkSKeysFunc not set")
 	}
-	return js.GetNwkSKeysFunc(ctx, req)
+	return js.GetNwkSKeysFunc(ctx, req, opts...)
 }
 
 func HandleJoinTest() func(t *testing.T) {
@@ -1954,36 +1956,10 @@ func HandleJoinTest() func(t *testing.T) {
 				collectionDoneCh := make(chan windowEnd, 1)
 				handleJoinCh := make(chan handleJoinRequest, 1)
 
-				jsSrv := rpcserver.New(test.ContextWithT(test.Context(), t))
-				ttnpb.RegisterNsJsServer(jsSrv.Server, &MockNsJsServer{
-					GetNwkSKeysFunc: func(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
-						err := errors.New("GetNwkSKeys should not be called")
-						test.MustTFromContext(ctx).Error(err)
-						return nil, err
-					},
-					HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
-						ch := make(chan *ttnpb.JoinResponse, 1)
-						errch := make(chan error, 1)
-						handleJoinCh <- handleJoinRequest{ctx, req, ch, errch}
-						return <-ch, <-errch
-					},
-				})
-
-				jsLst, err := net.Listen("tcp", ":0")
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				go jsSrv.Serve(jsLst)
-				defer jsSrv.Stop()
-
 				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
-						Cluster: config.Cluster{
-							JoinServer: jsLst.Addr().String(),
-						},
-					}}),
+					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
 						Devices: devReg,
 					},
@@ -1999,6 +1975,21 @@ func HandleJoinTest() func(t *testing.T) {
 					}),
 					WithNsGsClientFunc(func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
 						return &MockNsGsClient{}, nil
+					}),
+					WithNsJsClientFunc(func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
+						return &MockNsJsClient{
+							GetNwkSKeysFunc: func(ctx context.Context, req *ttnpb.SessionKeyRequest, _ ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
+								err := errors.New("GetNwkSKeys should not be called")
+								test.MustTFromContext(ctx).Error(err)
+								return nil, err
+							},
+							HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest, _ ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+								ch := make(chan *ttnpb.JoinResponse, 1)
+								errch := make(chan error, 1)
+								handleJoinCh <- handleJoinRequest{ctx, req, ch, errch}
+								return <-ch, <-errch
+							},
+						}, nil
 					}),
 				)).(*NetworkServer)
 				ns.Component.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher

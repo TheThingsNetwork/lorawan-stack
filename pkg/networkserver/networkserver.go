@@ -465,13 +465,13 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	}
 }
 
-// NsGsClientFunc is the function used to get Gateway Server.
-type NsGsClientFunc func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error)
-
 // PeerGetter is the interface, which wraps GetPeer method.
 type PeerGetter interface {
 	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer
 }
+
+// NsGsClientFunc is the function used to get Gateway Server.
+type NsGsClientFunc func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error)
 
 // NewGatewayServerPeerGetterFunc returns a NsGsClientFunc, which uses g to retrieve Gateway Server clients.
 func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
@@ -481,6 +481,20 @@ func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
 			return nil, errGatewayServerNotFound
 		}
 		return ttnpb.NewNsGsClient(p.Conn()), nil
+	}
+}
+
+// NsJsClientFunc is the function used to get Join Server.
+type NsJsClientFunc func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error)
+
+// NewJoinServerPeerGetterFunc returns a NsJsClientFunc, which uses g to retrieve Join Server clients.
+func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
+	return func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
+		p := g.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, id)
+		if p == nil {
+			return nil, errJoinServerNotFound
+		}
+		return ttnpb.NewNsJsClient(p.Conn()), nil
 	}
 }
 
@@ -513,6 +527,7 @@ type NetworkServer struct {
 	collectionDone    WindowEndFunc
 
 	gsClient NsGsClientFunc
+	jsClient NsJsClientFunc
 
 	macHandlers *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
 }
@@ -541,6 +556,14 @@ func WithCollectionDoneFunc(fn WindowEndFunc) Option {
 func WithNsGsClientFunc(fn NsGsClientFunc) Option {
 	return func(ns *NetworkServer) {
 		ns.gsClient = fn
+	}
+}
+
+// WithNsJsClientFunc overrides the default NsJsClientFunc, which
+// is used to get the Gateway Server for a gateway identifiers.
+func WithNsJsClientFunc(fn NsJsClientFunc) Option {
+	return func(ns *NetworkServer) {
+		ns.jsClient = fn
 	}
 }
 
@@ -607,6 +630,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 	if ns.gsClient == nil {
 		ns.gsClient = NewGatewayServerPeerGetterFunc(ns.Component)
+	}
+	if ns.jsClient == nil {
+		ns.jsClient = NewJoinServerPeerGetterFunc(ns.Component)
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
@@ -1233,12 +1259,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		},
 	}
 
-	jsPeer := ns.Component.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, dev.EndDeviceIdentifiers)
-	if jsPeer == nil {
-		logger.Warn("Join Server not found")
-		return errJoinServerNotFound
+	js, err := ns.jsClient(ctx, dev.EndDeviceIdentifiers)
+	if err != nil {
+		logger.WithError(err).Debug("Could not get Join Server")
+		return err
 	}
-	js := ttnpb.NewNsJsClient(jsPeer.Conn())
 
 	resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
 	if err != nil {
@@ -1551,7 +1576,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 				"gateway_uid", unique.ID(ctx, md.GatewayIdentifiers),
 			)
 
-			cl, err := ns.gsClient(ctx, md.GatewayIdentifiers)
+			gs, err := ns.gsClient(ctx, md.GatewayIdentifiers)
 			if err != nil {
 				logger.WithError(err).Debug("Could not get Gateway Server")
 				continue
@@ -1562,7 +1587,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 				Timestamp:          md.Timestamp + uint64(s.Delay.Nanoseconds()),
 			}
 
-			_, err = cl.ScheduleDownlink(ctx, down, ns.WithClusterAuth())
+			_, err = gs.ScheduleDownlink(ctx, down, ns.WithClusterAuth())
 			if err != nil {
 				errs = append(errs, err)
 				continue
