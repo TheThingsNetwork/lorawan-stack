@@ -22,6 +22,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -38,6 +39,8 @@ var (
 )
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
+	createdByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+
 	if err := blacklist.Check(ctx, req.ClientID); err != nil {
 		return nil, err
 	}
@@ -63,6 +66,12 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		return nil, err
 	}
 	req.Client.Secret = string(hashedSecret)
+
+	if !createdByAdmin {
+		req.Client.State = ttnpb.STATE_REQUESTED
+		req.Client.SkipAuthorization = false
+		req.Client.Endorsed = false
+	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
@@ -203,11 +212,21 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	return clis, nil
 }
 
+var (
+	errUpdateClientAdminField = errors.DefinePermissionDenied("client_update_admin_field", "only admins can update the `{field}` field")
+)
+
 func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
 	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
 	if err != nil {
 		return nil, err
 	}
+	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+
+	if hasField(req.FieldMask.Paths, "grants") && !updatedByAdmin {
+		return nil, errUpdateClientAdminField.WithAttributes("field", "grants")
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
 		cli, err = cliStore.UpdateClient(ctx, &req.Client, &req.FieldMask)

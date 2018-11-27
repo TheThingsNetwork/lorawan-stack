@@ -2546,6 +2546,15 @@
       "file": "contact_info_store.go"
     }
   },
+  "error:pkg/identityserver:client_update_admin_field": {
+    "translations": {
+      "en": "only admins can update the `{field}` field"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
   "error:pkg/identityserver:invalid_authorization": {
     "translations": {
       "en": "invalid authorization"
