@@ -46,7 +46,9 @@ func selectGatewayFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := gatewayColumnNames[path]; ok {
-				gatewayColumns = append(gatewayColumns, column)
+				if column != "" {
+					gatewayColumns = append(gatewayColumns, column)
+				}
 			} else {
 				gatewayColumns = append(gatewayColumns, path)
 			}

@@ -51,7 +51,9 @@ func selectUserFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := userColumnNames[path]; ok {
-				userColumns = append(userColumns, column)
+				if column != "" {
+					userColumns = append(userColumns, column)
+				}
 			} else {
 				userColumns = append(userColumns, path)
 			}
