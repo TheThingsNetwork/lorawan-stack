@@ -95,7 +95,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	orgProtos := make([]*ttnpb.Organization, len(orgModels))
 	for i, orgModel := range orgModels {
 		orgProto := new(ttnpb.Organization)
-		orgModel.toPB(orgProto, nil)
+		orgModel.toPB(orgProto, fieldMask)
 		orgProtos[i] = orgProto
 	}
 	return orgProtos, nil
@@ -113,7 +113,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 		return nil, err
 	}
 	orgProto := new(ttnpb.Organization)
-	orgModel.toPB(orgProto, nil)
+	orgModel.toPB(orgProto, fieldMask)
 	return orgProto, nil
 }
 
@@ -155,7 +155,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 		}
 	}
 	updated = new(ttnpb.Organization)
-	orgModel.toPB(updated, nil)
+	orgModel.toPB(updated, fieldMask)
 	return updated, nil
 }
 

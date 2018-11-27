@@ -96,7 +96,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	userProtos := make([]*ttnpb.User, len(userModels))
 	for i, userModel := range userModels {
 		userProto := new(ttnpb.User)
-		userModel.toPB(userProto, nil)
+		userModel.toPB(userProto, fieldMask)
 		userProtos[i] = userProto
 	}
 	return userProtos, nil
@@ -114,7 +114,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 		return nil, err
 	}
 	userProto := new(ttnpb.User)
-	userModel.toPB(userProto, nil)
+	userModel.toPB(userProto, fieldMask)
 	return userProto, nil
 }
 
@@ -156,7 +156,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 		}
 	}
 	updated = new(ttnpb.User)
-	userModel.toPB(updated, nil)
+	userModel.toPB(updated, fieldMask)
 	return updated, nil
 }
 
