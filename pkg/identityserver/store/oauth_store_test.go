@@ -91,5 +91,69 @@ func TestOauthStore(t *testing.T) {
 			a.So(err, should.NotBeNil)
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
+
+		t.Run("Authorization Code", func(t *testing.T) {
+			a := assertions.New(t)
+
+			code := "test-authorization-code"
+			redirectURI := "http://test-redirect-url:8080/callback"
+			state := "test-state"
+
+			authCode, err := store.GetAuthorizationCode(ctx, "")
+
+			a.So(authCode, should.BeNil)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+
+			empty, err := store.GetAuthorizationCode(ctx, code)
+
+			a.So(empty, should.BeNil)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+
+			err = store.DeleteAuthorizationCode(ctx, "")
+
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+
+			start := time.Now()
+
+			err = store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
+				ClientIDs:   *clientIDs,
+				UserIDs:     *userIDs,
+				Rights:      rights,
+				Code:        code,
+				RedirectURI: redirectURI,
+				State:       state,
+			})
+
+			a.So(err, should.BeNil)
+
+			got, err := store.GetAuthorizationCode(ctx, code)
+
+			a.So(got, should.NotBeNil)
+			a.So(err, should.BeNil)
+			a.So(got.UserIDs.UserID, should.Equal, userIDs.UserID)
+			a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
+			a.So(got.Code, should.Equal, code)
+			a.So(got.RedirectURI, should.Equal, redirectURI)
+			a.So(got.State, should.Equal, state)
+			a.So(got.CreatedAt, should.HappenAfter, start)
+			a.So(got.Rights, should.HaveLength, len(rights))
+
+			for _, right := range rights {
+				a.So(got.Rights, should.Contain, right)
+			}
+
+			err = store.DeleteAuthorizationCode(ctx, code)
+
+			a.So(err, should.BeNil)
+
+			deleted, err := store.GetAuthorizationCode(ctx, code)
+
+			a.So(deleted, should.BeNil)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		})
 	})
 }
