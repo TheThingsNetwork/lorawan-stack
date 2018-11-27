@@ -367,10 +367,10 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", format.ContentType)
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
 	}
+	req.Header.Set("Content-Type", format.ContentType)
 	return req, nil
 }
 
