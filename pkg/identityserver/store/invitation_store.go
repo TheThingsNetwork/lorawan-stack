@@ -53,9 +53,8 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 }
 
 func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error) {
-	// TODO: scope by ctx
 	var invitationModels []Invitation
-	err := s.db.Find(&invitationModels).Error
+	err := s.db.Scopes(withContext(ctx)).Find(&invitationModels).Error
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +68,8 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invitation not found")
 
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
-	// TODO: scope by ctx
 	var invitationModel Invitation
-	err := s.db.Where(&Invitation{Token: token}).First(&invitationModel).Error
+	err := s.db.Scopes(withContext(ctx)).Where(&Invitation{Token: token}).First(&invitationModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errInvitationNotFound
@@ -84,9 +82,8 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 var errInvitationAlreadyAccepted = errors.DefineAlreadyExists("invitation_already_accepted", "invitation already accepted")
 
 func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers) error {
-	// TODO: scope by ctx
 	var invitationModel Invitation
-	err := s.db.Where(&Invitation{Token: token}).First(&invitationModel).Error
+	err := s.db.Scopes(withContext(ctx)).Where(&Invitation{Token: token}).First(&invitationModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound
@@ -112,9 +109,8 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 }
 
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {
-	// TODO: scope by ctx
 	var invitationModel Invitation
-	err := s.db.Where(&Invitation{Email: email}).First(&invitationModel).Error
+	err := s.db.Scopes(withContext(ctx)).Where(&Invitation{Email: email}).First(&invitationModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound

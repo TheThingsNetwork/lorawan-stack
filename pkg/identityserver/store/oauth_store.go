@@ -139,9 +139,10 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 		return nil, errAuthorizationCodeNotFound
 	}
 	var codeModel AuthorizationCode
-	// TODO: scope by ctx
-	// TODO: don't preload so much.
-	err := s.db.Where(&AuthorizationCode{Code: code}).Preload("Client").Preload("User.Account").First(&codeModel).Error
+	// TODO: preload only IDs.
+	err := s.db.Scopes(withContext(ctx)).Where(&AuthorizationCode{
+		Code: code,
+	}).Preload("Client").Preload("User.Account").First(&codeModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errAuthorizationCodeNotFound
@@ -154,8 +155,9 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	if code == "" {
 		return errAuthorizationCodeNotFound
 	}
-	// TODO: scope by ctx
-	err := s.db.Where(&AuthorizationCode{Code: code}).Delete(&AuthorizationCode{}).Error
+	err := s.db.Scopes(withContext(ctx)).Where(&AuthorizationCode{
+		Code: code,
+	}).Delete(&AuthorizationCode{}).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errAuthorizationCodeNotFound
@@ -200,9 +202,10 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		return nil, errAccessTokenNotFound
 	}
 	var tokenModel AccessToken
-	// TODO: scope by ctx
-	// TODO: don't preload so much.
-	err := s.db.Where(&AccessToken{TokenID: id}).Preload("Client").Preload("User.Account").First(&tokenModel).Error
+	// TODO: preload only IDs.
+	err := s.db.Scopes(withContext(ctx)).Where(&AccessToken{
+		TokenID: id,
+	}).Preload("Client").Preload("User.Account").First(&tokenModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errAccessTokenNotFound
@@ -215,8 +218,9 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	if id == "" {
 		return errAccessTokenNotFound
 	}
-	// TODO: scope by ctx
-	err := s.db.Where(&AccessToken{TokenID: id}).Delete(&AccessToken{}).Error
+	err := s.db.Scopes(withContext(ctx)).Where(&AccessToken{
+		TokenID: id,
+	}).Delete(&AccessToken{}).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errAccessTokenNotFound

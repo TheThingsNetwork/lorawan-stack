@@ -68,9 +68,8 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not linked to an entity")
 
 func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
-	// TODO: scope by ctx
 	var keyModel APIKey
-	err := s.db.Where(&APIKey{APIKeyID: id}).First(&keyModel).Error
+	err := s.db.Scopes(withContext(ctx)).Where(&APIKey{APIKeyID: id}).First(&keyModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, nil, errAPIKeyNotFound
