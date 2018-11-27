@@ -96,6 +96,9 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 			}
 		}
 		for _, ids := range combined.GetEntityIdentifiers() {
+			if devIDs := ids.GetDeviceIDs(); devIDs != nil {
+				ids = devIDs.ApplicationIdentifiers.EntityIdentifiers()
+			}
 			rights, err := fetchRights(ids)
 			if err == nil {
 				setRights(ids, rights)

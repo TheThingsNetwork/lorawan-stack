@@ -138,6 +138,23 @@ func TestHook(t *testing.T) {
 				}
 			},
 		},
+		"EndDeviceRights": {
+			Fetcher: &mockFetcher{
+				applicationRights: ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
+			},
+			Req: &ttnpb.CombinedIdentifiers{
+				EntityIdentifiers: []*ttnpb.EntityIdentifiers{
+					ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}}.EntityIdentifiers(),
+				},
+			},
+			Call: func(a *assertions.Assertion, ctx context.Context, req interface{}) {
+				rights, ok := FromContext(ctx)
+				a.So(ok, should.BeTrue)
+				if a.So(rights.ApplicationRights, should.HaveLength, 1) {
+					a.So(rights.IncludesApplicationRights(unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}), ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
+				}
+			},
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			a := assertions.New(t)
