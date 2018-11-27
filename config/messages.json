@@ -2429,6 +2429,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/identityserver/store:end_device_not_found": {
+    "translations": {
+      "en": "end device `{application_id}:{device_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
   "error:pkg/identityserver/store:gateway_not_found": {
     "translations": {
       "en": "gateway `{gateway_id}` not found"
@@ -2472,6 +2481,15 @@
     "description": {
       "package": "pkg/identityserver/store",
       "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:multiple_application_ids": {
+    "translations": {
+      "en": "can not list devices for multiple application IDs"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "end_device_store.go"
     }
   },
   "error:pkg/identityserver/store:organization_not_found": {
@@ -4164,6 +4182,33 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "client_registry.go"
+    }
+  },
+  "event:end_device.create": {
+    "translations": {
+      "en": "Create end_device"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
+  "event:end_device.delete": {
+    "translations": {
+      "en": "Delete end_device"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
+  "event:end_device.update": {
+    "translations": {
+      "en": "Update end_device"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
     }
   },
   "event:gateway.api-key.create": {

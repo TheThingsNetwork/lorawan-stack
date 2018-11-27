@@ -45,6 +45,19 @@ type ClientStore interface {
 	DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
 }
 
+// EndDeviceStore interface for storing EndDevices.
+//
+// All functions assume the input and fieldMask to be validated, and assume
+// sufficient rights to perform the action.
+type EndDeviceStore interface {
+	CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error)
+	ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error)
+	FindEndDevices(ctx context.Context, ids []*ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error)
+	GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error)
+	UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error)
+	DeleteEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
+}
+
 // GatewayStore interface for storing Gateways.
 //
 // All functions assume the input and fieldMask to be validated, and assume

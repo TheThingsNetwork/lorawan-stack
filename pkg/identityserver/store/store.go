@@ -97,6 +97,8 @@ func entityTypeForID(id *ttnpb.EntityIdentifiers) string {
 		return "application"
 	case *ttnpb.ClientIdentifiers:
 		return "client"
+	case *ttnpb.EndDeviceIdentifiers:
+		return "device"
 	case *ttnpb.GatewayIdentifiers:
 		return "gateway"
 	case *ttnpb.OrganizationIdentifiers:
@@ -114,6 +116,8 @@ func modelForID(id *ttnpb.EntityIdentifiers) modelInterface {
 		return &Application{}
 	case *ttnpb.ClientIdentifiers:
 		return &Client{}
+	case *ttnpb.EndDeviceIdentifiers:
+		return &EndDevice{}
 	case *ttnpb.GatewayIdentifiers:
 		return &Gateway{}
 	case *ttnpb.OrganizationIdentifiers:
@@ -153,6 +157,7 @@ var (
 	errApplicationNotFound  = errors.DefineNotFound("application_not_found", "application `{application_id}` not found")
 	errClientNotFound       = errors.DefineNotFound("client_not_found", "client `{client_id}` not found")
 	errGatewayNotFound      = errors.DefineNotFound("gateway_not_found", "gateway `{gateway_id}` not found")
+	errEndDeviceNotFound    = errors.DefineNotFound("end_device_not_found", "end device `{application_id}:{device_id}` not found")
 	errOrganizationNotFound = errors.DefineNotFound("organization_not_found", "organization `{organization_id}` not found")
 	errUserNotFound         = errors.DefineNotFound("user_not_found", "user `{user_id}` not found")
 	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session `{session_id}` for user `{user_id}` not found")
@@ -170,6 +175,8 @@ func errNotFoundForID(entityID *ttnpb.EntityIdentifiers) error {
 		return errApplicationNotFound.WithAttributes("application_id", id.ApplicationID)
 	case *ttnpb.ClientIdentifiers:
 		return errClientNotFound.WithAttributes("client_id", id.ClientID)
+	case *ttnpb.EndDeviceIdentifiers:
+		return errEndDeviceNotFound.WithAttributes("application_id", id.ApplicationID, "device_id", id.DeviceID)
 	case *ttnpb.GatewayIdentifiers:
 		return errGatewayNotFound.WithAttributes("gateway_id", id.GatewayID)
 	case *ttnpb.OrganizationIdentifiers:

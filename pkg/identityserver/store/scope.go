@@ -59,6 +59,25 @@ func withClientID(id ...string) func(*gorm.DB) *gorm.DB {
 	}
 }
 
+func withDeviceID(id ...string) func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		switch len(id) {
+		case 0:
+			return db
+		case 1:
+			return db.Where("device_id = ?", id[0])
+		default:
+			return db.Where("device_id IN (?)", id).Order("device_id")
+		}
+	}
+}
+
+func withApplicationAndDeviceID(applicationID, deviceID string) func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("application_id = ? AND device_id = ?", applicationID, deviceID)
+	}
+}
+
 func withGatewayID(id ...string) func(*gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		switch len(id) {
@@ -125,6 +144,8 @@ func withID(entityID *ttnpb.EntityIdentifiers) func(*gorm.DB) *gorm.DB {
 		return withApplicationID(id.ApplicationID)
 	case *ttnpb.ClientIdentifiers:
 		return withClientID(id.ClientID)
+	case *ttnpb.EndDeviceIdentifiers:
+		return withApplicationAndDeviceID(id.ApplicationID, id.DeviceID)
 	case *ttnpb.GatewayIdentifiers:
 		return withGatewayID(id.GatewayID)
 	case *ttnpb.OrganizationIdentifiers:
