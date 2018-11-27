@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -53,20 +52,9 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	if err != nil {
 		return nil, err
 	}
-	token, err := auth.APIKey.Generate(ctx, "")
+	key, token, err := generateAPIKey(ctx, req.Name, req.Rights...)
 	if err != nil {
 		return nil, err
-	}
-	_, generatedID, generatedKey, _ := auth.SplitToken(token)
-	hashedKey, err := auth.Hash(generatedKey)
-	if err != nil {
-		return nil, err
-	}
-	key = &ttnpb.APIKey{
-		ID:     generatedID,
-		Key:    string(hashedKey),
-		Name:   req.Name,
-		Rights: req.Rights,
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		keyStore := store.GetAPIKeyStore(db)

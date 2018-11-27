@@ -67,7 +67,6 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 				return err
 			}
 		}
-		// TODO: Create initial Gateway API key with "link" rights
 		return nil
 	})
 	if err != nil {

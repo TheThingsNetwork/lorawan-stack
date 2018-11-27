@@ -67,7 +67,6 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 				return err
 			}
 		}
-		// TODO: Create initial Application API key with "link" rights
 		return nil
 	})
 	if err != nil {
