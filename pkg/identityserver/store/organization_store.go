@@ -50,12 +50,8 @@ func selectOrganizationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.
 		case contactInfoField:
 			query = query.Preload("ContactInfo")
 		default:
-			if column, ok := organizationColumnNames[path]; ok {
-				if column != "" {
-					organizationColumns = append(organizationColumns, column)
-				}
-			} else {
-				organizationColumns = append(organizationColumns, path)
+			if column, ok := organizationColumnNames[path]; ok && column != "" {
+				organizationColumns = append(organizationColumns, column)
 			}
 		}
 	}

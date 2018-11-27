@@ -95,12 +95,20 @@ func init() {
 	defaultClientFieldMask.Paths = paths
 }
 
-// fieldmask path to column name in clients table, if other than proto field.
+// fieldmask path to column name in clients table.
 var clientColumnNames = map[string]string{
-	"ids.client_id":  "client_id",
-	attributesField:  "Attributes",
-	contactInfoField: "ContactInfo",
-	secretField:      "client_secret",
+	"ids.client_id":        "client_id",
+	attributesField:        "Attributes",
+	contactInfoField:       "ContactInfo",
+	nameField:              nameField,
+	descriptionField:       descriptionField,
+	secretField:            "client_secret",
+	redirectURIsField:      redirectURIsField,
+	stateField:             stateField,
+	skipAuthorizationField: skipAuthorizationField,
+	endorsedField:          endorsedField,
+	grantsField:            grantsField,
+	rightsField:            rightsField,
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {

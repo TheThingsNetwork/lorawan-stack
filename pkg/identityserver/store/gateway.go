@@ -97,12 +97,21 @@ func init() {
 	defaultGatewayFieldMask.Paths = paths
 }
 
-// fieldmask path to column name in gateways table, if other than proto field.
+// fieldmask path to column name in gateways table.
 var gatewayColumnNames = map[string]string{
-	"ids.gateway_id": "gateway_id",
-	"ids.eui":        "gateway_eui",
-	attributesField:  "",
-	contactInfoField: "",
+	"ids.gateway_id":          "gateway_id",
+	"ids.eui":                 "gateway_eui",
+	attributesField:           "",
+	contactInfoField:          "",
+	nameField:                 nameField,
+	descriptionField:          descriptionField,
+	gatewayServerAddressField: gatewayServerAddressField,
+	autoUpdateField:           autoUpdateField,
+	updateChannelField:        updateChannelField,
+	frequencyPlanIDField:      frequencyPlanIDField,
+	scheduleDownlinkLateField: scheduleDownlinkLateField,
+	statusPublicField:         statusPublicField,
+	locationPublicField:       locationPublicField,
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {

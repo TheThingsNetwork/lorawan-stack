@@ -70,11 +70,13 @@ func init() {
 	defaultApplicationFieldMask.Paths = paths
 }
 
-// fieldmask path to column name in applications table, if other than proto field.
+// fieldmask path to column name in applications table.
 var applicationColumnNames = map[string]string{
 	"ids.application_id": "application_id",
 	attributesField:      "",
 	contactInfoField:     "",
+	nameField:            nameField,
+	descriptionField:     descriptionField,
 }
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask *types.FieldMask) {

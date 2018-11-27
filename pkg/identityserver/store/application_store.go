@@ -45,12 +45,8 @@ func selectApplicationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.D
 		case contactInfoField:
 			query = query.Preload("ContactInfo")
 		default:
-			if column, ok := applicationColumnNames[path]; ok {
-				if column != "" {
-					applicationColumns = append(applicationColumns, column)
-				}
-			} else {
-				applicationColumns = append(applicationColumns, path)
+			if column, ok := applicationColumnNames[path]; ok && column != "" {
+				applicationColumns = append(applicationColumns, column)
 			}
 		}
 	}

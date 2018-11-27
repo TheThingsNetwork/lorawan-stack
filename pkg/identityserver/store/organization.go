@@ -79,10 +79,12 @@ func init() {
 	defaultOrganizationFieldMask.Paths = paths
 }
 
-// fieldmask path to column name in organizations table, if other than proto field.
+// fieldmask path to column name in organizations table.
 var organizationColumnNames = map[string]string{
 	attributesField:  "",
 	contactInfoField: "",
+	nameField:        nameField,
+	descriptionField: descriptionField,
 }
 
 func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask) {

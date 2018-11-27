@@ -104,10 +104,18 @@ func init() {
 	defaultUserFieldMask.Paths = paths
 }
 
-// fieldmask path to column name in users table, if other than proto field.
+// fieldmask path to column name in users table.
 var userColumnNames = map[string]string{
-	attributesField:  "",
-	contactInfoField: "",
+	attributesField:            "",
+	contactInfoField:           "",
+	nameField:                  nameField,
+	descriptionField:           descriptionField,
+	primaryEmailAddressField:   primaryEmailAddressField,
+	passwordField:              passwordField,
+	passwordUpdatedAtField:     passwordUpdatedAtField,
+	requirePasswordUpdateField: requirePasswordUpdateField,
+	stateField:                 stateField,
+	adminField:                 adminField,
 }
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
