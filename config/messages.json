@@ -2507,7 +2507,7 @@
     },
     "description": {
       "package": "pkg/identityserver",
-      "file": "rights.go"
+      "file": "entity_access.go"
     }
   },
   "error:pkg/identityserver:invitation_token_expired": {
@@ -2579,7 +2579,16 @@
     },
     "description": {
       "package": "pkg/identityserver",
-      "file": "rights.go"
+      "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:unauthenticated": {
+    "translations": {
+      "en": "unauthenticated"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
     }
   },
   "error:pkg/identityserver:unsupported_authorization": {
@@ -2588,7 +2597,7 @@
     },
     "description": {
       "package": "pkg/identityserver",
-      "file": "rights.go"
+      "file": "entity_access.go"
     }
   },
   "error:pkg/joinserver/redis:duplicate_identifiers": {
