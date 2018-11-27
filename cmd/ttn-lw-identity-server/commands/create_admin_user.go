@@ -84,15 +84,18 @@ var (
 				return err
 			}
 
+			now := time.Now()
+
 			logger.Info("Creating user...")
 			userStore := store.GetUserStore(db)
 			_, err = userStore.CreateUser(ctx, &ttnpb.User{
-				UserIdentifiers:     ttnpb.UserIdentifiers{UserID: userID},
-				PrimaryEmailAddress: email,
-				Password:            string(hashedPassword),
-				PasswordUpdatedAt:   time.Now(),
-				State:               ttnpb.STATE_APPROVED,
-				Admin:               true,
+				UserIdentifiers:                ttnpb.UserIdentifiers{UserID: userID},
+				PrimaryEmailAddress:            email,
+				PrimaryEmailAddressValidatedAt: &now,
+				Password:                       string(hashedPassword),
+				PasswordUpdatedAt:              now,
+				State:                          ttnpb.STATE_APPROVED,
+				Admin:                          true,
 			})
 			if err != nil {
 				logger.WithError(err).Error("Could not create user")
