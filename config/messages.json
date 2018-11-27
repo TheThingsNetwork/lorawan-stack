@@ -2312,6 +2312,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/identityserver/blacklist:blacklisted_id": {
+    "translations": {
+      "en": "the ID `{id}` can not be registered"
+    },
+    "description": {
+      "package": "pkg/identityserver/blacklist",
+      "file": "blacklist.go"
+    }
+  },
   "error:pkg/identityserver/store:access_token_not_found": {
     "translations": {
       "en": "access token not found"
