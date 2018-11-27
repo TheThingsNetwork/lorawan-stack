@@ -7,7 +7,7 @@
   "containers.applications-table.index.empty": "No items matched your criteria",
   "containers.applications-table.index.add": "Add Application",
   "containers.devices-table.index.deviceId": "Device ID",
-  "containers.devices-table.index.connectedDevices": "Connected Devices {deviceCount}",
+  "containers.devices-table.index.connectedDevices": "Connected Devices ({deviceCount})",
   "containers.devices-table.index.add": "Add Device",
   "lib.shared-messages.access": "Access",
   "lib.shared-messages.add": "Add",

@@ -7,7 +7,7 @@
   "containers.applications-table.index.empty": "Xx xxxxx xxxxxxx xxxx xxxxxxxx",
   "containers.applications-table.index.add": "Xxx Xxxxxxxxxxx",
   "containers.devices-table.index.deviceId": "Xxxxxx XX",
-  "containers.devices-table.index.connectedDevices": "Xxxxxxxxx Xxxxxxx {deviceCount}",
+  "containers.devices-table.index.connectedDevices": "Xxxxxxxxx Xxxxxxx ({deviceCount})",
   "containers.devices-table.index.add": "Xxx Xxxxxx",
   "lib.shared-messages.access": "Xxxxxx",
   "lib.shared-messages.add": "Xxx",
