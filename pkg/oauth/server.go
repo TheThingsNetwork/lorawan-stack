@@ -153,29 +153,30 @@ func (s *server) RegisterRoutes(server *web.Server) {
 			frontendConfig := s.config.UI.FrontendConfig
 			frontendConfig.Language = s.config.UI.TemplateData.Language
 			c.Set("app_config", struct {
-				OAuth bool `json:"oauth"`
 				FrontendConfig
 			}{
-				OAuth:          true,
 				FrontendConfig: frontendConfig,
 			})
 			return next(c)
 		}
 	})
 
-	csrf := middleware.CSRF()
+	api := group.Group("/api", middleware.CSRF())
+	api.POST("/auth/login", s.Login)
+	api.POST("/auth/logout", s.Logout, s.requireLogin)
+	api.GET("/me", s.CurrentUser, s.requireLogin)
 
-	group.GET("/login", webui.Render, csrf, s.redirectToNext)
-
-	group.POST("/api/auth/login", s.Login, csrf)
-	group.POST("/api/auth/logout", s.Logout, csrf, s.requireLogin)
-	group.GET("/api/me", s.CurrentUser, csrf, s.requireLogin)
-
-	group.Any("/authorize", s.Authorize(webui.Render), csrf, s.redirectToLogin)
-	group.POST("/token", s.Token)
+	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:csrf",
+	}))
+	page.GET("/login", webui.Render, s.redirectToNext)
+	page.GET("/authorize", s.Authorize(webui.Render), s.redirectToLogin)
+	page.POST("/authorize", s.Authorize(webui.Render), s.redirectToLogin)
 
 	if s.config.Mount != "" && s.config.Mount != "/" {
-		group.GET("", webui.Render, csrf)
+		group.GET("", webui.Render)
 	}
-	group.GET("/*", webui.Render, csrf)
+	group.GET("/*", webui.Render)
+
+	group.POST("/token", s.Token) // No CSRF here.
 }
