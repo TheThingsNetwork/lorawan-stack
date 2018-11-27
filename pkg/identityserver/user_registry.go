@@ -82,16 +82,29 @@ func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err err
 }
 
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
+	createdByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+
 	if err := blacklist.Check(ctx, req.UserID); err != nil {
 		return nil, err
 	}
-	if req.InvitationToken == "" && is.configFromContext(ctx).UserInvitation.Required {
+	if req.InvitationToken == "" && is.configFromContext(ctx).UserInvitation.Required && !createdByAdmin {
 		return nil, errInvitationTokenRequired
 	}
 
-	err = is.preprocessUserProfilePicture(&req.User)
-	if err != nil {
-		return nil, err
+	var primaryEmailAddressFound bool
+	for _, contactInfo := range req.User.ContactInfo {
+		if !createdByAdmin {
+			contactInfo.ValidatedAt = nil
+		}
+		if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+			primaryEmailAddressFound = true
+		}
+	}
+	if !primaryEmailAddressFound {
+		req.User.ContactInfo = append(req.User.ContactInfo, &ttnpb.ContactInfo{
+			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			Value:         req.User.PrimaryEmailAddress,
+		})
 	}
 
 	hashedPassword, err := auth.Hash(req.User.Password)
@@ -99,6 +112,18 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	req.User.Password = string(hashedPassword)
+	req.User.PasswordUpdatedAt = time.Now()
+
+	if !createdByAdmin {
+		req.User.State = ttnpb.STATE_REQUESTED
+		req.User.Admin = false
+	}
+
+	err = is.preprocessUserProfilePicture(&req.User)
+	if err != nil {
+		return nil, err
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		invitationStore := store.GetInvitationStore(db)
 		if req.InvitationToken != "" {
@@ -151,16 +176,46 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	return usr, nil
 }
 
+var (
+	errUpdateUserPasswordRequest = errors.DefineInvalidArgument("password_in_update", "can not update password with regular user update request")
+	errUpdateUserAdminField      = errors.DefinePermissionDenied("user_update_admin_field", "only admins can update the `{field}` field")
+)
+
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
 	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_BASIC)
 	if err != nil {
 		return nil, err
 	}
+	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+
+	for _, path := range req.FieldMask.Paths {
+		switch path {
+		case "password", "password_updated_at":
+			return nil, errUpdateUserPasswordRequest
+		}
+	}
+
+	if !updatedByAdmin {
+		for _, path := range req.FieldMask.Paths {
+			switch path {
+			case "primary_email_address",
+				"require_password_update",
+				"state", "admin",
+				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
+				return nil, errUpdateUserAdminField.WithAttributes("field", path)
+			}
+		}
+
+		for _, contactInfo := range req.User.ContactInfo {
+			contactInfo.ValidatedAt = nil
+		}
+	}
+
 	err = is.preprocessUserProfilePicture(&req.User)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		usrStore := store.GetUserStore(db)
 		usr, err = usrStore.UpdateUser(ctx, &req.User, &req.FieldMask)
@@ -179,9 +234,12 @@ var (
 )
 
 var (
-	updatePasswordFieldMask    = &types.FieldMask{Paths: []string{"password"}}
+	updatePasswordFieldMask = &types.FieldMask{Paths: []string{
+		"password", "password_updated_at", "require_password_update",
+	}}
 	temporaryPasswordFieldMask = &types.FieldMask{Paths: []string{
-		"password", "temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
+		"password", "password_updated_at", "require_password_update",
+		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
 	}}
 	updateTemporaryPasswordFieldMask = &types.FieldMask{Paths: []string{
 		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
@@ -227,7 +285,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			usr.TemporaryPassword, usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = "", nil, nil
 			updateMask = temporaryPasswordFieldMask
 		}
-		usr.Password = string(hashedPassword)
+		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = string(hashedPassword), time.Now(), false
 		usr, err = usrStore.UpdateUser(ctx, usr, updateMask)
 		return err
 	})

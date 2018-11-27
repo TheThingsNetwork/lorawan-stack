@@ -163,7 +163,6 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []s
 			if columnName != "" {
 				columns = append(columns, columnName)
 			}
-			// TODO: if updating password, then also update PasswordUpdatedAt and set RequirePasswordUpdate=false
 			// TODO: if changing email, then also set EmailValidatedAt=false
 			continue
 		}

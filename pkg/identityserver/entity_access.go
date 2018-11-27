@@ -180,6 +180,14 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	return res, nil
 }
 
+func (is *IdentityServer) UniversalRights(ctx context.Context) *ttnpb.Rights {
+	info, err := is.authInfo(ctx)
+	if err == nil {
+		return info.GetUniversalRights()
+	}
+	return nil
+}
+
 func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
 	if apiKey := info.GetAPIKey(); apiKey != nil {
 		apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Intersect(rights).GetRights()

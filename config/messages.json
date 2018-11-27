@@ -2591,6 +2591,15 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/identityserver:password_in_update": {
+    "translations": {
+      "en": "can not update password with regular user update request"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:search_admin_only": {
     "translations": {
       "en": "search is only available to admins"
@@ -2643,6 +2652,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:user_update_admin_field": {
+    "translations": {
+      "en": "only admins can update the `{field}` field"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
     }
   },
   "error:pkg/joinserver/redis:duplicate_identifiers": {
