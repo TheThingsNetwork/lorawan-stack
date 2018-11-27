@@ -155,5 +155,70 @@ func TestOauthStore(t *testing.T) {
 			a.So(err, should.NotBeNil)
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
+
+		t.Run("Access Token", func(t *testing.T) {
+			a := assertions.New(t)
+
+			tokenID := "test-token-id"
+			access := "test-access-token"
+			refresh := "test-refresh-token"
+			prevID := ""
+
+			accessToken, err := store.GetAccessToken(ctx, "")
+
+			a.So(accessToken, should.BeNil)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+
+			err = store.DeleteAccessToken(ctx, "")
+
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+
+			empty, err := store.GetAccessToken(ctx, tokenID)
+
+			a.So(empty, should.BeNil)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+
+			start := time.Now()
+
+			err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+				UserIDs:      *userIDs,
+				ClientIDs:    *clientIDs,
+				ID:           tokenID,
+				AccessToken:  access,
+				RefreshToken: refresh,
+				Rights:       rights,
+			}, prevID)
+
+			a.So(err, should.BeNil)
+
+			got, err := store.GetAccessToken(ctx, tokenID)
+
+			a.So(got, should.NotBeNil)
+			a.So(err, should.BeNil)
+			a.So(got.UserIDs.UserID, should.Equal, userIDs.UserID)
+			a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
+			a.So(got.ID, should.Equal, tokenID)
+			a.So(got.AccessToken, should.Equal, access)
+			a.So(got.RefreshToken, should.Equal, refresh)
+			a.So(got.CreatedAt, should.HappenAfter, start)
+			a.So(got.Rights, should.HaveLength, len(rights))
+
+			for _, right := range rights {
+				a.So(got.Rights, should.Contain, right)
+			}
+
+			err = store.DeleteAccessToken(ctx, tokenID)
+
+			a.So(err, should.BeNil)
+
+			deleted, err := store.GetAccessToken(ctx, tokenID)
+
+			a.So(deleted, should.BeNil)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		})
 	})
 }
