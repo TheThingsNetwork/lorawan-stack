@@ -91,10 +91,15 @@ func (is *IdentityServer) withDatabase(ctx context.Context, f func(*gorm.DB) err
 // RegisterServices registers services provided by is at s.
 func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterApplicationRegistryServer(s, &applicationRegistry{IdentityServer: is})
+	ttnpb.RegisterApplicationAccessServer(s, &applicationAccess{IdentityServer: is})
 	ttnpb.RegisterClientRegistryServer(s, &clientRegistry{IdentityServer: is})
+	ttnpb.RegisterClientAccessServer(s, &clientAccess{IdentityServer: is})
 	ttnpb.RegisterGatewayRegistryServer(s, &gatewayRegistry{IdentityServer: is})
+	ttnpb.RegisterGatewayAccessServer(s, &gatewayAccess{IdentityServer: is})
 	ttnpb.RegisterOrganizationRegistryServer(s, &organizationRegistry{IdentityServer: is})
+	ttnpb.RegisterOrganizationAccessServer(s, &organizationAccess{IdentityServer: is})
 	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
+	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
 }
 
 // RegisterHandlers registers gRPC handlers.
