@@ -57,7 +57,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(append(append(modelColumns, "client_id"), clientColumns...)) // TODO: remove possible duplicate client_id
+	return query.Select(cleanFields(append(append(modelColumns, "client_id"), clientColumns...)...))
 }
 
 func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error) {

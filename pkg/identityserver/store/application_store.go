@@ -57,7 +57,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(append(append(modelColumns, "application_id"), applicationColumns...)) // TODO: remove possible duplicate application_id
+	return query.Select(cleanFields(append(append(modelColumns, "application_id"), applicationColumns...)...))
 }
 
 func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.Application) (*ttnpb.Application, error) {

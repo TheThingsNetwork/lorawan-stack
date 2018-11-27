@@ -60,7 +60,7 @@ func selectEndDeviceFields(ctx context.Context, query *gorm.DB, fieldMask *types
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(append(append(modelColumns, "application_id", "device_id"), deviceColumns...)) // TODO: remove possible duplicate application_id, device_id
+	return query.Select(cleanFields(append(append(modelColumns, "application_id", "device_id"), deviceColumns...)...))
 }
 
 func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {

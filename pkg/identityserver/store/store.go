@@ -240,3 +240,16 @@ func (l logger) Print(v ...interface{}) {
 		l.Error(fmt.Sprint(v...))
 	}
 }
+
+func cleanFields(fields ...string) []string {
+	seen := make(map[string]struct{}, len(fields))
+	out := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if _, ok := seen[field]; ok {
+			continue
+		}
+		seen[field] = struct{}{}
+		out = append(out, field)
+	}
+	return out
+}
