@@ -61,7 +61,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	var fetch func(db *gorm.DB) error
 	res := new(ttnpb.AuthInfoResponse)
-	userFieldMask := &types.FieldMask{Paths: []string{"admin"}}
+	userFieldMask := &types.FieldMask{Paths: []string{"admin", "state"}}
 	var user *ttnpb.User
 	var userRights *ttnpb.Rights
 
@@ -135,9 +135,36 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		if user.Admin {
 			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights.Implied()) // TODO: Use restricted Admin rights.
 		}
+
+		switch user.State {
+		case ttnpb.STATE_REQUESTED:
+			// Go to profile page, edit basic settings (such as email), delete account.
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
+		case ttnpb.STATE_APPROVED:
+			// Normal user.
+		case ttnpb.STATE_REJECTED:
+			// Go to profile page, delete account.
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE))
+		case ttnpb.STATE_FLAGGED:
+			// Innocent until proven guilty.
+		case ttnpb.STATE_SUSPENDED:
+			// Go to profile page.
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO))
+		default:
+			panic(fmt.Sprintf("Unhandled user state: %s", user.State.String()))
+		}
 	}
 
 	return res, nil
+}
+
+func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
+	if apiKey := info.GetAPIKey(); apiKey != nil {
+		apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Intersect(rights).GetRights()
+	} else if token := info.GetOAuthAccessToken(); token != nil {
+		token.Rights = ttnpb.RightsFrom(token.Rights...).Intersect(rights).GetRights()
+	}
+	info.UniversalRights = info.UniversalRights.Intersect(rights)
 }
 
 func entityRights(authInfo *ttnpb.AuthInfoResponse) (*ttnpb.EntityIdentifiers, *ttnpb.Rights) {
