@@ -93,7 +93,8 @@ func init() {
 // fieldmask path to column name in clients table.
 var clientColumnNames = map[string][]string{
 	"ids.client_id":        {"client_id"},
-	attributesField:        {"Attributes"},
+	attributesField:        {},
+	contactInfoField:       {},
 	nameField:              {nameField},
 	descriptionField:       {descriptionField},
 	secretField:            {"client_secret"},

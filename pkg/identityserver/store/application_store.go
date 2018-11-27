@@ -47,7 +47,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 		case attributesField:
 			query = query.Preload("Attributes")
 		default:
-			if columns, ok := applicationColumnNames[path]; ok && len(columns) > 0 {
+			if columns, ok := applicationColumnNames[path]; ok {
 				applicationColumns = append(applicationColumns, columns...)
 			} else {
 				notFoundPaths = append(notFoundPaths, path)

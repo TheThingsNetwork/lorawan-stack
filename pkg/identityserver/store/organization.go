@@ -77,6 +77,7 @@ func init() {
 // fieldmask path to column name in organizations table.
 var organizationColumnNames = map[string][]string{
 	attributesField:  {},
+	contactInfoField: {},
 	nameField:        {nameField},
 	descriptionField: {descriptionField},
 }

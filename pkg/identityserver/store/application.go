@@ -69,6 +69,7 @@ func init() {
 var applicationColumnNames = map[string][]string{
 	"ids.application_id": {"application_id"},
 	attributesField:      {},
+	contactInfoField:     {},
 	nameField:            {nameField},
 	descriptionField:     {descriptionField},
 }

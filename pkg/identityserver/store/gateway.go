@@ -159,6 +159,7 @@ var gatewayColumnNames = map[string][]string{
 	"ids.gateway_id":            {"gateway_id"},
 	"ids.eui":                   {"gateway_eui"},
 	attributesField:             {},
+	contactInfoField:            {},
 	nameField:                   {nameField},
 	descriptionField:            {descriptionField},
 	gatewayServerAddressField:   {gatewayServerAddressField},

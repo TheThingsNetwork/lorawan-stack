@@ -53,7 +53,7 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *ty
 		case attributesField:
 			query = query.Preload("Attributes")
 		default:
-			if columns, ok := organizationColumnNames[path]; ok && len(columns) > 0 {
+			if columns, ok := organizationColumnNames[path]; ok {
 				organizationColumns = append(organizationColumns, columns...)
 			} else {
 				notFoundPaths = append(notFoundPaths, path)

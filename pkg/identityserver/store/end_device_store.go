@@ -50,7 +50,7 @@ func selectEndDeviceFields(ctx context.Context, query *gorm.DB, fieldMask *types
 		case locationsField:
 			query = query.Preload("Locations")
 		default:
-			if columns, ok := deviceColumnNames[path]; ok && len(columns) > 0 {
+			if columns, ok := deviceColumnNames[path]; ok {
 				deviceColumns = append(deviceColumns, columns...)
 			} else {
 				notFoundPaths = append(notFoundPaths, path)

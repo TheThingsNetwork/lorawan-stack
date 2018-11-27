@@ -147,6 +147,7 @@ func init() {
 // fieldmask path to column name in users table.
 var userColumnNames = map[string][]string{
 	attributesField:                     {},
+	contactInfoField:                    {},
 	nameField:                           {nameField},
 	descriptionField:                    {descriptionField},
 	primaryEmailAddressField:            {primaryEmailAddressField},
