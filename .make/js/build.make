@@ -91,8 +91,9 @@ $(CACHE_DIR)/make/%.js: .make/js/%.js
 
 # Translations
 
-$(CACHE_DIR)/messages:
+$(CACHE_DIR)/messages: $(shell $(JS_SRC_FILES))
 	@$(log) "Extracting frontend translation messages via babel"
+	@rm -rf $(CACHE_DIR)/messages
 	@mkdir -p $(LOCALES_DIR)
 	@$(BABEL) -q $(JS_SRC_DIR) > /dev/null
 
@@ -110,6 +111,6 @@ $(BACKEND_LOCALES_DIR): $(CACHE_DIR)/make/translations.js $(CACHE_DIR)/make/xx.j
 	@$(log) "Gathering backend translation messages"
 	@$(NODE) $(CACHE_DIR)/make/translations.js --support $(SUPPORT_LOCALES) --backend-messages $(CONFIG_DIR)/messages.json --locales $(BACKEND_LOCALES_DIR) --backend-only
 
-js.translations: $(DEFAULT_LOCALE_FILE) js.build-main
+js.translations: $(DEFAULT_LOCALE_FILE)
 
 # vim: ft=make
