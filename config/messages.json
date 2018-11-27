@@ -5002,5 +5002,14 @@
       "package": "pkg/identityserver",
       "file": "user_registry.go"
     }
+  },
+  "event:user.update.incorrect_password": {
+    "translations": {
+      "en": "incorrect password for user update"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
   }
 }

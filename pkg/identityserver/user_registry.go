@@ -35,6 +35,8 @@ var (
 	evtCreateUser = events.Define("user.create", "Create user")
 	evtUpdateUser = events.Define("user.update", "Update user")
 	evtDeleteUser = events.Define("user.delete", "Delete user")
+
+	evtUpdateUserIncorrectPassword = events.Define("user.update.incorrect_password", "incorrect password for user update")
 )
 
 var (
@@ -141,10 +143,6 @@ var (
 )
 
 func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
-	err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL)
-	if err != nil {
-		return nil, err
-	}
 	hashedPassword, err := auth.Hash(req.New)
 	if err != nil {
 		return nil, err
@@ -160,8 +158,13 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		if err != nil {
 			return err
 		}
-		if !valid {
+		if valid {
+			if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL); err != nil {
+				return err
+			}
+		} else {
 			if usr.TemporaryPassword == "" {
+				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
 				return errIncorrectPassword
 			}
 			valid, err = auth.Password(usr.TemporaryPassword).Validate(req.Old)
@@ -169,8 +172,10 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			case err != nil:
 				return err
 			case !valid:
+				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
 				return errIncorrectPassword
 			case usr.TemporaryPasswordExpiresAt.Before(time.Now()):
+				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
 				return errTemporaryPasswordExpired
 			}
 			usr.TemporaryPassword, usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = "", nil, nil
