@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -186,16 +187,19 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		case ttnpb.STATE_REQUESTED:
 			// Go to profile page, edit basic settings (such as email), delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
+			warning.Add(ctx, "Restricted rights while account pending")
 		case ttnpb.STATE_APPROVED:
 			// Normal user.
 		case ttnpb.STATE_REJECTED:
 			// Go to profile page, delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE))
+			warning.Add(ctx, "Restricted rights after account rejection")
 		case ttnpb.STATE_FLAGGED:
 			// Innocent until proven guilty.
 		case ttnpb.STATE_SUSPENDED:
 			// Go to profile page.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO))
+			warning.Add(ctx, "Restricted rights after account suspension")
 		default:
 			panic(fmt.Sprintf("Unhandled user state: %s", user.State.String()))
 		}
