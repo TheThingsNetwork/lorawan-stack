@@ -17,6 +17,7 @@ package store
 const ( // TODO: should probably move this to ttnpb
 	// please keep this sorted
 	adminField                  = "admin"
+	antennasField               = "antennas"
 	attributesField             = "attributes"
 	autoUpdateField             = "auto_update"
 	brandIDField                = "version_ids.brand_id"

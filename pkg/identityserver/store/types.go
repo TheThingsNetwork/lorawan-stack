@@ -106,3 +106,11 @@ func (r *Rights) Scan(src interface{}) error {
 	*r = Rights{Rights: rights}
 	return nil
 }
+
+// Location can be embedded in other models.
+type Location struct {
+	Latitude  float64
+	Longitude float64
+	Altitude  int32
+	Accuracy  int32
+}

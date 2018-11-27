@@ -15,6 +15,8 @@
 package store
 
 import (
+	"sort"
+
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -55,6 +57,8 @@ type Gateway struct {
 	ScheduleDownlinkLate   bool `gorm:"not null"`
 	EnforceDutyCycle       bool `gorm:"not null"`
 	DownlinkPathConstraint int
+
+	Antennas []GatewayAntenna
 }
 
 func init() {
@@ -83,6 +87,13 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	downlinkPathConstraintField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint(gtw.DownlinkPathConstraint)
 	},
+	antennasField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		sort.Slice(gtw.Antennas, func(i int, j int) bool { return gtw.Antennas[i].Index < gtw.Antennas[j].Index })
+		pb.Antennas = make([]ttnpb.GatewayAntenna, len(gtw.Antennas))
+		for i, antenna := range gtw.Antennas {
+			pb.Antennas[i] = antenna.toPB()
+		}
+	},
 }
 
 // functions to set fields from the gateway proto into the gateway model.
@@ -109,6 +120,18 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	scheduleDownlinkLateField:   func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },
 	enforceDutyCycleField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.EnforceDutyCycle = pb.EnforceDutyCycle },
 	downlinkPathConstraintField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.DownlinkPathConstraint = int(pb.DownlinkPathConstraint) },
+	antennasField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		sort.Slice(gtw.Antennas, func(i int, j int) bool { return gtw.Antennas[i].Index < gtw.Antennas[j].Index })
+		antennas := make([]GatewayAntenna, len(pb.Antennas))
+		copy(antennas, gtw.Antennas)
+		gtw.Antennas = antennas
+		for i, pb := range pb.Antennas {
+			antenna := gtw.Antennas[i]
+			antenna.fromPB(pb)
+			antenna.Index = i
+			gtw.Antennas[i] = antenna
+		}
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -143,6 +166,7 @@ var gatewayColumnNames = map[string]string{
 	scheduleDownlinkLateField:   scheduleDownlinkLateField,
 	enforceDutyCycleField:       enforceDutyCycleField,
 	downlinkPathConstraintField: downlinkPathConstraintField,
+	antennasField:               "",
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
