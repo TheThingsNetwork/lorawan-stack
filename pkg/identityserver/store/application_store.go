@@ -16,10 +16,13 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -33,11 +36,12 @@ type applicationStore struct {
 }
 
 // selectApplicationFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectApplicationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
+func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var applicationColumns []string
+	var notFoundPaths []string
 	for _, path := range fieldMask.Paths {
 		switch path {
 		case attributesField:
@@ -47,8 +51,13 @@ func selectApplicationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.D
 		default:
 			if column, ok := applicationColumnNames[path]; ok && column != "" {
 				applicationColumns = append(applicationColumns, column)
+			} else {
+				notFoundPaths = append(notFoundPaths, path)
 			}
 		}
+	}
+	if len(notFoundPaths) > 0 {
+		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
 	return query.Select(append(append(modelColumns, "application_id"), applicationColumns...)) // TODO: remove possible duplicate application_id
 }
@@ -74,7 +83,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 		idStrings[i] = id.GetApplicationID()
 	}
 	query := s.db.Scopes(withContext(ctx), withApplicationID(idStrings...))
-	query = selectApplicationFields(query, fieldMask)
+	query = selectApplicationFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Application{}))
 		query = query.Limit(limit).Offset(offset)
@@ -96,7 +105,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 
 func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Application, error) {
 	query := s.db.Scopes(withContext(ctx), withApplicationID(id.GetApplicationID()))
-	query = selectApplicationFields(query, fieldMask)
+	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	err := query.First(&appModel).Error
 	if err != nil {
@@ -112,7 +121,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 
 func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *types.FieldMask) (updated *ttnpb.Application, err error) {
 	query := s.db.Scopes(withContext(ctx), withApplicationID(app.GetApplicationID()))
-	query = selectApplicationFields(query, fieldMask)
+	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	err = query.First(&appModel).Error
 	if err != nil {

@@ -16,10 +16,13 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -33,11 +36,12 @@ type userStore struct {
 }
 
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectUserFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
+func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		return query.Preload("Attributes").Preload("ContactInfo").Select([]string{"users.*", "accounts.uid"})
 	}
 	var userColumns []string
+	var notFoundPaths []string
 	for _, column := range modelColumns {
 		userColumns = append(userColumns, "users."+column)
 	}
@@ -52,8 +56,13 @@ func selectUserFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 		default:
 			if column, ok := userColumnNames[path]; ok && column != "" {
 				userColumns = append(userColumns, column)
+			} else {
+				notFoundPaths = append(notFoundPaths, path)
 			}
 		}
+	}
+	if len(notFoundPaths) > 0 {
+		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
 	return query.Select(append(userColumns, "accounts.uid"))
 }
@@ -80,7 +89,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 		idStrings[i] = id.GetUserID()
 	}
 	query := s.db.Scopes(withContext(ctx), withUserID(idStrings...))
-	query = selectUserFields(query, fieldMask)
+	query = selectUserFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&User{}))
 		query = query.Limit(limit).Offset(offset)
@@ -102,7 +111,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 
 func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
 	query := s.db.Scopes(withContext(ctx), withUserID(id.GetUserID()))
-	query = selectUserFields(query, fieldMask)
+	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
 	err := query.Preload("Account").First(&userModel).Error
 	if err != nil {
@@ -118,7 +127,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 
 func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (updated *ttnpb.User, err error) {
 	query := s.db.Scopes(withContext(ctx), withUserID(usr.GetUserID()))
-	query = selectUserFields(query, fieldMask)
+	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
 	err = query.First(&userModel).Error
 	if err != nil {

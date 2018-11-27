@@ -16,10 +16,13 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -33,11 +36,12 @@ type gatewayStore struct {
 }
 
 // selectGatewayFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectGatewayFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
+func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var gatewayColumns []string
+	var notFoundPaths []string
 	for _, path := range fieldMask.Paths {
 		switch path {
 		case attributesField:
@@ -47,8 +51,13 @@ func selectGatewayFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 		default:
 			if column, ok := gatewayColumnNames[path]; ok && column != "" {
 				gatewayColumns = append(gatewayColumns, column)
+			} else {
+				notFoundPaths = append(notFoundPaths, path)
 			}
 		}
+	}
+	if len(notFoundPaths) > 0 {
+		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
 	return query.Select(append(append(modelColumns, "gateway_id"), gatewayColumns...)) // TODO: remove possible duplicate gateway_id
 }
@@ -74,7 +83,7 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 		idStrings[i] = id.GetGatewayID()
 	}
 	query := s.db.Scopes(withContext(ctx), withGatewayID(idStrings...))
-	query = selectGatewayFields(query, fieldMask)
+	query = selectGatewayFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Gateway{}))
 		query = query.Limit(limit).Offset(offset)
@@ -99,7 +108,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 	if id.EUI != nil {
 		query = query.Scopes(withGatewayEUI(EUI64(*id.EUI)))
 	}
-	query = selectGatewayFields(query, fieldMask)
+	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
 	err := query.First(&gtwModel).Error
 	if err != nil {
@@ -115,7 +124,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 
 func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fieldMask *types.FieldMask) (updated *ttnpb.Gateway, err error) {
 	query := s.db.Scopes(withContext(ctx), withGatewayID(gtw.GetGatewayID()))
-	query = selectGatewayFields(query, fieldMask)
+	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
 	err = query.First(&gtwModel).Error
 	if err != nil {

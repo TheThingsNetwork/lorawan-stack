@@ -16,10 +16,13 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -33,11 +36,12 @@ type organizationStore struct {
 }
 
 // selectOrganizationFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectOrganizationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
+func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		return query.Preload("Attributes").Preload("ContactInfo").Select([]string{"organizations.*", "accounts.uid"})
 	}
 	var organizationColumns []string
+	var notFoundPaths []string
 	for _, column := range modelColumns {
 		organizationColumns = append(organizationColumns, "organizations."+column)
 	}
@@ -52,8 +56,13 @@ func selectOrganizationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.
 		default:
 			if column, ok := organizationColumnNames[path]; ok && column != "" {
 				organizationColumns = append(organizationColumns, column)
+			} else {
+				notFoundPaths = append(notFoundPaths, path)
 			}
 		}
+	}
+	if len(notFoundPaths) > 0 {
+		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
 	return query.Select(append(organizationColumns, "accounts.uid"))
 }
@@ -79,7 +88,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 		idStrings[i] = id.GetOrganizationID()
 	}
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(idStrings...))
-	query = selectOrganizationFields(query, fieldMask)
+	query = selectOrganizationFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Organization{}))
 		query = query.Limit(limit).Offset(offset)
@@ -101,7 +110,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 
 func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Organization, error) {
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(id.GetOrganizationID()))
-	query = selectOrganizationFields(query, fieldMask)
+	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
 	err := query.Preload("Account").First(&orgModel).Error
 	if err != nil {
@@ -117,7 +126,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 
 func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask *types.FieldMask) (updated *ttnpb.Organization, err error) {
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(org.GetOrganizationID()))
-	query = selectOrganizationFields(query, fieldMask)
+	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
 	err = query.Preload("Account").First(&orgModel).Error
 	if err != nil {

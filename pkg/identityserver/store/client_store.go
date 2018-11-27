@@ -16,10 +16,13 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -33,11 +36,12 @@ type clientStore struct {
 }
 
 // selectClientFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectClientFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
+func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var clientColumns []string
+	var notFoundPaths []string
 	for _, path := range fieldMask.Paths {
 		switch path {
 		case attributesField:
@@ -47,8 +51,13 @@ func selectClientFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 		default:
 			if column, ok := clientColumnNames[path]; ok && column != "" {
 				clientColumns = append(clientColumns, column)
+			} else {
+				notFoundPaths = append(notFoundPaths, path)
 			}
 		}
+	}
+	if len(notFoundPaths) > 0 {
+		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
 	return query.Select(append(append(modelColumns, "client_id"), clientColumns...)) // TODO: remove possible duplicate client_id
 }
@@ -74,7 +83,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 		idStrings[i] = id.GetClientID()
 	}
 	query := s.db.Scopes(withContext(ctx), withClientID(idStrings...))
-	query = selectClientFields(query, fieldMask)
+	query = selectClientFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Client{}))
 		query = query.Limit(limit).Offset(offset)
@@ -96,7 +105,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 
 func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
 	query := s.db.Scopes(withContext(ctx), withClientID(id.GetClientID()))
-	query = selectClientFields(query, fieldMask)
+	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	err := query.First(&cliModel).Error
 	if err != nil {
@@ -112,7 +121,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 
 func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (updated *ttnpb.Client, err error) {
 	query := s.db.Scopes(withContext(ctx), withClientID(cli.GetClientID()))
-	query = selectClientFields(query, fieldMask)
+	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	err = query.First(&cliModel).Error
 	if err != nil {
