@@ -48,7 +48,7 @@ GO_FILTERED_COVER_FILE = coverage.filtered.out
 
 # go test flags
 GO_COVERALLS_FLAGS = -cover -covermode=atomic -coverprofile=$(GO_COVER_FILE)
-GO_TEST_FLAGS ?= $(if $(CI),$(GO_COVERALLS_FLAGS),-cover)
+GO_TEST_FLAGS ?= $(if $(CI),$(GO_COVERALLS_FLAGS),-cover) -timeout 5m
 
 # select only go files
 only_go = grep '\.go$$'

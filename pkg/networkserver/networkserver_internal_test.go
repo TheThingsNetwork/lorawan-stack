@@ -47,8 +47,7 @@ var (
 	GenerateDownlink = generateDownlink
 	TimePtr          = timePtr
 
-	ErrNoDownlink     = errNoDownlink
-	ErrDeviceNotFound = errDeviceNotFound
+	ErrNoDownlink = errNoDownlink
 
 	FNwkSIntKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	SNwkSIntKey = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -570,8 +569,10 @@ func TestScheduleDownlink(t *testing.T) {
 				WithNsGsClientFunc(tc.NsGsClient),
 				WithDeduplicationDoneFunc(tc.DeduplicationDone),
 			)).(*NetworkServer)
-			test.Must(nil, ns.Start())
 			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+
+			test.Must(nil, ns.Start())
+			defer ns.Close()
 
 			ctx = context.WithValue(ctx, nsKey{}, ns)
 

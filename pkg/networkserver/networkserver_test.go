@@ -98,8 +98,6 @@ func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
 }
 
 func TestDownlinkQueueReplace(t *testing.T) {
-	t.Parallel()
-
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationID: ApplicationID,
@@ -110,17 +108,20 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name    string
-		Context context.Context
-		Device  *ttnpb.EndDevice
-		Request *ttnpb.DownlinkQueueRequest
-		Error   error
+		Name           string
+		Context        context.Context
+		Device         *ttnpb.EndDevice
+		Request        *ttnpb.DownlinkQueueRequest
+		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
 			Name:    "no device",
 			Context: test.Context(),
 			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
-			Error:   ErrDeviceNotFound,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
+			},
 		},
 		{
 			Name:    "empty queue/empty request",
@@ -189,8 +190,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			t.Parallel()
-
 			a := assertions.New(t)
 
 			redisClient, flush := test.NewRedis(t, "networkserver_test")
@@ -206,6 +205,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					CooldownWindow:      42,
 				})).(*NetworkServer)
 			test.Must(nil, ns.Start())
+			defer ns.Close()
 
 			pb := CopyEndDevice(tc.Device)
 			if tc.Device != nil {
@@ -223,11 +223,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			}
 
 			_, err := ns.DownlinkQueueReplace(tc.Context, tc.Request)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+			if tc.ErrorAssertion != nil {
+				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				return
 			}
-			a.So(tc.Error, should.BeNil)
+			a.So(err, should.BeNil)
 
 			pb.QueuedApplicationDownlinks = tc.Request.Downlinks
 
@@ -243,8 +243,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 }
 
 func TestDownlinkQueuePush(t *testing.T) {
-	t.Parallel()
-
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationID: ApplicationID,
@@ -255,17 +253,20 @@ func TestDownlinkQueuePush(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name    string
-		Context context.Context
-		Device  *ttnpb.EndDevice
-		Request *ttnpb.DownlinkQueueRequest
-		Error   error
+		Name           string
+		Context        context.Context
+		Device         *ttnpb.EndDevice
+		Request        *ttnpb.DownlinkQueueRequest
+		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
 			Name:    "no device",
 			Context: test.Context(),
 			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
-			Error:   ErrDeviceNotFound,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
+			},
 		},
 		{
 			Name:    "empty queue/empty request",
@@ -334,8 +335,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			t.Parallel()
-
 			a := assertions.New(t)
 
 			redisClient, flush := test.NewRedis(t, "networkserver_test")
@@ -351,6 +350,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					CooldownWindow:      42,
 				})).(*NetworkServer)
 			test.Must(nil, ns.Start())
+			defer ns.Close()
 
 			pb := CopyEndDevice(tc.Device)
 			if tc.Device != nil {
@@ -368,11 +368,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 			}
 
 			_, err := ns.DownlinkQueuePush(tc.Context, tc.Request)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+			if tc.ErrorAssertion != nil {
+				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				return
 			}
-			a.So(tc.Error, should.BeNil)
+			a.So(err, should.BeNil)
 
 			pb.QueuedApplicationDownlinks = append(pb.QueuedApplicationDownlinks, tc.Request.Downlinks...)
 
@@ -388,8 +388,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 }
 
 func TestDownlinkQueueList(t *testing.T) {
-	t.Parallel()
-
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationID: ApplicationID,
@@ -400,17 +398,20 @@ func TestDownlinkQueueList(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name    string
-		Context context.Context
-		Device  *ttnpb.EndDevice
-		Request *ttnpb.EndDeviceIdentifiers
-		Error   error
+		Name           string
+		Context        context.Context
+		Device         *ttnpb.EndDevice
+		Request        *ttnpb.EndDeviceIdentifiers
+		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
 			Name:    "no device",
 			Context: test.Context(),
 			Request: ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
-			Error:   ErrDeviceNotFound,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
+			},
 		},
 		{
 			Name:    "empty identifiers",
@@ -420,6 +421,10 @@ func TestDownlinkQueueList(t *testing.T) {
 				QueuedApplicationDownlinks: nil,
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
 		},
 		{
 			Name:    "empty queue",
@@ -446,8 +451,6 @@ func TestDownlinkQueueList(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			t.Parallel()
-
 			a := assertions.New(t)
 
 			redisClient, flush := test.NewRedis(t, "networkserver_test")
@@ -463,6 +466,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					CooldownWindow:      42,
 				})).(*NetworkServer)
 			test.Must(nil, ns.Start())
+			defer ns.Close()
 
 			pb := CopyEndDevice(tc.Device)
 			if tc.Device != nil {
@@ -483,12 +487,12 @@ func TestDownlinkQueueList(t *testing.T) {
 			}
 
 			resp, err := ns.DownlinkQueueList(tc.Context, tc.Request)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+			if tc.ErrorAssertion != nil {
+				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				a.So(resp, should.BeNil)
 				return
 			}
-			a.So(tc.Error, should.BeNil)
+			a.So(err, should.BeNil)
 			a.So(resp, should.HaveEmptyDiff, &ttnpb.ApplicationDownlinks{Downlinks: pb.QueuedApplicationDownlinks})
 		})
 	}
@@ -606,6 +610,7 @@ func TestLinkApplication(t *testing.T) {
 			CooldownWindow:      42,
 		})).(*NetworkServer)
 	test.Must(nil, ns.Start())
+	defer ns.Close()
 
 	id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 
@@ -673,6 +678,7 @@ func HandleUplinkTest() func(t *testing.T) {
 			})).(*NetworkServer)
 		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 		test.Must(nil, ns.Start())
+		defer ns.Close()
 
 		pb := &ttnpb.EndDevice{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1399,6 +1405,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				)).(*NetworkServer)
 				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 				test.Must(nil, ns.Start())
+				defer ns.Close()
 
 				type asSendReq struct {
 					up    *ttnpb.ApplicationUp
@@ -1755,6 +1762,7 @@ func HandleJoinTest() func(t *testing.T) {
 		)).(*NetworkServer)
 		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 		test.Must(nil, ns.Start())
+		defer ns.Close()
 
 		_, err := ns.HandleUplink(authorizedCtx, ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
 		a.So(err, should.NotBeNil)
@@ -1996,6 +2004,7 @@ func HandleJoinTest() func(t *testing.T) {
 				ns.Component.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 
 				test.Must(nil, ns.Start())
+				defer ns.Close()
 
 				asSendCh := make(chan *ttnpb.ApplicationUp)
 
@@ -2172,7 +2181,7 @@ func HandleJoinTest() func(t *testing.T) {
 
 					a.So(up.CorrelationIDs, should.NotBeEmpty)
 
-					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+					a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
 						CorrelationIDs: up.CorrelationIDs,
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 							DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
@@ -2251,7 +2260,7 @@ func HandleJoinTest() func(t *testing.T) {
 					case up := <-asSendCh:
 						a.So(up.CorrelationIDs, should.NotBeEmpty)
 
-						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
 							CorrelationIDs: up.CorrelationIDs,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 								DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
@@ -2314,6 +2323,7 @@ func TestHandleUplink(t *testing.T) {
 		},
 	)).(*NetworkServer)
 	test.Must(nil, ns.Start())
+	defer ns.Close()
 
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
