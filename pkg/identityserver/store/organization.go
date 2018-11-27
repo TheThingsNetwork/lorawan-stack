@@ -33,6 +33,7 @@ type Organization struct {
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:organization"`
+	APIKeys     []APIKey      `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	Memberships []Membership  `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	// END common fields
 }

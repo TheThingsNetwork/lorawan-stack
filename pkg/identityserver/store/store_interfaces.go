@@ -118,6 +118,19 @@ type MembershipStore interface {
 	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error
 }
 
+// APIKeyStore interface for storing API keys for entities (applications,
+// clients, gateways, organizations or users).
+type APIKeyStore interface {
+	// Create a new API key for the given entity.
+	CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) error
+	// Find API keys of the given entity.
+	FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.APIKey, error)
+	// Get an API key by its ID.
+	GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error)
+	// Update key rights on an entity. Rights can be deleted by not passing any rights, in which case the returned API key will be nil.
+	UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error)
+}
+
 // OAuthStore interface for the OAuth server.
 //
 // For internal use (by the OAuth server) only.

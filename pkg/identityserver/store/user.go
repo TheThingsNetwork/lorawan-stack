@@ -34,6 +34,7 @@ type User struct {
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:user"`
 	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:user"`
+	APIKeys     []APIKey      `gorm:"polymorphic:Entity;polymorphic_value:user"`
 	// END common fields
 
 	Sessions []*UserSession

@@ -2339,6 +2339,24 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:api_key_entity": {
+    "translations": {
+      "en": "API key not linked to an entity"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "api_key_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:api_key_not_found": {
+    "translations": {
+      "en": "API key not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
   "error:pkg/identityserver/store:application_not_found": {
     "translations": {
       "en": "application `{application_id}` not found"

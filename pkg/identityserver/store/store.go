@@ -160,6 +160,8 @@ var (
 	errAuthorizationNotFound     = errors.DefineNotFound("authorization_not_found", "authorization of `{user_id}` for `{client_id}` not found")
 	errAuthorizationCodeNotFound = errors.DefineNotFound("authorization_code_not_found", "authorization code not found")
 	errAccessTokenNotFound       = errors.DefineNotFound("access_token_not_found", "access token not found")
+
+	errAPIKeyNotFound = errors.DefineNotFound("api_key_not_found", "API key not found")
 )
 
 func errNotFoundForID(entityID *ttnpb.EntityIdentifiers) error {
