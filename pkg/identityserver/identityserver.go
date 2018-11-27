@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -37,6 +38,10 @@ type Config struct {
 		Required bool          `name:"required" description:"Require user invitations"`
 		TokenTTL time.Duration `name:"token-ttl" description:"TTL of invitation tokens"`
 	} `name:"user-invitation"`
+	AuthCache struct {
+		TokenTTL      time.Duration `name:"token-ttl" description:"TTL of token caches"`
+		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
+	} `name:"auth-cache"`
 	OAuth oauth.Config `name:"oauth"`
 }
 
@@ -49,6 +54,13 @@ type IdentityServer struct {
 	config *Config
 	db     *gorm.DB
 	oauth  oauth.Server
+
+	redis *redis.Client
+}
+
+// SetRedisCache configures the given redis instance for caching.
+func (is *IdentityServer) SetRedisCache(redis *redis.Client) {
+	is.redis = redis
 }
 
 type ctxKeyType struct{}

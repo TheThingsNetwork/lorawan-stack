@@ -15,6 +15,8 @@
 package identityserver
 
 import (
+	"time"
+
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
@@ -38,4 +40,9 @@ var DefaultIdentityServerConfig = identityserver.Config{
 			},
 		},
 	},
+}
+
+func init() {
+	DefaultIdentityServerConfig.AuthCache.TokenTTL = shared.DefaultRightsConfig.TTL
+	DefaultIdentityServerConfig.AuthCache.MembershipTTL = 10 * time.Minute
 }

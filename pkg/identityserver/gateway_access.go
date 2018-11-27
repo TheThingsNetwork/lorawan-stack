@@ -130,6 +130,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	} else {
 		events.Publish(evtDeleteGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
 	}
+	is.invalidateCachedAuthInfoForToken(ctx, key.Key)
 	return key, nil
 }
 
@@ -155,6 +156,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	} else {
 		events.Publish(evtDeleteGatewayCollaborator(ctx, req.GatewayIdentifiers, nil))
 	}
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator.OrganizationOrUserIdentifiers)
 	return ttnpb.Empty, nil
 }
 

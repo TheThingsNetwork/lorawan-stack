@@ -130,6 +130,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	} else {
 		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
 	}
+	is.invalidateCachedAuthInfoForToken(ctx, key.Key)
 	return key, nil
 }
 
@@ -155,6 +156,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	} else {
 		events.Publish(evtDeleteApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
 	}
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator.OrganizationOrUserIdentifiers)
 	return ttnpb.Empty, nil
 }
 

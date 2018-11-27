@@ -90,6 +90,11 @@ var (
 			}
 			_ = is
 
+			is.SetRedisCache(redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"is", "cache"},
+			}))
+
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
 				return shared.ErrInitializeGatewayServer.WithCause(err)

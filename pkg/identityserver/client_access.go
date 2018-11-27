@@ -65,6 +65,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	} else {
 		events.Publish(evtDeleteClientCollaborator(ctx, req.ClientIdentifiers, nil))
 	}
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator.OrganizationOrUserIdentifiers)
 	return ttnpb.Empty, nil
 }
 

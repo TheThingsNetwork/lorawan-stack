@@ -127,6 +127,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	} else {
 		events.Publish(evtDeleteUserAPIKey(ctx, req.UserIdentifiers, nil))
 	}
+	is.invalidateCachedAuthInfoForToken(ctx, key.Key)
 	return key, nil
 }
 

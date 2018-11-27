@@ -35,7 +35,7 @@ var (
 	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "access token expired")
 )
 
-func (is *IdentityServer) authInfo(ctx context.Context) (*ttnpb.AuthInfoResponse, error) {
+func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoResponse, err error) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 	if md.AuthType == "" {
 		return &ttnpb.AuthInfoResponse{}, nil
@@ -44,6 +44,16 @@ func (is *IdentityServer) authInfo(ctx context.Context) (*ttnpb.AuthInfoResponse
 		return nil, errUnsupportedAuthorization
 	}
 	token := md.AuthValue
+
+	if info = is.cachedAuthInfoForToken(ctx, token); info != nil {
+		return info, nil
+	}
+	defer func() {
+		if err == nil {
+			is.cacheAuthInfoForToken(ctx, token, info)
+		}
+	}()
+
 	tokenType, tokenID, tokenKey, err := auth.SplitToken(token)
 	if err != nil {
 		return nil, err
@@ -167,28 +177,34 @@ func (is *IdentityServer) memberRights(ctx context.Context, ids *ttnpb.EntityIde
 	if ouIDs == nil {
 		return nil, nil
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		entityRights, err = store.GetMembershipStore(db).FindMemberRights(ctx, ouIDs, "")
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	subMemberRights := make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights)
-	for ids, rights := range entityRights {
-		memberRights, err := is.memberRights(ctx, ids)
+
+	memberships := is.cachedMembershipsForAccount(ctx, ouIDs)
+	if memberships == nil {
+		err = is.withDatabase(ctx, func(db *gorm.DB) error {
+			memberships, err = store.GetMembershipStore(db).FindMemberRights(ctx, ouIDs, "")
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 		if err != nil {
 			return nil, err
 		}
-		for ids, memberRights := range memberRights {
-			subMemberRights[ids] = memberRights.Implied().Intersect(rights.Implied())
-		}
+		defer func() {
+			is.cacheMembershipsForAccount(ctx, ouIDs, memberships)
+		}()
 	}
-	for ids, rights := range subMemberRights {
+
+	entityRights = make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights)
+	for ids, rights := range memberships {
 		entityRights[ids] = rights
+		subMemberRights, err := is.memberRights(ctx, ids)
+		if err != nil {
+			return nil, err
+		}
+		for ids, memberRights := range subMemberRights {
+			entityRights[ids] = memberRights.Implied().Intersect(rights.Implied())
+		}
 	}
 	return entityRights, nil
 }

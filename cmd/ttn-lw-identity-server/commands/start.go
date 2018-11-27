@@ -19,6 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 )
 
 var (
@@ -31,10 +32,15 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
-			_, err = identityserver.New(c, &config.IS)
+			is, err := identityserver.New(c, &config.IS)
 			if err != nil {
 				return shared.ErrInitializeIdentityServer.WithCause(err)
 			}
+
+			is.SetRedisCache(redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"is", "cache"},
+			}))
 
 			logger.Info("Starting Identity Server...")
 			return c.Run()
