@@ -145,20 +145,20 @@ func init() {
 }
 
 // fieldmask path to column name in users table.
-var userColumnNames = map[string]string{
-	attributesField:                     "",
-	nameField:                           nameField,
-	descriptionField:                    descriptionField,
-	primaryEmailAddressField:            primaryEmailAddressField,
-	primaryEmailAddressValidatedAtField: primaryEmailAddressValidatedAtField,
-	passwordField:                       passwordField,
-	passwordUpdatedAtField:              passwordUpdatedAtField,
-	requirePasswordUpdateField:          requirePasswordUpdateField,
-	stateField:                          stateField,
-	adminField:                          adminField,
-	temporaryPasswordField:              temporaryPasswordField,
-	temporaryPasswordCreatedAtField:     temporaryPasswordCreatedAtField,
-	temporaryPasswordExpiresAtField:     temporaryPasswordExpiresAtField,
+var userColumnNames = map[string][]string{
+	attributesField:                     {},
+	nameField:                           {nameField},
+	descriptionField:                    {descriptionField},
+	primaryEmailAddressField:            {primaryEmailAddressField},
+	primaryEmailAddressValidatedAtField: {primaryEmailAddressValidatedAtField},
+	passwordField:                       {passwordField},
+	passwordUpdatedAtField:              {passwordUpdatedAtField},
+	requirePasswordUpdateField:          {requirePasswordUpdateField},
+	stateField:                          {stateField},
+	adminField:                          {adminField},
+	temporaryPasswordField:              {temporaryPasswordField},
+	temporaryPasswordCreatedAtField:     {temporaryPasswordCreatedAtField},
+	temporaryPasswordExpiresAtField:     {temporaryPasswordExpiresAtField},
 }
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
@@ -182,12 +182,10 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []s
 	for _, path := range fieldMask.Paths {
 		if setter, ok := userModelSetters[path]; ok {
 			setter(usr, pb)
-			columnName, ok := userColumnNames[path]
-			if !ok {
-				columnName = path
-			}
-			if columnName != "" {
-				columns = append(columns, columnName)
+			if columnNames, ok := userColumnNames[path]; ok {
+				columns = append(columns, columnNames...)
+			} else {
+				columns = append(columns, path)
 			}
 			continue
 		}

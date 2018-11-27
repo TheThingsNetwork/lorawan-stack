@@ -66,11 +66,11 @@ func init() {
 }
 
 // fieldmask path to column name in applications table.
-var applicationColumnNames = map[string]string{
-	"ids.application_id": "application_id",
-	attributesField:      "",
-	nameField:            nameField,
-	descriptionField:     descriptionField,
+var applicationColumnNames = map[string][]string{
+	"ids.application_id": {"application_id"},
+	attributesField:      {},
+	nameField:            {nameField},
+	descriptionField:     {descriptionField},
 }
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask *types.FieldMask) {
@@ -94,12 +94,10 @@ func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *types.FieldMask
 	for _, path := range fieldMask.Paths {
 		if setter, ok := applicationModelSetters[path]; ok {
 			setter(app, pb)
-			columnName, ok := applicationColumnNames[path]
-			if !ok {
-				columnName = path
-			}
-			if columnName != "" {
-				columns = append(columns, columnName)
+			if columnNames, ok := applicationColumnNames[path]; ok {
+				columns = append(columns, columnNames...)
+			} else {
+				columns = append(columns, path)
 			}
 			continue
 		}

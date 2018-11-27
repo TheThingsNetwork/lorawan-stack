@@ -75,10 +75,10 @@ func init() {
 }
 
 // fieldmask path to column name in organizations table.
-var organizationColumnNames = map[string]string{
-	attributesField:  "",
-	nameField:        nameField,
-	descriptionField: descriptionField,
+var organizationColumnNames = map[string][]string{
+	attributesField:  {},
+	nameField:        {nameField},
+	descriptionField: {descriptionField},
 }
 
 func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask) {
@@ -102,12 +102,10 @@ func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *types.FieldMa
 	for _, path := range fieldMask.Paths {
 		if setter, ok := organizationModelSetters[path]; ok {
 			setter(org, pb)
-			columnName, ok := organizationColumnNames[path]
-			if !ok {
-				columnName = path
-			}
-			if columnName != "" {
-				columns = append(columns, columnName)
+			if columnNames, ok := organizationColumnNames[path]; ok {
+				columns = append(columns, columnNames...)
+			} else {
+				columns = append(columns, path)
 			}
 			continue
 		}

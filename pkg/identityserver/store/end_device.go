@@ -63,6 +63,14 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	nameField:        func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Name = dev.Name },
 	descriptionField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Description = dev.Description },
 	attributesField:  func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Attributes = attributes(dev.Attributes).toMap() },
+	versionIDsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.VersionIDs = &ttnpb.EndDeviceVersionIdentifiers{
+			BrandID:         dev.BrandID,
+			ModelID:         dev.ModelID,
+			HardwareVersion: dev.HardwareVersion,
+			FirmwareVersion: dev.FirmwareVersion,
+		}
+	},
 	brandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		mustEndDeviceVersionIDs(pb).BrandID = dev.BrandID
 	},
@@ -88,6 +96,12 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	descriptionField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.Description = pb.Description },
 	attributesField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Attributes = attributes(dev.Attributes).updateFromMap(pb.Attributes)
+	},
+	versionIDsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.BrandID = pb.GetVersionIDs().GetBrandID()
+		dev.ModelID = pb.GetVersionIDs().GetModelID()
+		dev.HardwareVersion = pb.GetVersionIDs().GetHardwareVersion()
+		dev.FirmwareVersion = pb.GetVersionIDs().GetFirmwareVersion()
 	},
 	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BrandID = pb.GetVersionIDs().GetBrandID() },
 	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ModelID = pb.GetVersionIDs().GetModelID() },
@@ -118,21 +132,22 @@ func init() {
 }
 
 // fieldmask path to column name in devices table.
-var deviceColumnNames = map[string]string{
-	"ids.device_id":                      "device_id",
-	"ids.application_ids.application_id": "application_id",
-	attributesField:                      "",
-	nameField:                            nameField,
-	descriptionField:                     descriptionField,
-	brandIDField:                         "brand_id",
-	modelIDField:                         "model_id",
-	hardwareVersionField:                 "hardware_version",
-	firmwareVersionField:                 "firmware_version",
-	networkServerAddressField:            networkServerAddressField,
-	applicationServerAddressField:        applicationServerAddressField,
-	joinServerAddressField:               joinServerAddressField,
-	serviceProfileIDField:                serviceProfileIDField,
-	locationsField:                       "",
+var deviceColumnNames = map[string][]string{
+	"ids.device_id":                      {"device_id"},
+	"ids.application_ids.application_id": {"application_id"},
+	attributesField:                      {},
+	nameField:                            {nameField},
+	descriptionField:                     {descriptionField},
+	versionIDsField:                      {"brand_id", "model_id", "hardware_version", "firmware_version"},
+	brandIDField:                         {"brand_id"},
+	modelIDField:                         {"model_id"},
+	hardwareVersionField:                 {"hardware_version"},
+	firmwareVersionField:                 {"firmware_version"},
+	networkServerAddressField:            {networkServerAddressField},
+	applicationServerAddressField:        {applicationServerAddressField},
+	joinServerAddressField:               {joinServerAddressField},
+	serviceProfileIDField:                {serviceProfileIDField},
+	locationsField:                       {},
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) {
@@ -157,12 +172,10 @@ func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) (c
 	for _, path := range fieldMask.Paths {
 		if setter, ok := deviceModelSetters[path]; ok {
 			setter(dev, pb)
-			columnName, ok := deviceColumnNames[path]
-			if !ok {
-				columnName = path
-			}
-			if columnName != "" {
-				columns = append(columns, columnName)
+			if columnNames, ok := deviceColumnNames[path]; ok {
+				columns = append(columns, columnNames...)
+			} else {
+				columns = append(columns, path)
 			}
 			continue
 		}

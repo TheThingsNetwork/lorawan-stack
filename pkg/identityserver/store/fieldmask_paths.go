@@ -56,4 +56,5 @@ const ( // TODO: should probably move this to ttnpb
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"
 	updateChannelField                  = "update_channel"
+	versionIDsField                     = "version_ids"
 )

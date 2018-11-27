@@ -66,10 +66,18 @@ func init() {
 
 // functions to set fields from the gateway model into the gateway proto.
 var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
-	"ids.eui":                 func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EUI = (*types.EUI64)(gtw.GatewayEUI) }, // can we do this?
-	nameField:                 func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
-	descriptionField:          func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
-	attributesField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
+	"ids.eui":        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EUI = (*types.EUI64)(gtw.GatewayEUI) }, // can we do this?
+	nameField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
+	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
+	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
+	versionIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.GatewayVersionIdentifiers = ttnpb.GatewayVersionIdentifiers{
+			BrandID:         gtw.BrandID,
+			ModelID:         gtw.ModelID,
+			HardwareVersion: gtw.HardwareVersion,
+			FirmwareVersion: gtw.FirmwareVersion,
+		}
+	},
 	brandIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.BrandID = gtw.BrandID },
 	modelIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelID = gtw.ModelID },
 	hardwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.HardwareVersion = gtw.HardwareVersion },
@@ -101,6 +109,12 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
 	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
+	},
+	versionIDsField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.BrandID = pb.BrandID
+		gtw.ModelID = pb.ModelID
+		gtw.HardwareVersion = pb.HardwareVersion
+		gtw.FirmwareVersion = pb.FirmwareVersion
 	},
 	brandIDField:                func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandID },
 	modelIDField:                func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
@@ -141,26 +155,27 @@ func init() {
 }
 
 // fieldmask path to column name in gateways table.
-var gatewayColumnNames = map[string]string{
-	"ids.gateway_id":            "gateway_id",
-	"ids.eui":                   "gateway_eui",
-	attributesField:             "",
-	nameField:                   nameField,
-	descriptionField:            descriptionField,
-	gatewayServerAddressField:   gatewayServerAddressField,
-	brandIDField:                "brand_id",
-	modelIDField:                "model_id",
-	hardwareVersionField:        "hardware_version",
-	firmwareVersionField:        "firmware_version",
-	autoUpdateField:             autoUpdateField,
-	updateChannelField:          updateChannelField,
-	frequencyPlanIDField:        frequencyPlanIDField,
-	statusPublicField:           statusPublicField,
-	locationPublicField:         locationPublicField,
-	scheduleDownlinkLateField:   scheduleDownlinkLateField,
-	enforceDutyCycleField:       enforceDutyCycleField,
-	downlinkPathConstraintField: downlinkPathConstraintField,
-	antennasField:               "",
+var gatewayColumnNames = map[string][]string{
+	"ids.gateway_id":            {"gateway_id"},
+	"ids.eui":                   {"gateway_eui"},
+	attributesField:             {},
+	nameField:                   {nameField},
+	descriptionField:            {descriptionField},
+	gatewayServerAddressField:   {gatewayServerAddressField},
+	versionIDsField:             {"brand_id", "model_id", "hardware_version", "firmware_version"},
+	brandIDField:                {"brand_id"},
+	modelIDField:                {"model_id"},
+	hardwareVersionField:        {"hardware_version"},
+	firmwareVersionField:        {"firmware_version"},
+	autoUpdateField:             {autoUpdateField},
+	updateChannelField:          {updateChannelField},
+	frequencyPlanIDField:        {frequencyPlanIDField},
+	statusPublicField:           {statusPublicField},
+	locationPublicField:         {locationPublicField},
+	scheduleDownlinkLateField:   {scheduleDownlinkLateField},
+	enforceDutyCycleField:       {enforceDutyCycleField},
+	downlinkPathConstraintField: {downlinkPathConstraintField},
+	antennasField:               {},
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
@@ -184,12 +199,10 @@ func (gtw *Gateway) fromPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) (col
 	for _, path := range fieldMask.Paths {
 		if setter, ok := gatewayModelSetters[path]; ok {
 			setter(gtw, pb)
-			columnName, ok := gatewayColumnNames[path]
-			if !ok {
-				columnName = path
-			}
-			if columnName != "" {
-				columns = append(columns, columnName)
+			if columnNames, ok := gatewayColumnNames[path]; ok {
+				columns = append(columns, columnNames...)
+			} else {
+				columns = append(columns, path)
 			}
 			continue
 		}

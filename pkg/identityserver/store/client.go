@@ -91,18 +91,18 @@ func init() {
 }
 
 // fieldmask path to column name in clients table.
-var clientColumnNames = map[string]string{
-	"ids.client_id":        "client_id",
-	attributesField:        "Attributes",
-	nameField:              nameField,
-	descriptionField:       descriptionField,
-	secretField:            "client_secret",
-	redirectURIsField:      redirectURIsField,
-	stateField:             stateField,
-	skipAuthorizationField: skipAuthorizationField,
-	endorsedField:          endorsedField,
-	grantsField:            grantsField,
-	rightsField:            rightsField,
+var clientColumnNames = map[string][]string{
+	"ids.client_id":        {"client_id"},
+	attributesField:        {"Attributes"},
+	nameField:              {nameField},
+	descriptionField:       {descriptionField},
+	secretField:            {"client_secret"},
+	redirectURIsField:      {redirectURIsField},
+	stateField:             {stateField},
+	skipAuthorizationField: {skipAuthorizationField},
+	endorsedField:          {endorsedField},
+	grantsField:            {grantsField},
+	rightsField:            {rightsField},
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {
@@ -126,12 +126,10 @@ func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *types.FieldMask) (columns
 	for _, path := range fieldMask.Paths {
 		if setter, ok := clientModelSetters[path]; ok {
 			setter(cli, pb)
-			columnName, ok := clientColumnNames[path]
-			if !ok {
-				columnName = path
-			}
-			if columnName != "" {
-				columns = append(columns, columnName)
+			if columnNames, ok := clientColumnNames[path]; ok {
+				columns = append(columns, columnNames...)
+			} else {
+				columns = append(columns, path)
 			}
 			continue
 		}

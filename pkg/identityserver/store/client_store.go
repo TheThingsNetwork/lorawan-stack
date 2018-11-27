@@ -47,8 +47,8 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 		case attributesField:
 			query = query.Preload("Attributes")
 		default:
-			if column, ok := clientColumnNames[path]; ok && column != "" {
-				clientColumns = append(clientColumns, column)
+			if columns, ok := clientColumnNames[path]; ok && len(columns) > 0 {
+				clientColumns = append(clientColumns, columns...)
 			} else {
 				notFoundPaths = append(notFoundPaths, path)
 			}

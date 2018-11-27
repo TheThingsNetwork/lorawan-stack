@@ -56,8 +56,8 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 			userColumns = append(userColumns, "profile_picture_id")
 			query = query.Preload("ProfilePicture")
 		default:
-			if column, ok := userColumnNames[path]; ok && column != "" {
-				userColumns = append(userColumns, column)
+			if columns, ok := userColumnNames[path]; ok && len(columns) > 0 {
+				userColumns = append(userColumns, columns...)
 			} else {
 				notFoundPaths = append(notFoundPaths, path)
 			}

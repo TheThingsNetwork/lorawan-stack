@@ -49,8 +49,8 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 		case antennasField:
 			query = query.Preload("Antennas")
 		default:
-			if column, ok := gatewayColumnNames[path]; ok && column != "" {
-				gatewayColumns = append(gatewayColumns, column)
+			if columns, ok := gatewayColumnNames[path]; ok && len(columns) > 0 {
+				gatewayColumns = append(gatewayColumns, columns...)
 			} else {
 				notFoundPaths = append(notFoundPaths, path)
 			}
