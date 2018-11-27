@@ -8357,8 +8357,11 @@
     "v3UserSession": {
       "type": "object",
       "properties": {
-        "ids": {
-          "$ref": "#/definitions/v3UserSessionIdentifiers"
+        "user_ids": {
+          "$ref": "#/definitions/v3UserIdentifiers"
+        },
+        "session_id": {
+          "type": "string"
         },
         "created_at": {
           "type": "string",
@@ -8371,17 +8374,6 @@
         "expires_at": {
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "v3UserSessionIdentifiers": {
-      "type": "object",
-      "properties": {
-        "user_ids": {
-          "$ref": "#/definitions/v3UserIdentifiers"
-        },
-        "session_id": {
-          "type": "string"
         }
       }
     },

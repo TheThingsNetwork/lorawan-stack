@@ -4,8 +4,9 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	time "time"
+
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 )
 
 var UserFieldPathsNested = []string{
@@ -1060,41 +1061,51 @@ func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths 
 var UserSessionFieldPathsNested = []string{
 	"created_at",
 	"expires_at",
-	"ids",
-	"ids.session_id",
-	"ids.user_ids",
-	"ids.user_ids.email",
-	"ids.user_ids.user_id",
+	"session_id",
 	"updated_at",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
 }
 
 var UserSessionFieldPathsTopLevel = []string{
 	"created_at",
 	"expires_at",
-	"ids",
+	"session_id",
 	"updated_at",
+	"user_ids",
 }
 
 func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "ids":
+		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserSessionIdentifiers
-				var newSrc *UserSessionIdentifiers
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserSessionIdentifiers
+					newSrc = &src.UserIdentifiers
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserSessionIdentifiers = src.UserSessionIdentifiers
+					dst.UserIdentifiers = src.UserIdentifiers
 				} else {
-					var zero UserSessionIdentifiers
-					dst.UserSessionIdentifiers = zero
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
 				}
+			}
+		case "session_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ID = src.ID
+			} else {
+				var zero string
+				dst.ID = zero
 			}
 		case "created_at":
 			if len(subs) > 0 {

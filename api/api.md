@@ -5897,7 +5897,8 @@ User is the message that defines an user on the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| ids | [UserSessionIdentifiers](#ttn.lorawan.v3.UserSessionIdentifiers) |  |  |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| session_id | [string](#string) |  |  |
 | created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | updated_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | expires_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |

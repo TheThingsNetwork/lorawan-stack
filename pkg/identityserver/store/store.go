@@ -151,6 +151,7 @@ var (
 	errGatewayNotFound      = errors.DefineNotFound("gateway_not_found", "gateway `{gateway_id}` not found")
 	errOrganizationNotFound = errors.DefineNotFound("organization_not_found", "organization `{organization_id}` not found")
 	errUserNotFound         = errors.DefineNotFound("user_not_found", "user `{user_id}` not found")
+	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session `{session_id}` for user `{user_id}` not found")
 )
 
 func errNotFoundForID(entityID *ttnpb.EntityIdentifiers) error {

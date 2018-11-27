@@ -80,3 +80,14 @@ type UserStore interface {
 	UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (*ttnpb.User, error)
 	DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) error
 }
+
+// UserSessionStore interface for storing User sessions.
+//
+// For internal use (by the OAuth server) only.
+type UserSessionStore interface {
+	CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error)
+	FindSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.UserSession, error)
+	GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error)
+	UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error)
+	DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error
+}

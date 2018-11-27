@@ -36,6 +36,8 @@ type User struct {
 	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:user"`
 	// END common fields
 
+	Sessions []*UserSession
+
 	PrimaryEmailAddress            string     `gorm:"type:VARCHAR;not null;unique_index"`
 	PrimaryEmailAddressValidatedAt *time.Time // should be cleared when email changes
 

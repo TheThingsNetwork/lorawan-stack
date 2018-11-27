@@ -151,7 +151,8 @@ message UserSessionIdentifiers {
 }
 
 message UserSession {
-  UserSessionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string session_id = 2 [(gogoproto.customname) = "ID"];
   google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp expires_at = 5 [(gogoproto.stdtime) = true];
