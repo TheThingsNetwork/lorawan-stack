@@ -69,10 +69,13 @@ func (usr *User) SetContext(ctx context.Context) {
 
 // functions to set fields from the user model into the user proto.
 var userPBSetters = map[string]func(*ttnpb.User, *User){
-	nameField:                  func(pb *ttnpb.User, usr *User) { pb.Name = usr.Name },
-	descriptionField:           func(pb *ttnpb.User, usr *User) { pb.Description = usr.Description },
-	attributesField:            func(pb *ttnpb.User, usr *User) { pb.Attributes = attributes(usr.Attributes).toMap() },
-	primaryEmailAddressField:   func(pb *ttnpb.User, usr *User) { pb.PrimaryEmailAddress = usr.PrimaryEmailAddress },
+	nameField:                func(pb *ttnpb.User, usr *User) { pb.Name = usr.Name },
+	descriptionField:         func(pb *ttnpb.User, usr *User) { pb.Description = usr.Description },
+	attributesField:          func(pb *ttnpb.User, usr *User) { pb.Attributes = attributes(usr.Attributes).toMap() },
+	primaryEmailAddressField: func(pb *ttnpb.User, usr *User) { pb.PrimaryEmailAddress = usr.PrimaryEmailAddress },
+	primaryEmailAddressValidatedAtField: func(pb *ttnpb.User, usr *User) {
+		pb.PrimaryEmailAddressValidatedAt = usr.PrimaryEmailAddressValidatedAt
+	},
 	passwordField:              func(pb *ttnpb.User, usr *User) { pb.Password = usr.Password },
 	passwordUpdatedAtField:     func(pb *ttnpb.User, usr *User) { pb.PasswordUpdatedAt = cleanTime(usr.PasswordUpdatedAt) },
 	requirePasswordUpdateField: func(pb *ttnpb.User, usr *User) { pb.RequirePasswordUpdate = usr.RequirePasswordUpdate },
@@ -103,7 +106,10 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	attributesField: func(usr *User, pb *ttnpb.User) {
 		usr.Attributes = attributes(usr.Attributes).updateFromMap(pb.Attributes)
 	},
-	primaryEmailAddressField:   func(usr *User, pb *ttnpb.User) { usr.PrimaryEmailAddress = pb.PrimaryEmailAddress },
+	primaryEmailAddressField: func(usr *User, pb *ttnpb.User) { usr.PrimaryEmailAddress = pb.PrimaryEmailAddress },
+	primaryEmailAddressValidatedAtField: func(usr *User, pb *ttnpb.User) {
+		usr.PrimaryEmailAddressValidatedAt = pb.PrimaryEmailAddressValidatedAt
+	},
 	passwordField:              func(usr *User, pb *ttnpb.User) { usr.Password = pb.Password },
 	passwordUpdatedAtField:     func(usr *User, pb *ttnpb.User) { usr.PasswordUpdatedAt = cleanTime(pb.PasswordUpdatedAt) },
 	requirePasswordUpdateField: func(usr *User, pb *ttnpb.User) { usr.RequirePasswordUpdate = pb.RequirePasswordUpdate },
@@ -140,18 +146,19 @@ func init() {
 
 // fieldmask path to column name in users table.
 var userColumnNames = map[string]string{
-	attributesField:                 "",
-	nameField:                       nameField,
-	descriptionField:                descriptionField,
-	primaryEmailAddressField:        primaryEmailAddressField,
-	passwordField:                   passwordField,
-	passwordUpdatedAtField:          passwordUpdatedAtField,
-	requirePasswordUpdateField:      requirePasswordUpdateField,
-	stateField:                      stateField,
-	adminField:                      adminField,
-	temporaryPasswordField:          temporaryPasswordField,
-	temporaryPasswordCreatedAtField: temporaryPasswordCreatedAtField,
-	temporaryPasswordExpiresAtField: temporaryPasswordExpiresAtField,
+	attributesField:                     "",
+	nameField:                           nameField,
+	descriptionField:                    descriptionField,
+	primaryEmailAddressField:            primaryEmailAddressField,
+	primaryEmailAddressValidatedAtField: primaryEmailAddressValidatedAtField,
+	passwordField:                       passwordField,
+	passwordUpdatedAtField:              passwordUpdatedAtField,
+	requirePasswordUpdateField:          requirePasswordUpdateField,
+	stateField:                          stateField,
+	adminField:                          adminField,
+	temporaryPasswordField:              temporaryPasswordField,
+	temporaryPasswordCreatedAtField:     temporaryPasswordCreatedAtField,
+	temporaryPasswordExpiresAtField:     temporaryPasswordExpiresAtField,
 }
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
