@@ -16,6 +16,7 @@ package store
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -24,16 +25,30 @@ import (
 )
 
 func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
-	dbName := fmt.Sprintf("%s_%d", strings.ToLower(t.Name()), time.Now().UnixNano())
+	dbName := os.Getenv("TEST_DB_NAME")
+	randomDB := false
+	if dbName == "" {
+		dbName = fmt.Sprintf("%s_%d", strings.ToLower(t.Name()), time.Now().UnixNano())
+		randomDB = true
+	}
 	db, err := gorm.Open("postgres", fmt.Sprintf("postgresql://root@localhost:26257/%s?sslmode=disable", dbName))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 	db = db.Debug()
-	if err := db.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbName)).Error; err != nil {
+	if err := db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)).Error; err != nil {
 		panic(err)
 	}
-	defer db.Exec(fmt.Sprintf("DROP DATABASE %s CASCADE;", dbName))
+	if randomDB {
+		defer db.Exec(fmt.Sprintf("DROP DATABASE %s CASCADE;", dbName))
+	}
 	f(t, db)
+}
+
+func prepareTest(db *gorm.DB, models ...interface{}) {
+	db.AutoMigrate(models...)
+	if err := clear(db, models...); err != nil {
+		panic(err)
+	}
 }

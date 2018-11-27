@@ -32,7 +32,7 @@ func TestOrganizationStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Account{}, &Organization{}, &Attribute{})
+		prepareTest(db, &Account{}, &Organization{}, &Attribute{})
 		store := GetOrganizationStore(db)
 
 		created, err := store.CreateOrganization(ctx, &ttnpb.Organization{

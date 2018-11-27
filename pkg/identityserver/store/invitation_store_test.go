@@ -33,7 +33,7 @@ func TestInvitationStore(t *testing.T) {
 	now := time.Now()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Account{}, &User{}, &Invitation{})
+		prepareTest(db, &Account{}, &User{}, &Invitation{})
 
 		store := GetInvitationStore(db)
 

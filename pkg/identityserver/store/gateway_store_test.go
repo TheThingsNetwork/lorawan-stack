@@ -33,7 +33,7 @@ func TestGatewayStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Gateway{}, &GatewayAntenna{}, &Attribute{})
+		prepareTest(db, &Gateway{}, &GatewayAntenna{}, &Attribute{})
 		store := GetGatewayStore(db)
 
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{

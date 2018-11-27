@@ -32,7 +32,7 @@ func TestContactInfoStore(t *testing.T) {
 	now := time.Now()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&ContactInfo{}, &Application{})
+		prepareTest(db, &ContactInfo{}, &Application{})
 
 		appStore := GetApplicationStore(db)
 
@@ -83,7 +83,7 @@ func TestContactInfoValidation(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&ContactInfo{}, &Account{}, &User{}, &ContactInfoValidation{})
+		prepareTest(db, &ContactInfo{}, &Account{}, &User{}, &ContactInfoValidation{})
 
 		usrStore := GetUserStore(db)
 

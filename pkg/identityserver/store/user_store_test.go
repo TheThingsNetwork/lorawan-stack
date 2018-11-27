@@ -32,7 +32,7 @@ func TestUserStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Account{}, &User{}, &Attribute{}, &Picture{})
+		prepareTest(db, &Account{}, &User{}, &Attribute{}, &Picture{})
 		store := GetUserStore(db)
 
 		created, err := store.CreateUser(ctx, &ttnpb.User{

@@ -28,7 +28,7 @@ func TestMembershipStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(
+		prepareTest(db,
 			&Membership{},
 			&Account{}, &User{}, &Organization{},
 			&Application{}, &Client{}, &Gateway{},

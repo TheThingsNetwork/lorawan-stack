@@ -32,7 +32,7 @@ func TestClientStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Client{}, &Attribute{})
+		prepareTest(db, &Client{}, &Attribute{})
 		store := GetClientStore(db)
 
 		created, err := store.CreateClient(ctx, &ttnpb.Client{

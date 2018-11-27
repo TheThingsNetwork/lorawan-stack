@@ -31,7 +31,7 @@ func TestUserSessionStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Account{}, &User{}, &UserSession{})
+		prepareTest(db, &Account{}, &User{}, &UserSession{})
 
 		user := &User{
 			Account: Account{

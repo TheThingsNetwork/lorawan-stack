@@ -32,7 +32,7 @@ func TestEndDeviceStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&EndDevice{}, &Attribute{}, &EndDeviceLocation{})
+		prepareTest(db, &EndDevice{}, &Attribute{}, &EndDeviceLocation{})
 		store := GetEndDeviceStore(db)
 
 		created, err := store.CreateEndDevice(ctx, &ttnpb.EndDevice{

@@ -30,7 +30,7 @@ func TestEntitySearch(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Attribute{}, &Application{}, &Client{}, &Gateway{}, &Account{}, &User{}, &Organization{})
+		prepareTest(db, &Attribute{}, &Application{}, &Client{}, &Gateway{}, &Account{}, &User{}, &Organization{})
 
 		s := GetEntitySearch(db)
 

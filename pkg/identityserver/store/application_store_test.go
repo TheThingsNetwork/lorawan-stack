@@ -32,7 +32,7 @@ func TestApplicationStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Application{}, &Attribute{})
+		prepareTest(db, &Application{}, &Attribute{})
 		store := GetApplicationStore(db)
 
 		created, err := store.CreateApplication(ctx, &ttnpb.Application{
