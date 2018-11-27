@@ -36,16 +36,47 @@ var (
 	evtDeleteUser = events.Define("user.delete", "Delete user")
 )
 
+var (
+	errInvitationTokenRequired = errors.DefineUnauthenticated("invitation_token_required", "invitation token required")
+	errInvitationTokenExpired  = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
+)
+
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
+	if req.InvitationToken == "" && is.configFromContext(ctx).UserInvitation.Required {
+		return nil, errInvitationTokenRequired
+	}
+
 	hashedPassword, err := auth.Hash(req.User.Password)
 	if err != nil {
 		return nil, err
 	}
 	req.User.Password = string(hashedPassword)
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		invitationStore := store.GetInvitationStore(db)
+		if req.InvitationToken != "" {
+			invitationToken, err := invitationStore.GetInvitation(ctx, req.InvitationToken)
+			if err != nil {
+				return err
+			}
+			if !invitationToken.ExpiresAt.IsZero() && invitationToken.ExpiresAt.Before(time.Now()) {
+				return errInvitationTokenExpired
+			}
+		}
+
 		usrStore := store.GetUserStore(db)
 		usr, err = usrStore.CreateUser(ctx, &req.User)
-		return err
+		if err != nil {
+			return err
+		}
+
+		if req.InvitationToken != "" {
+			err = invitationStore.SetInvitationAcceptedBy(ctx, req.InvitationToken, &usr.UserIdentifiers)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
 	})
 	if err != nil {
 		return nil, err

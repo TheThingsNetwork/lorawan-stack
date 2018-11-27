@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
@@ -31,8 +32,12 @@ import (
 
 // Config for the Identity Server
 type Config struct {
-	DatabaseURI string       `name:"database-uri" description:"Database connection URI"`
-	OAuth       oauth.Config `name:"oauth"`
+	DatabaseURI    string `name:"database-uri" description:"Database connection URI"`
+	UserInvitation struct {
+		Required bool          `name:"required" description:"Require user invitations"`
+		TokenTTL time.Duration `name:"token-ttl" description:"TTL of invitation tokens"`
+	} `name:"user-invitation"`
+	OAuth oauth.Config `name:"oauth"`
 }
 
 // IdentityServer implements the Identity Server component.
@@ -44,6 +49,17 @@ type IdentityServer struct {
 	config *Config
 	db     *gorm.DB
 	oauth  oauth.Server
+}
+
+type ctxKeyType struct{}
+
+var ctxKey ctxKeyType
+
+func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
+	if config, ok := ctx.Value(ctxKey).(*Config); ok {
+		return config
+	}
+	return is.config
 }
 
 // New returns new *IdentityServer.
@@ -117,6 +133,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterOrganizationAccessServer(s, &organizationAccess{IdentityServer: is})
 	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
 	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
+	ttnpb.RegisterUserInvitationRegistryServer(s, &invitationRegistry{IdentityServer: is})
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -131,6 +148,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterOrganizationAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterUserInvitationRegistryHandler(is.Context(), s, conn)
 }
 
 // Roles returns the roles that the Identity Server fulfills.

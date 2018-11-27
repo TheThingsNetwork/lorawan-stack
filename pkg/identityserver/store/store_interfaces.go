@@ -147,3 +147,12 @@ type OAuthStore interface {
 	GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error)
 	DeleteAccessToken(ctx context.Context, id string) error
 }
+
+// InvitationStore interface for storing user invitations.
+type InvitationStore interface {
+	CreateInvitation(ctx context.Context, invitation *ttnpb.Invitation) (*ttnpb.Invitation, error)
+	FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error)
+	GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error)
+	SetInvitationAcceptedBy(ctx context.Context, token string, accepter *ttnpb.UserIdentifiers) error
+	DeleteInvitation(ctx context.Context, email string) error
+}

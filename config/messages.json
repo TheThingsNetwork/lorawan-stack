@@ -2438,6 +2438,33 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:invitation_already_accepted": {
+    "translations": {
+      "en": "invitation already accepted"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:invitation_already_sent": {
+    "translations": {
+      "en": "invitation already sent"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:invitation_not_found": {
+    "translations": {
+      "en": "invitation not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "invitation_store.go"
+    }
+  },
   "error:pkg/identityserver/store:organization_not_found": {
     "translations": {
       "en": "organization `{organization_id}` not found"
@@ -2474,6 +2501,24 @@
       "file": "rights.go"
     }
   },
+  "error:pkg/identityserver:invitation_token_expired": {
+    "translations": {
+      "en": "invitation token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:invitation_token_required": {
+    "translations": {
+      "en": "invitation token required"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:nested_organizations": {
     "translations": {
       "en": "organizations can not be nested"
@@ -2481,6 +2526,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "organization_registry.go"
+    }
+  },
+  "error:pkg/identityserver:no_invite_rights": {
+    "translations": {
+      "en": "no rights for inviting users"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "invitation_registry.go"
     }
   },
   "error:pkg/identityserver:old_password": {
@@ -4236,6 +4290,24 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "observability.go"
+    }
+  },
+  "event:invitation.create": {
+    "translations": {
+      "en": "Create invitation"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "invitation_registry.go"
+    }
+  },
+  "event:invitation.delete": {
+    "translations": {
+      "en": "Delete invitation"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "invitation_registry.go"
     }
   },
   "event:js.join.accept": {
