@@ -142,6 +142,14 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			return err
 		}
 
+		if len(req.ContactInfo) > 0 {
+			cleanContactInfo(req.ContactInfo)
+			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
+
 		if req.InvitationToken != "" {
 			err = invitationStore.SetInvitationAcceptedBy(ctx, req.InvitationToken, &usr.UserIdentifiers)
 			if err != nil {
@@ -168,6 +176,15 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		usrStore := store.GetUserStore(db)
 		usr, err = usrStore.GetUser(ctx, &req.UserIdentifiers, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			usr.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, usr.EntityIdentifiers())
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {
@@ -218,7 +235,23 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		usrStore := store.GetUserStore(db)
+		if fieldMaskContains(&req.FieldMask, "primary_email_address") {
+			// TODO: if updating primary_email_address, get existing contact info and set primary_email_address_validated_at
+			// depending on existing contact info. Until then, the primary email address can only be updated by admins.
+			req.PrimaryEmailAddressValidatedAt = nil
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
+		}
 		usr, err = usrStore.UpdateUser(ctx, &req.User, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			cleanContactInfo(req.ContactInfo)
+			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {

@@ -60,6 +60,13 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		if err != nil {
 			return err
 		}
+		if len(req.ContactInfo) > 0 {
+			cleanContactInfo(req.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		// TODO: Create initial Application API key with "link" rights
 		return nil
 	})
@@ -79,6 +86,15 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		appStore := store.GetApplicationStore(db)
 		app, err = appStore.GetApplication(ctx, &req.ApplicationIdentifiers, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			app.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, app.EntityIdentifiers())
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {
@@ -170,6 +186,16 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		appStore := store.GetApplicationStore(db)
 		app, err = appStore.UpdateApplication(ctx, &req.Application, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			cleanContactInfo(req.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {

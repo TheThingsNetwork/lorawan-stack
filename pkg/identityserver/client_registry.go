@@ -75,6 +75,13 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if err != nil {
 			return err
 		}
+		if len(req.ContactInfo) > 0 {
+			cleanContactInfo(req.ContactInfo)
+			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 	if err != nil {
@@ -96,6 +103,15 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
 		cli, err = cliStore.GetClient(ctx, &req.ClientIdentifiers, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			cli.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, cli.EntityIdentifiers())
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {
@@ -187,6 +203,16 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
 		cli, err = cliStore.UpdateClient(ctx, &req.Client, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			cleanContactInfo(req.ContactInfo)
+			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {

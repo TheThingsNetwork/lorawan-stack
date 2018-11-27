@@ -60,6 +60,13 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		if err != nil {
 			return err
 		}
+		if len(req.ContactInfo) > 0 {
+			cleanContactInfo(req.ContactInfo)
+			gtw.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, gtw.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		// TODO: Create initial Gateway API key with "link" rights
 		return nil
 	})
@@ -79,6 +86,15 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtwStore := store.GetGatewayStore(db)
 		gtw, err = gtwStore.GetGateway(ctx, &req.GatewayIdentifiers, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			gtw.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, gtw.EntityIdentifiers())
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {
@@ -170,6 +186,16 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtwStore := store.GetGatewayStore(db)
 		gtw, err = gtwStore.UpdateGateway(ctx, &req.Gateway, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			cleanContactInfo(req.ContactInfo)
+			gtw.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, gtw.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {

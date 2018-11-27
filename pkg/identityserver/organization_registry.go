@@ -61,6 +61,13 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if err != nil {
 			return err
 		}
+		if len(req.ContactInfo) > 0 {
+			cleanContactInfo(req.ContactInfo)
+			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 	if err != nil {
@@ -79,6 +86,15 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		orgStore := store.GetOrganizationStore(db)
 		org, err = orgStore.GetOrganization(ctx, &req.OrganizationIdentifiers, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			org.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, org.EntityIdentifiers())
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {
@@ -168,6 +184,16 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		orgStore := store.GetOrganizationStore(db)
 		org, err = orgStore.UpdateOrganization(ctx, &req.Organization, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		if fieldMaskContains(&req.FieldMask, "contact_info") {
+			cleanContactInfo(req.ContactInfo)
+			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.EntityIdentifiers(), req.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	})
 	if err != nil {
