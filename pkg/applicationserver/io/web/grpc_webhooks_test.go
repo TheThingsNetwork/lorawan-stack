@@ -39,7 +39,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 
 	// Formats.
 	{
-		res, err := srv.GetFormats(authorizedCtx, &registeredApplicationID)
+		res, err := srv.GetFormats(authorizedCtx, ttnpb.Empty)
 		a.So(err, should.BeNil)
 		a.So(res.Formats, should.HaveSameElementsDeep, map[string]string{
 			"json": "JSON",

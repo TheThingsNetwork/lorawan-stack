@@ -33,10 +33,7 @@ func NewWebhookRegistryRPC(webhooks WebhookRegistry) ttnpb.ApplicationWebhookReg
 	}
 }
 
-func (s webhookRegistryRPC) GetFormats(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationWebhookFormats, error) {
-	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
-		return nil, err
-	}
+func (s webhookRegistryRPC) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ApplicationWebhookFormats, error) {
 	fs := make(map[string]string, len(formats))
 	for key, val := range formats {
 		fs[key] = val.Name
