@@ -208,6 +208,19 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	return res, nil
 }
 
+func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return err
+	}
+	if apiKey := authInfo.GetAPIKey(); apiKey != nil {
+		return nil
+	} else if accessToken := authInfo.GetOAuthAccessToken(); accessToken != nil {
+		return nil
+	}
+	return errUnauthenticated
+}
+
 func (is *IdentityServer) UniversalRights(ctx context.Context) *ttnpb.Rights {
 	info, err := is.authInfo(ctx)
 	if err == nil {

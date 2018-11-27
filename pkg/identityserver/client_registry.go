@@ -95,11 +95,16 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 }
 
 func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientRequest) (cli *ttnpb.Client, err error) {
-	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
+	err = is.RequireAuthenticated(ctx) // Client info can be seen by all authenticated users.
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Filter FieldMask by Rights
+	if false { // TODO: If requesting non-public fields.
+		err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
+		if err != nil {
+			return nil, err
+		}
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
 		cli, err = cliStore.GetClient(ctx, &req.ClientIdentifiers, &req.FieldMask)

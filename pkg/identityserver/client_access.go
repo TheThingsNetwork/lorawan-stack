@@ -70,7 +70,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 }
 
 func (is *IdentityServer) listClientCollaborators(ctx context.Context, ids *ttnpb.ClientIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	err = rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL)
+	err = is.RequireAuthenticated(ctx) // Client collaborators can be seen by all authenticated users.
 	if err != nil {
 		return nil, err
 	}
