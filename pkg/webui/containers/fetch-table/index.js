@@ -240,6 +240,7 @@ class FetchTable extends Component {
 
 
 FetchTable.defaultProps = {
+  pageSize: 15,
   filterValidator,
   itemPathPrefix: '',
 }

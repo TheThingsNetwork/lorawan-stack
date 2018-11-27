@@ -46,10 +46,10 @@ class Row extends React.Component {
     const {
       className,
       children,
-      head = false,
-      body = true,
-      footer = false,
-      clickable = false,
+      clickable,
+      head,
+      body,
+      footer,
     } = this.props
 
     const rowClassNames = classnames(className, {
@@ -91,6 +91,9 @@ Row.propTypes = {
 
 Row.defaultProps = {
   clickable: true,
+  head: false,
+  body: true,
+  footer: false,
 }
 
 export default Row

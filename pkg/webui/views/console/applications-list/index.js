@@ -21,6 +21,8 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import ApplicationsTable from '../../../containers/applications-table'
 
+const APPLICATIONS_TABLE_SIZE = 5
+
 export default class List extends React.Component {
   render () {
     return (
@@ -29,7 +31,7 @@ export default class List extends React.Component {
           <title><Message content={sharedMessages.applications} /></title>
         </IntlHelmet>
         <Col sm={12}>
-          <ApplicationsTable />
+          <ApplicationsTable pageSize={APPLICATIONS_TABLE_SIZE} />
         </Col>
       </Row>
     )

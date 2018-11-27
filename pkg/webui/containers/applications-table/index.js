@@ -59,7 +59,6 @@ export default class ApplicationsTable extends Component {
         tableTitle={this.tableTitle}
         getItemsAction={getApplicationsList}
         searchItemsAction={searchApplicationsList}
-        pageSize={3}
         tabs={tabs}
         {...this.props}
       />
