@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -34,7 +35,7 @@ type userStore struct {
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectUserFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Select([]string{"users.*", "accounts.uid"})
+		return query.Preload("Attributes").Preload("ContactInfo").Select([]string{"users.*", "accounts.uid"})
 	}
 	var userColumns []string
 	for _, column := range modelColumns {
@@ -44,6 +45,10 @@ func selectUserFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 		switch path {
 		case "ids.user_id":
 			// accounts.uid is always selected
+		case attributesField:
+			query = query.Preload("Attributes")
+		case contactInfoField:
+			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := userColumnNames[path]; ok {
 				userColumns = append(userColumns, column)
@@ -130,12 +135,24 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	// NOTE: fromPB replaces these, it should not mutate
+	oldAttributes, oldContactInfo := userModel.Attributes, userModel.ContactInfo
 	columns := userModel.fromPB(usr, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&userModel).Select(columns).Updates(&userModel)
 		if query.Error != nil {
 			return nil, query.Error
+		}
+	}
+	if !reflect.DeepEqual(oldAttributes, userModel.Attributes) {
+		err = replaceAttributes(s.db, "user", userModel.ID, oldAttributes, userModel.Attributes)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !reflect.DeepEqual(oldContactInfo, userModel.ContactInfo) {
+		err = replaceContactInfos(s.db, "user", userModel.ID, oldContactInfo, userModel.ContactInfo)
+		if err != nil {
+			return nil, err
 		}
 	}
 	updated = new(ttnpb.User)

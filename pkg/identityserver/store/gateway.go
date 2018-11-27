@@ -28,9 +28,11 @@ type Gateway struct {
 	GatewayEUI *EUI64 `gorm:"unique_index:eui;type:VARCHAR(16);column:gateway_eui"`
 
 	// BEGIN common fields
-	GatewayID   string `gorm:"unique_index:id;type:VARCHAR(36)"`
-	Name        string `gorm:"type:VARCHAR"`
-	Description string `gorm:"type:TEXT"`
+	GatewayID   string        `gorm:"unique_index:id;type:VARCHAR(36)"`
+	Name        string        `gorm:"type:VARCHAR"`
+	Description string        `gorm:"type:TEXT"`
+	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
+	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 	// END common fields
 
 	GatewayServerAddress string `gorm:"type:VARCHAR"`
@@ -51,6 +53,8 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	"ids.eui":                 func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EUI = (*types.EUI64)(gtw.GatewayEUI) }, // can we do this?
 	nameField:                 func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
 	descriptionField:          func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
+	attributesField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
+	contactInfoField:          func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ContactInfo = contactInfos(gtw.ContactInfo).toPB() },
 	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.GatewayServerAddress = gtw.GatewayServerAddress },
 	autoUpdateField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.AutoUpdate = gtw.AutoUpdate },
 	updateChannelField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateChannel = gtw.UpdateChannel },
@@ -62,9 +66,15 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 
 // functions to set fields from the gateway proto into the gateway model.
 var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
-	"ids.eui":                 func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = (*EUI64)(pb.EUI) }, // can we do this?
-	nameField:                 func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Name = pb.Name },
-	descriptionField:          func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
+	"ids.eui":        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = (*EUI64)(pb.EUI) }, // can we do this?
+	nameField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Name = pb.Name },
+	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
+	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
+	},
+	contactInfoField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.ContactInfo = contactInfos(gtw.ContactInfo).updateFromPB(pb.ContactInfo)
+	},
 	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
 	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
 	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
@@ -89,6 +99,8 @@ func init() {
 var gatewayColumnNames = map[string]string{
 	"ids.gateway_id": "gateway_id",
 	"ids.eui":        "gateway_eui",
+	attributesField:  "",
+	contactInfoField: "",
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
@@ -116,7 +128,9 @@ func (gtw *Gateway) fromPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) (col
 			if !ok {
 				columnName = path
 			}
-			columns = append(columns, columnName)
+			if columnName != "" {
+				columns = append(columns, columnName)
+			}
 			continue
 		}
 	}

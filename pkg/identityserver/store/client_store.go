@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -34,14 +35,21 @@ type clientStore struct {
 // selectClientFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectClientFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query
+		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var clientColumns []string
 	for _, path := range fieldMask.Paths {
-		if column, ok := clientColumnNames[path]; ok {
-			clientColumns = append(clientColumns, column)
-		} else {
-			clientColumns = append(clientColumns, path)
+		switch path {
+		case attributesField:
+			query = query.Preload("Attributes")
+		case contactInfoField:
+			query = query.Preload("ContactInfo")
+		default:
+			if column, ok := clientColumnNames[path]; ok {
+				clientColumns = append(clientColumns, column)
+			} else {
+				clientColumns = append(clientColumns, path)
+			}
 		}
 	}
 	return query.Select(append(append(modelColumns, "client_id"), clientColumns...)) // TODO: remove possible duplicate client_id
@@ -121,11 +129,24 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
+	oldAttributes, oldContactInfo := cliModel.Attributes, cliModel.ContactInfo
 	columns := cliModel.fromPB(cli, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&cliModel).Select(columns).Updates(&cliModel)
 		if query.Error != nil {
 			return nil, query.Error
+		}
+	}
+	if !reflect.DeepEqual(oldAttributes, cliModel.Attributes) {
+		err = replaceAttributes(s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !reflect.DeepEqual(oldContactInfo, cliModel.ContactInfo) {
+		err = replaceContactInfos(s.db, "client", cliModel.ID, oldContactInfo, cliModel.ContactInfo)
+		if err != nil {
+			return nil, err
 		}
 	}
 	updated = new(ttnpb.Client)

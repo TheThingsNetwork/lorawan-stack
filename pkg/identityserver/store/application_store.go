@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -34,14 +35,21 @@ type applicationStore struct {
 // selectApplicationFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectApplicationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query
+		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var applicationColumns []string
 	for _, path := range fieldMask.Paths {
-		if column, ok := applicationColumnNames[path]; ok {
-			applicationColumns = append(applicationColumns, column)
-		} else {
-			applicationColumns = append(applicationColumns, path)
+		switch path {
+		case attributesField:
+			query = query.Preload("Attributes")
+		case contactInfoField:
+			query = query.Preload("ContactInfo")
+		default:
+			if column, ok := applicationColumnNames[path]; ok {
+				applicationColumns = append(applicationColumns, column)
+			} else {
+				applicationColumns = append(applicationColumns, path)
+			}
 		}
 	}
 	return query.Select(append(append(modelColumns, "application_id"), applicationColumns...)) // TODO: remove possible duplicate application_id
@@ -121,11 +129,24 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
+	oldAttributes, oldContactInfo := appModel.Attributes, appModel.ContactInfo
 	columns := appModel.fromPB(app, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&appModel).Select(columns).Updates(&appModel)
 		if query.Error != nil {
 			return nil, query.Error
+		}
+	}
+	if !reflect.DeepEqual(oldAttributes, appModel.Attributes) {
+		err = replaceAttributes(s.db, "application", appModel.ID, oldAttributes, appModel.Attributes)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !reflect.DeepEqual(oldContactInfo, appModel.ContactInfo) {
+		err = replaceContactInfos(s.db, "application", appModel.ID, oldContactInfo, appModel.ContactInfo)
+		if err != nil {
+			return nil, err
 		}
 	}
 	updated = new(ttnpb.Application)

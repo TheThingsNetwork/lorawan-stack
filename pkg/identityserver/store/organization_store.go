@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -34,7 +35,7 @@ type organizationStore struct {
 // selectOrganizationFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectOrganizationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Select([]string{"organizations.*", "accounts.uid"})
+		return query.Preload("Attributes").Preload("ContactInfo").Select([]string{"organizations.*", "accounts.uid"})
 	}
 	var organizationColumns []string
 	for _, column := range modelColumns {
@@ -44,6 +45,10 @@ func selectOrganizationFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.
 		switch path {
 		case "ids.organization_id":
 			// accounts.uid is always selected
+		case attributesField:
+			query = query.Preload("Attributes")
+		case contactInfoField:
+			query = query.Preload("ContactInfo")
 		default:
 			if column, ok := organizationColumnNames[path]; ok {
 				organizationColumns = append(organizationColumns, column)
@@ -129,11 +134,24 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
+	oldAttributes, oldContactInfo := orgModel.Attributes, orgModel.ContactInfo
 	columns := orgModel.fromPB(org, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&orgModel).Select(columns).Updates(&orgModel)
 		if query.Error != nil {
 			return nil, query.Error
+		}
+	}
+	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
+		err = replaceAttributes(s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !reflect.DeepEqual(oldContactInfo, orgModel.ContactInfo) {
+		err = replaceContactInfos(s.db, "organization", orgModel.ID, oldContactInfo, orgModel.ContactInfo)
+		if err != nil {
+			return nil, err
 		}
 	}
 	updated = new(ttnpb.Organization)

@@ -25,6 +25,14 @@ func cleanTime(t time.Time) time.Time {
 	return t.UTC().Truncate(time.Millisecond)
 }
 
+func cleanTimePtr(t *time.Time) *time.Time {
+	if t == nil {
+		return nil
+	}
+	clean := cleanTime(*t)
+	return &clean
+}
+
 func init() {
 	gorm.NowFunc = func() time.Time {
 		return cleanTime(time.Now())

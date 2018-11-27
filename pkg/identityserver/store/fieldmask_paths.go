@@ -17,7 +17,9 @@ package store
 const ( // TODO: should probably move this to ttnpb
 	// please keep this sorted
 	adminField                 = "admin"
+	attributesField            = "attributes"
 	autoUpdateField            = "auto_update"
+	contactInfoField           = "contact_info"
 	descriptionField           = "description"
 	endorsedField              = "endorsed"
 	frequencyPlanIDField       = "frequency_plan_id"

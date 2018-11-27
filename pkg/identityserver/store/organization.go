@@ -29,8 +29,10 @@ type Organization struct {
 	Account Account `gorm:"polymorphic:Account;polymorphic_value:organization"`
 
 	// BEGIN common fields
-	Name        string `gorm:"type:VARCHAR"`
-	Description string `gorm:"type:TEXT"`
+	Name        string        `gorm:"type:VARCHAR"`
+	Description string        `gorm:"type:TEXT"`
+	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:organization"`
+	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	// END common fields
 }
 
@@ -48,12 +50,20 @@ func (org *Organization) SetContext(ctx context.Context) {
 var organizationPBSetters = map[string]func(*ttnpb.Organization, *Organization){
 	nameField:        func(pb *ttnpb.Organization, org *Organization) { pb.Name = org.Name },
 	descriptionField: func(pb *ttnpb.Organization, org *Organization) { pb.Description = org.Description },
+	attributesField:  func(pb *ttnpb.Organization, org *Organization) { pb.Attributes = attributes(org.Attributes).toMap() },
+	contactInfoField: func(pb *ttnpb.Organization, org *Organization) { pb.ContactInfo = contactInfos(org.ContactInfo).toPB() },
 }
 
 // functions to set fields from the organization proto into the organization model.
 var organizationModelSetters = map[string]func(*Organization, *ttnpb.Organization){
 	nameField:        func(org *Organization, pb *ttnpb.Organization) { org.Name = pb.Name },
 	descriptionField: func(org *Organization, pb *ttnpb.Organization) { org.Description = pb.Description },
+	attributesField: func(org *Organization, pb *ttnpb.Organization) {
+		org.Attributes = attributes(org.Attributes).updateFromMap(pb.Attributes)
+	},
+	contactInfoField: func(org *Organization, pb *ttnpb.Organization) {
+		org.ContactInfo = contactInfos(org.ContactInfo).updateFromPB(pb.ContactInfo)
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -68,7 +78,10 @@ func init() {
 }
 
 // fieldmask path to column name in organizations table, if other than proto field.
-var organizationColumnNames = map[string]string{}
+var organizationColumnNames = map[string]string{
+	attributesField:  "",
+	contactInfoField: "",
+}
 
 func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask) {
 	pb.OrganizationIdentifiers.OrganizationID = org.Account.UID
@@ -95,7 +108,9 @@ func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *types.FieldMa
 			if !ok {
 				columnName = path
 			}
-			columns = append(columns, columnName)
+			if columnName != "" {
+				columns = append(columns, columnName)
+			}
 			continue
 		}
 	}

@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -34,14 +35,21 @@ type gatewayStore struct {
 // selectGatewayFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectGatewayFields(query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query
+		return query.Preload("Attributes").Preload("ContactInfo")
 	}
 	var gatewayColumns []string
 	for _, path := range fieldMask.Paths {
-		if column, ok := gatewayColumnNames[path]; ok {
-			gatewayColumns = append(gatewayColumns, column)
-		} else {
-			gatewayColumns = append(gatewayColumns, path)
+		switch path {
+		case attributesField:
+			query = query.Preload("Attributes")
+		case contactInfoField:
+			query = query.Preload("ContactInfo")
+		default:
+			if column, ok := gatewayColumnNames[path]; ok {
+				gatewayColumns = append(gatewayColumns, column)
+			} else {
+				gatewayColumns = append(gatewayColumns, path)
+			}
 		}
 	}
 	return query.Select(append(append(modelColumns, "gateway_id"), gatewayColumns...)) // TODO: remove possible duplicate gateway_id
@@ -124,11 +132,24 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
+	oldAttributes, oldContactInfo := gtwModel.Attributes, gtwModel.ContactInfo
 	columns := gtwModel.fromPB(gtw, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&gtwModel).Select(columns).Updates(&gtwModel)
 		if query.Error != nil {
 			return nil, query.Error
+		}
+	}
+	if !reflect.DeepEqual(oldAttributes, gtwModel.Attributes) {
+		err = replaceAttributes(s.db, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !reflect.DeepEqual(oldContactInfo, gtwModel.ContactInfo) {
+		err = replaceContactInfos(s.db, "gateway", gtwModel.ID, oldContactInfo, gtwModel.ContactInfo)
+		if err != nil {
+			return nil, err
 		}
 	}
 	updated = new(ttnpb.Gateway)

@@ -26,9 +26,11 @@ type Client struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ClientID    string `gorm:"unique_index;type:VARCHAR(36)"`
-	Name        string `gorm:"type:VARCHAR"`
-	Description string `gorm:"type:TEXT"`
+	ClientID    string        `gorm:"unique_index;type:VARCHAR(36)"`
+	Name        string        `gorm:"type:VARCHAR"`
+	Description string        `gorm:"type:TEXT"`
+	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:client"`
+	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:client"`
 	// END common fields
 
 	ClientSecret string         `gorm:"type:VARCHAR"`
@@ -51,6 +53,8 @@ func init() {
 var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
 	nameField:              func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
 	descriptionField:       func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
+	attributesField:        func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
+	contactInfoField:       func(pb *ttnpb.Client, cli *Client) { pb.ContactInfo = contactInfos(cli.ContactInfo).toPB() },
 	secretField:            func(pb *ttnpb.Client, cli *Client) { pb.Secret = cli.ClientSecret },
 	redirectURIsField:      func(pb *ttnpb.Client, cli *Client) { pb.RedirectURIs = cli.RedirectURIs },
 	stateField:             func(pb *ttnpb.Client, cli *Client) { pb.State = ttnpb.State(cli.State) },
@@ -62,8 +66,14 @@ var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
 
 // functions to set fields from the client proto into the client model.
 var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
-	nameField:              func(cli *Client, pb *ttnpb.Client) { cli.Name = pb.Name },
-	descriptionField:       func(cli *Client, pb *ttnpb.Client) { cli.Description = pb.Description },
+	nameField:        func(cli *Client, pb *ttnpb.Client) { cli.Name = pb.Name },
+	descriptionField: func(cli *Client, pb *ttnpb.Client) { cli.Description = pb.Description },
+	attributesField: func(cli *Client, pb *ttnpb.Client) {
+		cli.Attributes = attributes(cli.Attributes).updateFromMap(pb.Attributes)
+	},
+	contactInfoField: func(cli *Client, pb *ttnpb.Client) {
+		cli.ContactInfo = contactInfos(cli.ContactInfo).updateFromPB(pb.ContactInfo)
+	},
 	secretField:            func(cli *Client, pb *ttnpb.Client) { cli.ClientSecret = pb.Secret },
 	redirectURIsField:      func(cli *Client, pb *ttnpb.Client) { cli.RedirectURIs = pq.StringArray(pb.RedirectURIs) },
 	stateField:             func(cli *Client, pb *ttnpb.Client) { cli.State = int(pb.State) },
@@ -86,8 +96,10 @@ func init() {
 
 // fieldmask path to column name in clients table, if other than proto field.
 var clientColumnNames = map[string]string{
-	"ids.client_id": "client_id",
-	secretField:     "client_secret",
+	"ids.client_id":  "client_id",
+	attributesField:  "Attributes",
+	contactInfoField: "ContactInfo",
+	secretField:      "client_secret",
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {
@@ -115,7 +127,9 @@ func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *types.FieldMask) (columns
 			if !ok {
 				columnName = path
 			}
-			columns = append(columns, columnName)
+			if columnName != "" {
+				columns = append(columns, columnName)
+			}
 			continue
 		}
 	}

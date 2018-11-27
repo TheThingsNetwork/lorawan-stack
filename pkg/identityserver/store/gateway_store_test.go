@@ -32,8 +32,10 @@ func TestGatewayStore(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
+	now := time.Now()
+
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Gateway{})
+		db.AutoMigrate(&Gateway{}, &Attribute{}, &ContactInfo{})
 		store := GetGatewayStore(db)
 
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
@@ -43,19 +45,32 @@ func TestGatewayStore(t *testing.T) {
 			},
 			Name:        "Foo Gateway",
 			Description: "The Amazing Foo Gateway",
+			Attributes: map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+				"baz": "qux",
+			},
+			ContactInfo: []*ttnpb.ContactInfo{
+				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
+				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
+			},
 		})
 		a.So(err, should.BeNil)
 		a.So(created.GatewayID, should.Equal, "foo")
 		a.So(created.Name, should.Equal, "Foo Gateway")
 		a.So(created.Description, should.Equal, "The Amazing Foo Gateway")
+		a.So(created.Attributes, should.HaveLength, 3)
+		a.So(created.ContactInfo, should.HaveLength, 2)
 		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "contact_info"}})
 		a.So(err, should.BeNil)
 		a.So(got.GatewayID, should.Equal, "foo")
 		a.So(got.Name, should.Equal, "Foo Gateway")
 		a.So(got.Description, should.BeEmpty)
+		a.So(got.Attributes, should.HaveLength, 3)
+		a.So(got.ContactInfo, should.HaveLength, 2)
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 
@@ -74,9 +89,22 @@ func TestGatewayStore(t *testing.T) {
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
 			Name:               "Foobar Gateway",
 			Description:        "The Amazing Foobar Gateway",
-		}, &pbtypes.FieldMask{Paths: []string{"description"}})
+			Attributes: map[string]string{
+				"foo": "bar",
+				"baz": "baz",
+				"qux": "foo",
+			},
+			ContactInfo: []*ttnpb.ContactInfo{
+				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "bar@example.com"},
+				{ContactType: ttnpb.CONTACT_TYPE_ABUSE, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
+				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
+				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "other_admin@example.com"},
+			},
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "contact_info"}})
 		a.So(err, should.BeNil)
 		a.So(updated.Description, should.Equal, "The Amazing Foobar Gateway")
+		a.So(updated.Attributes, should.HaveLength, 3)
+		a.So(updated.ContactInfo, should.HaveLength, 4)
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
@@ -92,6 +120,8 @@ func TestGatewayStore(t *testing.T) {
 		a.So(got.GatewayID, should.Equal, created.GatewayID)
 		a.So(got.Name, should.Equal, created.Name)
 		a.So(got.Description, should.Equal, updated.Description)
+		a.So(got.Attributes, should.Resemble, updated.Attributes)
+		a.So(got.ContactInfo, should.HaveLength, len(updated.ContactInfo))
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 

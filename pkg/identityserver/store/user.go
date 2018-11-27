@@ -30,8 +30,10 @@ type User struct {
 	Account Account `gorm:"polymorphic:Account;polymorphic_value:user"`
 
 	// BEGIN common fields
-	Name        string `gorm:"type:VARCHAR"`
-	Description string `gorm:"type:TEXT"`
+	Name        string        `gorm:"type:VARCHAR"`
+	Description string        `gorm:"type:TEXT"`
+	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:user"`
+	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:user"`
 	// END common fields
 
 	PrimaryEmailAddress            string     `gorm:"type:VARCHAR;not null;unique_index"`
@@ -60,6 +62,8 @@ func (usr *User) SetContext(ctx context.Context) {
 var userPBSetters = map[string]func(*ttnpb.User, *User){
 	nameField:                  func(pb *ttnpb.User, usr *User) { pb.Name = usr.Name },
 	descriptionField:           func(pb *ttnpb.User, usr *User) { pb.Description = usr.Description },
+	attributesField:            func(pb *ttnpb.User, usr *User) { pb.Attributes = attributes(usr.Attributes).toMap() },
+	contactInfoField:           func(pb *ttnpb.User, usr *User) { pb.ContactInfo = contactInfos(usr.ContactInfo).toPB() },
 	primaryEmailAddressField:   func(pb *ttnpb.User, usr *User) { pb.PrimaryEmailAddress = usr.PrimaryEmailAddress },
 	passwordField:              func(pb *ttnpb.User, usr *User) { pb.Password = usr.Password },
 	passwordUpdatedAtField:     func(pb *ttnpb.User, usr *User) { pb.PasswordUpdatedAt = cleanTime(usr.PasswordUpdatedAt) },
@@ -70,8 +74,14 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 
 // functions to set fields from the user proto into the user model.
 var userModelSetters = map[string]func(*User, *ttnpb.User){
-	nameField:                  func(usr *User, pb *ttnpb.User) { usr.Name = pb.Name },
-	descriptionField:           func(usr *User, pb *ttnpb.User) { usr.Description = pb.Description },
+	nameField:        func(usr *User, pb *ttnpb.User) { usr.Name = pb.Name },
+	descriptionField: func(usr *User, pb *ttnpb.User) { usr.Description = pb.Description },
+	attributesField: func(usr *User, pb *ttnpb.User) {
+		usr.Attributes = attributes(usr.Attributes).updateFromMap(pb.Attributes)
+	},
+	contactInfoField: func(usr *User, pb *ttnpb.User) {
+		usr.ContactInfo = contactInfos(usr.ContactInfo).updateFromPB(pb.ContactInfo)
+	},
 	primaryEmailAddressField:   func(usr *User, pb *ttnpb.User) { usr.PrimaryEmailAddress = pb.PrimaryEmailAddress },
 	passwordField:              func(usr *User, pb *ttnpb.User) { usr.Password = pb.Password },
 	passwordUpdatedAtField:     func(usr *User, pb *ttnpb.User) { usr.PasswordUpdatedAt = cleanTime(pb.PasswordUpdatedAt) },
@@ -92,7 +102,10 @@ func init() {
 }
 
 // fieldmask path to column name in users table, if other than proto field.
-var userColumnNames = map[string]string{}
+var userColumnNames = map[string]string{
+	attributesField:  "",
+	contactInfoField: "",
+}
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
 	pb.UserIdentifiers.UserID = usr.Account.UID
@@ -119,7 +132,9 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []s
 			if !ok {
 				columnName = path
 			}
-			columns = append(columns, columnName)
+			if columnName != "" {
+				columns = append(columns, columnName)
+			}
 			// TODO: if updating password, then also update PasswordUpdatedAt and set RequirePasswordUpdate=false
 			// TODO: if changing email, then also set EmailValidatedAt=false
 			continue
