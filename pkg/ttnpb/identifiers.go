@@ -15,6 +15,8 @@
 package ttnpb
 
 import (
+	"fmt"
+
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -79,6 +81,26 @@ func (ids EntityIdentifiers) Identifiers() Identifiers {
 		return oneof.UserIDs
 	default:
 		panic("missed oneof type in EntityIdentifiers.Identifiers()")
+	}
+}
+
+// IDString returns the ID string of the Identifiers inside the oneof.
+func (ids EntityIdentifiers) IDString() string {
+	switch oneof := ids.Ids.(type) {
+	case *EntityIdentifiers_ApplicationIDs:
+		return oneof.ApplicationIDs.GetApplicationID()
+	case *EntityIdentifiers_ClientIDs:
+		return oneof.ClientIDs.GetClientID()
+	case *EntityIdentifiers_DeviceIDs:
+		return fmt.Sprintf("%s:%s", oneof.DeviceIDs.GetApplicationID(), oneof.DeviceIDs.GetDeviceID())
+	case *EntityIdentifiers_GatewayIDs:
+		return oneof.GatewayIDs.GetGatewayID()
+	case *EntityIdentifiers_OrganizationIDs:
+		return oneof.OrganizationIDs.GetOrganizationID()
+	case *EntityIdentifiers_UserIDs:
+		return oneof.UserIDs.GetUserID()
+	default:
+		panic("missed oneof type in EntityIdentifiers.IDString()")
 	}
 }
 

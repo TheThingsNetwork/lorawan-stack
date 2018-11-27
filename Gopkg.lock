@@ -432,6 +432,22 @@
   revision = "57d518f124b0cf46ea2021f25a01396b3522e6fb"
 
 [[projects]]
+  digest = "1:d269638dbd514822446c3c818b6389c880058af79ec54d97731818b34fe66921"
+  name = "github.com/jinzhu/gorm"
+  packages = ["."]
+  pruneopts = ""
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d9a7385b84d8187fd94e0357045c6fa1147ca94caa56fdd539336c7c102fc728"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  pruneopts = ""
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
   digest = "1:dc5126f78aa052ba39be47f4854a29683f29ab5064394646458f49b00bb0fc29"
   name = "github.com/jmank88/nuts"
   packages = ["."]
@@ -485,6 +501,17 @@
   pruneopts = ""
   revision = "7fd9f68ece0bcb1a905fac8f1549f0083f71c51b"
   version = "v0.2.8"
+
+[[projects]]
+  digest = "1:29145d7af4adafd72a79df5e41456ac9e232d5a28c1cd4dacf3ff008a217fc10"
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid",
+  ]
+  pruneopts = ""
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:961dc3b1d11f969370533390fdf203813162980c858e1dabe827b60940c909a5"
@@ -1071,10 +1098,12 @@
     "github.com/howeyc/gopass",
     "github.com/jacobsa/crypto/cmac",
     "github.com/jaytaylor/html2text",
+    "github.com/jinzhu/gorm",
     "github.com/kr/pretty",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/labstack/gommon/log",
+    "github.com/lib/pq",
     "github.com/mattn/go-isatty",
     "github.com/mitchellh/mapstructure",
     "github.com/mohae/deepcopy",
