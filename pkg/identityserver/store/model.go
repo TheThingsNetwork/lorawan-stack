@@ -48,9 +48,9 @@ type modelInterface interface {
 type Model struct {
 	ctx context.Context
 
-	ID        string `gorm:"type:UUID;primary_key;default:gen_random_uuid()"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string    `gorm:"type:UUID;primary_key;default:gen_random_uuid()"`
+	CreatedAt time.Time `gorm:"not null"`
+	UpdatedAt time.Time `gorm:"not null"`
 }
 
 // PrimaryKey returns the primary key of the model.

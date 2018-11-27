@@ -26,10 +26,10 @@ type Membership struct {
 	Model
 
 	Account    *Account
-	AccountID  string `gorm:"type:UUID;index"`
+	AccountID  string `gorm:"type:UUID;index;not null"`
 	Rights     Rights `gorm:"type:INT ARRAY"`
-	EntityID   string `gorm:"type:UUID;index"`
-	EntityType string `gorm:"index"`
+	EntityID   string `gorm:"type:UUID;index;not null"`
+	EntityType string `gorm:"index;not null"`
 }
 
 func init() {

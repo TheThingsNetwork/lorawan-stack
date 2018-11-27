@@ -26,7 +26,7 @@ type Client struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ClientID    string        `gorm:"unique_index:id;type:VARCHAR(36)"`
+	ClientID    string        `gorm:"unique_index:id;type:VARCHAR(36);not null"`
 	Name        string        `gorm:"type:VARCHAR"`
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:client"`
@@ -39,8 +39,8 @@ type Client struct {
 
 	State int `gorm:"not null"`
 
-	SkipAuthorization bool
-	Endorsed          bool
+	SkipAuthorization bool `gorm:"not null"`
+	Endorsed          bool `gorm:"not null"`
 
 	Grants Grants `gorm:"type:INT ARRAY"`
 	Rights Rights `gorm:"type:INT ARRAY"`

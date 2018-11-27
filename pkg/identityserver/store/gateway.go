@@ -28,7 +28,7 @@ type Gateway struct {
 	GatewayEUI *EUI64 `gorm:"unique_index:eui;type:VARCHAR(16);column:gateway_eui"`
 
 	// BEGIN common fields
-	GatewayID   string        `gorm:"unique_index:id;type:VARCHAR(36)"`
+	GatewayID   string        `gorm:"unique_index:id;type:VARCHAR(36);not null"`
 	Name        string        `gorm:"type:VARCHAR"`
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
@@ -44,16 +44,16 @@ type Gateway struct {
 
 	GatewayServerAddress string `gorm:"type:VARCHAR"`
 
-	AutoUpdate    bool
+	AutoUpdate    bool   `gorm:"not null"`
 	UpdateChannel string `gorm:"type:VARCHAR"`
 
 	FrequencyPlanID string `gorm:"type:VARCHAR"`
 
-	StatusPublic   bool
-	LocationPublic bool
+	StatusPublic   bool `gorm:"not null"`
+	LocationPublic bool `gorm:"not null"`
 
-	ScheduleDownlinkLate   bool
-	EnforceDutyCycle       bool
+	ScheduleDownlinkLate   bool `gorm:"not null"`
+	EnforceDutyCycle       bool `gorm:"not null"`
 	DownlinkPathConstraint int
 }
 

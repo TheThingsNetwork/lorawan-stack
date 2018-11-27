@@ -25,10 +25,10 @@ type ClientAuthorization struct {
 	Model
 
 	Client   *Client
-	ClientID string `gorm:"type:UUID;index"`
+	ClientID string `gorm:"type:UUID;index;not null"`
 
 	User   *User
-	UserID string `gorm:"type:UUID;index"`
+	UserID string `gorm:"type:UUID;index;not null"`
 
 	Rights Rights `gorm:"type:INT ARRAY"`
 }
@@ -51,7 +51,7 @@ func (a ClientAuthorization) toPB() *ttnpb.OAuthClientAuthorization {
 // AuthorizationCode model.
 type AuthorizationCode struct {
 	ClientAuthorization
-	Code        string `gorm:"type:VARCHAR;unique_index"`
+	Code        string `gorm:"type:VARCHAR;unique_index;not null"`
 	RedirectURI string `gorm:"type:VARCHAR;column:redirect_uri"`
 	State       string `gorm:"type:VARCHAR"`
 	ExpiresAt   time.Time
@@ -79,13 +79,13 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 type AccessToken struct {
 	ClientAuthorization
 
-	TokenID string `gorm:"type:VARCHAR;unique_index:id"`
+	TokenID string `gorm:"type:VARCHAR;unique_index:id;not null"`
 
 	Previous   *AccessToken `gorm:"foreignkey:PreviousID;association_foreignkey:TokenID"`
 	PreviousID string       `gorm:"type:VARCHAR;index"`
 
-	AccessToken  string `gorm:"type:VARCHAR"`
-	RefreshToken string `gorm:"type:VARCHAR"`
+	AccessToken  string `gorm:"type:VARCHAR;not null"`
+	RefreshToken string `gorm:"type:VARCHAR;not null"`
 
 	ExpiresAt time.Time
 }
