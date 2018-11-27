@@ -29,9 +29,9 @@ import (
 
 var defaultInstance = &PBKDF2{
 	iterations: 20000,
-	keyLength:  512,
-	algorithm:  Sha512,
-	saltLength: 64,
+	keyLength:  32,
+	algorithm:  Sha256,
+	saltLength: 16,
 }
 
 // SetDefaultIterations sets the number of iterations for the default PBKDF2 instance.
