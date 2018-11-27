@@ -47,17 +47,18 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 	if err != nil {
 		return nil, err
 	}
-	id, err := auth.GenerateID(ctx)
+	token, err := auth.APIKey.Generate(ctx, "")
 	if err != nil {
 		return nil, err
 	}
-	token, err := auth.APIKey.Generate(ctx, id)
+	_, generatedID, generatedKey, _ := auth.SplitToken(token)
+	hashedKey, err := auth.Hash(generatedKey)
 	if err != nil {
 		return nil, err
 	}
 	key = &ttnpb.APIKey{
-		ID:     id,
-		Key:    token,
+		ID:     generatedID,
+		Key:    string(hashedKey),
 		Name:   req.Name,
 		Rights: req.Rights,
 	}
@@ -69,6 +70,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 	if err != nil {
 		return nil, err
 	}
+	key.Key = token
 	return key, nil
 }
 
@@ -85,6 +87,9 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, ids *ttnp
 	})
 	if err != nil {
 		return nil, err
+	}
+	for _, key := range keys.APIKeys {
+		key.Key = ""
 	}
 	return keys, nil
 }
@@ -109,6 +114,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 	if key == nil {
 		return &ttnpb.APIKey{}, nil
 	}
+	key.Key = ""
 	return key, nil
 }
 
