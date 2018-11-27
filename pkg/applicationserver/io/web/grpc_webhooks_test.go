@@ -43,6 +43,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(res.Formats, should.HaveSameElementsDeep, map[string]string{
 			"json": "JSON",
+			"pb":   "Protobuf",
 		})
 	}
 
