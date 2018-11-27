@@ -49,6 +49,9 @@ type User struct {
 	State int `gorm:"not null"`
 
 	Admin bool `gorm:"not null"`
+
+	ProfilePicture   *Picture
+	ProfilePictureID *string `gorm:"type:UUID;index"`
 }
 
 func init() {
@@ -73,6 +76,13 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 	requirePasswordUpdateField: func(pb *ttnpb.User, usr *User) { pb.RequirePasswordUpdate = usr.RequirePasswordUpdate },
 	stateField:                 func(pb *ttnpb.User, usr *User) { pb.State = ttnpb.State(usr.State) },
 	adminField:                 func(pb *ttnpb.User, usr *User) { pb.Admin = usr.Admin },
+	profilePictureField: func(pb *ttnpb.User, usr *User) {
+		if usr.ProfilePicture == nil {
+			pb.ProfilePicture = nil
+		} else {
+			pb.ProfilePicture = usr.ProfilePicture.toPB()
+		}
+	},
 }
 
 // functions to set fields from the user proto into the user model.
@@ -91,6 +101,13 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	requirePasswordUpdateField: func(usr *User, pb *ttnpb.User) { usr.RequirePasswordUpdate = pb.RequirePasswordUpdate },
 	stateField:                 func(usr *User, pb *ttnpb.User) { usr.State = int(pb.State) },
 	adminField:                 func(usr *User, pb *ttnpb.User) { usr.Admin = pb.Admin },
+	profilePictureField: func(usr *User, pb *ttnpb.User) {
+		usr.ProfilePictureID, usr.ProfilePicture = nil, nil
+		if pb.ProfilePicture != nil {
+			usr.ProfilePicture = new(Picture)
+			usr.ProfilePicture.fromPB(pb.ProfilePicture)
+		}
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.

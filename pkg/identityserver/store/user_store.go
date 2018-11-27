@@ -39,7 +39,7 @@ type userStore struct {
 func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	query = query.Preload("Account")
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("ContactInfo")
+		return query.Preload("Attributes").Preload("ContactInfo").Preload("ProfilePicture")
 	}
 	var userColumns []string
 	var notFoundPaths []string
@@ -54,6 +54,9 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 			query = query.Preload("Attributes")
 		case contactInfoField:
 			query = query.Preload("ContactInfo")
+		case profilePictureField:
+			userColumns = append(userColumns, "profile_picture_id")
+			query = query.Preload("ProfilePicture")
 		default:
 			if column, ok := userColumnNames[path]; ok && column != "" {
 				userColumns = append(userColumns, column)
@@ -143,7 +146,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldContactInfo := userModel.Attributes, userModel.ContactInfo
+	oldAttributes, oldContactInfo, oldProfilePictureID := userModel.Attributes, userModel.ContactInfo, userModel.ProfilePictureID
 	columns := userModel.fromPB(usr, fieldMask)
 	if len(columns) > 0 {
 		query = s.db.Model(&userModel).Select(columns).Updates(&userModel)
@@ -159,6 +162,12 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	}
 	if !reflect.DeepEqual(oldContactInfo, userModel.ContactInfo) {
 		err = replaceContactInfos(s.db, "user", userModel.ID, oldContactInfo, userModel.ContactInfo)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if oldProfilePictureID != nil && userModel.ProfilePictureID != oldProfilePictureID {
+		err = s.db.Where(&Model{ID: *oldProfilePictureID}).Delete(&Picture{}).Error
 		if err != nil {
 			return nil, err
 		}

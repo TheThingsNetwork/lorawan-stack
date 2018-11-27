@@ -41,6 +41,7 @@ const ( // TODO: should probably move this to ttnpb
 	passwordField                 = "password"
 	passwordUpdatedAtField        = "password_updated_at"
 	primaryEmailAddressField      = "primary_email_address"
+	profilePictureField           = "profile_picture"
 	redirectURIsField             = "redirect_uris"
 	requirePasswordUpdateField    = "require_password_update"
 	rightsField                   = "rights"

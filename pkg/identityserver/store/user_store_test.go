@@ -34,7 +34,7 @@ func TestUserStore(t *testing.T) {
 	now := time.Now()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		db.AutoMigrate(&Account{}, &User{}, &Attribute{}, &ContactInfo{})
+		db.AutoMigrate(&Account{}, &User{}, &Attribute{}, &ContactInfo{}, &Picture{})
 		store := GetUserStore(db)
 
 		created, err := store.CreateUser(ctx, &ttnpb.User{
@@ -50,6 +50,12 @@ func TestUserStore(t *testing.T) {
 				{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
 				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
 			},
+			ProfilePicture: &ttnpb.Picture{
+				Embedded: &ttnpb.Picture_Embedded{
+					MimeType: "image/png",
+					Data:     []byte("foobarbaz"),
+				},
+			},
 		})
 		a.So(err, should.BeNil)
 		a.So(created.UserID, should.Equal, "foo")
@@ -57,6 +63,9 @@ func TestUserStore(t *testing.T) {
 		a.So(created.Description, should.Equal, "The Amazing Foo User")
 		a.So(created.Attributes, should.HaveLength, 3)
 		a.So(created.ContactInfo, should.HaveLength, 2)
+		if a.So(created.ProfilePicture, should.NotBeNil) {
+			a.So(created.ProfilePicture.Embedded, should.NotBeNil)
+		}
 		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
@@ -92,11 +101,17 @@ func TestUserStore(t *testing.T) {
 				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
 				{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "other_admin@example.com"},
 			},
-		}, &types.FieldMask{Paths: []string{"description", "attributes", "contact_info"}})
+			ProfilePicture: &ttnpb.Picture{
+				Sizes: map[uint32]string{0: "https://example.com/profile_picture.jpg"},
+			},
+		}, &types.FieldMask{Paths: []string{"description", "attributes", "contact_info", "profile_picture"}})
 		a.So(err, should.BeNil)
 		a.So(updated.Description, should.Equal, "The Amazing Foobar User")
 		a.So(updated.Attributes, should.HaveLength, 3)
 		a.So(updated.ContactInfo, should.HaveLength, 4)
+		if a.So(updated.ProfilePicture, should.NotBeNil) && a.So(updated.ProfilePicture.Sizes, should.HaveLength, 1) {
+			a.So(updated.ProfilePicture.Sizes[0], should.Equal, "https://example.com/profile_picture.jpg")
+		}
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
