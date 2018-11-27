@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -33,6 +34,8 @@ var (
 	errUnsupportedAuthorization = errors.DefineUnauthenticated("unsupported_authorization", "Unsupported authorization method")
 	errInvalidAuthorization     = errors.DefinePermissionDenied("invalid_authorization", "invalid authorization")
 	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "access token expired")
+	errOAuthClientRejected      = errors.DefinePermissionDenied("oauth_client_rejected", "OAuth client was rejected")
+	errOAuthClientSuspended     = errors.DefinePermissionDenied("oauth_client_suspended", "OAuth client was suspended")
 )
 
 func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoResponse, err error) {
@@ -62,6 +65,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	var fetch func(db *gorm.DB) error
 	res := new(ttnpb.AuthInfoResponse)
 	userFieldMask := &types.FieldMask{Paths: []string{"admin", "state"}}
+	clientFieldMask := &types.FieldMask{Paths: []string{"state"}}
 	var user *ttnpb.User
 	var userRights *ttnpb.Rights
 
@@ -118,6 +122,24 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			user, err = store.GetUserStore(db).GetUser(ctx, &accessToken.UserIDs, userFieldMask)
 			if err != nil {
 				return err
+			}
+			client, err := store.GetClientStore(db).GetClient(ctx, &accessToken.ClientIDs, clientFieldMask)
+			if err != nil {
+				return err
+			}
+			switch client.State {
+			case ttnpb.STATE_REQUESTED:
+				// OAuth authorization only passes for collaborators, so this is ok.
+			case ttnpb.STATE_APPROVED:
+				// Normal OAuth client.
+			case ttnpb.STATE_REJECTED:
+				return errOAuthClientRejected
+			case ttnpb.STATE_FLAGGED:
+				// Innocent until proven guilty.
+			case ttnpb.STATE_SUSPENDED:
+				return errOAuthClientSuspended
+			default:
+				panic(fmt.Sprintf("Unhandled client state: %s", client.State.String()))
 			}
 			userRights = ttnpb.RightsFrom(accessToken.Rights...)
 			return nil
