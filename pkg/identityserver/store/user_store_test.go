@@ -100,13 +100,6 @@ func TestUserStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		_, err = store.UpdateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "foo"},
-			Description:     "The Foobar User",
-			UpdatedAt:       created.UpdatedAt,
-		}, &types.FieldMask{Paths: []string{"description"}})
-		a.So(err, should.NotBeNil)
-
 		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, nil)
 		a.So(err, should.BeNil)
 		a.So(got.UserID, should.Equal, created.UserID)

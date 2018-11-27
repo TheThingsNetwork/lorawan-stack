@@ -85,13 +85,6 @@ func TestClientStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		_, err = store.UpdateClient(ctx, &ttnpb.Client{
-			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
-			Description:       "The Foobar Client",
-			UpdatedAt:         created.UpdatedAt,
-		}, &types.FieldMask{Paths: []string{"description"}})
-		a.So(err, should.NotBeNil)
-
 		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"}, nil)
 		a.So(err, should.BeNil)
 		a.So(got.ClientID, should.Equal, created.ClientID)

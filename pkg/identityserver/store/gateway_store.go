@@ -133,9 +133,6 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 		}
 		return nil, err
 	}
-	if !gtw.UpdatedAt.IsZero() && gtw.UpdatedAt != gtwModel.UpdatedAt {
-		return nil, errConcurrentWrite
-	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}

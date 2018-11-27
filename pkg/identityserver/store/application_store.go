@@ -128,9 +128,6 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 		}
 		return nil, err
 	}
-	if !app.UpdatedAt.IsZero() && app.UpdatedAt != appModel.UpdatedAt {
-		return nil, errConcurrentWrite
-	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}

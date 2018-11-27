@@ -86,11 +86,6 @@ func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err 
 	return f(tx)
 }
 
-var errConcurrentWrite = errors.DefineFailedPrecondition(
-	"concurrent_write",
-	"detected a concurrent write to the same object",
-)
-
 func entityTypeForID(id *ttnpb.EntityIdentifiers) string {
 	switch id := id.Identifiers().(type) {
 	case *ttnpb.ApplicationIdentifiers:

@@ -119,18 +119,6 @@ func TestEndDeviceStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		_, err = store.UpdateEndDevice(ctx, &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "test",
-				},
-				DeviceID: "foo",
-			},
-			Description: "The Foobar EndDevice",
-			UpdatedAt:   created.UpdatedAt,
-		}, &types.FieldMask{Paths: []string{"description"}})
-		a.So(err, should.NotBeNil)
-
 		got, err = store.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationID: "test",

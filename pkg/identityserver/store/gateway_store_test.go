@@ -109,13 +109,6 @@ func TestGatewayStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		_, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
-			Description:        "The Foobar Gateway",
-			UpdatedAt:          created.UpdatedAt,
-		}, &pbtypes.FieldMask{Paths: []string{"description"}})
-		a.So(err, should.NotBeNil)
-
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
 		a.So(err, should.BeNil)
 		a.So(got.GatewayID, should.Equal, created.GatewayID)

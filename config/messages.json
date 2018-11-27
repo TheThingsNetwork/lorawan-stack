@@ -2411,15 +2411,6 @@
       "file": "store.go"
     }
   },
-  "error:pkg/identityserver/store:concurrent_write": {
-    "translations": {
-      "en": "detected a concurrent write to the same object"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
   "error:pkg/identityserver/store:database": {
     "translations": {
       "en": "database error"

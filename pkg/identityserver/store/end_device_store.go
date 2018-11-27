@@ -148,9 +148,6 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 		}
 		return nil, err
 	}
-	if !dev.UpdatedAt.IsZero() && dev.UpdatedAt != devModel.UpdatedAt {
-		return nil, errConcurrentWrite
-	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}

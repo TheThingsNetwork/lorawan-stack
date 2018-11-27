@@ -128,9 +128,6 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 		}
 		return nil, err
 	}
-	if !cli.UpdatedAt.IsZero() && cli.UpdatedAt != cliModel.UpdatedAt {
-		return nil, errConcurrentWrite
-	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}

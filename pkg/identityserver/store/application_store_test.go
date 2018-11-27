@@ -85,13 +85,6 @@ func TestApplicationStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		_, err = store.UpdateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
-			Description:            "The Foobar Application",
-			UpdatedAt:              created.UpdatedAt,
-		}, &types.FieldMask{Paths: []string{"description"}})
-		a.So(err, should.NotBeNil)
-
 		got, err = store.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, nil)
 		a.So(err, should.BeNil)
 		a.So(got.ApplicationID, should.Equal, created.ApplicationID)

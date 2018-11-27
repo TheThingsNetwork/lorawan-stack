@@ -134,9 +134,6 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 		}
 		return nil, err
 	}
-	if !org.UpdatedAt.IsZero() && org.UpdatedAt != orgModel.UpdatedAt {
-		return nil, errConcurrentWrite
-	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}

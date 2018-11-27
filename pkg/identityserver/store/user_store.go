@@ -138,9 +138,6 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 		}
 		return nil, err
 	}
-	if !usr.UpdatedAt.IsZero() && usr.UpdatedAt != userModel.UpdatedAt {
-		return nil, errConcurrentWrite
-	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}

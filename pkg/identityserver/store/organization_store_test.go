@@ -85,13 +85,6 @@ func TestOrganizationStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		_, err = store.UpdateOrganization(ctx, &ttnpb.Organization{
-			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
-			Description:             "The Foobar Organization",
-			UpdatedAt:               created.UpdatedAt,
-		}, &types.FieldMask{Paths: []string{"description"}})
-		a.So(err, should.NotBeNil)
-
 		got, err = store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, nil)
 		a.So(err, should.BeNil)
 		a.So(got.OrganizationID, should.Equal, created.OrganizationID)
