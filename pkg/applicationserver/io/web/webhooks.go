@@ -284,7 +284,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 		[]string{
 			"base_url",
 			"headers",
-			"formatter",
+			"format",
 			"uplink_message",
 			"join_accept",
 			"downlink_ack",
@@ -351,11 +351,11 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		return nil, err
 	}
 	url.Path = path.Join(url.Path, cfg.Path)
-	formatter, ok := formatters[hook.Formatter]
+	format, ok := formats[hook.Format]
 	if !ok {
-		return nil, errFormatterNotFound.WithAttributes("formatter", hook.Formatter)
+		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
 	}
-	buf, err := formatter.Encode(msg)
+	buf, err := format.Encode(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -363,17 +363,14 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", formatter.ContentType)
+	req.Header.Set("Content-Type", format.ContentType)
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
 	}
 	return req, nil
 }
 
-var (
-	errWebhookNotFound   = errors.DefineNotFound("webhook_not_found", "webhook not found")
-	errFormatterNotFound = errors.DefineNotFound("formatter_not_found", "formatter `{formatter}` not found")
-)
+var errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
 
 func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) error {
 	ctx := w.ctx
@@ -384,22 +381,22 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 		"device_id", devID.DeviceID,
 		"webhook_id", hookID.WebhookID,
 	))
-	hook, err := w.registry.Get(ctx, hookID, []string{"formatter"})
+	hook, err := w.registry.Get(ctx, hookID, []string{"format"})
 	if err != nil {
 		return err
 	}
 	if hook == nil {
 		return errWebhookNotFound
 	}
-	formatter, ok := formatters[hook.Formatter]
+	format, ok := formats[hook.Format]
 	if !ok {
-		return errFormatterNotFound
+		return errFormatNotFound.WithAttributes("format", hook.Format)
 	}
 	body, err := ioutil.ReadAll(c.Request().Body)
 	if err != nil {
 		return err
 	}
-	items, err := formatter.Decode(body)
+	items, err := format.Decode(body)
 	if err != nil {
 		return err
 	}

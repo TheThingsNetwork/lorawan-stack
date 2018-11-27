@@ -37,12 +37,12 @@ func (s webhookRegistryRPC) GetFormats(ctx context.Context, ids *ttnpb.Applicati
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	formats := make(map[string]string, len(formatters))
-	for format, formatter := range formatters {
-		formats[format] = formatter.Name
+	fs := make(map[string]string, len(formats))
+	for key, val := range formats {
+		fs[key] = val.Name
 	}
 	return &ttnpb.ApplicationWebhookFormats{
-		Formats: formats,
+		Formats: fs,
 	}, nil
 }
 

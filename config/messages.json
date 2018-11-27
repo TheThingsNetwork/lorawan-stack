@@ -1115,27 +1115,27 @@
       "file": "grpc.go"
     }
   },
-  "error:pkg/applicationserver/io/web:buffer_full": {
+  "error:pkg/applicationserver/io/web:format_not_found": {
     "translations": {
-      "en": "the buffer is full"
+      "en": "format `{format}` not found"
     },
     "description": {
       "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
-  "error:pkg/applicationserver/io/web:formatter_not_found": {
-    "translations": {
-      "en": "formatter `{formatter}` not found"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
+      "file": "format.go"
     }
   },
   "error:pkg/applicationserver/io/web:http": {
     "translations": {
       "en": "HTTP error: {message}"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:queue_full": {
+    "translations": {
+      "en": "the queue is full"
     },
     "description": {
       "package": "pkg/applicationserver/io/web",

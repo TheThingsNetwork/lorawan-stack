@@ -257,7 +257,7 @@ func TestApplicationServer(t *testing.T) {
 					ApplicationWebhook: ttnpb.ApplicationWebhook{
 						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
 						BaseURL:                       webhookTarget.URL,
-						Formatter:                     "json",
+						Format:                        "json",
 						UplinkMessage:                 &ttnpb.ApplicationWebhook_Message{Path: ""},
 						JoinAccept:                    &ttnpb.ApplicationWebhook_Message{Path: ""},
 						DownlinkAck:                   &ttnpb.ApplicationWebhook_Message{Path: ""},

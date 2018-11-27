@@ -54,7 +54,7 @@ func TestWebhooks(t *testing.T) {
 			Headers: map[string]string{
 				"Authorization": "key secret",
 			},
-			Formatter: "json",
+			Format: "json",
 			UplinkMessage: &ttnpb.ApplicationWebhook_Message{
 				Path: "up",
 			},
@@ -83,7 +83,7 @@ func TestWebhooks(t *testing.T) {
 		paths := []string{
 			"base_url",
 			"headers",
-			"formatter",
+			"format",
 			"uplink_message",
 			"join_accept",
 			"downlink_ack",

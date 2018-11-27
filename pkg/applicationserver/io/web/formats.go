@@ -14,18 +14,26 @@
 
 package web
 
-import "go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
+import (
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+)
 
-type Formatter struct {
+// Format is a format to use for web-based frontends.
+type Format struct {
 	fmt.Formatter
 	Name        string
 	ContentType string
 }
 
-var formatters = map[string]Formatter{
-	"json": {
-		Formatter:   fmt.JSON,
-		Name:        "JSON",
-		ContentType: "application/json",
-	},
-}
+var (
+	formats = map[string]Format{
+		"json": {
+			Formatter:   fmt.JSON,
+			Name:        "JSON",
+			ContentType: "application/json",
+		},
+	}
+
+	errFormatNotFound = errors.DefineNotFound("format_not_found", "format `{format}` not found")
+)
