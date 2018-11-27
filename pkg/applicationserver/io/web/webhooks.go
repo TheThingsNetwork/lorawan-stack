@@ -17,6 +17,7 @@ package web
 import (
 	"bytes"
 	"context"
+	stdio "io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -58,7 +59,10 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	defer res.Body.Close()
+	defer func() {
+		stdio.Copy(ioutil.Discard, res.Body)
+		res.Body.Close()
+	}()
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	}
