@@ -19,4 +19,6 @@ import (
 )
 
 // DefaultIdentityServerConfig is the default configuration for the Identity Server.
-var DefaultIdentityServerConfig = identityserver.Config{}
+var DefaultIdentityServerConfig = identityserver.Config{
+	DatabaseURI: "postgresql://root@localhost:26257/is_development?sslmode=disable",
+}

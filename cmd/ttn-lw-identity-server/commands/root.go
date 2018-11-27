@@ -22,8 +22,11 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared/version"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
+
+var errMissingFlag = errors.DefineInvalidArgument("missing_flag", "missing CLI flag `{flag}`")
 
 var (
 	logger *log.Logger

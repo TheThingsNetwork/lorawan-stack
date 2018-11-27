@@ -1106,6 +1106,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/ttn-lw-identity-server/commands:missing_flag": {
+    "translations": {
+      "en": "missing CLI flag `{flag}`"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-identity-server/commands",
+      "file": "root.go"
+    }
+  },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect application `{application_uid}`"
@@ -1358,6 +1367,51 @@
       "file": "cluster.go"
     }
   },
+  "error:pkg/auth/pbkdf2:invalid_pbkdf2_format": {
+    "translations": {
+      "en": "password hash has invalid PBKDF2 format"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:pbkdf2_iterations": {
+    "translations": {
+      "en": "could not determine number of iterations from `{iterations}`"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:pbkdf2_key_length": {
+    "translations": {
+      "en": "could not determine key length"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:unknown_algorithm": {
+    "translations": {
+      "en": "algorithm `{alg}` unknown"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "algorithm.go"
+    }
+  },
+  "error:pkg/auth/pbkdf2:zero_length_salt": {
+    "translations": {
+      "en": "password salt can not have zero length"
+    },
+    "description": {
+      "package": "pkg/auth/pbkdf2",
+      "file": "pbkdf2.go"
+    }
+  },
   "error:pkg/auth/rights:insufficient_application_rights": {
     "translations": {
       "en": "insufficient rights for application `{uid}`"
@@ -1473,6 +1527,33 @@
     "description": {
       "package": "pkg/auth/rights",
       "file": "fetcher.go"
+    }
+  },
+  "error:pkg/auth:invalid_hash": {
+    "translations": {
+      "en": "invalid password hash"
+    },
+    "description": {
+      "package": "pkg/auth",
+      "file": "password.go"
+    }
+  },
+  "error:pkg/auth:token": {
+    "translations": {
+      "en": "invalid token"
+    },
+    "description": {
+      "package": "pkg/auth",
+      "file": "auth.go"
+    }
+  },
+  "error:pkg/auth:unknown_hashing_method": {
+    "translations": {
+      "en": "password hashing method `{method}` unknown"
+    },
+    "description": {
+      "package": "pkg/auth",
+      "file": "password.go"
     }
   },
   "error:pkg/band:band_not_found": {
@@ -2229,6 +2310,141 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/identityserver/store:access_token_not_found": {
+    "translations": {
+      "en": "access token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:account_type": {
+    "translations": {
+      "en": "account of type `{account_type}` can not collaborate on `{entity_type}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "membership_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:already_exists": {
+    "translations": {
+      "en": "entity already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:application_not_found": {
+    "translations": {
+      "en": "application `{application_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:authorization_code_not_found": {
+    "translations": {
+      "en": "authorization code not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:authorization_not_found": {
+    "translations": {
+      "en": "authorization of `{user_id}` for `{client_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:client_not_found": {
+    "translations": {
+      "en": "client `{client_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:concurrent_write": {
+    "translations": {
+      "en": "detected a concurrent write to the same object"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:database": {
+    "translations": {
+      "en": "database error"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:database_table": {
+    "translations": {
+      "en": "database table `{table}` does not exist"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/identityserver/store:gateway_not_found": {
+    "translations": {
+      "en": "gateway `{gateway_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:id_taken": {
+    "translations": {
+      "en": "ID already taken"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:organization_not_found": {
+    "translations": {
+      "en": "organization `{organization_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:session_not_found": {
+    "translations": {
+      "en": "session `{session_id}` for user `{user_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:user_not_found": {
+    "translations": {
+      "en": "user `{user_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
     }
   },
   "error:pkg/joinserver/redis:duplicate_identifiers": {

@@ -18,7 +18,7 @@ import "go.thethings.network/lorawan-stack/pkg/component"
 
 // Config for the Identity Server.
 type Config struct {
-	// TODO
+	DatabaseURI string `name:"database-uri" description:"Database connection URI"`
 }
 
 // IdentityServer implements the Identity Server component.
