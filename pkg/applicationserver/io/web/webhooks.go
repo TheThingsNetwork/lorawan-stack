@@ -31,9 +31,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/version"
 	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc/metadata"
 )
+
+var userAgent = "ttn-lw-application-server/" + version.TTN
 
 // Sink processes HTTP requests.
 type Sink interface {
@@ -371,6 +374,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		req.Header.Set(key, value)
 	}
 	req.Header.Set("Content-Type", format.ContentType)
+	req.Header.Set("User-Agent", userAgent)
 	return req, nil
 }
 
