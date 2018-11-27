@@ -109,6 +109,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				return errInvalidAuthorization
 			}
 			apiKey.Key = ""
+			apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Implied().GetRights()
 			res.AccessMethod = &ttnpb.AuthInfoResponse_APIKey{
 				APIKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
 					APIKey:    *apiKey,
@@ -141,6 +142,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				return errTokenExpired
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
+			accessToken.Rights = ttnpb.RightsFrom(accessToken.Rights...).Implied().GetRights()
 			res.AccessMethod = &ttnpb.AuthInfoResponse_OAuthAccessToken{
 				OAuthAccessToken: accessToken,
 			}
@@ -180,7 +182,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	if user != nil {
 		if user.Admin {
-			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights.Implied()) // TODO: Use restricted Admin rights.
+			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights) // TODO: Use restricted Admin rights.
 		}
 
 		if user.PrimaryEmailAddressValidatedAt == nil {
@@ -270,13 +272,13 @@ func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.Auth
 		return nil, nil
 	}
 	entityRights := make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights)
-	entityRights[ids] = rights.Implied()
+	entityRights[ids] = rights
 	memberRights, err := is.memberRights(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 	for ids, memberRights := range memberRights {
-		entityRights[ids] = memberRights.Implied().Intersect(rights.Implied())
+		entityRights[ids] = memberRights.Implied().Intersect(rights)
 	}
 	return entityRights, nil
 }
