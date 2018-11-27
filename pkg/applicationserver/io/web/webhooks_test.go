@@ -102,18 +102,18 @@ func TestWebhooks(t *testing.T) {
 		}
 		for _, sink := range []web.Sink{
 			testSink,
-			&web.BufferedSink{
+			&web.QueuedSink{
 				Target:  testSink,
-				Buffer:  make(chan *http.Request, 4),
+				Queue:   make(chan *http.Request, 4),
 				Workers: 1,
 			},
-			&web.BufferedSink{
-				Target: &web.BufferedSink{
+			&web.QueuedSink{
+				Target: &web.QueuedSink{
 					Target:  testSink,
-					Buffer:  make(chan *http.Request, 4),
+					Queue:   make(chan *http.Request, 4),
 					Workers: 1,
 				},
-				Buffer:  make(chan *http.Request, 4),
+				Queue:   make(chan *http.Request, 4),
 				Workers: 1,
 			},
 		} {

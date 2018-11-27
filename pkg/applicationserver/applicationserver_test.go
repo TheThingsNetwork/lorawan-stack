@@ -141,10 +141,10 @@ func TestApplicationServer(t *testing.T) {
 			Static: deviceRepositoryData,
 		},
 		Webhooks: applicationserver.WebhooksConfig{
-			Registry:   webhookRegistry,
-			Target:     "direct",
-			Timeout:    timeout,
-			BufferSize: 1,
+			Registry:  webhookRegistry,
+			Target:    "direct",
+			Timeout:   timeout,
+			QueueSize: 1,
 		},
 	}
 	as, err := applicationserver.New(c, config)

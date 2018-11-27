@@ -65,22 +65,22 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 	return errRequest.WithAttributes("code", res.StatusCode)
 }
 
-// BufferedSink is a ControllableSink with buffer.
-type BufferedSink struct {
+// QueuedSink is a ControllableSink with queue.
+type QueuedSink struct {
 	Target  Sink
-	Buffer  chan *http.Request
+	Queue   chan *http.Request
 	Workers int
 }
 
-// Run starts concurrent workers to process messages from the buffer.
+// Run starts concurrent workers to process messages from the queue.
 // If Target is a ControllableSink, this method runs the target.
 // This method blocks until the target (if controllable) and all workers are done.
-func (b *BufferedSink) Run(ctx context.Context) error {
-	if b.Workers < 1 {
-		b.Workers = 1
+func (s *QueuedSink) Run(ctx context.Context) error {
+	if s.Workers < 1 {
+		s.Workers = 1
 	}
 	wg := sync.WaitGroup{}
-	if controllable, ok := b.Target.(ControllableSink); ok {
+	if controllable, ok := s.Target.(ControllableSink); ok {
 		wg.Add(1)
 		go func() {
 			if err := controllable.Run(ctx); err != nil && !errors.IsCanceled(err) {
@@ -89,7 +89,7 @@ func (b *BufferedSink) Run(ctx context.Context) error {
 			wg.Done()
 		}()
 	}
-	for i := 0; i < b.Workers; i++ {
+	for i := 0; i < s.Workers; i++ {
 		wg.Add(1)
 		go func() {
 			for {
@@ -97,8 +97,8 @@ func (b *BufferedSink) Run(ctx context.Context) error {
 				case <-ctx.Done():
 					wg.Done()
 					return
-				case req := <-b.Buffer:
-					if err := b.Target.Process(req); err != nil {
+				case req := <-s.Queue:
+					if err := s.Target.Process(req); err != nil {
 						log.FromContext(ctx).WithError(err).Warn("Failed to process message")
 					}
 				}
@@ -110,16 +110,16 @@ func (b *BufferedSink) Run(ctx context.Context) error {
 	return ctx.Err()
 }
 
-var errBufferFull = errors.DefineResourceExhausted("buffer_full", "the buffer is full")
+var errQueueFull = errors.DefineResourceExhausted("queue_full", "the queue is full")
 
-// Process sends the request to the buffer.
-// This method returns immediately. An error is returned when the buffer is full.
-func (b *BufferedSink) Process(req *http.Request) error {
+// Process sends the request to the queue.
+// This method returns immediately. An error is returned when the queue is full.
+func (s *QueuedSink) Process(req *http.Request) error {
 	select {
-	case b.Buffer <- req:
+	case s.Queue <- req:
 		return nil
 	default:
-		return errBufferFull
+		return errQueueFull
 	}
 }
 

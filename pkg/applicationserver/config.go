@@ -94,11 +94,11 @@ var (
 
 // WebhooksConfig defines the configuration of the webhooks integration.
 type WebhooksConfig struct {
-	Registry   web.WebhookRegistry `name:"-"`
-	Target     string              `name:"target" description:"Target of the integration (direct)"`
-	Timeout    time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
-	BufferSize int                 `name:"buffer-size" description:"Number of requests to buffer"`
-	Workers    int                 `name:"workers" description:"Number of workers to process requests"`
+	Registry  web.WebhookRegistry `name:"-"`
+	Target    string              `name:"target" description:"Target of the integration (direct)"`
+	Timeout   time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
+	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
+	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
 }
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
@@ -120,10 +120,10 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	if c.Registry == nil {
 		return nil, errWebhooksRegistry
 	}
-	if c.BufferSize > 0 || c.Workers > 0 {
-		target = &web.BufferedSink{
+	if c.QueueSize > 0 || c.Workers > 0 {
+		target = &web.QueuedSink{
 			Target:  target,
-			Buffer:  make(chan *http.Request, c.BufferSize),
+			Queue:   make(chan *http.Request, c.QueueSize),
 			Workers: c.Workers,
 		}
 	}
