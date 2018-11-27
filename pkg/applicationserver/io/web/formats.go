@@ -15,13 +15,13 @@
 package web
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Format is a format to use for web-based frontends.
 type Format struct {
-	fmt.Formatter
+	formatters.Formatter
 	Name        string
 	ContentType string
 }
@@ -29,7 +29,7 @@ type Format struct {
 var (
 	formats = map[string]Format{
 		"json": {
-			Formatter:   fmt.JSON,
+			Formatter:   formatters.JSON,
 			Name:        "JSON",
 			ContentType: "application/json",
 		},

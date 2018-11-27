@@ -355,7 +355,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if !ok {
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
 	}
-	buf, err := format.Encode(msg)
+	buf, err := format.FromUp(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -396,7 +396,7 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 	if err != nil {
 		return err
 	}
-	items, err := format.Decode(body)
+	items, err := format.ToDownlinks(body)
 	if err != nil {
 		return err
 	}

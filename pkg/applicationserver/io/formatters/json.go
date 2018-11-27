@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fmt
+package formatters
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
@@ -22,11 +22,11 @@ import (
 type json struct {
 }
 
-func (json) Encode(msg *ttnpb.ApplicationUp) ([]byte, error) {
+func (json) FromUp(msg *ttnpb.ApplicationUp) ([]byte, error) {
 	return jsonpb.TTN().Marshal(msg)
 }
 
-func (json) Decode(data []byte) (*ttnpb.ApplicationDownlinks, error) {
+func (json) ToDownlinks(data []byte) (*ttnpb.ApplicationDownlinks, error) {
 	res := &ttnpb.ApplicationDownlinks{}
 	if err := jsonpb.TTN().Unmarshal(data, &res); err != nil {
 		return nil, err

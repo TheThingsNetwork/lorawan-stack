@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fmt_test
+package formatters_test
 
 import (
 	"strconv"
@@ -21,13 +21,13 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/fmt"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestJSONEncode(t *testing.T) {
-	formatter := fmt.JSON
+func TestJSONUpstream(t *testing.T) {
+	formatter := formatters.JSON
 
 	for i, tc := range []struct {
 		Message *ttnpb.ApplicationUp
@@ -82,7 +82,7 @@ func TestJSONEncode(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			buf, err := formatter.Encode(tc.Message)
+			buf, err := formatter.FromUp(tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -91,8 +91,8 @@ func TestJSONEncode(t *testing.T) {
 	}
 }
 
-func TestJSONDecode(t *testing.T) {
-	formatter := fmt.JSON
+func TestJSONDownstream(t *testing.T) {
+	formatter := formatters.JSON
 
 	for i, tc := range []struct {
 		Input []byte
@@ -118,7 +118,7 @@ func TestJSONDecode(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			res, err := formatter.Decode(tc.Input)
+			res, err := formatter.ToDownlinks(tc.Input)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fmt
+package formatters
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// Formatter encodes up and decodes downlink messages.
+// Formatter formats upstream and downstream messages.
 type Formatter interface {
-	Encode(*ttnpb.ApplicationUp) ([]byte, error)
-	Decode([]byte) (*ttnpb.ApplicationDownlinks, error)
+	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
+	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
 }
