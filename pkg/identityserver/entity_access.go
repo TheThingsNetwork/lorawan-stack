@@ -38,7 +38,31 @@ var (
 	errOAuthClientSuspended     = errors.DefinePermissionDenied("oauth_client_suspended", "OAuth client was suspended")
 )
 
+type requestAccessKeyType struct{}
+
+var requestAccessKey requestAccessKeyType
+
+type requestAccess struct {
+	authInfo     *ttnpb.AuthInfoResponse
+	entityRights map[*ttnpb.EntityIdentifiers]*ttnpb.Rights
+}
+
+func (is *IdentityServer) withRequestAccessCache(ctx context.Context) context.Context {
+	return context.WithValue(ctx, requestAccessKey, new(requestAccess))
+}
+
 func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoResponse, err error) {
+	if access, ok := ctx.Value(requestAccessKey).(*requestAccess); ok {
+		if access.authInfo != nil {
+			return access.authInfo, nil
+		}
+		defer func() {
+			if err == nil {
+				access.authInfo = info
+			}
+		}()
+	}
+
 	md := rpcmetadata.FromIncomingContext(ctx)
 	if md.AuthType == "" {
 		return &ttnpb.AuthInfoResponse{}, nil
@@ -206,7 +230,18 @@ func entityRights(authInfo *ttnpb.AuthInfoResponse) (*ttnpb.EntityIdentifiers, *
 	return nil, nil
 }
 
-func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.AuthInfoResponse) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.AuthInfoResponse) (res map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, err error) {
+	if access, ok := ctx.Value(requestAccessKey).(*requestAccess); ok {
+		if access.entityRights != nil {
+			return access.entityRights, nil
+		}
+		defer func() {
+			if err == nil {
+				access.entityRights = res
+			}
+		}()
+	}
+
 	ids, rights := entityRights(authInfo)
 	if ids == nil {
 		return nil, nil

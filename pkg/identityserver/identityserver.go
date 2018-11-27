@@ -109,7 +109,9 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}, is.config.OAuth)
 
 	c.AddContextFiller(func(ctx context.Context) context.Context {
-		return rights.NewContextWithFetcher(ctx, is)
+		ctx = is.withRequestAccessCache(ctx)
+		ctx = rights.NewContextWithFetcher(ctx, is)
+		return ctx
 	})
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationRegistry", rights.HookName, rights.Hook)
