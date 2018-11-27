@@ -1115,6 +1115,15 @@
       "file": "root.go"
     }
   },
+  "error:cmd/ttn-lw-identity-server/commands:password_mismatch": {
+    "translations": {
+      "en": "password did not match"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-identity-server/commands",
+      "file": "create_admin_user.go"
+    }
+  },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect application `{application_uid}`"

@@ -16,15 +16,20 @@ package commands
 
 import (
 	"context"
+	"os"
 	"time"
 
+	"github.com/howeyc/gopass"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
 
 var (
 	createAdminUserCommand = &cobra.Command{
@@ -56,6 +61,20 @@ var (
 			password, err := cmd.Flags().GetString("password")
 			if err != nil {
 				return err
+			}
+			if password == "" {
+				pw, err := gopass.GetPasswdPrompt("Please enter user password:", true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
+				password = string(pw)
+				pw, err = gopass.GetPasswdPrompt("Please repeat user password:", true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
+				if string(pw) != password {
+					return errPasswordMismatch
+				}
 			}
 			if password == "" {
 				return errMissingFlag.WithAttributes("flag", "password")
