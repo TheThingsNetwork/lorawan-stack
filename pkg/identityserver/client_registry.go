@@ -91,6 +91,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
 	events.Publish(evtCreateClient(ctx, req.ClientIdentifiers, nil))
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return cli, nil
 }
 
@@ -241,6 +242,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 		return nil, err
 	}
 	events.Publish(evtDeleteClient(ctx, ids, nil))
+	// TODO: Invalidate rights of members
 	return ttnpb.Empty, nil
 }
 

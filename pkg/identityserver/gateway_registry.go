@@ -74,6 +74,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil, err
 	}
 	events.Publish(evtCreateGateway(ctx, req.GatewayIdentifiers, nil))
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return gtw, nil
 }
 
@@ -219,6 +220,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 		return nil, err
 	}
 	events.Publish(evtDeleteGateway(ctx, ids, nil))
+	// TODO: Invalidate rights of members
 	return ttnpb.Empty, nil
 }
 

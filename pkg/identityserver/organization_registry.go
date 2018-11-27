@@ -74,6 +74,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		return nil, err
 	}
 	events.Publish(evtCreateOrganization(ctx, req.OrganizationIdentifiers, nil))
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return org, nil
 }
 
@@ -217,6 +218,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 		return nil, err
 	}
 	events.Publish(evtDeleteOrganization(ctx, ids, nil))
+	// TODO: Invalidate rights of members
 	return ttnpb.Empty, nil
 }
 

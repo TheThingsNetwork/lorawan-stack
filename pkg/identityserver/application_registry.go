@@ -74,6 +74,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		return nil, err
 	}
 	events.Publish(evtCreateApplication(ctx, req.ApplicationIdentifiers, nil))
+	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return app, nil
 }
 
@@ -219,6 +220,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 		return nil, err
 	}
 	events.Publish(evtDeleteApplication(ctx, ids, nil))
+	// TODO: Invalidate rights of members
 	return ttnpb.Empty, nil
 }
 
