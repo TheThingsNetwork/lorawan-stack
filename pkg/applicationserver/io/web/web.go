@@ -14,3 +14,6 @@
 
 // Package web implements the webhooks integration.
 package web
+
+// APIPrefix for the HTTP handlers.
+const APIPrefix = "/api/v3"

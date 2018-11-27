@@ -159,7 +159,7 @@ func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
 		w.validateAndFillIDs(),
 		w.requireApplicationRights(ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE),
 	}
-	group := server.Group("/as/applications/:application_id/webhooks/:webhook_id/down/:device_id", middleware...)
+	group := server.Group(APIPrefix+"/as/applications/:application_id/webhooks/:webhook_id/down/:device_id", middleware...)
 	group.POST("/push", func(c echo.Context) error {
 		return w.handleDown(c, io.Server.DownlinkQueuePush)
 	})

@@ -301,7 +301,7 @@ func TestApplicationServer(t *testing.T) {
 							chs.downErr <- err
 							continue
 						}
-						url := fmt.Sprintf("http://127.0.0.1:8099/as/applications/%s/webhooks/%s/down/%s/%s",
+						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/down/%s/%s",
 							data.ApplicationID, registeredApplicationWebhookID.WebhookID, data.DeviceID, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
