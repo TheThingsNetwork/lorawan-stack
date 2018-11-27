@@ -33,6 +33,7 @@ type Gateway struct {
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
+	Memberships []Membership  `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 	// END common fields
 
 	GatewayServerAddress string `gorm:"type:VARCHAR"`

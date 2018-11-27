@@ -91,3 +91,29 @@ type UserSessionStore interface {
 	UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error)
 	DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error
 }
+
+// MembershipStore interface for storing membership (collaboration) relations
+// between accounts (users or organizations) and entities (applications, clients,
+// gateways or organizations).
+//
+// As the operations in this store may be quite expensive, the results of FindXXX
+// operations should typically be cached. The recommended cache behavior is:
+//
+// - The results of FindMembers are cached by (entity_type,entity_id)
+// - The results of FindMemberRights are cached by (account_id,[entityType])
+// - The results of FindAllMemberRights are cached by (account_id,[entityType])
+// - The results of FindMemberRightsOn are cached by (account_id,entity_type,entity_id)
+// - Any (successful or unsuccessful) call to SetMember expires the caches
+//   for (account_id,entity_type,entity_id), (account_id,[entityType]) and (entity_type,entity_id).
+type MembershipStore interface {
+	// Find (direct) member of the given entity.
+	FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
+	// Find direct member rights of the given organization or user. The entityType may be omitted.
+	FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error)
+	// Find (recursive) member rights of the given organization or user. The entityType may be omitted.
+	FindAllMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error)
+	// Recursively find member rights of the given organization or user on the given entity.
+	FindMemberRightsOn(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error)
+	// Set member rights on an entity. Rights can be deleted by not passing any rights.
+	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error
+}

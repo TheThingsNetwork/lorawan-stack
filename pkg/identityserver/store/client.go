@@ -31,6 +31,7 @@ type Client struct {
 	Description string        `gorm:"type:TEXT"`
 	Attributes  []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:client"`
 	ContactInfo []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:client"`
+	Memberships []Membership  `gorm:"polymorphic:Entity;polymorphic_value:client"`
 	// END common fields
 
 	ClientSecret string         `gorm:"type:VARCHAR"`

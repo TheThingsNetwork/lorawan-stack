@@ -30,6 +30,7 @@ type Application struct {
 	Description   string        `gorm:"type:TEXT"`
 	Attributes    []Attribute   `gorm:"polymorphic:Entity;polymorphic_value:application"`
 	ContactInfo   []ContactInfo `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	Memberships   []Membership  `gorm:"polymorphic:Entity;polymorphic_value:application"`
 	// END common fields
 }
 

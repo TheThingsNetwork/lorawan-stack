@@ -15,6 +15,9 @@
 package store
 
 import (
+	"context"
+
+	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -27,10 +30,27 @@ type Account struct {
 
 	AccountID   string `gorm:"type:UUID;index:account"`
 	AccountType string `gorm:"type:VARCHAR;index:account"` // user or organization
+
+	Memberships []*Membership
 }
 
 func init() {
 	registerModel(&Account{})
+}
+
+func findAccount(ctx context.Context, db *gorm.DB, id *ttnpb.OrganizationOrUserIdentifiers) (*Account, error) {
+	entityID := id.EntityIdentifiers()
+	var account Account
+	err := db.Scopes(withContext(ctx)).Where(&Account{
+		UID: entityID.IDString(),
+	}).Find(&account).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errNotFoundForID(entityID)
+		}
+		return nil, err
+	}
+	return &account, nil
 }
 
 // OrganizationOrUserIdentifiers for the account, depending on its type.
