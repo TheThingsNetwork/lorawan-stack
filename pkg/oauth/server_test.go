@@ -185,6 +185,9 @@ func TestServerLoginLogout(t *testing.T) {
 					ID:              "session_id",
 					CreatedAt:       now,
 				}
+				s.res.user = &ttnpb.User{
+					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+				}
 			},
 			Method:       "GET",
 			Path:         "/oauth/api/me",
@@ -192,9 +195,9 @@ func TestServerLoginLogout(t *testing.T) {
 			ExpectedBody: `"user_id":"user"`,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
-				a.So(s.lastCall, should.Equal, "GetSession")
+				a.So(s.lastCall, should.Equal, "GetUser")
 				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
-				a.So(s.req.sessionID, should.Equal, "session_id")
+				a.So(s.req.sessionID, should.Equal, "session_id") // actually the before-last call.
 			},
 		},
 		{

@@ -16,6 +16,7 @@ package oauth
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
@@ -102,16 +104,45 @@ func (s *server) getSession(c echo.Context) (*ttnpb.UserSession, error) {
 	return session, nil
 }
 
+const userKey = "user"
+
+func (s *server) getUser(c echo.Context) (*ttnpb.User, error) {
+	existing := c.Get(userKey)
+	if user, ok := existing.(*ttnpb.User); ok {
+		return user, nil
+	}
+	session, err := s.getSession(c)
+	if err != nil {
+		return nil, err
+	}
+	user, err := s.store.GetUser(
+		c.Request().Context(),
+		&ttnpb.UserIdentifiers{UserID: session.UserID},
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	c.Set(userKey, user)
+	return user, nil
+}
+
 func (s *server) CurrentUser(c echo.Context) error {
 	session, err := s.getSession(c)
 	if err != nil {
 		return err
 	}
+	user, err := s.getUser(c)
+	if err != nil {
+		return err
+	}
+	safeUser := user.PublicSafe()
+	userJSON, _ := jsonpb.TTN().Marshal(safeUser)
 	return c.JSON(http.StatusOK, struct {
-		UserID     string    `json:"user_id,omitempty"`
-		LoggedInAt time.Time `json:"logged_in_at,omitempty"`
+		User       json.RawMessage `json:"user"`
+		LoggedInAt time.Time       `json:"logged_in_at"`
 	}{
-		UserID:     session.UserID,
+		User:       userJSON,
 		LoggedInAt: session.CreatedAt,
 	})
 }

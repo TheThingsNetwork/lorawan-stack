@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/RangelReale/osin"
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -72,7 +71,7 @@ func (s *storage) GetClient(id string) (osin.Client, error) {
 	cli, err := s.clients.GetClient(
 		s.ctx,
 		&ttnpb.ClientIdentifiers{ClientID: id},
-		&types.FieldMask{Paths: []string{"secret", "redirect_uris", "state", "skip_authorization", "endorsed", "grants", "rights"}},
+		nil,
 	)
 	if err != nil {
 		return nil, err

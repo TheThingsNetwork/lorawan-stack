@@ -15,6 +15,7 @@
 package oauth
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -23,6 +24,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -105,6 +107,21 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			case http.MethodPost:
 				ar.Authorized, _ = strconv.ParseBool(req.Form.Get("authorize")) // TODO: Replace with PostForm
 			case http.MethodGet:
+				safeClient := client.PublicSafe()
+				clientJSON, _ := jsonpb.TTN().Marshal(safeClient)
+				user, err := s.getUser(c)
+				if err != nil {
+					return err
+				}
+				safeUser := user.PublicSafe()
+				userJSON, _ := jsonpb.TTN().Marshal(safeUser)
+				c.Set("page_data", struct {
+					Client json.RawMessage `json:"client"`
+					User   json.RawMessage `json:"user"`
+				}{
+					Client: clientJSON,
+					User:   userJSON,
+				})
 				return authorizePage(c)
 			}
 		}

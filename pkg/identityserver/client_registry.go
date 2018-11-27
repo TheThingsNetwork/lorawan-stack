@@ -105,6 +105,13 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		defer func() {
+			if cli != nil {
+				safe := cli.PublicSafe()
+				cli = &safe
+			}
+		}()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cliStore := store.GetClientStore(db)
