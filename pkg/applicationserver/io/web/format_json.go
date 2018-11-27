@@ -14,26 +14,12 @@
 
 package web
 
-import (
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-)
+import "go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
 
-// Format is a format to use for web-based frontends.
-type Format struct {
-	formatters.Formatter
-	Name        string
-	ContentType string
-}
-
-var (
-	formats = map[string]Format{
-		"json": {
-			Formatter:   formatters.JSON,
-			Name:        "JSON",
-			ContentType: "application/json",
-		},
+func init() {
+	formats["json"] = Format{
+		Formatter:   formatters.JSON,
+		Name:        "JSON",
+		ContentType: "application/json",
 	}
-
-	errFormatNotFound = errors.DefineNotFound("format_not_found", "format `{format}` not found")
-)
+}
