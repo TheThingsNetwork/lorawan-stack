@@ -865,6 +865,7 @@
     "internal/socks",
     "internal/timeseries",
     "proxy",
+    "publicsuffix",
     "trace",
     "websocket",
   ]
@@ -1126,6 +1127,7 @@
     "go.opencensus.io/stats/view",
     "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb",
     "golang.org/x/crypto/pbkdf2",
+    "golang.org/x/net/publicsuffix",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/google",
     "google.golang.org/genproto/googleapis/api/annotations",
