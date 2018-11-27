@@ -2555,6 +2555,15 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/identityserver:search_admin_only": {
+    "translations": {
+      "en": "search is only available to admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "registry_search.go"
+    }
+  },
   "error:pkg/identityserver:temporary_password_expired": {
     "translations": {
       "en": "temporary password expired"

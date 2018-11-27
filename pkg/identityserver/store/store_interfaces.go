@@ -150,3 +150,8 @@ type InvitationStore interface {
 	SetInvitationAcceptedBy(ctx context.Context, token string, accepter *ttnpb.UserIdentifiers) error
 	DeleteInvitation(ctx context.Context, email string) error
 }
+
+// EntitySearch interface for searching entities.
+type EntitySearch interface {
+	FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]*ttnpb.EntityIdentifiers, error)
+}
