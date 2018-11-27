@@ -44,12 +44,46 @@ var (
 	errInvitationTokenExpired  = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
 )
 
+func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err error) {
+	if usr.ProfilePicture == nil {
+		return
+	}
+	var original string
+	if len(usr.ProfilePicture.Sizes) > 0 {
+		original = usr.ProfilePicture.Sizes[0]
+		if original == "" {
+			var max uint32
+			for size, url := range usr.ProfilePicture.Sizes {
+				if size > max {
+					max = size
+					original = url
+				}
+			}
+		}
+	}
+	if usr.ProfilePicture.Embedded != nil && len(usr.ProfilePicture.Embedded.Data) > 0 {
+		// TODO: Upload to blob store, set original to path.
+	}
+	if original != "" {
+		usr.ProfilePicture.Sizes = map[uint32]string{0: original}
+	} else {
+		usr.ProfilePicture.Sizes = nil
+	}
+	// TODO: Schedule background processing.
+	return
+}
+
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
 	if err := blacklist.Check(ctx, req.UserID); err != nil {
 		return nil, err
 	}
 	if req.InvitationToken == "" && is.configFromContext(ctx).UserInvitation.Required {
 		return nil, errInvitationTokenRequired
+	}
+
+	err = is.preprocessUserProfilePicture(&req.User)
+	if err != nil {
+		return nil, err
 	}
 
 	hashedPassword, err := auth.Hash(req.User.Password)
@@ -111,6 +145,10 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
 	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_BASIC)
+	if err != nil {
+		return nil, err
+	}
+	err = is.preprocessUserProfilePicture(&req.User)
 	if err != nil {
 		return nil, err
 	}
