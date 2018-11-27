@@ -20,9 +20,11 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -77,6 +79,21 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
 	}, is.config.OAuth)
+
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		return rights.NewContextWithFetcher(ctx, is)
+	})
+
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationRegistry", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationAccess", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientRegistry", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientAccess", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayRegistry", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayAccess", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationRegistry", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationAccess", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserRegistry", rights.HookName, rights.Hook)
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", rights.HookName, rights.Hook)
 
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)

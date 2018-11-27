@@ -2465,6 +2465,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver:invalid_authorization": {
+    "translations": {
+      "en": "invalid authorization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
+    }
+  },
   "error:pkg/identityserver:nested_organizations": {
     "translations": {
       "en": "organizations can not be nested"
@@ -2499,6 +2508,24 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:token_expired": {
+    "translations": {
+      "en": "access token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
+    }
+  },
+  "error:pkg/identityserver:unsupported_authorization": {
+    "translations": {
+      "en": "Unsupported authorization method"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
     }
   },
   "error:pkg/joinserver/redis:duplicate_identifiers": {
