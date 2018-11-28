@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
@@ -51,7 +52,7 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}
-	c.web.RootGroup(rpcserver.APIPrefix).Any("/*", echo.WrapHandler(http.StripPrefix(rpcserver.APIPrefix, c.grpc)))
+	c.web.RootGroup(ttnpb.HTTPAPIPrefix).Any("/*", echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)))
 	return nil
 }
 

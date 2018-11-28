@@ -12,5 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package web implements the webhooks integration.
-package web
+package ttnpb
+
+// HTTPAPIPrefix is the API prefix for the HTTP handler.
+const HTTPAPIPrefix = "/api/v3"

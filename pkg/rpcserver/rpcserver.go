@@ -46,9 +46,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// APIPrefix for the HTTP handler
-const APIPrefix = "/api/v3"
-
 func init() {
 	grpc.EnableTracing = false
 }
