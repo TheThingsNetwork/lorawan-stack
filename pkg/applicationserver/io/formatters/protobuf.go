@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web
+package formatters
 
-import "go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-func init() {
-	formats["pb"] = Format{
-		Formatter:   formatters.Protobuf,
-		Name:        "Protobuf",
-		ContentType: "application/octet-stream",
-	}
+type protobuf struct{}
+
+func (protobuf) FromUp(msg *ttnpb.ApplicationUp) ([]byte, error) {
+	return msg.Marshal()
 }
+
+func (protobuf) ToDownlinks(buf []byte) (*ttnpb.ApplicationDownlinks, error) {
+	res := &ttnpb.ApplicationDownlinks{}
+	if err := res.Unmarshal(buf); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// Protobuf is a formatter that uses proto marshaling.
+var Protobuf Formatter = &protobuf{}

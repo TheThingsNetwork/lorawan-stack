@@ -1306,7 +1306,7 @@
   },
   "error:pkg/applicationserver:webhooks_target": {
     "translations": {
-      "en": "invalid webhooks target `{value}`"
+      "en": "invalid webhooks target `{target}`"
     },
     "description": {
       "package": "pkg/applicationserver",

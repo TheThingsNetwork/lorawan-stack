@@ -42,8 +42,8 @@ func TestWebhookRegistryRPC(t *testing.T) {
 		res, err := srv.GetFormats(authorizedCtx, ttnpb.Empty)
 		a.So(err, should.BeNil)
 		a.So(res.Formats, should.HaveSameElementsDeep, map[string]string{
-			"json": "JSON",
-			"pb":   "Protobuf",
+			"json":     "JSON",
+			"protobuf": "Protocol Buffers",
 		})
 	}
 
