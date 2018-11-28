@@ -27,6 +27,6 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Target:    "direct",
 		Timeout:   5 * time.Second,
 		QueueSize: 16,
-		Workers:   4,
+		Workers:   16,
 	},
 }
