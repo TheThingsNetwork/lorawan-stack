@@ -21,7 +21,7 @@ pkg/version/ttn.go: .FORCE
 	@echo "package version" >> pkg/version/ttn.go
 	@echo "" >> pkg/version/ttn.go
 	@echo "// TTN Version" >> pkg/version/ttn.go
-	@echo "const TTN = \"v$(VERSION)-dev\"" >> pkg/version/ttn.go
+	@echo "var TTN = \"v$(VERSION)-dev\"" >> pkg/version/ttn.go
 
 package.json: VERSION ?= $(CURRENT_VERSION)
 package.json: .FORCE
