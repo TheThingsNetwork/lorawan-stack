@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
@@ -36,6 +37,7 @@ func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
 		panic(err)
 	}
 	defer db.Close()
+	SetLogger(db, test.GetLogger(t))
 	db = db.Debug()
 	if err := db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)).Error; err != nil {
 		panic(err)
