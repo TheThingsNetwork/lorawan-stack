@@ -37,9 +37,26 @@ var (
 	population   = store.NewPopulator(10, 42)
 )
 
+var (
+	userIndex                                         int
+	defaultUser, defaultUserIdx                       = getTestUser()
+	collaboratorUser, collaboratorUserIdx             = getTestUser()
+	applicationAccessUser, applicationAccessUserIdx   = getTestUser()
+	clientAccessUser, clientAccessUserIdx             = getTestUser()
+	gatewayAccessUser, gatewayAccessUserIdx           = getTestUser()
+	organizationAccessUser, organizationAccessUserIdx = getTestUser()
+	userAccessUser, userAccessUserIdx                 = getTestUser()
+)
+
 func init() {
-	population.Users[0].Admin = false
-	population.Users[0].State = ttnpb.STATE_APPROVED
+	defaultUser.Admin = false
+	defaultUser.State = ttnpb.STATE_APPROVED
+}
+
+func getTestUser() (*ttnpb.User, int) {
+	defer func() { userIndex++ }()
+
+	return population.Users[userIndex], userIndex
 }
 
 func userCreds(idx int) grpc.CallOption {
@@ -53,6 +70,138 @@ func userCreds(idx int) grpc.CallOption {
 		}
 	}
 	return nil
+}
+
+func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
+	for id, apiKeys := range population.APIKeys {
+		if id.GetUserIDs().GetUserID() == userID.GetUserID() {
+			return ttnpb.APIKeys{
+				APIKeys: apiKeys,
+			}
+		}
+	}
+
+	return ttnpb.APIKeys{
+		APIKeys: []*ttnpb.APIKey{},
+	}
+}
+
+func applicationAPIKeys(applicationID *ttnpb.ApplicationIdentifiers) ttnpb.APIKeys {
+	for id, apiKeys := range population.APIKeys {
+		if id.GetApplicationIDs().GetApplicationID() == applicationID.GetApplicationID() {
+			return ttnpb.APIKeys{
+				APIKeys: apiKeys,
+			}
+		}
+	}
+
+	return ttnpb.APIKeys{
+		APIKeys: []*ttnpb.APIKey{},
+	}
+}
+
+func gatewayAPIKeys(gatewayID *ttnpb.GatewayIdentifiers) ttnpb.APIKeys {
+	for id, apiKeys := range population.APIKeys {
+		if id.GetGatewayIDs().GetGatewayID() == gatewayID.GetGatewayID() {
+			return ttnpb.APIKeys{
+				APIKeys: apiKeys,
+			}
+		}
+	}
+
+	return ttnpb.APIKeys{
+		APIKeys: []*ttnpb.APIKey{},
+	}
+}
+
+func organizationAPIKeys(organizationID *ttnpb.OrganizationIdentifiers) ttnpb.APIKeys {
+	for id, apiKeys := range population.APIKeys {
+		if id.GetOrganizationIDs().GetOrganizationID() == organizationID.GetOrganizationID() {
+			return ttnpb.APIKeys{
+				APIKeys: apiKeys,
+			}
+		}
+	}
+
+	return ttnpb.APIKeys{
+		APIKeys: []*ttnpb.APIKey{},
+	}
+}
+
+func userApplications(userID *ttnpb.UserIdentifiers) ttnpb.Applications {
+	applications := []*ttnpb.Application{}
+	for _, app := range population.Applications {
+		for id, collaborators := range population.Memberships {
+			if app.EntityIdentifiers().IDString() == id.IDString() {
+				for _, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						applications = append(applications, app)
+					}
+				}
+			}
+		}
+	}
+
+	return ttnpb.Applications{
+		Applications: applications,
+	}
+}
+
+func userClients(userID *ttnpb.UserIdentifiers) ttnpb.Clients {
+	clients := []*ttnpb.Client{}
+	for _, client := range population.Clients {
+		for id, collaborators := range population.Memberships {
+			if client.EntityIdentifiers().IDString() == id.IDString() {
+				for _, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						clients = append(clients, client)
+					}
+				}
+			}
+		}
+	}
+
+	return ttnpb.Clients{
+		Clients: clients,
+	}
+}
+
+func userGateways(userID *ttnpb.UserIdentifiers) ttnpb.Gateways {
+	gateways := []*ttnpb.Gateway{}
+	for _, gateway := range population.Gateways {
+		for id, collaborators := range population.Memberships {
+			if gateway.EntityIdentifiers().IDString() == id.IDString() {
+				for _, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						gateways = append(gateways, gateway)
+					}
+				}
+			}
+		}
+	}
+
+	return ttnpb.Gateways{
+		Gateways: gateways,
+	}
+}
+
+func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
+	organizations := []*ttnpb.Organization{}
+	for _, organization := range population.Organizations {
+		for id, collaborators := range population.Memberships {
+			if organization.EntityIdentifiers().IDString() == id.IDString() {
+				for _, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						organizations = append(organizations, organization)
+					}
+				}
+			}
+		}
+	}
+
+	return ttnpb.Organizations{
+		Organizations: organizations,
+	}
 }
 
 func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
