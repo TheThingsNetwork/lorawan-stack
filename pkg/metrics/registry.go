@@ -16,7 +16,6 @@ package metrics
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
 	ocprom "go.opencensus.io/exporter/prometheus"
@@ -36,7 +35,7 @@ var Exporter http.Handler = exporter
 var Registry prometheus.Registerer = registry
 
 func init() {
-	registry.MustRegister(prometheus.NewProcessCollector(os.Getpid(), ""))
+	registry.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
 	registry.MustRegister(prometheus.NewGoCollector())
 	registry.MustRegister(ttnInfo)
 	view.RegisterExporter(exporter)

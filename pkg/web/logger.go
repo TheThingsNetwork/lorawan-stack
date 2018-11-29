@@ -29,6 +29,7 @@ func (n *noopLogger) Prefix() string                            { return "" }
 func (n *noopLogger) SetPrefix(p string)                        {}
 func (n *noopLogger) Level() log.Lvl                            { return log.DEBUG }
 func (n *noopLogger) SetLevel(v log.Lvl)                        {}
+func (n *noopLogger) SetHeader(h string)                        {}
 func (n *noopLogger) Print(i ...interface{})                    {}
 func (n *noopLogger) Printf(format string, args ...interface{}) {}
 func (n *noopLogger) Printj(j log.JSON)                         {}

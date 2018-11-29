@@ -71,7 +71,7 @@ func (c Config) getLocal(_ context.Context, bucket string) (*blob.Bucket, error)
 			return nil, errConfig.WithCause(err)
 		}
 	}
-	return fileblob.NewBucket(bucketPath)
+	return fileblob.OpenBucket(bucketPath, nil)
 }
 
 type awsCredentials Config
@@ -96,7 +96,7 @@ func (c Config) getAWS(ctx context.Context, bucket string) (*blob.Bucket, error)
 	if err != nil {
 		return nil, err
 	}
-	return s3blob.OpenBucket(ctx, s, bucket)
+	return s3blob.OpenBucket(ctx, bucket, s, nil)
 }
 
 func (c Config) getGCP(ctx context.Context, bucket string) (*blob.Bucket, error) {
@@ -120,7 +120,7 @@ func (c Config) getGCP(ctx context.Context, bucket string) (*blob.Bucket, error)
 	if err != nil {
 		return nil, err
 	}
-	return gcsblob.OpenBucket(ctx, bucket, cli)
+	return gcsblob.OpenBucket(ctx, bucket, cli, nil)
 }
 
 // WriterOptions returns WriterOptions with the given content type and metadata

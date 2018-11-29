@@ -46,7 +46,7 @@ func ErrorAsExceptions(err error, includePaths ...string) *raven.Exceptions {
 				} else {
 					file = "unknown"
 				}
-				frame := raven.NewStacktraceFrame(pc, file, line, 3, includePaths)
+				frame := raven.NewStacktraceFrame(pc, fn.Name(), file, line, 3, includePaths)
 				if frame != nil {
 					frames = append([]*raven.StacktraceFrame{frame}, frames...)
 				}
