@@ -475,8 +475,8 @@ type NsGsClientFunc func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnp
 
 // NewGatewayServerPeerGetterFunc returns a NsGsClientFunc, which uses g to retrieve Gateway Server clients.
 func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
-	return func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
-		p := g.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, id)
+	return func(ctx context.Context, ids ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
+		p := g.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, ids)
 		if p == nil {
 			return nil, errGatewayServerNotFound
 		}
@@ -489,8 +489,8 @@ type NsJsClientFunc func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (tt
 
 // NewJoinServerPeerGetterFunc returns a NsJsClientFunc, which uses g to retrieve Join Server clients.
 func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
-	return func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
-		p := g.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, id)
+	return func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
+		p := g.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
 		if p == nil {
 			return nil, errJoinServerNotFound
 		}
@@ -530,6 +530,8 @@ type NetworkServer struct {
 	jsClient NsJsClientFunc
 
 	macHandlers *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
+
+	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 }
 
 // Option configures the NetworkServer.
@@ -537,33 +539,40 @@ type Option func(ns *NetworkServer)
 
 // WithDeduplicationDoneFunc overrides the default WindowEndFunc, which
 // is used to determine the end of uplink metadata deduplication.
-func WithDeduplicationDoneFunc(fn WindowEndFunc) Option {
+func WithDeduplicationDoneFunc(f WindowEndFunc) Option {
 	return func(ns *NetworkServer) {
-		ns.deduplicationDone = fn
+		ns.deduplicationDone = f
 	}
 }
 
 // WithCollectionDoneFunc overrides the default WindowEndFunc, which
 // is used to determine the end of uplink duplicate collection.
-func WithCollectionDoneFunc(fn WindowEndFunc) Option {
+func WithCollectionDoneFunc(f WindowEndFunc) Option {
 	return func(ns *NetworkServer) {
-		ns.collectionDone = fn
+		ns.collectionDone = f
 	}
 }
 
 // WithNsGsClientFunc overrides the default NsGsClientFunc, which
-// is used to get the Gateway Server for a gateway identifiers.
-func WithNsGsClientFunc(fn NsGsClientFunc) Option {
+// is used to get the Gateway Server by gateway identifiers.
+func WithNsGsClientFunc(f NsGsClientFunc) Option {
 	return func(ns *NetworkServer) {
-		ns.gsClient = fn
+		ns.gsClient = f
 	}
 }
 
 // WithNsJsClientFunc overrides the default NsJsClientFunc, which
-// is used to get the Gateway Server for a gateway identifiers.
-func WithNsJsClientFunc(fn NsJsClientFunc) Option {
+// is used to get the Join Server by end device identifiers.
+func WithNsJsClientFunc(f NsJsClientFunc) Option {
 	return func(ns *NetworkServer) {
-		ns.jsClient = fn
+		ns.jsClient = f
+	}
+}
+
+// WithASUplinkHandler overrides the default function called, for sending the uplink to AS.
+func WithASUplinkHandler(f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationUp) (bool, error)) Option {
+	return func(ns *NetworkServer) {
+		ns.handleASUplink = f
 	}
 }
 
@@ -628,11 +637,24 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	if ns.collectionDone == nil {
 		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
 	}
+
 	if ns.gsClient == nil {
 		ns.gsClient = NewGatewayServerPeerGetterFunc(ns.Component)
 	}
 	if ns.jsClient == nil {
 		ns.jsClient = NewJoinServerPeerGetterFunc(ns.Component)
+	}
+
+	if ns.handleASUplink == nil {
+		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (ok bool, err error) {
+			ns.applicationServersMu.RLock()
+			as, ok := ns.applicationServers[unique.ID(ctx, ids)]
+			if ok {
+				err = as.Send(up)
+			}
+			ns.applicationServersMu.RUnlock()
+			return ok, err
+		}
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
@@ -740,7 +762,7 @@ outer:
 				if err != nil {
 					logger.WithError(err).WithFields(log.Fields(
 						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-					)).Warn("Failed to get the frequency plan of a device in registry")
+					)).Warn("Failed to get the frequency plan of the device in registry")
 					continue
 				}
 
@@ -748,7 +770,7 @@ outer:
 				if err != nil {
 					logger.WithError(err).WithFields(log.Fields(
 						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-					)).Warn("Failed to get band of a device in registry")
+					)).Warn("Failed to get the band of the device in registry")
 					continue
 				}
 
@@ -881,18 +903,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		return errDeviceNotFound.WithCause(err)
 	}
 
-	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-	))
+	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 
 	pld := up.Payload.GetMACPayload()
 	if pld == nil {
 		return errNoPayload
 	}
-
-	ns.applicationServersMu.RLock()
-	asCl, asOk := ns.applicationServers[unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)]
-	ns.applicationServersMu.RUnlock()
 
 	if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
 		asUp := &ttnpb.ApplicationUp{
@@ -911,8 +927,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		}
 		asUp.CorrelationIDs = append(asUp.CorrelationIDs, up.CorrelationIDs...)
 
-		if err := asCl.Send(asUp); err != nil {
+		logger.Debug("Sending downlink (n)ack to Application Server...")
+		if ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, asUp); err != nil {
 			return err
+		} else if !ok {
+			logger.Warn("Application Server not found, downlink (n)ack not sent")
 		}
 	}
 
@@ -1134,12 +1153,27 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		return err
 	}
 
+	registerForwardUplink(ctx, dev, up)
+	ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		CorrelationIDs:       up.CorrelationIDs,
+		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+			FCnt:         dev.Session.LastFCntUp,
+			FPort:        pld.FPort,
+			FRMPayload:   pld.FRMPayload,
+			RxMetadata:   up.RxMetadata,
+			SessionKeyID: dev.Session.SessionKeyID,
+			Settings:     up.Settings,
+		}},
+	})
+
 	updateTimeout := appQueueUpdateTimeout
-	if !asOk {
+	if !ok {
+		logger.Warn("Application Server not found, not forwarding uplink")
 		updateTimeout = 0
 	}
 
-	defer time.AfterFunc(updateTimeout, func() {
+	time.AfterFunc(updateTimeout, func() {
 		// TODO: Decouple Class A downlink from uplink. (https://github.com/TheThingsIndustries/lorawan-stack/issues/905)
 		var schedErr bool
 		_, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, []string{
@@ -1171,24 +1205,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
 		}
 	})
-
-	if !asOk {
-		return nil
-	}
-
-	registerForwardUplink(ctx, dev, up)
-	return asCl.Send(&ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		CorrelationIDs:       up.CorrelationIDs,
-		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			FCnt:         dev.Session.LastFCntUp,
-			FPort:        pld.FPort,
-			FRMPayload:   pld.FRMPayload,
-			RxMetadata:   up.RxMetadata,
-			SessionKeyID: dev.Session.SessionKeyID,
-			Settings:     up.Settings,
-		}},
-	})
+	return err
 }
 
 // newDevAddr generates a DevAddr for specified EndDevice.
@@ -1375,23 +1392,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		return err
 	}
 
-	uid := unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
-	if uid == "" {
-		return errUnknownApplicationID
-	}
+	logger = logger.WithField(
+		"application_uid", unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers),
+	)
 
-	// TODO: cluster.GetPeer(ctx, ttnpb.PeerInfo_APPLICATION_SERVER, dev.EndDeviceIdentifiers.ApplicationIdentifiers)
-	// If not handled by cluster, try ns.applicationServers[uid].
-
-	ns.applicationServersMu.RLock()
-	cl, ok := ns.applicationServers[uid]
-	ns.applicationServersMu.RUnlock()
-
-	if !ok {
-		return nil
-	}
-
-	if err := cl.Send(&ttnpb.ApplicationUp{
+	logger.Debug("Sending join-accept to AS...")
+	_, err = ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
@@ -1400,12 +1406,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			SessionKeyID:         dev.Session.SessionKeyID,
 			SessionStartedAt:     dev.Session.StartedAt,
 		}},
-	}); err != nil {
-		logger.WithField(
-			"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		).WithError(err).Errorf("Failed to send join-accept to AS")
+	})
+	if err != nil {
+		logger.WithError(err).Errorf("Failed to send join-accept to AS")
 		return err
 	}
+
 	return nil
 }
 

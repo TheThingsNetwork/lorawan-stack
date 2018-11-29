@@ -47,7 +47,7 @@ import (
 var (
 	DuplicateCount = 6
 	DeviceCount    = 100
-	Timeout        = (1 << 17) * test.Delay
+	Timeout        = (1 << 10) * test.Delay
 
 	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
 
@@ -1384,6 +1384,12 @@ func HandleUplinkTest() func(t *testing.T) {
 				deduplicationDoneCh := make(chan windowEnd, 1)
 				collectionDoneCh := make(chan windowEnd, 1)
 
+				type asSendReq struct {
+					up    *ttnpb.ApplicationUp
+					errch chan error
+				}
+				asSendCh := make(chan asSendReq)
+
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
@@ -1401,39 +1407,18 @@ func HandleUplinkTest() func(t *testing.T) {
 						collectionDoneCh <- windowEnd{ctx, msg, ch}
 						return ch
 					}),
+					WithASUplinkHandler(func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
+						req := asSendReq{
+							up:    up,
+							errch: make(chan error),
+						}
+						asSendCh <- req
+						return true, <-req.errch
+					}),
 				)).(*NetworkServer)
 				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 				test.Must(nil, ns.Start())
 				defer ns.Close()
-
-				type asSendReq struct {
-					up    *ttnpb.ApplicationUp
-					errch chan error
-				}
-				asSendCh := make(chan asSendReq)
-
-				go func() {
-					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
-					id.ApplicationID = ApplicationID
-
-					err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
-						MockServerStream: &test.MockServerStream{
-							MockStream: &test.MockStream{
-								ContextFunc: contextWithKey,
-							},
-						},
-						SendFunc: func(up *ttnpb.ApplicationUp) error {
-							req := asSendReq{
-								up:    up,
-								errch: make(chan error),
-							}
-							asSendCh <- req
-							return <-req.errch
-						},
-					})
-					// LinkApplication should not return
-					t.Errorf("LinkApplication should not return, returned with error: %s", err)
-				}()
 
 				pb := CopyEndDevice(tc.Device)
 
@@ -1955,6 +1940,7 @@ func HandleJoinTest() func(t *testing.T) {
 				deduplicationDoneCh := make(chan windowEnd, 1)
 				collectionDoneCh := make(chan windowEnd, 1)
 				handleJoinCh := make(chan handleJoinRequest, 1)
+				asSendCh := make(chan *ttnpb.ApplicationUp)
 
 				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
 
@@ -1991,32 +1977,15 @@ func HandleJoinTest() func(t *testing.T) {
 							},
 						}, nil
 					}),
+					WithASUplinkHandler(func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
+						asSendCh <- up
+						return true, nil
+					}),
 				)).(*NetworkServer)
 				ns.Component.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 
 				test.Must(nil, ns.Start())
 				defer ns.Close()
-
-				asSendCh := make(chan *ttnpb.ApplicationUp)
-
-				go func() {
-					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
-					id.ApplicationID = ApplicationID
-
-					err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
-						MockServerStream: &test.MockServerStream{
-							MockStream: &test.MockStream{
-								ContextFunc: contextWithKey,
-							},
-						},
-						SendFunc: func(up *ttnpb.ApplicationUp) error {
-							asSendCh <- up
-							return nil
-						},
-					})
-					// LinkApplication should not return
-					t.Errorf("LinkApplication should not return, returned with error: %s", err)
-				}()
 
 				pb := CopyEndDevice(tc.Device)
 

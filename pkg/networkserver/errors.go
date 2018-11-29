@@ -19,8 +19,8 @@ import (
 )
 
 var (
-	errCIDOutOfRange             = errors.DefineInvalidArgument("cid_out_of_range", "CID must be in range from {min} to {max}")
 	errChannelIndexTooHigh       = errors.DefineInvalidArgument("channel_index_too_high", "channel index is too high")
+	errCIDOutOfRange             = errors.DefineInvalidArgument("cid_out_of_range", "CID must be in range from {min} to {max}")
 	errComputeMIC                = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
 	errCorruptedMACState         = errors.DefineCorruption("corrupted_mac_state", "MAC state is corrupted")
 	errDecodePayload             = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
