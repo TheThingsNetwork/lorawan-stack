@@ -1446,6 +1446,17 @@ Ns:
       http:
       - method: GET
         path: /ns/dev_addr
+NsAs:
+  name: NsAs
+  comment: The NsAs service connects a Network Server to an Application Server.
+  methods:
+    HandleUplink:
+      name: HandleUplink
+      input:
+        name: NsAsHandleUplinkRequest
+      output:
+        package: google.protobuf
+        name: Empty
 NsEndDeviceRegistry:
   name: NsEndDeviceRegistry
   comment: The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.

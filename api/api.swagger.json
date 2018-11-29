@@ -1049,7 +1049,6 @@
     },
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
-        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "As_GetLink",
         "responses": {
           "200": {
@@ -1089,7 +1088,6 @@
         ]
       },
       "put": {
-        "summary": "Set creates or updates the device.",
         "operationId": "As_SetLink",
         "responses": {
           "200": {
@@ -1165,7 +1163,6 @@
     },
     "/as/applications/{application_id}/link": {
       "delete": {
-        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "As_DeleteLink",
         "responses": {
           "200": {

@@ -1314,6 +1314,35 @@
           ]
         },
         {
+          "name": "NsAsHandleUplinkRequest",
+          "longName": "NsAsHandleUplinkRequest",
+          "fullName": "ttn.lorawan.v3.NsAsHandleUplinkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ups",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationUp",
+              "longType": "ApplicationUp",
+              "fullType": "ttn.lorawan.v3.ApplicationUp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "SetApplicationLinkRequest",
           "longName": "SetApplicationLinkRequest",
           "fullName": "ttn.lorawan.v3.SetApplicationLinkRequest",
@@ -1679,6 +1708,26 @@
                   ]
                 }
               }
+            }
+          ]
+        },
+        {
+          "name": "NsAs",
+          "longName": "NsAs",
+          "fullName": "ttn.lorawan.v3.NsAs",
+          "description": "The NsAs service connects a Network Server to an Application Server.",
+          "methods": [
+            {
+              "name": "HandleUplink",
+              "description": "",
+              "requestType": "NsAsHandleUplinkRequest",
+              "requestLongType": "NsAsHandleUplinkRequest",
+              "requestFullType": "ttn.lorawan.v3.NsAsHandleUplinkRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
             }
           ]
         }
