@@ -1,6 +1,10 @@
 required = ["github.com/golang/dep"]
 
 [[constraint]]
+  name = "github.com/RangelReale/osin"
+  version = "1.0.1"
+
+[[constraint]]
   name = "github.com/TheThingsNetwork/go-cayenne-lib"
   version = "1.0.0"
 

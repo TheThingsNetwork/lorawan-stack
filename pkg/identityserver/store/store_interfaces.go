@@ -117,3 +117,20 @@ type MembershipStore interface {
 	// Set member rights on an entity. Rights can be deleted by not passing any rights.
 	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error
 }
+
+// OAuthStore interface for the OAuth server.
+//
+// For internal use (by the OAuth server) only.
+type OAuthStore interface {
+	GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error)
+	Authorize(ctx context.Context, req *ttnpb.OAuthClientAuthorization) (authorization *ttnpb.OAuthClientAuthorization, err error)
+	DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error
+
+	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error
+	GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error)
+	DeleteAuthorizationCode(ctx context.Context, code string) error
+
+	CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error
+	GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error)
+	DeleteAccessToken(ctx context.Context, id string) error
+}

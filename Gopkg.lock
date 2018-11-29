@@ -50,6 +50,14 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
+  digest = "1:fd7b5197ee54b40879b8adaccf480e7207e197a4f4491c12290e0575773367f7"
+  name = "github.com/RangelReale/osin"
+  packages = ["."]
+  pruneopts = ""
+  revision = "0f3357bb07e801ea62327872d19913969001dd7a"
+  version = "v1.0.1"
+
+[[projects]]
   branch = "master"
   digest = "1:c6aec1dfe065a5973f2ad8320aaf14e4edbb6f71e940db3baae562d2d39ffc1a"
   name = "github.com/TheThingsIndustries/mystique"
@@ -302,6 +310,14 @@
   pruneopts = ""
   revision = "1929e0c4fa0bd3defff57736e5f821d9983aad91"
   version = "v0.6.0"
+
+[[projects]]
+  digest = "1:a25a2c5ae694b01713fb6cd03c3b1ac1ccc1902b9f0a922680a88ec254f968e1"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = ""
+  revision = "9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:463579773f7f97e3a97ae6fb32abc90c03493e903a11c756a588bed06d0535e2"
@@ -592,6 +608,14 @@
   pruneopts = ""
   revision = "e6d60cf7ba1f42d86d54cdf5508611c4aafb3970"
   version = "v0.0.1"
+
+[[projects]]
+  digest = "1:a5484d4fa43127138ae6e7b2299a6a52ae006c7f803d98d717f60abf3e97192e"
+  name = "github.com/pborman/uuid"
+  packages = ["."]
+  pruneopts = ""
+  revision = "adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1"
+  version = "v1.2"
 
 [[projects]]
   digest = "1:894aef961c056b6d85d12bac890bf60c44e99b46292888bfa66caf529f804457"
@@ -1055,6 +1079,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/PuerkitoBio/purell",
+    "github.com/RangelReale/osin",
     "github.com/TheThingsIndustries/mystique/pkg/auth",
     "github.com/TheThingsIndustries/mystique/pkg/log",
     "github.com/TheThingsIndustries/mystique/pkg/net",

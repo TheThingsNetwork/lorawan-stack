@@ -152,6 +152,10 @@ var (
 	errOrganizationNotFound = errors.DefineNotFound("organization_not_found", "organization `{organization_id}` not found")
 	errUserNotFound         = errors.DefineNotFound("user_not_found", "user `{user_id}` not found")
 	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session `{session_id}` for user `{user_id}` not found")
+
+	errAuthorizationNotFound     = errors.DefineNotFound("authorization_not_found", "authorization of `{user_id}` for `{client_id}` not found")
+	errAuthorizationCodeNotFound = errors.DefineNotFound("authorization_code_not_found", "authorization code not found")
+	errAccessTokenNotFound       = errors.DefineNotFound("access_token_not_found", "access token not found")
 )
 
 func errNotFoundForID(entityID *ttnpb.EntityIdentifiers) error {
