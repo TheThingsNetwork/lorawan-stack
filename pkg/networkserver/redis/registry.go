@@ -37,11 +37,18 @@ var (
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
 )
 
+func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
+	if dst == nil {
+		dst = &ttnpb.EndDevice{}
+	}
+	return dst, dst.SetFields(src, append(paths, "ids")...)
+}
+
 type DeviceRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, _ []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
@@ -49,53 +56,55 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err := ids.Validate(); err != nil {
 		return nil, err
 	}
-	dev := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(unique.ID(ctx, ids))).ScanProto(dev); err != nil {
+
+	pb := &ttnpb.EndDevice{}
+	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
-
-	// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-
-	return dev, nil
+	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
-func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, _ []string) (*ttnpb.EndDevice, error) {
-	dev := &ttnpb.EndDevice{}
-	if err := ttnredis.FindProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()), r.Redis.Key).ScanProto(dev); err != nil {
+func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+	pb := &ttnpb.EndDevice{}
+	if err := ttnredis.FindProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()), r.Redis.Key).ScanProto(pb); err != nil {
 		return nil, err
 	}
-
-	// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-
-	return dev, nil
+	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
-func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, _ []string, f func(*ttnpb.EndDevice) bool) error {
-	return ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() bool) {
-		dev := &ttnpb.EndDevice{}
-		return dev, func() bool {
-			// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-			return f(dev)
+func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+	var inErr error
+	if err := ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() bool) {
+		pb := &ttnpb.EndDevice{}
+		return pb, func() bool {
+			pb, inErr = applyDeviceFieldMask(nil, pb, paths...)
+			if inErr != nil {
+				return false
+			}
+			return f(pb)
 		}
-	})
+	}); err != nil {
+		return err
+	}
+	return inErr
 }
 
-func getDevAddrsAndIDs(dev *ttnpb.EndDevice) (addrs struct{ current, fallback *types.DevAddr }, ids ttnpb.EndDeviceIdentifiers) {
-	if dev == nil {
+func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, fallback *types.DevAddr }, ids ttnpb.EndDeviceIdentifiers) {
+	if pb == nil {
 		return
 	}
 
-	if dev.Session != nil {
+	if pb.Session != nil {
 		var addr types.DevAddr
-		copy(addr[:], dev.Session.DevAddr[:])
+		copy(addr[:], pb.Session.DevAddr[:])
 		addrs.current = &addr
 	}
-	if dev.PendingSession != nil {
+	if pb.PendingSession != nil {
 		var addr types.DevAddr
-		copy(addr[:], dev.PendingSession.DevAddr[:])
+		copy(addr[:], pb.PendingSession.DevAddr[:])
 		addrs.fallback = &addr
 	}
-	return addrs, *dev.EndDeviceIdentifiers.Copy(&ttnpb.EndDeviceIdentifiers{})
+	return addrs, *pb.EndDeviceIdentifiers.Copy(&ttnpb.EndDeviceIdentifiers{})
 }
 
 func equalAddr(x, y *types.DevAddr) bool {
@@ -112,7 +121,7 @@ func equalEUI(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
-func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, _ []string, f func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
@@ -123,32 +132,36 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	uid := unique.ID(ctx, ids)
 	k := r.Redis.Key(uid)
 
-	var dev *ttnpb.EndDevice
+	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		var create bool
-		dev = &ttnpb.EndDevice{}
-		if err := ttnredis.GetProto(tx, k).ScanProto(dev); errors.IsNotFound(err) {
+		cmd := ttnredis.GetProto(tx, k)
+		stored := &ttnpb.EndDevice{}
+		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			create = true
-			dev = nil
+			stored = nil
 		} else if err != nil {
 			return err
 		}
 
-		createdAt := dev.GetCreatedAt()
-		oldAddrs, oldIDs := getDevAddrsAndIDs(dev)
-
-		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+		oldAddrs, oldIDs := getDevAddrsAndIDs(stored)
 
 		var err error
-		dev, _, err = f(dev)
+		if stored != nil {
+			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
+			}
+		}
+
+		var sets []string
+		pb, sets, err = f(pb)
 		if err != nil {
 			return err
 		}
 
-		// TODO: Apply field mask once generator is ready(https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-
 		var f func(redis.Pipeliner) error
-		if dev == nil {
+		if pb == nil {
 			f = func(p redis.Pipeliner) error {
 				p.Del(k)
 				if oldIDs.JoinEUI != nil && oldIDs.DevEUI != nil {
@@ -163,18 +176,32 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				return nil
 			}
 		} else {
-			newAddrs, newIDs := getDevAddrsAndIDs(dev)
+			pb.ApplicationIdentifiers = appID
+			pb.DeviceID = devID
+			pb.UpdatedAt = time.Now().UTC()
+			sets = append(sets, "updated_at")
+			if create {
+				pb.CreatedAt = pb.UpdatedAt
+				sets = append(sets, "created_at")
+			}
+			stored = &ttnpb.EndDevice{}
+			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			stored, err = applyDeviceFieldMask(stored, pb, sets...)
+			if err != nil {
+				return err
+			}
+			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
+			}
+
+			newAddrs, newIDs := getDevAddrsAndIDs(stored)
 
 			if !create && (!equalEUI(oldIDs.JoinEUI, newIDs.JoinEUI) || !equalEUI(oldIDs.DevEUI, newIDs.DevEUI) ||
 				oldIDs.ApplicationIdentifiers != newIDs.ApplicationIdentifiers || oldIDs.DeviceID != newIDs.DeviceID) {
 				return errInvalidIdentifiers
-			}
-
-			dev.UpdatedAt = time.Now().UTC()
-			if create {
-				dev.CreatedAt = dev.UpdatedAt
-			} else {
-				dev.CreatedAt = createdAt
 			}
 
 			f = func(p redis.Pipeliner) error {
@@ -193,7 +220,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Set(ek, uid, 0)
 				}
 
-				ttnredis.SetProto(p, k, dev, 0)
+				ttnredis.SetProto(p, k, stored, 0)
 
 				if oldAddrs.fallback != nil && !equalAddr(oldAddrs.fallback, newAddrs.fallback) && !equalAddr(oldAddrs.fallback, newAddrs.current) {
 					p.SRem(r.Redis.Key(addrKey, oldAddrs.fallback.String()), uid)
@@ -225,5 +252,5 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err != nil {
 		return nil, err
 	}
-	return dev, nil
+	return pb, nil
 }

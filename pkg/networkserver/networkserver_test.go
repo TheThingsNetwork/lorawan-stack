@@ -230,7 +230,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 			pb.QueuedApplicationDownlinks = tc.Request.Downlinks
 
-			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
+			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -375,7 +375,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 			pb.QueuedApplicationDownlinks = append(pb.QueuedApplicationDownlinks, tc.Request.Downlinks...)
 
-			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
+			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -1486,7 +1486,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				if !t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
 
-					ret, err := devReg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
+					ret, err := devReg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 					if !a.So(err, should.BeNil) ||
 						!a.So(ret, should.NotBeNil) {
 						t.FailNow()
@@ -2065,7 +2065,7 @@ func HandleJoinTest() func(t *testing.T) {
 					if !t.Run("device update", func(t *testing.T) {
 						a := assertions.New(t)
 
-						ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, pb.FieldMaskPaths())
+						ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 						if !a.So(err, should.BeNil) ||
 							!a.So(ret, should.NotBeNil) {
 							t.FailNow()
@@ -2152,7 +2152,7 @@ func HandleJoinTest() func(t *testing.T) {
 						},
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:              resp.SessionKeys.AppSKey,
-							SessionKeyID:         test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+							SessionKeyID:         test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
 							InvalidatedDownlinks: tc.Device.QueuedApplicationDownlinks,
 							SessionStartedAt:     pb.Session.StartedAt,
 						}},
@@ -2231,7 +2231,7 @@ func HandleJoinTest() func(t *testing.T) {
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:          resp.SessionKeys.AppSKey,
-								SessionKeyID:     test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, tc.Device.FieldMaskPaths())).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+								SessionKeyID:     test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
 								SessionStartedAt: up.GetJoinAccept().SessionStartedAt,
 							}},
 						})

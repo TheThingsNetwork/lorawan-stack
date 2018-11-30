@@ -29,16 +29,16 @@ type DeviceRegistry interface {
 }
 
 func DeleteDevice(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string) error {
-	_, err := r.SetByID(ctx, appID, devID, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
+	_, err := r.SetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
 
 func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
-	dev, err := r.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, nil, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, err := r.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {
 			return nil, nil, errDuplicateIdentifiers
 		}
-		return dev, nil, nil
+		return dev, ttnpb.EndDeviceFieldPathsTopLevel, nil
 	})
 	if err != nil {
 		return nil, err
