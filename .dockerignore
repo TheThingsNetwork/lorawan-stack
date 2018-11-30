@@ -1,0 +1,6 @@
+/.cache
+/.dev
+/.env
+/.git
+/node_modules
+/vendor

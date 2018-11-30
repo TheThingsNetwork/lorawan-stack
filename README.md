@@ -51,6 +51,53 @@ For the latest **master**, you can download pre-compiled binaries:
 | [ttn-lw-windows-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-windows-amd64.zip) | windows | amd64 |
 | [ttn-lw-windows-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-windows-386.zip) | windows | 386 |
 
+## Private Network Setup
+
+The simplest way to set up a private network is with our provided [`docker-compose.yml`](docker-compose.yml).
+
+0. Prerequisites
+    - Make sure you have [Docker](https://docs.docker.com/install/#supported-platforms) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+    - Make sure you have a TLS certificate and key ready. We'll expect a `cert.pem` and `key.pem`. For development, you can generate self-signed certificates with `make dev.certs`.
+1. Pull the Docker images:  
+    ```sh
+    docker-compose pull
+    ```
+2. Initialize the database:  
+    ```sh
+    docker-compose run --rm stack ttn-lw-identity-server db init
+    ```
+3. Create the `admin` user:
+    ```sh
+    docker-compose run --rm stack ttn-lw-identity-server create-admin-user \
+      --id admin --email admin@example.com
+    ```
+    You can choose a different user ID if you want. If you do, make sure to use
+    that for `owner` below.
+4. Register the CLI as an OAuth client:  
+    ```sh
+    docker-compose run --rm stack ttn-lw-identity-server create-oauth-client \
+      --id cli --name "Command Line Interface" --no-secret \
+      --owner admin \
+      --redirect-uri 'http://localhost:11885/oauth/callback'
+    ```
+5. Register the Console as an OAuth client:  
+    ```sh
+    docker-compose run --rm stack ttn-lw-identity-server create-oauth-client \ 
+      --id console --name "Console" \
+      --owner admin \
+      --redirect-uri 'http://example.com:1885/console/oauth/callback' \
+      --redirect-uri 'https://example.com:8885/console/oauth/callback'
+    ```
+    Make sure to copy the value of the `secret` that is printed by this command.
+6. Export the Console's OAuth client secret or replace it in your `docker-compose.yml`:
+    ```sh
+    export TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=<PASTE SECRET HERE>
+    ```
+7. Run the Stack:
+    ```sh
+    docker-compose up
+    ```
+
 ## Documentation
 
 - General documentation can be found on [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/)

@@ -52,7 +52,7 @@ dev.databases.redis-cli: dev.databases.start
 # Binaries
 
 dev.stack.init: dev.databases.start
-	go run ./cmd/ttn-lw-identity-server init
+	go run ./cmd/ttn-lw-identity-server db init
 	go run ./cmd/ttn-lw-identity-server create-admin-user --id admin --email admin@localhost --password admin
 	go run ./cmd/ttn-lw-identity-server create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'http://localhost:11885/oauth/callback'
 	go run ./cmd/ttn-lw-identity-server create-oauth-client --id console --name "Console" --owner admin --secret console --redirect-uri 'http://localhost:1885/console/oauth/callback'

@@ -90,38 +90,10 @@ make init
 make deps
 ```
 
-#### Folder Structure
+For convenience, you can initialize the development database with some defaults:
 
-```
-.
-├── CONTRIBUTING.md     guidelines for contributing: branching, commits, code style, etc.
-├── DEVELOPMENT.md      guide for setting up your development environment
-├── Dockerfile          formula for building Docker images
-├── Gopkg.lock          dependency lock file managed by golang/dep
-├── Gopkg.toml          dependency file managed by golang/dep
-├── LICENSE             the license that explains what you're allowed to do with this code
-├── Makefile            dev/test/build tooling
-├── README.md           general information about this project
-│   ...
-├── api                 contains the protocol buffer definitions for our API
-├── cmd                 contains the different binaries that form the TTN stack for LoRaWAN
-│   ├── shared          contains configuration that is shared between the different binaries
-│   │   ...
-│   └── ttn-lw-stack    bundles the binaries that form the TTN stack for LoRaWAN
-├── config
-├── doc
-├── pkg                 contains all libraries used in the TTN stack for LoRaWAN
-│   ├── component       contains the base component; all other components extend this component
-│   ├── config          package for configuration using config files, environment and CLI flags
-│   ├── errors          package for rich errors that include metadata and cross API boundaries
-│   ├── log             package for logging
-│   ├── messages        contains non-proto messages (such as the messages that are sent over MQTT)
-│   ├── metrics         package for metrics collection
-│   ├── ttnpb           contains generated code from our protocol buffer definitions and some helper functions
-│   ├── types           contains primitive types
-│   └── ...
-├── release             binaries will be compiled to this folder - not added to git
-└── vendor              dependencies managed by golang/dep - not added to git
+```sh
+make dev.stack.init
 ```
 
 #### Testing
@@ -135,32 +107,12 @@ make test
 You can build the stack with the following command:
 
 ```
-make build-all
+make clean build-all
 ```
 
 This will compile the front-end in `public`, and the binaries in `release`. There is a single binary (`ttn-lw-stack`) as well as specialized binaries. The single binary contains all components and can be started independent of other binaries, while the specialized binaries together form the entire stack. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
 
 Note that the operating system and architecture is appended to the binary name, i.e. on macOS, you will find `release/ttn-lw-stack-darwin-amd64`.
-
-#### Development builds
-
-When developing, it is not necessary to re-build all packages every time you compile. You should instead be using dev builds. The dev build rule for `ttn-example` is 
-called `ttn-example.dev`. This builds the `ttn-example` binary, but makes some assumptions which can be made only in development mode, to speed up builds.
-
-Use this together with artifact caching to speed up builds dramatically. The `cache` rule pre-builds all relevant build artifacts and caches them so they can be used for
-dev builds.
-
-When developing you should therefore run:
-
-```
-make cache
-make ttn-example.dev
-# make edits...
-make ttn-example.dev
-# make some more edits...
-make ttn-example.dev
-# ...
-```
 
 #### API
 
@@ -173,5 +125,44 @@ From the `.proto` files, we generate code using the `protoc` compiler. As we pla
 The actual commands for compilation are handled by our Makefile, so the only thing you have to execute, is:
 
 ```sh
-make protos
+make protos.clean protos
+```
+
+#### Folder Structure
+
+```
+.
+├── .editorconfig       configuration for your editor, see editorconfig.org
+├── CONTRIBUTING.md     guidelines for contributing: branching, commits, code style, etc.
+├── DEVELOPMENT.md      guide for setting up your development environment
+├── docker-compose.yml  deployment file (including databases) for Docker Compose
+├── Dockerfile          formula for building Docker images
+├── Gopkg.lock          dependency lock file managed by golang/dep
+├── Gopkg.toml          dependency file managed by golang/dep
+├── LICENSE             the license that explains what you're allowed to do with this code
+├── Makefile            dev/test/build tooling
+├── README.md           general information about this project
+│   ...
+├── api                 contains the protocol buffer definitions for our API
+├── cmd                 contains the different binaries that form the TTN stack for LoRaWAN
+│   ├── internal        contains internal files shared between the different binaries
+│   │   ...
+│   ├── ttn-lw-cli      the command-line-interface for the TTN stack for LoRaWAN
+│   └── ttn-lw-stack    bundles the binaries that form the TTN stack for LoRaWAN
+├── config              configuration for our JavaScript SDK and frontend
+├── doc                 detailed documentation on the workings of the TTN stack for LoRaWAN
+├── pkg                 contains all libraries used in the TTN stack for LoRaWAN
+│   ├── component       contains the base component; all other components extend this component
+│   ├── config          package for configuration using config files, environment and CLI flags
+│   ├── errors          package for rich errors that include metadata and cross API boundaries
+│   ├── log             package for logging
+│   ├── messages        contains non-proto messages (such as the messages that are sent over MQTT)
+│   ├── metrics         package for metrics collection
+│   ├── ttnpb           contains generated code from our protocol buffer definitions and some helper functions
+│   ├── types           contains primitive types
+│   └── ...
+├── public              frontend code will be compiled to this folder - not added to git
+├── release             binaries will be compiled to this folder - not added to git
+└── sdk                 source code for our SDKs
+    └── js              source code for our JavaScript SDK
 ```

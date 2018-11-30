@@ -43,6 +43,8 @@ test: go.test js.test sdk.test
 
 quality: go.quality js.quality styl.quality snap.quality
 
+clean: go.clean js.clean
+
 # stack binary
 ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
 ttn-lw-stack: js.build
@@ -85,5 +87,11 @@ build-all-platforms:
 	GOOS=darwin GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=386 make build-all
+
+DOCKER_IMAGE ?= thethingsnetwork/lorawan-stack
+
+docker:
+	GOOS=linux GOARCH=amd64 make build-all
+	docker build -t $(DOCKER_IMAGE) .
 
 translations: messages js.translations
