@@ -27,7 +27,7 @@ type DeviceRegistry interface {
 }
 
 func DeleteDevice(ctx context.Context, r DeviceRegistry, joinEUI types.EUI64, devEUI types.EUI64) error {
-	_, err := r.SetByEUI(ctx, joinEUI, devEUI, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
+	_, err := r.SetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
 
@@ -35,11 +35,11 @@ func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (
 	if dev.EndDeviceIdentifiers.JoinEUI == nil || dev.EndDeviceIdentifiers.DevEUI == nil {
 		return nil, errInvalidIdentifiers
 	}
-	dev, err := r.SetByEUI(ctx, *dev.EndDeviceIdentifiers.JoinEUI, *dev.EndDeviceIdentifiers.DevEUI, nil, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, err := r.SetByEUI(ctx, *dev.EndDeviceIdentifiers.JoinEUI, *dev.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {
 			return nil, nil, errDuplicateIdentifiers
 		}
-		return dev, nil, nil
+		return dev, ttnpb.EndDeviceFieldPathsTopLevel, nil
 	})
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ type KeyRegistry interface {
 }
 
 func DeleteKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, id string) error {
-	_, err := r.SetByID(ctx, devEUI, id, nil, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) { return nil, nil, nil })
+	_, err := r.SetByID(ctx, devEUI, id, ttnpb.SessionKeysFieldPathsTopLevel, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) { return nil, nil, nil })
 	return err
 }
 
@@ -61,11 +61,11 @@ func CreateKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, ks *ttnp
 	if devEUI.IsZero() || ks.SessionKeyID == "" {
 		return nil, errInvalidIdentifiers
 	}
-	ks, err := r.SetByID(ctx, devEUI, ks.SessionKeyID, nil, func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+	ks, err := r.SetByID(ctx, devEUI, ks.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel, func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
 		if stored != nil {
 			return nil, nil, errDuplicateIdentifiers
 		}
-		return ks, nil, nil
+		return ks, ttnpb.SessionKeysFieldPathsTopLevel, nil
 	})
 	if err != nil {
 		return nil, err
