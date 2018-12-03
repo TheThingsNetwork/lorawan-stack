@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import DOM from 'react-dom'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
@@ -125,7 +124,7 @@ export default class Modal extends React.PureComponent {
       )
     }
 
-    const results = (
+    return (
       <React.Fragment>
         {!inline && <div key="shadow" className={style.shadow} />}
         <RootComponent key="modal" className={modalClassNames} {...rest}>
@@ -149,16 +148,5 @@ export default class Modal extends React.PureComponent {
         </RootComponent>
       </React.Fragment>
     )
-
-    const modalNode = document.getElementById('modal-container')
-
-    if (modalNode) {
-      return DOM.createPortal(
-        results,
-        modalNode
-      )
-    }
-
-    return results
   }
 }
