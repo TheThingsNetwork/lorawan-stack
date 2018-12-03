@@ -24,6 +24,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Spinner from '../../../components/spinner'
 
 import ApplicationOverview from '../application-overview'
+import ApplicationGeneralSettings from '../application-general-settings'
 
 import { getApplication } from '../../../actions/application'
 
@@ -120,7 +121,7 @@ export default class Application extends React.Component {
     return (
       <Switch>
         <Route exact path={`${match.path}`} component={ApplicationOverview} />
-        {/* other routes for specific application */}
+        <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
       </Switch>
     )
   }
