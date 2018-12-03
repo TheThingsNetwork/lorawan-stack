@@ -13,7 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
+import DOM from 'react-dom'
 import bind from 'autobind-decorator'
+import { connect } from 'react-redux'
+import classnames from 'classnames'
 import PropTypes from '../../lib/prop-types'
 
 import sharedMessages from '../../lib/shared-messages'
@@ -22,8 +25,11 @@ import Message from '../../lib/components/message'
 import Button from '../button'
 import Logo from '../logo'
 
+import { removeModal } from '../../actions/modal'
+
 import style from './modal.styl'
 
+@connect()
 @bind
 export default class Modal extends React.PureComponent {
   static propTypes = {
@@ -43,20 +49,25 @@ export default class Modal extends React.PureComponent {
     cancelButtonMessage: PropTypes.message,
     method: PropTypes.string,
     buttonName: PropTypes.message,
+    inline: PropTypes.bool,
+    danger: PropTypes.bool,
   }
 
   handleApprove () {
-    const { onComplete } = this.props
-    if (onComplete) {
-      onComplete(true)
-    }
+    this.handleComplete(true)
   }
 
   handleCancel () {
-    const { onComplete } = this.props
+    this.handleComplete(false)
+  }
+
+  handleComplete (result) {
+    const { onComplete, dispatch } = this.props
     if (onComplete) {
-      onComplete(false)
+      onComplete(result)
     }
+
+    dispatch(removeModal())
   }
 
   render () {
@@ -72,12 +83,19 @@ export default class Modal extends React.PureComponent {
       cancelButtonMessage = sharedMessages.cancel,
       onComplete,
       bottomLine,
+      inline = false,
+      dispatch,
+      danger,
       ...rest
     } = this.props
 
+    const modalClassNames = classnames(style.modal, style.modal, {
+      [inline]: inline,
+    })
+
     const name = formName ? { name: formName } : {}
     const RootComponent = this.props.method ? 'form' : 'div'
-    const messageElement = (<span className={style.message}>{message}</span>)
+    const messageElement = (<Message content={message} className={style.message} />)
     const bottomLineElement = <Message content={bottomLine} />
 
     let buttons = <div><Button message={buttonMessage} onClick={this.handleApprove} icon="check" /></div>
@@ -100,33 +118,47 @@ export default class Modal extends React.PureComponent {
             name={formName}
             icon="check"
             value="true"
+            danger={danger}
             {...name}
           />
         </div>
       )
     }
 
-    return [
-      <div key="shadow" className={style.shadow} />,
-      <RootComponent key="modal" className={style.modal} {...rest}>
-        { title
-          && <div className={style.titleSection}>
-            <div>
-              <h1><Message content={title} /></h1>
-              { subtitle && (<Message content={subtitle} />) }
+    const results = (
+      <React.Fragment>
+        {!inline && <div key="shadow" className={style.shadow} />}
+        <RootComponent key="modal" className={modalClassNames} {...rest}>
+          { title
+            && <div className={style.titleSection}>
+              <div>
+                <h1><Message content={title} /></h1>
+                { subtitle && (<Message content={subtitle} />) }
+              </div>
+              { logo && (<Logo className={style.logo} />)}
             </div>
-            { logo && (<Logo className={style.logo} />)}
+          }
+          { title && <div className={style.line} /> }
+          <div className={style.body}>
+            {children || messageElement}
           </div>
-        }
-        { title && <div className={style.line} /> }
-        <div className={style.body}>
-          {children || messageElement}
-        </div>
-        <div className={style.controlBar}>
-          <div>{ bottomLineElement }</div>
-          {buttons}
-        </div>
-      </RootComponent>,
-    ]
+          <div className={style.controlBar}>
+            <div>{ bottomLineElement }</div>
+            {buttons}
+          </div>
+        </RootComponent>
+      </React.Fragment>
+    )
+
+    const modalNode = document.getElementById('modal-container')
+
+    if (modalNode) {
+      return DOM.createPortal(
+        results,
+        modalNode
+      )
+    }
+
+    return results
   }
 }
