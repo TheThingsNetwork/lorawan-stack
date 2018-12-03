@@ -1449,6 +1449,11 @@ func HandleUplinkTest() func(t *testing.T) {
 						}
 						close(req.errch)
 
+					case we := <-collectionDoneCh:
+						close(we.ch)
+						a.So(<-errch, should.BeNil)
+						t.Fatal("Downlink (n)ack not sent to AS")
+
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
 					}
@@ -1475,8 +1480,9 @@ func HandleUplinkTest() func(t *testing.T) {
 						}},
 					})
 
-				case err := <-errch:
-					a.So(err, should.BeNil)
+				case we := <-collectionDoneCh:
+					close(we.ch)
+					a.So(<-errch, should.BeNil)
 					t.Fatal("Uplink not sent to AS")
 
 				case <-time.After(Timeout):
@@ -1621,6 +1627,11 @@ func HandleUplinkTest() func(t *testing.T) {
 							}
 							close(req.errch)
 
+						case we := <-collectionDoneCh:
+							close(we.ch)
+							a.So(<-errch, should.BeNil)
+							t.Fatal("Downlink (n)ack not sent to AS")
+
 						case <-time.After(Timeout):
 							t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
 						}
@@ -1646,8 +1657,9 @@ func HandleUplinkTest() func(t *testing.T) {
 							}},
 						})
 
-					case err := <-errch:
-						a.So(err, should.BeNil)
+					case we := <-collectionDoneCh:
+						close(we.ch)
+						a.So(<-errch, should.BeNil)
 						t.Fatal("Uplink not sent to AS")
 
 					case <-time.After(Timeout):
@@ -2040,9 +2052,10 @@ func HandleJoinTest() func(t *testing.T) {
 					req.ch <- resp
 					req.errch <- nil
 
-				case err := <-errch:
-					a.So(err, should.BeNil)
-					t.Fatal("Join not sent to JS")
+				case we := <-collectionDoneCh:
+					close(we.ch)
+					a.So(<-errch, should.BeNil)
+					t.Fatal("Join request not sent to JS")
 
 				case <-time.After(Timeout):
 					t.Fatal("Timed out while waiting for join to be sent to JS")
