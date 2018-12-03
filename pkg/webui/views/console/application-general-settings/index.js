@@ -17,6 +17,9 @@ import bind from 'autobind-decorator'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
+import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+
+import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import Form from '../../../components/form'
@@ -29,8 +32,19 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete Application',
   modalWarning: 'Are you sure you want to delete this Application? This cannot be undone.',
+  generalSettings: 'General Settings',
 })
 
+@withBreadcrumb('apps.single.general-settings', function (props) {
+  const { appId } = props
+  return (
+    <Breadcrumb
+      path={`/console/applications/${appId}/general-settings`}
+      icon="general_settings"
+      content={m.generalSettings}
+    />
+  )
+})
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
 
