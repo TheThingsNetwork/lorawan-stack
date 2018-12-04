@@ -14,7 +14,6 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 import PropTypes from '../../lib/prop-types'
 
@@ -24,33 +23,10 @@ import Message from '../../lib/components/message'
 import Button from '../button'
 import Logo from '../logo'
 
-import { removeModal } from '../../actions/modal'
-
 import style from './modal.styl'
 
-@connect()
 @bind
-export default class Modal extends React.PureComponent {
-  static propTypes = {
-    title: PropTypes.message,
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]),
-    message: PropTypes.message,
-    subtitle: PropTypes.message,
-    bottomLine: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.message,
-    ]),
-    approval: PropTypes.bool,
-    buttonMessage: PropTypes.message,
-    cancelButtonMessage: PropTypes.message,
-    method: PropTypes.string,
-    buttonName: PropTypes.message,
-    inline: PropTypes.bool,
-    danger: PropTypes.bool,
-  }
+class Modal extends React.PureComponent {
 
   handleApprove () {
     this.handleComplete(true)
@@ -61,12 +37,9 @@ export default class Modal extends React.PureComponent {
   }
 
   handleComplete (result) {
-    const { onComplete, dispatch } = this.props
-    if (onComplete) {
-      onComplete(result)
-    }
+    const { onComplete } = this.props
 
-    dispatch(removeModal())
+    onComplete(result)
   }
 
   render () {
@@ -76,14 +49,13 @@ export default class Modal extends React.PureComponent {
       children,
       message,
       logo,
-      approval = false,
+      approval,
       formName,
       buttonMessage = this.props.approval ? sharedMessages.approve : sharedMessages.ok,
       cancelButtonMessage = sharedMessages.cancel,
       onComplete,
       bottomLine,
-      inline = false,
-      dispatch,
+      inline,
       danger,
       ...rest
     } = this.props
@@ -150,3 +122,32 @@ export default class Modal extends React.PureComponent {
     )
   }
 }
+
+Modal.defaultProps = {
+  onComplete: () => null,
+  inline: false,
+  approval: true,
+}
+
+Modal.propTypes = {
+  title: PropTypes.message,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+  ]),
+  message: PropTypes.message,
+  subtitle: PropTypes.message,
+  bottomLine: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.message,
+  ]),
+  approval: PropTypes.bool,
+  buttonMessage: PropTypes.message,
+  cancelButtonMessage: PropTypes.message,
+  method: PropTypes.string,
+  buttonName: PropTypes.message,
+  inline: PropTypes.bool,
+  danger: PropTypes.bool,
+}
+
+export default Modal
