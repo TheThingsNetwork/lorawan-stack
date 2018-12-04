@@ -35,15 +35,20 @@ func TestEndDeviceStore(t *testing.T) {
 		prepareTest(db, &EndDevice{}, &Attribute{}, &EndDeviceLocation{})
 		store := GetEndDeviceStore(db)
 
+		deviceID := ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
+			DeviceID:               "foo",
+		}
+
+		deviceNewID := ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
+			DeviceID:               "bar",
+		}
+
 		created, err := store.CreateEndDevice(ctx, &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "test",
-				},
-				DeviceID: "foo",
-			},
-			Name:        "Foo EndDevice",
-			Description: "The Amazing Foo EndDevice",
+			EndDeviceIdentifiers: deviceID,
+			Name:                 "Foo EndDevice",
+			Description:          "The Amazing Foo EndDevice",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"bar": "baz",
@@ -54,21 +59,19 @@ func TestEndDeviceStore(t *testing.T) {
 			},
 		})
 		a.So(err, should.BeNil)
-		a.So(created.DeviceID, should.Equal, "foo")
+		a.So(created.DeviceID, should.Equal, deviceID.DeviceID)
 		a.So(created.Name, should.Equal, "Foo EndDevice")
 		a.So(created.Description, should.Equal, "The Amazing Foo EndDevice")
 		a.So(created.Attributes, should.HaveLength, 3)
 		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
-		got, err := store.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test",
-			},
-			DeviceID: "foo",
-		}, &types.FieldMask{Paths: []string{"name", "attributes", "locations"}})
+		got, err := store.GetEndDevice(ctx,
+			&deviceID,
+			&types.FieldMask{Paths: []string{"name", "attributes", "locations"}},
+		)
 		a.So(err, should.BeNil)
-		a.So(got.DeviceID, should.Equal, "foo")
+		a.So(got.DeviceID, should.Equal, deviceID.DeviceID)
 		a.So(got.Name, should.Equal, "Foo EndDevice")
 		a.So(got.Description, should.BeEmpty)
 		a.So(got.Attributes, should.HaveLength, 3)
@@ -79,26 +82,16 @@ func TestEndDeviceStore(t *testing.T) {
 		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 
 		_, err = store.UpdateEndDevice(ctx, &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "test",
-				},
-				DeviceID: "bar",
-			},
+			EndDeviceIdentifiers: deviceNewID,
 		}, nil)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		updated, err := store.UpdateEndDevice(ctx, &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "test",
-				},
-				DeviceID: "foo",
-			},
-			Name:        "Foobar EndDevice",
-			Description: "The Amazing Foobar EndDevice",
+			EndDeviceIdentifiers: deviceID,
+			Name:                 "Foobar EndDevice",
+			Description:          "The Amazing Foobar EndDevice",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"baz": "baz",
@@ -119,12 +112,7 @@ func TestEndDeviceStore(t *testing.T) {
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
-		got, err = store.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test",
-			},
-			DeviceID: "foo",
-		}, nil)
+		got, err = store.GetEndDevice(ctx, &deviceID, nil)
 		a.So(err, should.BeNil)
 		a.So(got.DeviceID, should.Equal, created.DeviceID)
 		a.So(got.Name, should.Equal, created.Name)
@@ -134,37 +122,102 @@ func TestEndDeviceStore(t *testing.T) {
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 
-		list, err := store.ListEndDevices(ctx, &ttnpb.ApplicationIdentifiers{
-			ApplicationID: "test",
-		}, &types.FieldMask{Paths: []string{"name"}})
+		list, err := store.ListEndDevices(ctx,
+			&deviceID.ApplicationIdentifiers,
+			&types.FieldMask{Paths: []string{"name"}},
+		)
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		err = store.DeleteEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test",
+		devices, err := store.FindEndDevices(ctx,
+			[]*ttnpb.EndDeviceIdentifiers{&deviceID},
+			&types.FieldMask{Paths: []string{"name"}},
+		)
+		a.So(err, should.BeNil)
+		if a.So(devices, should.HaveLength, 1) {
+			a.So(devices[0].Name, should.EndWith, got.Name)
+		}
+
+		createdNew, err := store.CreateEndDevice(ctx, &ttnpb.EndDevice{
+			EndDeviceIdentifiers: deviceNewID,
+			Name:                 "Bar EndDevice",
+			Description:          "The Amazing Bar EndDevice",
+			Attributes: map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+				"baz": "qux",
 			},
-			DeviceID: "foo",
+			Locations: map[string]*ttnpb.Location{
+				"": {Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY},
+			},
 		})
 		a.So(err, should.BeNil)
+		a.So(createdNew.DeviceID, should.Equal, deviceNewID.DeviceID)
+		a.So(createdNew.Name, should.Equal, "Bar EndDevice")
+		a.So(createdNew.Description, should.Equal, "The Amazing Bar EndDevice")
+		a.So(createdNew.Attributes, should.HaveLength, 3)
+		a.So(createdNew.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+		a.So(createdNew.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
-		got, err = store.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test",
-			},
-			DeviceID: "foo",
-		}, nil)
+		list, err = store.ListEndDevices(ctx,
+			&deviceID.ApplicationIdentifiers,
+			nil,
+		)
+		a.So(err, should.BeNil)
+		if a.So(list, should.HaveLength, 2) {
+			a.So(list, should.Contain, got)
+			a.So(list, should.Contain, createdNew)
+		}
+
+		devices, err = store.FindEndDevices(ctx,
+			[]*ttnpb.EndDeviceIdentifiers{&deviceID, &deviceNewID},
+			nil,
+		)
+		a.So(err, should.BeNil)
+		if a.So(devices, should.HaveLength, 2) {
+			a.So(list, should.Contain, got)
+			a.So(devices, should.Contain, createdNew)
+		}
+
+		err = store.DeleteEndDevice(ctx, &deviceID)
+		a.So(err, should.BeNil)
+
+		got, err = store.GetEndDevice(ctx, &deviceID, nil)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		list, err = store.ListEndDevices(ctx, &ttnpb.ApplicationIdentifiers{
-			ApplicationID: "test",
-		}, nil)
+		err = store.DeleteEndDevice(ctx, &deviceNewID)
+		a.So(err, should.BeNil)
+
+		got, err = store.GetEndDevice(ctx, &deviceNewID, nil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+
+		list, err = store.ListEndDevices(ctx, &deviceID.ApplicationIdentifiers, nil)
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
+		devices, err = store.FindEndDevices(ctx,
+			[]*ttnpb.EndDeviceIdentifiers{&deviceID},
+			nil)
+		a.So(err, should.BeNil)
+		a.So(devices, should.BeEmpty)
+
+		devices, err = store.FindEndDevices(ctx,
+			[]*ttnpb.EndDeviceIdentifiers{
+				&deviceID,
+				{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-another"},
+					DeviceID:               "baz",
+				}},
+			nil)
+		a.So(devices, should.BeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 	})
 }
