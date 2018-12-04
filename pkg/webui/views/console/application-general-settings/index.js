@@ -25,18 +25,21 @@ import Message from '../../../lib/components/message'
 import Form from '../../../components/form'
 import Field from '../../../components/field'
 import Button from '../../../components/button'
+import ModalButton from '../../../containers/modal-button'
 
 import style from './application-general-settings.styl'
 
 const m = defineMessages({
   basics: 'Basics',
-  deleteApp: 'Delete Application',
-  modalWarning: 'Are you sure you want to delete this Application? This cannot be undone.',
+  deleteApp: 'Delete application',
+  modalWarning: 'Are you sure you want to delete "{appId}"? Deleting an application cannot be undone!',
   generalSettings: 'General Settings',
 })
 
 @withBreadcrumb('apps.single.general-settings', function (props) {
-  const { appId } = props
+  const { match } = props
+  const appId = match.params.appId
+
   return (
     <Breadcrumb
       path={`/console/applications/${appId}/general-settings`}
@@ -55,6 +58,9 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   render () {
+    const { match } = this.props
+    const appId = match.params.appId
+
     return (
       <div>
         <Row justify="center">
@@ -91,14 +97,14 @@ export default class ApplicationGeneralSettings extends React.Component {
                   <Button type="submit" message={sharedMessages.saveChanges} />
                   <Button type="button" naked secondary message={sharedMessages.cancel} />
                 </div>
-                <Button
+                <ModalButton
                   type="button"
                   icon="delete"
                   danger
                   naked
                   message={m.deleteApp}
-                  modalApprove={{ message: m.modalWarning }}
-                  onClick={this.handleDelete}
+                  modalData={{ message: { values: { appId }, ...m.modalWarning }}}
+                  onApprove={this.handleDelete}
                 />
               </div>
             </Form>
