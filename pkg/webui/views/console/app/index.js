@@ -21,7 +21,6 @@ import { Helmet } from 'react-helmet'
 
 import { withEnv } from '../../../lib/components/env'
 import SideNavigation from '../../../components/navigation/side'
-import ConnectedModal from '../../../containers/connected-modal'
 import Header from '../../../components/header'
 import Footer from '../../../components/footer'
 import Landing from '../landing'
@@ -56,7 +55,7 @@ export default class ConsoleApp extends React.Component {
           titleTemplate="%s - Console - The Things Network"
           defaultTitle="The Things Network Console"
         />
-        <ConnectedModal />
+        <div id="modal-container" />
         <Header className={style.header} user={user} handleLogout={this.handleLogout} />
         <main className={style.main}>
           <div>
