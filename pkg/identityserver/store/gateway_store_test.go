@@ -125,6 +125,15 @@ func TestGatewayStore(t *testing.T) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
+		updated, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			Antennas:           []ttnpb.GatewayAntenna{},
+		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
+
+		a.So(updated, should.NotBeNil)
+		a.So(updated.Antennas, should.HaveLength, 0)
+		a.So(err, should.BeNil)
+
 		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
 		a.So(err, should.BeNil)
 
@@ -136,6 +145,5 @@ func TestGatewayStore(t *testing.T) {
 		list, err = store.FindGateways(ctx, nil, nil)
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
-
 	})
 }
