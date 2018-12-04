@@ -12,36 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React from 'react'
 import DOM from 'react-dom'
-import bind from 'autobind-decorator'
 
 import Modal from '../../components/modal'
 
-@bind
-class PortalledModal extends Component {
-  handleComplete (result) {
-    const { modal } = this.props
-    if (modal && modal.onComplete) {
-      modal.onComplete(result)
-    }
+const PortalledModal = function ({ dispatch, modal, visible, ...rest }) {
+  if (!modal) {
+    return null
   }
 
-  render () {
-    const { modal, visible, ...rest } = this.props
+  const props = { ...rest, ...modal }
 
-    if (!modal) {
-      return null
-    }
-
-    const { onComplete, ...modalRest } = modal
-    const props = { ...rest, ...modalRest }
-
-    return DOM.createPortal(
-      visible && <Modal onComplete={this.handleComplete} {...props} />,
-      document.getElementById('modal-container')
-    )
-  }
+  return DOM.createPortal(
+    visible && <Modal {...props} />,
+    document.getElementById('modal-container')
+  )
 }
 
 export default PortalledModal
