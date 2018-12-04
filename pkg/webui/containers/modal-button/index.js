@@ -21,6 +21,11 @@ import Button from '../../components/button'
 import { setModal } from '../../actions/modal'
 import PropTypes from '../../lib/prop-types'
 
+/**
+ * ModalButton is a button which needs a modal confirmation to complete the
+ * action. It can be used as an easy way to get the users explicit confirmation
+ * before doing an action, e.g. deleting a resource.
+ */
 @connect()
 @bind
 class ModalButton extends React.Component {
