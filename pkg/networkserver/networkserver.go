@@ -705,6 +705,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	var devs []device
 	if err := ns.devices.RangeByAddr(pld.DevAddr,
 		[]string{
+			"frequency_plan_id",
 			"mac_state",
 			"pending_session",
 			"recent_downlinks",
@@ -992,6 +993,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"mac_state",
 			"pending_session",
 			"recent_uplinks",
+			"resets_f_cnt",
 			"session",
 			"supports_join",
 		},
