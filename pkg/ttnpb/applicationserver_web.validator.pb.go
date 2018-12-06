@@ -3,13 +3,15 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/empty"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
 
@@ -21,9 +23,14 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
+var _regex_ApplicationWebhookIdentifiers_WebhookID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+
 func (this *ApplicationWebhookIdentifiers) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ApplicationIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationIdentifiers", err)
+	}
+	if !_regex_ApplicationWebhookIdentifiers_WebhookID.MatchString(this.WebhookID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("WebhookID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.WebhookID))
 	}
 	return nil
 }

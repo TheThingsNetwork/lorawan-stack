@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -27,7 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ApplicationWebhookIdentifiers {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string webhook_id = 2 [(gogoproto.customname) = "WebhookID"];
+  string webhook_id = 2 [(gogoproto.customname) = "WebhookID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"}];
 }
 
 message ApplicationWebhook {
