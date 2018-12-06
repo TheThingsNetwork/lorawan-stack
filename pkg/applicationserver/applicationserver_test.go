@@ -470,11 +470,12 @@ func TestApplicationServer(t *testing.T) {
 				})
 
 				for _, tc := range []struct {
-					Name         string
-					IDs          ttnpb.EndDeviceIdentifiers
-					Message      *ttnpb.ApplicationUp
-					AssertUp     func(t *testing.T, up *ttnpb.ApplicationUp)
-					AssertDevice func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink)
+					Name          string
+					IDs           ttnpb.EndDeviceIdentifiers
+					Message       *ttnpb.ApplicationUp
+					ExpectTimeout bool
+					AssertUp      func(t *testing.T, up *ttnpb.ApplicationUp)
+					AssertDevice  func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink)
 				}{
 					{
 						Name: "RegisteredDevice/JoinAccept",
@@ -1128,8 +1129,9 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "UnregisteredDevice/JoinAccept",
-						IDs:  unregisteredDeviceID,
+						Name:          "UnregisteredDevice/JoinAccept",
+						IDs:           unregisteredDeviceID,
+						ExpectTimeout: true,
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -1143,37 +1145,11 @@ func TestApplicationServer(t *testing.T) {
 								},
 							},
 						},
-						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
-							a := assertions.New(t)
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
-								Up: &ttnpb.ApplicationUp_JoinAccept{
-									JoinAccept: &ttnpb.ApplicationJoinAccept{
-										SessionKeyID: "session5",
-									},
-								},
-							})
-						},
-						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
-							a := assertions.New(t)
-							a.So(dev.Session, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x55, 0x55, 0x55, 0x55},
-								SessionKeys: ttnpb.SessionKeys{
-									SessionKeyID: "session5",
-									AppSKey: &ttnpb.KeyEnvelope{
-										Key:      []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
-										KEKLabel: "test",
-									},
-								},
-								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
-							})
-							a.So(queue, should.HaveLength, 0)
-						},
 					},
 					{
-						Name: "UnregisteredDevice/UplinkMessage",
-						IDs:  unregisteredDeviceID,
+						Name:          "UnregisteredDevice/UplinkMessage",
+						IDs:           unregisteredDeviceID,
+						ExpectTimeout: true,
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -1185,42 +1161,23 @@ func TestApplicationServer(t *testing.T) {
 								},
 							},
 						},
-						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
-							a := assertions.New(t)
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
-								Up: &ttnpb.ApplicationUp_UplinkMessage{
-									UplinkMessage: &ttnpb.ApplicationUplink{
-										SessionKeyID: "session5",
-										FPort:        11,
-										FCnt:         11,
-										FRMPayload:   []byte{0x7, 0x67, 0x0, 0xe1},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
-												"temperature_7": {
-													Kind: &pbtypes.Value_NumberValue{
-														NumberValue: 22.5, // Application's default formatter is CayenneLPP.
-													},
-												},
-											},
-										},
-									},
-								},
-							})
-						},
 					},
 				} {
 					tcok := t.Run(tc.Name, func(t *testing.T) {
 						ns.upCh <- tc.Message
 						select {
 						case msg := <-chs.up:
-							if tc.AssertUp != nil {
-								tc.AssertUp(t, msg)
+							if tc.ExpectTimeout {
+								t.Fatalf("Expected timeout but got %v", msg)
 							} else {
-								t.Fatalf("Expected no upstream message but got %v", msg)
+								if tc.AssertUp != nil {
+									tc.AssertUp(t, msg)
+								} else {
+									t.Fatalf("Expected no upstream message but got %v", msg)
+								}
 							}
 						case <-time.After(timeout):
-							if tc.AssertUp != nil {
+							if !tc.ExpectTimeout && tc.AssertUp != nil {
 								t.Fatal("Expected upstream timeout")
 							}
 						}

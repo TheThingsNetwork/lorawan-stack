@@ -378,10 +378,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
 			if dev == nil {
-				logger.Debug("Creating new device")
-				dev = &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ids,
-				}
+				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
 			var appSKey ttnpb.KeyEnvelope
 			if joinAccept.AppSKey != nil {
@@ -442,13 +439,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
-			created := false
 			if dev == nil {
-				logger.Debug("Creating new device")
-				dev = &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ids,
-				}
-				created = true
+				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
 			if dev.Session == nil || dev.Session.SessionKeyID != uplink.SessionKeyID {
 				logger := logger.WithField("session_key_id", uplink.SessionKeyID)
@@ -457,9 +449,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					logger.Debug("Switching to pending session")
 					dev.Session = dev.PendingSession
 				} else {
-					if !created {
-						logger.Debug("Missed join-accept for this session. Restoring session...")
-					}
 					appSKey, err := as.fetchAppSKey(ctx, ids, uplink.SessionKeyID)
 					if err != nil {
 						return nil, nil, errFetchAppSKey.WithCause(err)
