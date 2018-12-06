@@ -21,10 +21,36 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
+
+func init() {
+	// remove applications assigned to the user by the populator
+	userID := paginationUser.UserIdentifiers
+	for _, app := range population.Applications {
+		for id, collaborators := range population.Memberships {
+			if app.EntityIdentifiers().IDString() == id.IDString() {
+				for i, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
+					}
+				}
+			}
+		}
+	}
+
+	// add deterministic number of applications
+	for i := 0; i < 3; i++ {
+		applicationID := population.Applications[i].EntityIdentifiers()
+		population.Memberships[applicationID] = append(population.Memberships[applicationID], &ttnpb.Collaborator{
+			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
+			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+		})
+	}
+}
 
 func TestApplicationsPermissionDenied(t *testing.T) {
 	a := assertions.New(t)
@@ -149,5 +175,52 @@ func TestApplicationsCRUD(t *testing.T) {
 		_, err = reg.Delete(ctx, &created.ApplicationIdentifiers, creds)
 		a.So(err, should.BeNil)
 
+	})
+}
+
+func TestApplicationsPagination(t *testing.T) {
+	a := assertions.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := paginationUser.UserIdentifiers
+		creds := userCreds(paginationUserIdx)
+
+		reg := ttnpb.NewApplicationRegistryClient(cc)
+
+		md := rpcmetadata.MD{Limit: 2, Page: 1}
+		ctx := md.ToOutgoingContext(test.Context())
+
+		list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Applications, should.HaveLength, 2)
+		a.So(err, should.BeNil)
+
+		md = rpcmetadata.MD{Limit: 2, Page: 2}
+		ctx = md.ToOutgoingContext(test.Context())
+
+		list, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Applications, should.HaveLength, 1)
+		a.So(err, should.BeNil)
+
+		md = rpcmetadata.MD{Limit: 2, Page: 3}
+		ctx = md.ToOutgoingContext(test.Context())
+
+		list, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Applications, should.BeEmpty)
+		a.So(err, should.BeNil)
 	})
 }

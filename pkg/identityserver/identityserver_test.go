@@ -46,11 +46,14 @@ var (
 	gatewayAccessUser, gatewayAccessUserIdx           = getTestUser()
 	organizationAccessUser, organizationAccessUserIdx = getTestUser()
 	userAccessUser, userAccessUserIdx                 = getTestUser()
+	paginationUser, paginationUserIdx                 = getTestUser()
 )
 
 func init() {
 	defaultUser.Admin = false
 	defaultUser.State = ttnpb.STATE_APPROVED
+	paginationUser.Admin = false
+	paginationUser.State = ttnpb.STATE_APPROVED
 }
 
 func getTestUser() (*ttnpb.User, int) {
