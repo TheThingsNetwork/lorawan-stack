@@ -88,7 +88,7 @@ const Field = function (props) {
       errors = {},
     } = props
 
-    _value = values[name]
+    _value = values[name] || ''
     _error = errors[name]
     _touched = touched[name]
     rest.value = _value
