@@ -21,10 +21,36 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
+
+func init() {
+	// remove clients assigned to the user by the populator
+	userID := paginationUser.UserIdentifiers
+	for _, client := range population.Clients {
+		for id, collaborators := range population.Memberships {
+			if client.EntityIdentifiers().IDString() == id.IDString() {
+				for i, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
+					}
+				}
+			}
+		}
+	}
+
+	// add deterministic number of clients
+	for i := 0; i < 3; i++ {
+		clientID := population.Clients[i].EntityIdentifiers()
+		population.Memberships[clientID] = append(population.Memberships[clientID], &ttnpb.Collaborator{
+			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
+			Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+		})
+	}
+}
 
 func TestClientsPermissionDenied(t *testing.T) {
 	a := assertions.New(t)
@@ -149,5 +175,52 @@ func TestClientsCRUD(t *testing.T) {
 		_, err = reg.Delete(ctx, &created.ClientIdentifiers, creds)
 		a.So(err, should.BeNil)
 
+	})
+}
+
+func TestClientsPagination(t *testing.T) {
+	a := assertions.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := paginationUser.UserIdentifiers
+		creds := userCreds(paginationUserIdx)
+
+		reg := ttnpb.NewClientRegistryClient(cc)
+
+		md := rpcmetadata.MD{Limit: 2, Page: 1}
+		ctx := md.ToOutgoingContext(test.Context())
+
+		list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Clients, should.HaveLength, 2)
+		a.So(err, should.BeNil)
+
+		md = rpcmetadata.MD{Limit: 2, Page: 2}
+		ctx = md.ToOutgoingContext(test.Context())
+
+		list, err = reg.List(ctx, &ttnpb.ListClientsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Clients, should.HaveLength, 1)
+		a.So(err, should.BeNil)
+
+		md = rpcmetadata.MD{Limit: 2, Page: 3}
+		ctx = md.ToOutgoingContext(test.Context())
+
+		list, err = reg.List(ctx, &ttnpb.ListClientsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Clients, should.BeEmpty)
+		a.So(err, should.BeNil)
 	})
 }
