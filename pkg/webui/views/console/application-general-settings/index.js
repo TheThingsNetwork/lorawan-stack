@@ -16,6 +16,7 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
+import { connect } from 'react-redux'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
@@ -32,10 +33,15 @@ import style from './application-general-settings.styl'
 const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
-  modalWarning: 'Are you sure you want to delete "{appId}"? Deleting an application cannot be undone!',
+  modalWarning: 'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
   generalSettings: 'General Settings',
 })
 
+@connect(function ({ application }) {
+  return {
+    application: application.application,
+  }
+})
 @withBreadcrumb('apps.single.general-settings', function (props) {
   const { match } = props
   const appId = match.params.appId
@@ -58,13 +64,12 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   render () {
-    const { match } = this.props
-    const appId = match.params.appId
+    const { application } = this.props
 
     return (
       <div>
         <Row justify="center">
-          <Col sm={8}>
+          <Col lg={8} md={12}>
             <Message
               component="h2"
               content={sharedMessages.generalSettings}
@@ -72,10 +77,11 @@ export default class ApplicationGeneralSettings extends React.Component {
           </Col>
         </Row>
         <Row justify="center">
-          <Col sm={8}>
+          <Col lg={8} md={12}>
             <Form
               horizontal
               onSubmit={this.handleSubmit}
+              initialValues={{ name: application.name, description: application.description }}
             >
               <Message
                 component="h4"
@@ -103,7 +109,7 @@ export default class ApplicationGeneralSettings extends React.Component {
                   danger
                   naked
                   message={m.deleteApp}
-                  modalData={{ message: { values: { appId }, ...m.modalWarning }}}
+                  modalData={{ message: { values: { appName: application.name }, ...m.modalWarning }}}
                   onApprove={this.handleDelete}
                 />
               </div>
