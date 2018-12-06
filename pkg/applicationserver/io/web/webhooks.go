@@ -229,7 +229,7 @@ func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
 				ApplicationIdentifiers: appID,
 				DeviceID:               c.Param(deviceIDKey),
 			}
-			if err := devID.Validate(); err != nil {
+			if err := devID.ValidateContext(w.ctx); err != nil {
 				return err
 			}
 			c.Set(deviceIDKey, devID)
