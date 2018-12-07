@@ -16,7 +16,10 @@
 package redis
 
 import (
+	"context"
 	"encoding/base64"
+	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -33,6 +36,12 @@ const (
 var (
 	encoding = base64.RawStdEncoding
 )
+
+// WatchCmdable is transactional redis.Cmdable.
+type WatchCmdable interface {
+	redis.Cmdable
+	Watch(fn func(*redis.Tx) error, keys ...string) error
+}
 
 // MarshalProto marshals pb into printable string.
 func MarshalProto(pb proto.Message) (string, error) {
@@ -82,8 +91,8 @@ func New(conf *Config) *Client {
 }
 
 // Key constructs the full key for entity identified by ks by prepending the configured namespace and joining ks using the default separator.
-func (s *Client) Key(ks ...string) string {
-	return Key(append([]string{s.namespace}, ks...)...)
+func (cl *Client) Key(ks ...string) string {
+	return Key(append([]string{cl.namespace}, ks...)...)
 }
 
 type ProtoCmd struct {
@@ -112,12 +121,6 @@ func SetProto(r redis.Cmdable, k string, pb proto.Message, expiration time.Durat
 		return nil, err
 	}
 	return r.Set(k, s, expiration), nil
-}
-
-// WatchCmdable is transactional redis.Cmdable.
-type WatchCmdable interface {
-	redis.Cmdable
-	Watch(fn func(*redis.Tx) error, keys ...string) error
 }
 
 func FindProto(r WatchCmdable, k string, keyCmd func(...string) string) *ProtoCmd {
@@ -166,4 +169,311 @@ func FindProtos(r redis.Cmdable, k string, keyCmd func(...string) string) *Proto
 			Get:   []string{keyCmd("*")},
 		}).Result,
 	}
+}
+
+const (
+	payloadKey = "payload"
+	startAtKey = "start_at"
+)
+
+// InputTaskKey returns the subkey of k, where input tasks are stored.
+func InputTaskKey(k string) string {
+	return Key(k, "input")
+}
+
+// ReadyTaskKey returns the subkey of k, where ready tasks are stored.
+func ReadyTaskKey(k string) string {
+	return Key(k, "ready")
+}
+
+// WaitingTaskKey returns the subkey of k, where waiting tasks are stored.
+func WaitingTaskKey(k string) string {
+	return Key(k, "waiting")
+}
+
+// InitTaskGroup initializes the task group for streams at InputTaskKey(k) and ReadyTaskKey(k).
+// It must be called before all other task-related functions at subkeys of k.
+func InitTaskGroup(r redis.Cmdable, group, k string) error {
+	_, err := r.Pipelined(func(p redis.Pipeliner) error {
+		p.XGroupCreateMkStream(InputTaskKey(k), group, "$")
+		p.XGroupCreateMkStream(ReadyTaskKey(k), group, "$")
+		return nil
+	})
+	if err != nil && err.Error() == "BUSYGROUP Consumer Group name already exists" {
+		return nil
+	}
+	return ConvertError(err)
+}
+
+// AddTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k).
+// maxLen is the approximate length of the stream, to which it may be trimmed.
+func AddTask(r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time) error {
+	m := make(map[string]interface{}, 2)
+	m[payloadKey] = payload
+	if !startAt.IsZero() {
+		m[startAtKey] = startAt.UnixNano()
+	}
+	return ConvertError(r.XAdd(&redis.XAddArgs{
+		Stream:       InputTaskKey(k),
+		MaxLenApprox: maxLen,
+		Values:       m,
+	}).Err())
+}
+
+// DispatchTasks dispatches ready-to-execute tasks from input task streams and waiting task sets to ready task streams.
+// It first attempts to read at most maxLen tasks from streams at input task keys corresponding to ks as a consumer id from group group.
+// It blocks until deadline, if it is not zero, otherwise it blocks forever.
+// It then adds all the tasks read from the stream to the sorted set
+// at corresponding waiting task key and acks them.
+// Note that task payload is used as the key in the sorted set.
+// It then proceeds to add all the tasks from the sorted set, for which execution time is at or before time.Now() to corresponding ready task stream.
+func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time.Time, ks ...string) (time.Time, error) {
+	readStreams := make([]string, 0, len(ks))
+	for _, k := range ks {
+		readStreams = append(readStreams, InputTaskKey(k))
+	}
+	for range readStreams {
+		readStreams = append(readStreams, ">")
+	}
+
+	var block time.Duration
+	if !deadline.IsZero() {
+		block = time.Until(deadline)
+		if block <= 0 {
+			block = time.Duration(-1)
+		}
+	}
+
+	rets, err := r.XReadGroup(&redis.XReadGroupArgs{
+		Group:    group,
+		Consumer: id,
+		Streams:  readStreams,
+		Count:    maxLen,
+		Block:    block,
+	}).Result()
+	if err != nil && err != redis.Nil {
+		return time.Time{}, ConvertError(err)
+	}
+
+	if err != redis.Nil {
+		_, err := r.Pipelined(func(p redis.Pipeliner) error {
+			for i, ret := range rets {
+				zs := make([]redis.Z, 0, len(ret.Messages))
+				toAck := make([]string, 0, len(ret.Messages))
+				for _, msg := range ret.Messages {
+					var score float64
+					if v, ok := msg.Values[startAtKey]; ok {
+						s, ok := v.(string)
+						if !ok {
+							return errInvalidKeyValueType.WithAttributes("key", startAtKey)
+						}
+
+						i, err := strconv.ParseInt(s, 10, 64)
+						if err != nil {
+							return errInvalidKeyValueType.WithAttributes("key", startAtKey).WithCause(err)
+						}
+						score = float64(i)
+					}
+
+					var member interface{}
+					if v, ok := msg.Values[payloadKey]; ok {
+						s, ok := v.(string)
+						if !ok {
+							return errInvalidKeyValueType.WithAttributes("key", payloadKey)
+						}
+						member = s
+					}
+
+					toAck = append(toAck, msg.ID)
+					zs = append(zs, redis.Z{
+						Member: member,
+						Score:  score,
+					})
+				}
+				// TODO: Keep the minimum value in the set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1380)
+				p.ZAddNX(WaitingTaskKey(ks[i]), zs...)
+				p.XAck(ret.Stream, group, toAck...)
+			}
+			return nil
+		})
+		if err != nil {
+			return time.Time{}, ConvertError(err)
+		}
+	}
+
+	var min time.Time
+	for _, k := range ks {
+		if err := r.Watch(func(tx *redis.Tx) error {
+			zs, err := tx.ZRangeByScoreWithScores(WaitingTaskKey(k), redis.ZRangeBy{
+				Min: "-inf",
+				Max: fmt.Sprintf("%d", time.Now().UnixNano()),
+			}).Result()
+			if err != nil {
+				return err
+			}
+
+			var minCmd *redis.ZSliceCmd
+			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+				toDel := make([]interface{}, 0, len(zs))
+				for _, z := range zs {
+					toDel = append(toDel, z.Member)
+					p.XAdd(&redis.XAddArgs{
+						Stream:       fmt.Sprintf(ReadyTaskKey(k)),
+						MaxLenApprox: maxLen,
+						Values: map[string]interface{}{
+							payloadKey: z.Member,
+							startAtKey: z.Score,
+						},
+					})
+				}
+				if len(toDel) > 0 {
+					p.ZRem(WaitingTaskKey(k), toDel...)
+				}
+				minCmd = p.ZRangeWithScores(WaitingTaskKey(k), 0, 0)
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+			if v := minCmd.Val(); len(v) == 1 {
+				t := time.Unix(0, int64(v[0].Score))
+				if min.IsZero() || t.Before(min) {
+					min = t
+				}
+			}
+			return nil
+		}, WaitingTaskKey(k)); err != nil {
+			return time.Time{}, ConvertError(err)
+		}
+	}
+	return min, nil
+}
+
+// PopTask calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()]
+// If timeout value is 0 - PopTask blocks forever
+// If timeout value is negative - PopTask does not block
+// If timeout value is positive - PopTask blocks until either a task is popped or timeout has passed.
+// group is the consumer group name.
+// id is the consumer group ID.
+// ks are the keys to pop from.
+// Tasks are acked if f returns without error.
+func PopTask(r redis.Cmdable, group, id string, timeout time.Duration, f func(k string, payload string, startAt time.Time) error, ks ...string) error {
+	if len(ks) == 0 {
+		return nil
+	}
+
+	readStreams := make([]string, 0, len(ks))
+	for _, k := range ks {
+		readStreams = append(readStreams, ReadyTaskKey(k))
+	}
+	for range readStreams {
+		readStreams = append(readStreams, ">")
+	}
+
+	rets, err := r.XReadGroup(&redis.XReadGroupArgs{
+		Group:    group,
+		Consumer: id,
+		Streams:  readStreams,
+		Count:    1,
+		Block:    timeout,
+	}).Result()
+	if err != nil && err != redis.Nil {
+		return ConvertError(err)
+	}
+	for i, ret := range rets {
+		for _, msg := range ret.Messages {
+			var startAt time.Time
+			if v, ok := msg.Values[startAtKey]; ok {
+				s, ok := v.(string)
+				if !ok {
+					return errInvalidKeyValueType.WithAttributes("key", startAtKey)
+				}
+				i, err := strconv.ParseInt(s, 10, 64)
+				if err != nil {
+					return errInvalidKeyValueType.WithAttributes("key", startAtKey).WithCause(err)
+				}
+				startAt = time.Unix(0, i).UTC()
+			}
+
+			var payload string
+			if v, ok := msg.Values[payloadKey]; ok {
+				payload, ok = v.(string)
+				if !ok {
+					return errInvalidKeyValueType.WithAttributes("key", payloadKey)
+				}
+			}
+			if err := f(ks[i], payload, startAt); err != nil {
+				return err
+			}
+			_, err = r.XAck(ret.Stream, group, msg.ID).Result()
+			return ConvertError(err)
+		}
+	}
+	return nil
+}
+
+// TaskQueue is a task queue.
+type TaskQueue struct {
+	Redis     WatchCmdable
+	MaxLen    int64
+	Group, ID string
+	Key       string
+}
+
+// Init initializes the task queue.
+// It must be called at least once before using the queue.
+func (q *TaskQueue) Init() error {
+	return InitTaskGroup(q.Redis, q.Group, q.Key)
+}
+
+// Run dispatches tasks until ctx.Deadline() is reached(if present) or read on ctx.Done() succeeds.
+func (q *TaskQueue) Run(ctx context.Context) error {
+	if err := q.Init(); err != nil {
+		return err
+	}
+
+	var hasDeadline bool
+	dl, ok := ctx.Deadline()
+	min := dl
+	if !ok {
+		min = time.Now()
+	} else {
+		hasDeadline = !dl.IsZero()
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		var err error
+		min, err = DispatchTasks(q.Redis, q.Group, q.ID, q.MaxLen, min, q.Key)
+		if err != nil {
+			return err
+		}
+		if min.IsZero() || hasDeadline && dl.Before(min) {
+			min = dl
+		}
+	}
+}
+
+// Add adds a task s to the queue with a timestamp startAt.
+func (q *TaskQueue) Add(s string, startAt time.Time) error {
+	return AddTask(q.Redis, q.Key, q.MaxLen, s, startAt)
+}
+
+// Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
+// if such is available, otherwise it blocks until it is.
+// If ctx.Deadline() is present, Pop will return at or shortly after it.
+func (q *TaskQueue) Pop(ctx context.Context, f func(string, time.Time) error) error {
+	var timeout time.Duration
+	dl, ok := ctx.Deadline()
+	if ok {
+		timeout = time.Until(dl)
+	}
+	return PopTask(q.Redis, q.Group, q.ID, timeout, func(_ string, payload string, startAt time.Time) error {
+		return f(payload, startAt)
+	}, q.Key)
 }

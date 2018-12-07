@@ -20,10 +20,13 @@ import (
 )
 
 var (
-	errNotFound = errors.DefineNotFound("not_found", "entity not found")
-	errStore    = errors.Define("store", "store error")
+	errNotFound            = errors.DefineNotFound("not_found", "entity not found")
+	errStore               = errors.Define("store", "store error")
+	errInvalidKeyValueType = errors.DefineInvalidArgument("value_type", "invalid value type for key `{key}`")
+	errMissingKey          = errors.DefineInvalidArgument("missing_key", "missing key `{key}`")
 )
 
+// ConvertError converts Redis error into errors.Error.
 func ConvertError(err error) error {
 	switch err {
 	case nil:
