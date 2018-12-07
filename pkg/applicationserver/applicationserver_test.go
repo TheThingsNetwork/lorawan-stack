@@ -345,7 +345,7 @@ func TestApplicationServer(t *testing.T) {
 					FieldMask: pbtypes.FieldMask{
 						Paths: []string{
 							"base_url",
-							"formatter",
+							"format",
 							"uplink_message",
 							"join_accept",
 							"downlink_ack",

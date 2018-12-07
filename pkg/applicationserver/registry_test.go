@@ -44,8 +44,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		app1IDs: app1,
 		app2IDs: app2,
 	} {
-		// TODO: Get all field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-		_, err := reg.Get(ctx, ids, nil)
+		_, err := reg.Get(ctx, ids, ttnpb.ApplicationLinkFieldPathsTopLevel)
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
 			t.FailNow()
 		}
@@ -54,15 +53,13 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 			if pb != nil {
 				t.Fatal("Link already exists")
 			}
-			// TODO: Return all field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-			return link, nil, nil
+			return link, ttnpb.ApplicationLinkFieldPathsTopLevel, nil
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
 
-		// TODO: Get all field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-		pb, err := reg.Get(ctx, ids, nil)
+		pb, err := reg.Get(ctx, ids, ttnpb.ApplicationLinkFieldPathsTopLevel)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
@@ -70,7 +67,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	}
 
 	seen := make(map[string]*ttnpb.ApplicationLink)
-	reg.Range(ctx, nil, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
+	reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
 		uid := unique.ID(ctx, ids)
 		seen[uid] = pb
 		return true

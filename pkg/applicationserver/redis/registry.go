@@ -25,6 +25,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
+func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
+	if dst == nil {
+		dst = &ttnpb.EndDevice{}
+	}
+	return dst, dst.SetFields(src, append(paths, "ids")...)
+}
+
 // DeviceRegistry is a Redis device registry.
 type DeviceRegistry struct {
 	Redis *ttnredis.Client
@@ -37,31 +44,39 @@ func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	if err := ttnredis.GetProto(r.Redis, k).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-	return pb, nil
+	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
 // Set creates, updates or deletes the end device by its identifiers.
-func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	k := r.Redis.Key(unique.ID(ctx, ids))
+
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		var create bool
-		pb = &ttnpb.EndDevice{}
-		if err := ttnredis.GetProto(tx, k).ScanProto(pb); errors.IsNotFound(err) {
+		cmd := ttnredis.GetProto(tx, k)
+		stored := &ttnpb.EndDevice{}
+		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			create = true
-			pb = nil
+			stored = nil
 		} else if err != nil {
 			return err
 		}
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-		createdAt := pb.GetCreatedAt()
+
 		var err error
-		pb, _, err = f(pb)
+		if stored != nil {
+			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
+			}
+		}
+
+		var sets []string
+		pb, sets, err = f(pb)
 		if err != nil {
 			return err
 		}
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
@@ -71,16 +86,29 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		} else {
 			pb.EndDeviceIdentifiers = ids
 			pb.UpdatedAt = time.Now().UTC()
+			sets = append(sets, "updated_at")
 			if create {
 				pb.CreatedAt = pb.UpdatedAt
-			} else {
-				pb.CreatedAt = createdAt
+				sets = append(sets, "created_at")
+			}
+			stored = &ttnpb.EndDevice{}
+			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			stored, err = applyDeviceFieldMask(stored, pb, sets...)
+			if err != nil {
+				return err
+			}
+			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, pb, 0)
+				ttnredis.SetProto(p, k, stored, 0)
 				return nil
 			}
 		}
+
 		cmds, err := tx.Pipelined(f)
 		if err != nil {
 			return err
@@ -96,6 +124,13 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		return nil, err
 	}
 	return pb, nil
+}
+
+func applyLinkFieldMask(dst, src *ttnpb.ApplicationLink, paths ...string) (*ttnpb.ApplicationLink, error) {
+	if dst == nil {
+		dst = &ttnpb.ApplicationLink{}
+	}
+	return dst, dst.SetFields(src, paths...)
 }
 
 // LinkRegistry is a store for application links.
@@ -115,8 +150,7 @@ func (r *LinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 	if err := ttnredis.GetProto(r.Redis, k).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-	return pb, nil
+	return applyLinkFieldMask(nil, pb, paths...)
 }
 
 var errApplicationUID = errors.DefineCorruption("application_uid", "invalid application UID `{application_uid}`")
@@ -140,7 +174,10 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 		if err := ttnredis.GetProto(r.Redis, r.Redis.Key(linkKey, uid)).ScanProto(pb); err != nil {
 			return err
 		}
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+		pb, err = applyLinkFieldMask(nil, pb, paths...)
+		if err != nil {
+			return err
+		}
 		if !f(ctx, ids, pb) {
 			break
 		}
@@ -149,24 +186,33 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 }
 
 // Set creates, updates or deletes the link by the application identifiers.
-func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
+func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
 	uid := unique.ID(ctx, ids)
 	k := r.Redis.Key(linkKey, uid)
 	var pb *ttnpb.ApplicationLink
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		pb = &ttnpb.ApplicationLink{}
-		if err := ttnredis.GetProto(tx, k).ScanProto(pb); errors.IsNotFound(err) {
-			pb = nil
+		cmd := ttnredis.GetProto(tx, k)
+		stored := &ttnpb.ApplicationLink{}
+		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
+			stored = nil
 		} else if err != nil {
 			return err
 		}
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var err error
-		pb, _, err = f(pb)
+		if pb != nil {
+			pb, err = applyLinkFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
+			}
+		}
+
+		var sets []string
+		pb, sets, err = f(pb)
 		if err != nil {
 			return err
 		}
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
@@ -175,8 +221,20 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 				return nil
 			}
 		} else {
+			stored = &ttnpb.ApplicationLink{}
+			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			stored, err = applyLinkFieldMask(stored, pb, sets...)
+			if err != nil {
+				return err
+			}
+			pb, err = applyLinkFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
+			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, pb, 0)
+				ttnredis.SetProto(p, k, stored, 0)
 				p.SAdd(r.Redis.Key(allKey), uid)
 				return nil
 			}
