@@ -28,6 +28,13 @@ import (
 
 const webhookKey = "webhook"
 
+func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) (*ttnpb.ApplicationWebhook, error) {
+	if dst == nil {
+		dst = &ttnpb.ApplicationWebhook{}
+	}
+	return dst, dst.SetFields(src, append(paths, "ids")...)
+}
+
 // WebhookRegistry is a Redis webhook registry.
 type WebhookRegistry struct {
 	Redis *ttnredis.Client
@@ -40,8 +47,7 @@ func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookId
 	if err := ttnredis.GetProto(r.Redis, k).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
-	return pb, nil
+	return applyWebhookFieldMask(nil, pb, paths...)
 }
 
 // List implements WebhookRegistry.
@@ -51,12 +57,15 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 	keyCmd := func(ks ...string) string {
 		return r.Redis.Key(append([]string{webhookKey, unique.ID(ctx, ids)}, ks...)...)
 	}
-	err := ttnredis.FindProtos(r.Redis, k, keyCmd).Range(func() (proto.Message, func() bool) {
+	err := ttnredis.FindProtos(r.Redis, k, keyCmd).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.ApplicationWebhook{}
-		return pb, func() bool {
-			// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+		return pb, func() (bool, error) {
+			pb, err := applyWebhookFieldMask(nil, pb, paths...)
+			if err != nil {
+				return false, err
+			}
 			pbs = append(pbs, pb)
-			return true
+			return true, nil
 		}
 	})
 	if err != nil {
@@ -66,26 +75,34 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 }
 
 // Set implements WebhookRegistry.
-func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, paths []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error) {
+func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, gets []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error) {
 	k := r.Redis.Key(webhookKey, unique.ID(ctx, ids.ApplicationIdentifiers), ids.WebhookID)
 	var pb *ttnpb.ApplicationWebhook
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		var create bool
-		pb = &ttnpb.ApplicationWebhook{}
-		if err := ttnredis.GetProto(tx, k).ScanProto(pb); errors.IsNotFound(err) {
+		cmd := ttnredis.GetProto(tx, k)
+		stored := &ttnpb.ApplicationWebhook{}
+		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			create = true
-			pb = nil
+			stored = nil
 		} else if err != nil {
 			return err
 		}
-		createdAt := pb.GetCreatedAt()
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var err error
-		pb, _, err = f(pb)
+		if stored != nil {
+			pb, err = applyWebhookFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
+			}
+		}
+
+		var sets []string
+		pb, sets, err = f(pb)
 		if err != nil {
 			return err
 		}
-		// TODO: Apply field mask once generator is ready (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
+
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
@@ -96,13 +113,25 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		} else {
 			pb.ApplicationWebhookIdentifiers = ids
 			pb.UpdatedAt = time.Now().UTC()
+			sets = append(sets, "updated_at")
 			if create {
 				pb.CreatedAt = pb.UpdatedAt
-			} else {
-				pb.CreatedAt = createdAt
+				sets = append(sets, "created_at")
+			}
+			stored = &ttnpb.ApplicationWebhook{}
+			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			stored, err = applyWebhookFieldMask(stored, pb, sets...)
+			if err != nil {
+				return err
+			}
+			pb, err = applyWebhookFieldMask(nil, stored, gets...)
+			if err != nil {
+				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, pb, 0)
+				ttnredis.SetProto(p, k, stored, 0)
 				p.SAdd(r.Redis.Key(webhookKey, unique.ID(ctx, ids.ApplicationIdentifiers)), ids.WebhookID)
 				return nil
 			}
