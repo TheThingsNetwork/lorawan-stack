@@ -73,20 +73,16 @@ func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64
 }
 
 func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
-	var inErr error
-	if err := ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() bool) {
+	return ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
-		return pb, func() bool {
-			pb, inErr = applyDeviceFieldMask(nil, pb, paths...)
-			if inErr != nil {
-				return false
+		return pb, func() (bool, error) {
+			pb, err := applyDeviceFieldMask(nil, pb, paths...)
+			if err != nil {
+				return false, err
 			}
-			return f(pb)
+			return f(pb), nil
 		}
-	}); err != nil {
-		return err
-	}
-	return inErr
+	})
 }
 
 func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, fallback *types.DevAddr }, ids ttnpb.EndDeviceIdentifiers) {
