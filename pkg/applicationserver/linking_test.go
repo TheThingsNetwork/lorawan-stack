@@ -40,6 +40,7 @@ func TestLink(t *testing.T) {
 
 	mask := []string{
 		"network_server_address",
+		"allow_insecure",
 		"api_key",
 		"default_formatters",
 	}
