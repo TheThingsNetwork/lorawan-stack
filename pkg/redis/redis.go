@@ -139,7 +139,7 @@ type ProtosCmd struct {
 	result func() ([]string, error)
 }
 
-func (cmd ProtosCmd) Range(f func() (proto.Message, func() bool)) error {
+func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error {
 	ss, err := cmd.result()
 	if err != nil {
 		return err
@@ -149,7 +149,9 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() bool)) error {
 		if err := UnmarshalProto(s, pb); err != nil {
 			return err
 		}
-		if !cb() {
+		if ok, err := cb(); err != nil {
+			return err
+		} else if !ok {
 			return nil
 		}
 	}
