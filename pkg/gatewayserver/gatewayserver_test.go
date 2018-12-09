@@ -63,7 +63,7 @@ func TestGatewayServer(t *testing.T) {
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen:                      ":9184",
+				Listen:                      ":9187",
 				AllowInsecureForCredentials: true,
 			},
 			Cluster: config.Cluster{
@@ -121,7 +121,7 @@ func TestGatewayServer(t *testing.T) {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				conn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
+				conn, err := grpc.Dial(":9187", grpc.WithInsecure(), grpc.WithBlock())
 				if err != nil {
 					return err
 				}
@@ -450,7 +450,7 @@ func TestGatewayServer(t *testing.T) {
 
 			// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 			// upstream and downstream.
-			statsConn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
+			statsConn, err := grpc.Dial(":9187", grpc.WithInsecure(), grpc.WithBlock())
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
