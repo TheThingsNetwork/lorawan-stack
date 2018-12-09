@@ -260,16 +260,16 @@ func TestFromDownlinkMessage(t *testing.T) {
 	a := assertions.New(t)
 
 	msg := &ttnpb.DownlinkMessage{
-		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: 1886440700000,
-		},
-		Settings: ttnpb.TxSettings{
-			Frequency:          925700000,
-			Modulation:         ttnpb.Modulation_LORA,
-			TxPower:            20,
-			SpreadingFactor:    10,
-			Bandwidth:          500000,
-			InvertPolarization: true,
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				Frequency:          925700000,
+				Modulation:         ttnpb.Modulation_LORA,
+				TxPower:            20,
+				SpreadingFactor:    10,
+				Bandwidth:          500000,
+				InvertPolarization: true,
+				Timestamp:          1886440700,
+			},
 		},
 		RawPayload: []byte{0x7d, 0xf3, 0x8e},
 	}
@@ -284,16 +284,16 @@ func TestFromDownlinkMessage(t *testing.T) {
 func TestDownlinkRoundtrip(t *testing.T) {
 	a := assertions.New(t)
 	expected := &ttnpb.DownlinkMessage{
-		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: 188700000,
-		},
-		Settings: ttnpb.TxSettings{
-			Frequency:          925700000,
-			Modulation:         ttnpb.Modulation_LORA,
-			TxPower:            20,
-			SpreadingFactor:    10,
-			Bandwidth:          500000,
-			InvertPolarization: true,
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				Frequency:          925700000,
+				Modulation:         ttnpb.Modulation_LORA,
+				TxPower:            20,
+				SpreadingFactor:    10,
+				Bandwidth:          500000,
+				InvertPolarization: true,
+				Timestamp:          188700000,
+			},
 		},
 		RawPayload: []byte{0x7d, 0xf3, 0x8e},
 	}
@@ -303,13 +303,19 @@ func TestDownlinkRoundtrip(t *testing.T) {
 	actual, err := udp.ToDownlinkMessage(tx)
 	a.So(err, should.BeNil)
 
-	a.So(pretty.Diff(actual, expected), should.BeEmpty)
+	a.So(actual, should.HaveEmptyDiff, expected)
 }
 
 func TestFromDownlinkMessageDummy(t *testing.T) {
 	a := assertions.New(t)
 
-	msg := ttnpb.DownlinkMessage{Settings: ttnpb.TxSettings{Modulation: 3939}} // Dummy modulation set
+	msg := ttnpb.DownlinkMessage{
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				Modulation: 3939,
+			},
+		},
+	}
 	_, err := udp.FromDownlinkMessage(&msg)
 	a.So(err, should.NotBeNil)
 }

@@ -17,7 +17,6 @@ package udp
 import (
 	"encoding/base64"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -311,75 +310,82 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 
 // ToDownlinkMessage converts the UDP format to a downlink message.
 func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
-	msg := &ttnpb.DownlinkMessage{
-		Settings: ttnpb.TxSettings{
-			CodingRate:         tx.CodR,
-			Frequency:          uint64(tx.Freq * 1000000),
-			InvertPolarization: tx.IPol,
-			TxPower:            int32(tx.Powe) + eirpDelta,
-		},
-		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: uint64(tx.Tmst * 1000),
-		},
+	scheduled := &ttnpb.TxSettings{
+		Frequency:          uint64(tx.Freq * 1000000),
+		InvertPolarization: tx.IPol,
+		TxPower:            int32(tx.Powe) + eirpDelta,
+		Timestamp:          tx.Tmst,
 	}
-	var err error
-	msg.RawPayload, err = base64.RawStdEncoding.DecodeString(strings.TrimRight(tx.Data, "="))
-	if err != nil {
-		return nil, err
+	if tx.Time != nil {
+		abs := time.Time(*tx.Time)
+		scheduled.Time = &abs
 	}
 	switch tx.Modu {
 	case lora:
-		msg.Settings.Modulation = ttnpb.Modulation_LORA
-		msg.Settings.EnableCRC = !tx.NCRC
+		scheduled.Modulation = ttnpb.Modulation_LORA
+		scheduled.EnableCRC = !tx.NCRC
 		sf, err := tx.DatR.SpreadingFactor()
 		if err != nil {
 			return nil, err
 		}
-		msg.Settings.SpreadingFactor = uint32(sf)
+		scheduled.SpreadingFactor = uint32(sf)
 		bw, err := tx.DatR.Bandwidth()
 		if err != nil {
 			return nil, err
 		}
-		msg.Settings.Bandwidth = bw
+		scheduled.Bandwidth = bw
+		scheduled.CodingRate = tx.CodR
 
 	case fsk:
-		msg.Settings.Modulation = ttnpb.Modulation_FSK
-		msg.Settings.BitRate = tx.DatR.FSK
+		scheduled.Modulation = ttnpb.Modulation_FSK
+		scheduled.BitRate = tx.DatR.FSK
 	}
-	return msg, nil
+	buf, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(tx.Data, "="))
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.DownlinkMessage{
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: scheduled,
+		},
+		RawPayload: buf,
+	}, nil
 }
 
 // FromDownlinkMessage converts to the downlink message to the UDP format.
 func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	payload := msg.GetRawPayload()
-	tmst := msg.TxMetadata.Timestamp / 1000
+	scheduled := msg.GetScheduled()
+	if scheduled == nil {
+		return nil, errNotScheduled
+	}
 	tx := &TxPacket{
-		CodR: msg.Settings.CodingRate,
-		Freq: float64(msg.Settings.Frequency) / 1000000,
-		Imme: msg.TxMetadata.Timestamp == 0,
-		IPol: msg.Settings.InvertPolarization,
-		Powe: uint8(msg.Settings.TxPower) - uint8(eirpDelta),
+		CodR: scheduled.CodingRate,
+		Freq: float64(scheduled.Frequency) / 1000000,
+		IPol: scheduled.InvertPolarization,
+		Powe: uint8(scheduled.TxPower) - uint8(eirpDelta),
 		Size: uint16(len(payload)),
 		Data: base64.StdEncoding.EncodeToString(payload),
+		Tmst: scheduled.Timestamp,
 	}
-	if t := msg.TxMetadata.Time; t != nil {
-		gpsTime := CompactTime(*t)
+	if scheduled.Timestamp == 0 {
+		tx.Imme = true
+	}
+	if scheduled.Time != nil {
+		gpsTime := CompactTime(*scheduled.Time)
 		tx.Time = &gpsTime
-	} else {
-		tx.Tmst = uint32(tmst % math.MaxUint32)
 	}
 
-	switch msg.Settings.Modulation {
+	switch scheduled.Modulation {
 	case ttnpb.Modulation_LORA:
 		tx.Modu = "LORA"
-		tx.NCRC = !msg.Settings.EnableCRC
-		tx.DatR.LoRa = fmt.Sprintf("SF%dBW%d", msg.Settings.SpreadingFactor, msg.Settings.Bandwidth/1000)
+		tx.NCRC = !scheduled.EnableCRC
+		tx.DatR.LoRa = fmt.Sprintf("SF%dBW%d", scheduled.SpreadingFactor, scheduled.Bandwidth/1000)
 	case ttnpb.Modulation_FSK:
 		tx.Modu = "FSK"
-		tx.DatR.FSK = msg.Settings.BitRate
+		tx.DatR.FSK = scheduled.BitRate
 	default:
-		return tx, errModulation.WithAttributes("modulation", msg.Settings.Modulation)
+		return tx, errModulation.WithAttributes("modulation", scheduled.Modulation)
 	}
-
 	return tx, nil
 }

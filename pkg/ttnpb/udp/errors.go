@@ -26,4 +26,5 @@ var (
 	errEUI             = errors.DefineInvalidArgument("eui", "failed to parse EUI")
 	errTimestamp       = errors.DefineInvalidArgument("timestamp", "failed to parse timestamp")
 	errModulation      = errors.DefineInvalidArgument("modulation", "invalid modulation `{modulation}`")
+	errNotScheduled    = errors.DefineInvalidArgument("not_scheduled", "downlink message not scheduled")
 )
