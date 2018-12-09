@@ -87,44 +87,49 @@ message DownlinkMessage {
   // Mapping from UDP message:
   //
   // imme: -
-  // tmst: tx_metadata.timestamp
-  // time: tx_metadata.time
-  // freq: settings.frequency
+  // tmst: scheduled.timestamp
+  // tmms: scheduled.time
+  // freq: scheduled.frequency
   // rfch: (0)
-  // powe: settings.tx_power
-  // modu: settings.modulation
-  // datr: settings.data_rate_index (derived)
-  // codr: settings.coding_rate
+  // powe: scheduled.tx_power
+  // modu: scheduled.modulation
+  // datr: scheduled.data_rate_index (derived)
+  // codr: scheduled.coding_rate
   // fdev: (derived from bandwidth)
-  // ipol: settings.polarization_inversion
-  // prea: [settings.advanced]
+  // ipol: scheduled.invert_polarization
+  // prea: [scheduled.advanced]
   // size: (derived from len(raw_payload))
   // data: raw_payload
-  // ncrc: [settings.advanced]
+  // ncrc: [scheduled.advanced]
 
   // Mapping from BACKEND message:
   //
   // - PHYPayload: raw_payload
   // - FRMPayload: payload.mac_payload.frm_payload
-  // - DevEUI: end_device.dev_eui
-  // - DevAddr: end_device.dev_addr
+  // - DevEUI: end_device_ids.dev_eui
+  // - DevAddr: end_device_ids.dev_addr
   // - DLMetadata:
-  //  - DevEUI: end_device.dev_eui
-  //  - DevAddr: end_device.dev_addr
+  //  - DevEUI: end_device_ids.dev_eui
+  //  - DevAddr: end_device_ids.dev_addr
   //  - FPort: payload.mac_payload.f_port
   //  - FCntDown: payload.mac_payload.f_hdr.f_cnt
   //  - Confirmed: payload.mhdr.m_type
-  //  - RxDelay1:                                                           | TODO: Rx1/2 selection
-  //  - DataRate1/DataRate2: settings.data_rate_index (and derived fields)  |
-  //  - DLFreq1/DLFreq2: settings.frequency                                 |
+  //  - RxDelay1: request.rx1_delay
+  //  - DLFreq1: request.rx1_frequency
+  //  - DLFreq2: request.rx2_frequency
+  //  - DataRate1: request_rx1_data_rate_index
+  //  - DataRate2: request.rx2_data_rate_index
   //  - GWInfo:
-  //   - ID: tx_metadata.gateway_id
+  //   - ID: request.gateway_ids.gateway_id
+  //  - HiPriorityFlag: request.priority >= HIGH
 
   bytes raw_payload = 1;
   Message payload = 2;
   EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
-  TxSettings settings = 4 [(gogoproto.nullable) = false];
-  TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
+  oneof settings {
+    TxRequest request = 4;
+    TxSettings scheduled = 5;
+  }
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
@@ -188,10 +193,6 @@ message ApplicationDownlink {
   bool confirmed = 6;
 
   message ClassBC {
-    message GatewayAntennaIdentifiers {
-      GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-      uint32 antenna_index = 2;
-    }
     // Possible gateway identifiers and antenna index to use for this downlink message.
     // The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
     // If none of the gateways can be selected, the downlink message fails.
@@ -201,14 +202,16 @@ message ApplicationDownlink {
     // This requires the gateway to have GPS time synchronization.
     // If the time is in the past or if there is a scheduling conflict, the downlink message fails.
     // If null, the time is selected based on slot availability. This is recommended in class B mode.
-    google.protobuf.Timestamp time = 8 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp absolute_time = 8 [(gogoproto.stdtime) = true];
   }
   // Optional gateway and timing information for class B and C.
   // If set, this downlink message will only be transmitted as class B or C downlink.
   // If not set, this downlink message may be transmitted in class A, B and C.
   ClassBC class_b_c = 7;
+  // Priority for scheduling the downlink message.
+  TxSchedulePriority priority = 8;
 
-  repeated string correlation_ids = 8 [(gogoproto.customname) = "CorrelationIDs"];
+  repeated string correlation_ids = 9 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlinks {

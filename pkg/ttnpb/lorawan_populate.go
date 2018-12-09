@@ -16,6 +16,7 @@ package ttnpb
 
 import (
 	"fmt"
+	time "time"
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -49,6 +50,53 @@ func NewPopulatedMACPayload(r randyLorawan, easy bool) *MACPayload {
 			out.FRMPayload[i] = byte(128 + r.Intn(128))
 		}
 	}
+	return out
+}
+
+func NewPopulatedTxRequest(r randyLorawan, easy bool) *TxRequest {
+	out := &TxRequest{}
+	out.Class = []Class{CLASS_A, CLASS_B, CLASS_C}[r.Intn(3)]
+	switch out.Class {
+	case CLASS_A:
+		uplinkToken := make([]byte, 10)
+		for i := 0; i < len(uplinkToken); i++ {
+			if r.Intn(2) == 0 {
+				uplinkToken[i] = byte(1 + r.Intn(15))
+			} else {
+				uplinkToken[i] = byte(128 + r.Intn(128))
+			}
+		}
+		out.DownlinkPaths = []*DownlinkPath{
+			{
+				Path: &DownlinkPath_UplinkToken{
+					UplinkToken: uplinkToken,
+				},
+			},
+		}
+	default:
+		out.DownlinkPaths = []*DownlinkPath{
+			{
+				Path: &DownlinkPath_Fixed{
+					Fixed: &GatewayAntennaIdentifiers{
+						GatewayIdentifiers: *NewPopulatedGatewayIdentifiers(r, true),
+						AntennaIndex:       uint32(r.Intn(2)),
+					},
+				},
+			},
+		}
+		if r.Intn(2) == 0 {
+			abs := time.Unix(r.Int63(), 0)
+			out.AbsoluteTime = &TxRequest_AbsoluteTime{
+				Time: &abs,
+			}
+		}
+	}
+	out.Rx1Delay = []RxDelay{RX_DELAY_1, RX_DELAY_2, RX_DELAY_5}[r.Intn(3)]
+	out.Rx1DataRateIndex = []DataRateIndex{DATA_RATE_0, DATA_RATE_1, DATA_RATE_2}[r.Intn(3)]
+	out.Rx1Frequency = []uint64{868100000, 868300000, 868500000}[r.Intn(3)]
+	out.Rx2DataRateIndex = []DataRateIndex{DATA_RATE_0, DATA_RATE_1, DATA_RATE_2}[r.Intn(3)]
+	out.Rx2Frequency = []uint64{868100000, 868300000, 868500000}[r.Intn(3)]
+	out.Priority = []TxSchedulePriority{TxSchedulePriority_LOW, TxSchedulePriority_NORMAL, TxSchedulePriority_HIGH}[r.Intn(3)]
 	return out
 }
 

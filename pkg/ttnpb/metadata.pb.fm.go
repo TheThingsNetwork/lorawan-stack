@@ -27,6 +27,7 @@ var RxMetadataFieldPathsNested = []string{
 	"snr",
 	"time",
 	"timestamp",
+	"uplink_token",
 }
 
 var RxMetadataFieldPathsTopLevel = []string{
@@ -45,6 +46,7 @@ var RxMetadataFieldPathsTopLevel = []string{
 	"snr",
 	"time",
 	"timestamp",
+	"uplink_token",
 }
 
 func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
@@ -208,90 +210,15 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				var zero DownlinkPathConstraint
 				dst.DownlinkPathConstraint = zero
 			}
-		case "advanced":
+		case "uplink_token":
 			if len(subs) > 0 {
-				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'uplink_token' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Advanced = src.Advanced
+				dst.UplinkToken = src.UplinkToken
 			} else {
-				dst.Advanced = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-var TxMetadataFieldPathsNested = []string{
-	"advanced",
-	"antenna_index",
-	"gateway_ids",
-	"gateway_ids.eui",
-	"gateway_ids.gateway_id",
-	"time",
-	"timestamp",
-}
-
-var TxMetadataFieldPathsTopLevel = []string{
-	"advanced",
-	"antenna_index",
-	"gateway_ids",
-	"time",
-	"timestamp",
-}
-
-func (dst *TxMetadata) SetFields(src *TxMetadata, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "gateway_ids":
-			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayIdentifiers
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
-				} else {
-					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
-				}
-			}
-		case "antenna_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.AntennaIndex = src.AntennaIndex
-			} else {
-				var zero uint32
-				dst.AntennaIndex = zero
-			}
-		case "time":
-			if len(subs) > 0 {
-				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Time = src.Time
-			} else {
-				dst.Time = nil
-			}
-		case "timestamp":
-			if len(subs) > 0 {
-				return fmt.Errorf("'timestamp' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Timestamp = src.Timestamp
-			} else {
-				var zero uint64
-				dst.Timestamp = zero
+				var zero []byte
+				dst.UplinkToken = zero
 			}
 		case "advanced":
 			if len(subs) > 0 {

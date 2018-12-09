@@ -74,6 +74,8 @@ var UplinkMessageFieldPathsNested = []string{
 	"settings.invert_polarization",
 	"settings.modulation",
 	"settings.spreading_factor",
+	"settings.time",
+	"settings.timestamp",
 	"settings.tx_power",
 }
 
@@ -252,25 +254,32 @@ var DownlinkMessageFieldPathsNested = []string{
 	"payload.mic",
 	"raw_payload",
 	"settings",
-	"settings.bandwidth",
-	"settings.bit_rate",
-	"settings.channel_index",
-	"settings.coding_rate",
-	"settings.data_rate_index",
-	"settings.enable_crc",
-	"settings.frequency",
-	"settings.invert_polarization",
-	"settings.modulation",
-	"settings.spreading_factor",
-	"settings.tx_power",
-	"tx_metadata",
-	"tx_metadata.advanced",
-	"tx_metadata.antenna_index",
-	"tx_metadata.gateway_ids",
-	"tx_metadata.gateway_ids.eui",
-	"tx_metadata.gateway_ids.gateway_id",
-	"tx_metadata.time",
-	"tx_metadata.timestamp",
+	"settings.request",
+	"settings.request.absolute_time",
+	"settings.request.absolute_time.time",
+	"settings.request.advanced",
+	"settings.request.class",
+	"settings.request.downlink_paths",
+	"settings.request.priority",
+	"settings.request.rx1_data_rate_index",
+	"settings.request.rx1_delay",
+	"settings.request.rx1_frequency",
+	"settings.request.rx2_data_rate_index",
+	"settings.request.rx2_frequency",
+	"settings.scheduled",
+	"settings.scheduled.bandwidth",
+	"settings.scheduled.bit_rate",
+	"settings.scheduled.channel_index",
+	"settings.scheduled.coding_rate",
+	"settings.scheduled.data_rate_index",
+	"settings.scheduled.enable_crc",
+	"settings.scheduled.frequency",
+	"settings.scheduled.invert_polarization",
+	"settings.scheduled.modulation",
+	"settings.scheduled.spreading_factor",
+	"settings.scheduled.time",
+	"settings.scheduled.timestamp",
+	"settings.scheduled.tx_power",
 }
 
 var DownlinkMessageFieldPathsTopLevel = []string{
@@ -280,7 +289,6 @@ var DownlinkMessageFieldPathsTopLevel = []string{
 	"payload",
 	"raw_payload",
 	"settings",
-	"tx_metadata",
 }
 
 func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) error {
@@ -338,42 +346,6 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 					dst.EndDeviceIDs = nil
 				}
 			}
-		case "settings":
-			if len(subs) > 0 {
-				newDst := &dst.Settings
-				var newSrc *TxSettings
-				if src != nil {
-					newSrc = &src.Settings
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.Settings = src.Settings
-				} else {
-					var zero TxSettings
-					dst.Settings = zero
-				}
-			}
-		case "tx_metadata":
-			if len(subs) > 0 {
-				newDst := &dst.TxMetadata
-				var newSrc *TxMetadata
-				if src != nil {
-					newSrc = &src.TxMetadata
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.TxMetadata = src.TxMetadata
-				} else {
-					var zero TxMetadata
-					dst.TxMetadata = zero
-				}
-			}
 		case "correlation_ids":
 			if len(subs) > 0 {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
@@ -382,6 +354,75 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 				dst.CorrelationIDs = src.CorrelationIDs
 			} else {
 				dst.CorrelationIDs = nil
+			}
+
+		case "settings":
+			if len(subs) == 0 && src == nil {
+				dst.Settings = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Settings = src.Settings
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "request":
+					if _, ok := dst.Settings.(*DownlinkMessage_Request); !ok {
+						dst.Settings = &DownlinkMessage_Request{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Settings.(*DownlinkMessage_Request).Request
+						if newDst == nil {
+							newDst = &TxRequest{}
+							dst.Settings.(*DownlinkMessage_Request).Request = newDst
+						}
+						var newSrc *TxRequest
+						if src != nil {
+							newSrc = src.GetRequest()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Settings.(*DownlinkMessage_Request).Request = src.GetRequest()
+						} else {
+							dst.Settings.(*DownlinkMessage_Request).Request = nil
+						}
+					}
+				case "scheduled":
+					if _, ok := dst.Settings.(*DownlinkMessage_Scheduled); !ok {
+						dst.Settings = &DownlinkMessage_Scheduled{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Settings.(*DownlinkMessage_Scheduled).Scheduled
+						if newDst == nil {
+							newDst = &TxSettings{}
+							dst.Settings.(*DownlinkMessage_Scheduled).Scheduled = newDst
+						}
+						var newSrc *TxSettings
+						if src != nil {
+							newSrc = src.GetScheduled()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Settings.(*DownlinkMessage_Scheduled).Scheduled = src.GetScheduled()
+						} else {
+							dst.Settings.(*DownlinkMessage_Scheduled).Scheduled = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
 			}
 
 		default:
@@ -449,6 +490,8 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"settings.invert_polarization",
 	"settings.modulation",
 	"settings.spreading_factor",
+	"settings.time",
+	"settings.timestamp",
 	"settings.tx_power",
 }
 
@@ -866,57 +909,6 @@ func (dst *ApplicationDownlink_ClassBC) SetFields(src *ApplicationDownlink_Class
 	return nil
 }
 
-var ApplicationDownlink_ClassBC_GatewayAntennaIdentifiersFieldPathsNested = []string{
-	"antenna_index",
-	"gateway_ids",
-	"gateway_ids.eui",
-	"gateway_ids.gateway_id",
-}
-
-var ApplicationDownlink_ClassBC_GatewayAntennaIdentifiersFieldPathsTopLevel = []string{
-	"antenna_index",
-	"gateway_ids",
-}
-
-func (dst *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) SetFields(src *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "gateway_ids":
-			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayIdentifiers
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
-				} else {
-					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
-				}
-			}
-		case "antenna_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.AntennaIndex = src.AntennaIndex
-			} else {
-				var zero uint32
-				dst.AntennaIndex = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 var ApplicationDownlinksFieldPathsNested = []string{
 	"downlinks",
 }
@@ -1179,6 +1171,8 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.settings.invert_polarization",
 	"up.uplink_message.settings.modulation",
 	"up.uplink_message.settings.spreading_factor",
+	"up.uplink_message.settings.time",
+	"up.uplink_message.settings.timestamp",
 	"up.uplink_message.settings.tx_power",
 }
 

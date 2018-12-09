@@ -864,6 +864,8 @@ var TxSettingsFieldPathsNested = []string{
 	"invert_polarization",
 	"modulation",
 	"spreading_factor",
+	"time",
+	"timestamp",
 	"tx_power",
 }
 
@@ -878,6 +880,8 @@ var TxSettingsFieldPathsTopLevel = []string{
 	"invert_polarization",
 	"modulation",
 	"spreading_factor",
+	"time",
+	"timestamp",
 	"tx_power",
 }
 
@@ -993,6 +997,334 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 			} else {
 				var zero bool
 				dst.EnableCRC = zero
+			}
+		case "timestamp":
+			if len(subs) > 0 {
+				return fmt.Errorf("'timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Timestamp = src.Timestamp
+			} else {
+				var zero uint32
+				dst.Timestamp = zero
+			}
+		case "time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				dst.Time = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var GatewayAntennaIdentifiersFieldPathsNested = []string{
+	"antenna_index",
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+}
+
+var GatewayAntennaIdentifiersFieldPathsTopLevel = []string{
+	"antenna_index",
+	"gateway_ids",
+}
+
+func (dst *GatewayAntennaIdentifiers) SetFields(src *GatewayAntennaIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "antenna_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AntennaIndex = src.AntennaIndex
+			} else {
+				var zero uint32
+				dst.AntennaIndex = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var DownlinkPathFieldPathsNested = []string{
+	"path",
+	"path.fixed",
+	"path.fixed.antenna_index",
+	"path.fixed.gateway_ids",
+	"path.fixed.gateway_ids.eui",
+	"path.fixed.gateway_ids.gateway_id",
+	"path.uplink_token",
+}
+
+var DownlinkPathFieldPathsTopLevel = []string{
+	"path",
+}
+
+func (dst *DownlinkPath) SetFields(src *DownlinkPath, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "path":
+			if len(subs) == 0 && src == nil {
+				dst.Path = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Path = src.Path
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "uplink_token":
+					if _, ok := dst.Path.(*DownlinkPath_UplinkToken); !ok {
+						dst.Path = &DownlinkPath_UplinkToken{}
+					}
+					if len(oneofSubs) > 0 {
+						return fmt.Errorf("'uplink_token' has no subfields, but %s were specified", oneofSubs)
+					}
+					if src != nil {
+						dst.Path.(*DownlinkPath_UplinkToken).UplinkToken = src.GetUplinkToken()
+					} else {
+						var zero []byte
+						dst.Path.(*DownlinkPath_UplinkToken).UplinkToken = zero
+					}
+				case "fixed":
+					if _, ok := dst.Path.(*DownlinkPath_Fixed); !ok {
+						dst.Path = &DownlinkPath_Fixed{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Path.(*DownlinkPath_Fixed).Fixed
+						if newDst == nil {
+							newDst = &GatewayAntennaIdentifiers{}
+							dst.Path.(*DownlinkPath_Fixed).Fixed = newDst
+						}
+						var newSrc *GatewayAntennaIdentifiers
+						if src != nil {
+							newSrc = src.GetFixed()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Path.(*DownlinkPath_Fixed).Fixed = src.GetFixed()
+						} else {
+							dst.Path.(*DownlinkPath_Fixed).Fixed = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var TxRequestFieldPathsNested = []string{
+	"absolute_time",
+	"absolute_time.time",
+	"advanced",
+	"class",
+	"downlink_paths",
+	"priority",
+	"rx1_data_rate_index",
+	"rx1_delay",
+	"rx1_frequency",
+	"rx2_data_rate_index",
+	"rx2_frequency",
+}
+
+var TxRequestFieldPathsTopLevel = []string{
+	"absolute_time",
+	"advanced",
+	"class",
+	"downlink_paths",
+	"priority",
+	"rx1_data_rate_index",
+	"rx1_delay",
+	"rx1_frequency",
+	"rx2_data_rate_index",
+	"rx2_frequency",
+}
+
+func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "class":
+			if len(subs) > 0 {
+				return fmt.Errorf("'class' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Class = src.Class
+			} else {
+				var zero Class
+				dst.Class = zero
+			}
+		case "downlink_paths":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_paths' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkPaths = src.DownlinkPaths
+			} else {
+				dst.DownlinkPaths = nil
+			}
+		case "rx1_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1Delay = src.Rx1Delay
+			} else {
+				var zero RxDelay
+				dst.Rx1Delay = zero
+			}
+		case "rx1_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1DataRateIndex = src.Rx1DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.Rx1DataRateIndex = zero
+			}
+		case "rx1_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1Frequency = src.Rx1Frequency
+			} else {
+				var zero uint64
+				dst.Rx1Frequency = zero
+			}
+		case "rx2_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.Rx2DataRateIndex = zero
+			}
+		case "rx2_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2Frequency = src.Rx2Frequency
+			} else {
+				var zero uint64
+				dst.Rx2Frequency = zero
+			}
+		case "priority":
+			if len(subs) > 0 {
+				return fmt.Errorf("'priority' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Priority = src.Priority
+			} else {
+				var zero TxSchedulePriority
+				dst.Priority = zero
+			}
+		case "absolute_time":
+			if len(subs) > 0 {
+				newDst := dst.AbsoluteTime
+				if newDst == nil {
+					newDst = &TxRequest_AbsoluteTime{}
+					dst.AbsoluteTime = newDst
+				}
+				var newSrc *TxRequest_AbsoluteTime
+				if src != nil {
+					newSrc = src.AbsoluteTime
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AbsoluteTime = src.AbsoluteTime
+				} else {
+					dst.AbsoluteTime = nil
+				}
+			}
+		case "advanced":
+			if len(subs) > 0 {
+				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Advanced = src.Advanced
+			} else {
+				dst.Advanced = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var TxRequest_AbsoluteTimeFieldPathsNested = []string{
+	"time",
+}
+
+var TxRequest_AbsoluteTimeFieldPathsTopLevel = []string{
+	"time",
+}
+
+func (dst *TxRequest_AbsoluteTime) SetFields(src *TxRequest_AbsoluteTime, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Time = src.Time
+			} else {
+				dst.Time = nil
 			}
 
 		default:

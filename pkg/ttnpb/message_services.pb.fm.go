@@ -35,6 +35,8 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.settings.invert_polarization",
 	"message.settings.modulation",
 	"message.settings.spreading_factor",
+	"message.settings.time",
+	"message.settings.timestamp",
 	"message.settings.tx_power",
 	"parameter",
 }

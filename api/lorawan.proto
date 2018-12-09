@@ -15,8 +15,10 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/identifiers.proto";
 
 package ttn.lorawan.v3;
 
@@ -209,8 +211,19 @@ enum Class {
   CLASS_C = 2;
 }
 
-// TxSettings contains the LoRaWAN settings for a transmission.
-// This message is used in both uplink and downlink
+enum TxSchedulePriority {
+  LOWEST = 0;
+  LOW = 1;
+  BELOW_NORMAL = 2;
+  NORMAL = 3;
+  ABOVE_NORMAL = 4;
+  HIGH = 5;
+  HIGHEST = 6;
+}
+
+// TxSettings contains the settings for a transmission.
+// This message is used on both uplink and downlink.
+// On downlink, this is a scheduled transmission.
 message TxSettings {
   option (gogoproto.populate) = false;
 
@@ -235,6 +248,71 @@ message TxSettings {
   uint32 channel_index = 10;
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
   bool enable_crc = 11 [(gogoproto.customname) = "EnableCRC"];
+  // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).
+  // On downlink, set timestamp to 0 and time to null to use immediate scheduling.
+  uint32 timestamp = 12;
+  // Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.
+  // For downlink, this requires the gateway to have GPS time synchronization.
+  google.protobuf.Timestamp time = 13 [(gogoproto.stdtime) = true];
+}
+
+message GatewayAntennaIdentifiers {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 antenna_index = 2;
+}
+
+message DownlinkPath {
+  // Set uplink token for class A downlink to the uplink token received from the corresponding UplinkMessage. Uplink tokens are opaque to the Network Server.
+  // Set fixed to force using the specified gateway antenna identifiers for downlink. This can only be used for class C downlinks.
+  oneof path {
+    bytes uplink_token = 1;
+    GatewayAntennaIdentifiers fixed = 2;
+  }
+}
+
+// TxRequest is a request for transmission.
+// If sent to a roaming partner, this request is used to generate the DLMetadata Object (see Backend Interfaces 1.0, Table 22).
+// If the gateway has a scheduler, this request is sent to the gateway, in the order of gateway_ids.
+// Otherwise, the Gateway Server attempts to schedule the request and creates the TxSettings.
+message TxRequest {
+  option (gogoproto.populate) = false;
+
+  Class class = 1;
+  // Downlink paths used to select a gateway for downlink.
+  // In class A, the downlink paths are required to contain only uplink tokens.
+  // In class B/C, the downlink paths may contain uplink tokens and fixed gateways.
+  repeated DownlinkPath downlink_paths = 2;
+
+  // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
+  RxDelay rx1_delay = 3;
+  // LoRaWAN data rate index for Rx1.
+  DataRateIndex rx1_data_rate_index = 4;
+  // Frequency (Hz) for Rx1.
+  uint64 rx1_frequency = 5;
+  // LoRaWAN data rate index for Rx2.
+  // Rx2 parameters are used for class B/C downlink.
+  DataRateIndex rx2_data_rate_index = 6;
+  // Frequency (Hz) for Rx2.
+  // Rx2 parameters are used for class B/C downlink.
+  uint64 rx2_frequency = 7;
+  // Priority for scheduling.
+  // Requests with a higher priority are allocated more channel utilization time than messages with a lower priority, in duty-cycle limited regions.
+  // A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object.
+  TxSchedulePriority priority = 8;
+
+  message AbsoluteTime {
+    google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true];
+  }
+  // Time when the downlink message should be transmitted.
+  // This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots.
+  // This requires the gateway to have GPS time sychronization.
+  // If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations.
+  AbsoluteTime absolute_time = 9;
+
+  // Advanced metadata fields
+  // - can be used for advanced information or experimental features that are not yet formally defined in the API
+  // - field names are written in snake_case
+  google.protobuf.Struct advanced = 99;
 }
 
 enum MACCommandIdentifier {

@@ -121,8 +121,7 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	}()
 
 	out := &DownlinkMessage{}
-	out.Settings = *NewPopulatedTxSettings(r, false)
-	out.TxMetadata = *NewPopulatedTxMetadata(r, false)
+	//out.Settings = *NewPopulatedTxSettings(r, false)
 
 	msg := NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), r.Intn(2) == 1)
 	out.Payload = msg
