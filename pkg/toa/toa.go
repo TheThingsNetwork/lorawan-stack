@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package toa provides methods for computing a LoRaWAN packet's time-on-air
+// Package toa provides methods for computing a LoRaWAN packet's time-on-air.
+// See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7.
 package toa
 
 import (
@@ -23,47 +24,45 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
-// Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.
-//
-// See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7
-func Compute(rawPayload []byte, settings ttnpb.TxSettings) (d time.Duration, err error) {
+// Compute computes the time-on-air for the given payload size and the TxSettings.
+// This function takes into account PHYPayload.
+func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
 	switch settings.Modulation {
 	case ttnpb.Modulation_LORA:
-		return computeLoRa(rawPayload, settings)
+		return computeLoRa(payloadSize, settings.Bandwidth, uint8(settings.SpreadingFactor), settings.CodingRate)
 	case ttnpb.Modulation_FSK:
-		return computeFSK(rawPayload, settings), nil
+		return computeFSK(payloadSize, settings.BitRate), nil
 	default:
 		panic("invalid modulation")
 	}
 }
 
-var codingRate = map[string]float64{
+var codingRates = map[string]float64{
 	"4/5": 1,
 	"4/6": 2,
 	"4/7": 3,
 	"4/8": 4,
 }
 
-func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error) {
+func computeLoRa(payloadSize int, bandwidth uint32, spreadingFactor uint8, codingRate string) (time.Duration, error) {
 	err := validate.All(
-		validate.LoRaBandwidth(int(settings.Bandwidth/1000)),
-		validate.LoRaSpreadingFactor(int(settings.SpreadingFactor)),
-		validate.LoRaCodingRateString(settings.CodingRate),
+		validate.LoRaBandwidth(int(bandwidth/1000)),
+		validate.LoRaSpreadingFactor(int(spreadingFactor)),
+		validate.LoRaCodingRateString(codingRate),
 	)
 	if err != nil {
 		return 0, err
 	}
 
-	cr := codingRate[settings.CodingRate]
-	bandwidth := settings.Bandwidth / 1000 // Bandwidth in KHz
-	spreadingFactor := settings.SpreadingFactor
+	cr := codingRates[codingRate]
+	bandwidth = bandwidth / 1000 // Bandwidth in KHz
 
 	var de float64
 	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
 		de = 1.0
 	}
 
-	pl := float64(len(rawPayload))
+	pl := float64(payloadSize)
 	floatBW := float64(bandwidth)
 	floatSF := float64(spreadingFactor)
 	h := 0.0 // 0 means header is enabled
@@ -76,11 +75,7 @@ func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, e
 	return time.Duration(timeOnAir), nil
 }
 
-func computeFSK(rawPayload []byte, settings ttnpb.TxSettings) time.Duration {
-	payloadSize := len(rawPayload)
-	bitRate := settings.BitRate
-
-	tPkt := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
-
-	return time.Duration(tPkt)
+func computeFSK(payloadSize int, bitRate uint32) time.Duration {
+	timeOnAir := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
+	return time.Duration(timeOnAir)
 }
