@@ -21,10 +21,38 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
+
+func init() {
+	userID := paginationUser.UserIdentifiers
+
+	// remove organizations assigned to the user by the populator
+	for _, organization := range population.Organizations {
+		for id, collaborators := range population.Memberships {
+			if organization.EntityIdentifiers().IDString() == id.IDString() {
+				for i, collaborator := range collaborators {
+					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+						population.Memberships[id] = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
+					}
+				}
+			}
+		}
+	}
+
+	// add deterministic number of organizations
+	for i := 0; i < 3; i++ {
+		organizationID := population.Organizations[i].EntityIdentifiers()
+		ouID := paginationUser.OrganizationOrUserIdentifiers()
+		population.Memberships[organizationID] = append(population.Memberships[organizationID], &ttnpb.Collaborator{
+			OrganizationOrUserIdentifiers: *ouID,
+			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+		})
+	}
+}
 
 func TestOrganizationsPermissionDenied(t *testing.T) {
 	a := assertions.New(t)
@@ -148,6 +176,52 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &created.OrganizationIdentifiers, creds)
 		a.So(err, should.BeNil)
+	})
+}
 
+func TestOrganizationsPagination(t *testing.T) {
+	a := assertions.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := paginationUser.UserIdentifiers
+		creds := userCreds(paginationUserIdx)
+
+		reg := ttnpb.NewOrganizationRegistryClient(cc)
+
+		md := rpcmetadata.MD{Limit: 2, Page: 1}
+		ctx := md.ToOutgoingContext(test.Context())
+
+		list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Organizations, should.HaveLength, 2)
+		a.So(err, should.BeNil)
+
+		md = rpcmetadata.MD{Limit: 2, Page: 2}
+		ctx = md.ToOutgoingContext(test.Context())
+
+		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Organizations, should.HaveLength, 1)
+		a.So(err, should.BeNil)
+
+		md = rpcmetadata.MD{Limit: 2, Page: 3}
+		ctx = md.ToOutgoingContext(test.Context())
+
+		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(list, should.NotBeNil)
+		a.So(list.Organizations, should.BeEmpty)
+		a.So(err, should.BeNil)
 	})
 }
