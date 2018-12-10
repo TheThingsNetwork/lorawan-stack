@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -37,120 +36,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
-
-const (
-	RecentUplinkCount = recentUplinkCount
-)
-
-var (
-	ResetMACState    = resetMACState
-	GenerateDownlink = generateDownlink
-	TimePtr          = timePtr
-
-	ErrNoDownlink = errNoDownlink
-
-	FNwkSIntKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	SNwkSIntKey = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	NwkSEncKey  = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	AppSKey     = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-
-	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
-	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	DeviceID      = "test-dev"
-	ApplicationID = "test-app"
-)
-
-func init() {
-	events.DefaultPubSub = events.NewPubSub(0)
-}
-
-var _ events.PubSub = &MockEventPubSub{}
-
-type MockEventPubSub struct {
-	PublishFunc     func(events.Event)
-	SubscribeFunc   func(string, events.Handler) error
-	UnsubscribeFunc func(string, events.Handler)
-}
-
-func (ps *MockEventPubSub) Publish(ev events.Event) {
-	if ps.PublishFunc == nil {
-		return
-	}
-	ps.PublishFunc(ev)
-}
-
-func (ps *MockEventPubSub) Subscribe(name string, hdl events.Handler) error {
-	if ps.SubscribeFunc == nil {
-		return nil
-	}
-	return ps.SubscribeFunc(name, hdl)
-}
-
-func (ps *MockEventPubSub) Unsubscribe(name string, hdl events.Handler) {
-	if ps.UnsubscribeFunc == nil {
-		return
-	}
-	ps.UnsubscribeFunc(name, hdl)
-}
-
-// TODO(#1008) Move collectEvents to the test package
-func collectEvents(f func()) (evs []events.Event) {
-	oldPS := events.DefaultPubSub
-	events.DefaultPubSub = &MockEventPubSub{
-		PublishFunc: func(ev events.Event) { evs = append(evs, ev) },
-	}
-	defer func() { events.DefaultPubSub = oldPS }()
-
-	f()
-	return evs
-}
-
-func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
-	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
-}
-
-func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
-	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
-}
-
-func SetAppQueueUpdateTimeout(d time.Duration) {
-	appQueueUpdateTimeout = d
-}
-
-func TestAccumulator(t *testing.T) {
-	a := assertions.New(t)
-
-	acc := newMetadataAccumulator()
-	a.So(func() { acc.Add() }, should.NotPanic)
-
-	vals := []*ttnpb.RxMetadata{
-		ttnpb.NewPopulatedRxMetadata(test.Randy, false),
-		ttnpb.NewPopulatedRxMetadata(test.Randy, false),
-		nil,
-		ttnpb.NewPopulatedRxMetadata(test.Randy, false),
-		ttnpb.NewPopulatedRxMetadata(test.Randy, false),
-		ttnpb.NewPopulatedRxMetadata(test.Randy, false),
-		ttnpb.NewPopulatedRxMetadata(test.Randy, false),
-	}
-
-	acc = newMetadataAccumulator(vals...)
-	a.So(acc.Accumulated(), should.HaveSameElementsDeep, vals)
-	acc.Reset()
-	a.So(acc.Accumulated(), should.BeEmpty)
-
-	acc.Add(vals[0], vals[1], vals[2])
-	a.So(acc.Accumulated(), should.HaveSameElementsDeep, vals[:3])
-
-	for i := 2; i < len(vals); i++ {
-		acc.Add(vals[i])
-		a.So(acc.Accumulated(), should.HaveSameElementsDeep, vals[:i+1])
-	}
-	a.So(acc.Accumulated(), should.HaveSameElementsDeep, vals)
-
-	acc.Reset()
-	a.So(acc.Accumulated(), should.BeEmpty)
-}
 
 var _ ttnpb.NsGsClient = &MockNsGsClient{}
 
