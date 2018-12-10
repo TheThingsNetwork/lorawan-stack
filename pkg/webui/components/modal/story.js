@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { withInfo } from '@storybook/addon-info'
 import Icon from '../icon'
 
 import style from './story.styl'
@@ -27,15 +28,23 @@ const bottomLine = (
 )
 
 storiesOf('Modal', module)
+  .addDecorator((story, context) => withInfo({
+    inline: true,
+    header: false,
+    text: 'The modal can be displayed inline or portalled via `<PortalledModal />`',
+    propTables: [ Modal ],
+  })(story)(context))
   .add('Basic Modal', () => (
     <Modal
       title="Example Modal"
       message="This is something you need to know!"
+      inline
     />
   ))
   .add('No Title', () => (
     <Modal
       message="This modal has no title. Might be useful in some situations."
+      inline
     />
   ))
   .add('OAuth Authorize Example', () => (
@@ -46,6 +55,7 @@ storiesOf('Modal', module)
       buttonMessage="Allow"
       approval
       logo
+      inline
     >
       <div className={style.left}>
         <ul>
@@ -62,4 +72,10 @@ storiesOf('Modal', module)
         <p>The Console is the official The Things Network web application.</p>
       </div>
     </Modal>
+  ))
+  .add('As Overlay', () => (
+    <Modal
+      title="Example Modal"
+      message="This is something you need to know!"
+    />
   ))

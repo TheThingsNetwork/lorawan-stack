@@ -61,7 +61,8 @@ class Modal extends React.PureComponent {
     } = this.props
 
     const modalClassNames = classnames(style.modal, style.modal, {
-      [inline]: inline,
+      [style.modalInline]: inline,
+      [style.modalAbsolute]: !Boolean(inline),
     })
 
     const name = formName ? { name: formName } : {}

@@ -26,7 +26,7 @@ import Message from '../../../lib/components/message'
 import Form from '../../../components/form'
 import Field from '../../../components/field'
 import Button from '../../../components/button'
-import ModalButton from '../../../containers/modal-button'
+import ModalButton from '../../../components/button/modal-button'
 
 import style from './application-general-settings.styl'
 

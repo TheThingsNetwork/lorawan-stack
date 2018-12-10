@@ -13,27 +13,30 @@
 // limitations under the License.
 
 .modal
-  center-absolute()
-  z-index: $zi.modal
   background: white
   border-radius: $br.m
-  width: 60%
-  max-height: 80vh
   display: flex
   flex-direction: column
 
-  &.inline
+  &-absolute
+    center-absolute()
+    z-index: $zi.modal
+    width: 60%
+    max-height: 80vh
+
+    +media-query-min($bp.s)
+      min-width: 500px
+      max-width: 780px
+
+    +media-query($bp.s)
+      full-screen()
+      border: 0
+      border-radius: 0
+      justify-content: space-between
+
+  &-inline
     border-dark()
-
-  +media-query-min($bp.s)
-    min-width: 500px
-    max-width: 780px
-
-  +media-query($bp.s)
-    full-screen()
-    border: 0
-    border-radius: 0
-    justify-content: space-between
+    max-width: 800px
 
 .title-section
   horizontalize()
@@ -124,5 +127,9 @@
   position: fixed
   width: 100vw
   height: 100vh
+  top: 0
+  bottom: 0
+  left: 0
+  right:0
   background: rgba(0, 0, 0, .5)
   z-index: $zi.modal

@@ -15,8 +15,17 @@
 import React from 'react'
 import DOM from 'react-dom'
 
-import Modal from '../../components/modal'
+import Modal from '../'
 
+/**
+ * PortalledModal is a wrapper around the modal component that renders it into
+ * a portal div with the id "modal-container". This div needs to be present
+ * for the portal to be functional. This way the modal can be displayed at the
+ * top of the DOM hierarchy, regardless of its position in the component
+ * hierarchy.
+ *
+ * @returns {Object} - The modal rendered into a portal.
+ */
 const PortalledModal = function ({ dispatch, modal, visible, ...rest }) {
   if (!modal) {
     return null

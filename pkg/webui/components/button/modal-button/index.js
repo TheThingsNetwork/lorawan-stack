@@ -15,10 +15,10 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import Button from '../../components/button'
-import PortalledModal from '../../containers/portalled-modal'
+import Button from '../'
+import PortalledModal from '../../../components/modal/portalled'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '../../../lib/prop-types'
 
 /**
  * ModalButton is a button which needs a modal confirmation to complete the
