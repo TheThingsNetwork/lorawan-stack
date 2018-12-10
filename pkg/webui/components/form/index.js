@@ -33,6 +33,8 @@ const InnerForm = function ({
   children,
   horizontal,
   submitEnabledWhenInvalid,
+  validateOnBlur,
+  validateOnChange,
 }) {
 
   const decoratedChildren = recursiveMap(children,
@@ -46,6 +48,8 @@ const InnerForm = function ({
           touched,
           horizontal,
           submitEnabledWhenInvalid,
+          validateOnBlur,
+          validateOnChange,
           ...Child.props,
         })
       } else if (Child.type === Button && Child.props.type === 'submit') {

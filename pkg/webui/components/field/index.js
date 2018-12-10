@@ -48,11 +48,14 @@ const Field = function (props) {
 
   const handleChange = function (value) {
     props.setFieldValue(props.name, value)
+    if (props.validateOnChange) {
+      props.setFieldTouched(props.name, true)
+    }
   }
 
   const handleBlur = function (e) {
     // Always regard inputs that never received a value as untouched (better UX)
-    if (e.target.value !== '') {
+    if (e.target.value !== '' && props.validateOnBlur) {
       props.setFieldTouched(props.name, true)
     }
   }
