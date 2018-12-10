@@ -147,7 +147,6 @@ func TestScheduleDownlink(t *testing.T) {
 		Name              string
 		Context           context.Context
 		Device            *ttnpb.EndDevice
-		Accumulator       *metadataAccumulator
 		Bytes             []byte
 		DeduplicationDone WindowEndFunc
 		NsGsClient        NsGsClientFunc
@@ -173,6 +172,23 @@ func TestScheduleDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				RecentUplinks: []*ttnpb.UplinkMessage{{
+					RxMetadata: []*ttnpb.RxMetadata{
+						{
+							GatewayIdentifiers: gateways[0],
+							Timestamp:          123,
+							SNR:                8.1,
+						},
+						{
+							GatewayIdentifiers: gateways[1],
+							Timestamp:          124,
+							SNR:                4,
+						},
+						{
+							GatewayIdentifiers: gateways[2],
+							Timestamp:          42,
+							SNR:                -1,
+						},
+					},
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -187,23 +203,6 @@ func TestScheduleDownlink(t *testing.T) {
 					},
 				}},
 			},
-			Accumulator: newMetadataAccumulator(
-				&ttnpb.RxMetadata{
-					GatewayIdentifiers: gateways[0],
-					Timestamp:          123,
-					SNR:                8.1,
-				},
-				&ttnpb.RxMetadata{
-					GatewayIdentifiers: gateways[1],
-					Timestamp:          124,
-					SNR:                4,
-				},
-				&ttnpb.RxMetadata{
-					GatewayIdentifiers: gateways[2],
-					Timestamp:          42,
-					SNR:                -1,
-				},
-			),
 			Bytes: testBytes,
 			DeduplicationDone: func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -294,6 +293,23 @@ func TestScheduleDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				RecentUplinks: []*ttnpb.UplinkMessage{{
+					RxMetadata: []*ttnpb.RxMetadata{
+						{
+							GatewayIdentifiers: gateways[0],
+							Timestamp:          123,
+							SNR:                8.1,
+						},
+						{
+							GatewayIdentifiers: gateways[1],
+							Timestamp:          124,
+							SNR:                4,
+						},
+						{
+							GatewayIdentifiers: gateways[2],
+							Timestamp:          42,
+							SNR:                -1,
+						},
+					},
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -308,23 +324,6 @@ func TestScheduleDownlink(t *testing.T) {
 					},
 				}},
 			},
-			Accumulator: newMetadataAccumulator(
-				&ttnpb.RxMetadata{
-					GatewayIdentifiers: gateways[0],
-					Timestamp:          123,
-					SNR:                8.1,
-				},
-				&ttnpb.RxMetadata{
-					GatewayIdentifiers: gateways[1],
-					Timestamp:          124,
-					SNR:                4,
-				},
-				&ttnpb.RxMetadata{
-					GatewayIdentifiers: gateways[2],
-					Timestamp:          42,
-					SNR:                -1,
-				},
-			),
 			Bytes: testBytes,
 			DeduplicationDone: func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -426,7 +425,6 @@ func TestScheduleDownlink(t *testing.T) {
 					return nil, nil
 				}
 			}(),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.RecentDownlinks = append(dev.RecentDownlinks,
 					rx2Downlink(42, ttnpb.DATA_RATE_3, ttnpb.TxMetadata{
@@ -464,7 +462,7 @@ func TestScheduleDownlink(t *testing.T) {
 			dev := CopyEndDevice(tc.Device)
 			b := deepcopy.Copy(tc.Bytes).([]byte)
 
-			err := ns.scheduleDownlink(ctx, dev, tc.Accumulator, b)
+			err := ns.scheduleDownlink(ctx, dev, b)
 			if tc.Error == nil && !a.So(err, should.BeNil) ||
 				tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) {
 				t.FailNow()

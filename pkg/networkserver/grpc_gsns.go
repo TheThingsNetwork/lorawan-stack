@@ -577,7 +577,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"recent_uplinks",
 			"session",
 		}, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			if err := ns.scheduleDownlink(ctx, stored, acc, nil); err != nil {
+			if err := ns.scheduleDownlink(ctx, stored, nil); err != nil {
 				schedErr = true
 				return nil, nil, err
 			}
@@ -764,7 +764,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"session",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			err := ns.scheduleDownlink(ctx, stored, acc, resp.RawPayload)
+			err := ns.scheduleDownlink(ctx, stored, resp.RawPayload)
 			if err != nil {
 				schedErr = true
 				return nil, nil, err
@@ -818,11 +818,10 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessa
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// scheduleDownlink schedules downlink with payload b for device dev.
-// up represents the uplink message, which triggered the downlink(if such exists).
-// acc represents the metadata accumulator used to deduplicate up.
+// scheduleDownlink schedules downlink with optional payload b for device dev.
+// If b is not specified, downlink is generated.
 // scheduleDownlink returns the downlink scheduled and error if any.
-func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, acc *metadataAccumulator, b []byte) error {
+func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDevice, b []byte) error {
 	if dev.MACState == nil {
 		return errUnknownMACState
 	}
@@ -925,20 +924,9 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 	}
 	slots = append(slots, rx2)
 
-	mds := up.RxMetadata
-	if acc != nil {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-ns.deduplicationDone(ctx, up):
-		}
-
-		mds = acc.Accumulated()
-	}
-
-	sort.SliceStable(mds, func(i, j int) bool {
+	sort.SliceStable(up.RxMetadata, func(i, j int) bool {
 		// TODO: Improve the sorting algorithm (https://github.com/TheThingsIndustries/ttn/issues/729)
-		return mds[i].SNR > mds[j].SNR
+		return up.RxMetadata[i].SNR > up.RxMetadata[j].SNR
 	})
 
 	ctx = events.ContextWithCorrelationID(ctx, append(
@@ -970,7 +958,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *ttnpb.EndDev
 			}
 		}
 
-		for _, md := range mds {
+		for _, md := range up.RxMetadata {
 			logger := logger.WithField(
 				"gateway_uid", unique.ID(ctx, md.GatewayIdentifiers),
 			)
