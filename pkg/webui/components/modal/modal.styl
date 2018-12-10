@@ -13,15 +13,17 @@
 // limitations under the License.
 
 .modal
-  border-dark()
   center-absolute()
-  z-index: 10
+  z-index: $zi.modal
   background: white
   border-radius: $br.m
   width: 60%
   max-height: 80vh
   display: flex
   flex-direction: column
+
+  &.inline
+    border-dark()
 
   +media-query-min($bp.s)
     min-width: 500px
@@ -120,8 +122,7 @@
 
 .shadow
   position: fixed
-  top: 0
-  left: 0
-  right: 0
-  bottom: 0
-  background: rgba(0, 0, 0, .05)
+  width: 100vw
+  height: 100vh
+  background: rgba(0, 0, 0, .5)
+  z-index: $zi.modal
