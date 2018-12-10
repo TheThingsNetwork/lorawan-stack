@@ -30,7 +30,10 @@ const Empty = ({
   colSpan,
   message,
 }) => (
-  <Row className={classnames(className, style.emptyMessageRow)}>
+  <Row
+    className={classnames(className, style.emptyMessageRow)}
+    clickable={false}
+  >
     <DataCell colSpan={colSpan}>
       <Message className={style.emptyMessage} content={message} />
     </DataCell>
