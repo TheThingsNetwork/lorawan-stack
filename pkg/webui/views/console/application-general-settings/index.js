@@ -17,9 +17,9 @@ import bind from 'autobind-decorator'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
+import * as Yup from 'yup'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
@@ -35,6 +35,15 @@ const m = defineMessages({
   deleteApp: 'Delete application',
   modalWarning: 'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
   generalSettings: 'General Settings',
+})
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(3, sharedMessages.validateTooShort)
+    .max(50, sharedMessages.validateTooLong)
+    .required(sharedMessages.validateRequired),
+  description: Yup.string()
+    .max(150, sharedMessages.validateTooLong),
 })
 
 @connect(function ({ application }) {
@@ -82,6 +91,7 @@ export default class ApplicationGeneralSettings extends React.Component {
               horizontal
               onSubmit={this.handleSubmit}
               initialValues={{ name: application.name, description: application.description }}
+              validationSchema={validationSchema}
             >
               <Message
                 component="h4"
