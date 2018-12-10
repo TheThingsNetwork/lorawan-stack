@@ -111,7 +111,6 @@ export default class ApplicationGeneralSettings extends React.Component {
               <div className={style.submitBar}>
                 <div>
                   <Button type="submit" message={sharedMessages.saveChanges} />
-                  <Button type="button" naked secondary message={sharedMessages.cancel} />
                 </div>
                 <ModalButton
                   type="button"
