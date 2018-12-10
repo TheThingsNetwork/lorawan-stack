@@ -13,12 +13,11 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
 import Button from '../../components/button'
+import PortalledModal from '../../containers/portalled-modal'
 
-import { setModal } from '../../actions/modal'
 import PropTypes from '../../lib/prop-types'
 
 /**
@@ -26,11 +25,17 @@ import PropTypes from '../../lib/prop-types'
  * action. It can be used as an easy way to get the users explicit confirmation
  * before doing an action, e.g. deleting a resource.
  */
-@connect()
 @bind
 class ModalButton extends React.Component {
-  handleClick (e) {
-    const { dispatch, modalData, message, onApprove, onCancel } = this.props
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      modalVisible: false,
+    }
+  }
+  handleClick () {
+    const { modalData } = this.props
 
     if (!modalData) {
       // No modal data likely means a faulty implementation, so since it's
@@ -38,27 +43,46 @@ class ModalButton extends React.Component {
       return
     }
 
-    dispatch(setModal({
+    this.setState({ modalVisible: true })
+  }
+
+  handleComplete (confirmed) {
+    const { onApprove, onCancel } = this.props
+
+    if (confirmed) {
+      onApprove()
+    } else {
+      onCancel()
+    }
+    this.setState({ modalVisible: false })
+  }
+
+  render () {
+    const {
+      modalData,
+      message,
+      onApprove,
+      onCancel,
+      ...rest
+    } = this.props
+
+    const modalComposedData = {
       approval: true,
       danger: true,
       buttonMessage: message,
       title: message,
-      onComplete (confirmed) {
-        if (confirmed) {
-          onApprove(e)
-        } else {
-          onCancel(e)
-        }
-      },
+      onComplete: this.handleComplete,
       ...modalData,
-    }))
-  }
-
-  render () {
-    const { dispatch, modalData, onApprove, onCancel, ...rest } = this.props
+    }
 
     return (
-      <Button onClick={this.handleClick} {...rest} />
+      <React.Fragment>
+        <PortalledModal
+          visible={this.state.modalVisible}
+          modal={modalComposedData}
+        />
+        <Button onClick={this.handleClick} message={message} {...rest} />
+      </React.Fragment>
     )
   }
 }

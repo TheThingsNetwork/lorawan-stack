@@ -13,36 +13,22 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import DOM from 'react-dom'
 import bind from 'autobind-decorator'
 
 import Modal from '../../components/modal'
 
-import { removeModal } from '../../actions/modal'
-
-/**
- * ConnectedModal is a modal component connected to the store. It will display
- * all messages fed into the `modal` subtree of the global store and remove them
- * upon completing the modal. This way, modal messages can be initiated from
- * anywhere by dispatching the `SET_MODAL` action.
- */
-@connect(state => ({
-  modal: state.modal,
-}))
 @bind
-class ConnectedModal extends Component {
-
+class PortalledModal extends Component {
   handleComplete (result) {
-    const { dispatch, modal } = this.props
+    const { modal } = this.props
     if (modal && modal.onComplete) {
       modal.onComplete(result)
     }
-
-    dispatch(removeModal())
   }
 
   render () {
-    const { dispatch, modal, ...rest } = this.props
+    const { modal, visible, ...rest } = this.props
 
     if (!modal) {
       return null
@@ -51,8 +37,11 @@ class ConnectedModal extends Component {
     const { onComplete, ...modalRest } = modal
     const props = { ...rest, ...modalRest }
 
-    return <Modal onComplete={this.handleComplete} {...props} />
+    return DOM.createPortal(
+      visible && <Modal onComplete={this.handleComplete} {...props} />,
+      document.getElementById('modal-container')
+    )
   }
 }
 
-export default ConnectedModal
+export default PortalledModal
