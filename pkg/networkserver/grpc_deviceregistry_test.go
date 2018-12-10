@@ -21,48 +21,12 @@ import (
 
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
-
-// MockDeviceRegistry implemets DeviceRegistry
-type MockDeviceRegistry struct {
-	GetByEUIFunc    func(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
-	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
-	RangeByAddrFunc func(devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error
-	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-}
-
-func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-	if r.GetByEUIFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
-}
-
-func (r *MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-	if r.SetByIDFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.GetByIDFunc(ctx, appID, devID, paths)
-}
-
-func (r *MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	if r.SetByIDFunc == nil {
-		return nil, errors.New("Not implemented")
-	}
-	return r.SetByIDFunc(ctx, appID, devID, paths, f)
-}
-
-func (r *MockDeviceRegistry) RangeByAddr(devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
-	if r.SetByIDFunc == nil {
-		return errors.New("Not implemented")
-	}
-	return r.RangeByAddrFunc(devAddr, paths, f)
-}
 
 func TestDeviceRegistry(t *testing.T) {
 	for _, tc := range []struct {

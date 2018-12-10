@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"math"
+	"sort"
 	"sync"
 	"time"
 
@@ -31,7 +32,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -278,8 +281,13 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	var up *ttnpb.UplinkMessage
 	for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
 		switch up = dev.RecentUplinks[i]; up.Payload.MHDR.MType {
-		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP, ttnpb.MType_JOIN_REQUEST:
+		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP, ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 			break
+		default:
+			log.FromContext(ctx).WithFields(log.Fields(
+				"m_type", up.Payload.MHDR.MType,
+				"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
+			)).Warn("Unknown MType stored in RecentUplinks")
 		}
 	}
 
@@ -307,7 +315,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		var down *ttnpb.ApplicationDownlink
 		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
 
-		if len(pld.FRMPayload) > int(maxDownLen) {
+		if len(down.FRMPayload) > int(maxDownLen) {
 			// TODO: Inform AS that payload is too long(https://github.com/TheThingsIndustries/lorawan-stack/issues/377)
 		} else {
 			pld.FHDR.FCnt = down.FCnt
@@ -480,9 +488,10 @@ func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	Devices             DeviceRegistry `name:"-"`
-	DeduplicationWindow time.Duration  `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow      time.Duration  `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+	Devices             DeviceRegistry    `name:"-"`
+	DownlinkTasks       DownlinkTaskQueue `name:"-"`
+	DeduplicationWindow time.Duration     `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow      time.Duration     `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 }
 
 // NetworkServer implements the Network Server component.
@@ -503,13 +512,14 @@ type NetworkServer struct {
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
 
+	macHandlers   *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
+	downlinkTasks DownlinkTaskQueue
+
 	deduplicationDone WindowEndFunc
 	collectionDone    WindowEndFunc
 
 	gsClient NsGsClientFunc
 	jsClient NsJsClientFunc
-
-	macHandlers *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
 
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 }
@@ -582,6 +592,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ns := &NetworkServer{
 		Component:               c,
 		devices:                 conf.Devices,
+		downlinkTasks:           conf.DownlinkTasks,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
@@ -609,6 +620,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	case ns.collectionDone == nil && conf.CooldownWindow == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow is zero and WithCollectionDoneFunc not specified"))
+	}
+
+	if ns.downlinkTasks == nil {
+		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified"))
 	}
 
 	if ns.deduplicationDone == nil {
@@ -641,8 +656,265 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsApplicationDownlinkQueue", cluster.HookName, c.ClusterAuthUnaryHook())
 
+	ns.Component.RegisterTask(func(ctx context.Context) error {
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
+
+			if err := ns.processDownlinkTask(ctx); err != nil {
+				return err
+			}
+		}
+	}, component.TaskRestartOnFailure)
+
 	c.RegisterGRPC(ns)
 	return ns, nil
+}
+
+func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
+	var scheduleErr bool
+	var setErr bool
+	var addErr bool
+	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+		logger := log.FromContext(ctx).WithFields(log.Fields(
+			"delay", time.Now().Sub(t),
+			"device_uid", unique.ID(ctx, devID),
+			"start_at", t,
+		))
+		logger.Debug("Processing downlink task...")
+
+		dev, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
+			[]string{
+				"frequency_plan_id",
+				"mac_state",
+				"queued_application_downlinks",
+				"recent_downlinks",
+				"recent_uplinks",
+				"session",
+			},
+			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				if dev == nil {
+					return nil, nil, nil
+				}
+
+				if dev.MACState == nil {
+					return nil, nil, errUnknownMACState
+				}
+
+				// TODO: Support RxRequest and proper class-based downlink here once https://github.com/TheThingsIndustries/lorawan-stack/pull/1376 is merged.
+
+				type tx struct {
+					ttnpb.TxSettings
+					Delay time.Duration
+				}
+				slots := make([]tx, 0, 2)
+
+				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
+				if err != nil {
+					return nil, nil, errUnknownFrequencyPlan.WithCause(err)
+				}
+
+				band, err := band.GetByID(fp.BandID)
+				if err != nil {
+					return nil, nil, errUnknownBand.WithCause(err)
+				}
+
+				if len(dev.RecentUplinks) == 0 {
+					return nil, nil, errUplinkNotFound
+				}
+				up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+
+				var upADR bool
+				for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
+					switch up := dev.RecentUplinks[i]; up.Payload.MHDR.MType {
+					case ttnpb.MType_JOIN_REQUEST:
+						break
+					case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
+						upADR = up.Payload.GetMACPayload().FHDR.FCtrl.ADR
+						break
+					}
+				}
+
+				drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
+				if err != nil {
+					return nil, nil, err
+				}
+
+				chIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
+				if err != nil {
+					return nil, nil, err
+				}
+				if uint(chIdx) < uint(len(dev.MACState.CurrentParameters.Channels)) &&
+					dev.MACState.CurrentParameters.Channels[int(chIdx)] != nil &&
+					dev.MACState.CurrentParameters.Channels[int(chIdx)].DownlinkFrequency != 0 {
+					rx1 := tx{
+						TxSettings: ttnpb.TxSettings{
+							DataRateIndex:      drIdx,
+							CodingRate:         "4/5",
+							InvertPolarization: true,
+							ChannelIndex:       chIdx,
+							Frequency:          dev.MACState.CurrentParameters.Channels[int(chIdx)].DownlinkFrequency,
+							TxPower:            int32(band.DefaultMaxEIRP),
+						},
+					}
+					if up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST {
+						rx1.Delay = band.JoinAcceptDelay1
+					} else {
+						rx1.Delay = time.Second * time.Duration(dev.MACState.CurrentParameters.Rx1Delay)
+					}
+
+					if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
+						return nil, nil, err
+					}
+					slots = append(slots, rx1)
+				}
+
+				if uint(dev.MACState.CurrentParameters.Rx2DataRateIndex) > uint(len(band.DataRates)) {
+					return nil, nil, errInvalidRx2DataRateIndex
+				}
+
+				rx2 := tx{
+					TxSettings: ttnpb.TxSettings{
+						DataRateIndex:      dev.MACState.CurrentParameters.Rx2DataRateIndex,
+						CodingRate:         "4/5",
+						InvertPolarization: true,
+						Frequency:          dev.MACState.CurrentParameters.Rx2Frequency,
+						TxPower:            int32(band.DefaultMaxEIRP),
+					},
+				}
+				if up != nil && up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST {
+					rx2.Delay = band.JoinAcceptDelay2
+				} else {
+					rx2.Delay = time.Second * time.Duration(1+dev.MACState.CurrentParameters.Rx1Delay)
+				}
+
+				if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex]); err != nil {
+					return nil, nil, err
+				}
+				slots = append(slots, rx2)
+
+				sort.SliceStable(up.RxMetadata, func(i, j int) bool {
+					// TODO: Improve the sorting algorithm (https://github.com/TheThingsIndustries/ttn/issues/729)
+					return up.RxMetadata[i].SNR > up.RxMetadata[j].SNR
+				})
+
+				ctx = events.ContextWithCorrelationID(ctx, append(
+					up.CorrelationIDs,
+					fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()),
+				)...)
+
+				var errs []error
+				for _, s := range slots {
+					// generateDownlink may mutate device, hence we may need to create a copy
+					sDev := dev
+
+					down := &ttnpb.DownlinkMessage{
+						EndDeviceIDs:   &sDev.EndDeviceIdentifiers,
+						Settings:       s.TxSettings,
+						CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+					}
+
+					if up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST || up.Payload.MHDR.MType == ttnpb.MType_REJOIN_REQUEST {
+						down.RawPayload = sDev.MACState.QueuedJoinAccept
+
+					} else {
+						var maxUpDR ttnpb.DataRateIndex
+						if upADR {
+							maxUpDR = up.Settings.DataRateIndex
+						}
+
+						sDev = deepcopy.Copy(sDev).(*ttnpb.EndDevice)
+
+						down.RawPayload, err = generateDownlink(ctx, sDev,
+							band.DataRates[down.Settings.DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+							band.DataRates[maxUpDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+						)
+						if err != nil {
+							return nil, nil, err
+						}
+					}
+					if down.RawPayload == nil {
+						return nil, nil, errNoPayload
+					}
+
+					for _, md := range up.RxMetadata {
+						logger := logger.WithField(
+							"gateway_uid", unique.ID(ctx, md.GatewayIdentifiers),
+						)
+
+						gs, err := ns.gsClient(ctx, md.GatewayIdentifiers)
+						if err != nil {
+							logger.WithError(err).Debug("Could not get Gateway Server")
+							continue
+						}
+
+						down.TxMetadata = ttnpb.TxMetadata{
+							GatewayIdentifiers: md.GatewayIdentifiers,
+							Timestamp:          md.Timestamp + uint64(s.Delay.Nanoseconds()),
+						}
+
+						_, err = gs.ScheduleDownlink(ctx, down, ns.WithClusterAuth())
+						if err != nil {
+							errs = append(errs, err)
+							continue
+						}
+
+						dev = sDev
+						dev.MACState.QueuedJoinAccept = nil
+						dev.RecentDownlinks = append(dev.RecentDownlinks, down)
+						if len(dev.RecentDownlinks) > recentDownlinkCount {
+							dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
+						}
+						return dev, []string{
+							"mac_state",
+							"queued_application_downlinks",
+							"recent_downlinks",
+							"session",
+						}, nil
+					}
+				}
+
+				for i, err := range errs {
+					logger = logger.WithField(
+						fmt.Sprintf("error_%d", i), err,
+					)
+				}
+				scheduleErr = true
+				logger.Warn("All Gateway Servers failed to schedule the downlink")
+				return nil, nil, errSchedule
+			})
+
+		switch {
+		case scheduleErr:
+			return err
+
+		case err != nil && errors.Resemble(err, errNoDownlink):
+			return nil
+
+		case err != nil:
+			setErr = true
+			logger.WithError(err).Error("Failed to update device in registry")
+			return err
+		}
+
+		if dev.GetMACState().GetDeviceClass() != ttnpb.CLASS_C {
+			return nil
+		}
+
+		if err := ns.downlinkTasks.Add(ctx, devID, time.Now()); err != nil {
+			addErr = true
+			logger.WithError(err).Error("Failed to add class C device to downlink schedule")
+			return err
+		}
+		return nil
+	})
+	if err != nil && !setErr && !addErr && !scheduleErr {
+		ns.Logger().WithError(err).Error("Failed to pop device from downlink schedule")
+	}
+	return err
 }
 
 // RegisterServices registers services provided by ns at s.

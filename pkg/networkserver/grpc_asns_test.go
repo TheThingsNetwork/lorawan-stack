@@ -47,6 +47,7 @@ func TestLinkApplication(t *testing.T) {
 			Devices:             devReg,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
+			DownlinkTasks:       &MockDownlinkTaskQueue{},
 		})).(*NetworkServer)
 	test.Must(nil, ns.Start())
 	defer ns.Close()
@@ -191,19 +192,37 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			defer redisClient.Close()
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
 
+			type addReq struct {
+				ctx   context.Context
+				devID ttnpb.EndDeviceIdentifiers
+				t     time.Time
+			}
+			addReqCh := make(chan addReq, 1)
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+							addReqCh <- addReq{
+								ctx:   ctx,
+								devID: devID,
+								t:     t,
+							}
+							return nil
+						},
+					},
 				})).(*NetworkServer)
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
+			start := time.Now()
+
 			pb := CopyEndDevice(tc.Device)
 			if tc.Device != nil {
-				start := time.Now()
 				ret, err := CreateDevice(tc.Context, devReg, CopyEndDevice(tc.Device))
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -222,6 +241,20 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return
 			}
 			a.So(err, should.BeNil)
+
+			if pb.MACState != nil && pb.MACState.DeviceClass == ttnpb.CLASS_C {
+				select {
+				case req := <-addReqCh:
+					a.So(req.ctx, should.HaveParentContext, tc.Context)
+					a.So(req.devID, should.Resemble, ids)
+					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timeout waiting for Add to be called")
+				}
+			} else {
+				a.So(addReqCh, should.BeEmpty)
+			}
 
 			pb.QueuedApplicationDownlinks = tc.Request.Downlinks
 
@@ -336,19 +369,37 @@ func TestDownlinkQueuePush(t *testing.T) {
 			defer redisClient.Close()
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
 
+			type addReq struct {
+				ctx   context.Context
+				devID ttnpb.EndDeviceIdentifiers
+				t     time.Time
+			}
+			addReqCh := make(chan addReq, 1)
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+							addReqCh <- addReq{
+								ctx:   ctx,
+								devID: devID,
+								t:     t,
+							}
+							return nil
+						},
+					},
 				})).(*NetworkServer)
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
+			start := time.Now()
+
 			pb := CopyEndDevice(tc.Device)
 			if tc.Device != nil {
-				start := time.Now()
 				ret, err := CreateDevice(tc.Context, devReg, CopyEndDevice(tc.Device))
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -367,6 +418,20 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return
 			}
 			a.So(err, should.BeNil)
+
+			if pb.MACState != nil && pb.MACState.DeviceClass == ttnpb.CLASS_C {
+				select {
+				case req := <-addReqCh:
+					a.So(req.ctx, should.HaveParentContext, tc.Context)
+					a.So(req.devID, should.Resemble, ids)
+					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timeout waiting for Add to be called")
+				}
+			} else {
+				a.So(addReqCh, should.BeEmpty)
+			}
 
 			pb.QueuedApplicationDownlinks = append(pb.QueuedApplicationDownlinks, tc.Request.Downlinks...)
 
@@ -458,6 +523,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
 			test.Must(nil, ns.Start())
 			defer ns.Close()

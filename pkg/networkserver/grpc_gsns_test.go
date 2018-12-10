@@ -45,7 +45,6 @@ import (
 var (
 	DuplicateCount = 6
 	DeviceCount    = 100
-	Timeout        = (1 << 10) * test.Delay
 
 	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
 
@@ -181,6 +180,7 @@ func handleUplinkTest() func(t *testing.T) {
 				Devices:             devReg,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
+				DownlinkTasks:       &MockDownlinkTaskQueue{},
 			})).(*NetworkServer)
 		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 		test.Must(nil, ns.Start())
@@ -897,12 +897,29 @@ func handleUplinkTest() func(t *testing.T) {
 				}
 				asSendCh := make(chan asSendReq)
 
+				type downlinkTasksAddRequest struct {
+					ctx   context.Context
+					devID ttnpb.EndDeviceIdentifiers
+					t     time.Time
+				}
+				downlinkAddCh := make(chan downlinkTasksAddRequest, 1)
+
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
 						Devices:             devReg,
 						DeduplicationWindow: 42,
 						CooldownWindow:      42,
+						DownlinkTasks: &MockDownlinkTaskQueue{
+							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+								downlinkAddCh <- downlinkTasksAddRequest{
+									ctx:   ctx,
+									devID: devID,
+									t:     t,
+								}
+								return nil
+							},
+						},
 					},
 					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
 						ch := make(chan time.Time, 1)
@@ -1046,47 +1063,21 @@ func handleUplinkTest() func(t *testing.T) {
 					t.FailNow()
 				}
 
+				close(deduplicationDoneCh)
 				close(asUpReq.errch)
+
+				select {
+				case req := <-downlinkAddCh:
+					a.So(req.ctx, should.HaveParentContext, ctx)
+					a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timeout waiting for Add to be called")
+				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 				close(collectionDoneCh)
-
-				_, err = GenerateDownlink(ctx, pb, math.MaxUint16, math.MaxUint16)
-				if err != nil {
-					a.So(err, should.Equal, ErrNoDownlink)
-				}
-				hasDownlink := err == nil
-
-				if hasDownlink {
-					t.Run("downlink", func(t *testing.T) {
-						a := assertions.New(t)
-
-						select {
-						case we := <-deduplicationDoneCh:
-							a.So(we.msg.RxMetadata, should.HaveSameElementsDiff, md)
-
-							close(deduplicationDoneCh)
-
-							msg := CopyUplinkMessage(tc.UplinkMessage)
-
-							msg.RxMetadata = we.msg.RxMetadata
-
-							a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
-							msg.ReceivedAt = we.msg.ReceivedAt
-
-							a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
-							msg.CorrelationIDs = we.msg.CorrelationIDs
-
-							a.So(we.msg, should.HaveEmptyDiff, msg)
-							a.So(we.ctx, should.HaveParentContext, ctx)
-
-							we.ch <- time.Now()
-
-						case <-time.After(Timeout):
-							t.Fatal("Timed out while waiting for deduplication window end request during downlink scheduling")
-						}
-					})
-				}
 
 				select {
 				case err := <-errch:
@@ -1173,7 +1164,18 @@ func handleUplinkTest() func(t *testing.T) {
 						t.Fatal("Timed out while waiting for uplink to be sent to AS")
 					}
 
+					close(deduplicationDoneCh)
 					close(asUpReq.errch)
+
+					select {
+					case req := <-downlinkAddCh:
+						a.So(req.ctx, should.HaveParentContext, ctx)
+						a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+						a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
+
+					case <-time.After(Timeout):
+						t.Fatal("Timeout waiting for Add to be called")
+					}
 
 					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 					close(collectionDoneCh)
@@ -1185,40 +1187,6 @@ func handleUplinkTest() func(t *testing.T) {
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for HandleUplink to return")
 					}
-
-					if !hasDownlink {
-						close(deduplicationDoneCh)
-						return
-					}
-
-					t.Run("downlink", func(t *testing.T) {
-						a := assertions.New(t)
-
-						select {
-						case we := <-deduplicationDoneCh:
-							close(deduplicationDoneCh)
-
-							a.So(we.msg.RxMetadata, should.HaveSameElementsDiff, md)
-
-							msg := CopyUplinkMessage(tc.UplinkMessage)
-
-							msg.RxMetadata = we.msg.RxMetadata
-
-							a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
-							msg.ReceivedAt = we.msg.ReceivedAt
-
-							a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
-							msg.CorrelationIDs = we.msg.CorrelationIDs
-
-							a.So(we.msg, should.HaveEmptyDiff, msg)
-							a.So(we.ctx, should.HaveParentContext, ctx)
-
-							we.ch <- time.Now()
-
-						case <-time.After(Timeout):
-							t.Fatal("Timed out while waiting for deduplication window end request during downlink scheduling")
-						}
-					})
 				})
 			})
 		}
@@ -1264,6 +1232,7 @@ func handleJoinTest() func(t *testing.T) {
 				Devices:             devReg,
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
+				DownlinkTasks:       &MockDownlinkTaskQueue{},
 			},
 		)).(*NetworkServer)
 		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
@@ -1456,6 +1425,13 @@ func handleJoinTest() func(t *testing.T) {
 					errch chan<- error
 				}
 
+				type downlinkTasksAddRequest struct {
+					ctx   context.Context
+					devID ttnpb.EndDeviceIdentifiers
+					t     time.Time
+				}
+				downlinkAddCh := make(chan downlinkTasksAddRequest, 1)
+
 				deduplicationDoneCh := make(chan windowEnd, 1)
 				collectionDoneCh := make(chan windowEnd, 1)
 				handleJoinCh := make(chan handleJoinRequest, 1)
@@ -1467,6 +1443,16 @@ func handleJoinTest() func(t *testing.T) {
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
 						Devices: devReg,
+						DownlinkTasks: &MockDownlinkTaskQueue{
+							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+								downlinkAddCh <- downlinkTasksAddRequest{
+									ctx:   ctx,
+									devID: devID,
+									t:     t,
+								}
+								return nil
+							},
+						},
 					},
 					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
 						ch := make(chan time.Time, 1)
@@ -1570,14 +1556,6 @@ func handleJoinTest() func(t *testing.T) {
 
 				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 
-				select {
-				case we := <-deduplicationDoneCh:
-					we.ch <- time.Now()
-
-				case <-time.After(Timeout):
-					t.Fatal("Timed out while waiting for join accept to be sent to device")
-				}
-
 				close(deduplicationDoneCh)
 
 				select {
@@ -1591,11 +1569,10 @@ func handleJoinTest() func(t *testing.T) {
 							t.FailNow()
 						}
 						if a.So(ret.Session, should.NotBeNil) {
-							ses := ret.Session
-							a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
-							a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
+							a.So(ret.Session.StartedAt, should.HappenBetween, start, time.Now())
+							a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ret.Session.DevAddr)
 							if tc.Device.Session != nil {
-								a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
+								a.So(ret.Session.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
 							}
 						}
 
@@ -1603,17 +1580,12 @@ func handleJoinTest() func(t *testing.T) {
 							t.FailNow()
 						}
 
-						if !a.So(ret.RecentDownlinks, should.NotBeEmpty) {
-							t.FailNow()
-						}
-
-						a.So(ret.RecentDownlinks[len(ret.RecentDownlinks)-1].RawPayload, should.HaveEmptyDiff, resp.RawPayload)
-
 						err = ResetMACState(ns.Component.FrequencyPlans, pb)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
 
+						pb.MACState.QueuedJoinAccept = resp.RawPayload
 						pb.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
 						pb.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
 						pb.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
@@ -1624,14 +1596,12 @@ func handleJoinTest() func(t *testing.T) {
 
 						pb.EndDeviceIdentifiers.DevAddr = ret.EndDeviceIdentifiers.DevAddr
 						pb.Session = &ttnpb.Session{
+							DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
 							SessionKeys: *keys,
 							StartedAt:   ret.Session.StartedAt,
-							DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
 						}
 						pb.CreatedAt = ret.CreatedAt
 						pb.UpdatedAt = ret.UpdatedAt
-						pb.RecentDownlinks = ret.RecentDownlinks
-
 						pb.QueuedApplicationDownlinks = nil
 
 						msg := CopyUplinkMessage(tc.UplinkMessage)
@@ -1660,16 +1630,9 @@ func handleJoinTest() func(t *testing.T) {
 					}
 
 					a.So(up.CorrelationIDs, should.NotBeEmpty)
-
 					a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
-						CorrelationIDs: up.CorrelationIDs,
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-							DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
-							DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
-							DeviceID:               tc.Device.EndDeviceIdentifiers.DeviceID,
-							JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
-							ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
-						},
+						CorrelationIDs:       up.CorrelationIDs,
+						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:              resp.SessionKeys.AppSKey,
 							SessionKeyID:         test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
@@ -1680,6 +1643,16 @@ func handleJoinTest() func(t *testing.T) {
 
 				case <-time.After(Timeout):
 					t.Fatal("Timed out while waiting for join to be sent to AS")
+				}
+
+				select {
+				case req := <-downlinkAddCh:
+					a.So(req.ctx, should.HaveParentContext, ctx)
+					a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timeout waiting for Add to be called")
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
@@ -1727,14 +1700,7 @@ func handleJoinTest() func(t *testing.T) {
 					}
 
 					_ = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-
-					select {
-					case we := <-deduplicationDoneCh:
-						we.ch <- time.Now()
-
-					case <-time.After(Timeout):
-						t.Fatal("Timed out while waiting for join accept to be sent to device")
-					}
+					close(deduplicationDoneCh)
 
 					select {
 					case up := <-asSendCh:
@@ -1760,7 +1726,19 @@ func handleJoinTest() func(t *testing.T) {
 						t.Fatal("Timed out while waiting for join to be sent to AS")
 					}
 
+					pb.EndDeviceIdentifiers.DevAddr = expectedRequest.EndDeviceIdentifiers.DevAddr
+					select {
+					case req := <-downlinkAddCh:
+						a.So(req.ctx, should.HaveParentContext, ctx)
+						a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+						a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
+
+					case <-time.After(Timeout):
+						t.Fatal("Timeout waiting for Add to be called")
+					}
+
 					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+					close(collectionDoneCh)
 
 					select {
 					case err := <-errch:
@@ -1769,9 +1747,6 @@ func handleJoinTest() func(t *testing.T) {
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for HandleUplink to return")
 					}
-
-					close(deduplicationDoneCh)
-					close(collectionDoneCh)
 				})
 			})
 		}
@@ -1800,6 +1775,7 @@ func TestHandleUplink(t *testing.T) {
 			Devices:             devReg,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
+			DownlinkTasks:       &MockDownlinkTaskQueue{},
 		},
 	)).(*NetworkServer)
 	test.Must(nil, ns.Start())

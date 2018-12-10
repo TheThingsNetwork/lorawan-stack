@@ -17,6 +17,7 @@ package networkserver
 
 import (
 	"context"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -87,7 +88,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	}
 
 	if dev.MACState != nil && dev.MACState.DeviceClass == ttnpb.CLASS_C {
-		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
+		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, time.Now())
 	}
 	return ttnpb.Empty, nil
 }
@@ -106,7 +107,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	}
 
 	if dev.MACState != nil && dev.MACState.DeviceClass == ttnpb.CLASS_C {
-		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
+		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, time.Now())
 	}
 	return ttnpb.Empty, nil
 }
