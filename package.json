@@ -53,7 +53,6 @@
     "mini-css-extract-plugin": "^0.4.0",
     "mkdirp": "^0.5.1",
     "nib": "^1.1.2",
-    "nsp": "^3.1.0",
     "react-test-renderer": "^16.0.0",
     "snapshot-diff": "^0.4.0",
     "stylint": "^1.5.9",
