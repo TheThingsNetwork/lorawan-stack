@@ -202,7 +202,8 @@
   version = "v2.3.1"
 
 [[projects]]
-  digest = "1:0366b920e401e5fe9c9bc1e1d5b0d58b79af8c9c88b292c1db11d13a29ed9f28"
+  branch = "master"
+  digest = "1:a87c4cf59f297af94a17c8c1c166af840bf954ba087d9c662a0e72e6b37123c7"
   name = "github.com/go-redis/redis"
   packages = [
     ".",
@@ -215,8 +216,7 @@
     "internal/util",
   ]
   pruneopts = ""
-  revision = "b3d9bf10f6666b2ee5100a6f3f84f4caf3b4e37d"
-  version = "v6.14.2"
+  revision = "45a00fd91abb111b4dd9cced7769d584d621ce2d"
 
 [[projects]]
   digest = "1:9ab1b1c637d7c8f49e39d8538a650d7eb2137b076790cff69d160823b505964c"
