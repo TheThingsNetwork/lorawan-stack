@@ -48,6 +48,6 @@ js.test:
 
 js.vulnerabilities:
 	@$(log) "checking js dependencies for vulnerabilities"
-	@$(NSP) check
+	@$(YARN) audit
 
 # vim: ft=make
