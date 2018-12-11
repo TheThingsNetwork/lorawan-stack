@@ -54,6 +54,37 @@ func init() {
 	}
 }
 
+func TestOrganizationsNestedError(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := defaultUser.UserIdentifiers
+		creds := userCreds(defaultUserIdx)
+		org := userOrganizations(&userID).Organizations[0]
+
+		reg := ttnpb.NewOrganizationRegistryClient(cc)
+
+		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
+			Organization: ttnpb.Organization{
+				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"},
+			},
+			Collaborator: *org.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			Collaborator: org.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	})
+}
+
 func TestOrganizationsPermissionDenied(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
