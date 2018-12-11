@@ -20,7 +20,7 @@ PUBLIC_DIR ?= public
 CONFIG_DIR ?= config
 BINARIES_DIR ?= ./node_modules/.bin
 DEV_SERVER_BUILD ?= false
-YARN_VERSION ?= 1.10.1
+YARN_VERSION ?= 1.12.3
 
 YARN ?= $(BINARIES_DIR)/yarn
 ESLINT ?= $(BINARIES_DIR)/eslint
