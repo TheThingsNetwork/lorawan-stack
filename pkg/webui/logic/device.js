@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init'
-import applications from './applications'
-import application from './application'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
+import { createLogic } from 'redux-logic'
+
+import api from '../api'
+import * as device from '../actions/device'
+
+const getDeviceLogic = createLogic({
+  type: [ device.GET_DEV ],
+  async process ({ getState, action }, dispatch, done) {
+    const { id } = action
+    try {
+      const dev = await api.v3.is.device.get(id)
+      dispatch(device.getDeviceSuccess(dev))
+    } catch (e) {
+      dispatch(device.getDeviceFailure(e))
+    }
+
+    done()
+  },
+})
 
 export default [
-  client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
-  ...devices,
-  ...device,
-  ...gateways,
+  getDeviceLogic,
 ]
