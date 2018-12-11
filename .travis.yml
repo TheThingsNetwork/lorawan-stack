@@ -35,6 +35,5 @@ script:
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make build-all; fi # only on pull requests
 - make js.lint
 - make js.test
-- make js.vulnerabilities
 after_success:
 - make go.coveralls
