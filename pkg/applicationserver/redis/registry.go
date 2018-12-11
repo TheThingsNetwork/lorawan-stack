@@ -29,7 +29,10 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 	if dst == nil {
 		dst = &ttnpb.EndDevice{}
 	}
-	return dst, dst.SetFields(src, append(paths, "ids")...)
+	if err := dst.SetFields(src, append(paths, "ids")...); err != nil {
+		return dst, err
+	}
+	return dst, dst.EndDeviceIdentifiers.Validate()
 }
 
 // DeviceRegistry is a Redis device registry.
@@ -130,6 +133,7 @@ func applyLinkFieldMask(dst, src *ttnpb.ApplicationLink, paths ...string) (*ttnp
 	if dst == nil {
 		dst = &ttnpb.ApplicationLink{}
 	}
+
 	return dst, dst.SetFields(src, paths...)
 }
 
