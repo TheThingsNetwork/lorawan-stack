@@ -28,6 +28,24 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestTemporaryValidPassword(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := defaultUser.UserIdentifiers
+
+		reg := ttnpb.NewUserRegistryClient(cc)
+
+		_, err := reg.CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
+			UserIdentifiers: userID,
+		})
+
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	})
+}
+
 func TestUsersPermissionNotRequired(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
