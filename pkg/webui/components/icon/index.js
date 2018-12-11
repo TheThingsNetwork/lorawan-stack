@@ -20,7 +20,8 @@ import style from './icon.styl'
 
 // A map of hardcoded names to their corresponding icons.
 const hardcoded = {
-  devices: 'devices',
+  devices: 'device_hub',
+  device: 'device_hub',
   settings: 'tune',
   integration: 'settings_ethernet',
   data: 'poll',
