@@ -14,6 +14,9 @@
 
 import faker from 'faker'
 
+// Persist random values
+faker.seed(1)
+
 const APPLICATIONS_COUNT = 10
 const DEVICES_COUNT = 80
 const GATEWAYS_COUNT = 15
@@ -73,6 +76,9 @@ const applicationsApiKeys = applications.reduce(function (acc, curr, idx, apps) 
 
   return acc
 }, [])
+
+// Reset the seed again for devices
+faker.seed(1)
 
 const devices = [ ...new Array(DEVICES_COUNT).keys() ]
   .map(function () {
