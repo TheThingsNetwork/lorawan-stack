@@ -21,6 +21,7 @@ import _console from './console' // conflicting name with window.console
 import applications from './applications'
 import application from './application'
 import devices from './devices'
+import device from './device'
 import gateways from './gateways'
 import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
@@ -32,6 +33,7 @@ export default combineReducers({
   applications,
   application,
   devices,
+  device,
   gateways,
   apiKeys: combineReducers({
     applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
