@@ -4,8 +4,9 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
 	time "time"
+
+	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var JoinRequestFieldPathsNested = []string{

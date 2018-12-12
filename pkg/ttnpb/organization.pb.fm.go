@@ -4,8 +4,9 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	time "time"
+
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 )
 
 var OrganizationFieldPathsNested = []string{

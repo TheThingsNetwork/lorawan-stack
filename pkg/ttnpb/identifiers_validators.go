@@ -16,7 +16,11 @@ package ttnpb
 
 import (
 	"context"
+
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
+
+var errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{name}`")
 
 // ValidateContext is used as validator function by the GRPC validator interceptor.
 func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
@@ -24,4 +28,12 @@ func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
 		return errMissingIdentifiers
 	}
 	return ids.Validate()
+}
+
+// ValidateContext is used as validator function by the GRPC validator interceptor.
+func (ids *ApplicationIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.Validate(); err != nil {
+		return errInvalidField.WithCause(err)
+	}
+	return nil
 }

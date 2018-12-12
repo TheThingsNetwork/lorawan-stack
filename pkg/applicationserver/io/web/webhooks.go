@@ -220,7 +220,7 @@ func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
 			appID := ttnpb.ApplicationIdentifiers{
 				ApplicationID: c.Param(applicationIDKey),
 			}
-			if err := appID.Validate(); err != nil {
+			if err := appID.ValidateContext(w.ctx); err != nil {
 				return err
 			}
 			c.Set(applicationIDKey, appID)

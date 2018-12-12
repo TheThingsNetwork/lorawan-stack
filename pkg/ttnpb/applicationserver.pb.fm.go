@@ -4,6 +4,7 @@ package ttnpb
 
 import (
 	fmt "fmt"
+
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 )
 

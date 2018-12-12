@@ -3797,6 +3797,15 @@
       "file": "message_validators.go"
     }
   },
+  "error:pkg/ttnpb:field": {
+    "translations": {
+      "en": "invalid field `{name}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "identifiers_validators.go"
+    }
+  },
   "error:pkg/ttnpb:field_bound": {
     "translations": {
       "en": "`{lorawan_field}` should be between `{min}` and `{max}`"

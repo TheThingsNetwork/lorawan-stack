@@ -4,9 +4,10 @@ package ttnpb
 
 import (
 	fmt "fmt"
+	time "time"
+
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
-	time "time"
 )
 
 var SessionFieldPathsNested = []string{
