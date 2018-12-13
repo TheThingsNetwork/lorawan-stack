@@ -24,10 +24,10 @@ var errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{nam
 
 // ValidateContext is used as validator function by the GRPC validator interceptor.
 func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
-	if ids == nil || ids.IsZero() {
-		return errMissingIdentifiers
+	if err := ids.Validate(); err != nil {
+		return errInvalidField.WithCause(err)
 	}
-	return ids.Validate()
+	return nil
 }
 
 // ValidateContext is used as validator function by the GRPC validator interceptor.

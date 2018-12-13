@@ -39,11 +39,11 @@ func TestUserIdentifiersValidate(t *testing.T) {
 	ids = UserIdentifiers{
 		Email: "foo@bar.com",
 	}
-	a.So(ids.Validate(), should.BeNil)
+	a.So(ids.Validate(), should.NotBeNil)
 
 	ids = UserIdentifiers{}
 	err := ids.Validate()
-	a.So(err, should.BeNil)
+	a.So(err, should.NotBeNil)
 
 	ids = UserIdentifiers{
 		UserID: "foo",
@@ -75,11 +75,11 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	ids = GatewayIdentifiers{
 		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
 	}
-	a.So(ids.Validate(), should.BeNil)
+	a.So(ids.Validate(), should.NotBeNil)
 
 	ids = GatewayIdentifiers{}
 	err := ids.Validate()
-	a.So(err, should.BeNil)
+	a.So(err, should.NotBeNil)
 
 	ids = GatewayIdentifiers{
 		GatewayID: "_foo-gtw",
@@ -96,5 +96,5 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	ids = GatewayIdentifiers{
 		EUI: new(types.EUI64),
 	}
-	a.So(ids.Validate(), should.BeNil)
+	a.So(ids.Validate(), should.NotBeNil)
 }
