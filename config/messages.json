@@ -2849,7 +2849,7 @@
     },
     "description": {
       "package": "pkg/networkserver",
-      "file": "networkserver.go"
+      "file": "downlink.go"
     }
   },
   "error:pkg/networkserver:no_payload": {
@@ -3014,6 +3014,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/redis:missing_key": {
+    "translations": {
+      "en": "missing key `{key}`"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/redis:not_found": {
     "translations": {
       "en": "entity not found"
@@ -3026,6 +3035,15 @@
   "error:pkg/redis:store": {
     "translations": {
       "en": "store error"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:value_type": {
+    "translations": {
+      "en": "invalid value type for key `{key}`"
     },
     "description": {
       "package": "pkg/redis",
