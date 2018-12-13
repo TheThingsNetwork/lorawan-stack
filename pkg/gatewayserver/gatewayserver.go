@@ -290,24 +290,25 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		case msg := <-conn.Up():
 			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			registerReceiveUplink(ctx, conn.Gateway(), msg)
-			drop := func(err error) {
+			drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 				logger.WithError(err).Debug("Dropping message")
-				registerDropUplink(ctx, conn.Gateway(), msg, err)
+				registerDropUplink(ctx, ids, conn.Gateway(), msg, err)
 			}
-			if err := lorawan.UnmarshalUplinkMessageIdentifiers(msg); err != nil {
-				drop(err)
+			ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
+			if err != nil {
+				drop(ttnpb.EndDeviceIdentifiers{}, err)
 				break
 			}
-			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, msg.EndDeviceIDs)
+			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
 			if ns == nil {
-				drop(errNoNetworkServer)
+				drop(ids, errNoNetworkServer)
 				break
 			}
 			if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg, gs.WithClusterAuth()); err != nil {
-				drop(err)
+				drop(ids, err)
 				break
 			}
-			registerForwardUplink(ctx, conn.Gateway(), msg, ns.Name())
+			registerForwardUplink(ctx, ids, conn.Gateway(), msg, ns.Name())
 		case status := <-conn.Status():
 			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_status:%s", events.NewCorrelationID()))
 			registerReceiveStatus(ctx, conn.Gateway(), status)

@@ -579,66 +579,64 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 	return nil
 }
 
-// UnmarshalUplinkMessageIdentifiers unmarshals msg.
-func UnmarshalUplinkMessageIdentifiers(msg *ttnpb.UplinkMessage) error {
+// GetUplinkMessageIdentifiers parses the msg and retrieves the EndDeviceIdentifers (except DeviceID).
+func GetUplinkMessageIdentifiers(msg *ttnpb.UplinkMessage) (ttnpb.EndDeviceIdentifiers, error) {
 	n := len(msg.RawPayload)
 	if n == 0 {
-		return errMissing("PHYPayload")
+		return ttnpb.EndDeviceIdentifiers{}, errMissing("PHYPayload")
 	}
 	if msg.Payload == nil {
 		msg.Payload = &ttnpb.Message{}
 	}
-	if msg.EndDeviceIDs == nil {
-		msg.EndDeviceIDs = &ttnpb.EndDeviceIdentifiers{}
-	}
 	if err := UnmarshalMHDR(msg.RawPayload[0:1], &msg.Payload.MHDR); err != nil {
-		return errFailedDecoding("MHDR").WithCause(err)
+		return ttnpb.EndDeviceIdentifiers{}, errFailedDecoding("MHDR").WithCause(err)
 	}
+	var ids ttnpb.EndDeviceIdentifiers
 	switch msg.Payload.MHDR.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		if n < 12 {
-			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
+			return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
 		}
 		var devAddr types.DevAddr
 		copyReverse(devAddr[:], msg.RawPayload[1:5])
-		msg.EndDeviceIDs.DevAddr = &devAddr
-		return nil
+		ids.DevAddr = &devAddr
+		return ids, nil
 	case ttnpb.MType_JOIN_REQUEST:
 		if n != 23 {
-			return errExpectedLengthEqual("JoinRequestPHYPayload", 23)(n)
+			return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthEqual("JoinRequestPHYPayload", 23)(n)
 		}
 		var joinEUI, devEUI types.EUI64
 		copyReverse(joinEUI[:], msg.RawPayload[1:9])
 		copyReverse(devEUI[:], msg.RawPayload[9:17])
-		msg.EndDeviceIDs.JoinEUI = &joinEUI
-		msg.EndDeviceIDs.DevEUI = &devEUI
-		return nil
+		ids.JoinEUI = &joinEUI
+		ids.DevEUI = &devEUI
+		return ids, nil
 	case ttnpb.MType_REJOIN_REQUEST:
 		if n != 19 && n != 24 {
-			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
+			return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
 		}
 		switch msg.RawPayload[1] {
 		case 0, 2:
 			if n != 19 {
-				return errExpectedLengthEqual("RejoinRequestPHYPayload", 19)(n)
+				return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthEqual("RejoinRequestPHYPayload", 19)(n)
 			}
 			var devEUI types.EUI64
 			copyReverse(devEUI[:], msg.RawPayload[5:13])
-			msg.EndDeviceIDs.DevEUI = &devEUI
+			ids.DevEUI = &devEUI
 		case 1:
 			if n != 24 {
-				return errExpectedLengthEqual("RejoinRequestPHYPayload", 24)(n)
+				return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthEqual("RejoinRequestPHYPayload", 24)(n)
 			}
 			var joinEUI, devEUI types.EUI64
 			copyReverse(joinEUI[:], msg.RawPayload[2:10])
 			copyReverse(devEUI[:], msg.RawPayload[10:18])
-			msg.EndDeviceIDs.JoinEUI = &joinEUI
-			msg.EndDeviceIDs.DevEUI = &devEUI
+			ids.JoinEUI = &joinEUI
+			ids.DevEUI = &devEUI
 		default:
-			return errUnknown("RejoinType")(msg.RawPayload[1])
+			return ttnpb.EndDeviceIdentifiers{}, errUnknown("RejoinType")(msg.RawPayload[1])
 		}
-		return nil
+		return ids, nil
 	default:
-		return errUnknown("MType")(msg.Payload.MType.String())
+		return ttnpb.EndDeviceIdentifiers{}, errUnknown("MType")(msg.Payload.MType.String())
 	}
 }

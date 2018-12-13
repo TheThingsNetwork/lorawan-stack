@@ -296,11 +296,6 @@ func (m *SetEndDeviceRequest) CombinedIdentifiers() *CombinedIdentifiers {
 }
 
 // CombinedIdentifiers implements Identifiers.
-func (m *UplinkMessage) CombinedIdentifiers() *CombinedIdentifiers {
-	return m.GetEndDeviceIDs().CombinedIdentifiers()
-}
-
-// CombinedIdentifiers implements Identifiers.
 func (m *ListOAuthAccessTokensRequest) CombinedIdentifiers() *CombinedIdentifiers {
 	return CombineIdentifiers(m.UserIDs, m.ClientIDs)
 }

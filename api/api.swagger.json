@@ -8309,9 +8309,6 @@
         "payload": {
           "$ref": "#/definitions/lorawanv3Message"
         },
-        "end_device_ids": {
-          "$ref": "#/definitions/v3EndDeviceIdentifiers"
-        },
         "settings": {
           "$ref": "#/definitions/v3TxSettings"
         },

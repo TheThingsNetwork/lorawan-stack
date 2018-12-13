@@ -126,10 +126,6 @@ func TestCombinedIdentifiers(t *testing.T) {
 
 		NewPopulatedPullGatewayConfigurationRequest(test.Randy, true),
 
-		NewPopulatedUplinkMessage(test.Randy, true),
-		NewPopulatedDownlinkMessage(test.Randy, true),
-		NewPopulatedJoinRequest(test.Randy, true),
-
 		NewPopulatedDownlinkQueueRequest(test.Randy, true),
 
 		NewPopulatedGetApplicationLinkRequest(test.Randy, true),

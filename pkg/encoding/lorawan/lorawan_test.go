@@ -572,11 +572,11 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 			msg := &ttnpb.UplinkMessage{
 				RawPayload: tc.Bytes,
 			}
-			err := UnmarshalUplinkMessageIdentifiers(msg)
+			ids, err := GetUplinkMessageIdentifiers(msg)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(msg.EndDeviceIDs, should.Resemble, tc.Identifiers)
+			a.So(&ids, should.Resemble, tc.Identifiers)
 		})
 	}
 }
@@ -629,7 +629,7 @@ func TestUnmarshalResilience(t *testing.T) {
 				msg := &ttnpb.UplinkMessage{
 					RawPayload: tc,
 				}
-				err := UnmarshalUplinkMessageIdentifiers(msg)
+				_, err := GetUplinkMessageIdentifiers(msg)
 				a.So(err, should.NotBeNil)
 			}, should.NotPanic)
 		})

@@ -398,10 +398,10 @@ outer:
 // MACHandler defines the behavior of a MAC command on a device.
 type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, up *ttnpb.UplinkMessage) error
 
-func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
-			registerDropUplink(ctx, up, err)
+			registerDropUplink(ctx, devIDs, up, err)
 		}
 	}()
 
@@ -714,10 +714,10 @@ func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.Dev
 	return devAddr
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
-			registerDropUplink(ctx, up, err)
+			registerDropUplink(ctx, devIDs, up, err)
 		}
 	}()
 
@@ -883,10 +883,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	return nil
 }
 
-func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleRejoin(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
-			registerDropUplink(ctx, up, err)
+			registerDropUplink(ctx, devIDs, up, err)
 		}
 	}()
 	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
@@ -922,11 +922,15 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
+	devIDs, err := lorawan.GetUplinkMessageIdentifiers(up)
+	if err != nil {
+		return nil, errDecodePayload.WithCause(err)
+	}
 	if ok {
-		registerReceiveUplinkDuplicate(ctx, up)
+		registerReceiveUplinkDuplicate(ctx, devIDs, up)
 		return ttnpb.Empty, nil
 	}
-	registerReceiveUplink(ctx, up)
+	registerReceiveUplink(ctx, devIDs, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
 		<-ns.collectionDone(ctx, up)
@@ -936,11 +940,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up = deepcopy.Copy(up).(*ttnpb.UplinkMessage)
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		return ttnpb.Empty, ns.handleUplink(ctx, up, acc)
+		return ttnpb.Empty, ns.handleUplink(ctx, devIDs, up, acc)
 	case ttnpb.MType_JOIN_REQUEST:
-		return ttnpb.Empty, ns.handleJoin(ctx, up, acc)
+		return ttnpb.Empty, ns.handleJoin(ctx, devIDs, up, acc)
 	case ttnpb.MType_REJOIN_REQUEST:
-		return ttnpb.Empty, ns.handleRejoin(ctx, up, acc)
+		return ttnpb.Empty, ns.handleRejoin(ctx, devIDs, up, acc)
 	default:
 		logger.Error("Unmatched MType")
 		return ttnpb.Empty, nil

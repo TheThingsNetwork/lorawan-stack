@@ -10,13 +10,6 @@ import (
 var UplinkMessageFieldPathsNested = []string{
 	"Payload",
 	"correlation_ids",
-	"end_device_ids",
-	"end_device_ids.application_ids",
-	"end_device_ids.application_ids.application_id",
-	"end_device_ids.dev_addr",
-	"end_device_ids.dev_eui",
-	"end_device_ids.device_id",
-	"end_device_ids.join_eui",
 	"payload",
 	"payload.Payload.join_accept_payload",
 	"payload.Payload.join_accept_payload.cf_list",
@@ -82,7 +75,6 @@ var UplinkMessageFieldPathsNested = []string{
 var UplinkMessageFieldPathsTopLevel = []string{
 	"Payload",
 	"correlation_ids",
-	"end_device_ids",
 	"payload",
 	"raw_payload",
 	"received_at",
@@ -122,27 +114,6 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 					dst.Payload = src.Payload
 				} else {
 					dst.Payload = nil
-				}
-			}
-		case "end_device_ids":
-			if len(subs) > 0 {
-				newDst := dst.EndDeviceIDs
-				if newDst == nil {
-					newDst = &EndDeviceIdentifiers{}
-					dst.EndDeviceIDs = newDst
-				}
-				var newSrc *EndDeviceIdentifiers
-				if src != nil {
-					newSrc = src.EndDeviceIDs
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.EndDeviceIDs = src.EndDeviceIDs
-				} else {
-					dst.EndDeviceIDs = nil
 				}
 			}
 		case "settings":

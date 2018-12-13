@@ -161,14 +161,14 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 func mType(msg *ttnpb.UplinkMessage) string { return strings.ToLower(msg.Payload.MType.String()) }
 
-func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUp(ctx, msg.EndDeviceIDs, nil))
+func registerReceiveUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
+	events.Publish(evtReceiveUp(ctx, devIDs, nil))
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, mType(msg)).Inc()
 	nsMetrics.uplinkUniqueReceived.WithLabelValues(ctx, mType(msg)).Inc()
 }
 
-func registerReceiveUplinkDuplicate(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUpDuplicate(ctx, msg.EndDeviceIDs, nil))
+func registerReceiveUplinkDuplicate(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
+	events.Publish(evtReceiveUpDuplicate(ctx, devIDs, nil))
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, mType(msg)).Inc()
 }
 
@@ -188,14 +188,16 @@ func registerForwardUplink(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb
 	nsMetrics.uplinkForwarded.WithLabelValues(ctx, mType(msg), appID).Inc()
 }
 
-func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error) {
-	switch msg.Payload.MType {
-	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		events.Publish(evtDropData(ctx, msg.EndDeviceIDs, err))
-	case ttnpb.MType_JOIN_REQUEST:
-		events.Publish(evtDropJoin(ctx, msg.EndDeviceIDs, err))
-	case ttnpb.MType_REJOIN_REQUEST:
-		events.Publish(evtDropRejoin(ctx, msg.EndDeviceIDs, err))
+func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
+	if !devIDs.IsZero() {
+		switch msg.Payload.MType {
+		case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+			events.Publish(evtDropData(ctx, devIDs, err))
+		case ttnpb.MType_JOIN_REQUEST:
+			events.Publish(evtDropJoin(ctx, devIDs, err))
+		case ttnpb.MType_REJOIN_REQUEST:
+			events.Publish(evtDropRejoin(ctx, devIDs, err))
+		}
 	}
 	if ttnErr, ok := errors.From(err); ok {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, mType(msg), ttnErr.String()).Inc()

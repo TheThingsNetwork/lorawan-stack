@@ -175,15 +175,15 @@ func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.U
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
-	events.Publish(evtForwardUp(ctx, ttnpb.CombineIdentifiers(gtw, msg.EndDeviceIDs), nil))
+func registerForwardUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
+	events.Publish(evtForwardUp(ctx, ttnpb.CombineIdentifiers(gtw, devIDs), nil))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
-func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
+func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
 	var ids ttnpb.Identifiers = gtw
-	if msg.EndDeviceIDs != nil {
-		ids = ttnpb.CombineIdentifiers(ids, *msg.EndDeviceIDs)
+	if !devIDs.IsZero() {
+		ids = ttnpb.CombineIdentifiers(ids, devIDs)
 	}
 	events.Publish(evtDropUp(ctx, ids, err))
 	if ttnErr, ok := errors.From(err); ok {

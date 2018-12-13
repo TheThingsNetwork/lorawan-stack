@@ -72,7 +72,6 @@ message UplinkMessage {
 
   bytes raw_payload = 1;
   Message payload = 2;
-  EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
   TxSettings settings = 4 [(gogoproto.nullable) = false];
   repeated RxMetadata rx_metadata = 5;
   // Server time when a component received the message.
