@@ -4,9 +4,8 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	time "time"
-
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	time "time"
 )
 
 var UserFieldPathsNested = []string{
