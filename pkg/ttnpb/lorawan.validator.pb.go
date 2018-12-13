@@ -110,6 +110,53 @@ func (this *TxSettings) Validate() error {
 	if !(this.ChannelIndex < 256) {
 		return github_com_mwitkow_go_proto_validators.FieldError("ChannelIndex", fmt.Errorf(`value '%v' must be less than '256'`, this.ChannelIndex))
 	}
+	if this.Time != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Time); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Time", err)
+		}
+	}
+	return nil
+}
+func (this *GatewayAntennaIdentifiers) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("GatewayIdentifiers", err)
+	}
+	return nil
+}
+func (this *UplinkToken) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayAntennaIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("GatewayAntennaIdentifiers", err)
+	}
+	return nil
+}
+func (this *DownlinkPath) Validate() error {
+	if oneOfNester, ok := this.GetPath().(*DownlinkPath_Fixed); ok {
+		if oneOfNester.Fixed != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.Fixed); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Fixed", err)
+			}
+		}
+	}
+	return nil
+}
+func (this *TxRequest) Validate() error {
+	for _, item := range this.DownlinkPaths {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("DownlinkPaths", err)
+			}
+		}
+	}
+	if this.AbsoluteTime != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AbsoluteTime); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("AbsoluteTime", err)
+		}
+	}
+	if this.Advanced != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Advanced); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Advanced", err)
+		}
+	}
 	return nil
 }
 func (this *MACCommand) Validate() error {

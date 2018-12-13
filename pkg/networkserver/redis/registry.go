@@ -59,7 +59,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
 	}
-	if err := ids.ValidateContext(nil); err != nil {
+	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
 

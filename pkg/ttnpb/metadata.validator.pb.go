@@ -40,22 +40,6 @@ func (this *RxMetadata) Validate() error {
 	}
 	return nil
 }
-func (this *TxMetadata) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayIdentifiers)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("GatewayIdentifiers", err)
-	}
-	if this.Time != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Time); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Time", err)
-		}
-	}
-	if this.Advanced != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Advanced); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Advanced", err)
-		}
-	}
-	return nil
-}
 func (this *Location) Validate() error {
 	return nil
 }

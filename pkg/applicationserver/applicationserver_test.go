@@ -804,7 +804,7 @@ func TestApplicationServer(t *testing.T) {
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						ResetQueue: []*ttnpb.ApplicationDownlink{ // Pop the first item; it will be inserted because of the nack.
 							{
-								SessionKeyID: "session3",
+								SessionKeyID: "33",
 								FPort:        22,
 								FCnt:         2,
 								FRMPayload:   []byte{0x92, 0xfe, 0x93, 0xf5},
@@ -815,9 +815,9 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_DownlinkNack{
 								DownlinkNack: &ttnpb.ApplicationDownlink{
 									SessionKeyID: "33",
-									FPort:        42,
-									FCnt:         42,
-									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+									FPort:        11,
+									FCnt:         1,
+									FRMPayload:   []byte{0x5f, 0x38, 0x7c, 0xb0},
 								},
 							},
 						},
@@ -828,8 +828,8 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_DownlinkNack{
 									DownlinkNack: &ttnpb.ApplicationDownlink{
 										SessionKeyID: "33",
-										FPort:        42,
-										FCnt:         42,
+										FPort:        11,
+										FCnt:         1,
 										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									},
 								},
@@ -839,13 +839,13 @@ func TestApplicationServer(t *testing.T) {
 							a := assertions.New(t)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{ // The nacked item is inserted first.
-									SessionKeyID: "session3",
+									SessionKeyID: "33",
 									FPort:        11,
 									FCnt:         1,
 									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 								},
 								{
-									SessionKeyID: "session3",
+									SessionKeyID: "33",
 									FPort:        22,
 									FCnt:         2,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},

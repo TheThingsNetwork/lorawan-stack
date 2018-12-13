@@ -188,8 +188,8 @@ func (this *UserSessionIdentifiers) Validate() error {
 	return nil
 }
 func (this *UserSession) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserSessionIdentifiers)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("UserSessionIdentifiers", err)
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.UserIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("UserIdentifiers", err)
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CreatedAt)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)

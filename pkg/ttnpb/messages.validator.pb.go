@@ -27,11 +27,6 @@ func (this *UplinkMessage) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("Payload", err)
 		}
 	}
-	if this.EndDeviceIDs != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.EndDeviceIDs); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIDs", err)
-		}
-	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Settings)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("Settings", err)
 	}
@@ -58,11 +53,19 @@ func (this *DownlinkMessage) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIDs", err)
 		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Settings)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("Settings", err)
+	if oneOfNester, ok := this.GetSettings().(*DownlinkMessage_Request); ok {
+		if oneOfNester.Request != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.Request); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Request", err)
+			}
+		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.TxMetadata)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("TxMetadata", err)
+	if oneOfNester, ok := this.GetSettings().(*DownlinkMessage_Scheduled); ok {
+		if oneOfNester.Scheduled != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.Scheduled); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Scheduled", err)
+			}
+		}
 	}
 	return nil
 }
@@ -151,16 +154,10 @@ func (this *ApplicationDownlink_ClassBC) Validate() error {
 			}
 		}
 	}
-	if this.Time != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Time); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Time", err)
+	if this.AbsoluteTime != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AbsoluteTime); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("AbsoluteTime", err)
 		}
-	}
-	return nil
-}
-func (this *ApplicationDownlink_ClassBC_GatewayAntennaIdentifiers) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayIdentifiers)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("GatewayIdentifiers", err)
 	}
 	return nil
 }

@@ -175,6 +175,13 @@ func (this *EndDevice) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("LastDevStatusReceivedAt", err)
 		}
 	}
+	for _, item := range this.RecentADRUplinks {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("RecentADRUplinks", err)
+			}
+		}
+	}
 	for _, item := range this.RecentUplinks {
 		if item != nil {
 			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
