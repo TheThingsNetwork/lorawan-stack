@@ -16,6 +16,7 @@ package test
 
 import (
 	"context"
+	"sync/atomic"
 	"testing"
 )
 
@@ -39,4 +40,46 @@ func MustTFromContext(ctx context.Context) *testing.T {
 		panic("*testing.T not present in the context")
 	}
 	return t
+}
+
+// ContextWithCounter adds a counter to ctx under key specified.
+func ContextWithCounter(ctx context.Context, key interface{}) context.Context {
+	var i int64
+	return context.WithValue(ctx, key, &i)
+}
+
+// CounterFromContext gets the counter from context.
+func CounterFromContext(ctx context.Context, key interface{}) (int64, bool) {
+	i, ok := ctx.Value(key).(*int64)
+	if !ok {
+		return 0, false
+	}
+	return *i, true
+}
+
+// MustCounterFromContext gets the counter from context, and panics if it is not present in the context
+func MustCounterFromContext(ctx context.Context, key interface{}) int64 {
+	i, ok := CounterFromContext(ctx, key)
+	if !ok {
+		panic("counter not present in the context")
+	}
+	return i
+}
+
+// IncrementContextCounter increments the counter in the context.
+func IncrementContextCounter(ctx context.Context, key interface{}, v int64) (int64, bool) {
+	i, ok := ctx.Value(key).(*int64)
+	if !ok {
+		return 0, false
+	}
+	return atomic.AddInt64(i, v), true
+}
+
+// MustIncrementContextCounter increments the counter in the context, and panics if it is not present in the context.
+func MustIncrementContextCounter(ctx context.Context, key interface{}, v int64) int64 {
+	i, ok := IncrementContextCounter(ctx, key, v)
+	if !ok {
+		panic("counter not present in the context")
+	}
+	return i
 }
