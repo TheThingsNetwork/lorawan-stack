@@ -39,14 +39,6 @@ func (acc *accumulator) Reset() {
 	acc.Range(acc.m.Delete)
 }
 
-func newAccumulator(vs ...interface{}) *accumulator {
-	var acc accumulator
-	for _, v := range vs {
-		acc.Add(v)
-	}
-	return &acc
-}
-
 type metadataAccumulator struct {
 	accumulator
 }
