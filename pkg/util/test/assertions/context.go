@@ -117,3 +117,28 @@ func ShouldHaveParentContext(actual interface{}, expected ...interface{}) string
 	}
 	return success
 }
+
+// ShouldHaveParentContextOrEqual takes as argument a context.Context and context.Context.
+// If the arguments are valid and the actual context has the expected context as
+// parent or if they are equal, this function returns an empty string.
+// Otherwise, it returns a string describing the error.
+func ShouldHaveParentContextOrEqual(actual interface{}, expected ...interface{}) string {
+	if len(expected) != 1 {
+		return fmt.Sprintf(needExactValues, 1, len(expected))
+	}
+
+	ctx, ok := actual.(context.Context)
+	if !ok {
+		return fmt.Sprintf(needContext, actual)
+	}
+
+	parent, ok := expected[0].(context.Context)
+	if !ok {
+		return fmt.Sprintf(needContext, expected[0])
+	}
+
+	if ctx != parent && !contextHasParent(ctx, parent) {
+		return fmt.Sprintf(shouldHaveParentContext, parent)
+	}
+	return success
+}

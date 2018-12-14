@@ -302,6 +302,11 @@ func TestShouldHaveParentContext(t *testing.T) {
 
 			msg := ShouldHaveParentContext(tc.Actual, tc.Expected)
 			a.So(msg, tc.Test)
+			if tc.Actual == tc.Expected {
+				a.So(ShouldHaveParentContextOrEqual(tc.Actual, tc.Expected), should.BeEmpty)
+			} else {
+				a.So(ShouldHaveParentContextOrEqual(tc.Actual, tc.Expected), tc.Test)
+			}
 		})
 	}
 }

@@ -153,6 +153,8 @@ var (
 	NotHaveSameElementsDiff = testassertions.ShouldNotHaveSameElementsDiff
 	// HaveParentContext asserts that the context.Context is a child of context.Context.
 	HaveParentContext = testassertions.ShouldHaveParentContext
+	// HaveParentContextOrEqual asserts that the context.Context is a child of context.Context or they're equal.
+	HaveParentContextOrEqual = testassertions.ShouldHaveParentContextOrEqual
 	// HaveSameErrorDefinitionAs asserts that the error definitions of the actual and expected arguments are the same.
 	HaveSameErrorDefinitionAs = testassertions.ShouldHaveSameErrorDefinitionAs
 	// EqualErrorOrDefinition asserts that the actual and expected arguments are of the same type (error or definition),
