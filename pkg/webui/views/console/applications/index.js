@@ -16,7 +16,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import ApplicationAdd from '../application-add'
-import ApplicationList from '../applications-list'
+import ApplicationsList from '../applications-list'
 import Application from '../application'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -37,7 +37,7 @@ export default class Applications extends React.Component {
     const { path } = this.props.match
     return (
       <Switch>
-        <Route exact path={`${path}`} component={ApplicationList} />
+        <Route exact path={`${path}`} component={ApplicationsList} />
         <Route path={`${path}/add`} component={ApplicationAdd} />
         <Route path={`${path}/:appId`} component={Application} />
       </Switch>
