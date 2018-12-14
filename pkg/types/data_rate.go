@@ -21,7 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-var invalidDataRate = errors.DefineInvalidArgument("data_rate", "invalid data rate")
+var errDataRate = errors.DefineInvalidArgument("data_rate", "invalid data rate")
 
 // DataRate encodes a LoRa data rate as a string or an FSK bit rate as an uint
 type DataRate struct {
@@ -35,11 +35,11 @@ var sfRegexp = regexp.MustCompile("^SF(6|7|8|9|10|11|12)")
 func (dr DataRate) SpreadingFactor() (uint8, error) {
 	matches := sfRegexp.FindStringSubmatch(dr.LoRa)
 	if len(matches) != 2 {
-		return 0, invalidDataRate
+		return 0, errDataRate
 	}
 	sf, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return 0, invalidDataRate
+		return 0, errDataRate
 	}
 	return uint8(sf), err
 }
@@ -50,11 +50,11 @@ var drRegexp = regexp.MustCompile("BW(125|250|500)$")
 func (dr DataRate) Bandwidth() (uint32, error) {
 	matches := drRegexp.FindStringSubmatch(dr.LoRa)
 	if len(matches) != 2 {
-		return 0, invalidDataRate
+		return 0, errDataRate
 	}
 	bw, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return 0, invalidDataRate
+		return 0, errDataRate
 	}
 	return uint32(bw) * 1000, err
 }
