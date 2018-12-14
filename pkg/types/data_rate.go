@@ -31,6 +31,9 @@ type DataRate struct {
 
 var sfRegexp = regexp.MustCompile("^SF(6|7|8|9|10|11|12)")
 
+// EmptyDataRate is an empty DataRate.
+var EmptyDataRate DataRate
+
 // SpreadingFactor returns the spreading factor of this data rate, if it is a LoRa data rate. It returns an error otherwise.
 func (dr DataRate) SpreadingFactor() (uint8, error) {
 	matches := sfRegexp.FindStringSubmatch(dr.LoRa)
