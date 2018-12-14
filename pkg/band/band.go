@@ -188,21 +188,23 @@ type Band struct {
 	regionalParameters1_1RevA   versionSwap
 }
 
-// DutyCycle for the [MinFrequency;MaxFrequency] sub-band.
+// DutyCycle contains the sub-band frequency range and its duty cycle.
 type DutyCycle struct {
+	// MinFrequency is the inclusive minimum frequency.
 	MinFrequency uint64
+	// MaxFrequency is the exlusive maximum frequency.
 	MaxFrequency uint64
-	DutyCycle    float32
+	Value        float32
 }
 
-// Comprises returns whether the duty cycle applies to that channel.
-func (d DutyCycle) Comprises(channel uint64) bool {
-	return channel >= d.MinFrequency && channel < d.MaxFrequency
+// Comprises returns whether the duty cycle applies to the given frequency.
+func (d DutyCycle) Comprises(frequency uint64) bool {
+	return frequency >= d.MinFrequency && frequency < d.MaxFrequency
 }
 
 // MaxEmissionDuring the period passed as parameter, that is allowed by that duty cycle.
 func (d DutyCycle) MaxEmissionDuring(period time.Duration) time.Duration {
-	return time.Duration(d.DutyCycle * float32(period))
+	return time.Duration(d.Value * float32(period))
 }
 
 // All contains all the bands available.

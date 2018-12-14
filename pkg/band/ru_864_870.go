@@ -39,7 +39,7 @@ func init() {
 			{
 				MinFrequency: 864000000,
 				MaxFrequency: 870000000,
-				DutyCycle:    0.01,
+				Value:        0.01,
 			},
 		},
 
