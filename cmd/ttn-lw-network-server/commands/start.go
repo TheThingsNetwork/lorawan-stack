@@ -15,6 +15,9 @@
 package commands
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -33,16 +36,26 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
+			host, err := os.Hostname()
+			if err != nil {
+				return err
+			}
+
 			config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"ns", "devices"},
 			})}
+			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"ns", "tasks"},
+			}), 100000, "ns", redis.Key(host, strconv.Itoa(os.Getpid())))
+			config.NS.DownlinkTasks = nsDownlinkTasks
 
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			_ = ns
+			ns.Component.RegisterTask(nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 
 			logger.Info("Starting Network Server...")
 			return c.Run()
