@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package scheduling offer convenience methods to manage RF packets that must respect scheduling constraints.
+// Package scheduling implements a packet scheduling that detects and avoids conflicts and enforces regional
+// restrictions like duty-cycle and dwell time.
 package scheduling
 
 import (
@@ -23,14 +24,27 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// QueueDelay indicates the time the gateway needs to recharge the concentrator between items in the queue.
-// This is a conservative value as implemented in the Semtech UDP Packet Forwarder reference implementation,
-// see https://github.com/Lora-net/packet_forwarder/blob/v4.0.1/lora_pkt_fwd/src/jitqueue.c#L39
-var QueueDelay = 30 * time.Millisecond
+var (
+	// QueueDelay indicates the time the gateway needs to recharge the concentrator between items in the queue.
+	// This is a conservative value as implemented in the Semtech UDP Packet Forwarder reference implementation,
+	// see https://github.com/Lora-net/packet_forwarder/blob/v4.0.1/lora_pkt_fwd/src/jitqueue.c#L39
+	QueueDelay = 30 * time.Millisecond
+
+	// ScheduleTimeShort is a short time to send a downlink message to the gateway before it has to be transmitted.
+	// This time is comprised of a lower network latency and QueueDelay. This delay is used for logging a warning message
+	// when a message is scheduled shorter before transmission than this value.
+	ScheduleTimeShort = 30*time.Millisecond + QueueDelay
+
+	// ScheduleTimeLong is a long time to send a downlink message to the gateway before it has to be transmitted.
+	// This time is comprised of a higher network latency and QueueDelay. This delay is used for pseudo-immediate
+	// scheduling, see ScheduleAnytime.
+	ScheduleTimeLong = 300*time.Millisecond + QueueDelay
+)
 
 // Clock represents an absolute time source.
 type Clock interface {
@@ -103,27 +117,27 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 var errConflict = errors.DefineResourceExhausted("conflict", "scheduling conflict")
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
-func (s *Scheduler) ScheduleAt(payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) error {
+func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
-		return err
+		return Emission{}, err
 	}
 	em, err := s.newEmission(payloadSize, settings)
 	if err != nil {
-		return err
+		return Emission{}, err
 	}
 	s.emissionsMu.Lock()
 	defer s.emissionsMu.Unlock()
 	for _, other := range s.emissions {
 		if em.AfterWithOffAir(other, s.timeOffAir)-QueueDelay < 0 && em.BeforeWithOffAir(other, s.timeOffAir)-QueueDelay < 0 {
-			return errConflict
+			return Emission{}, errConflict
 		}
 	}
 	if err := sb.Schedule(em, priority); err != nil {
-		return err
+		return Emission{}, err
 	}
 	s.emissions = s.emissions.Insert(em)
-	return nil
+	return em, nil
 }
 
 // ScheduleAnytime attempts to schedule the given Tx settings with the given priority from the time in the settings.
@@ -131,7 +145,7 @@ func (s *Scheduler) ScheduleAt(payloadSize int, settings ttnpb.TxSettings, prior
 //
 // The scheduler does not support immediate scheduling, i.e. sending a message to the gateway that should be transmitted
 // immediately. The reason for this is that this scheduler cannot determine conflicts or enforce duty-cycle when the
-// emission time is unknown. Therefore, when the timestamp is set to 0, the estimated current concentrator time plus
+// emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	sb, err := s.findSubBand(settings.Frequency)
@@ -159,12 +173,13 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 			}
 			nextConflicts := em.BeforeWithOffAir(s.emissions[i+1], s.timeOffAir)-QueueDelay < 0
 			if nextConflicts {
-				// If we conflict with the next, try the next window.
+				// If it conflicts with the next, try the next window.
 				em.t = s.emissions[i+1].EndsWithOffAir(s.timeOffAir) + QueueDelay
 				i++
 				continue
 			}
 			// No conflicts, but advance counter for potential next iteration.
+			// A next iteration can be necessary when this emission and priority exceeds a duty-cycle limitation.
 			i++
 			return em.t
 		}
@@ -174,6 +189,9 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	em, err = sb.ScheduleAnytime(em.d, next, priority)
 	if err != nil {
 		return Emission{}, err
+	}
+	if delta := em.Starts() - now; delta < ScheduleTimeShort {
+		log.FromContext(ctx).WithField("delta", delta).Warn("The scheduled time is late for transmission")
 	}
 	s.emissions = s.emissions.Insert(em)
 	return em, nil

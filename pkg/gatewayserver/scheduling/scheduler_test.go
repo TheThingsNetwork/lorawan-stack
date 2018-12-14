@@ -161,7 +161,7 @@ func TestScheduleAt(t *testing.T) {
 			d, err := toa.Compute(tc.PayloadSize, tc.Settings)
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)
-			err = scheduler.ScheduleAt(tc.PayloadSize, tc.Settings, tc.Priority)
+			_, err = scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, tc.Priority)
 			if err != nil && tc.AssertError == nil {
 				a.So(err, should.BeNil)
 			} else if err != nil {
@@ -210,9 +210,9 @@ func TestScheduleAnytime(t *testing.T) {
 	// Time-on-air is 41216 us, time-off-air is 1000000 us, queue delay is 30000 us.
 	// 1: [1000000, 2071216]
 	// 2: [4000000, 5071216]
-	err = scheduler.ScheduleAt(10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
+	_, err = scheduler.ScheduleAt(ctx, 10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
 	a.So(err, should.BeNil)
-	err = scheduler.ScheduleAt(10, settingsAt(869525000, 7, 4000000), ttnpb.TxSchedulePriority_NORMAL)
+	_, err = scheduler.ScheduleAt(ctx, 10, settingsAt(869525000, 7, 4000000), ttnpb.TxSchedulePriority_NORMAL)
 	a.So(err, should.BeNil)
 
 	// Try schedule a transmission from 1000000 us.
@@ -221,7 +221,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 1: [1000000, 2071216]
 	// 3: [2071216, 3142432]
 	// 2: [4000000, 5071216]
-	em, err := scheduler.ScheduleAnytime(10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
+	em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
 	a.So(err, should.BeNil)
 	a.So(em.Starts(), should.Equal, 2071216*time.Microsecond)
 
@@ -232,7 +232,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 3: [2071216, 3142432]
 	// 2: [4000000, 5071216]
 	// 4: [5071216, 6142432]
-	em, err = scheduler.ScheduleAnytime(10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
+	em, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
 	a.So(err, should.BeNil)
 	a.So(em.Starts(), should.Equal, 5071216*time.Microsecond)
 
@@ -245,13 +245,13 @@ func TestScheduleAnytime(t *testing.T) {
 	// 2: [4000000, 5071216]
 	// 4: [5071216, 6142432]
 	// 5: [14121200, 15112432]
-	em, err = scheduler.ScheduleAnytime(10, settingsAt(869525000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
+	em, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
 	a.So(err, should.BeNil)
 	a.So(em.Starts(), should.Equal, 14121200*time.Microsecond)
 
 	// Try schedule another transmission from 1000000 us.
 	// Time-on-air is 991232 us, time-off-air is 1000000 us, queue delay is 30000 us.
 	// It's 9.91% in a 1% duty-cycle sub-band, so it hits the duty-cycle limitation.
-	_, err = scheduler.ScheduleAnytime(10, settingsAt(868100000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
+	_, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(868100000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
 	a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrDutyCycle)
 }
