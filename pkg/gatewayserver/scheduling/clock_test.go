@@ -1,0 +1,48 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package scheduling_test
+
+import (
+	"math"
+	"testing"
+	"time"
+
+	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+)
+
+func TestConcentratorClock(t *testing.T) {
+	a := assertions.New(t)
+	clock := &scheduling.RolloverClock{}
+
+	clock.Sync(10000000, time.Unix(10, 0), time.Unix(0, 0)) // The gateway has no idea of time.
+	a.So(clock.Now(time.Unix(10, 100)), should.Equal, 10000000*time.Microsecond+100)
+	a.So(clock.ConcentratorTime(time.Unix(0, 100)), should.Equal, 10000000*time.Microsecond+100)
+
+	{
+		// Test first roll-over to 4299967295 us (math.MaxUint32 + 5000000).
+		passed := time.Duration(time.Microsecond * (math.MaxUint32 + 5000000))
+		clock.Sync(5000000, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
+		a.So(clock.Now(time.Unix(10, 100).Add(passed)), should.Equal, passed+100)
+	}
+
+	{
+		// Test second roll-over to 8589934590 us (2 * math.MaxUint32).
+		passed := time.Duration(time.Microsecond * 2 * math.MaxUint32)
+		clock.Sync(0, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
+		a.So(clock.Now(time.Unix(10, 100).Add(passed)), should.Equal, passed+100)
+	}
+}

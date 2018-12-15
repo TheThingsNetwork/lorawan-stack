@@ -24,7 +24,7 @@ type mockClock struct {
 	t time.Duration
 }
 
-func (c *mockClock) Now() time.Duration {
+func (c *mockClock) Now(_ time.Time) time.Duration {
 	return c.t
 }
 func (c *mockClock) ConcentratorTime(t time.Time) time.Duration {

@@ -46,14 +46,6 @@ var (
 	ScheduleTimeLong = 300*time.Millisecond + QueueDelay
 )
 
-// Clock represents an absolute time source.
-type Clock interface {
-	// Now returns an indication of the current concentrator time.
-	Now() time.Duration
-	// ConcentratorTime returns the concentrator time based on the given absolute time.
-	ConcentratorTime(time.Time) time.Duration
-}
-
 // NewScheduler instantiates a new Scheduler for the given clock source and frequency plan.
 func NewScheduler(ctx context.Context, clock Clock, fp *frequencyplans.FrequencyPlan) (*Scheduler, error) {
 	s := &Scheduler{
@@ -148,6 +140,10 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
+	now := s.clock.Now(time.Now())
+	if settings.Timestamp == 0 && settings.Time == nil {
+		settings.Timestamp = uint32((now + ScheduleTimeLong) / time.Microsecond)
+	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
 		return Emission{}, err
