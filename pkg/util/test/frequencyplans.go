@@ -33,22 +33,57 @@ const (
 	euFrequencyPlan   = `band-id: EU_863_870
 uplink-channels:
 - frequency: 867100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867300000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867500000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867700000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867900000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 868100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 868300000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 868500000
+  min-data-rate: 0
+  max-data-rate: 5
 downlink-channels:
 - frequency: 867100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867300000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867500000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867700000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867900000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 868100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 868300000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 868500000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 869525000
+  min-data-rate: 0
+  max-data-rate: 5
 lora-standard-channel:
   frequency: 863000000
   data-rate:
@@ -63,20 +98,48 @@ fsk-channel:
 	krFrequencyPlan   = `band-id: KR_920_923
 uplink-channels:
 - frequency: 922100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922300000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922500000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922700000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922900000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 923100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 923300000
+  min-data-rate: 0
+  max-data-rate: 5
 downlink-channels:
 - frequency: 922100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922300000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922500000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922700000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 922900000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 923100000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 923300000
+  min-data-rate: 0
+  max-data-rate: 5
 lbt:
   rssi-target: -80
   scan-time: 128`
