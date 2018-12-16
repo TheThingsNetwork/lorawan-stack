@@ -35,9 +35,12 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 		dst = &ttnpb.EndDevice{}
 	}
 	if err := dst.SetFields(src, append(paths, "ids")...); err != nil {
-		return dst, err
+		return nil, err
 	}
-	return dst, dst.EndDeviceIdentifiers.Validate()
+	if err := dst.EndDeviceIdentifiers.Validate(); err != nil {
+		return nil, err
+	}
+	return dst, nil
 }
 
 type DeviceRegistry struct {
