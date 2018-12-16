@@ -65,20 +65,12 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 }
 
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 	gtw := &ttnpb.Gateway{GatewayIdentifiers: ids}
-	fp, err := s.store.GetByID(test.EUFrequencyPlanID)
-	if err != nil {
-		return nil, err
-	}
-	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
-	if err != nil {
-		return nil, err
-	}
-	conn := io.NewConnection(ctx, protocol, gtw, scheduler)
+	conn := io.NewConnection(ctx, protocol, gtw, fp, scheduler)
 	select {
 	case s.connectionsCh <- conn:
 	default:

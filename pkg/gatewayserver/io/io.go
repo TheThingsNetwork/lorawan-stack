@@ -16,15 +16,18 @@ package io
 
 import (
 	"context"
+	"fmt"
 	"sync/atomic"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
-	"go.thethings.network/lorawan-stack/pkg/toa"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 const bufferSize = 10
@@ -35,7 +38,7 @@ type Server interface {
 	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
-	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*Connection, error)
+	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
 	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
@@ -60,7 +63,8 @@ type Connection struct {
 
 	protocol  string
 	gateway   *ttnpb.Gateway
-	scheduler scheduling.Scheduler
+	fp        *frequencyplans.FrequencyPlan
+	scheduler *scheduling.Scheduler
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -69,13 +73,14 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway, scheduler scheduling.Scheduler) *Connection {
+func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	return &Connection{
 		ctx:         ctx,
 		cancelCtx:   cancelCtx,
 		protocol:    protocol,
 		gateway:     gateway,
+		fp:          fp,
 		scheduler:   scheduler,
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
@@ -103,6 +108,10 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
+	if up.Settings.Time != nil {
+		c.scheduler.Sync(up.Settings.Timestamp, time.Now(), *up.Settings.Time)
+	}
+
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
@@ -141,20 +150,138 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 	return nil
 }
 
-var errComputeTOA = errors.Define("compute_toa", "could not compute the time on air")
+var (
+	errNotTxRequest    = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
+	errDownlinkPath    = errors.DefineInvalidArgument("downlink_path", "invalid downlink path: need exactly one option")
+	errRxEmpty         = errors.DefineNotFound("rx_empty", "settings empty")
+	errDataRate        = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
+	errDownlinkChannel = errors.DefineInvalidArgument("downlink_channel", "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`")
+	errTxSchedule      = errors.DefineAborted("tx_schedule", "schedule failed", "reason_rx1", "reason_rx2")
+)
 
 // SendDown schedules and sends a downlink message and updates the downlink stats.
+// This method returns an error if the downlink message is not a Tx request or if the downlink path is not already
+// reduced to one.
 func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
-	duration, err := toa.Compute(down.RawPayload, down.Settings)
-	if err != nil {
-		return errComputeTOA.WithCause(err)
+	request := down.GetRequest()
+	if request == nil {
+		return errNotTxRequest
 	}
-	span := scheduling.Span{
-		Start:    scheduling.ConcentratorTime(down.TxMetadata.Timestamp),
-		Duration: duration,
+	if len(request.DownlinkPaths) != 1 {
+		return errDownlinkPath
 	}
-	if err := c.scheduler.ScheduleAt(span, down.Settings.Frequency); err != nil {
-		return err
+	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
+	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
+	if c.scheduler != nil {
+		band, err := band.GetByID(c.fp.BandID)
+		if err != nil {
+			return err
+		}
+		var schedulingErrors []error
+		for i, rx := range []struct {
+			dataRateIndex ttnpb.DataRateIndex
+			frequency     uint64
+			delay         time.Duration
+		}{
+			{
+				dataRateIndex: request.Rx1DataRateIndex,
+				frequency:     request.Rx1Frequency,
+				delay:         time.Duration(request.Rx1Delay) * time.Second,
+			},
+			{
+				dataRateIndex: request.Rx2DataRateIndex,
+				frequency:     request.Rx2Frequency,
+				delay:         time.Duration(request.Rx1Delay+1) * time.Second,
+			},
+		} {
+			if rx.frequency == 0 {
+				schedulingErrors = append(schedulingErrors, errRxEmpty)
+				continue
+			}
+			dataRate := band.DataRates[rx.dataRateIndex].Rate
+			if dataRate == types.EmptyDataRate {
+				return errDataRate.WithAttributes("index", rx.dataRateIndex)
+			}
+			var found bool
+			var channelIndex int
+			for i, ch := range c.fp.DownlinkChannels {
+				if ch.Frequency == rx.frequency &&
+					rx.dataRateIndex >= ttnpb.DataRateIndex(ch.MinDataRate) &&
+					rx.dataRateIndex <= ttnpb.DataRateIndex(ch.MaxDataRate) {
+					channelIndex = i
+					found = true
+					break
+				}
+			}
+			if !found {
+				return errDownlinkChannel.WithAttributes(
+					"frequency", rx.frequency,
+					"data_rate_index", rx.dataRateIndex,
+				)
+			}
+			settings := ttnpb.TxSettings{
+				DataRateIndex: rx.dataRateIndex,
+				Frequency:     rx.frequency,
+				TxPower:       int32(band.DefaultMaxEIRP),
+				ChannelIndex:  uint32(channelIndex),
+			}
+			if dataRate.LoRa != "" {
+				settings.Modulation = ttnpb.Modulation_LORA
+				bw, err := dataRate.Bandwidth()
+				if err != nil {
+					return err
+				}
+				settings.Bandwidth = bw
+				sf, err := dataRate.SpreadingFactor()
+				if err != nil {
+					return err
+				}
+				settings.SpreadingFactor = uint32(sf)
+				settings.CodingRate = "4/5"
+				settings.InvertPolarization = true
+			} else {
+				settings.Modulation = ttnpb.Modulation_FSK
+				settings.BitRate = dataRate.FSK
+			}
+			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
+			switch t := request.Time.(type) {
+			case *ttnpb.TxRequest_RelativeToUplink:
+				f = c.scheduler.ScheduleAt
+				settings.Timestamp = request.DownlinkPaths[0].Timestamp + uint32(rx.delay/time.Microsecond)
+			case *ttnpb.TxRequest_Absolute:
+				f = c.scheduler.ScheduleAt
+				abs := *t.Absolute
+				settings.Time = &abs
+			case *ttnpb.TxRequest_Any:
+				f = c.scheduler.ScheduleAnytime
+			default:
+				panic(fmt.Sprintf("proto: unexpected type %T in oneof", t))
+			}
+			em, err := f(c.ctx, len(down.RawPayload), settings, request.Priority)
+			if err != nil {
+				schedulingErrors = append(schedulingErrors, err)
+				continue
+			}
+			schedulingErrors = nil
+			down.Settings = &ttnpb.DownlinkMessage_Scheduled{
+				Scheduled: &settings,
+			}
+			log.FromContext(c.ctx).WithFields(log.Fields(
+				"rx_window", i+1,
+				"frequency", rx.frequency,
+				"data_rate", rx.dataRateIndex,
+				"starts", em.Starts(),
+				"duration", em.Duration(),
+			)).Debug("Scheduled downlink")
+			break
+		}
+		if schedulingErrors != nil {
+			var kv []interface{}
+			for i, err := range schedulingErrors {
+				kv = append(kv, fmt.Sprintf("reason_rx%d", i+1), err.Error())
+			}
+			return errTxSchedule.WithAttributes(kv...)
+		}
 	}
 
 	select {
