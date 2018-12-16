@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -203,6 +202,7 @@ func TestTraffic(t *testing.T) {
 	connections := &sync.Map{}
 	eui1 := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
 	eui2 := types.EUI64{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}
+	eui3 := types.EUI64{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03}
 
 	t.Run("Upstream", func(t *testing.T) {
 		udpConn, err := net.Dial("udp", lis.LocalAddr().String())
@@ -322,7 +322,7 @@ func TestTraffic(t *testing.T) {
 			Packet             encoding.Packet
 			AckOK              bool
 			ExpectConnect      bool
-			SyncClock          bool
+			SyncClock          *time.Duration
 			Message            *ttnpb.DownlinkMessage
 			PreferScheduleLate bool
 			ScheduledLate      bool
@@ -348,18 +348,21 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
-				SyncClock:     false,
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
-					},
-					TxMetadata: ttnpb.TxMetadata{
-						Timestamp: uint64(5 * time.Second),
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+								{
+									Timestamp: 5000000,
+								},
+							},
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
+							Rx1Delay:         ttnpb.RX_DELAY_1,
+							Rx1DataRateIndex: 5,
+							Rx1Frequency:     868100000,
+							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+						},
 					},
 				},
 				PreferScheduleLate: false,
@@ -372,18 +375,21 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
-				SyncClock:     false,
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
-					},
-					TxMetadata: ttnpb.TxMetadata{
-						Timestamp: uint64(10 * time.Second),
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+								{
+									Timestamp: 10000000,
+								},
+							},
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
+							Rx1Delay:         ttnpb.RX_DELAY_1,
+							Rx1DataRateIndex: 5,
+							Rx1Frequency:     868100000,
+							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+						},
 					},
 				},
 				PreferScheduleLate: true,
@@ -396,18 +402,22 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
-				SyncClock:     true,
+				SyncClock:     durationPtr(1 * time.Second), // Rx1 delay
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x03},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
-					},
-					TxMetadata: ttnpb.TxMetadata{
-						Timestamp: uint64(testConfig.DownlinkPathExpires * 100 / 150),
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+								{
+									Timestamp: uint32(testConfig.DownlinkPathExpires/time.Microsecond) * 150 / 100,
+								},
+							},
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
+							Rx1Delay:         ttnpb.RX_DELAY_1,
+							Rx1DataRateIndex: 5,
+							Rx1Frequency:     868100000,
+							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+						},
 					},
 				},
 				PreferScheduleLate: true,
@@ -420,18 +430,22 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
-				SyncClock:     true,
+				SyncClock:     durationPtr(0),
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x04},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
-					},
-					TxMetadata: ttnpb.TxMetadata{
-						Timestamp: uint64(15 * time.Second),
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+								{
+									Timestamp: 15000000,
+								},
+							},
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
+							Rx1Delay:         ttnpb.RX_DELAY_1,
+							Rx1DataRateIndex: 5,
+							Rx1Frequency:     868100000,
+							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+						},
 					},
 				},
 				PreferScheduleLate: true,
@@ -467,8 +481,8 @@ func TestTraffic(t *testing.T) {
 
 				// Sync the clock at 0, i.e. approximate time.Now().
 				var clockSynced time.Time
-				if tc.SyncClock {
-					packet := generatePushData(eui2, false, 0)
+				if tc.SyncClock != nil {
+					packet := generatePushData(eui2, false, *tc.SyncClock)
 					buf, err = packet.MarshalBinary()
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
@@ -494,10 +508,11 @@ func TestTraffic(t *testing.T) {
 				// Set expected time for the pull response.
 				expectedTime := time.Now()
 				if tc.ScheduledLate {
-					if tc.SyncClock {
+					if tc.SyncClock != nil {
+						expectedTime = expectedTime.Add(-*tc.SyncClock)
 						expectedTime = expectedTime.Add(-time.Since(clockSynced))
 					}
-					expectedTime = expectedTime.Add(time.Duration(tc.Message.TxMetadata.Timestamp))
+					expectedTime = expectedTime.Add(time.Duration(tc.Message.GetScheduled().Timestamp) * time.Microsecond)
 					expectedTime = expectedTime.Add(-testConfig.ScheduleLateTime)
 				}
 
@@ -552,24 +567,19 @@ func TestTraffic(t *testing.T) {
 			t.FailNow()
 		}
 
-		packet := generateTxAck(eui1, encoding.TxErrNone)
+		packet := generateTxAck(eui3, encoding.TxErrNone)
 		buf, err := packet.MarshalBinary()
 		if !a.So(err, should.BeNil) {
-			t.FailNow()
+			t.Fatalf("Failed to marshal Tx acknowledgement: %v", err)
 		}
-
 		token := [2]byte{0x00, 0xae}
 		copy(buf[1:], token[:])
 		_, err = udpConn.Write(buf)
 		if !a.So(err, should.BeNil) {
-			t.FailNow()
+			t.Fatalf("Failed to write Tx acknowledgement: %v", err)
 		}
 
-		v, loaded := connections.Load(eui1)
-		if !a.So(loaded, should.BeTrue) {
-			t.FailNow()
-		}
-		conn := v.(*io.Connection)
+		conn := expectConnection(t, gs, connections, eui3, true)
 		select {
 		case <-conn.TxAck():
 		case <-time.After(timeout):

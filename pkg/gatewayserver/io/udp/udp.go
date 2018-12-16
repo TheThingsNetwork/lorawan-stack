@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
@@ -198,6 +199,14 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 		if err != nil {
 			return nil, err
 		}
+		fp, err := s.server.GetFrequencyPlan(ctx, ids)
+		if err != nil {
+			return nil, err
+		}
+		scheduler, err := scheduling.NewScheduler(ctx, fp)
+		if err != nil {
+			return nil, err
+		}
 		uid := unique.ID(ctx, ids)
 		ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 		ctx = rights.NewContext(ctx, rights.Rights{
@@ -207,7 +216,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				},
 			},
 		})
-		io, err = s.server.Connect(ctx, "udp", ids)
+		io, err = s.server.Connect(ctx, "udp", ids, fp, scheduler)
 		if err != nil {
 			return nil, err
 		}
@@ -273,14 +282,12 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
 			logger.Debug("Received Tx acknowledgement, JIT queue supported")
 		}
-
 		msg, err := encoding.ToGatewayUp(*packet.Data, md)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal packet")
 			return err
 		}
-		v, ok := state.correlations.Load(packet.Token)
-		if ok {
+		if v, ok := state.correlations.Load(packet.Token); ok {
 			sent := v.(downlinkSent)
 			msg.TxAcknowledgment.CorrelationIDs = sent.correlationIDs
 		}
