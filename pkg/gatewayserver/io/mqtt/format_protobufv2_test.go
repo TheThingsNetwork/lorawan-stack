@@ -34,18 +34,17 @@ func TestProtobufV2Downlink(t *testing.T) {
 	input := &ttnpb.DownlinkMessage{
 		RawPayload: pld,
 		Payload:    &ttnpb.Message{},
-		Settings: ttnpb.TxSettings{
-			Modulation:      ttnpb.Modulation_LORA,
-			DataRateIndex:   0,
-			Bandwidth:       125000,
-			SpreadingFactor: 12,
-			CodingRate:      "4/5",
-			Frequency:       863000000,
-			TxPower:         15,
-		},
-		TxMetadata: ttnpb.TxMetadata{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "registered-gateway"},
-			Timestamp:          12000,
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				Modulation:      ttnpb.Modulation_LORA,
+				DataRateIndex:   0,
+				Bandwidth:       125000,
+				SpreadingFactor: 12,
+				CodingRate:      "4/5",
+				Frequency:       863000000,
+				TxPower:         15,
+				Timestamp:       12000,
+			},
 		},
 	}
 	err := lorawan.UnmarshalMessage(pld, input.Payload)

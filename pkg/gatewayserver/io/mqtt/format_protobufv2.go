@@ -16,7 +16,6 @@ package mqtt
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 	"time"
 
@@ -62,6 +61,7 @@ var (
 		62: "AS_923",
 	}
 
+	errNotScheduled    = errors.DefineInvalidArgument("not_scheduled", "not scheduled")
 	errLoRaWANPayload  = errors.DefineInvalidArgument("lorawan_payload", "invalid LoRaWAN payload")
 	errLoRaWANMetadata = errors.DefineInvalidArgument("lorawan_metadata", "missing LoRaWAN metadata")
 	errDataRate        = errors.DefineInvalidArgument("data_rate", "unknown data rate `{data_rate}`")
@@ -74,28 +74,32 @@ type protobufv2 struct {
 }
 
 func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+	settings := down.GetScheduled()
+	if settings == nil {
+		return nil, errNotScheduled
+	}
 	var fcnt uint32
 	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
 		fcnt = pld.MACPayload.FHDR.FCnt
 	}
-	modulation, ok := modulationToV2[down.Settings.Modulation]
+	modulation, ok := modulationToV2[settings.Modulation]
 	if !ok {
 		return nil, errModulation.WithAttributes("modulation", modulation.String())
 	}
 	v2downlink := &legacyttnpb.DownlinkMessage{
 		Payload: down.RawPayload,
 		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
-			Frequency:             down.Settings.Frequency,
-			Power:                 down.Settings.TxPower - eirpDelta,
+			Frequency:             settings.Frequency,
+			Power:                 settings.TxPower - eirpDelta,
 			PolarizationInversion: true,
 			RfChain:               0,
-			Timestamp:             uint32(down.TxMetadata.Timestamp % math.MaxUint32),
+			Timestamp:             settings.Timestamp,
 		},
 		ProtocolConfiguration: legacyttnpb.ProtocolTxConfiguration{
 			LoRaWAN: &legacyttnpb.LoRaWANTxConfiguration{
-				BitRate:    down.Settings.BitRate,
-				CodingRate: down.Settings.CodingRate,
-				DataRate:   fmt.Sprintf("SF%dBW%d", down.Settings.SpreadingFactor, down.Settings.Bandwidth/1000),
+				BitRate:    settings.BitRate,
+				CodingRate: settings.CodingRate,
+				DataRate:   fmt.Sprintf("SF%dBW%d", settings.SpreadingFactor, settings.Bandwidth/1000),
 				FCnt:       fcnt,
 				Modulation: modulation,
 			},
