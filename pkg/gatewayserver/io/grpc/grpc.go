@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -47,7 +48,6 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	// TODO: Remove (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
 	if err = validate.ID(ids.GatewayID); err != nil {
 		return
 	}
@@ -58,6 +58,14 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	if err != nil {
 		return
 	}
+	fp, err := s.server.GetFrequencyPlan(ctx, ids)
+	if err != nil {
+		return
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp)
+	if err != nil {
+		return
+	}
 
 	if peer, ok := peer.FromContext(ctx); ok {
 		ctx = log.NewContextWithField(ctx, "remote_addr", peer.Addr.String())
@@ -65,8 +73,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
-
-	conn, err := s.server.Connect(ctx, "grpc", ids)
+	conn, err := s.server.Connect(ctx, "grpc", ids, fp, scheduler)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)
@@ -136,7 +143,6 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	// TODO: Remove (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
 	if err := validate.ID(ids.GatewayID); err != nil {
 		return nil, err
 	}

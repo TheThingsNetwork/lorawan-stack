@@ -148,7 +148,7 @@ func TestTraffic(t *testing.T) {
 	go func() {
 		if err := srv.LinkGateway(stream); err != nil {
 			if !a.So(errors.IsCanceled(err), should.BeTrue) {
-				t.FailNow()
+				t.Fatalf("Expected context cancellation but got: %v", err)
 			}
 		}
 	}()
@@ -238,47 +238,57 @@ func TestTraffic(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		for i, tc := range []struct {
-			Message *ttnpb.DownlinkMessage
-			OK      bool
+			Message     *ttnpb.DownlinkMessage
+			AssertError func(error) bool
 		}{
 			{
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+								{
+									Timestamp: 100,
+								},
+							},
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
+							Rx1Delay:         ttnpb.RX_DELAY_1,
+							Rx1DataRateIndex: 5,
+							Rx1Frequency:     868100000,
+							Rx2DataRateIndex: 0,
+							Rx2Frequency:     869525000,
+							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+						},
 					},
 				},
-				OK: true,
+			},
+			{
+				Message: &ttnpb.DownlinkMessage{
+					RawPayload: []byte{0x01},
+					Settings: &ttnpb.DownlinkMessage_Scheduled{
+						Scheduled: &ttnpb.TxSettings{
+							Modulation:      ttnpb.Modulation_LORA,
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+							CodingRate:      "4/5",
+							Frequency:       869525000,
+						},
+					},
+				},
+				AssertError: errors.IsInvalidArgument, // Does not support scheduled downlink; the Gateway Server or gateway will take care of that.
 			},
 			{
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
 				},
-				OK: false, // Tx settings missing.
-			},
-			{
-				Message: &ttnpb.DownlinkMessage{
-					RawPayload: []byte{0x03},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
-					},
-				},
-				OK: false, // Invalid gateway ID.
+				AssertError: errors.IsInvalidArgument, // Tx request missing.
 			},
 		} {
 			t.Run(strconv.Itoa(i), func(t *testing.T) {
 				a := assertions.New(t)
 
 				err := conn.SendDown(tc.Message)
-				if tc.OK {
+				if tc.AssertError == nil {
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
@@ -288,8 +298,8 @@ func TestTraffic(t *testing.T) {
 					case <-time.After(timeout):
 						t.Fatal("Receive expected downlink timeout")
 					}
-				} else if !a.So(err, should.NotBeNil) {
-					t.FailNow()
+				} else if !a.So(tc.AssertError(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
 				}
 			})
 		}
