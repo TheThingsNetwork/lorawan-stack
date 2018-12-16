@@ -33,7 +33,6 @@ import (
 func TestScheduleAt(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	clock := &mockClock{}
 	fp := &frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
@@ -44,7 +43,7 @@ func TestScheduleAt(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, clock, fp)
+	scheduler, err := scheduling.NewScheduler(ctx, fp)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -181,7 +180,6 @@ func TestScheduleAt(t *testing.T) {
 func TestScheduleAnytime(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	clock := &mockClock{}
 	fp := &frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
@@ -192,7 +190,7 @@ func TestScheduleAnytime(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, clock, fp)
+	scheduler, err := scheduling.NewScheduler(ctx, fp)
 	a.So(err, should.BeNil)
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {

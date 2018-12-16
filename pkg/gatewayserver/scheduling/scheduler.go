@@ -46,10 +46,10 @@ var (
 	ScheduleTimeLong = 300*time.Millisecond + QueueDelay
 )
 
-// NewScheduler instantiates a new Scheduler for the given clock source and frequency plan.
-func NewScheduler(ctx context.Context, clock Clock, fp *frequencyplans.FrequencyPlan) (*Scheduler, error) {
+// NewScheduler instantiates a new Scheduler for the given frequency plan.
+func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan) (*Scheduler, error) {
 	s := &Scheduler{
-		clock:             clock,
+		RolloverClock:     &RolloverClock{},
 		respectsDwellTime: fp.RespectsDwellTime,
 		timeOffAir:        fp.TimeOffAir,
 	}
@@ -58,7 +58,7 @@ func NewScheduler(ctx context.Context, clock Clock, fp *frequencyplans.Frequency
 		return nil, err
 	}
 	for _, subBand := range band.BandDutyCycles {
-		sb := NewSubBand(ctx, subBand, clock, nil)
+		sb := NewSubBand(ctx, subBand, s.RolloverClock, nil)
 		s.subBands = append(s.subBands, sb)
 	}
 	return s, nil
@@ -66,7 +66,7 @@ func NewScheduler(ctx context.Context, clock Clock, fp *frequencyplans.Frequency
 
 // Scheduler is a packet scheduler that takes time conflicts and sub-band restrictions into account.
 type Scheduler struct {
-	clock             Clock
+	*RolloverClock
 	respectsDwellTime func(isDownlink bool, frequency uint64, duration time.Duration) bool
 	timeOffAir        frequencyplans.TimeOffAir
 	subBands          []*SubBand
@@ -99,7 +99,7 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 	}
 	var relative time.Duration
 	if settings.Time != nil {
-		relative = s.clock.ConcentratorTime(*settings.Time)
+		relative = s.RolloverClock.ConcentratorTime(*settings.Time)
 	} else {
 		relative = time.Duration(settings.Timestamp) * time.Microsecond
 	}
@@ -140,7 +140,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
-	now := s.clock.Now(time.Now())
+	now := s.RolloverClock.Now(time.Now())
 	if settings.Timestamp == 0 && settings.Time == nil {
 		settings.Timestamp = uint32((now + ScheduleTimeLong) / time.Microsecond)
 	}

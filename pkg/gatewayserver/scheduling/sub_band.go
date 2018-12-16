@@ -53,7 +53,7 @@ type SubBand struct {
 	emissions Emissions
 }
 
-// NewSubBand returns a new SubBand for the given band's duty-cycle, clock provider and optionally duty-cycle ceilings.
+// NewSubBand returns a new SubBand for the given band's duty-cycle, clock and optionally duty-cycle ceilings.
 func NewSubBand(ctx context.Context, band band.DutyCycle, clock Clock, ceilings DutyCycleCeilings) *SubBand {
 	if ceilings == nil {
 		ceilings = DefaultDutyCycleCeilings
