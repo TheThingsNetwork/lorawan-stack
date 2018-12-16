@@ -239,35 +239,46 @@ func TestTraffic(t *testing.T) {
 				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+								{
+									Timestamp: 100,
+								},
+							},
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
+							Rx1Delay:         ttnpb.RX_DELAY_1,
+							Rx1DataRateIndex: 5,
+							Rx1Frequency:     868100000,
+							Rx2DataRateIndex: 0,
+							Rx2Frequency:     869525000,
+							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+						},
 					},
 				},
 			},
 			{
 				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
 				Message: &ttnpb.DownlinkMessage{
-					RawPayload: []byte{0x02},
-				},
-				AssertError: errors.IsInvalidArgument, // Tx settings missing
-			},
-			{
-				Topic: fmt.Sprintf("v3/%v/down", "invalid-gateway"),
-				Message: &ttnpb.DownlinkMessage{
-					RawPayload: []byte{0x03},
-					Settings: ttnpb.TxSettings{
-						Modulation:      ttnpb.Modulation_LORA,
-						Bandwidth:       125000,
-						SpreadingFactor: 7,
-						CodingRate:      "4/5",
-						Frequency:       869525000,
+					RawPayload: []byte{0x01},
+					Settings: &ttnpb.DownlinkMessage_Scheduled{
+						Scheduled: &ttnpb.TxSettings{
+							Modulation:      ttnpb.Modulation_LORA,
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+							CodingRate:      "4/5",
+							Frequency:       869525000,
+						},
 					},
 				},
-				AssertError: errors.IsResourceExhausted, // schedule conflict
+				AssertError: errors.IsInvalidArgument, // Does not support scheduled downlink; the Gateway Server or gateway will take care of that.
+			},
+			{
+				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Message: &ttnpb.DownlinkMessage{
+					RawPayload: []byte{0x02},
+				},
+				AssertError: errors.IsInvalidArgument, // Tx request missing.
 			},
 		} {
 			t.Run(tc.Topic, func(t *testing.T) {
