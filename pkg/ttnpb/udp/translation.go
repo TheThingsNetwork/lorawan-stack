@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/version"
@@ -317,8 +318,8 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 		Timestamp:          tx.Tmst,
 	}
 	if tx.Time != nil {
-		abs := time.Time(*tx.Time)
-		scheduled.Time = &abs
+		gpsTime := gpstime.Parse(int64(*tx.Tmms))
+		scheduled.Time = &gpsTime
 	}
 	switch tx.Modu {
 	case lora:
@@ -372,8 +373,8 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		tx.Imme = true
 	}
 	if scheduled.Time != nil {
-		gpsTime := CompactTime(*scheduled.Time)
-		tx.Time = &gpsTime
+		gpsTime := uint64(gpstime.ToGPS(*scheduled.Time))
+		tx.Tmms = &gpsTime
 	}
 
 	switch scheduled.Modulation {
