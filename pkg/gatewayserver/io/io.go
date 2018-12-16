@@ -170,6 +170,7 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 	if len(request.DownlinkPaths) != 1 {
 		return errDownlinkPath
 	}
+	downlinkPath := request.DownlinkPaths[0]
 	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
@@ -225,6 +226,9 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 				TxPower:       int32(band.DefaultMaxEIRP),
 				ChannelIndex:  uint32(channelIndex),
 			}
+			if int(downlinkPath.AntennaIndex) < len(c.gateway.Antennas) {
+				settings.TxPower -= int32(c.gateway.Antennas[downlinkPath.AntennaIndex].Gain)
+			}
 			if dataRate.LoRa != "" {
 				settings.Modulation = ttnpb.Modulation_LORA
 				bw, err := dataRate.Bandwidth()
@@ -247,7 +251,7 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 			switch t := request.Time.(type) {
 			case *ttnpb.TxRequest_RelativeToUplink:
 				f = c.scheduler.ScheduleAt
-				settings.Timestamp = request.DownlinkPaths[0].Timestamp + uint32(rx.delay/time.Microsecond)
+				settings.Timestamp = downlinkPath.Timestamp + uint32(rx.delay/time.Microsecond)
 			case *ttnpb.TxRequest_Absolute:
 				f = c.scheduler.ScheduleAt
 				abs := *t.Absolute
