@@ -24,6 +24,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
@@ -230,9 +231,9 @@ func TestTraffic(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		for _, tc := range []struct {
-			Topic   string
-			Message *ttnpb.DownlinkMessage
-			OK      bool
+			Topic       string
+			Message     *ttnpb.DownlinkMessage
+			AssertError func(error) bool
 		}{
 			{
 				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
@@ -246,14 +247,13 @@ func TestTraffic(t *testing.T) {
 						Frequency:       869525000,
 					},
 				},
-				OK: true,
 			},
 			{
 				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
 				},
-				OK: false, // Tx settings missing
+				AssertError: errors.IsInvalidArgument, // Tx settings missing
 			},
 			{
 				Topic: fmt.Sprintf("v3/%v/down", "invalid-gateway"),
@@ -267,7 +267,7 @@ func TestTraffic(t *testing.T) {
 						Frequency:       869525000,
 					},
 				},
-				OK: false, // invalid gateway ID
+				AssertError: errors.IsResourceExhausted, // schedule conflict
 			},
 		} {
 			t.Run(tc.Topic, func(t *testing.T) {
@@ -285,18 +285,20 @@ func TestTraffic(t *testing.T) {
 				}
 
 				err := conn.SendDown(tc.Message)
-				if tc.OK {
-					if !a.So(err, should.BeNil) {
-						t.FailNow()
-					}
-					select {
-					case down := <-downCh:
+				if err != nil && (tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue)) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				select {
+				case down := <-downCh:
+					if tc.AssertError == nil {
 						a.So(down, should.Resemble, tc.Message)
-					case <-time.After(timeout):
+					} else {
+						t.Fatalf("Unexpected message: %v", down)
+					}
+				case <-time.After(timeout):
+					if tc.AssertError == nil {
 						t.Fatal("Receive expected downlink timeout")
 					}
-				} else if !a.So(err, should.NotBeNil) {
-					t.FailNow()
 				}
 			})
 		}

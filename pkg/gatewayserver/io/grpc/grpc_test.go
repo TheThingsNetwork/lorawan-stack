@@ -288,18 +288,20 @@ func TestTraffic(t *testing.T) {
 				a := assertions.New(t)
 
 				err := conn.SendDown(tc.Message)
-				if tc.AssertError == nil {
-					if !a.So(err, should.BeNil) {
-						t.FailNow()
-					}
-					select {
-					case down := <-downCh:
+				if err != nil && (tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue)) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				select {
+				case down := <-downCh:
+					if tc.AssertError == nil {
 						a.So(down, should.Resemble, tc.Message)
-					case <-time.After(timeout):
+					} else {
+						t.Fatalf("Unexpected message: %v", down)
+					}
+				case <-time.After(timeout):
+					if tc.AssertError == nil {
 						t.Fatal("Receive expected downlink timeout")
 					}
-				} else if !a.So(tc.AssertError(err), should.BeTrue) {
-					t.Fatalf("Unexpected error: %v", err)
 				}
 			})
 		}
