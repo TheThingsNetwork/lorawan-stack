@@ -16,6 +16,7 @@ import faker from 'faker'
 
 const APPLICATIONS_COUNT = 10
 const DEVICES_COUNT = 80
+const GATEWAYS_COUNT = 15
 
 const applications = [ ...new Array(APPLICATIONS_COUNT).keys() ]
   .map(_ => ({
@@ -41,4 +42,34 @@ const devices = [ ...new Array(DEVICES_COUNT).keys() ]
     }
   })
 
-export default { devices, applications }
+const generateGatewayEUI = function () {
+  let res = 'eui-'
+  for (let i = 0; i < 16; i++) {
+    res += faker.random.alphaNumeric()
+  }
+
+  return res
+}
+
+const gatewayAntennas = [ ...new Array(GATEWAYS_COUNT).keys() ]
+  .map(_ => ({
+    gain: Math.floor(Math.random() * 5),
+    location: {
+      latitude: faker.address.latitude(),
+      longitude: faker.address.longitude(),
+    },
+  }))
+
+const gateways = [ ...new Array(GATEWAYS_COUNT).keys() ]
+  .map((_, idx) => ({
+    gateway_id: faker.random.uuid(),
+    eui: generateGatewayEUI(),
+    name: faker.lorem.word(),
+    description: faker.lorem.words(),
+    created_at: faker.date.past(),
+    updated_at: faker.date.recent(),
+    frequency_plan: 'EU_863_870',
+    antennas: [ gatewayAntennas[idx] ],
+  }))
+
+export default { devices, applications, gateways }
