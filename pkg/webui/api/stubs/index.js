@@ -14,30 +14,32 @@
 
 import fakeData from './fake-data'
 
+const genericSearch = function (entity, params, predicate = () => true) {
+  const start = (params.page - 1) * params.pageSize
+  const end = start + params.pageSize
+
+  const res = fakeData[entity].filter(predicate)
+  const total = res.length
+  const delay = Math.floor(Math.random() * (800 - 100)) + 100
+
+  return new Promise(resolve => setTimeout(() => resolve(
+    { [entity]: res.slice(start, end), totalCount: total }
+  ), delay))
+}
+
 export default {
   applications: {
     list (params) {
-      const start = (params.page - 1) * params.pageSize
-      const end = start + params.pageSize
-
-      const res = fakeData.applications.filter(app => app.application_id)
-      const total = res.length
-
-      return new Promise(resolve => setTimeout(() => resolve(
-        { applications: res.slice(start, end), totalCount: total }
-      ), 1000))
+      return genericSearch('applications', params)
     },
     search (params) {
-      const start = (params.page - 1) * params.pageSize
-      const end = start + params.pageSize
       const query = params.query || ''
 
-      const res = fakeData.applications.filter(app => app.application_id.includes(query))
-      const total = res.length
-
-      return new Promise(resolve => setTimeout(() => resolve(
-        { applications: res.slice(start, end), totalCount: total }
-      ), 1000))
+      return genericSearch(
+        'applications',
+        params,
+        app => app.application_id.includes(query)
+      )
     },
   },
   application: {
@@ -55,29 +57,16 @@ export default {
   },
   devices: {
     list (appId, params) {
-      const start = (params.page - 1) * params.pageSize
-      const end = start + params.pageSize
-
-      const res = fakeData.devices.filter(d => d.application_id === appId)
-      const total = res.length
-
-      return new Promise(resolve => setTimeout(() => resolve(
-        { devices: res.slice(start, end), totalCount: total }
-      ), 1000))
+      return genericSearch('devices', params, d => d.application_id === appId)
     },
     search (appId, params) {
-      const start = (params.page - 1) * params.pageSize
-      const end = start + params.pageSize
       const query = params.query || ''
 
-      const res = fakeData.devices
-        .filter(d => d.application_id === appId)
-        .filter(d => d.device_id.includes(query))
-      const total = res.length
-
-      return new Promise(resolve => setTimeout(() => resolve(
-        { devices: res.slice(start, end), totalCount: total }
-      ), 1000))
+      return genericSearch(
+        'devices',
+        params,
+        d => d.application_id === appId && d.device_id.includes(query),
+      )
     },
   },
 }
