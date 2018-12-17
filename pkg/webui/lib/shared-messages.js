@@ -19,6 +19,7 @@ export default defineMessages({
   access: 'Access',
   add: 'Add',
   all: 'All',
+  antennas: 'Antennas',
   appId: 'Application ID',
   application: 'Application',
   applications: 'Applications',
