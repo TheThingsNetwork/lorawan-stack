@@ -92,7 +92,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
 				},
-				BatteryPercentage: float32(42-2) / float32(253),
+				BatteryPercentage: float32(42-1) / float32(253),
 				DownlinkMargin:    4,
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},

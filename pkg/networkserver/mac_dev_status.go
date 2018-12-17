@@ -64,7 +64,7 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 			dev.BatteryPercentage = -1
 		default:
 			dev.PowerState = ttnpb.PowerState_POWER_BATTERY
-			dev.BatteryPercentage = float32(pld.Battery-2) / 253
+			dev.BatteryPercentage = float32(pld.Battery-1) / 253
 		}
 		dev.DownlinkMargin = pld.Margin
 		dev.LastDevStatusReceivedAt = &recvAt
