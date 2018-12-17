@@ -22,44 +22,52 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
-var errAntennaNotFound = errors.DefineNotFound("antenna_not_found", "antenna `{index}` not found")
+var (
+	errNotTxRequest = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
+	errSchedulePath = errors.Define("schedule_path", "failed to schedule on path `{gateway_uid}`")
+	errSchedule     = errors.DefineAborted("schedule", "failed to schedule")
+)
 
-// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
-// The Gateway Server may refuse if there are any conflicts in the schedule or
-// if a duty cycle prevents the gateway from transmitting.
+// ScheduleDownlink instructs the Gateway Server to schedule a downlink message request.
+// This method returns an error if the downlink path cannot be found, if the requested parameters are invalid for the
+// gateway's frequency plan or if there is no transmission window available because of scheduling conflicts or regional
+// limitations such as duty-cycle and dwell time.
 func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
+	request := down.GetRequest()
+	if request == nil {
+		return nil, errNotTxRequest
+	}
+	paths := request.DownlinkPaths
 
-	ids := down.TxMetadata.GatewayIdentifiers
-	// TODO: Remove validation (https://github.com/TheThingsIndustries/lorawan-stack/issues/1058)
-	if err := validate.ID(ids.GatewayID); err != nil {
-		return nil, err
+	logger := log.FromContext(ctx)
+	var details []interface{}
+	for _, path := range paths {
+		uid := unique.ID(ctx, path.GatewayIdentifiers)
+		val, ok := gs.connections.Load(uid)
+		if !ok {
+			details = append(details, errNotConnected.WithAttributes("gateway_uid", uid))
+			continue
+		}
+		conn := val.(*io.Connection)
+		// Provide only the connection's downlink path as required by SendDown.
+		request.DownlinkPaths = []*ttnpb.TxRequest_DownlinkPath{path}
+		if err := conn.SendDown(down); err != nil {
+			logger.WithField("gateway_uid", uid).WithError(err).Debug("Failed to schedule on path")
+			details = append(details, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))
+			continue
+		}
+		ctx = events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
+		registerSendDownlink(ctx, conn.Gateway(), down)
+		return &types.Empty{}, nil
 	}
 
-	uid := unique.ID(ctx, ids)
-	val, ok := gs.connections.Load(uid)
-	if !ok {
-		return nil, errNotConnected.WithAttributes("gateway_uid", uid)
-	}
-	conn := val.(*io.Connection)
-	gtw := conn.Gateway()
-	if int(down.TxMetadata.AntennaIndex) >= len(gtw.Antennas) {
-		return nil, errAntennaNotFound.WithAttributes("index", down.TxMetadata.AntennaIndex)
-	}
-	down.Settings.TxPower -= int32(gtw.Antennas[down.TxMetadata.AntennaIndex].Gain)
-
-	if err := conn.SendDown(down); err != nil {
-		return nil, err
-	}
-
-	ctx = events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
-	registerSendDownlink(ctx, conn.Gateway(), down)
-	return &types.Empty{}, nil
+	return nil, errSchedule.WithDetails(details...)
 }

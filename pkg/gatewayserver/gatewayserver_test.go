@@ -694,98 +694,139 @@ func TestGatewayServer(t *testing.T) {
 				ctx := cluster.NewContext(test.Context(), nil)
 				downlinkCount := 0
 				for _, tc := range []struct {
-					Name       string
-					Message    *ttnpb.DownlinkMessage
-					ValidError func(error) bool
+					Name                          string
+					Message                       *ttnpb.DownlinkMessage
+					AssertError                   func(error) bool
+					AssertScheduleRxWindowDetails []func(error) bool
 				}{
 					{
-						Name: "NotConnected",
+						Name: "InvalidSettingsType",
 						Message: &ttnpb.DownlinkMessage{
-							TxMetadata: ttnpb.TxMetadata{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-									GatewayID: "not-connected",
+							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
+							Settings: &ttnpb.DownlinkMessage_Scheduled{
+								Scheduled: &ttnpb.TxSettings{
+									Modulation:      ttnpb.Modulation_LORA,
+									SpreadingFactor: 12,
+									Bandwidth:       125000,
+									CodingRate:      "4/5",
+									Frequency:       869525000,
+									TxPower:         10,
+									Timestamp:       100,
 								},
 							},
 						},
-						ValidError: errors.IsNotFound,
+						AssertError: errors.IsInvalidArgument, // Network Server sends Tx request only.
 					},
 					{
-						Name: "Valid",
+						Name: "NotConnected",
+						Message: &ttnpb.DownlinkMessage{
+							Settings: &ttnpb.DownlinkMessage_Request{
+								Request: &ttnpb.TxRequest{
+									DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+										{
+											GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+												GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+													GatewayID: "not-connected",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						AssertError: errors.IsAborted, // The gateway is not connected.
+					},
+					{
+						Name: "ValidClassA",
 						Message: &ttnpb.DownlinkMessage{
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
-							Settings: ttnpb.TxSettings{
-								Modulation:      ttnpb.Modulation_LORA,
-								SpreadingFactor: 12,
-								Bandwidth:       125000,
-								CodingRate:      "4/5",
-								Frequency:       869525000,
-								TxPower:         10,
-							},
-							TxMetadata: ttnpb.TxMetadata{
-								GatewayIdentifiers: ids,
-								Timestamp:          0,
+							Settings: &ttnpb.DownlinkMessage_Request{
+								Request: &ttnpb.TxRequest{
+									DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+										{
+											GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+												GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+													GatewayID: registeredGatewayID,
+												},
+											},
+											Timestamp: 100,
+										},
+									},
+									Priority:         ttnpb.TxSchedulePriority_NORMAL,
+									Rx1Delay:         ttnpb.RX_DELAY_1,
+									Rx1DataRateIndex: 5,
+									Rx1Frequency:     868100000,
+									Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+								},
 							},
 						},
 					},
 					{
-						Name: "Invalid antenna",
-						Message: &ttnpb.DownlinkMessage{
-							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
-							Settings: ttnpb.TxSettings{
-								Modulation:      ttnpb.Modulation_LORA,
-								SpreadingFactor: 12,
-								Bandwidth:       125000,
-								CodingRate:      "4/5",
-								Frequency:       869525000,
-							},
-							TxMetadata: ttnpb.TxMetadata{
-								AntennaIndex:       130,
-								GatewayIdentifiers: ids,
-								Timestamp:          0,
-							},
-						},
-						ValidError: errors.IsNotFound,
-					},
-					{
-						Name: "Conflict",
+						Name: "ConflictClassA",
 						Message: &ttnpb.DownlinkMessage{
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
-							Settings: ttnpb.TxSettings{
-								Modulation:      ttnpb.Modulation_LORA,
-								SpreadingFactor: 10,
-								Bandwidth:       125000,
-								CodingRate:      "4/5",
-								Frequency:       869525000,
-								TxPower:         10,
-							},
-							TxMetadata: ttnpb.TxMetadata{
-								GatewayIdentifiers: ids,
-								Timestamp:          0,
+							Settings: &ttnpb.DownlinkMessage_Request{
+								Request: &ttnpb.TxRequest{
+									DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
+										{
+											GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+												GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+													GatewayID: registeredGatewayID,
+												},
+											},
+											Timestamp: 100,
+										},
+									},
+									Priority:         ttnpb.TxSchedulePriority_NORMAL,
+									Rx1Delay:         ttnpb.RX_DELAY_1,
+									Rx1DataRateIndex: 5,
+									Rx1Frequency:     868100000,
+									Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
+								},
 							},
 						},
-						ValidError: errors.IsResourceExhausted,
+						AssertError: errors.IsAborted,
+						AssertScheduleRxWindowDetails: []func(error) bool{
+							errors.IsResourceExhausted,  // Rx1 conflicts with previous.
+							errors.IsFailedPrecondition, // Rx2 not provided.
+						},
 					},
 				} {
 					t.Run(tc.Name, func(t *testing.T) {
 						a := assertions.New(t)
 
 						_, err := gs.ScheduleDownlink(ctx, tc.Message)
-						if tc.ValidError != nil {
-							if !a.So(tc.ValidError(err), should.BeTrue) {
-								t.Fatalf("Expected a different error, but have %v", err)
+						if err != nil {
+							if tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue) {
+								t.Fatalf("Unexpected error: %v", err)
+							}
+							if tc.AssertScheduleRxWindowDetails != nil {
+								a.So(err, should.HaveSameErrorDefinitionAs, gatewayserver.ErrSchedule)
+								a.So(errors.Details(err), should.HaveLength, 1)
+								errSchedulePathCause := errors.Cause(errors.Details(err)[0].(error))
+								a.So(errors.IsAborted(errSchedulePathCause), should.BeTrue)
+								for i, assert := range tc.AssertScheduleRxWindowDetails {
+									errRxWindow := errors.Details(errSchedulePathCause)[i].(error)
+									if !a.So(assert(errRxWindow), should.BeTrue) {
+										t.Fatalf("Unexpected Rx window %d error: %v", i+1, errRxWindow)
+									}
+								}
 							}
 							return
-						} else if !a.So(err, should.BeNil) {
-							t.FailNow()
+						} else if tc.AssertError != nil {
+							t.Fatalf("Expected error")
 						}
 						downlinkCount++
 
 						select {
 						case msg := <-downCh:
-							msg.DownlinkMessage.TxMetadata.GatewayIdentifiers = ids
-							a.So(msg.DownlinkMessage.Settings, should.Resemble, tc.Message.Settings)
-							a.So(msg.DownlinkMessage.TxMetadata, should.Resemble, tc.Message.TxMetadata)
-							a.So(msg.DownlinkMessage.RawPayload, should.Resemble, tc.Message.RawPayload)
+							if gs.GetConnection(ctx, ids).HasScheduler() {
+								settings := msg.DownlinkMessage.GetScheduled()
+								a.So(settings, should.NotBeNil)
+							} else {
+								request := msg.DownlinkMessage.GetRequest()
+								a.So(request, should.NotBeNil)
+							}
 						case <-time.After(timeout):
 							t.Fatal("Expected downlink timeout")
 						}
