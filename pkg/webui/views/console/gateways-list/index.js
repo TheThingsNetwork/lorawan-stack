@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,26 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Row, Col } from 'react-grid-system'
 
-import GatewaysList from '../gateways-list'
-
+import Message from '../../../lib/components/message'
+import GatewaysTable from '../../../containers/gateways-table'
 import sharedMessages from '../../../lib/shared-messages'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 
-@withBreadcrumb('gateways', function (props) {
-  return (
-    <Breadcrumb
-      path="/console/gateways"
-      content={sharedMessages.gateways}
-    />
-  )
-})
-export default class Gateways extends React.Component {
+const GATEWAYS_TABLE_SIZE = 5
 
+export default class GatewaysList extends React.Component {
   render () {
-    const { path } = this.props.match
     return (
-      <Switch>
-        <Route exact path={`${path}`} component={GatewaysList} />
-      </Switch>
+      <Row>
+        <IntlHelmet>
+          <title><Message content={sharedMessages.gateways} /></title>
+        </IntlHelmet>
+        <Col sm={12}>
+          <GatewaysTable pageSize={GATEWAYS_TABLE_SIZE} />
+        </Col>
+      </Row>
     )
   }
 }
