@@ -43,7 +43,7 @@ func TestScheduleAt(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -190,7 +190,7 @@ func TestScheduleAnytime(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	a.So(err, should.BeNil)
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {

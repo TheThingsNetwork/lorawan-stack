@@ -18,6 +18,7 @@ package scheduling
 
 import (
 	"context"
+	"math"
 	"sync"
 	"time"
 
@@ -47,18 +48,27 @@ var (
 )
 
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
-func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan) (*Scheduler, error) {
+func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Scheduler, error) {
 	s := &Scheduler{
 		RolloverClock:     &RolloverClock{},
 		respectsDwellTime: fp.RespectsDwellTime,
 		timeOffAir:        fp.TimeOffAir,
 	}
-	band, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return nil, err
-	}
-	for _, subBand := range band.BandDutyCycles {
-		sb := NewSubBand(ctx, subBand, s.RolloverClock, nil)
+	if enforceDutyCycle {
+		band, err := band.GetByID(fp.BandID)
+		if err != nil {
+			return nil, err
+		}
+		for _, subBand := range band.BandDutyCycles {
+			sb := NewSubBand(ctx, subBand, s.RolloverClock, nil)
+			s.subBands = append(s.subBands, sb)
+		}
+	} else {
+		sb := NewSubBand(ctx, band.DutyCycle{
+			MinFrequency: 0,
+			MaxFrequency: math.MaxUint64,
+			Value:        1,
+		}, s.RolloverClock, nil)
 		s.subBands = append(s.subBands, sb)
 	}
 	return s, nil

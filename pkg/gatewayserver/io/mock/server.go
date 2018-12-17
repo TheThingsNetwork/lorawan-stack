@@ -20,12 +20,11 @@ import (
 	"strings"
 	"sync"
 
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
-
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -75,7 +74,7 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 	if err != nil {
 		return nil, err
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	if err != nil {
 		return nil, err
 	}
