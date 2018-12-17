@@ -313,6 +313,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -377,6 +378,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -446,6 +448,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -516,6 +519,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -582,6 +586,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -662,6 +667,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -731,6 +737,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
@@ -811,6 +818,7 @@ func handleUplinkTest() func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
+					msg.Payload.GetMACPayload().FHDR.ADR = false
 					msg.Settings.ChannelIndex = 2
 					msg.Settings.DataRateIndex = 3
 
