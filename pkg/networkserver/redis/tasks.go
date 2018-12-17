@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
+// DownlinkTaskQueue is a Redis downlink task queue.
 type DownlinkTaskQueue struct {
 	*ttnredis.TaskQueue
 }
@@ -31,6 +32,7 @@ const (
 	downlinkKey = "downlink"
 )
 
+// NewDownlinkTaskQueue returns new downlink task queue.
 func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *DownlinkTaskQueue {
 	return &DownlinkTaskQueue{TaskQueue: &ttnredis.TaskQueue{
 		Redis:  cl,
@@ -41,10 +43,13 @@ func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *
 	}}
 }
 
+// Add adds downlink task for device identified by devID at time startAt.
 func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, startAt time.Time) error {
 	return q.TaskQueue.Add(unique.ID(ctx, devID), startAt)
 }
 
+// Pop calls f on the most recent downlink task in the schedule, for which timestamp is in range [0, time.Now()],
+// if such is available, otherwise it blocks until it is.
 func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
 	return q.TaskQueue.Pop(ctx, func(uid string, startAt time.Time) error {
 		ids, err := unique.ToDeviceID(uid)

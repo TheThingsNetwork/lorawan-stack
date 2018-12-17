@@ -21,7 +21,15 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// DownlinkTaskQueue represents an entity, that holds downlink tasks sorted by timestamp.
 type DownlinkTaskQueue interface {
+	// Add adds downlink task for device identified by devID at time t.
+	// Implementations must ensure that Add returns fast.
 	Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error
+
+	// Pop calls f on the most recent downlink task in the schedule, for which timestamp is in range [0, time.Now()],
+	// if such is available, otherwise it blocks until it is.
+	// Context passed to f must be derived from ctx.
+	// Implementations must respect ctx.Deadline() value on best-effort basis, if such is present.
 	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }

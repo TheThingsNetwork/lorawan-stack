@@ -674,6 +674,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	return ns, nil
 }
 
+// processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
+// NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 	var scheduleErr bool
 	var setErr bool

@@ -51,10 +51,12 @@ var (
 	Timeout = (1 << 10) * test.Delay
 )
 
+// CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.
 func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
 	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
 }
 
+// CopyUplinkMessage returns a deep copy of ttnpb.UplinkMessage pb.
 func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
 }
@@ -65,11 +67,13 @@ func SetAppQueueUpdateTimeout(d time.Duration) {
 
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
 
+// MockDownlinkTaskQueue is a mock DownlinkTaskQueue used for testing.
 type MockDownlinkTaskQueue struct {
 	AddFunc func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error
 	PopFunc func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }
 
+// Add calls AddFunc if set and returns nil otherwise.
 func (q MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
 	if q.AddFunc == nil {
 		return nil
@@ -77,6 +81,7 @@ func (q MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIde
 	return q.AddFunc(ctx, devID, t)
 }
 
+// Pop calls PopFunc if set and waits until read on ctx.Done() succeeds and returns ctx.Err() otherwise.
 func (q MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
 	if q.PopFunc == nil {
 		<-ctx.Done()
@@ -95,6 +100,7 @@ type MockDeviceRegistry struct {
 	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
+// GetByEUI calls GetByEUIFunc if set and returns nil, error otherwise.
 func (r MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	if r.GetByEUIFunc == nil {
 		return nil, errors.New("GetByEUI not set")
@@ -102,6 +108,7 @@ func (r MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.
 	return r.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
 }
 
+// GetByID calls GetByIDFunc if set and returns nil, error otherwise.
 func (r MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 	if r.GetByIDFunc == nil {
 		return nil, errors.New("GetByID not set")
@@ -109,6 +116,7 @@ func (r MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 	return r.GetByIDFunc(ctx, appID, devID, paths)
 }
 
+// RangeByAddr calls RangeByAddrFunc if set and returns error otherwise.
 func (r MockDeviceRegistry) RangeByAddr(devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
 	if r.RangeByAddrFunc == nil {
 		return errors.New("RangeByAddr not set")
@@ -116,6 +124,7 @@ func (r MockDeviceRegistry) RangeByAddr(devAddr types.DevAddr, paths []string, f
 	return r.RangeByAddrFunc(devAddr, paths, f)
 }
 
+// SetByID calls SetByIDFunc if set and returns nil, error otherwise.
 func (r MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if r.SetByIDFunc == nil {
 		return nil, errors.New("SetByID not set")
