@@ -20,11 +20,12 @@ import (
 	"strings"
 	"sync"
 
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
+
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -65,11 +66,19 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 }
 
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) (*io.Connection, error) {
+func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 	gtw := &ttnpb.Gateway{GatewayIdentifiers: ids}
+	fp, err := s.GetFrequencyPlan(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp)
+	if err != nil {
+		return nil, err
+	}
 	conn := io.NewConnection(ctx, protocol, gtw, fp, scheduler)
 	select {
 	case s.connectionsCh <- conn:

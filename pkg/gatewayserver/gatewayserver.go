@@ -199,7 +199,7 @@ var (
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
-func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) (*io.Connection, error) {
+func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -239,6 +239,14 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		}
 	} else if err != nil {
+		return nil, err
+	}
+	fp, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanID)
+	if err != nil {
+		return nil, err
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp)
+	if err != nil {
 		return nil, err
 	}
 

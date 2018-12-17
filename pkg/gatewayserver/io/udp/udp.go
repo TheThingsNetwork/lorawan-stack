@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
@@ -199,14 +198,6 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 		if err != nil {
 			return nil, err
 		}
-		fp, err := s.server.GetFrequencyPlan(ctx, ids)
-		if err != nil {
-			return nil, err
-		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp)
-		if err != nil {
-			return nil, err
-		}
 		uid := unique.ID(ctx, ids)
 		ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 		ctx = rights.NewContext(ctx, rights.Rights{
@@ -216,7 +207,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				},
 			},
 		})
-		io, err = s.server.Connect(ctx, "udp", ids, fp, scheduler)
+		io, err = s.server.Connect(ctx, "udp", ids)
 		if err != nil {
 			return nil, err
 		}

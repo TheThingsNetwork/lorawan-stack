@@ -28,7 +28,6 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -202,18 +201,10 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	if err != nil {
 		return nil, err
 	}
-	fp, err := c.server.GetFrequencyPlan(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp)
-	if err != nil {
-		return nil, err
-	}
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
-	c.io, err = c.server.Connect(ctx, "mqtt", ids, fp, scheduler)
+	c.io, err = c.server.Connect(ctx, "mqtt", ids)
 	if err != nil {
 		return nil, err
 	}
