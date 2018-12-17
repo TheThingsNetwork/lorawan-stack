@@ -69,4 +69,18 @@ export default {
       )
     },
   },
+  gateways: {
+    list (params) {
+      return genericSearch('gateways', params)
+    },
+    search (params) {
+      const query = params.query || ''
+
+      return genericSearch(
+        'gateways',
+        params,
+        gtw => gtw.gateway_id.includes(query)
+      )
+    },
+  },
 }

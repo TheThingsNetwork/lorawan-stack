@@ -50,6 +50,10 @@ export default {
         list: stubs.devices.list,
         search: stubs.devices.search,
       },
+      gateways: {
+        list: stubs.gateways.list,
+        search: stubs.gateways.search,
+      },
     },
   },
   console: {
