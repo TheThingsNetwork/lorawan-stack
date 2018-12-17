@@ -18,6 +18,7 @@ import init from './init'
 import applications from './applications'
 import application from './application'
 import devices from './devices'
+import gateways from './gateways'
 
 export default [
   client,
@@ -26,4 +27,5 @@ export default [
   ...applications,
   ...application,
   ...devices,
+  ...gateways,
 ]

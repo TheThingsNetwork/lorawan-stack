@@ -19,6 +19,7 @@ import _console from './console' // conflicting name with window.console
 import applications from './applications'
 import application from './application'
 import devices from './devices'
+import gateways from './gateways'
 
 export default combineReducers({
   user,
@@ -27,4 +28,5 @@ export default combineReducers({
   applications,
   application,
   devices,
+  gateways,
 })
