@@ -101,6 +101,9 @@ func (c *Connection) Disconnect(err error) {
 // Protocol returns the protocol used for the connection, i.e. grpc, mqtt or udp.
 func (c *Connection) Protocol() string { return c.protocol }
 
+// HasScheduler returns whether the connection has a scheduler.
+func (c *Connection) HasScheduler() bool { return c.scheduler != nil }
+
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
@@ -151,26 +154,27 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 }
 
 var (
-	errNotTxRequest    = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
-	errDownlinkPath    = errors.DefineInvalidArgument("downlink_path", "invalid downlink path: need exactly one option")
-	errRxEmpty         = errors.DefineNotFound("rx_empty", "settings empty")
-	errDataRate        = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
-	errDownlinkChannel = errors.DefineInvalidArgument("downlink_channel", "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`")
-	errTxSchedule      = errors.DefineAborted("tx_schedule", "schedule failed", "reason_rx1", "reason_rx2")
+	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
+	errDownlinkPath     = errors.DefineInvalidArgument("downlink_path", "invalid downlink path; need exactly one path")
+	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
+	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
+	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
+	errDownlinkChannel  = errors.DefineInvalidArgument("downlink_channel", "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`")
+	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
 
 // SendDown schedules and sends a downlink message and updates the downlink stats.
-// This method returns an error if the downlink message is not a Tx request or if the downlink path is not already
-// reduced to one.
-func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
-	request := down.GetRequest()
+// This method returns an error if the downlink message is not a Tx request or if the request does not contain exactly
+// one downlink path.
+func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
+	request := msg.GetRequest()
 	if request == nil {
 		return errNotTxRequest
 	}
 	if len(request.DownlinkPaths) != 1 {
 		return errDownlinkPath
 	}
-	downlinkPath := request.DownlinkPaths[0]
+	path := request.DownlinkPaths[0]
 	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
@@ -178,7 +182,7 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 		if err != nil {
 			return err
 		}
-		var schedulingErrors []error
+		var errRxDetails []interface{}
 		for i, rx := range []struct {
 			dataRateIndex ttnpb.DataRateIndex
 			frequency     uint64
@@ -196,7 +200,7 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 			},
 		} {
 			if rx.frequency == 0 {
-				schedulingErrors = append(schedulingErrors, errRxEmpty)
+				errRxDetails = append(errRxDetails, errRxEmpty)
 				continue
 			}
 			dataRate := band.DataRates[rx.dataRateIndex].Rate
@@ -226,8 +230,8 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 				TxPower:       int32(band.DefaultMaxEIRP),
 				ChannelIndex:  uint32(channelIndex),
 			}
-			if int(downlinkPath.AntennaIndex) < len(c.gateway.Antennas) {
-				settings.TxPower -= int32(c.gateway.Antennas[downlinkPath.AntennaIndex].Gain)
+			if int(path.AntennaIndex) < len(c.gateway.Antennas) {
+				settings.TxPower -= int32(c.gateway.Antennas[path.AntennaIndex].Gain)
 			}
 			if dataRate.LoRa != "" {
 				settings.Modulation = ttnpb.Modulation_LORA
@@ -251,7 +255,7 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 			switch t := request.Time.(type) {
 			case *ttnpb.TxRequest_RelativeToUplink:
 				f = c.scheduler.ScheduleAt
-				settings.Timestamp = downlinkPath.Timestamp + uint32(rx.delay/time.Microsecond)
+				settings.Timestamp = path.Timestamp + uint32(rx.delay/time.Microsecond)
 			case *ttnpb.TxRequest_Absolute:
 				f = c.scheduler.ScheduleAt
 				abs := *t.Absolute
@@ -261,13 +265,12 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 			default:
 				panic(fmt.Sprintf("proto: unexpected type %T in oneof", t))
 			}
-			em, err := f(c.ctx, len(down.RawPayload), settings, request.Priority)
+			em, err := f(c.ctx, len(msg.RawPayload), settings, request.Priority)
 			if err != nil {
-				schedulingErrors = append(schedulingErrors, err)
+				errRxDetails = append(errRxDetails, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
 				continue
 			}
-			schedulingErrors = nil
-			down.Settings = &ttnpb.DownlinkMessage_Scheduled{
+			msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 				Scheduled: &settings,
 			}
 			log.FromContext(c.ctx).WithFields(log.Fields(
@@ -277,21 +280,17 @@ func (c *Connection) SendDown(down *ttnpb.DownlinkMessage) error {
 				"starts", em.Starts(),
 				"duration", em.Duration(),
 			)).Debug("Scheduled downlink")
+			errRxDetails = nil
 			break
 		}
-		if schedulingErrors != nil {
-			var kv []interface{}
-			for i, err := range schedulingErrors {
-				kv = append(kv, fmt.Sprintf("reason_rx%d", i+1), err.Error())
-			}
-			return errTxSchedule.WithAttributes(kv...)
+		if errRxDetails != nil {
+			return errTxSchedule.WithDetails(errRxDetails...)
 		}
 	}
-
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
-	case c.downCh <- down:
+	case c.downCh <- msg:
 		atomic.AddUint64(&c.downlinks, 1)
 		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
 	default:
