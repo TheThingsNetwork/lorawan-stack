@@ -18,23 +18,45 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type jsEndDeviceRegistryServer struct {
 	JS *JoinServer
 }
 
-func (jsEndDeviceRegistryServer) Get(context.Context, *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+// Get implements ttnpb.JsEndDeviceRegistryServer.
+func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	// TODO: Change JsEndDeviceRegistry to not work with EndDeviceIdentifiers (https://github.com/TheThingsIndustries/lorawan-stack/pull/1374)
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+	return s.JS.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
 }
 
-func (jsEndDeviceRegistryServer) Set(context.Context, *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+// Set implements ttnpb.AsEndDeviceRegistryServer.
+func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	// TODO: Change JsEndDeviceRegistry to not work with EndDeviceIdentifiers (https://github.com/TheThingsIndustries/lorawan-stack/pull/1374)
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+	return s.JS.devices.SetByEUI(ctx, *req.Device.EndDeviceIdentifiers.JoinEUI, *req.Device.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return &req.Device, req.FieldMask.Paths, nil
+	})
 }
 
-func (jsEndDeviceRegistryServer) Delete(context.Context, *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+// Delete implements ttnpb.AsEndDeviceRegistryServer.
+func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	// TODO: Change JsEndDeviceRegistry to not work with EndDeviceIdentifiers (https://github.com/TheThingsIndustries/lorawan-stack/pull/1374)
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+	_, err := s.JS.devices.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return nil, nil, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, err
 }
