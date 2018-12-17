@@ -19,19 +19,38 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func (ns *NetworkServer) Get(context.Context, *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+// Get implements NsEndDeviceRegistryServer.
+func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+		return nil, err
+	}
+	return ns.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
 }
 
-func (ns *NetworkServer) Set(context.Context, *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+// Set implements NsEndDeviceRegistryServer.
+func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+	return ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return &req.Device, req.FieldMask.Paths, nil
+	})
 }
 
-func (ns *NetworkServer) Delete(context.Context, *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+// Delete implements NsEndDeviceRegistryServer.
+func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+	_, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return nil, nil, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, err
 }
