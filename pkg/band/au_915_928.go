@@ -122,7 +122,7 @@ func init() {
 			return ttnpb.DataRateIndex(si), nil
 		},
 
-		GenerateChMasks: generateChMask72,
+		GenerateChMasks: makeGenerateChMask72(true),
 		ParseChMask:     parseChMask72,
 
 		DefaultRx2Parameters: Rx2Parameters{8, 923300000},
@@ -137,7 +137,7 @@ func init() {
 		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1:     bandIdentity,
 		regionalParameters1_0_2RevA: auDataRates1_0_2,
-		regionalParameters1_0_2RevB: bandIdentity,
+		regionalParameters1_0_2RevB: disableChMaskCntl51_0_2,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
 	All[AU_915_928] = au_915_928

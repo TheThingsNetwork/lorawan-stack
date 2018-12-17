@@ -215,7 +215,7 @@ func TestGenerateChMask(t *testing.T) {
 		},
 		{
 			Name:     "72 channels/1-16 on, 42, 67, 69 on",
-			Generate: generateChMask72,
+			Generate: makeGenerateChMask72(false),
 			Mask: []bool{
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
 				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
@@ -233,7 +233,7 @@ func TestGenerateChMask(t *testing.T) {
 		},
 		{
 			Name:     "72 channels/125Hz on, 66, 68 on",
-			Generate: generateChMask72,
+			Generate: makeGenerateChMask72(false),
 			Mask: []bool{
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
@@ -247,7 +247,7 @@ func TestGenerateChMask(t *testing.T) {
 		},
 		{
 			Name:     "72 channels/125Hz off, 67, 69 on",
-			Generate: generateChMask72,
+			Generate: makeGenerateChMask72(false),
 			Mask: []bool{
 				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,

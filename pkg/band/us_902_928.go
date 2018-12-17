@@ -117,7 +117,7 @@ func init() {
 			return ttnpb.DataRateIndex(si), nil
 		},
 
-		GenerateChMasks: generateChMask72,
+		GenerateChMasks: makeGenerateChMask72(true),
 		ParseChMask:     parseChMask72,
 
 		ImplementsCFList: true,
@@ -135,7 +135,7 @@ func init() {
 		regionalParameters1_0:       bandIdentity,
 		regionalParameters1_0_1:     bandIdentity,
 		regionalParameters1_0_2RevA: usBeacon1_0_2,
-		regionalParameters1_0_2RevB: disableCFList1_0_2,
+		regionalParameters1_0_2RevB: composeSwaps(disableCFList1_0_2, disableChMaskCntl51_0_2),
 		regionalParameters1_1RevA:   bandIdentity,
 	}
 	All[US_902_928] = us_902_928

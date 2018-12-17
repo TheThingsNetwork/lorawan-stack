@@ -80,6 +80,15 @@ func bandIdentity(b Band) Band {
 	return b
 }
 
+func composeSwaps(swaps ...versionSwap) versionSwap {
+	return func(bn Band) Band {
+		for _, swap := range swaps {
+			bn = swap(bn)
+		}
+		return bn
+	}
+}
+
 func channelIndexIdentity(idx uint32) (uint32, error) {
 	return idx, nil
 }
@@ -374,34 +383,38 @@ func generateChMask16(mask []bool) (map[uint8][16]bool, error) {
 	return map[uint8][16]bool{6: {}}, nil
 }
 
-func generateChMask72(mask []bool) (map[uint8][16]bool, error) {
-	if len(mask) != 72 {
-		return nil, errInvalidChannelCount
-	}
-
-	on125 := uint8(0)
-	for i := 0; i < 64; i++ {
-		if mask[i] {
-			on125++
-		}
-	}
-
-	if on125 == 0 || on125 == 64 {
-		block, err := generateChMaskBlock(mask[64:72])
-		if err != nil {
-			return nil, err
+func makeGenerateChMask72(supportChMaskCntl5 bool) func([]bool) (map[uint8][16]bool, error) {
+	return func(mask []bool) (map[uint8][16]bool, error) {
+		if len(mask) != 72 {
+			return nil, errInvalidChannelCount
 		}
 
-		idx := uint8(6)
-		if on125 == 0 {
-			idx = 7
+		on125 := uint8(0)
+		for i := 0; i < 64; i++ {
+			if mask[i] {
+				on125++
+			}
 		}
-		return map[uint8][16]bool{idx: block}, nil
+
+		if on125 == 0 || on125 == 64 {
+			block, err := generateChMaskBlock(mask[64:72])
+			if err != nil {
+				return nil, err
+			}
+
+			idx := uint8(6)
+			if on125 == 0 {
+				idx = 7
+			}
+			return map[uint8][16]bool{idx: block}, nil
+		}
+
+		if supportChMaskCntl5 {
+			// TODO: Support ChMaskCntl 5.  (https://github.com/TheThingsIndustries/lorawan-stack/issues/1264)
+		}
+
+		return generateChMaskMatrix(mask)
 	}
-
-	// TODO: Support ChMaskCntl 5 if required.  (https://github.com/TheThingsIndustries/lorawan-stack/issues/1264)
-
-	return generateChMaskMatrix(mask)
 }
 
 func generateChMask96(mask []bool) (map[uint8][16]bool, error) {
