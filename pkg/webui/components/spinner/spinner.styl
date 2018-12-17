@@ -63,16 +63,16 @@ $s = $cs.l
 
 .center
   position: absolute
-  top: 0
+  top: ($l * -1) // visual centering
   left: 0
   right: 0
   bottom: 0
   margin: auto
-
   height: $l
 
   &.small
     height: $s
+    top: ($s * -1) // visual centering
 
 .small .spinner
   width: $s
