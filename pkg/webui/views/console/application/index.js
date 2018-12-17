@@ -27,6 +27,8 @@ import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
 import ApplicationAccess from '../application-access'
 
+import Device from '../device'
+
 import { getApplication } from '../../../actions/application'
 
 @connect(function ({ application }, props) {
@@ -125,6 +127,7 @@ export default class Application extends React.Component {
         <Route exact path={`${match.path}`} component={ApplicationOverview} />
         <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
         <Route path={`${match.path}/access`} component={ApplicationAccess} />
+        <Route path={`${match.path}/devices/:devId`} component={Device} />
       </Switch>
     )
   }

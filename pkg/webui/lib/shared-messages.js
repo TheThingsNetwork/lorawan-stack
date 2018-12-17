@@ -30,6 +30,7 @@ export default defineMessages({
   data: 'Data',
   description: 'Description',
   devices: 'Devices',
+  devID: 'Device ID',
   edit: 'Edit',
   email: 'Email',
   gateways: 'Gateways',
