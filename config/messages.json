@@ -3347,6 +3347,15 @@
       "file": "required.go"
     }
   },
+  "error:pkg/validate:fieldmaskpath": {
+    "translations": {
+      "en": "`{fieldmaskpath}` may consist of only lowercase letters, numbers, underscores and dots. It may not start or end with a dot or underscore, or have two or more consecutive dots or underscores. Also, it must be between 2 and 256 characters in length."
+    },
+    "description": {
+      "package": "pkg/validate",
+      "file": "fieldmask.go"
+    }
+  },
   "error:pkg/validate:id": {
     "translations": {
       "en": "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash."
