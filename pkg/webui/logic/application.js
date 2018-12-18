@@ -32,6 +32,28 @@ const getApplicationLogic = createLogic({
   },
 })
 
+const getApplicationApiKeysLogic = createLogic({
+  type: application.GET_APP_API_KEYS_LIST,
+  async process ({ getState, action }, dispatch, done) {
+    const { id, params } = action
+    try {
+      const res = await api.v3.is.application.apiKeys.list(id, params)
+      dispatch(
+        application.getApplicationApiKeysListSuccess(
+          id,
+          res.applicationsApiKeys,
+          res.totalCount
+        )
+      )
+    } catch (e) {
+      dispatch(application.getApplicationApiKeysListFailure(id, e))
+    }
+
+    done()
+  },
+})
+
 export default [
   getApplicationLogic,
+  getApplicationApiKeysLogic,
 ]

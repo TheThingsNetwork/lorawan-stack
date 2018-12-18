@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  getApiKeysList,
+  createGetApiKeysListActionType,
+  getApiKeysListFailure,
+  createGetApiKeysListFailureActionType,
+  getApiKeysListSuccess,
+  createGetApiKeysListSuccessActionType,
+} from '../actions/api-keys'
+
+export const SHARED_NAME = 'APPLICATION'
+
 export const GET_APP = 'GET_APPLICATION'
 export const GET_APP_SUCCESS = 'GET_APPLICATION_SUCCESS'
 export const GET_APP_FAILURE = 'GET_APPLICATION_FAILURE'
+export const GET_APP_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
+export const GET_APP_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
+export const GET_APP_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
 
 export const getApplication = id => (
   { type: GET_APP, id }
@@ -27,3 +41,9 @@ export const getApplicationSuccess = application => (
 export const getApplicationFailure = error => (
   { type: GET_APP_FAILURE, error }
 )
+
+export const getApplicationApiKeysList = getApiKeysList(SHARED_NAME)
+
+export const getApplicationApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAME)
+
+export const getApplicationApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
