@@ -56,7 +56,6 @@ var (
 			}
 
 			logger.Info("Successfully initialized")
-
 			return nil
 		},
 	}

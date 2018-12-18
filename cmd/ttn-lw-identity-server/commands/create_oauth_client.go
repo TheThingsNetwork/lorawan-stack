@@ -123,12 +123,11 @@ var (
 			})
 
 			if err != nil {
-				logger.WithError(err).Error("Could not create OAuth client")
-			} else {
-				logger.WithField("secret", secret).Info("Created OAuth client")
+				return err
 			}
 
-			return err
+			logger.WithField("secret", secret).Info("Created OAuth client")
+			return nil
 		},
 	}
 )

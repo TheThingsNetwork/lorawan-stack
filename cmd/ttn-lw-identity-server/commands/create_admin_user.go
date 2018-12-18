@@ -98,19 +98,18 @@ var (
 				Admin:                          true,
 			})
 			if err != nil {
-				logger.WithError(err).Error("Could not create user")
-			} else {
-				logger.Info("Created user")
+				return err
 			}
 
-			return err
+			logger.Info("Created user")
+			return nil
 		},
 	}
 )
 
 func init() {
 	createAdminUserCommand.Flags().String("id", "admin", "User ID")
-	createAdminUserCommand.Flags().String("email", "", "Email Address")
+	createAdminUserCommand.Flags().String("email", "", "Email address")
 	createAdminUserCommand.Flags().String("password", "", "Password")
 	Root.AddCommand(createAdminUserCommand)
 }
