@@ -30,8 +30,8 @@ var (
 	evtCreateGatewayAPIKey       = events.Define("gateway.api-key.create", "Create gateway API key")
 	evtUpdateGatewayAPIKey       = events.Define("gateway.api-key.update", "Update gateway API key")
 	evtDeleteGatewayAPIKey       = events.Define("gateway.api-key.delete", "Delete gateway API key")
-	evtUpdateGatewayCollaborator = events.Define("gateway.collaborator.update", "Update gateway API collaborator")
-	evtDeleteGatewayCollaborator = events.Define("gateway.collaborator.delete", "Delete gateway API collaborator")
+	evtUpdateGatewayCollaborator = events.Define("gateway.collaborator.update", "Update gateway collaborator")
+	evtDeleteGatewayCollaborator = events.Define("gateway.collaborator.delete", "Delete gateway collaborator")
 )
 
 func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {

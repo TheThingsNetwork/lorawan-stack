@@ -30,9 +30,9 @@ import (
 )
 
 var (
-	evtCreateEndDevice = events.Define("end_device.create", "Create end_device")
-	evtUpdateEndDevice = events.Define("end_device.update", "Update end_device")
-	evtDeleteEndDevice = events.Define("end_device.delete", "Delete end_device")
+	evtCreateEndDevice = events.Define("end_device.create", "Create end device")
+	evtUpdateEndDevice = events.Define("end_device.update", "Update end device")
+	evtDeleteEndDevice = events.Define("end_device.delete", "Delete end device")
 )
 
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {

@@ -38,7 +38,7 @@ var (
 	evtUpdateUser = events.Define("user.update", "Update user")
 	evtDeleteUser = events.Define("user.delete", "Delete user")
 
-	evtUpdateUserIncorrectPassword = events.Define("user.update.incorrect_password", "incorrect password for user update")
+	evtUpdateUserIncorrectPassword = events.Define("user.update.incorrect_password", "Incorrect password for user update")
 )
 
 var (

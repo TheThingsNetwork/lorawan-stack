@@ -4033,7 +4033,7 @@
   },
   "event:application.collaborator.delete": {
     "translations": {
-      "en": "Delete application API collaborator"
+      "en": "Delete application collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4042,7 +4042,7 @@
   },
   "event:application.collaborator.update": {
     "translations": {
-      "en": "Update application API collaborator"
+      "en": "Update application collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4204,7 +4204,7 @@
   },
   "event:client.collaborator.delete": {
     "translations": {
-      "en": "Delete client API collaborator"
+      "en": "Delete client collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4213,7 +4213,7 @@
   },
   "event:client.collaborator.update": {
     "translations": {
-      "en": "Update client API collaborator"
+      "en": "Update client collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4249,7 +4249,7 @@
   },
   "event:end_device.create": {
     "translations": {
-      "en": "Create end_device"
+      "en": "Create end device"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4258,7 +4258,7 @@
   },
   "event:end_device.delete": {
     "translations": {
-      "en": "Delete end_device"
+      "en": "Delete end device"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4267,7 +4267,7 @@
   },
   "event:end_device.update": {
     "translations": {
-      "en": "Update end_device"
+      "en": "Update end device"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4303,7 +4303,7 @@
   },
   "event:gateway.collaborator.delete": {
     "translations": {
-      "en": "Delete gateway API collaborator"
+      "en": "Delete gateway collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4312,7 +4312,7 @@
   },
   "event:gateway.collaborator.update": {
     "translations": {
-      "en": "Update gateway API collaborator"
+      "en": "Update gateway collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5023,7 +5023,7 @@
   },
   "event:organization.collaborator.delete": {
     "translations": {
-      "en": "Delete organization API collaborator"
+      "en": "Delete organization collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5032,7 +5032,7 @@
   },
   "event:organization.collaborator.update": {
     "translations": {
-      "en": "Update organization API collaborator"
+      "en": "Update organization collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5122,7 +5122,7 @@
   },
   "event:user.update.incorrect_password": {
     "translations": {
-      "en": "incorrect password for user update"
+      "en": "Incorrect password for user update"
     },
     "description": {
       "package": "pkg/identityserver",

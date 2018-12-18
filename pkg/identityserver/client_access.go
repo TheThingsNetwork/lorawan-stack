@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	evtUpdateClientCollaborator = events.Define("client.collaborator.update", "Update client API collaborator")
-	evtDeleteClientCollaborator = events.Define("client.collaborator.delete", "Delete client API collaborator")
+	evtUpdateClientCollaborator = events.Define("client.collaborator.update", "Update client collaborator")
+	evtDeleteClientCollaborator = events.Define("client.collaborator.delete", "Delete client collaborator")
 )
 
 func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {

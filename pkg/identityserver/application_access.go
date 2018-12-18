@@ -30,8 +30,8 @@ var (
 	evtCreateApplicationAPIKey       = events.Define("application.api-key.create", "Create application API key")
 	evtUpdateApplicationAPIKey       = events.Define("application.api-key.update", "Update application API key")
 	evtDeleteApplicationAPIKey       = events.Define("application.api-key.delete", "Delete application API key")
-	evtUpdateApplicationCollaborator = events.Define("application.collaborator.update", "Update application API collaborator")
-	evtDeleteApplicationCollaborator = events.Define("application.collaborator.delete", "Delete application API collaborator")
+	evtUpdateApplicationCollaborator = events.Define("application.collaborator.update", "Update application collaborator")
+	evtDeleteApplicationCollaborator = events.Define("application.collaborator.delete", "Delete application collaborator")
 )
 
 func (is *IdentityServer) listApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
