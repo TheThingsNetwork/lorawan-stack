@@ -238,19 +238,18 @@ func TestTraffic(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		for i, tc := range []struct {
+			Path        *ttnpb.DownlinkPath
 			Message     *ttnpb.DownlinkMessage
 			AssertError func(error) bool
 		}{
 			{
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 100,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-								{
-									Timestamp: 100,
-								},
-							},
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
@@ -263,6 +262,9 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 100,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
@@ -278,6 +280,9 @@ func TestTraffic(t *testing.T) {
 				AssertError: errors.IsInvalidArgument, // Does not support scheduled downlink; the Gateway Server or gateway will take care of that.
 			},
 			{
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 100,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
 				},
@@ -287,7 +292,7 @@ func TestTraffic(t *testing.T) {
 			t.Run(strconv.Itoa(i), func(t *testing.T) {
 				a := assertions.New(t)
 
-				err := conn.SendDown(tc.Message)
+				err := conn.SendDown(tc.Path, tc.Message)
 				if err != nil && (tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue)) {
 					t.Fatalf("Unexpected error: %v", err)
 				}

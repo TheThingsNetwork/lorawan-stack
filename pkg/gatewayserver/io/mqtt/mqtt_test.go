@@ -232,20 +232,19 @@ func TestTraffic(t *testing.T) {
 	t.Run("Downstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Topic       string
+			Path        *ttnpb.DownlinkPath
 			Message     *ttnpb.DownlinkMessage
 			AssertError func(error) bool
 		}{
 			{
 				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 100,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-								{
-									Timestamp: 100,
-								},
-							},
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
@@ -259,6 +258,9 @@ func TestTraffic(t *testing.T) {
 			},
 			{
 				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 100,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
@@ -295,7 +297,7 @@ func TestTraffic(t *testing.T) {
 					t.FailNow()
 				}
 
-				err := conn.SendDown(tc.Message)
+				err := conn.SendDown(tc.Path, tc.Message)
 				if err != nil && (tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue)) {
 					t.Fatalf("Unexpected error: %v", err)
 				}

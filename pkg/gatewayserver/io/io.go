@@ -155,7 +155,6 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 
 var (
 	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
-	errDownlinkPath     = errors.DefineInvalidArgument("downlink_path", "invalid downlink path; need exactly one path")
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
@@ -163,18 +162,13 @@ var (
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
 
-// SendDown schedules and sends a downlink message and updates the downlink stats.
-// This method returns an error if the downlink message is not a Tx request or if the request does not contain exactly
-// one downlink path.
-func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
+// SendDown schedules and sends a downlink message by using the given path and updates the downlink stats.
+// This method returns an error if the downlink message is not a Tx request.
+func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) error {
 	request := msg.GetRequest()
 	if request == nil {
 		return errNotTxRequest
 	}
-	if len(request.DownlinkPaths) != 1 {
-		return errDownlinkPath
-	}
-	path := request.DownlinkPaths[0]
 	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
@@ -255,7 +249,7 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 			switch t := request.Time.(type) {
 			case *ttnpb.TxRequest_RelativeToUplink:
 				f = c.scheduler.ScheduleAt
-				settings.Timestamp = path.Timestamp + uint32(rx.delay/time.Microsecond)
+				settings.Timestamp = path.UplinkTimestamp + uint32(rxDelay/time.Microsecond)
 			case *ttnpb.TxRequest_Absolute:
 				f = c.scheduler.ScheduleAt
 				abs := *t.Absolute

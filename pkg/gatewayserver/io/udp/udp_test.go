@@ -323,6 +323,7 @@ func TestTraffic(t *testing.T) {
 			AckOK              bool
 			ExpectConnect      bool
 			SyncClock          *time.Duration
+			Path               *ttnpb.DownlinkPath
 			Message            *ttnpb.DownlinkMessage
 			PreferScheduleLate bool
 			ScheduledLate      bool
@@ -348,15 +349,13 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 5000000,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-								{
-									Timestamp: 5000000,
-								},
-							},
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
@@ -375,15 +374,13 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 10000000,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-								{
-									Timestamp: 10000000,
-								},
-							},
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
@@ -403,15 +400,13 @@ func TestTraffic(t *testing.T) {
 				AckOK:         true,
 				ExpectConnect: false,
 				SyncClock:     durationPtr(1 * time.Second), // Rx1 delay
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: uint32(testConfig.DownlinkPathExpires/time.Microsecond) * 150 / 100,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x03},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-								{
-									Timestamp: uint32(testConfig.DownlinkPathExpires/time.Microsecond) * 150 / 100,
-								},
-							},
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
@@ -431,15 +426,13 @@ func TestTraffic(t *testing.T) {
 				AckOK:         true,
 				ExpectConnect: false,
 				SyncClock:     durationPtr(0),
+				Path: &ttnpb.DownlinkPath{
+					UplinkTimestamp: 15000000,
+				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x04},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-								{
-									Timestamp: 15000000,
-								},
-							},
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
@@ -500,7 +493,7 @@ func TestTraffic(t *testing.T) {
 
 				// Send the downlink message, optionally buffer first.
 				conn.Gateway().ScheduleDownlinkLate = tc.PreferScheduleLate
-				err = conn.SendDown(tc.Message)
+				err = conn.SendDown(tc.Path, tc.Message)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}

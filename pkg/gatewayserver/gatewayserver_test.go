@@ -715,22 +715,20 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						AssertError: errors.IsInvalidArgument, // Network Server sends Tx request only.
+						AssertError: errors.IsInvalidArgument, // Network Server may send Tx request only.
 					},
 					{
 						Name: "NotConnected",
 						Message: &ttnpb.DownlinkMessage{
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: &ttnpb.TxRequest{
-									DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-										{
-											GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-												GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-													GatewayID: "not-connected",
-												},
+									DownlinkPath: &ttnpb.TxRequest_Fixed{Fixed: &ttnpb.DownlinkPaths{Paths: []*ttnpb.DownlinkPath{{
+										GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+											GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+												GatewayID: "not-connected",
 											},
 										},
-									},
+									}}}},
 								},
 							},
 						},
@@ -742,16 +740,14 @@ func TestGatewayServer(t *testing.T) {
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: &ttnpb.TxRequest{
-									DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-										{
-											GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-												GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-													GatewayID: registeredGatewayID,
-												},
+									DownlinkPath: &ttnpb.TxRequest_Fixed{Fixed: &ttnpb.DownlinkPaths{Paths: []*ttnpb.DownlinkPath{{
+										GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+											GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+												GatewayID: registeredGatewayID,
 											},
-											Timestamp: 100,
 										},
-									},
+										Timestamp: 100,
+									}}}},
 									Priority:         ttnpb.TxSchedulePriority_NORMAL,
 									Rx1Delay:         ttnpb.RX_DELAY_1,
 									Rx1DataRateIndex: 5,
@@ -767,16 +763,14 @@ func TestGatewayServer(t *testing.T) {
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: &ttnpb.TxRequest{
-									DownlinkPaths: []*ttnpb.TxRequest_DownlinkPath{
-										{
-											GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-												GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-													GatewayID: registeredGatewayID,
-												},
+									DownlinkPath: &ttnpb.TxRequest_Fixed{Fixed: &ttnpb.DownlinkPaths{Paths: []*ttnpb.DownlinkPath{{
+										GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+											GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+												GatewayID: registeredGatewayID,
 											},
-											Timestamp: 100,
 										},
-									},
+										Timestamp: 100,
+									}}}},
 									Priority:         ttnpb.TxSchedulePriority_NORMAL,
 									Rx1Delay:         ttnpb.RX_DELAY_1,
 									Rx1DataRateIndex: 5,
