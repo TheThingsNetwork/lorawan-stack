@@ -56,6 +56,121 @@ var (
 	appQueueUpdateTimeout = 200 * time.Millisecond
 )
 
+func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
+	fp, err := fps.GetByID(dev.FrequencyPlanID)
+	if err != nil {
+		return err
+	}
+
+	band, err := band.GetByID(fp.BandID)
+	if err != nil {
+		return err
+	}
+
+	dev.MACState = &ttnpb.MACState{
+		LoRaWANVersion: dev.LoRaWANVersion,
+		CurrentParameters: ttnpb.MACParameters{
+			ADRAckDelay:       uint32(band.ADRAckDelay),
+			ADRAckLimit:       uint32(band.ADRAckLimit),
+			ADRNbTrans:        1,
+			MaxDutyCycle:      ttnpb.DUTY_CYCLE_1,
+			MaxEIRP:           band.DefaultMaxEIRP,
+			Rx1Delay:          ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
+			Rx1DataRateOffset: 0,
+			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
+			Rx2Frequency:      band.DefaultRx2Parameters.Frequency,
+		},
+	}
+
+	// NOTE: dev.MACState.CurrentParameters must not contain pointer values at this point.
+	dev.MACState.DesiredParameters = dev.MACState.CurrentParameters
+
+	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) {
+		// NOTE: In case the spec changes and this assumption is not valid anymore,
+		// the implementation of this function won't be valid and has to be changed.
+		return errInvalidFrequencyPlan
+	}
+
+	dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
+	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(dev.MACState.CurrentParameters.Channels)), float64(len(fp.UplinkChannels)))))
+
+	for i, upCh := range band.UplinkChannels {
+		if len(upCh.DataRateIndexes) == 0 {
+			return errInvalidFrequencyPlan
+		}
+
+		ch := &ttnpb.MACParameters_Channel{
+			UplinkFrequency:  upCh.Frequency,
+			MinDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[0]),
+			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[len(upCh.DataRateIndexes)-1]),
+		}
+		dev.MACState.CurrentParameters.Channels[i] = ch
+
+		chCopy := *ch
+		dev.MACState.DesiredParameters.Channels[i] = &chCopy
+	}
+
+	for i, downCh := range band.DownlinkChannels {
+		if i >= len(dev.MACState.CurrentParameters.Channels) {
+			return errInvalidFrequencyPlan
+		}
+		dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+	}
+
+	for i, upCh := range fp.UplinkChannels {
+		ch := dev.MACState.DesiredParameters.Channels[i]
+		if ch == nil {
+			dev.MACState.DesiredParameters.Channels[i] = &ttnpb.MACParameters_Channel{
+				MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
+				MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
+				UplinkFrequency:  upCh.Frequency,
+			}
+			continue
+		}
+
+		if ch.MinDataRateIndex > ttnpb.DataRateIndex(upCh.MinDataRate) || ttnpb.DataRateIndex(upCh.MaxDataRate) > ch.MaxDataRateIndex {
+			return errInvalidFrequencyPlan
+		}
+		ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
+		ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
+		ch.UplinkFrequency = upCh.Frequency
+	}
+
+	for i, downCh := range fp.DownlinkChannels {
+		if i >= len(dev.MACState.DesiredParameters.Channels) {
+			return errInvalidFrequencyPlan
+		}
+		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+	}
+
+	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
+	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
+
+	if fp.Rx2 != nil {
+		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2.Frequency
+	}
+	if fp.DefaultRx2DataRate != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
+	}
+
+	if fp.PingSlot != nil {
+		dev.MACState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
+	}
+	if fp.DefaultPingSlotDataRate != nil {
+		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
+	}
+
+	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 {
+		dev.MACState.DesiredParameters.MaxEIRP = float32(math.Min(float64(dev.MACState.CurrentParameters.MaxEIRP), float64(*fp.MaxEIRP)))
+	}
+
+	if dev.DefaultMACParameters != nil {
+		dev.MACState.CurrentParameters = deepcopy.Copy(*dev.DefaultMACParameters).(ttnpb.MACParameters)
+	}
+
+	return nil
+}
+
 func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage) (*metadataAccumulator, func(), bool) {
 	h := ns.hashPool.Get().(hash.Hash64)
 	_, _ = h.Write(up.RawPayload)
