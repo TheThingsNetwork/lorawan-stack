@@ -17,11 +17,13 @@ package identityserver
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -77,6 +79,26 @@ func TestEntityAccess(t *testing.T) {
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(adminUserIdx), grpc.Header(&md))
 			a.So(err, should.BeNil)
 			a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
+		})
+
+		t.Run("Membership Cache", func(t *testing.T) {
+			a := assertions.New(t)
+
+			redis, flush := test.NewRedis(t, "is_entity_access")
+			defer flush()
+
+			is.SetRedisCache(redis)
+			is.config.AuthCache.MembershipTTL = time.Minute
+
+			ctx := log.NewContext(ctx, is.Logger())
+
+			entityRights, err := is.memberRights(ctx, adminUser.EntityIdentifiers())
+			a.So(err, should.BeNil)
+
+			cachedEntityRights, err := is.memberRights(ctx, adminUser.EntityIdentifiers())
+			a.So(err, should.BeNil)
+
+			a.So(len(cachedEntityRights), should.Equal, len(entityRights))
 		})
 
 	})
