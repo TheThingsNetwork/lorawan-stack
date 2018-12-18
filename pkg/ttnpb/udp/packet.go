@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"io"
 	"net"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -85,6 +86,7 @@ func (p PacketType) String() string {
 // Packet struct
 type Packet struct {
 	GatewayAddr *net.UDPAddr
+	ReceivedAt  time.Time
 
 	ProtocolVersion ProtocolVersion
 	Token           [2]byte
