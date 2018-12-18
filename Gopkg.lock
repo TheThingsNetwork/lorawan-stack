@@ -273,16 +273,19 @@
     "jsonpb",
     "proto",
     "protoc-gen-go/descriptor",
+    "protoc-gen-go/generator",
+    "protoc-gen-go/generator/internal/remap",
+    "protoc-gen-go/plugin",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
     "ptypes/empty",
     "ptypes/struct",
     "ptypes/timestamp",
+    "ptypes/wrappers",
   ]
   pruneopts = ""
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
-  version = "v1.2.0"
 
 [[projects]]
   digest = "1:bc3b81668de7cd144959113c8c6c4ff03a8130b0995ded71d7e5c6d9923906aa"
@@ -362,8 +365,8 @@
   revision = "68e3a13e41175110a447e67246a59873d6aca902"
 
 [[projects]]
-  branch = "release-1.5.1"
-  digest = "1:53ee9a211223ebd3dfe658c5a9648211b3de4a150b47dcaaf34a34ec3e1b1870"
+  branch = "release-1.6.2"
+  digest = "1:0caa8a1f126d1561e99cc142c9719f99ed7214f68afb8f5ec4ed62d4c807e79f"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "runtime",
@@ -371,7 +374,7 @@
     "utilities",
   ]
   pruneopts = ""
-  revision = "c596c2ac4327a5f6569ebc82fed0f111ffa66667"
+  revision = "211508d3035bfad629363e274f4427aff3c40a05"
   source = "github.com/TheThingsIndustries/grpc-gateway"
 
 [[projects]]
@@ -925,8 +928,7 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:212d4045ef941b209a154001718705dc723bd77e0200fcea36d15ec87ed49dec"
+  digest = "1:3970150423e3f47a6d354b2868f7db632b665463755194aac1a30c4fb341be57"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
@@ -936,7 +938,7 @@
     "protobuf/field_mask",
   ]
   pruneopts = ""
-  revision = "31ac5d88444a9e7ad18077db9a165d793ad06a2e"
+  revision = "383e8b2c3b9e36c4076b235b32537292176bae20"
 
 [[projects]]
   digest = "1:1293087271e314cfa2b3decededba2ecba0ff327e7b7809e00f73f616449191c"
