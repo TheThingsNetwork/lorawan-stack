@@ -185,14 +185,19 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			{
 				dataRateIndex: request.Rx1DataRateIndex,
 				frequency:     request.Rx1Frequency,
-				delay:         time.Duration(request.Rx1Delay) * time.Second,
+				delay:         0,
 			},
 			{
 				dataRateIndex: request.Rx2DataRateIndex,
 				frequency:     request.Rx2Frequency,
-				delay:         time.Duration(request.Rx1Delay+1) * time.Second,
+				delay:         time.Second,
 			},
 		} {
+			rx1Delay := time.Duration(request.Rx1Delay) * time.Second
+			if rx1Delay == 0 {
+				rx1Delay = time.Second // RX_DELAY_0 is valid, and 1 second.
+			}
+			rxDelay := rx1Delay + rx.delay
 			if rx.frequency == 0 {
 				errRxDetails = append(errRxDetails, errRxEmpty)
 				continue
