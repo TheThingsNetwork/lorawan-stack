@@ -33,7 +33,7 @@ func TestTemporaryValidPassword(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
+		userID := population.Users[defaultUserIdx].UserIdentifiers
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 
@@ -71,7 +71,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[0].UserIdentifiers
+		userID := population.Users[defaultUserIdx].UserIdentifiers
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 
@@ -91,7 +91,7 @@ func TestUsersPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		user := population.Users[0]
+		user := population.Users[defaultUserIdx]
 		userID := user.UserIdentifiers
 
 		reg := ttnpb.NewUserRegistryClient(cc)
@@ -136,7 +136,7 @@ func TestUsersCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		user, creds := population.Users[0], userCreds(0)
+		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 

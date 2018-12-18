@@ -19,6 +19,7 @@ import (
 	"os"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -34,12 +35,16 @@ import (
 var (
 	setup        sync.Once
 	dbConnString string
-	population   = store.NewPopulator(10, 42)
+	population   = store.NewPopulator(12, 42)
 )
 
 var (
 	userIndex                                         int
+	newUser, newUserIdx                               = getTestUser()
+	rejectedUser, rejectedUserIdx                     = getTestUser()
 	defaultUser, defaultUserIdx                       = getTestUser()
+	suspendedUser, suspendedUserIdx                   = getTestUser()
+	adminUser, adminUserIdx                           = getTestUser()
 	collaboratorUser, collaboratorUserIdx             = getTestUser()
 	applicationAccessUser, applicationAccessUserIdx   = getTestUser()
 	clientAccessUser, clientAccessUserIdx             = getTestUser()
@@ -49,10 +54,31 @@ var (
 	paginationUser, paginationUserIdx                 = getTestUser()
 )
 
+var now = time.Now()
+
 func init() {
+	newUser.Admin = false
+	newUser.PrimaryEmailAddressValidatedAt = nil
+	newUser.State = ttnpb.STATE_REQUESTED
+
+	rejectedUser.Admin = false
+	rejectedUser.PrimaryEmailAddressValidatedAt = &now
+	rejectedUser.State = ttnpb.STATE_REJECTED
+
 	defaultUser.Admin = false
+	defaultUser.PrimaryEmailAddressValidatedAt = &now
 	defaultUser.State = ttnpb.STATE_APPROVED
+
+	suspendedUser.Admin = false
+	suspendedUser.PrimaryEmailAddressValidatedAt = &now
+	suspendedUser.State = ttnpb.STATE_SUSPENDED
+
+	adminUser.Admin = true
+	adminUser.PrimaryEmailAddressValidatedAt = &now
+	adminUser.State = ttnpb.STATE_APPROVED
+
 	paginationUser.Admin = false
+	paginationUser.PrimaryEmailAddressValidatedAt = &now
 	paginationUser.State = ttnpb.STATE_APPROVED
 }
 

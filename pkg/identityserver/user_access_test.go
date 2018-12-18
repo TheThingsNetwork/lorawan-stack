@@ -39,7 +39,7 @@ func TestUserAccessNotFound(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -97,7 +97,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[0].UserIdentifiers
+		userID := population.Users[defaultUserIdx].UserIdentifiers
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -141,7 +141,7 @@ func TestUserAccessCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		user, creds := population.Users[0], userCreds(0)
+		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
 
 		reg := ttnpb.NewUserAccessClient(cc)
 

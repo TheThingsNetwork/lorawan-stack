@@ -153,7 +153,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := population.Users[0].UserIdentifiers, userCreds(0)
+		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
 
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
