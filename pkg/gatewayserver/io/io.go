@@ -112,7 +112,7 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	if up.Settings.Time != nil {
-		c.scheduler.Sync(up.Settings.Timestamp, time.Now(), *up.Settings.Time)
+		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
 	}
 
 	select {
@@ -120,7 +120,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		return c.ctx.Err()
 	case c.upCh <- up:
 		atomic.AddUint64(&c.uplinks, 1)
-		atomic.StoreInt64(&c.lastUplinkTime, time.Now().UnixNano())
+		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 	default:
 		return errBufferFull
 	}

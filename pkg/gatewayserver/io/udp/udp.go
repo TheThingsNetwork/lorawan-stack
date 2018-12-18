@@ -111,12 +111,16 @@ func (s *srv) read() {
 			}
 			return
 		}
+		now := time.Now()
 
 		packetBuf := make([]byte, n)
 		copy(packetBuf, buf[:])
 
 		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
-		packet := encoding.Packet{GatewayAddr: addr}
+		packet := encoding.Packet{
+			GatewayAddr: addr,
+			ReceivedAt:  now,
+		}
 		if err = packet.UnmarshalBinary(packetBuf); err != nil {
 			log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal packet")
 			continue
@@ -258,6 +262,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			return err
 		}
 		for _, up := range msg.UplinkMessages {
+			up.ReceivedAt = packet.ReceivedAt
 			if err := state.io.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}

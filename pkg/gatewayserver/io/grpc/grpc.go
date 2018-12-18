@@ -16,6 +16,7 @@ package grpc
 
 import (
 	"context"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -104,6 +105,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 			conn.Disconnect(err)
 			return err
 		}
+		now := time.Now()
 
 		logger.WithFields(log.Fields(
 			"has_status", msg.GatewayStatus != nil,
@@ -111,6 +113,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 		)).Debug("Received message")
 
 		for _, up := range msg.UplinkMessages {
+			up.ReceivedAt = now
 			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
