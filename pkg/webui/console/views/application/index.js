@@ -53,6 +53,7 @@ import { getApplication } from '../../store/actions/application'
         title: sharedMessages.devices,
         path: `${matchedUrl}/devices`,
         icon: 'devices',
+        exact: false,
       },
       {
         title: sharedMessages.data,
