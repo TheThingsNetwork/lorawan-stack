@@ -33,7 +33,7 @@ class ApplicationOverview extends React.Component {
 
   get applicationInfo () {
     const {
-      application_id,
+      ids,
       description,
       created_at,
       updated_at,
@@ -42,7 +42,7 @@ class ApplicationOverview extends React.Component {
     return (
       <div>
         <h2 className={style.id}>
-          {application_id}
+          {ids.application_id}
         </h2>
         <p>{description}</p>
         <ul className={style.attributes}>
