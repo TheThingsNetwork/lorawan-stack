@@ -32,7 +32,11 @@ const hardcoded = {
   organization: 'people',
   api_keys: 'lock',
   link: 'code',
+  payload_formats: 'code',
+  develop: 'code',
+  access: 'lock',
   general_settings: 'settings',
+  location: 'place',
 }
 
 const Icon = function ({
