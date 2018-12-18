@@ -18,8 +18,17 @@ import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
+import Tabs from '../../../components/tabs'
 
 import style from './device-overview.styl'
+
+const tabs = [
+  { title: 'Overview', name: 'overview', icon: 'overview' },
+  { title: 'Data', name: 'data', icon: 'data' },
+  { title: 'Location', name: 'location', icon: 'location' },
+  { title: 'Develop', name: 'develop', icon: 'develop' },
+  { title: 'General Settings', name: 'general-settings', icon: 'general_settings' },
+]
 
 @connect(function ({ device }, props) {
   return {
@@ -27,6 +36,10 @@ import style from './device-overview.styl'
   }
 })
 class DeviceOverview extends React.Component {
+
+  handleTabChange () {
+
+  }
 
   get deviceInfo () {
     const {
@@ -61,9 +74,20 @@ class DeviceOverview extends React.Component {
   }
 
   render () {
+    const { device_id } = this.props.device
     return (
       <Container>
         <Row className={style.head}>
+          <Col lg={12}>
+            <h2 className={style.id}>
+              {device_id}
+            </h2>
+            <Tabs
+              active="overview"
+              tabs={tabs}
+              onTabChange={this.handleTabChange}
+            />
+          </Col>
           <Col sm={12} lg={6}>
             {this.deviceInfo}
           </Col>
