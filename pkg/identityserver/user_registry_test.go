@@ -136,9 +136,10 @@ func TestUsersCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
-
 		reg := ttnpb.NewUserRegistryClient(cc)
+
+		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
+		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
@@ -151,6 +152,22 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(got.CreatedAt, should.Equal, user.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, user.UpdatedAt)
 		a.So(err, should.BeNil)
+
+		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			FieldMask:       types.FieldMask{Paths: []string{"ids"}},
+		}, credsWithoutRights)
+
+		a.So(err, should.BeNil)
+
+		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			FieldMask:       types.FieldMask{Paths: []string{"attributes"}},
+		}, credsWithoutRights)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 
 		updateTime := time.Now()
 		updatedName := "updated user name"

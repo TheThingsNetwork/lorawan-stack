@@ -69,6 +69,18 @@ func init() {
 	defaultUser.PrimaryEmailAddressValidatedAt = &now
 	defaultUser.State = ttnpb.STATE_APPROVED
 
+	for id, apiKeys := range population.APIKeys {
+		if id.GetUserIDs().GetUserID() == defaultUser.GetUserID() {
+			population.APIKeys[id] = append(
+				apiKeys,
+				&ttnpb.APIKey{
+					Name:   "key without rights",
+					Rights: []ttnpb.Right{ttnpb.RIGHT_SEND_INVITES},
+				},
+			)
+		}
+	}
+
 	suspendedUser.Admin = false
 	suspendedUser.PrimaryEmailAddressValidatedAt = &now
 	suspendedUser.State = ttnpb.STATE_SUSPENDED
@@ -88,12 +100,25 @@ func getTestUser() (*ttnpb.User, int) {
 	return population.Users[userIndex], userIndex
 }
 
-func userCreds(idx int) grpc.CallOption {
+func userCreds(idx int, preferredNames ...string) grpc.CallOption {
 	for id, apiKeys := range population.APIKeys {
 		if id.GetUserIDs().GetUserID() == population.Users[idx].GetUserID() {
+			selectedIdx := 0
+			if len(preferredNames) == 0 {
+				preferredNames = []string{"default key"}
+			}
+		findPreferred:
+			for _, name := range preferredNames {
+				for i, apiKey := range apiKeys {
+					if apiKey.Name == name {
+						selectedIdx = i
+						break findPreferred
+					}
+				}
+			}
 			return grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      "bearer",
-				AuthValue:     apiKeys[0].Key,
+				AuthValue:     apiKeys[selectedIdx].Key,
 				AllowInsecure: true,
 			})
 		}

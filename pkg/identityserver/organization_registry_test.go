@@ -153,9 +153,10 @@ func TestOrganizationsCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
-
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
+
+		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		created, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
@@ -175,6 +176,22 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(got.Name, should.Equal, created.Name)
+
+		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
+			OrganizationIdentifiers: created.OrganizationIdentifiers,
+			FieldMask:               types.FieldMask{Paths: []string{"ids"}},
+		}, credsWithoutRights)
+
+		a.So(err, should.BeNil)
+
+		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
+			OrganizationIdentifiers: created.OrganizationIdentifiers,
+			FieldMask:               types.FieldMask{Paths: []string{"attributes"}},
+		}, credsWithoutRights)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
 			Organization: ttnpb.Organization{

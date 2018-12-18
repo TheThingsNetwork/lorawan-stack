@@ -15,6 +15,7 @@
 package identityserver
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -152,12 +153,14 @@ func TestUserAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		userAPIKeys := userAPIKeys(&user.UserIdentifiers)
-		APIKeys, err := reg.ListAPIKeys(ctx, &user.UserIdentifiers, creds)
+		sort.Slice(userAPIKeys.APIKeys, func(i int, j int) bool { return userAPIKeys.APIKeys[i].Name < userAPIKeys.APIKeys[j].Name })
+		apiKeys, err := reg.ListAPIKeys(ctx, &user.UserIdentifiers, creds)
+		sort.Slice(apiKeys.APIKeys, func(i int, j int) bool { return apiKeys.APIKeys[i].Name < apiKeys.APIKeys[j].Name })
 
-		a.So(APIKeys, should.NotBeNil)
+		a.So(apiKeys, should.NotBeNil)
 		a.So(err, should.BeNil)
-		a.So(len(APIKeys.APIKeys), should.Equal, len(userAPIKeys.APIKeys))
-		for i, APIkey := range APIKeys.APIKeys {
+		a.So(len(apiKeys.APIKeys), should.Equal, len(userAPIKeys.APIKeys))
+		for i, APIkey := range apiKeys.APIKeys {
 			a.So(APIkey.Name, should.Equal, userAPIKeys.APIKeys[i].Name)
 			a.So(APIkey.ID, should.Equal, userAPIKeys.APIKeys[i].ID)
 		}
