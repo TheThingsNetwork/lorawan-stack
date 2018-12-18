@@ -58,17 +58,17 @@ func TestUserSessionStore(t *testing.T) {
 			UserIdentifiers: userIDs,
 		})
 		a.So(err, should.BeNil)
-		a.So(created.ID, should.NotBeEmpty)
+		a.So(created.SessionID, should.NotBeEmpty)
 		a.So(created.CreatedAt, should.NotBeZeroValue)
 		a.So(created.UpdatedAt, should.NotBeZeroValue)
 		a.So(created.ExpiresAt, should.BeNil)
 
-		_, err = store.GetSession(ctx, &doesNotExistIDs, created.ID)
+		_, err = store.GetSession(ctx, &doesNotExistIDs, created.SessionID)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		got, err := store.GetSession(ctx, &userIDs, created.ID)
+		got, err := store.GetSession(ctx, &userIDs, created.SessionID)
 		a.So(err, should.BeNil)
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
@@ -77,7 +77,7 @@ func TestUserSessionStore(t *testing.T) {
 		later := time.Now().Add(time.Hour)
 		updated, err := store.UpdateSession(ctx, &ttnpb.UserSession{
 			UserIdentifiers: userIDs,
-			ID:              created.ID,
+			SessionID:       created.SessionID,
 			ExpiresAt:       &later,
 		})
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
@@ -91,7 +91,7 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIdentifiers: userIDs, ID: "00000000-0000-0000-0000-000000000000"})
+		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIdentifiers: userIDs, SessionID: "00000000-0000-0000-0000-000000000000"})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
@@ -109,15 +109,15 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(list[0].ExpiresAt, should.Resemble, updated.ExpiresAt)
 		}
 
-		err = store.DeleteSession(ctx, &doesNotExistIDs, created.ID)
+		err = store.DeleteSession(ctx, &doesNotExistIDs, created.SessionID)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.DeleteSession(ctx, &userIDs, created.ID)
+		err = store.DeleteSession(ctx, &userIDs, created.SessionID)
 		a.So(err, should.BeNil)
 
-		_, err = store.GetSession(ctx, &userIDs, created.ID)
+		_, err = store.GetSession(ctx, &userIDs, created.SessionID)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}

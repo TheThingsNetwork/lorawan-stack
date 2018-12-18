@@ -156,7 +156,7 @@ func TestServerLoginLogout(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.err = nil
 				s.res.user = &ttnpb.User{Password: string(password)}
-				s.res.session = &ttnpb.UserSession{UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"}, ID: "session_id"}
+				s.res.session = &ttnpb.UserSession{UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"}, SessionID: "session_id"}
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
@@ -169,7 +169,7 @@ func TestServerLoginLogout(t *testing.T) {
 				s.res.user = &ttnpb.User{Password: string(password)}
 				s.res.session = &ttnpb.UserSession{
 					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-					ID:              "session_id",
+					SessionID:       "session_id",
 					CreatedAt:       now,
 				}
 			},
@@ -182,7 +182,7 @@ func TestServerLoginLogout(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.session = &ttnpb.UserSession{
 					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-					ID:              "session_id",
+					SessionID:       "session_id",
 					CreatedAt:       now,
 				}
 				s.res.user = &ttnpb.User{

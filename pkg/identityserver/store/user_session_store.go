@@ -100,12 +100,12 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(&UserSession{Model: Model{ID: sess.ID}, UserID: user.PrimaryKey()})
+	query := s.db.Where(&UserSession{Model: Model{ID: sess.SessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
 	err = query.Find(&sessionModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("user_id", sess.UserIdentifiers.UserID, "session_id", sess.ID)
+			return nil, errSessionNotFound.WithAttributes("user_id", sess.UserIdentifiers.UserID, "session_id", sess.SessionID)
 		}
 		return nil, err
 	}

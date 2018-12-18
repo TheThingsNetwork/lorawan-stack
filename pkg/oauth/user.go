@@ -197,7 +197,7 @@ func (s *server) Login(c echo.Context) error {
 	events.Publish(evtUserLogin(ctx, userIDs, nil))
 	err = s.updateAuthCookie(c, func(cookie *authCookie) error {
 		cookie.UserID = session.UserID
-		cookie.SessionID = session.ID
+		cookie.SessionID = session.SessionID
 		return nil
 	})
 	if err != nil {
@@ -213,7 +213,7 @@ func (s *server) Logout(c echo.Context) error {
 		return err
 	}
 	events.Publish(evtUserLogout(ctx, session.UserIdentifiers, nil))
-	err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.ID)
+	err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID)
 	if err != nil {
 		return err
 	}

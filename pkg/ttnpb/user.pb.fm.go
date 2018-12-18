@@ -1101,10 +1101,10 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 				return fmt.Errorf("'session_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.SessionID = src.SessionID
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.SessionID = zero
 			}
 		case "created_at":
 			if len(subs) > 0 {
