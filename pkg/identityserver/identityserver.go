@@ -44,7 +44,6 @@ type Config struct {
 		} `name:"admin-approval"`
 	} `name:"user-registration"`
 	AuthCache struct {
-		TokenTTL      time.Duration `name:"token-ttl" description:"TTL of token caches"`
 		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
 	} `name:"auth-cache"`
 	OAuth oauth.Config `name:"oauth"`

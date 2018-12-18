@@ -118,7 +118,6 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	} else {
 		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
 	}
-	is.invalidateCachedAuthInfoForToken(ctx, key.Key)
 	return key, nil
 }
 

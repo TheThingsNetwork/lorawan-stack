@@ -43,6 +43,5 @@ var DefaultIdentityServerConfig = identityserver.Config{
 }
 
 func init() {
-	DefaultIdentityServerConfig.AuthCache.TokenTTL = shared.DefaultRightsConfig.TTL
 	DefaultIdentityServerConfig.AuthCache.MembershipTTL = 10 * time.Minute
 }

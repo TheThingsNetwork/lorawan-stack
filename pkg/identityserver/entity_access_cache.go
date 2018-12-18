@@ -24,48 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-func (is *IdentityServer) cachedAuthInfoForToken(ctx context.Context, token string) *ttnpb.AuthInfoResponse {
-	if is.redis == nil || is.config.AuthCache.TokenTTL == 0 {
-		return nil
-	}
-	var res ttnpb.AuthInfoResponse
-	err := ttnredis.GetProto(is.redis, is.redis.Key("token", token)).ScanProto(&res)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			return nil
-		}
-		is.Logger().WithError(err).Error("Failed to get cached auth info")
-		return nil
-	}
-	return &res
-}
-
-func (is *IdentityServer) invalidateCachedAuthInfoForToken(ctx context.Context, token string) {
-	if is.redis == nil || is.config.AuthCache.TokenTTL == 0 {
-		return
-	}
-	err := is.redis.Del(is.redis.Key("token", token)).Err()
-	if err != nil {
-		is.Logger().WithError(err).Error("Failed to delete cached auth info")
-		return
-	}
-}
-
-func (is *IdentityServer) cacheAuthInfoForToken(ctx context.Context, token string, info *ttnpb.AuthInfoResponse) {
-	if is.redis == nil || is.config.AuthCache.TokenTTL == 0 {
-		return
-	}
-	status, err := ttnredis.SetProto(is.redis, is.redis.Key("token", token), info, is.config.AuthCache.TokenTTL)
-	if err != nil {
-		is.Logger().WithError(err).Error("Failed to set cached auth info")
-		return
-	}
-	if err = status.Err(); err != nil {
-		is.Logger().WithError(err).Error("Failed to set cached auth info")
-		return
-	}
-}
-
 func (is *IdentityServer) cachedMembershipsForAccount(ctx context.Context, ouIDs *ttnpb.OrganizationOrUserIdentifiers) map[*ttnpb.EntityIdentifiers]*ttnpb.Rights {
 	if is.redis == nil || is.config.AuthCache.MembershipTTL == 0 {
 		return nil

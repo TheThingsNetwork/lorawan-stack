@@ -118,7 +118,6 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	} else {
 		events.Publish(evtDeleteGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
 	}
-	is.invalidateCachedAuthInfoForToken(ctx, key.Key)
 	return key, nil
 }
 

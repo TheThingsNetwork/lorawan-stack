@@ -73,15 +73,6 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	}
 	token := md.AuthValue
 
-	if info = is.cachedAuthInfoForToken(ctx, token); info != nil {
-		return info, nil
-	}
-	defer func() {
-		if err == nil {
-			is.cacheAuthInfoForToken(ctx, token, info)
-		}
-	}()
-
 	tokenType, tokenID, tokenKey, err := auth.SplitToken(token)
 	if err != nil {
 		return nil, err
