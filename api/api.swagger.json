@@ -21,7 +21,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Applications"
             }
@@ -93,7 +93,7 @@
         "operationId": "Update",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Application"
             }
@@ -126,7 +126,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Application"
             }
@@ -161,7 +161,7 @@
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -193,7 +193,7 @@
         "operationId": "UpdateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -232,7 +232,7 @@
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -265,7 +265,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevices"
             }
@@ -322,7 +322,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -376,7 +376,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -401,7 +401,7 @@
         "operationId": "ListAPIKeys",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKeys"
             }
@@ -425,7 +425,7 @@
         "operationId": "ListCollaborators",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Collaborators"
             }
@@ -450,7 +450,7 @@
         "operationId": "ListRights",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Rights"
             }
@@ -475,7 +475,7 @@
         "operationId": "Create",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -507,7 +507,7 @@
         "operationId": "Update",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -546,7 +546,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -610,7 +610,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -664,7 +664,7 @@
         "operationId": "DownlinkQueueList",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationDownlinks"
             }
@@ -718,7 +718,7 @@
         "operationId": "GetLink",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationLink"
             }
@@ -750,7 +750,7 @@
         "operationId": "SetLink",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationLink"
             }
@@ -782,7 +782,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationWebhooks"
             }
@@ -816,7 +816,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -846,7 +846,7 @@
         "operationId": "DeleteLink",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -870,7 +870,7 @@
         "operationId": "Set2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -902,7 +902,7 @@
         "operationId": "Set",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -940,7 +940,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -1004,7 +1004,7 @@
         "operationId": "DownlinkQueuePush",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1042,7 +1042,7 @@
         "operationId": "DownlinkQueueReplace",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1080,7 +1080,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationWebhook"
             }
@@ -1120,7 +1120,7 @@
         "operationId": "Set",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationWebhook"
             }
@@ -1158,7 +1158,7 @@
         "operationId": "GetFormats",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ApplicationWebhookFormats"
             }
@@ -1175,7 +1175,7 @@
         "operationId": "AuthInfo",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3AuthInfoResponse"
             }
@@ -1192,7 +1192,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Clients"
             }
@@ -1264,7 +1264,7 @@
         "operationId": "Update",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Client"
             }
@@ -1297,7 +1297,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Client"
             }
@@ -1332,7 +1332,7 @@
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1364,7 +1364,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1389,7 +1389,7 @@
         "operationId": "ListCollaborators",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Collaborators"
             }
@@ -1414,7 +1414,7 @@
         "operationId": "ListRights",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Rights"
             }
@@ -1439,7 +1439,7 @@
         "operationId": "RequestValidation",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3ContactInfoValidation"
             }
@@ -1454,7 +1454,7 @@
         "operationId": "Validate",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1471,7 +1471,7 @@
         "operationId": "Stream",
         "responses": {
           "200": {
-            "description": "(streaming responses)",
+            "description": "A successful response.(streaming responses)",
             "schema": {
               "$ref": "#/definitions/v3Event"
             }
@@ -1498,7 +1498,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateways"
             }
@@ -1570,7 +1570,7 @@
         "operationId": "Update",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateway"
             }
@@ -1603,7 +1603,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateway"
             }
@@ -1646,7 +1646,7 @@
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -1678,7 +1678,7 @@
         "operationId": "UpdateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -1717,7 +1717,7 @@
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1749,7 +1749,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1782,7 +1782,7 @@
         "operationId": "ListAPIKeys",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKeys"
             }
@@ -1814,7 +1814,7 @@
         "operationId": "ListCollaborators",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Collaborators"
             }
@@ -1847,7 +1847,7 @@
         "operationId": "ListRights",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Rights"
             }
@@ -1880,7 +1880,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Invitations"
             }
@@ -1894,7 +1894,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1917,7 +1917,7 @@
         "operationId": "Send",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Invitation"
             }
@@ -1944,7 +1944,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -1998,7 +1998,7 @@
         "operationId": "Set2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -2030,7 +2030,7 @@
         "operationId": "Set",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -2068,7 +2068,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -2132,7 +2132,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -2186,7 +2186,7 @@
         "operationId": "Set2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -2218,7 +2218,7 @@
         "operationId": "Set",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -2256,7 +2256,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevice"
             }
@@ -2321,7 +2321,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Organizations"
             }
@@ -2394,7 +2394,7 @@
         "operationId": "List3",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Applications"
             }
@@ -2465,7 +2465,7 @@
         "operationId": "Create2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Application"
             }
@@ -2499,7 +2499,7 @@
         "operationId": "List3",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Clients"
             }
@@ -2570,7 +2570,7 @@
         "operationId": "Create2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Client"
             }
@@ -2604,7 +2604,7 @@
         "operationId": "List3",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateways"
             }
@@ -2675,7 +2675,7 @@
         "operationId": "Create2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateway"
             }
@@ -2708,7 +2708,7 @@
         "operationId": "Update",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Organization"
             }
@@ -2742,7 +2742,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Organization"
             }
@@ -2778,7 +2778,7 @@
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -2811,7 +2811,7 @@
         "operationId": "UpdateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -2851,7 +2851,7 @@
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -2884,7 +2884,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -2910,7 +2910,7 @@
         "operationId": "ListAPIKeys",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKeys"
             }
@@ -2935,7 +2935,7 @@
         "operationId": "ListCollaborators",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Collaborators"
             }
@@ -2961,7 +2961,7 @@
         "operationId": "ListRights",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Rights"
             }
@@ -2986,7 +2986,7 @@
         "operationId": "SearchApplications",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Applications"
             }
@@ -3035,7 +3035,7 @@
         "operationId": "SearchEndDevices",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3EndDevices"
             }
@@ -3111,7 +3111,7 @@
         "operationId": "SearchClients",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Clients"
             }
@@ -3160,7 +3160,7 @@
         "operationId": "SearchGateways",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateways"
             }
@@ -3209,7 +3209,7 @@
         "operationId": "SearchOrganizations",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Organizations"
             }
@@ -3258,7 +3258,7 @@
         "operationId": "SearchUsers",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Users"
             }
@@ -3308,7 +3308,7 @@
         "operationId": "Create",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3User"
             }
@@ -3335,7 +3335,7 @@
         "operationId": "List2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Applications"
             }
@@ -3406,7 +3406,7 @@
         "operationId": "Create",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Application"
             }
@@ -3440,7 +3440,7 @@
         "operationId": "List2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Clients"
             }
@@ -3511,7 +3511,7 @@
         "operationId": "Create",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Client"
             }
@@ -3545,7 +3545,7 @@
         "operationId": "List2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateways"
             }
@@ -3616,7 +3616,7 @@
         "operationId": "Create",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Gateway"
             }
@@ -3650,7 +3650,7 @@
         "operationId": "List2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Organizations"
             }
@@ -3721,7 +3721,7 @@
         "operationId": "Create",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Organization"
             }
@@ -3754,7 +3754,7 @@
         "operationId": "Update",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3User"
             }
@@ -3788,7 +3788,7 @@
         "operationId": "Get",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3User"
             }
@@ -3831,7 +3831,7 @@
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -3865,7 +3865,7 @@
         "operationId": "UpdateAPIKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKey"
             }
@@ -3905,7 +3905,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3OAuthClientAuthorizations"
             }
@@ -3960,7 +3960,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -3998,7 +3998,7 @@
         "operationId": "ListTokens",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3OAuthAccessTokens"
             }
@@ -4059,7 +4059,7 @@
         "operationId": "DeleteToken",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -4103,7 +4103,7 @@
         "operationId": "UpdatePassword",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -4137,7 +4137,7 @@
         "operationId": "List",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3UserSessions"
             }
@@ -4193,7 +4193,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -4232,7 +4232,7 @@
         "operationId": "CreateTemporaryPassword",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -4257,7 +4257,7 @@
         "operationId": "Delete",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/protobufEmpty"
             }
@@ -4289,7 +4289,7 @@
         "operationId": "ListAPIKeys",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3APIKeys"
             }
@@ -4322,7 +4322,7 @@
         "operationId": "ListRights",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v3Rights"
             }
