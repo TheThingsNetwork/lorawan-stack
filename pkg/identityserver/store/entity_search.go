@@ -41,18 +41,18 @@ func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntiti
 	}
 	db = db.Select(fmt.Sprintf("%s AS id", idField)).Where(fmt.Sprintf("%s.deleted_at IS NULL", table))
 	if req.IDContains != "" {
-		db = db.Where(fmt.Sprintf("%s LIKE ?", idField), "%"+req.IDContains+"%")
+		db = db.Where(fmt.Sprintf("%s LIKE ?", idField), "%"+req.IDContains+"%") // TODO: Escape wildcards.
 	}
 	if req.NameContains != "" {
-		db = db.Where("name LIKE ?", "%"+req.NameContains+"%")
+		db = db.Where("name LIKE ?", "%"+req.NameContains+"%") // TODO: Escape wildcards.
 	}
 	if req.DescriptionContains != "" {
-		db = db.Where("description LIKE ?", "%"+req.DescriptionContains+"%")
+		db = db.Where("description LIKE ?", "%"+req.DescriptionContains+"%") // TODO: Escape wildcards.
 	}
 	if len(req.AttributesContain) > 0 {
 		sub := s.db.Scopes(withContext(ctx)).Table("attributes").Select("entity_id").Where("entity_type = ?", entityType)
 		for key, value := range req.AttributesContain {
-			sub = sub.Where("key = ? AND value LIKE ?", key, "%"+value+"%")
+			sub = sub.Where("key = ? AND value LIKE ?", key, "%"+value+"%") // TODO: Escape wildcards.
 		}
 		db = db.Where(fmt.Sprintf("%s.id IN (?)", table), sub.QueryExpr())
 	}

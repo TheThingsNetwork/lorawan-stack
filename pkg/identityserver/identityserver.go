@@ -156,7 +156,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
 	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
 	ttnpb.RegisterUserInvitationRegistryServer(s, &invitationRegistry{IdentityServer: is})
-	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is})
+	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is, adminOnly: true})
 	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
 }
 
