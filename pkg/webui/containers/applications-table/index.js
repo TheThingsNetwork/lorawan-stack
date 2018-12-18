@@ -14,6 +14,7 @@
 
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
+import bind from 'autobind-decorator'
 
 import FetchTable from '../fetch-table'
 
@@ -49,7 +50,13 @@ const headers = [
   },
 ]
 
+@bind
 export default class ApplicationsTable extends Component {
+
+  baseDataSelector ({ applications }) {
+    return applications
+  }
+
   render () {
     return (
       <FetchTable
@@ -60,6 +67,7 @@ export default class ApplicationsTable extends Component {
         getItemsAction={getApplicationsList}
         searchItemsAction={searchApplicationsList}
         tabs={tabs}
+        baseDataSelector={this.baseDataSelector}
         {...this.props}
       />
     )

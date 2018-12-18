@@ -15,6 +15,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import bind from 'autobind-decorator'
 
 import sharedMessages from '../../lib/shared-messages'
 import Message from '../../lib/components/message'
@@ -45,12 +46,17 @@ const headers = [
     totalCount: devices.totalCount,
   }
 })
+@bind
 export default class DevicesTable extends React.Component {
   constructor (props) {
     super(props)
 
     this.searchDevicesList = filters => searchDevicesList(props.appId, filters)
     this.getDevicesList = filters => getDevicesList(props.appId, filters)
+  }
+
+  baseDataSelector ({ devices }) {
+    return devices
   }
 
   render () {
@@ -64,6 +70,7 @@ export default class DevicesTable extends React.Component {
         getItemsAction={this.getDevicesList}
         searchItemsAction={this.searchDevicesList}
         itemPathPrefix="/devices"
+        baseDataSelector={this.baseDataSelector}
         {...this.props}
       />
     )

@@ -60,11 +60,12 @@ const filterValidator = function (filters) {
 }
 
 @connect(function (state, props) {
+  const base = props.baseDataSelector(state)
   return {
-    items: state[props.entity][props.entity],
-    totalCount: state[props.entity].totalCount,
-    fetching: state[props.entity].fetching,
-    fetchingSearch: state[props.entity].fetchingSearch,
+    items: base[props.entity] || [],
+    totalCount: base.totalCount || 0,
+    fetching: base.fetching,
+    fetchingSearch: base.fetchingSearch,
     pathname: location.pathname,
   }
 })
