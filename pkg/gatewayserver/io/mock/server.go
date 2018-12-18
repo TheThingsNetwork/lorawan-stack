@@ -32,6 +32,8 @@ import (
 
 type server struct {
 	store          *frequencyplans.Store
+	gateways       map[string]*ttnpb.Gateway
+	connections    map[string]*io.Connection
 	connectionsCh  chan *io.Connection
 	downlinkClaims sync.Map
 }
@@ -41,6 +43,8 @@ type Server interface {
 	io.Server
 
 	HasDownlinkClaim(context.Context, ttnpb.GatewayIdentifiers) bool
+	RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway)
+	GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection
 	Connections() <-chan *io.Connection
 }
 
@@ -48,6 +52,8 @@ type Server interface {
 func NewServer() Server {
 	return &server{
 		store:         frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		gateways:      make(map[string]*ttnpb.Gateway),
+		connections:   make(map[string]*io.Connection),
 		connectionsCh: make(chan *io.Connection, 10),
 	}
 }
@@ -69,7 +75,13 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-	gtw := &ttnpb.Gateway{GatewayIdentifiers: ids}
+	gtw, ok := s.gateways[unique.ID(ctx, ids)]
+	if !ok {
+		gtw = &ttnpb.Gateway{
+			GatewayIdentifiers: ids,
+			FrequencyPlanID:    test.EUFrequencyPlanID,
+		}
+	}
 	fp, err := s.GetFrequencyPlan(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -79,6 +91,7 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 		return nil, err
 	}
 	conn := io.NewConnection(ctx, protocol, gtw, fp, scheduler)
+	s.connections[unique.ID(ctx, ids)] = conn
 	select {
 	case s.connectionsCh <- conn:
 	default:
@@ -87,8 +100,14 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 }
 
 // GetFrequencyPlan implements io.Server.
-func (s *server) GetFrequencyPlan(ctx context.Context, _ ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error) {
-	return s.store.GetByID(test.EUFrequencyPlanID)
+func (s *server) GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error) {
+	var fpID string
+	if gtw, ok := s.gateways[unique.ID(ctx, ids)]; ok {
+		fpID = gtw.FrequencyPlanID
+	} else {
+		fpID = test.EUFrequencyPlanID
+	}
+	return s.store.GetByID(fpID)
 }
 
 // ClaimDownlink implements io.Server.
@@ -106,6 +125,14 @@ func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifie
 func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) bool {
 	_, ok := s.downlinkClaims.Load(unique.ID(ctx, ids))
 	return ok
+}
+
+func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway) {
+	s.gateways[unique.ID(ctx, ids)] = gateway
+}
+
+func (s *server) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection {
+	return s.connections[unique.ID(ctx, ids)]
 }
 
 func (s *server) Connections() <-chan *io.Connection {

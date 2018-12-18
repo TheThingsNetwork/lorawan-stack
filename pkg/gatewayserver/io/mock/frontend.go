@@ -16,6 +16,7 @@ package mock
 
 import (
 	"context"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -29,8 +30,9 @@ type Frontend struct {
 	Down   chan *ttnpb.DownlinkMessage
 }
 
-// Connect connects a new mock front-end to the given server.
-func Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers, server io.Server) (*Frontend, error) {
+// ConnectFrontend connects a new mock front-end to the given server.
+// The gateway time starts at Unix epoch.
+func ConnectFrontend(ctx context.Context, ids ttnpb.GatewayIdentifiers, server io.Server) (*Frontend, error) {
 	conn, err := server.Connect(ctx, "mock", ids)
 	if err != nil {
 		return nil, err
@@ -41,12 +43,16 @@ func Connect(ctx context.Context, ids ttnpb.GatewayIdentifiers, server io.Server
 		TxAck:  make(chan *ttnpb.TxAcknowledgment, 1),
 		Down:   make(chan *ttnpb.DownlinkMessage, 1),
 	}
+	started := time.Now()
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case up := <-f.Up:
+				gatewayTime := time.Unix(0, 0).Add(time.Since(started))
+				up.ReceivedAt = time.Now()
+				up.Settings.Time = &gatewayTime
 				conn.HandleUp(up)
 			case status := <-f.Status:
 				conn.HandleStatus(status)
