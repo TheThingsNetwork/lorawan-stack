@@ -168,7 +168,7 @@ class FetchTable extends Component {
   onItemClick (id) {
     const { dispatch, pathname, items, entity, itemPathPrefix } = this.props
     const entitySingle = entity.substr(0, entity.length - 1)
-    const item_id = items[id][`${entitySingle}_id`]
+    const item_id = items[id].ids[`${entitySingle}_id`]
 
     dispatch(push(`${pathname}${itemPathPrefix}/${item_id}`))
   }

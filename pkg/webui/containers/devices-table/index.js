@@ -31,7 +31,7 @@ const m = defineMessages({
 
 const headers = [
   {
-    name: 'device_id',
+    name: 'ids.device_id',
     displayName: m.deviceId,
   },
   {

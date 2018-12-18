@@ -41,7 +41,7 @@ const tabs = [
 
 const headers = [
   {
-    name: 'application_id',
+    name: 'ids.application_id',
     displayName: m.appId,
   },
   {

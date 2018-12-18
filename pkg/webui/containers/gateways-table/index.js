@@ -27,18 +27,19 @@ import {
 const m = defineMessages({
   add: 'Add Gateway',
   gtwId: 'Gateway ID',
+  gtwEUI: 'Gateway EUI',
   freqPlan: 'Frequency Plan',
 })
 
 const headers = [
   {
-    name: 'gateway_id',
+    name: 'ids.gateway_id',
     displayName: m.gtwId,
     width: 45,
   },
   {
-    name: 'eui',
-    displayName: 'EUI',
+    name: 'ids.eui',
+    displayName: m.gtwEUI,
     width: 25,
   },
   {
@@ -53,7 +54,7 @@ const headers = [
     width: 5,
   },
   {
-    name: 'frequency_plan',
+    name: 'frequency_plan_id',
     displayName: m.freqPlan,
     width: 15,
   },
