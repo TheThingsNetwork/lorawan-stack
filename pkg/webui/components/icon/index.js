@@ -31,8 +31,10 @@ const hardcoded = {
   gateway: 'router',
   organization: 'people',
   payload_formats: 'code',
+  develop: 'code',
   access: 'lock',
   general_settings: 'settings',
+  location: 'place',
 }
 
 const Icon = function ({
