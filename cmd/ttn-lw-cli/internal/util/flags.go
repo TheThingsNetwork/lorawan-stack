@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/spf13/pflag"
@@ -57,9 +58,9 @@ func FieldMaskFlags(v interface{}, prefix ...string) *pflag.FlagSet {
 	return fieldMaskFlags(prefix, t, true)
 }
 
-func isAtomicType(t reflect.Type) bool {
+func isAtomicType(t reflect.Type, maskOnly bool) bool {
 	switch t.Name() {
-	case "Time":
+	case "Time", "Duration":
 		return true
 	}
 	return false
@@ -91,14 +92,14 @@ func enumValues(t reflect.Type) map[string]int32 {
 
 func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 	if maskOnly {
-		if t.Kind() == reflect.Struct && !isAtomicType(t) {
+		if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
 			fs.Bool(name, false, fmt.Sprintf("select the %s field and all sub-fields", name))
 		} else {
 			fs.Bool(name, false, fmt.Sprintf("select the %s field", name))
 		}
 		return
 	}
-	if t.Kind() == reflect.Struct && !isAtomicType(t) {
+	if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
 		return
 	}
 	if t.PkgPath() == "" {
@@ -107,6 +108,18 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			fs.Bool(name, false, "")
 		case reflect.String:
 			fs.String(name, "", "")
+		case reflect.Int32:
+			fs.Int32(name, 0, "")
+		case reflect.Int64:
+			fs.Int64(name, 0, "")
+		case reflect.Uint32:
+			fs.Uint32(name, 0, "")
+		case reflect.Uint64:
+			fs.Uint64(name, 0, "")
+		case reflect.Float32:
+			fs.Float32(name, 0, "")
+		case reflect.Float64:
+			fs.Float64(name, 0, "")
 		case reflect.Slice:
 			switch t.Elem().Kind() {
 			case reflect.String:
@@ -118,23 +131,39 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 						values = append(values, value)
 					}
 					fs.StringSlice(name, nil, strings.Join(values, "|"))
+				} else {
+					fs.IntSlice(name, nil, "")
 				}
+			case reflect.Int64:
+				fs.IntSlice(name, nil, "")
+			case reflect.Uint8:
+				fs.String(name, "", "(hex)")
+			case reflect.Uint32, reflect.Uint64:
+				fs.UintSlice(name, nil, "")
+			case reflect.Ptr:
+				// Not supported
 			default:
 				fmt.Printf("flags: %s slice not yet supported (%s)\n", t.Elem().Kind(), name)
 			}
+		case reflect.Map:
+			// Not supported
 		default:
 			fmt.Printf("flags: %s not yet supported (%s)\n", t.Kind(), name)
 		}
-	} else {
-		switch t.Kind() {
-		case reflect.Int32:
-			if valueMap := enumValues(t); valueMap != nil {
-				values := make([]string, 0, len(valueMap))
-				for value := range valueMap {
-					values = append(values, value)
-				}
-				fs.String(name, "", strings.Join(values, "|"))
+	} else if t.Kind() == reflect.Int32 && strings.HasSuffix(t.PkgPath(), "ttnpb") {
+		if valueMap := enumValues(t); valueMap != nil {
+			values := make([]string, 0, len(valueMap))
+			for value := range valueMap {
+				values = append(values, value)
 			}
+			fs.String(name, "", strings.Join(values, "|"))
+		}
+	} else {
+		switch t.Name() {
+		case "Time":
+			fs.String(name, "", "(YYYY-MM-DDTHH:MM:SSZ)")
+		case "Duration":
+			fs.Duration(name, 0, "(1h2m3s)")
 		default:
 			fmt.Printf("flags: %s.%s not yet supported (%s)\n", t.PkgPath(), t.Name(), name)
 		}
@@ -165,7 +194,7 @@ func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagS
 			continue
 		}
 		addField(flagSet, name, fieldType, maskOnly)
-		if fieldType.Kind() == reflect.Struct {
+		if fieldType.Kind() == reflect.Struct && !isAtomicType(fieldType, maskOnly) {
 			flagSet.AddFlagSet(fieldMaskFlags(path, fieldType, maskOnly))
 		}
 	}
@@ -190,20 +219,24 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
 		switch flag.Value.Type() {
 		case "bool":
 			v, _ = flags.GetBool(flag.Name)
-			if v == "" {
-				return
-			}
 		case "string":
 			v, _ = flags.GetString(flag.Name)
-			if v == "" {
-				return
-			}
+		case "int32":
+			v, _ = flags.GetInt32(flag.Name)
+		case "int64":
+			v, _ = flags.GetInt64(flag.Name)
+		case "uint32":
+			v, _ = flags.GetUint32(flag.Name)
+		case "uint64":
+			v, _ = flags.GetUint64(flag.Name)
+		case "float32":
+			v, _ = flags.GetFloat32(flag.Name)
+		case "float64":
+			v, _ = flags.GetFloat64(flag.Name)
 		case "stringSlice":
-			s, _ := flags.GetStringSlice(flag.Name)
-			if len(s) == 0 {
-				return
-			}
-			v = s
+			v, _ = flags.GetStringSlice(flag.Name)
+		case "duration":
+			v, _ = flags.GetDuration(flag.Name)
 		}
 		if v == nil {
 			panic(fmt.Sprintf("can't set %s to %s (%v)", flag.Name, flag.Value, flag.Value.Type()))
@@ -219,6 +252,12 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 	for _, prop := range props.Prop {
 		if prop.OrigName == path[0] {
 			field := rv.FieldByName(prop.Name)
+			if field.Type().Kind() == reflect.Ptr {
+				if field.IsNil() {
+					field.Set(reflect.New(field.Type().Elem()))
+				}
+				field = field.Elem()
+			}
 			ft := field.Type()
 			if len(path) == 1 {
 				switch {
@@ -228,16 +267,26 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 					if valueMap := enumValues(ft); valueMap != nil {
 						field.SetInt(int64(valueMap[v.String()]))
 					}
+				case ft.PkgPath() == "time" && ft.Name() == "Time" && vt.Kind() == reflect.String:
+					var t time.Time
+					var err error
+					if v.String() != "" {
+						t, err = time.Parse(time.RFC3339Nano, v.String())
+						if err != nil {
+							panic(err)
+						}
+					}
+					field.Set(reflect.ValueOf(t))
+				case ft.PkgPath() == "time" && ft.Name() == "Duration" && vt.Kind() == reflect.String:
+					d, err := time.ParseDuration(v.String())
+					if err != nil {
+						panic(err)
+					}
+					field.Set(reflect.ValueOf(d))
 				default:
 					panic(fmt.Sprintf("%v is not assingable to %v\n", ft, vt))
 				}
 				return
-			}
-			if ft.Kind() == reflect.Ptr {
-				if field.IsNil() {
-					field.Set(reflect.New(ft.Elem()))
-				}
-				field = field.Elem()
 			}
 			setField(field, path[1:], v)
 		}
