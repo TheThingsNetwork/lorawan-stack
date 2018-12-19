@@ -33,7 +33,7 @@ var (
 	logger       *log.Logger
 	name         = "ttn-lw-cli"
 	mgr          = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig)
-	config       = new(Config)
+	config       = &Config{}
 	oauth2Config *oauth2.Config
 	ctx          = context.Background()
 	cache        util.Cache

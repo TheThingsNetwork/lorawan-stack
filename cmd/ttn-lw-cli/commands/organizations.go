@@ -33,7 +33,7 @@ var (
 )
 
 func organizationIDFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("organization-id", "", "")
 	return flagSet
 }

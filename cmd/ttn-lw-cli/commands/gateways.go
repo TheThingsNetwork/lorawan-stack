@@ -34,7 +34,7 @@ var (
 )
 
 func gatewayIDFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("gateway-id", "", "")
 	return flagSet
 }

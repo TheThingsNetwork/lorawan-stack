@@ -33,7 +33,7 @@ var (
 )
 
 func applicationIDFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("application-id", "", "")
 	return flagSet
 }

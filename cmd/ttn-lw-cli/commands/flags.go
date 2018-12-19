@@ -25,7 +25,7 @@ import (
 var defaultGetPaths = []string{"name"}
 
 func collaboratorFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("user-id", "", "")
 	flagSet.String("organization-id", "", "")
 	return flagSet
@@ -49,7 +49,7 @@ func getCollaborator(flagSet *pflag.FlagSet) *ttnpb.OrganizationOrUserIdentifier
 }
 
 func attributesFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.StringSlice("attributes", nil, "key=value")
 	return flagSet
 }
@@ -72,7 +72,7 @@ func mergeAttributes(attributes map[string]string, flagSet *pflag.FlagSet) map[s
 }
 
 func rightsFlags(filter func(string) bool) *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	for right := range ttnpb.Right_value {
 		right := strings.Replace(strings.ToLower(right), "_", "-", -1)
 		if filter == nil || filter(right) {
@@ -108,7 +108,7 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string) string {
 }
 
 func searchFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("id-contains", "", "")
 	flagSet.String("name-contains", "", "")
 	flagSet.String("description-contains", "", "")
@@ -132,7 +132,7 @@ func getSearchEntitiesRequest(flagSet *pflag.FlagSet) *ttnpb.SearchEntitiesReque
 var errNoIDs = errors.DefineInvalidArgument("no_ids", "no IDs set")
 
 func combinedIdentifiersFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.StringSlice("application-id", nil, "")
 	flagSet.StringSlice("client-id", nil, "")
 	flagSet.StringSlice("device-id", nil, "")
@@ -150,7 +150,7 @@ func getCombinedIdentifiers(flagSet *pflag.FlagSet) *ttnpb.CombinedIdentifiers {
 	organizationIDs, _ := flagSet.GetStringSlice("organization-id")
 	userIDs, _ := flagSet.GetStringSlice("user-id")
 
-	ids := new(ttnpb.CombinedIdentifiers)
+	ids := &ttnpb.CombinedIdentifiers{}
 	if len(deviceIDs) > 0 {
 		if len(clientIDs)+len(gatewayIDs)+len(organizationIDs)+len(userIDs) > 0 {
 			logger.Warn("considering only devices")

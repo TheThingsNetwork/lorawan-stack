@@ -32,13 +32,13 @@ import (
 )
 
 var (
-	selectEndDeviceListFlags = new(pflag.FlagSet)
-	selectEndDeviceFlags     = new(pflag.FlagSet)
-	setEndDeviceFlags        = new(pflag.FlagSet)
+	selectEndDeviceListFlags = &pflag.FlagSet{}
+	selectEndDeviceFlags     = &pflag.FlagSet{}
+	setEndDeviceFlags        = &pflag.FlagSet{}
 )
 
 func endDeviceIDFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("application-id", "", "")
 	flagSet.String("device-id", "", "")
 	flagSet.String("join-eui", "", "(hex)")

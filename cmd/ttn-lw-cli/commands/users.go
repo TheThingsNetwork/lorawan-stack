@@ -34,7 +34,7 @@ var (
 )
 
 func userIDFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("user-id", "", "")
 	return flagSet
 }

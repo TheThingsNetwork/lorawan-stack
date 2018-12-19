@@ -33,7 +33,7 @@ var (
 )
 
 func clientIDFlags() *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	flagSet.String("client-id", "", "")
 	return flagSet
 }

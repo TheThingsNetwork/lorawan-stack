@@ -174,7 +174,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 }
 
 func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagSet {
-	flagSet := new(pflag.FlagSet)
+	flagSet := &pflag.FlagSet{}
 	props := proto.GetProperties(t)
 	for _, prop := range props.Prop {
 		if prop.Tag == 0 {
