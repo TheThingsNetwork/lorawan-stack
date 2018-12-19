@@ -44,9 +44,11 @@ func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.Clien
 }
 
 func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {
+	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights we're giving to the collaborator.
 	if err := rights.RequireClient(ctx, req.ClientIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}

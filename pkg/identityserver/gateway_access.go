@@ -47,9 +47,11 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 }
 
 func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -89,9 +91,11 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, ids *ttnpb.Gat
 }
 
 func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -116,9 +120,11 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 }
 
 func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
+	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights we're giving to the collaborator.
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}

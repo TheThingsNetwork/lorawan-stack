@@ -44,9 +44,11 @@ func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIde
 }
 
 func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -86,9 +88,11 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, ids *ttnpb.UserId
 }
 
 func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}

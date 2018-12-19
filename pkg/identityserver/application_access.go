@@ -47,9 +47,11 @@ func (is *IdentityServer) listApplicationRights(ctx context.Context, ids *ttnpb.
 }
 
 func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnpb.CreateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -89,9 +91,11 @@ func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, ids *ttnpb
 }
 
 func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -116,9 +120,11 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
+	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights we're giving to the collaborator.
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}

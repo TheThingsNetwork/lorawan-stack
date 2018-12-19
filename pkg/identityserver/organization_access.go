@@ -47,9 +47,11 @@ func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb
 }
 
 func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttnpb.CreateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -89,9 +91,11 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, ids *ttnp
 }
 
 func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	// Require that caller has rights to manage API keys.
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights of the API key.
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
@@ -116,9 +120,11 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 }
 
 func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*types.Empty, error) {
+	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
+	// Require that caller has at least the rights we're giving to the collaborator.
 	if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}
