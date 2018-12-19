@@ -28,8 +28,9 @@ import (
 )
 
 var (
-	selectGatewayFlags = util.FieldMaskFlags(&ttnpb.Gateway{})
-	setGatewayFlags    = util.FieldFlags(&ttnpb.Gateway{})
+	selectGatewayFlags     = util.FieldMaskFlags(&ttnpb.Gateway{})
+	setGatewayFlags        = util.FieldFlags(&ttnpb.Gateway{})
+	setGatewayAntennaFlags = util.FieldFlags(&ttnpb.GatewayAntenna{}, "antenna")
 )
 
 func gatewayIDFlags() *pflag.FlagSet {
@@ -166,6 +167,10 @@ var (
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			gateway.GatewayIdentifiers = *gtwID
 
+			var antenna ttnpb.GatewayAntenna
+			util.SetFields(&antenna, setGatewayAntennaFlags, "antenna")
+			gateway.Antennas = []ttnpb.GatewayAntenna{antenna}
+
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
 				return err
@@ -181,6 +186,7 @@ var (
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}
+	errAntennaIndex       = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
 	gatewaysUpdateCommand = &cobra.Command{
 		Use:     "update",
 		Aliases: []string{"set"},
@@ -191,7 +197,8 @@ var (
 				return errNoGatewayID
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
-			if len(paths) == 0 {
+			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
+			if len(paths)+len(antennaPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
@@ -204,6 +211,33 @@ var (
 			if err != nil {
 				return err
 			}
+
+			antennaAdd, _ := cmd.Flags().GetBool("antenna.add")
+			antennaRemove, _ := cmd.Flags().GetBool("antenna.remove")
+			if len(antennaPaths) > 0 || antennaAdd || antennaRemove {
+				res, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
+					GatewayIdentifiers: gateway.GatewayIdentifiers,
+					FieldMask:          types.FieldMask{Paths: []string{"antennas"}},
+				})
+				if err != nil {
+					return err
+				}
+				antennaIndex, _ := cmd.Flags().GetInt("antenna.index")
+				if antennaAdd {
+					res.Antennas = append(res.Antennas, ttnpb.GatewayAntenna{})
+					antennaIndex = len(res.Antennas) - 1
+				} else if antennaIndex > len(res.Antennas) {
+					return errAntennaIndex
+				}
+				if antennaRemove {
+					gateway.Antennas = append(res.Antennas[:antennaIndex], res.Antennas[antennaIndex+1:]...)
+				} else { // create or update
+					util.SetFields(&res.Antennas[antennaIndex], setGatewayAntennaFlags, "antenna")
+					gateway.Antennas = res.Antennas
+				}
+				paths = append(paths, "antennas")
+			}
+
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
 				Gateway:   gateway,
 				FieldMask: types.FieldMask{Paths: paths},
@@ -279,10 +313,15 @@ func init() {
 	gatewaysCreateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(collaboratorFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayFlags)
+	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
 	gatewaysCreateCommand.Flags().AddFlagSet(attributesFlags())
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
 	gatewaysUpdateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysUpdateCommand.Flags().AddFlagSet(setGatewayFlags)
+	gatewaysUpdateCommand.Flags().Int("antenna.index", 0, "index of the antenna to update or remove")
+	gatewaysUpdateCommand.Flags().Bool("antenna.add", false, "add an extra antenna")
+	gatewaysUpdateCommand.Flags().Bool("antenna.remove", false, "remove an antenna")
+	gatewaysUpdateCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
 	gatewaysUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	gatewaysCommand.AddCommand(gatewaysUpdateCommand)
 	gatewaysDeleteCommand.Flags().AddFlagSet(gatewayIDFlags())

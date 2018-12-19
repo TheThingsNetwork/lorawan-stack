@@ -47,14 +47,14 @@ func UpdateFieldMask(cmdFlags *pflag.FlagSet, fieldMaskFlags ...*pflag.FlagSet) 
 	return
 }
 
-func FieldFlags(v interface{}) *pflag.FlagSet {
+func FieldFlags(v interface{}, prefix ...string) *pflag.FlagSet {
 	t := reflect.Indirect(reflect.ValueOf(v)).Type()
-	return fieldMaskFlags(nil, t, false)
+	return fieldMaskFlags(prefix, t, false)
 }
 
-func FieldMaskFlags(v interface{}) *pflag.FlagSet {
+func FieldMaskFlags(v interface{}, prefix ...string) *pflag.FlagSet {
 	t := reflect.Indirect(reflect.ValueOf(v)).Type()
-	return fieldMaskFlags(nil, t, true)
+	return fieldMaskFlags(prefix, t, true)
 }
 
 func isAtomicType(t reflect.Type) bool {
@@ -172,7 +172,18 @@ func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagS
 	return flagSet
 }
 
-func SetFields(dst interface{}, flags *pflag.FlagSet) {
+func trimPrefix(path []string, prefix ...string) []string {
+	var nextElement int
+	for i, prefix := range prefix {
+		if i >= len(path) || path[i] != prefix {
+			break
+		}
+		nextElement = i + 1
+	}
+	return path[nextElement:]
+}
+
+func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
 	rv := reflect.Indirect(reflect.ValueOf(dst))
 	flags.VisitAll(func(flag *pflag.Flag) {
 		var v interface{}
@@ -197,7 +208,7 @@ func SetFields(dst interface{}, flags *pflag.FlagSet) {
 		if v == nil {
 			panic(fmt.Sprintf("can't set %s to %s (%v)", flag.Name, flag.Value, flag.Value.Type()))
 		}
-		setField(rv, strings.Split(flag.Name, "."), reflect.ValueOf(v))
+		setField(rv, trimPrefix(strings.Split(flag.Name, "."), prefix...), reflect.ValueOf(v))
 	})
 }
 
