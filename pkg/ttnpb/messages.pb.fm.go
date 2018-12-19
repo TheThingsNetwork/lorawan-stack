@@ -748,14 +748,15 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 
 var ApplicationDownlinkFieldPathsNested = []string{
 	"class_b_c",
+	"class_b_c.absolute_time",
 	"class_b_c.gateways",
-	"class_b_c.time",
 	"confirmed",
 	"correlation_ids",
 	"decoded_payload",
 	"f_cnt",
 	"f_port",
 	"frm_payload",
+	"priority",
 	"session_key_id",
 }
 
@@ -767,6 +768,7 @@ var ApplicationDownlinkFieldPathsTopLevel = []string{
 	"f_cnt",
 	"f_port",
 	"frm_payload",
+	"priority",
 	"session_key_id",
 }
 
@@ -853,6 +855,16 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 					dst.ClassBC = nil
 				}
 			}
+		case "priority":
+			if len(subs) > 0 {
+				return fmt.Errorf("'priority' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Priority = src.Priority
+			} else {
+				var zero TxSchedulePriority
+				dst.Priority = zero
+			}
 		case "correlation_ids":
 			if len(subs) > 0 {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
@@ -871,13 +883,13 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 }
 
 var ApplicationDownlink_ClassBCFieldPathsNested = []string{
+	"absolute_time",
 	"gateways",
-	"time",
 }
 
 var ApplicationDownlink_ClassBCFieldPathsTopLevel = []string{
+	"absolute_time",
 	"gateways",
-	"time",
 }
 
 func (dst *ApplicationDownlink_ClassBC) SetFields(src *ApplicationDownlink_ClassBC, paths ...string) error {
@@ -892,14 +904,14 @@ func (dst *ApplicationDownlink_ClassBC) SetFields(src *ApplicationDownlink_Class
 			} else {
 				dst.Gateways = nil
 			}
-		case "time":
+		case "absolute_time":
 			if len(subs) > 0 {
-				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'absolute_time' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Time = src.Time
+				dst.AbsoluteTime = src.AbsoluteTime
 			} else {
-				dst.Time = nil
+				dst.AbsoluteTime = nil
 			}
 
 		default:
@@ -940,14 +952,15 @@ func (dst *ApplicationDownlinks) SetFields(src *ApplicationDownlinks, paths ...s
 var ApplicationDownlinkFailedFieldPathsNested = []string{
 	"downlink",
 	"downlink.class_b_c",
+	"downlink.class_b_c.absolute_time",
 	"downlink.class_b_c.gateways",
-	"downlink.class_b_c.time",
 	"downlink.confirmed",
 	"downlink.correlation_ids",
 	"downlink.decoded_payload",
 	"downlink.f_cnt",
 	"downlink.f_port",
 	"downlink.frm_payload",
+	"downlink.priority",
 	"downlink.session_key_id",
 	"error",
 	"error.attributes",
@@ -1067,26 +1080,28 @@ var ApplicationUpFieldPathsNested = []string{
 	"up",
 	"up.downlink_ack",
 	"up.downlink_ack.class_b_c",
+	"up.downlink_ack.class_b_c.absolute_time",
 	"up.downlink_ack.class_b_c.gateways",
-	"up.downlink_ack.class_b_c.time",
 	"up.downlink_ack.confirmed",
 	"up.downlink_ack.correlation_ids",
 	"up.downlink_ack.decoded_payload",
 	"up.downlink_ack.f_cnt",
 	"up.downlink_ack.f_port",
 	"up.downlink_ack.frm_payload",
+	"up.downlink_ack.priority",
 	"up.downlink_ack.session_key_id",
 	"up.downlink_failed",
 	"up.downlink_failed.downlink",
 	"up.downlink_failed.downlink.class_b_c",
+	"up.downlink_failed.downlink.class_b_c.absolute_time",
 	"up.downlink_failed.downlink.class_b_c.gateways",
-	"up.downlink_failed.downlink.class_b_c.time",
 	"up.downlink_failed.downlink.confirmed",
 	"up.downlink_failed.downlink.correlation_ids",
 	"up.downlink_failed.downlink.decoded_payload",
 	"up.downlink_failed.downlink.f_cnt",
 	"up.downlink_failed.downlink.f_port",
 	"up.downlink_failed.downlink.frm_payload",
+	"up.downlink_failed.downlink.priority",
 	"up.downlink_failed.downlink.session_key_id",
 	"up.downlink_failed.error",
 	"up.downlink_failed.error.attributes",
@@ -1102,39 +1117,42 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.downlink_failed.error.namespace",
 	"up.downlink_nack",
 	"up.downlink_nack.class_b_c",
+	"up.downlink_nack.class_b_c.absolute_time",
 	"up.downlink_nack.class_b_c.gateways",
-	"up.downlink_nack.class_b_c.time",
 	"up.downlink_nack.confirmed",
 	"up.downlink_nack.correlation_ids",
 	"up.downlink_nack.decoded_payload",
 	"up.downlink_nack.f_cnt",
 	"up.downlink_nack.f_port",
 	"up.downlink_nack.frm_payload",
+	"up.downlink_nack.priority",
 	"up.downlink_nack.session_key_id",
 	"up.downlink_queue_invalidated",
 	"up.downlink_queue_invalidated.downlinks",
 	"up.downlink_queue_invalidated.last_f_cnt_down",
 	"up.downlink_queued",
 	"up.downlink_queued.class_b_c",
+	"up.downlink_queued.class_b_c.absolute_time",
 	"up.downlink_queued.class_b_c.gateways",
-	"up.downlink_queued.class_b_c.time",
 	"up.downlink_queued.confirmed",
 	"up.downlink_queued.correlation_ids",
 	"up.downlink_queued.decoded_payload",
 	"up.downlink_queued.f_cnt",
 	"up.downlink_queued.f_port",
 	"up.downlink_queued.frm_payload",
+	"up.downlink_queued.priority",
 	"up.downlink_queued.session_key_id",
 	"up.downlink_sent",
 	"up.downlink_sent.class_b_c",
+	"up.downlink_sent.class_b_c.absolute_time",
 	"up.downlink_sent.class_b_c.gateways",
-	"up.downlink_sent.class_b_c.time",
 	"up.downlink_sent.confirmed",
 	"up.downlink_sent.correlation_ids",
 	"up.downlink_sent.decoded_payload",
 	"up.downlink_sent.f_cnt",
 	"up.downlink_sent.f_port",
 	"up.downlink_sent.frm_payload",
+	"up.downlink_sent.priority",
 	"up.downlink_sent.session_key_id",
 	"up.join_accept",
 	"up.join_accept.app_s_key",

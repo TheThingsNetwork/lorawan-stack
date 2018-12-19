@@ -221,6 +221,10 @@ message MACState {
   // Queued join-accept payload.
   // Set each time (re-)join request is received and removed each time a downlink is scheduled.
   bytes queued_join_accept = 11;
+  // Whether or not Rx windows are expected to be open.
+  // Set to true every time an uplink is received.
+  // Set to false every time a successful downlink scheduling attempt is made.
+  bool rx_windows_available = 12;
 
   // TODO: Add info about failed MAC requests
 }

@@ -1020,19 +1020,21 @@ var MACStateFieldPathsNested = []string{
 	"lorawan_version",
 	"pending_application_downlink",
 	"pending_application_downlink.class_b_c",
+	"pending_application_downlink.class_b_c.absolute_time",
 	"pending_application_downlink.class_b_c.gateways",
-	"pending_application_downlink.class_b_c.time",
 	"pending_application_downlink.confirmed",
 	"pending_application_downlink.correlation_ids",
 	"pending_application_downlink.decoded_payload",
 	"pending_application_downlink.f_cnt",
 	"pending_application_downlink.f_port",
 	"pending_application_downlink.frm_payload",
+	"pending_application_downlink.priority",
 	"pending_application_downlink.session_key_id",
 	"pending_requests",
 	"ping_slot_periodicity",
 	"queued_join_accept",
 	"queued_responses",
+	"rx_windows_available",
 }
 
 var MACStateFieldPathsTopLevel = []string{
@@ -1047,6 +1049,7 @@ var MACStateFieldPathsTopLevel = []string{
 	"ping_slot_periodicity",
 	"queued_join_accept",
 	"queued_responses",
+	"rx_windows_available",
 }
 
 func (dst *MACState) SetFields(src *MACState, paths ...string) error {
@@ -1186,6 +1189,16 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				var zero []byte
 				dst.QueuedJoinAccept = zero
 			}
+		case "rx_windows_available":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx_windows_available' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RxWindowsAvailable = src.RxWindowsAvailable
+			} else {
+				var zero bool
+				dst.RxWindowsAvailable = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1297,19 +1310,21 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_state.lorawan_version",
 	"mac_state.pending_application_downlink",
 	"mac_state.pending_application_downlink.class_b_c",
+	"mac_state.pending_application_downlink.class_b_c.absolute_time",
 	"mac_state.pending_application_downlink.class_b_c.gateways",
-	"mac_state.pending_application_downlink.class_b_c.time",
 	"mac_state.pending_application_downlink.confirmed",
 	"mac_state.pending_application_downlink.correlation_ids",
 	"mac_state.pending_application_downlink.decoded_payload",
 	"mac_state.pending_application_downlink.f_cnt",
 	"mac_state.pending_application_downlink.f_port",
 	"mac_state.pending_application_downlink.frm_payload",
+	"mac_state.pending_application_downlink.priority",
 	"mac_state.pending_application_downlink.session_key_id",
 	"mac_state.pending_requests",
 	"mac_state.ping_slot_periodicity",
 	"mac_state.queued_join_accept",
 	"mac_state.queued_responses",
+	"mac_state.rx_windows_available",
 	"max_frequency",
 	"min_frequency",
 	"name",
@@ -2103,19 +2118,21 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.lorawan_version",
 	"end_device.mac_state.pending_application_downlink",
 	"end_device.mac_state.pending_application_downlink.class_b_c",
+	"end_device.mac_state.pending_application_downlink.class_b_c.absolute_time",
 	"end_device.mac_state.pending_application_downlink.class_b_c.gateways",
-	"end_device.mac_state.pending_application_downlink.class_b_c.time",
 	"end_device.mac_state.pending_application_downlink.confirmed",
 	"end_device.mac_state.pending_application_downlink.correlation_ids",
 	"end_device.mac_state.pending_application_downlink.decoded_payload",
 	"end_device.mac_state.pending_application_downlink.f_cnt",
 	"end_device.mac_state.pending_application_downlink.f_port",
 	"end_device.mac_state.pending_application_downlink.frm_payload",
+	"end_device.mac_state.pending_application_downlink.priority",
 	"end_device.mac_state.pending_application_downlink.session_key_id",
 	"end_device.mac_state.pending_requests",
 	"end_device.mac_state.ping_slot_periodicity",
 	"end_device.mac_state.queued_join_accept",
 	"end_device.mac_state.queued_responses",
+	"end_device.mac_state.rx_windows_available",
 	"end_device.max_frequency",
 	"end_device.min_frequency",
 	"end_device.name",
@@ -2329,19 +2346,21 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.lorawan_version",
 	"end_device.mac_state.pending_application_downlink",
 	"end_device.mac_state.pending_application_downlink.class_b_c",
+	"end_device.mac_state.pending_application_downlink.class_b_c.absolute_time",
 	"end_device.mac_state.pending_application_downlink.class_b_c.gateways",
-	"end_device.mac_state.pending_application_downlink.class_b_c.time",
 	"end_device.mac_state.pending_application_downlink.confirmed",
 	"end_device.mac_state.pending_application_downlink.correlation_ids",
 	"end_device.mac_state.pending_application_downlink.decoded_payload",
 	"end_device.mac_state.pending_application_downlink.f_cnt",
 	"end_device.mac_state.pending_application_downlink.f_port",
 	"end_device.mac_state.pending_application_downlink.frm_payload",
+	"end_device.mac_state.pending_application_downlink.priority",
 	"end_device.mac_state.pending_application_downlink.session_key_id",
 	"end_device.mac_state.pending_requests",
 	"end_device.mac_state.ping_slot_periodicity",
 	"end_device.mac_state.queued_join_accept",
 	"end_device.mac_state.queued_responses",
+	"end_device.mac_state.rx_windows_available",
 	"end_device.max_frequency",
 	"end_device.min_frequency",
 	"end_device.name",
@@ -2708,19 +2727,21 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.mac_state.lorawan_version",
 	"device.mac_state.pending_application_downlink",
 	"device.mac_state.pending_application_downlink.class_b_c",
+	"device.mac_state.pending_application_downlink.class_b_c.absolute_time",
 	"device.mac_state.pending_application_downlink.class_b_c.gateways",
-	"device.mac_state.pending_application_downlink.class_b_c.time",
 	"device.mac_state.pending_application_downlink.confirmed",
 	"device.mac_state.pending_application_downlink.correlation_ids",
 	"device.mac_state.pending_application_downlink.decoded_payload",
 	"device.mac_state.pending_application_downlink.f_cnt",
 	"device.mac_state.pending_application_downlink.f_port",
 	"device.mac_state.pending_application_downlink.frm_payload",
+	"device.mac_state.pending_application_downlink.priority",
 	"device.mac_state.pending_application_downlink.session_key_id",
 	"device.mac_state.pending_requests",
 	"device.mac_state.ping_slot_periodicity",
 	"device.mac_state.queued_join_accept",
 	"device.mac_state.queued_responses",
+	"device.mac_state.rx_windows_available",
 	"device.max_frequency",
 	"device.min_frequency",
 	"device.name",

@@ -4357,11 +4357,11 @@
         "gateways": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/ClassBCGatewayAntennaIdentifiers"
+            "$ref": "#/definitions/v3GatewayAntennaIdentifiers"
           },
           "description": "Possible gateway identifiers and antenna index to use for this downlink message.\nThe Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.\nIf none of the gateways can be selected, the downlink message fails.\nIf empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks."
         },
-        "time": {
+        "absolute_time": {
           "type": "string",
           "format": "date-time",
           "description": "Absolute time when the downlink message should be transmitted.\nThis requires the gateway to have GPS time synchronization.\nIf the time is in the past or if there is a scheduling conflict, the downlink message fails.\nIf null, the time is selected based on slot availability. This is recommended in class B mode."
@@ -4376,18 +4376,6 @@
         },
         "entity_ids": {
           "$ref": "#/definitions/v3EntityIdentifiers"
-        }
-      }
-    },
-    "ClassBCGatewayAntennaIdentifiers": {
-      "type": "object",
-      "properties": {
-        "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
-        },
-        "antenna_index": {
-          "type": "integer",
-          "format": "int64"
         }
       }
     },
@@ -4862,6 +4850,15 @@
       ],
       "default": "SUCCESS"
     },
+    "TxRequestAbsoluteTime": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "lorawanv3Location": {
       "type": "object",
       "properties": {
@@ -5189,6 +5186,10 @@
         "class_b_c": {
           "$ref": "#/definitions/ApplicationDownlinkClassBC",
           "description": "Optional gateway and timing information for class B and C.\nIf set, this downlink message will only be transmitted as class B or C downlink.\nIf not set, this downlink message may be transmitted in class A, B and C."
+        },
+        "priority": {
+          "$ref": "#/definitions/v3TxSchedulePriority",
+          "description": "Priority for scheduling the downlink message."
         },
         "correlation_ids": {
           "type": "array",
@@ -6004,11 +6005,11 @@
         "end_device_ids": {
           "$ref": "#/definitions/v3EndDeviceIdentifiers"
         },
-        "settings": {
-          "$ref": "#/definitions/v3TxSettings"
+        "request": {
+          "$ref": "#/definitions/v3TxRequest"
         },
-        "tx_metadata": {
-          "$ref": "#/definitions/v3TxMetadata"
+        "scheduled": {
+          "$ref": "#/definitions/v3TxSettings"
         },
         "correlation_ids": {
           "type": "array",
@@ -6018,6 +6019,18 @@
         }
       },
       "title": "Downlink message from the network to the end device"
+    },
+    "v3DownlinkPath": {
+      "type": "object",
+      "properties": {
+        "uplink_token": {
+          "type": "string",
+          "format": "byte"
+        },
+        "fixed": {
+          "$ref": "#/definitions/v3GatewayAntennaIdentifiers"
+        }
+      }
     },
     "v3DownlinkPathConstraint": {
       "type": "string",
@@ -6551,6 +6564,18 @@
         }
       },
       "description": "GatewayAntenna is the message that defines a gateway antenna."
+    },
+    "v3GatewayAntennaIdentifiers": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/v3GatewayIdentifiers"
+        },
+        "antenna_index": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
     },
     "v3GatewayConnectionStats": {
       "type": "object",
@@ -7218,6 +7243,11 @@
           "type": "string",
           "format": "byte",
           "description": "Queued join-accept payload.\nSet each time (re-)join request is received and removed each time a downlink is scheduled."
+        },
+        "rx_windows_available": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether or not Rx windows are expected to be open.\nSet to true every time an uplink is received.\nSet to false every time a successful downlink scheduling attempt is made."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server and is read only."
@@ -7815,6 +7845,11 @@
           "$ref": "#/definitions/v3DownlinkPathConstraint",
           "description": "Gateway downlink path constraint; injected by the Gateway Server."
         },
+        "uplink_token": {
+          "type": "string",
+          "format": "byte",
+          "description": "Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS."
+        },
         "advanced": {
           "$ref": "#/definitions/protobufStruct",
           "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"
@@ -8018,32 +8053,68 @@
         }
       }
     },
-    "v3TxMetadata": {
+    "v3TxRequest": {
       "type": "object",
       "properties": {
-        "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+        "class": {
+          "$ref": "#/definitions/v3Class"
         },
-        "antenna_index": {
-          "type": "integer",
-          "format": "int64"
+        "downlink_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3DownlinkPath"
+          },
+          "description": "Downlink paths used to select a gateway for downlink.\nIn class A, the downlink paths are required to contain only uplink tokens.\nIn class B/C, the downlink paths may contain uplink tokens and fixed gateways."
         },
-        "time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Absolute time when the downlink message should be transmitted.\nThis requires the gateway to have GPS time synchronization.\nIf set, this field takes precedence over timestamp."
+        "rx1_delay": {
+          "$ref": "#/definitions/v3RxDelay",
+          "description": "Rx1 delay (Rx2 delay is Rx1 delay + 1 second)."
         },
-        "timestamp": {
+        "rx1_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex",
+          "description": "LoRaWAN data rate index for Rx1."
+        },
+        "rx1_frequency": {
           "type": "string",
           "format": "uint64",
-          "description": "Gateway concentrator timestamp when the downlink message should be transmitted (nanoseconds).\nNOTE: most gateways use microsecond timestamps, so conversion may be needed."
+          "description": "Frequency (Hz) for Rx1."
+        },
+        "rx2_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex",
+          "description": "LoRaWAN data rate index for Rx2.\nRx2 parameters are used for class B/C downlink."
+        },
+        "rx2_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency (Hz) for Rx2.\nRx2 parameters are used for class B/C downlink."
+        },
+        "priority": {
+          "$ref": "#/definitions/v3TxSchedulePriority",
+          "description": "Priority for scheduling.\nRequests with a higher priority are allocated more channel utilization time than messages with a lower priority, in duty-cycle limited regions.\nA priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object."
+        },
+        "absolute_time": {
+          "$ref": "#/definitions/TxRequestAbsoluteTime",
+          "description": "Time when the downlink message should be transmitted.\nThis value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots.\nThis requires the gateway to have GPS time sychronization.\nIf the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations."
         },
         "advanced": {
           "$ref": "#/definitions/protobufStruct",
           "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"
         }
       },
-      "title": "Contains metadata for a to-be-transmitted message.\nIt contains gateway-specific fields that are not in the TxSettings message"
+      "description": "TxRequest is a request for transmission.\nIf sent to a roaming partner, this request is used to generate the DLMetadata Object (see Backend Interfaces 1.0, Table 22).\nIf the gateway has a scheduler, this request is sent to the gateway, in the order of gateway_ids.\nOtherwise, the Gateway Server attempts to schedule the request and creates the TxSettings."
+    },
+    "v3TxSchedulePriority": {
+      "type": "string",
+      "enum": [
+        "LOWEST",
+        "LOW",
+        "BELOW_NORMAL",
+        "NORMAL",
+        "ABOVE_NORMAL",
+        "HIGH",
+        "HIGHEST"
+      ],
+      "default": "LOWEST"
     },
     "v3TxSettings": {
       "type": "object",
@@ -8098,9 +8169,19 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled."
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).\nOn downlink, set timestamp to 0 and time to null to use immediate scheduling."
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.\nFor downlink, this requires the gateway to have GPS time synchronization."
         }
       },
-      "title": "TxSettings contains the LoRaWAN settings for a transmission.\nThis message is used in both uplink and downlink"
+      "description": "TxSettings contains the settings for a transmission.\nThis message is used on both uplink and downlink.\nOn downlink, this is a scheduled transmission."
     },
     "v3UpdateApplicationAPIKeyRequest": {
       "type": "object",

@@ -267,8 +267,10 @@
 - [lorawan-stack/api/lorawan.proto](#lorawan-stack/api/lorawan.proto)
     - [CFList](#ttn.lorawan.v3.CFList)
     - [DLSettings](#ttn.lorawan.v3.DLSettings)
+    - [DownlinkPath](#ttn.lorawan.v3.DownlinkPath)
     - [FCtrl](#ttn.lorawan.v3.FCtrl)
     - [FHDR](#ttn.lorawan.v3.FHDR)
+    - [GatewayAntennaIdentifiers](#ttn.lorawan.v3.GatewayAntennaIdentifiers)
     - [JoinAcceptPayload](#ttn.lorawan.v3.JoinAcceptPayload)
     - [JoinRequestPayload](#ttn.lorawan.v3.JoinRequestPayload)
     - [MACCommand](#ttn.lorawan.v3.MACCommand)
@@ -306,6 +308,8 @@
     - [MHDR](#ttn.lorawan.v3.MHDR)
     - [Message](#ttn.lorawan.v3.Message)
     - [RejoinRequestPayload](#ttn.lorawan.v3.RejoinRequestPayload)
+    - [TxRequest](#ttn.lorawan.v3.TxRequest)
+    - [TxRequest.AbsoluteTime](#ttn.lorawan.v3.TxRequest.AbsoluteTime)
     - [TxSettings](#ttn.lorawan.v3.TxSettings)
   
     - [ADRAckDelayExponent](#ttn.lorawan.v3.ADRAckDelayExponent)
@@ -328,6 +332,7 @@
     - [RejoinTimeExponent](#ttn.lorawan.v3.RejoinTimeExponent)
     - [RejoinType](#ttn.lorawan.v3.RejoinType)
     - [RxDelay](#ttn.lorawan.v3.RxDelay)
+    - [TxSchedulePriority](#ttn.lorawan.v3.TxSchedulePriority)
   
   
   
@@ -368,7 +373,6 @@
 - [lorawan-stack/api/metadata.proto](#lorawan-stack/api/metadata.proto)
     - [Location](#ttn.lorawan.v3.Location)
     - [RxMetadata](#ttn.lorawan.v3.RxMetadata)
-    - [TxMetadata](#ttn.lorawan.v3.TxMetadata)
   
     - [LocationSource](#ttn.lorawan.v3.LocationSource)
   
@@ -1771,6 +1775,7 @@ This is used internally by the Network Server and is read only.
 | queued_responses | [MACCommand](#ttn.lorawan.v3.MACCommand) | repeated | Queued MAC responses. Regenerated on each uplink. |
 | pending_requests | [MACCommand](#ttn.lorawan.v3.MACCommand) | repeated | Pending MAC requests(i.e. sent requests, for which no response has been received yet). Regenerated on each downlink. |
 | queued_join_accept | [bytes](#bytes) |  | Queued join-accept payload. Set each time (re-)join request is received and removed each time a downlink is scheduled. |
+| rx_windows_available | [bool](#bool) |  | Whether or not Rx windows are expected to be open. Set to true every time an uplink is received. Set to false every time a successful downlink scheduling attempt is made. |
 
 
 
@@ -3093,6 +3098,22 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
+<a name="ttn.lorawan.v3.DownlinkPath"/>
+
+### DownlinkPath
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uplink_token | [bytes](#bytes) |  |  |
+| fixed | [GatewayAntennaIdentifiers](#ttn.lorawan.v3.GatewayAntennaIdentifiers) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.FCtrl"/>
 
 ### FCtrl
@@ -3124,6 +3145,22 @@ Only the components for which the keys were meant, will have the key-encryption-
 | f_ctrl | [FCtrl](#ttn.lorawan.v3.FCtrl) |  |  |
 | f_cnt | [uint32](#uint32) |  |  |
 | f_opts | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.GatewayAntennaIdentifiers"/>
+
+### GatewayAntennaIdentifiers
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| antenna_index | [uint32](#uint32) |  |  |
 
 
 
@@ -3765,11 +3802,54 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
+<a name="ttn.lorawan.v3.TxRequest"/>
+
+### TxRequest
+TxRequest is a request for transmission.
+If sent to a roaming partner, this request is used to generate the DLMetadata Object (see Backend Interfaces 1.0, Table 22).
+If the gateway has a scheduler, this request is sent to the gateway, in the order of gateway_ids.
+Otherwise, the Gateway Server attempts to schedule the request and creates the TxSettings.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| class | [Class](#ttn.lorawan.v3.Class) |  |  |
+| downlink_paths | [DownlinkPath](#ttn.lorawan.v3.DownlinkPath) | repeated | Downlink paths used to select a gateway for downlink. In class A, the downlink paths are required to contain only uplink tokens. In class B/C, the downlink paths may contain uplink tokens and fixed gateways. |
+| rx1_delay | [RxDelay](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay &#43; 1 second). |
+| rx1_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. |
+| rx1_frequency | [uint64](#uint64) |  | Frequency (Hz) for Rx1. |
+| rx2_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. Rx2 parameters are used for class B/C downlink. |
+| rx2_frequency | [uint64](#uint64) |  | Frequency (Hz) for Rx2. Rx2 parameters are used for class B/C downlink. |
+| priority | [TxSchedulePriority](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel utilization time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
+| absolute_time | [TxRequest.AbsoluteTime](#ttn.lorawan.v3.TxRequest.AbsoluteTime) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |
+| advanced | [google.protobuf.Struct](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.TxRequest.AbsoluteTime"/>
+
+### TxRequest.AbsoluteTime
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.TxSettings"/>
 
 ### TxSettings
-TxSettings contains the LoRaWAN settings for a transmission.
-This message is used in both uplink and downlink
+TxSettings contains the settings for a transmission.
+This message is used on both uplink and downlink.
+On downlink, this is a scheduled transmission.
 
 
 | Field | Type | Label | Description |
@@ -3785,6 +3865,8 @@ This message is used in both uplink and downlink
 | invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
 | channel_index | [uint32](#uint32) |  | Index of the channel that received the message. |
 | enable_crc | [bool](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
+| timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
+| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
 
 
 
@@ -4204,6 +4286,23 @@ This message is used in both uplink and downlink
 | RX_DELAY_15 | 15 | 15 seconds. |
 
 
+
+<a name="ttn.lorawan.v3.TxSchedulePriority"/>
+
+### TxSchedulePriority
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| LOWEST | 0 |  |
+| LOW | 1 |  |
+| BELOW_NORMAL | 2 |  |
+| NORMAL | 3 |  |
+| ABOVE_NORMAL | 4 |  |
+| HIGH | 5 |  |
+| HIGHEST | 6 |  |
+
+
  
 
  
@@ -4306,6 +4405,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | decoded_payload | [google.protobuf.Struct](#google.protobuf.Struct) |  |  |
 | confirmed | [bool](#bool) |  |  |
 | class_b_c | [ApplicationDownlink.ClassBC](#ttn.lorawan.v3.ApplicationDownlink.ClassBC) |  | Optional gateway and timing information for class B and C. If set, this downlink message will only be transmitted as class B or C downlink. If not set, this downlink message may be transmitted in class A, B and C. |
+| priority | [TxSchedulePriority](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling the downlink message. |
 | correlation_ids | [string](#string) | repeated |  |
 
 
@@ -4321,8 +4421,8 @@ The UplinkMessageProcessor service processes uplink messages.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| gateways | [ApplicationDownlink.ClassBC.GatewayAntennaIdentifiers](#ttn.lorawan.v3.ApplicationDownlink.ClassBC.GatewayAntennaIdentifiers) | repeated | Possible gateway identifiers and antenna index to use for this downlink message. The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot. If none of the gateways can be selected, the downlink message fails. If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks. |
-| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If the time is in the past or if there is a scheduling conflict, the downlink message fails. If null, the time is selected based on slot availability. This is recommended in class B mode. |
+| gateways | [GatewayAntennaIdentifiers](#ttn.lorawan.v3.GatewayAntennaIdentifiers) | repeated | Possible gateway identifiers and antenna index to use for this downlink message. The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot. If none of the gateways can be selected, the downlink message fails. If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks. |
+| absolute_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If the time is in the past or if there is a scheduling conflict, the downlink message fails. If null, the time is selected based on slot availability. This is recommended in class B mode. |
 
 
 
@@ -4485,8 +4585,8 @@ Downlink message from the network to the end device
 | raw_payload | [bytes](#bytes) |  |  |
 | payload | [Message](#ttn.lorawan.v3.Message) |  |  |
 | end_device_ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| settings | [TxSettings](#ttn.lorawan.v3.TxSettings) |  |  |
-| tx_metadata | [TxMetadata](#ttn.lorawan.v3.TxMetadata) |  |  |
+| request | [TxRequest](#ttn.lorawan.v3.TxRequest) |  |  |
+| scheduled | [TxSettings](#ttn.lorawan.v3.TxSettings) |  |  |
 | correlation_ids | [string](#string) | repeated |  |
 
 
@@ -4659,26 +4759,7 @@ a message corresponds to one RxMetadata.
 | frequency_offset | [int64](#int64) |  | Frequency offset (Hz). |
 | location | [Location](#ttn.lorawan.v3.Location) |  | Antenna location; injected by the Gateway Server. |
 | downlink_path_constraint | [DownlinkPathConstraint](#ttn.lorawan.v3.DownlinkPathConstraint) |  | Gateway downlink path constraint; injected by the Gateway Server. |
-| advanced | [google.protobuf.Struct](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
-
-
-
-
-
-
-<a name="ttn.lorawan.v3.TxMetadata"/>
-
-### TxMetadata
-Contains metadata for a to-be-transmitted message.
-It contains gateway-specific fields that are not in the TxSettings message
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| antenna_index | [uint32](#uint32) |  |  |
-| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If set, this field takes precedence over timestamp. |
-| timestamp | [uint64](#uint64) |  | Gateway concentrator timestamp when the downlink message should be transmitted (nanoseconds). NOTE: most gateways use microsecond timestamps, so conversion may be needed. |
+| uplink_token | [bytes](#bytes) |  | Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS. |
 | advanced | [google.protobuf.Struct](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 
