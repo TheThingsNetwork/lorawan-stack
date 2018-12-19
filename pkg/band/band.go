@@ -128,6 +128,7 @@ type Band struct {
 	// DownlinkChannels by default.
 	DownlinkChannels []Channel
 
+	// BandDutyCycles define the sub-bands and their duty-cycle limit. The frequency ranges may not overlap.
 	BandDutyCycles []DutyCycle
 
 	DataRates [16]DataRate
