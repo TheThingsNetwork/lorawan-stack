@@ -17,29 +17,29 @@
 
 // ## General
 
-border-normal($side = '')
+border-normal($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: 1px solid $c-divider
+  border{$prefix + $side}: $width solid $c-divider
 
-border-dark($side = '')
+border-dark($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: 1px solid $c-divider-dark
+  border{$prefix + $side}: $width solid $c-divider-dark
 
-border-input($side = '')
+border-input($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: 1px solid $c-input-border
+  border{$prefix + $side}: $width solid $c-input-border
 
-border-subtle($side = '')
+border-subtle($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: 1px solid $c-divider-subtle
+  border{$prefix + $side}: $width solid $c-divider-subtle
 
 pseudo-border($size, $color)
   &:before
