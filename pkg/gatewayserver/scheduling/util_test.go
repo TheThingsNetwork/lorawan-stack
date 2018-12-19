@@ -24,10 +24,10 @@ type mockClock struct {
 	t scheduling.ConcentratorTime
 }
 
-func (c *mockClock) Now(_ time.Time) scheduling.ConcentratorTime {
+func (c *mockClock) ServerTime(_ time.Time) scheduling.ConcentratorTime {
 	return c.t
 }
-func (c *mockClock) ConcentratorTime(t time.Time) scheduling.ConcentratorTime {
+func (c *mockClock) GatewayTime(t time.Time) scheduling.ConcentratorTime {
 	return scheduling.ConcentratorTime(t.Sub(time.Unix(0, 0)))
 }
 

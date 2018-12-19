@@ -109,7 +109,7 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 	}
 	var relative ConcentratorTime
 	if settings.Time != nil {
-		relative = s.RolloverClock.ConcentratorTime(*settings.Time)
+		relative = s.RolloverClock.GatewayTime(*settings.Time)
 	} else {
 		relative = ConcentratorTime(time.Duration(settings.Timestamp) * time.Microsecond)
 	}
@@ -150,7 +150,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
-	now := s.RolloverClock.Now(time.Now())
+	now := s.RolloverClock.ServerTime(time.Now())
 	if settings.Timestamp == 0 && settings.Time == nil {
 		settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
 	}

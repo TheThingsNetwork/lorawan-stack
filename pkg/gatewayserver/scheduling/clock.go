@@ -21,10 +21,10 @@ import (
 
 // Clock represents an absolute time source.
 type Clock interface {
-	// Now returns an indication of the current concentrator time at the given server time.
-	Now(server time.Time) ConcentratorTime
-	// ConcentratorTime returns the concentrator time based on the given absolute gateway time.
-	ConcentratorTime(time.Time) ConcentratorTime
+	// ServerTime returns an indication of the concentrator time at the given server time.
+	ServerTime(server time.Time) ConcentratorTime
+	// GatewayTime returns an indication of the concentrator time at the given gateway time.
+	GatewayTime(time.Time) ConcentratorTime
 }
 
 // RolloverClock is a Clock that takes roll-over of uint32 concentrator time into account.
@@ -47,12 +47,12 @@ func (c *RolloverClock) Sync(v uint32, server, gateway time.Time) {
 	c.gateway = gateway
 }
 
-// Now implements Clock.
-func (c *RolloverClock) Now(server time.Time) ConcentratorTime {
+// ServerTime implements Clock.
+func (c *RolloverClock) ServerTime(server time.Time) ConcentratorTime {
 	return c.absolute + ConcentratorTime(server.Sub(c.server))
 }
 
-// ConcentratorTime implements Clock.
-func (c *RolloverClock) ConcentratorTime(gateway time.Time) ConcentratorTime {
+// GatewayTime implements Clock.
+func (c *RolloverClock) GatewayTime(gateway time.Time) ConcentratorTime {
 	return c.absolute + ConcentratorTime(gateway.Sub(c.gateway))
 }
