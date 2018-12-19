@@ -1,6 +1,11 @@
 {
   "components.footer.index.footer": "Xxx xxx xxx xxxxxxx. Xxx'x xxxxx xxxx xxxxx xxxxxxxx.",
   "components.navigation.side.side.hideSidebar": "Xxxx Xxxxxxx",
+  "components.safe-inspector.index.copied": "Xxxxxx xx xxxxxxxxx!",
+  "components.safe-inspector.index.toggleVisibility": "Xxxxxx xxxxxxxxxx",
+  "components.safe-inspector.index.copyClipboard": "Xxxx xx xxxxxxxxx",
+  "components.safe-inspector.index.cStyle": "Xxxxxx X-Xxxxx xxxxxxxxxx",
+  "components.safe-inspector.index.byteSignificance": "Xxxx xxxx xxxxxxxxxxxx",
   "containers.applications-table.index.all": "Xxx",
   "containers.applications-table.index.appId": "Xxxxxxxxxxx XX",
   "containers.applications-table.index.desc": "Xxxxxxxxxxx",

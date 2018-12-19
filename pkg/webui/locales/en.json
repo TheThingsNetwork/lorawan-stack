@@ -1,6 +1,11 @@
 {
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.navigation.side.side.hideSidebar": "Hide Sidebar",
+  "components.safe-inspector.index.copied": "Copied to clipboard!",
+  "components.safe-inspector.index.toggleVisibility": "Toggle visibility",
+  "components.safe-inspector.index.copyClipboard": "Copy to clipboard",
+  "components.safe-inspector.index.cStyle": "Toggle C-Style formatting",
+  "components.safe-inspector.index.byteSignificance": "Swap byte significance",
   "containers.applications-table.index.all": "All",
   "containers.applications-table.index.appId": "Application ID",
   "containers.applications-table.index.desc": "Description",
