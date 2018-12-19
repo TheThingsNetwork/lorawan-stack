@@ -814,7 +814,9 @@ func TestGatewayServer(t *testing.T) {
 
 						select {
 						case msg := <-downCh:
-							if gs.GetConnection(ctx, ids).HasScheduler() {
+							conn, ok := gs.GetConnection(ctx, ids)
+							a.So(ok, should.BeTrue)
+							if conn.HasScheduler() {
 								settings := msg.DownlinkMessage.GetScheduled()
 								a.So(settings, should.NotBeNil)
 							} else {

@@ -258,13 +258,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	return conn, nil
 }
 
-// GetConnection returns the *io.Connection for the given gateway. If not found, this method returns nil.
-func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection {
+// GetConnection returns the *io.Connection for the given gateway. If not found, this method returns nil, false.
+func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io.Connection, bool) {
 	conn, loaded := gs.connections.Load(unique.ID(ctx, ids))
 	if !loaded {
-		return nil
+		return nil, false
 	}
-	return conn.(*io.Connection)
+	return conn.(*io.Connection), true
 }
 
 var (

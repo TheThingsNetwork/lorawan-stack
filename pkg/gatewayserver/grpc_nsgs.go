@@ -22,7 +22,6 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -66,12 +65,11 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 	logger := log.FromContext(ctx)
 	for _, path := range paths {
 		uid := unique.ID(ctx, path.GatewayIdentifiers)
-		val, ok := gs.connections.Load(uid)
+		conn, ok := gs.GetConnection(ctx, path.GatewayIdentifiers)
 		if !ok {
 			details = append(details, errNotConnected.WithAttributes("gateway_uid", uid))
 			continue
 		}
-		conn := val.(*io.Connection)
 		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage
 		down.GetRequest().DownlinkPath = nil                 // And do not leak the downlink path to the gateway
 		if err := conn.SendDown(path, down); err != nil {
