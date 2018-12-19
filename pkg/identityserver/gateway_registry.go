@@ -140,7 +140,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 		}
 	}()
-	gtws = new(ttnpb.Gateways)
+	gtws = &ttnpb.Gateways{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if gtwRights == nil {
 			memberStore := store.GetMembershipStore(db)

@@ -94,7 +94,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	}
 	cliProtos := make([]*ttnpb.Client, len(cliModels))
 	for i, cliModel := range cliModels {
-		cliProto := new(ttnpb.Client)
+		cliProto := &ttnpb.Client{}
 		cliModel.toPB(cliProto, fieldMask)
 		cliProtos[i] = cliProto
 	}
@@ -111,7 +111,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 		}
 		return nil, err
 	}
-	cliProto := new(ttnpb.Client)
+	cliProto := &ttnpb.Client{}
 	cliModel.toPB(cliProto, fieldMask)
 	return cliProto, nil
 }
@@ -142,7 +142,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 			return nil, err
 		}
 	}
-	updated = new(ttnpb.Client)
+	updated = &ttnpb.Client{}
 	cliModel.toPB(updated, fieldMask)
 	return updated, nil
 }

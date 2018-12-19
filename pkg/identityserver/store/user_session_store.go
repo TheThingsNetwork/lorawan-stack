@@ -67,7 +67,7 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 	}
 	sessionProtos := make([]*ttnpb.UserSession, len(sessionModels))
 	for i, sessionModel := range sessionModels {
-		sessionProto := new(ttnpb.UserSession)
+		sessionProto := &ttnpb.UserSession{}
 		sessionProto.UserID = userIDs.UserID
 		sessionModel.toPB(sessionProto)
 		sessionProtos[i] = sessionProto
@@ -88,7 +88,7 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 		}
 		return nil, err
 	}
-	sessionProto := new(ttnpb.UserSession)
+	sessionProto := &ttnpb.UserSession{}
 	sessionProto.UserID = userIDs.UserID
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
@@ -111,7 +111,7 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 	if err = s.db.Model(&sessionModel).Updates(&sessionModel).Error; err != nil {
 		return nil, err
 	}
-	updated := new(ttnpb.UserSession)
+	updated := &ttnpb.UserSession{}
 	sessionModel.toPB(updated)
 	return updated, nil
 }

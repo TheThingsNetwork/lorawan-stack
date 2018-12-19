@@ -100,7 +100,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	}
 	orgProtos := make([]*ttnpb.Organization, len(orgModels))
 	for i, orgModel := range orgModels {
-		orgProto := new(ttnpb.Organization)
+		orgProto := &ttnpb.Organization{}
 		orgModel.toPB(orgProto, fieldMask)
 		orgProtos[i] = orgProto
 	}
@@ -117,7 +117,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 		}
 		return nil, err
 	}
-	orgProto := new(ttnpb.Organization)
+	orgProto := &ttnpb.Organization{}
 	orgModel.toPB(orgProto, fieldMask)
 	return orgProto, nil
 }
@@ -148,7 +148,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 			return nil, err
 		}
 	}
-	updated = new(ttnpb.Organization)
+	updated = &ttnpb.Organization{}
 	orgModel.toPB(updated, fieldMask)
 	return updated, nil
 }

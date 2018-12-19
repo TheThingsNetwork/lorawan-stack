@@ -139,7 +139,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 		}
 	}()
-	orgs = new(ttnpb.Organizations)
+	orgs = &ttnpb.Organizations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if orgRights == nil {
 			memberStore := store.GetMembershipStore(db)

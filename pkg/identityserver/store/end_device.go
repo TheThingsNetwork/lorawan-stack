@@ -53,7 +53,7 @@ func init() {
 
 func mustEndDeviceVersionIDs(pb *ttnpb.EndDevice) *ttnpb.EndDeviceVersionIdentifiers {
 	if pb.VersionIDs == nil {
-		pb.VersionIDs = new(ttnpb.EndDeviceVersionIdentifiers)
+		pb.VersionIDs = &ttnpb.EndDeviceVersionIdentifiers{}
 	}
 	return pb.VersionIDs
 }

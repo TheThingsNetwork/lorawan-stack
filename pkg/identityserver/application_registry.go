@@ -140,7 +140,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 		}
 	}()
-	apps = new(ttnpb.Applications)
+	apps = &ttnpb.Applications{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if appRights == nil {
 			memberStore := store.GetMembershipStore(db)

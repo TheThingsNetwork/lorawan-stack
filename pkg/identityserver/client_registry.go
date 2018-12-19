@@ -167,7 +167,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 		}
 	}()
-	clis = new(ttnpb.Clients)
+	clis = &ttnpb.Clients{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if cliRights == nil {
 			memberStore := store.GetMembershipStore(db)

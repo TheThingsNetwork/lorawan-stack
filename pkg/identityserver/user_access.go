@@ -70,7 +70,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, ids *ttnpb.UserId
 	if err = rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	keys = new(ttnpb.APIKeys)
+	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		keyStore := store.GetAPIKeyStore(db)
 		keys.APIKeys, err = keyStore.FindAPIKeys(ctx, ids.EntityIdentifiers())

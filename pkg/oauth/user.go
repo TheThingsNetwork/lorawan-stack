@@ -60,7 +60,7 @@ func (s *server) getAuthCookie(c echo.Context) (cookie authCookie, err error) {
 }
 
 func (s *server) updateAuthCookie(c echo.Context, update func(value *authCookie) error) error {
-	cookie := new(authCookie)
+	cookie := &authCookie{}
 	_, err := s.authCookie().Get(c, cookie)
 	if err != nil {
 		return err

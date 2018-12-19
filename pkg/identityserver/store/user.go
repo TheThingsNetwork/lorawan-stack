@@ -127,7 +127,7 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	profilePictureField: func(usr *User, pb *ttnpb.User) {
 		usr.ProfilePictureID, usr.ProfilePicture = nil, nil
 		if pb.ProfilePicture != nil {
-			usr.ProfilePicture = new(Picture)
+			usr.ProfilePicture = &Picture{}
 			usr.ProfilePicture.fromPB(pb.ProfilePicture)
 		}
 	},

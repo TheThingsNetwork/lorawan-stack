@@ -94,7 +94,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 	}
 	appProtos := make([]*ttnpb.Application, len(appModels))
 	for i, appModel := range appModels {
-		appProto := new(ttnpb.Application)
+		appProto := &ttnpb.Application{}
 		appModel.toPB(appProto, fieldMask)
 		appProtos[i] = appProto
 	}
@@ -111,7 +111,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 		}
 		return nil, err
 	}
-	appProto := new(ttnpb.Application)
+	appProto := &ttnpb.Application{}
 	appModel.toPB(appProto, fieldMask)
 	return appProto, nil
 }
@@ -142,7 +142,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 			return nil, err
 		}
 	}
-	updated = new(ttnpb.Application)
+	updated = &ttnpb.Application{}
 	appModel.toPB(updated, fieldMask)
 	return updated, nil
 }

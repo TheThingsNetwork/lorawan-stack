@@ -74,7 +74,7 @@ func (is *IdentityServer) listInvitations(ctx context.Context, in *types.Empty) 
 	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights
 	}
-	invitations = new(ttnpb.Invitations)
+	invitations = &ttnpb.Invitations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		invitations.Invitations, err = store.GetInvitationStore(db).FindInvitations(ctx)
 		return err

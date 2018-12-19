@@ -73,7 +73,7 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, ids *ttnp
 	if err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	keys = new(ttnpb.APIKeys)
+	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		keyStore := store.GetAPIKeyStore(db)
 		keys.APIKeys, err = keyStore.FindAPIKeys(ctx, ids.EntityIdentifiers())
@@ -153,7 +153,7 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, ids
 		if err != nil {
 			return err
 		}
-		collaborators = new(ttnpb.Collaborators)
+		collaborators = &ttnpb.Collaborators{}
 		for member, rights := range memberRights {
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *member,

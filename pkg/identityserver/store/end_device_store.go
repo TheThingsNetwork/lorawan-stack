@@ -93,7 +93,7 @@ func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldM
 	}
 	devProtos := make([]*ttnpb.EndDevice, len(devModels))
 	for i, devModel := range devModels {
-		devProto := new(ttnpb.EndDevice)
+		devProto := &ttnpb.EndDevice{}
 		devModel.toPB(devProto, fieldMask)
 		devProtos[i] = devProto
 	}
@@ -131,7 +131,7 @@ func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 		}
 		return nil, err
 	}
-	devProto := new(ttnpb.EndDevice)
+	devProto := &ttnpb.EndDevice{}
 	devModel.toPB(devProto, fieldMask)
 	return devProto, nil
 }
@@ -167,7 +167,7 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 			return nil, err
 		}
 	}
-	updated = new(ttnpb.EndDevice)
+	updated = &ttnpb.EndDevice{}
 	devModel.toPB(updated, fieldMask)
 	return updated, nil
 }

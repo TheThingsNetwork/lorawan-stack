@@ -81,7 +81,7 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, ids *ttnp
 		if err != nil {
 			return err
 		}
-		collaborators = new(ttnpb.Collaborators)
+		collaborators = &ttnpb.Collaborators{}
 		for member, rights := range memberRights {
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *member,

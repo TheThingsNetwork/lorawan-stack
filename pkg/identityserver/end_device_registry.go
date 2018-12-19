@@ -83,7 +83,7 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 		}
 	}()
-	devs = new(ttnpb.EndDevices)
+	devs = &ttnpb.EndDevices{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		devStore := store.GetEndDeviceStore(db)
 		devs.EndDevices, err = devStore.ListEndDevices(ctx, &req.ApplicationIdentifiers, &req.FieldMask)

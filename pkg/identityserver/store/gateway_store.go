@@ -96,7 +96,7 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 	}
 	gtwProtos := make([]*ttnpb.Gateway, len(gtwModels))
 	for i, gtwModel := range gtwModels {
-		gtwProto := new(ttnpb.Gateway)
+		gtwProto := &ttnpb.Gateway{}
 		gtwModel.toPB(gtwProto, fieldMask)
 		gtwProtos[i] = gtwProto
 	}
@@ -116,7 +116,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 		}
 		return nil, err
 	}
-	gtwProto := new(ttnpb.Gateway)
+	gtwProto := &ttnpb.Gateway{}
 	gtwModel.toPB(gtwProto, fieldMask)
 	return gtwProto, nil
 }
@@ -152,7 +152,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 			return nil, err
 		}
 	}
-	updated = new(ttnpb.Gateway)
+	updated = &ttnpb.Gateway{}
 	gtwModel.toPB(updated, fieldMask)
 	return updated, nil
 }
