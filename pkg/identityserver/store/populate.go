@@ -275,8 +275,7 @@ func (p *Populator) populateAPIKeys(ctx context.Context, db *gorm.DB) (err error
 			hashedKey, _ := auth.Hash(generatedKey)
 			apiKey.ID = generatedID
 			apiKey.Key = string(hashedKey)
-			err = GetAPIKeyStore(db).CreateAPIKey(ctx, entityID, apiKey)
-			if err != nil {
+			if err = GetAPIKeyStore(db).CreateAPIKey(ctx, entityID, apiKey); err != nil {
 				return err
 			}
 			apiKey.Key = token
@@ -288,8 +287,7 @@ func (p *Populator) populateAPIKeys(ctx context.Context, db *gorm.DB) (err error
 func (p *Populator) populateMemberships(ctx context.Context, db *gorm.DB) (err error) {
 	for entityID, members := range p.Memberships {
 		for _, member := range members {
-			err = GetMembershipStore(db).SetMember(ctx, &member.OrganizationOrUserIdentifiers, entityID, ttnpb.RightsFrom(member.Rights...))
-			if err != nil {
+			if err = GetMembershipStore(db).SetMember(ctx, &member.OrganizationOrUserIdentifiers, entityID, ttnpb.RightsFrom(member.Rights...)); err != nil {
 				return err
 			}
 		}

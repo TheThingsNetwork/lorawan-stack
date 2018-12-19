@@ -110,8 +110,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 	}
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
-	err := query.First(&gtwModel).Error
-	if err != nil {
+	if err := query.First(&gtwModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id.EntityIdentifiers())
 		}
@@ -126,8 +125,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	query := s.db.Scopes(withContext(ctx), withGatewayID(gtw.GetGatewayID()))
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
-	err = query.First(&gtwModel).Error
-	if err != nil {
+	if err = query.First(&gtwModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(gtw.GatewayIdentifiers.EntityIdentifiers())
 		}
@@ -145,14 +143,12 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, gtwModel.Attributes) {
-		err = replaceAttributes(s.db, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes)
-		if err != nil {
+		if err = replaceAttributes(s.db, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
 	if !reflect.DeepEqual(oldAntennas, gtwModel.Antennas) {
-		err = replaceGatewayAntennas(s.db, gtwModel.ID, oldAntennas, gtwModel.Antennas)
-		if err != nil {
+		if err = replaceGatewayAntennas(s.db, gtwModel.ID, oldAntennas, gtwModel.Antennas); err != nil {
 			return nil, err
 		}
 	}

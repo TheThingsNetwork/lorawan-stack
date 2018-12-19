@@ -98,7 +98,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 }
 
 func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*types.Empty, error) {
-	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		return store.GetContactInfoStore(db).Validate(ctx, req)
 	})
 	if err != nil {

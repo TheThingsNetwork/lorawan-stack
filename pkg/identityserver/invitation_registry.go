@@ -93,7 +93,7 @@ func (is *IdentityServer) deleteInvitation(ctx context.Context, in *ttnpb.Delete
 	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		return store.GetInvitationStore(db).DeleteInvitation(ctx, in.Email)
 	})
 	if err != nil {

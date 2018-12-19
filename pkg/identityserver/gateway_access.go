@@ -47,22 +47,19 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 }
 
 func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := generateAPIKey(ctx, req.Name, req.Rights...)
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		keyStore := store.GetAPIKeyStore(db)
-		err = keyStore.CreateAPIKey(ctx, req.GatewayIdentifiers.EntityIdentifiers(), key)
-		return err
+		return keyStore.CreateAPIKey(ctx, req.GatewayIdentifiers.EntityIdentifiers(), key)
 	})
 	if err != nil {
 		return nil, err
@@ -73,8 +70,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 }
 
 func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	keys = new(ttnpb.APIKeys)
@@ -93,12 +89,10 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, ids *ttnpb.Gat
 }
 
 func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -122,18 +116,20 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 }
 
 func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
-	err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
-	if err != nil {
+	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Collaborator.Rights...)
-	if err != nil {
+	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator.OrganizationOrUserIdentifiers, req.GatewayIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(req.Collaborator.Rights...))
-		return err
+		return memberStore.SetMember(
+			ctx,
+			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.GatewayIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(req.Collaborator.Rights...),
+		)
 	})
 	if err != nil {
 		return nil, err
@@ -148,11 +144,10 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 }
 
 func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
 		memberRights, err := memberStore.FindMembers(ctx, ids.EntityIdentifiers())
 		if err != nil {

@@ -60,8 +60,7 @@ func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntiti
 	var entities []struct {
 		ID string
 	}
-	err := db.Scan(&entities).Error
-	if err != nil {
+	if err := db.Scan(&entities).Error; err != nil {
 		return nil, err
 	}
 

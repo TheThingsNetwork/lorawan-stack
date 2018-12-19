@@ -115,8 +115,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	query := s.db.Scopes(withContext(ctx), withUserID(id.GetUserID()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
-	err := query.Preload("Account").First(&userModel).Error
-	if err != nil {
+	if err := query.Preload("Account").First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id.EntityIdentifiers())
 		}
@@ -131,8 +130,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	query := s.db.Scopes(withContext(ctx), withUserID(usr.GetUserID()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
-	err = query.First(&userModel).Error
-	if err != nil {
+	if err = query.First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(usr.UserIdentifiers.EntityIdentifiers())
 		}
@@ -150,14 +148,12 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, userModel.Attributes) {
-		err = replaceAttributes(s.db, "user", userModel.ID, oldAttributes, userModel.Attributes)
-		if err != nil {
+		if err = replaceAttributes(s.db, "user", userModel.ID, oldAttributes, userModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
 	if oldProfilePictureID != nil && userModel.ProfilePictureID != oldProfilePictureID {
-		err = s.db.Where(&Model{ID: *oldProfilePictureID}).Delete(&Picture{}).Error
-		if err != nil {
+		if err = s.db.Where(&Model{ID: *oldProfilePictureID}).Delete(&Picture{}).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -175,8 +171,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (
 	query := s.db.Scopes(withContext(ctx), withUserID(id.GetUserID()))
 	query = query.Select("users.id")
 	var userModel User
-	err = query.First(&userModel).Error
-	if err != nil {
+	if err = query.First(&userModel).Error; err != nil {
 		return err
 	}
 	return s.db.Delete(&userModel).Error

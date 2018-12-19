@@ -56,8 +56,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			return err
 		}
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator, gtw.GatewayIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL))
-		if err != nil {
+		if err = memberStore.SetMember(ctx, &req.Collaborator, gtw.GatewayIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL)); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -78,12 +77,10 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 }
 
 func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayRequest) (gtw *ttnpb.Gateway, err error) {
-	err = is.RequireAuthenticated(ctx)
-	if err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicGatewayFields) {
 			defer func() { gtw = gtw.PublicSafe() }()
 		} else {
@@ -144,7 +141,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 	}()
 	gtws = new(ttnpb.Gateways)
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if gtwRights == nil {
 			memberStore := store.GetMembershipStore(db)
 			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "gateway")
@@ -186,8 +183,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 }
 
 func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
-	err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
-	if err != nil {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -213,14 +209,12 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 }
 
 func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
-	err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_DELETE)
-	if err != nil {
+	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		gtwStore := store.GetGatewayStore(db)
-		err = gtwStore.DeleteGateway(ctx, ids)
-		return err
+		return gtwStore.DeleteGateway(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

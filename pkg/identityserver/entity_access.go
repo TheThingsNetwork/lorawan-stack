@@ -166,8 +166,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		return nil, errUnsupportedAuthorization
 	}
 
-	err = is.withDatabase(ctx, fetch)
-	if err != nil {
+	if err = is.withDatabase(ctx, fetch); err != nil {
 		return nil, err
 	}
 

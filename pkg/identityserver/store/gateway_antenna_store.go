@@ -21,15 +21,13 @@ import (
 func replaceGatewayAntennas(db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) (err error) {
 	db = db.Where(&GatewayAntenna{GatewayID: gatewayUUID})
 	if len(new) < len(old) {
-		err = db.Where("\"index\" >= ?", len(new)).Delete(&GatewayAntenna{}).Error
-		if err != nil {
+		if err = db.Where("\"index\" >= ?", len(new)).Delete(&GatewayAntenna{}).Error; err != nil {
 			return err
 		}
 	}
 	for _, antenna := range new {
 		antenna.GatewayID = gatewayUUID
-		err = db.Save(&antenna).Error
-		if err != nil {
+		if err = db.Save(&antenna).Error; err != nil {
 			return err
 		}
 	}

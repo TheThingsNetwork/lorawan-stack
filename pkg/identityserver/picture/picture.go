@@ -50,8 +50,7 @@ func MakeSquare(r io.Reader, dimensions int) (*ttnpb.Picture, error) {
 	}
 	encodedFormat, mimeType, _ := settings(format)
 	var buf bytes.Buffer
-	err = imaging.Encode(&buf, img, encodedFormat)
-	if err != nil {
+	if err = imaging.Encode(&buf, img, encodedFormat); err != nil {
 		return nil, err
 	}
 	return &ttnpb.Picture{

@@ -65,8 +65,7 @@ func (s *server) updateAuthCookie(c echo.Context, update func(value *authCookie)
 	if err != nil {
 		return err
 	}
-	err = update(cookie)
-	if err != nil {
+	if err = update(cookie); err != nil {
 		return err
 	}
 	return s.authCookie().Set(c, cookie)
@@ -155,8 +154,7 @@ type loginRequest struct {
 var errIncorrectPassword = errors.DefineUnauthenticated("password", "incorrect password")
 
 func (s *server) doLogin(ctx context.Context, userID, password string) error {
-	err := validate.ID(userID)
-	if err != nil {
+	if err := validate.ID(userID); err != nil {
 		return err
 	}
 	user, err := s.store.GetUser(
@@ -178,12 +176,10 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 func (s *server) Login(c echo.Context) error {
 	ctx := c.Request().Context()
 	req := new(loginRequest)
-	err := c.Bind(req)
-	if err != nil {
+	if err := c.Bind(req); err != nil {
 		return err
 	}
-	err = s.doLogin(ctx, req.UserID, req.Password)
-	if err != nil {
+	if err := s.doLogin(ctx, req.UserID, req.Password); err != nil {
 		return err
 	}
 	userIDs := ttnpb.UserIdentifiers{UserID: req.UserID}
@@ -213,8 +209,7 @@ func (s *server) Logout(c echo.Context) error {
 		return err
 	}
 	events.Publish(evtUserLogout(ctx, session.UserIdentifiers, nil))
-	err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID)
-	if err != nil {
+	if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
 		return err
 	}
 	s.removeAuthCookie(c)

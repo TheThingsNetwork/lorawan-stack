@@ -58,8 +58,7 @@ func (is *IdentityServer) invalidateCachedMembershipsForAccount(ctx context.Cont
 	if is.redis == nil || is.config.AuthCache.MembershipTTL == 0 {
 		return
 	}
-	err := is.redis.Del(is.redis.Key("memberships", unique.ID(ctx, ouIDs.Identifiers()))).Err()
-	if err != nil {
+	if err := is.redis.Del(is.redis.Key("memberships", unique.ID(ctx, ouIDs.Identifiers()))).Err(); err != nil {
 		is.Logger().WithError(err).Error("Failed to delete cached membership info")
 		return
 	}

@@ -68,8 +68,7 @@ func (g Grants) Value() (driver.Value, error) {
 // Scan reads the value from the database into the Grants.
 func (g *Grants) Scan(src interface{}) error {
 	var ints pq.Int64Array
-	err := ints.Scan(src)
-	if err != nil {
+	if err := ints.Scan(src); err != nil {
 		return err
 	}
 	grants := make(Grants, len(ints))
@@ -95,8 +94,7 @@ func (r Rights) Value() (driver.Value, error) {
 // Scan reads the value from the database into the Rights.
 func (r *Rights) Scan(src interface{}) error {
 	var ints pq.Int64Array
-	err := ints.Scan(src)
-	if err != nil {
+	if err := ints.Scan(src); err != nil {
 		return err
 	}
 	rights := make([]ttnpb.Right, len(ints))

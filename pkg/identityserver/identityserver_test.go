@@ -294,8 +294,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	if err != nil {
 		panic(err)
 	}
-	err = is.Start()
-	if err != nil {
+	if err = is.Start(); err != nil {
 		panic(err)
 	}
 	return is, is.LoopbackConn()

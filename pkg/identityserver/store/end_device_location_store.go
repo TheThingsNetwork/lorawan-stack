@@ -47,20 +47,17 @@ func replaceEndDeviceLocations(db *gorm.DB, endDeviceUUID string, old []EndDevic
 	}
 	for _, loc := range toCreate {
 		loc.EndDeviceID = endDeviceUUID
-		err = db.Save(&loc).Error
-		if err != nil {
+		if err = db.Save(&loc).Error; err != nil {
 			return err
 		}
 	}
 	for _, loc := range toUpdate {
-		err = db.Save(&loc).Error
-		if err != nil {
+		if err = db.Save(&loc).Error; err != nil {
 			return err
 		}
 	}
 	if len(toDelete) > 0 {
-		err = db.Where("id in (?)", toDelete).Delete(&EndDeviceLocation{}).Error
-		if err != nil {
+		if err = db.Where("id in (?)", toDelete).Delete(&EndDeviceLocation{}).Error; err != nil {
 			return err
 		}
 	}

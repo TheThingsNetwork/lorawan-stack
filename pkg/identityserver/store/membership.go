@@ -42,8 +42,7 @@ func findAccountMemberships(db *gorm.DB, account *Account, entityType string) ([
 		query = query.Where("entity_type = ?", entityType)
 	}
 	var memberships []*Membership
-	err := query.Find(&memberships).Error
-	if err != nil {
+	if err := query.Find(&memberships).Error; err != nil {
 		return nil, err
 	}
 	return memberships, nil

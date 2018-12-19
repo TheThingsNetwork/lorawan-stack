@@ -44,18 +44,20 @@ func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.Clien
 }
 
 func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {
-	err := rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
-	if err != nil {
+	if err := rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
-	err = rights.RequireClient(ctx, req.ClientIdentifiers, req.Collaborator.Rights...)
-	if err != nil {
+	if err := rights.RequireClient(ctx, req.ClientIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator.OrganizationOrUserIdentifiers, req.ClientIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(req.Collaborator.Rights...))
-		return err
+		return memberStore.SetMember(
+			ctx,
+			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.ClientIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(req.Collaborator.Rights...),
+		)
 	})
 	if err != nil {
 		return nil, err
@@ -70,11 +72,10 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 }
 
 func (is *IdentityServer) listClientCollaborators(ctx context.Context, ids *ttnpb.ClientIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	err = is.RequireAuthenticated(ctx) // Client collaborators can be seen by all authenticated users.
-	if err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil { // Client collaborators can be seen by all authenticated users.
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
 		memberRights, err := memberStore.FindMembers(ctx, ids.EntityIdentifiers())
 		if err != nil {

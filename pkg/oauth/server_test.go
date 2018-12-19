@@ -78,8 +78,7 @@ func TestServerLoginLogout(t *testing.T) {
 		},
 	})
 	c.RegisterWeb(s)
-	err = c.Start()
-	if err != nil {
+	if err = c.Start(); err != nil {
 		panic(err)
 	}
 

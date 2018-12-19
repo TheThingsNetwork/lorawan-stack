@@ -125,8 +125,7 @@ func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 	query := s.db.Scopes(withContext(ctx), withApplicationID(id.GetApplicationID()), withDeviceID(id.GetDeviceID()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
-	err := query.First(&devModel).Error
-	if err != nil {
+	if err := query.First(&devModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id.EntityIdentifiers())
 		}
@@ -141,8 +140,7 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 	query := s.db.Scopes(withContext(ctx), withApplicationID(dev.GetApplicationID()), withDeviceID(dev.GetDeviceID()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
-	err = query.First(&devModel).Error
-	if err != nil {
+	if err = query.First(&devModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(dev.EndDeviceIdentifiers.EntityIdentifiers())
 		}
@@ -160,14 +158,12 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, devModel.Attributes) {
-		err = replaceAttributes(s.db, "device", devModel.ID, oldAttributes, devModel.Attributes)
-		if err != nil {
+		if err = replaceAttributes(s.db, "device", devModel.ID, oldAttributes, devModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
 	if !reflect.DeepEqual(oldLocations, devModel.Locations) {
-		err = replaceEndDeviceLocations(s.db, devModel.ID, oldLocations, devModel.Locations)
-		if err != nil {
+		if err = replaceEndDeviceLocations(s.db, devModel.ID, oldLocations, devModel.Locations); err != nil {
 			return nil, err
 		}
 	}

@@ -82,8 +82,7 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 	}
 	query := s.db.Where(&UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
-	err = query.Find(&sessionModel).Error
-	if err != nil {
+	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errSessionNotFound.WithAttributes("user_id", userIDs.UserID, "session_id", sessionID)
 		}
@@ -102,16 +101,14 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 	}
 	query := s.db.Where(&UserSession{Model: Model{ID: sess.SessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
-	err = query.Find(&sessionModel).Error
-	if err != nil {
+	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errSessionNotFound.WithAttributes("user_id", sess.UserIdentifiers.UserID, "session_id", sess.SessionID)
 		}
 		return nil, err
 	}
 	sessionModel.fromPB(sess)
-	err = s.db.Model(&sessionModel).Updates(&sessionModel).Error
-	if err != nil {
+	if err = s.db.Model(&sessionModel).Updates(&sessionModel).Error; err != nil {
 		return nil, err
 	}
 	updated := new(ttnpb.UserSession)

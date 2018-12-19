@@ -45,14 +45,12 @@ func AutoMigrate(db *gorm.DB) *gorm.DB {
 
 // clear database tables for the given models.
 // This should be used with caution.
-func clear(db *gorm.DB, models ...interface{}) error {
-	err := db.Exec("SET SQL_SAFE_UPDATES = FALSE").Error
-	if err != nil {
+func clear(db *gorm.DB, models ...interface{}) (err error) {
+	if err = db.Exec("SET SQL_SAFE_UPDATES = FALSE").Error; err != nil {
 		return err
 	}
 	for _, model := range models {
-		err = db.Unscoped().Delete(model).Error
-		if err != nil {
+		if err = db.Unscoped().Delete(model).Error; err != nil {
 			return err
 		}
 	}

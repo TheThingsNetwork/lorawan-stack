@@ -47,22 +47,19 @@ func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb
 }
 
 func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttnpb.CreateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := generateAPIKey(ctx, req.Name, req.Rights...)
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		keyStore := store.GetAPIKeyStore(db)
-		err = keyStore.CreateAPIKey(ctx, req.OrganizationIdentifiers.EntityIdentifiers(), key)
-		return err
+		return keyStore.CreateAPIKey(ctx, req.OrganizationIdentifiers.EntityIdentifiers(), key)
 	})
 	if err != nil {
 		return nil, err
@@ -73,8 +70,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 }
 
 func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	keys = new(ttnpb.APIKeys)
@@ -93,12 +89,10 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, ids *ttnp
 }
 
 func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -122,18 +116,20 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 }
 
 func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*types.Empty, error) {
-	err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
-	if err != nil {
+	if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Collaborator.Rights...)
-	if err != nil {
+	if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator.OrganizationOrUserIdentifiers, req.OrganizationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(req.Collaborator.Rights...))
-		return err
+		return memberStore.SetMember(
+			ctx,
+			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.OrganizationIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(req.Collaborator.Rights...),
+		)
 	})
 	if err != nil {
 		return nil, err
@@ -148,8 +144,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 }
 
 func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {

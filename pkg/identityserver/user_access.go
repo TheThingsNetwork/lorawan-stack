@@ -44,22 +44,19 @@ func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIde
 }
 
 func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := generateAPIKey(ctx, req.Name, req.Rights...)
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		keyStore := store.GetAPIKeyStore(db)
-		err = keyStore.CreateAPIKey(ctx, req.UserIdentifiers.EntityIdentifiers(), key)
-		return err
+		return keyStore.CreateAPIKey(ctx, req.UserIdentifiers.EntityIdentifiers(), key)
 	})
 	if err != nil {
 		return nil, err
@@ -70,8 +67,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 }
 
 func (is *IdentityServer) listUserAPIKeys(ctx context.Context, ids *ttnpb.UserIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	err = rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	keys = new(ttnpb.APIKeys)
@@ -90,12 +86,10 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, ids *ttnpb.UserId
 }
 
 func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {

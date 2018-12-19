@@ -113,22 +113,19 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.E
 
 	for _, info := range toCreate {
 		info.EntityType, info.EntityID = entityType, entityUUID
-		err = s.db.Save(&info).Error
-		if err != nil {
+		if err = s.db.Save(&info).Error; err != nil {
 			return nil, err
 		}
 	}
 
 	for _, info := range toUpdate {
-		err = s.db.Save(&info).Error
-		if err != nil {
+		if err = s.db.Save(&info).Error; err != nil {
 			return nil, err
 		}
 	}
 
 	if len(toDelete) > 0 {
-		err = s.db.Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error
-		if err != nil {
+		if err = s.db.Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error; err != nil {
 			return nil, err
 		}
 	}

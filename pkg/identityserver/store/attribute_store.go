@@ -47,20 +47,17 @@ func replaceAttributes(db *gorm.DB, entityType, entityUUID string, old []Attribu
 	}
 	for _, attr := range toCreate {
 		attr.EntityType, attr.EntityID = entityType, entityUUID
-		err = db.Save(&attr).Error
-		if err != nil {
+		if err = db.Save(&attr).Error; err != nil {
 			return err
 		}
 	}
 	for _, attr := range toUpdate {
-		err = db.Save(&attr).Error
-		if err != nil {
+		if err = db.Save(&attr).Error; err != nil {
 			return err
 		}
 	}
 	if len(toDelete) > 0 {
-		err = db.Where("id in (?)", toDelete).Delete(&Attribute{}).Error
-		if err != nil {
+		if err = db.Where("id in (?)", toDelete).Delete(&Attribute{}).Error; err != nil {
 			return err
 		}
 	}

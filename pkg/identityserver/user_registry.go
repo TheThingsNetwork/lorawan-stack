@@ -123,8 +123,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		req.User.Admin = false
 	}
 
-	err = is.preprocessUserProfilePicture(&req.User)
-	if err != nil {
+	if err = is.preprocessUserProfilePicture(&req.User); err != nil {
 		return nil, err
 	}
 
@@ -155,8 +154,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		}
 
 		if req.InvitationToken != "" {
-			err = invitationStore.SetInvitationAcceptedBy(ctx, req.InvitationToken, &usr.UserIdentifiers)
-			if err != nil {
+			if err = invitationStore.SetInvitationAcceptedBy(ctx, req.InvitationToken, &usr.UserIdentifiers); err != nil {
 				return err
 			}
 		}
@@ -177,12 +175,10 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 }
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
-	err = is.RequireAuthenticated(ctx)
-	if err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_INFO)
-	if err != nil {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_INFO); err != nil {
 		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicUserFields) {
 			defer func() { usr = usr.PublicSafe() }()
 		} else {
@@ -215,8 +211,7 @@ var (
 )
 
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
-	err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_BASIC)
-	if err != nil {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
@@ -244,8 +239,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		}
 	}
 
-	err = is.preprocessUserProfilePicture(&req.User)
-	if err != nil {
+	if err = is.preprocessUserProfilePicture(&req.User); err != nil {
 		return nil, err
 	}
 
@@ -301,7 +295,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 	updateMask := updatePasswordFieldMask
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		usrStore := store.GetUserStore(db)
 		usr, err := usrStore.GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
@@ -357,7 +351,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		usrStore := store.GetUserStore(db)
 		usr, err := usrStore.GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
@@ -385,14 +379,12 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
-	err := rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_DELETE)
-	if err != nil {
+	if err := rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		usrStore := store.GetUserStore(db)
-		err = usrStore.DeleteUser(ctx, ids)
-		return err
+		return usrStore.DeleteUser(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

@@ -105,8 +105,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 	query := s.db.Scopes(withContext(ctx), withClientID(id.GetClientID()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
-	err := query.First(&cliModel).Error
-	if err != nil {
+	if err := query.First(&cliModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id.EntityIdentifiers())
 		}
@@ -121,8 +120,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	query := s.db.Scopes(withContext(ctx), withClientID(cli.GetClientID()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
-	err = query.First(&cliModel).Error
-	if err != nil {
+	if err = query.First(&cliModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(cli.ClientIdentifiers.EntityIdentifiers())
 		}
@@ -140,8 +138,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, cliModel.Attributes) {
-		err = replaceAttributes(s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes)
-		if err != nil {
+		if err = replaceAttributes(s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
 			return nil, err
 		}
 	}

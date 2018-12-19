@@ -80,8 +80,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 			return err
 		}
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator, cli.ClientIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL))
-		if err != nil {
+		if err = memberStore.SetMember(ctx, &req.Collaborator, cli.ClientIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL)); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -105,12 +104,10 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 }
 
 func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientRequest) (cli *ttnpb.Client, err error) {
-	err = is.RequireAuthenticated(ctx)
-	if err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
-	if err != nil {
+	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicClientFields) {
 			defer func() { cli = cli.PublicSafe() }()
 		} else {
@@ -171,7 +168,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		}
 	}()
 	clis = new(ttnpb.Clients)
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if cliRights == nil {
 			memberStore := store.GetMembershipStore(db)
 			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "client")
@@ -217,8 +214,7 @@ var (
 )
 
 func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
-	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
-	if err != nil {
+	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
@@ -250,14 +246,12 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 }
 
 func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*types.Empty, error) {
-	err := rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL)
-	if err != nil {
+	if err := rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		cliStore := store.GetClientStore(db)
-		err = cliStore.DeleteClient(ctx, ids)
-		return err
+		return cliStore.DeleteClient(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

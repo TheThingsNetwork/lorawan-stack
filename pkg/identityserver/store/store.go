@@ -133,8 +133,7 @@ func findEntity(ctx context.Context, db *gorm.DB, entityID *ttnpb.EntityIdentifi
 	if len(fields) > 0 {
 		query = query.Select(fields)
 	}
-	err := query.First(entity).Error
-	if err != nil {
+	if err := query.First(entity).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(entityID)
 		}

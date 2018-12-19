@@ -37,8 +37,7 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 		return nil, err
 	}
 	var memberships []Membership
-	err = s.db.Model(entity).Preload("Account").Association("Memberships").Find(&memberships).Error
-	if err != nil {
+	if err = s.db.Model(entity).Preload("Account").Association("Memberships").Find(&memberships).Error; err != nil {
 		return nil, err
 	}
 	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(memberships))
@@ -89,8 +88,7 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 		return err
 	}
 	var memberships []Membership
-	err = s.db.Model(entity).Association("Memberships").Find(&memberships).Error
-	if err != nil {
+	if err = s.db.Model(entity).Association("Memberships").Find(&memberships).Error; err != nil {
 		return err
 	}
 	for _, membership := range memberships {

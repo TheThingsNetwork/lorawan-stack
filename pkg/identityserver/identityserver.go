@@ -91,8 +91,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	if c.LogDebug() {
 		is.db = is.db.Debug()
 	}
-	err = store.Check(is.db)
-	if err != nil {
+	if err = store.Check(is.db); err != nil {
 		return nil, err
 	}
 	go func() {

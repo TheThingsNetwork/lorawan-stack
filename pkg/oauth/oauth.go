@@ -152,8 +152,7 @@ func (s *server) Token(c echo.Context) error {
 		ar.Authorized = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
 	case osin.PASSWORD:
 		if clientHasGrant(&client, ttnpb.GRANT_PASSWORD) {
-			err := s.doLogin(req.Context(), ar.Username, ar.Password)
-			if err != nil {
+			if err := s.doLogin(req.Context(), ar.Username, ar.Password); err != nil {
 				return err
 			}
 			ar.Authorized = true

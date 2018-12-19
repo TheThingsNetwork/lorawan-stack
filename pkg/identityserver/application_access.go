@@ -47,22 +47,19 @@ func (is *IdentityServer) listApplicationRights(ctx context.Context, ids *ttnpb.
 }
 
 func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnpb.CreateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := generateAPIKey(ctx, req.Name, req.Rights...)
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		keyStore := store.GetAPIKeyStore(db)
-		err = keyStore.CreateAPIKey(ctx, req.ApplicationIdentifiers.EntityIdentifiers(), key)
-		return err
+		return keyStore.CreateAPIKey(ctx, req.ApplicationIdentifiers.EntityIdentifiers(), key)
 	})
 	if err != nil {
 		return nil, err
@@ -73,8 +70,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	keys = new(ttnpb.APIKeys)
@@ -93,12 +89,10 @@ func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, ids *ttnpb
 }
 
 func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -122,18 +116,20 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
-	err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
-	if err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Collaborator.Rights...)
-	if err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Collaborator.Rights...); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator.OrganizationOrUserIdentifiers, req.ApplicationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(req.Collaborator.Rights...))
-		return err
+		return memberStore.SetMember(
+			ctx,
+			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.ApplicationIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(req.Collaborator.Rights...),
+		)
 	})
 	if err != nil {
 		return nil, err
@@ -148,11 +144,10 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 }
 
 func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		memberStore := store.GetMembershipStore(db)
 		memberRights, err := memberStore.FindMembers(ctx, ids.EntityIdentifiers())
 		if err != nil {

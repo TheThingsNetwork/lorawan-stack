@@ -54,8 +54,7 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 		return nil, err
 	}
 	var keyModels []APIKey
-	err = s.db.Model(entity).Association("APIKeys").Find(&keyModels).Error
-	if err != nil {
+	if err = s.db.Model(entity).Association("APIKeys").Find(&keyModels).Error; err != nil {
 		return nil, err
 	}
 	keyProtos := make([]*ttnpb.APIKey, len(keyModels))
@@ -69,8 +68,7 @@ var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not lin
 
 func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
 	var keyModel APIKey
-	err := s.db.Scopes(withContext(ctx)).Where(&APIKey{APIKeyID: id}).First(&keyModel).Error
-	if err != nil {
+	if err := s.db.Scopes(withContext(ctx)).Where(&APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, nil, errAPIKeyNotFound
 		}
@@ -113,8 +111,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 	}
 	keyModel.Name = key.Name
 	keyModel.Rights = Rights{Rights: key.Rights}
-	err = s.db.Model(&keyModel).Select("name", "rights").Updates(&keyModel).Error
-	if err != nil {
+	if err = s.db.Model(&keyModel).Select("name", "rights").Updates(&keyModel).Error; err != nil {
 		return nil, err
 	}
 	return keyModel.toPB(), nil

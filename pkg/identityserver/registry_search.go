@@ -43,12 +43,11 @@ func (rs *registrySearch) SearchAllowed(ctx context.Context) error {
 }
 
 func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Applications, error) {
-	err := rs.SearchAllowed(ctx)
-	if err != nil {
+	if err := rs.SearchAllowed(ctx); err != nil {
 		return nil, err
 	}
 	res := new(ttnpb.Applications)
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
 		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "application")
 		if err != nil {
 			return err
@@ -76,12 +75,11 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 }
 
 func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Clients, error) {
-	err := rs.SearchAllowed(ctx)
-	if err != nil {
+	if err := rs.SearchAllowed(ctx); err != nil {
 		return nil, err
 	}
 	res := new(ttnpb.Clients)
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
 		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "client")
 		if err != nil {
 			return err
@@ -109,12 +107,11 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 }
 
 func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Gateways, error) {
-	err := rs.SearchAllowed(ctx)
-	if err != nil {
+	if err := rs.SearchAllowed(ctx); err != nil {
 		return nil, err
 	}
 	res := new(ttnpb.Gateways)
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
 		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "gateway")
 		if err != nil {
 			return err
@@ -142,12 +139,11 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 }
 
 func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Organizations, error) {
-	err := rs.SearchAllowed(ctx)
-	if err != nil {
+	if err := rs.SearchAllowed(ctx); err != nil {
 		return nil, err
 	}
 	res := new(ttnpb.Organizations)
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
 		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "organization")
 		if err != nil {
 			return err
@@ -175,12 +171,11 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 }
 
 func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Users, error) {
-	err := rs.SearchAllowed(ctx)
-	if err != nil {
+	if err := rs.SearchAllowed(ctx); err != nil {
 		return nil, err
 	}
 	res := new(ttnpb.Users)
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
 		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "user")
 		if err != nil {
 			return err

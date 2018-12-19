@@ -57,8 +57,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 			return err
 		}
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator, org.OrganizationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL))
-		if err != nil {
+		if err = memberStore.SetMember(ctx, &req.Collaborator, org.OrganizationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL)); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -79,12 +78,10 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 }
 
 func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrganizationRequest) (org *ttnpb.Organization, err error) {
-	err = is.RequireAuthenticated(ctx)
-	if err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO); err != nil {
 		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicOrganizationFields) {
 			defer func() { org = org.PublicSafe() }()
 		} else {
@@ -185,8 +182,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 }
 
 func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
-	if err != nil {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -212,14 +208,12 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 }
 
 func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
-	err := rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_DELETE)
-	if err != nil {
+	if err := rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		orgStore := store.GetOrganizationStore(db)
-		err = orgStore.DeleteOrganization(ctx, ids)
-		return err
+		return orgStore.DeleteOrganization(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

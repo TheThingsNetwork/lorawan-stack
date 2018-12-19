@@ -111,8 +111,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(id.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
-	err := query.Preload("Account").First(&orgModel).Error
-	if err != nil {
+	if err := query.Preload("Account").First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id.EntityIdentifiers())
 		}
@@ -127,8 +126,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(org.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
-	err = query.Preload("Account").First(&orgModel).Error
-	if err != nil {
+	if err = query.Preload("Account").First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(org.OrganizationIdentifiers.EntityIdentifiers())
 		}
@@ -146,8 +144,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
-		err = replaceAttributes(s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes)
-		if err != nil {
+		if err = replaceAttributes(s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -165,8 +162,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(id.GetOrganizationID()))
 	query = query.Select("organizations.id")
 	var orgModel Organization
-	err = query.First(&orgModel).Error
-	if err != nil {
+	if err = query.First(&orgModel).Error; err != nil {
 		return err
 	}
 	return s.db.Delete(&orgModel).Error

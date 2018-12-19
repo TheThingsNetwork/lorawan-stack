@@ -56,8 +56,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 			return err
 		}
 		memberStore := store.GetMembershipStore(db)
-		err = memberStore.SetMember(ctx, &req.Collaborator, app.ApplicationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL))
-		if err != nil {
+		if err = memberStore.SetMember(ctx, &req.Collaborator, app.ApplicationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL)); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -78,12 +77,10 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 }
 
 func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetApplicationRequest) (app *ttnpb.Application, err error) {
-	err = is.RequireAuthenticated(ctx)
-	if err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
 		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicApplicationFields) {
 			defer func() { app = app.PublicSafe() }()
 		} else {
@@ -144,7 +141,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 	}()
 	apps = new(ttnpb.Applications)
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if appRights == nil {
 			memberStore := store.GetMembershipStore(db)
 			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "application")
@@ -186,8 +183,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 }
 
 func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (app *ttnpb.Application, err error) {
-	err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
-	if err != nil {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -213,14 +209,12 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 }
 
 func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
-	err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_DELETE)
-	if err != nil {
+	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		appStore := store.GetApplicationStore(db)
-		err = appStore.DeleteApplication(ctx, ids)
-		return err
+		return appStore.DeleteApplication(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

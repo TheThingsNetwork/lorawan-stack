@@ -105,8 +105,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 	query := s.db.Scopes(withContext(ctx), withApplicationID(id.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
-	err := query.First(&appModel).Error
-	if err != nil {
+	if err := query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id.EntityIdentifiers())
 		}
@@ -121,8 +120,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	query := s.db.Scopes(withContext(ctx), withApplicationID(app.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
-	err = query.First(&appModel).Error
-	if err != nil {
+	if err = query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(app.ApplicationIdentifiers.EntityIdentifiers())
 		}
@@ -140,8 +138,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, appModel.Attributes) {
-		err = replaceAttributes(s.db, "application", appModel.ID, oldAttributes, appModel.Attributes)
-		if err != nil {
+		if err = replaceAttributes(s.db, "application", appModel.ID, oldAttributes, appModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
