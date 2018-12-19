@@ -510,7 +510,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				return nil, nil, errOutdatedData
 			}
 
-			paths := make([]string, 0, 9)
+			var paths []string
 
 			storedSes := stored.Session
 			if ses != dev.Session {
@@ -651,6 +651,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				// Sanity check
 				panic(fmt.Errorf("Session mismatch"))
 			}
+			stored.MACState.RxWindowsAvailable = true
 
 			if !pld.FHDR.ADR {
 				dev.RecentADRUplinks = nil
@@ -677,6 +678,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		return err
 	}
 
+	scheduleAt := time.Now().UTC()
 	ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
@@ -689,8 +691,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			Settings:     up.Settings,
 		}},
 	})
-	scheduleAt := time.Now().UTC()
-	if !ok {
+	if err != nil {
+		logger.WithError(err).Error("Failed to forward uplink to AS")
+	} else if !ok {
 		logger.Warn("Application Server not found, not forwarding uplink")
 	} else {
 		registerForwardUplink(ctx, dev, up)
@@ -819,6 +822,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 				return nil, nil, err
 			}
 
+			dev.MACState.RxWindowsAvailable = true
 			dev.MACState.QueuedJoinAccept = resp.RawPayload
 			if req.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
 				// The version will be further negotiated via RekeyInd/RekeyConf

@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -91,54 +90,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 		ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
 	}
 
-	rx1Downlink := func(b []byte, chIdx uint32, drIdx ttnpb.DataRateIndex, drOffset uint32, dwellTime bool, md ttnpb.TxMetadata, correlationIDs ...string) *ttnpb.DownlinkMessage {
-		chIdx = test.Must(band.Rx1Channel(chIdx)).(uint32)
-		drIdx = test.Must(band.Rx1DataRate(drIdx, drOffset, dwellTime)).(ttnpb.DataRateIndex)
-
-		msg := &ttnpb.DownlinkMessage{
-			RawPayload:     b,
-			CorrelationIDs: correlationIDs,
-			EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-				DeviceID:               DeviceID,
-				DevAddr:                &DevAddr,
-			},
-			Settings: ttnpb.TxSettings{
-				DataRateIndex:      drIdx,
-				CodingRate:         "4/5",
-				InvertPolarization: true,
-				ChannelIndex:       chIdx,
-				Frequency:          channels[int(chIdx)].DownlinkFrequency,
-				TxPower:            int32(band.DefaultMaxEIRP),
-			},
-			TxMetadata: md,
-		}
-		test.Must(nil, setDownlinkModulation(&msg.Settings, band.DataRates[int(drIdx)]))
-		return msg
-	}
-
-	rx2Downlink := func(b []byte, freq uint64, drIdx ttnpb.DataRateIndex, md ttnpb.TxMetadata, correlationIDs ...string) *ttnpb.DownlinkMessage {
-		msg := &ttnpb.DownlinkMessage{
-			RawPayload:     b,
-			CorrelationIDs: correlationIDs,
-			EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-				DeviceID:               DeviceID,
-				DevAddr:                &DevAddr,
-			},
-			Settings: ttnpb.TxSettings{
-				DataRateIndex:      drIdx,
-				CodingRate:         "4/5",
-				InvertPolarization: true,
-				Frequency:          freq,
-				TxPower:            int32(band.DefaultMaxEIRP),
-			},
-			TxMetadata: md,
-		}
-		test.Must(nil, setDownlinkModulation(&msg.Settings, band.DataRates[int(drIdx)]))
-		return msg
-	}
-
 	type nsKey struct{}
 	type deviceKey struct{}
 	type popCallKey struct{}
@@ -179,59 +130,67 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
+							Rx1Delay:          ttnpb.RX_DELAY_3,
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Channels:          channels[:],
 						},
 						DesiredParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
+							Rx1Delay:          ttnpb.RX_DELAY_3,
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Channels:          channels[:],
 						},
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						DeviceClass:        ttnpb.CLASS_A,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{{
-						RxMetadata: []*ttnpb.RxMetadata{
-							{
-								GatewayIdentifiers: gateways[0],
-								Timestamp:          123,
-								SNR:                8.1,
+					MACSettings: &ttnpb.MACSettings{},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						{
+							RxMetadata: []*ttnpb.RxMetadata{
+								{
+									GatewayIdentifiers: gateways[0],
+									SNR:                8.1,
+									UplinkToken:        []byte("testToken0"),
+								},
+								{
+									GatewayIdentifiers: gateways[1],
+									SNR:                4,
+									UplinkToken:        []byte("testToken1"),
+								},
+								{
+									GatewayIdentifiers: gateways[2],
+									SNR:                -1,
+									UplinkToken:        []byte("testToken2"),
+								},
 							},
-							{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          124,
-								SNR:                4,
+							Settings: ttnpb.TxSettings{
+								DataRateIndex: ttnpb.DATA_RATE_0,
+								ChannelIndex:  3,
 							},
-							{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          42,
-								SNR:                -1,
+							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
+							ReceivedAt:     time.Now().Add(time.Hour),
+							Payload: &ttnpb.Message{
+								MHDR: ttnpb.MHDR{
+									MType: ttnpb.MType_UNCONFIRMED_UP,
+								},
+								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 							},
 						},
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-						},
-						Settings: ttnpb.TxSettings{
-							DataRateIndex:      ttnpb.DATA_RATE_0,
-							CodingRate:         "4/5",
-							InvertPolarization: false,
-							ChannelIndex:       3,
-						},
-					}},
+					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							SessionKeyID:   "testKeyID",
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
-							CorrelationIDs: []string{"testCorrelationID1", "testCorrelationID2"},
+							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
 						},
 					},
 				})
@@ -261,8 +220,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
-
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID})
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -274,32 +231,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				})
 
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+
 				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-
-				ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatal("Invalid context")
-				}
-				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-
-				expected := CopyEndDevice(pb)
-				b, err := GenerateDownlink(ctx, expected,
-					band.DataRates[test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-				)
-				if !a.So(err, should.BeNil) {
-					t.Fatalf("Failed to generate downlink: '%v'", errors.Stack(err))
-				}
-
-				expected.RecentDownlinks = append(expected.RecentDownlinks,
-					rx1Downlink(b, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-						GatewayIdentifiers: gateways[2],
-						Timestamp:          uint64(time.Unix(0, 42).Add(3 * time.Second).UnixNano()),
-					}),
-				)
 
 				ret, paths, err := f(CopyEndDevice(pb))
 				a.So(err, should.BeNil)
@@ -309,11 +246,58 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"recent_downlinks",
 					"session",
 				})
-				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) || !a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 1) {
+				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
 					t.FailNow()
 				}
-				expected.RecentDownlinks[0].CorrelationIDs = ret.RecentDownlinks[0].CorrelationIDs
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 3)
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID1")
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID2")
+
+				ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
+				if !a.So(ok, should.BeTrue) {
+					t.Fatal("Invalid context")
+				}
+				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+				rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
+					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+				)).([]byte)
+
+				expected := CopyEndDevice(pb)
+				expected.MACState.PendingApplicationDownlink = nil
+				expected.MACState.PendingRequests = nil
+				expected.MACState.QueuedJoinAccept = nil
+				expected.MACState.QueuedResponses = nil
+				expected.MACState.RxWindowsAvailable = false
+				expected.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
+					RawPayload:     rx1Payload,
+					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
+					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
+						DevAddr:                &DevAddr,
+					},
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							Rx1Delay:         ttnpb.RX_DELAY_3,
+							Rx1DataRateIndex: rx1DRIdx,
+							Rx1Frequency:     rx1Freq,
+							DownlinkPaths: []*ttnpb.DownlinkPath{
+								{
+									Path: &ttnpb.DownlinkPath_UplinkToken{
+										UplinkToken: []byte("testToken2"),
+									},
+								},
+							},
+						},
+					},
+				})
 				a.So(ret, should.Resemble, expected)
+
 				return ret, nil
 			},
 
@@ -333,6 +317,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+				rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
+					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+				)).([]byte)
 
 				switch uid := unique.ID(ctx, id); uid {
 				case unique.ID(ctx, gateways[0]):
@@ -349,20 +339,33 @@ func TestProcessDownlinkTask(t *testing.T) {
 							defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 							a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
-
-							b, err := GenerateDownlink(ctx, CopyEndDevice(pb),
-								band.DataRates[test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-								band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-							)
-							if !a.So(err, should.BeNil) {
-								t.Fatalf("Failed to generate downlink: %s", err)
-							}
-
-							a.So(msg.CorrelationIDs, should.NotBeEmpty)
-							a.So(msg, should.Resemble, rx1Downlink(b, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          uint64(time.Unix(0, 124).Add(3 * time.Second).UnixNano()),
-							}, msg.CorrelationIDs...))
+							a.So(msg.CorrelationIDs, should.HaveLength, 3)
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+								RawPayload:     rx1Payload,
+								CorrelationIDs: msg.CorrelationIDs,
+								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+									DeviceID:               DeviceID,
+									DevAddr:                &DevAddr,
+								},
+								Settings: &ttnpb.DownlinkMessage_Request{
+									Request: &ttnpb.TxRequest{
+										Class:            ttnpb.CLASS_A,
+										Rx1Delay:         ttnpb.RX_DELAY_3,
+										Rx1DataRateIndex: rx1DRIdx,
+										Rx1Frequency:     rx1Freq,
+										DownlinkPaths: []*ttnpb.DownlinkPath{
+											{
+												Path: &ttnpb.DownlinkPath_UplinkToken{
+													UplinkToken: []byte("testToken1"),
+												},
+											},
+										},
+									},
+								},
+							})
 							a.So(opts, should.Contain, ns.WithClusterAuth())
 							return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 						},
@@ -378,27 +381,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 							a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
-
-							b, err := GenerateDownlink(ctx, CopyEndDevice(pb),
-								band.DataRates[test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-								band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-							)
-							if !a.So(err, should.BeNil) {
-								t.Fatalf("Failed to generate downlink: %s", err)
-							}
-
-							a.So(msg.CorrelationIDs, should.NotBeEmpty)
-							a.So(msg, should.Resemble, rx1Downlink(b, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          uint64(time.Unix(0, 42).Add(3 * time.Second).UnixNano()),
-							}, msg.CorrelationIDs...))
-							a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+							a.So(msg.CorrelationIDs, should.HaveLength, 3)
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+								RawPayload:     rx1Payload,
+								CorrelationIDs: msg.CorrelationIDs,
+								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+									DeviceID:               DeviceID,
+									DevAddr:                &DevAddr,
+								},
+								Settings: &ttnpb.DownlinkMessage_Request{
+									Request: &ttnpb.TxRequest{
+										Class:            ttnpb.CLASS_A,
+										Rx1Delay:         ttnpb.RX_DELAY_3,
+										Rx1DataRateIndex: rx1DRIdx,
+										Rx1Frequency:     rx1Freq,
+										DownlinkPaths: []*ttnpb.DownlinkPath{
+											{
+												Path: &ttnpb.DownlinkPath_UplinkToken{
+													UplinkToken: []byte("testToken2"),
+												},
+											},
+										},
+									},
+								},
+							})
+							a.So(opts, should.Contain, ns.WithClusterAuth())
 							return ttnpb.Empty, nil
 						},
 					}, nil
 
 				default:
-					t.Errorf("Unknown gateway `%s` requested", uid)
+					t.Fatalf("Unknown gateway `%s` requested", uid)
 				}
 				return nil, nil
 			},
@@ -436,61 +451,69 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
+							Rx1Delay:          ttnpb.RX_DELAY_3,
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Rx2Frequency:      42,
 							Channels:          channels[:],
 						},
 						DesiredParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
+							Rx1Delay:          ttnpb.RX_DELAY_3,
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Rx2Frequency:      42,
 							Channels:          channels[:],
 						},
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						DeviceClass:        ttnpb.CLASS_A,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{{
-						RxMetadata: []*ttnpb.RxMetadata{
-							{
-								GatewayIdentifiers: gateways[0],
-								Timestamp:          123,
-								SNR:                8.1,
+					MACSettings: &ttnpb.MACSettings{},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						{
+							RxMetadata: []*ttnpb.RxMetadata{
+								{
+									GatewayIdentifiers: gateways[0],
+									SNR:                8.1,
+									UplinkToken:        []byte("testToken0"),
+								},
+								{
+									GatewayIdentifiers: gateways[1],
+									SNR:                4,
+									UplinkToken:        []byte("testToken1"),
+								},
+								{
+									GatewayIdentifiers: gateways[2],
+									SNR:                -1,
+									UplinkToken:        []byte("testToken2"),
+								},
 							},
-							{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          124,
-								SNR:                4,
+							Settings: ttnpb.TxSettings{
+								DataRateIndex: ttnpb.DATA_RATE_0,
+								ChannelIndex:  3,
 							},
-							{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          42,
-								SNR:                -1,
+							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
+							ReceivedAt:     time.Now().Add(time.Hour),
+							Payload: &ttnpb.Message{
+								MHDR: ttnpb.MHDR{
+									MType: ttnpb.MType_UNCONFIRMED_UP,
+								},
+								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 							},
 						},
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-						},
-						Settings: ttnpb.TxSettings{
-							DataRateIndex:      ttnpb.DATA_RATE_0,
-							CodingRate:         "4/5",
-							InvertPolarization: false,
-							ChannelIndex:       3,
-						},
-					}},
+					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							SessionKeyID:   "testKeyID",
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
-							CorrelationIDs: []string{"testCorrelationID1", "testCorrelationID2"},
+							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
 						},
 					},
 				})
@@ -520,8 +543,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
-
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID})
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -533,32 +554,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				})
 
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+
 				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-
-				ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatal("Invalid context")
-				}
-				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-
-				expected := CopyEndDevice(pb)
-				b, err := GenerateDownlink(ctx, expected,
-					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-				)
-				if !a.So(err, should.BeNil) {
-					t.Fatalf("Failed to generate downlink: %s", err)
-				}
-
-				expected.RecentDownlinks = append(expected.RecentDownlinks,
-					rx2Downlink(b, 42, ttnpb.DATA_RATE_1, ttnpb.TxMetadata{
-						GatewayIdentifiers: gateways[2],
-						Timestamp:          uint64(time.Unix(0, 42).Add(3*time.Second + time.Second).UnixNano()),
-					}),
-				)
 
 				ret, paths, err := f(CopyEndDevice(pb))
 				a.So(err, should.BeNil)
@@ -568,11 +569,56 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"recent_downlinks",
 					"session",
 				})
-				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) || !a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 1) {
+				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
 					t.FailNow()
 				}
-				expected.RecentDownlinks[0].CorrelationIDs = ret.RecentDownlinks[0].CorrelationIDs
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 3)
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID1")
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID2")
+
+				ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
+				if !a.So(ok, should.BeTrue) {
+					t.Fatal("Invalid context")
+				}
+				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				rx2Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
+					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+				)).([]byte)
+
+				expected := CopyEndDevice(pb)
+				expected.MACState.PendingApplicationDownlink = nil
+				expected.MACState.PendingRequests = nil
+				expected.MACState.QueuedJoinAccept = nil
+				expected.MACState.QueuedResponses = nil
+				expected.MACState.RxWindowsAvailable = false
+				expected.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
+					RawPayload:     rx2Payload,
+					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
+					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
+						DevAddr:                &DevAddr,
+					},
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							Rx1Delay:         ttnpb.RX_DELAY_3,
+							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+							Rx2Frequency:     42,
+							DownlinkPaths: []*ttnpb.DownlinkPath{
+								{
+									Path: &ttnpb.DownlinkPath_UplinkToken{
+										UplinkToken: []byte("testToken2"),
+									},
+								},
+							},
+						},
+					},
+				})
 				a.So(ret, should.Resemble, expected)
+
 				return ret, nil
 			},
 
@@ -594,6 +640,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 					fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+					rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
+						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					)).([]byte)
+					rx2Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
+						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					)).([]byte)
 
 					switch uid := unique.ID(ctx, id); uid {
 					case unique.ID(ctx, gateways[0]):
@@ -615,21 +671,34 @@ func TestProcessDownlinkTask(t *testing.T) {
 									defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 									a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
-
-									b, err := GenerateDownlink(ctx, CopyEndDevice(pb),
-										band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-										band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-									)
-									if !a.So(err, should.BeNil) {
-										t.Fatalf("Failed to generate downlink: %s", err)
-									}
-
-									a.So(msg.CorrelationIDs, should.NotBeEmpty)
-									a.So(msg, should.Resemble, rx2Downlink(b, 42, ttnpb.DATA_RATE_1, ttnpb.TxMetadata{
-										GatewayIdentifiers: gateways[1],
-										Timestamp:          uint64(time.Unix(0, 124).Add(4 * time.Second).UnixNano()),
-									}, msg.CorrelationIDs...))
-									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+									a.So(msg.CorrelationIDs, should.HaveLength, 3)
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+										RawPayload:     rx2Payload,
+										CorrelationIDs: msg.CorrelationIDs,
+										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+											DeviceID:               DeviceID,
+											DevAddr:                &DevAddr,
+										},
+										Settings: &ttnpb.DownlinkMessage_Request{
+											Request: &ttnpb.TxRequest{
+												Class:            ttnpb.CLASS_A,
+												Rx1Delay:         ttnpb.RX_DELAY_3,
+												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+												Rx2Frequency:     42,
+												DownlinkPaths: []*ttnpb.DownlinkPath{
+													{
+														Path: &ttnpb.DownlinkPath_UplinkToken{
+															UplinkToken: []byte("testToken1"),
+														},
+													},
+												},
+											},
+										},
+									})
+									a.So(opts, should.Contain, ns.WithClusterAuth())
 									return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 								},
 							}, nil
@@ -644,20 +713,32 @@ func TestProcessDownlinkTask(t *testing.T) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
-
-								b, err := GenerateDownlink(ctx, CopyEndDevice(pb),
-									band.DataRates[test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-									band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-								)
-								if !a.So(err, should.BeNil) {
-									t.Fatalf("Failed to generate downlink: %s", err)
-								}
-
-								a.So(msg.CorrelationIDs, should.NotBeEmpty)
-								a.So(msg, should.Resemble, rx1Downlink(b, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-									GatewayIdentifiers: gateways[1],
-									Timestamp:          uint64(time.Unix(0, 124).Add(3 * time.Second).UnixNano()),
-								}, msg.CorrelationIDs...))
+								a.So(msg.CorrelationIDs, should.HaveLength, 3)
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+									RawPayload:     rx1Payload,
+									CorrelationIDs: msg.CorrelationIDs,
+									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+										DeviceID:               DeviceID,
+										DevAddr:                &DevAddr,
+									},
+									Settings: &ttnpb.DownlinkMessage_Request{
+										Request: &ttnpb.TxRequest{
+											Class:            ttnpb.CLASS_A,
+											Rx1Delay:         ttnpb.RX_DELAY_3,
+											Rx1DataRateIndex: rx1DRIdx,
+											Rx1Frequency:     rx1Freq,
+											DownlinkPaths: []*ttnpb.DownlinkPath{
+												{
+													Path: &ttnpb.DownlinkPath_UplinkToken{
+														UplinkToken: []byte("testToken1"),
+													},
+												},
+											},
+										},
+									},
+								})
 								a.So(opts, should.Contain, ns.WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
@@ -676,21 +757,34 @@ func TestProcessDownlinkTask(t *testing.T) {
 									defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 									a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 3)
-
-									b, err := GenerateDownlink(ctx, CopyEndDevice(pb),
-										band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-										band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-									)
-									if !a.So(err, should.BeNil) {
-										t.Fatalf("Failed to generate downlink: %s", err)
-									}
-
-									a.So(msg.CorrelationIDs, should.NotBeEmpty)
-									a.So(msg, should.Resemble, rx2Downlink(b, 42, ttnpb.DATA_RATE_1, ttnpb.TxMetadata{
-										GatewayIdentifiers: gateways[2],
-										Timestamp:          uint64(time.Unix(0, 42).Add(4 * time.Second).UnixNano()),
-									}, msg.CorrelationIDs...))
-									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+									a.So(msg.CorrelationIDs, should.HaveLength, 3)
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+										RawPayload:     rx2Payload,
+										CorrelationIDs: msg.CorrelationIDs,
+										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+											DeviceID:               DeviceID,
+											DevAddr:                &DevAddr,
+										},
+										Settings: &ttnpb.DownlinkMessage_Request{
+											Request: &ttnpb.TxRequest{
+												Class:            ttnpb.CLASS_A,
+												Rx1Delay:         ttnpb.RX_DELAY_3,
+												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+												Rx2Frequency:     42,
+												DownlinkPaths: []*ttnpb.DownlinkPath{
+													{
+														Path: &ttnpb.DownlinkPath_UplinkToken{
+															UplinkToken: []byte("testToken2"),
+														},
+													},
+												},
+											},
+										},
+									})
+									a.So(opts, should.Contain, ns.WithClusterAuth())
 									return ttnpb.Empty, nil
 								},
 							}, nil
@@ -705,27 +799,40 @@ func TestProcessDownlinkTask(t *testing.T) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
-
-								b, err := GenerateDownlink(ctx, CopyEndDevice(pb),
-									band.DataRates[test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-									band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
-								)
-								if !a.So(err, should.BeNil) {
-									t.Fatalf("Failed to generate downlink: %s", err)
-								}
-
-								a.So(msg.CorrelationIDs, should.NotBeEmpty)
-								a.So(msg, should.Resemble, rx1Downlink(b, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-									GatewayIdentifiers: gateways[2],
-									Timestamp:          uint64(time.Unix(0, 42).Add(3 * time.Second).UnixNano()),
-								}, msg.CorrelationIDs...))
-								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+								a.So(msg.CorrelationIDs, should.HaveLength, 3)
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+									RawPayload:     rx1Payload,
+									CorrelationIDs: msg.CorrelationIDs,
+									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+										DeviceID:               DeviceID,
+										DevAddr:                &DevAddr,
+									},
+									Settings: &ttnpb.DownlinkMessage_Request{
+										Request: &ttnpb.TxRequest{
+											Class:            ttnpb.CLASS_A,
+											Rx1Delay:         ttnpb.RX_DELAY_3,
+											Rx1DataRateIndex: rx1DRIdx,
+											Rx1Frequency:     rx1Freq,
+											DownlinkPaths: []*ttnpb.DownlinkPath{
+												{
+													Path: &ttnpb.DownlinkPath_UplinkToken{
+														UplinkToken: []byte("testToken2"),
+													},
+												},
+											},
+										},
+									},
+								})
+								a.So(opts, should.Contain, ns.WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
 						}, nil
 
 					default:
-						t.Errorf("Unknown gateway `%s` requested", uid)
+						t.Fatalf("Unknown gateway `%s` requested", uid)
 					}
 					return nil, nil
 				}
@@ -741,7 +848,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "1.1/Rx1/join accept/non-empty application downlink queue",
+			Name: "1.1/Rx1/join accept",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return context.WithValue(ctx, deviceKey{}, &ttnpb.EndDevice{
 					FrequencyPlanID: test.EUFrequencyPlanID,
@@ -764,60 +871,66 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Channels:          channels[:],
 						},
 						DesiredParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Channels:          channels[:],
 						},
-						QueuedJoinAccept: []byte("testJoinAccept"),
-						LoRaWANVersion:   ttnpb.MAC_V1_1,
+						DeviceClass:        ttnpb.CLASS_A,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
+						QueuedJoinAccept:   []byte("testJoinAccept"),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{{
-						RxMetadata: []*ttnpb.RxMetadata{
-							{
-								GatewayIdentifiers: gateways[0],
-								Timestamp:          123,
-								SNR:                8.1,
+					MACSettings: &ttnpb.MACSettings{},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						{
+							RxMetadata: []*ttnpb.RxMetadata{
+								{
+									GatewayIdentifiers: gateways[0],
+									SNR:                8.1,
+									UplinkToken:        []byte("testToken0"),
+								},
+								{
+									GatewayIdentifiers: gateways[1],
+									SNR:                4,
+									UplinkToken:        []byte("testToken1"),
+								},
+								{
+									GatewayIdentifiers: gateways[2],
+									SNR:                -1,
+									UplinkToken:        []byte("testToken2"),
+								},
 							},
-							{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          124,
-								SNR:                4,
+							Settings: ttnpb.TxSettings{
+								DataRateIndex: ttnpb.DATA_RATE_0,
+								ChannelIndex:  3,
 							},
-							{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          42,
-								SNR:                -1,
+							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
+							ReceivedAt:     time.Now().Add(time.Hour),
+							Payload: &ttnpb.Message{
+								MHDR: ttnpb.MHDR{
+									MType: ttnpb.MType_JOIN_REQUEST,
+								},
+								Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{}},
 							},
 						},
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_JOIN_REQUEST,
-							},
-							Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{}},
-						},
-						Settings: ttnpb.TxSettings{
-							DataRateIndex:      ttnpb.DATA_RATE_0,
-							CodingRate:         "4/5",
-							InvertPolarization: false,
-							ChannelIndex:       3,
-						},
-					}},
+					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							SessionKeyID:   "testKeyID",
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
-							CorrelationIDs: []string{"testCorrelationID1", "testCorrelationID2"},
+							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
 						},
 					},
 				})
@@ -847,8 +960,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
-
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID})
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -860,19 +971,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				})
 
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+
 				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-
-				expected := CopyEndDevice(pb)
-				expected.MACState.QueuedJoinAccept = nil
-				expected.RecentDownlinks = append(expected.RecentDownlinks,
-					rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-						GatewayIdentifiers: gateways[2],
-						Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay1).UnixNano()),
-					}),
-				)
 
 				ret, paths, err := f(CopyEndDevice(pb))
 				a.So(err, should.BeNil)
@@ -882,11 +986,48 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"recent_downlinks",
 					"session",
 				})
-				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) || !a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 1) {
+				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
 					t.FailNow()
 				}
-				expected.RecentDownlinks[0].CorrelationIDs = ret.RecentDownlinks[0].CorrelationIDs
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 3)
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID1")
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID2")
+
+				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+
+				expected := CopyEndDevice(pb)
+				expected.MACState.PendingApplicationDownlink = nil
+				expected.MACState.PendingRequests = nil
+				expected.MACState.QueuedJoinAccept = nil
+				expected.MACState.QueuedResponses = nil
+				expected.MACState.RxWindowsAvailable = false
+				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
+					RawPayload:     []byte("testJoinAccept"),
+					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
+					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
+						DevAddr:                &DevAddr,
+					},
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+							Rx1DataRateIndex: rx1DRIdx,
+							Rx1Frequency:     rx1Freq,
+							DownlinkPaths: []*ttnpb.DownlinkPath{
+								{
+									Path: &ttnpb.DownlinkPath_UplinkToken{
+										UplinkToken: []byte("testToken2"),
+									},
+								},
+							},
+						},
+					},
+				})
 				a.So(ret, should.Resemble, expected)
+
 				return ret, nil
 			},
 
@@ -896,15 +1037,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				defer test.MustIncrementContextCounter(ctx, nsGsClientCallKey{}, 1)
 
-				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatal("Invalid context")
-				}
-
 				ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
+				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 
 				switch uid := unique.ID(ctx, id); uid {
 				case unique.ID(ctx, gateways[0]):
@@ -921,12 +1059,33 @@ func TestProcessDownlinkTask(t *testing.T) {
 							defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 							a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
-
-							a.So(msg.CorrelationIDs, should.NotBeEmpty)
-							a.So(msg, should.Resemble, rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          uint64(time.Unix(0, 124).Add(band.JoinAcceptDelay1).UnixNano()),
-							}, msg.CorrelationIDs...))
+							a.So(msg.CorrelationIDs, should.HaveLength, 3)
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+								RawPayload:     []byte("testJoinAccept"),
+								CorrelationIDs: msg.CorrelationIDs,
+								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+									DeviceID:               DeviceID,
+									DevAddr:                &DevAddr,
+								},
+								Settings: &ttnpb.DownlinkMessage_Request{
+									Request: &ttnpb.TxRequest{
+										Class:            ttnpb.CLASS_A,
+										Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+										Rx1DataRateIndex: rx1DRIdx,
+										Rx1Frequency:     rx1Freq,
+										DownlinkPaths: []*ttnpb.DownlinkPath{
+											{
+												Path: &ttnpb.DownlinkPath_UplinkToken{
+													UplinkToken: []byte("testToken1"),
+												},
+											},
+										},
+									},
+								},
+							})
 							a.So(opts, should.Contain, ns.WithClusterAuth())
 							return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 						},
@@ -942,19 +1101,40 @@ func TestProcessDownlinkTask(t *testing.T) {
 							defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 							a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
-
-							a.So(msg.CorrelationIDs, should.NotBeEmpty)
-							a.So(msg, should.Resemble, rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay1).UnixNano()),
-							}, msg.CorrelationIDs...))
-							a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+							a.So(msg.CorrelationIDs, should.HaveLength, 3)
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+								RawPayload:     []byte("testJoinAccept"),
+								CorrelationIDs: msg.CorrelationIDs,
+								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+									DeviceID:               DeviceID,
+									DevAddr:                &DevAddr,
+								},
+								Settings: &ttnpb.DownlinkMessage_Request{
+									Request: &ttnpb.TxRequest{
+										Class:            ttnpb.CLASS_A,
+										Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+										Rx1DataRateIndex: rx1DRIdx,
+										Rx1Frequency:     rx1Freq,
+										DownlinkPaths: []*ttnpb.DownlinkPath{
+											{
+												Path: &ttnpb.DownlinkPath_UplinkToken{
+													UplinkToken: []byte("testToken2"),
+												},
+											},
+										},
+									},
+								},
+							})
+							a.So(opts, should.Contain, ns.WithClusterAuth())
 							return ttnpb.Empty, nil
 						},
 					}, nil
 
 				default:
-					t.Errorf("Unknown gateway `%s` requested", uid)
+					t.Fatalf("Unknown gateway `%s` requested", uid)
 				}
 				return nil, nil
 			},
@@ -969,7 +1149,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "1.1/Rx1/join accept/empty application downlink queue",
+			Name: "1.1/Rx2/join accept",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return context.WithValue(ctx, deviceKey{}, &ttnpb.EndDevice{
 					FrequencyPlanID: test.EUFrequencyPlanID,
@@ -992,281 +1172,69 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
-							Rx1DataRateOffset: 2,
-							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
-							Channels:          channels[:],
-						},
-						DesiredParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
-							Rx1DataRateOffset: 2,
-							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
-							Channels:          channels[:],
-						},
-						QueuedJoinAccept: []byte("testJoinAccept"),
-						LoRaWANVersion:   ttnpb.MAC_V1_1,
-					},
-					RecentUplinks: []*ttnpb.UplinkMessage{{
-						RxMetadata: []*ttnpb.RxMetadata{
-							{
-								GatewayIdentifiers: gateways[0],
-								Timestamp:          123,
-								SNR:                8.1,
-							},
-							{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          124,
-								SNR:                4,
-							},
-							{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          42,
-								SNR:                -1,
-							},
-						},
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_JOIN_REQUEST,
-							},
-							Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{}},
-						},
-						Settings: ttnpb.TxSettings{
-							DataRateIndex:      ttnpb.DATA_RATE_0,
-							CodingRate:         "4/5",
-							InvertPolarization: false,
-							ChannelIndex:       3,
-						},
-					}},
-				})
-			},
-
-			PopFunc: func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-				t, ok := test.TFromContext(ctx)
-				if !ok {
-					// This is the Pop called by the cluster, block until test is done or the time limit exceeded
-					<-ctx.Done()
-					return ctx.Err()
-				}
-				a := assertions.New(t)
-
-				defer test.MustIncrementContextCounter(ctx, popCallKey{}, 1)
-
-				err := f(ctx, ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-				}, time.Now())
-				a.So(err, should.BeNil)
-
-				return nil
-			},
-
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
-
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID})
-				a.So(devID, should.Equal, DeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"mac_state",
-					"queued_application_downlinks",
-					"recent_downlinks",
-					"recent_uplinks",
-					"session",
-				})
-
-				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatal("Invalid context")
-				}
-
-				expected := CopyEndDevice(pb)
-				expected.MACState.QueuedJoinAccept = nil
-				expected.RecentDownlinks = append(expected.RecentDownlinks,
-					rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-						GatewayIdentifiers: gateways[2],
-						Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay1).UnixNano()),
-					}),
-				)
-
-				ret, paths, err := f(CopyEndDevice(pb))
-				a.So(err, should.BeNil)
-				a.So(paths, should.HaveSameElementsDeep, []string{
-					"mac_state",
-					"queued_application_downlinks",
-					"recent_downlinks",
-					"session",
-				})
-				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) || !a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 1) {
-					t.FailNow()
-				}
-				expected.RecentDownlinks[0].CorrelationIDs = ret.RecentDownlinks[0].CorrelationIDs
-				a.So(ret, should.Resemble, expected)
-				return ret, nil
-			},
-
-			NsGsClient: func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				defer test.MustIncrementContextCounter(ctx, nsGsClientCallKey{}, 1)
-
-				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatal("Invalid context")
-				}
-
-				ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatal("Invalid context")
-				}
-
-				switch uid := unique.ID(ctx, id); uid {
-				case unique.ID(ctx, gateways[0]):
-					a.So(test.MustCounterFromContext(ctx, nsGsClientCallKey{}), should.Equal, 0)
-					return nil, fmt.Errorf("`%s` gsClient error", uid)
-
-				case unique.ID(ctx, gateways[1]):
-					a.So(test.MustCounterFromContext(ctx, nsGsClientCallKey{}), should.Equal, 1)
-					return &MockNsGsClient{
-						ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
-							t := test.MustTFromContext(ctx)
-							a := assertions.New(t)
-
-							defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
-
-							a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
-
-							a.So(msg.CorrelationIDs, should.NotBeEmpty)
-							a.So(msg, should.Resemble, rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          uint64(time.Unix(0, 124).Add(band.JoinAcceptDelay1).UnixNano()),
-							}, msg.CorrelationIDs...))
-							a.So(opts, should.Contain, ns.WithClusterAuth())
-							return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
-						},
-					}, nil
-
-				case unique.ID(ctx, gateways[2]):
-					a.So(test.MustCounterFromContext(ctx, nsGsClientCallKey{}), should.Equal, 2)
-					return &MockNsGsClient{
-						ScheduleDownlinkFunc: func(ctx context.Context, msg *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
-							t := test.MustTFromContext(ctx)
-							a := assertions.New(t)
-
-							defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
-
-							a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
-
-							a.So(msg.CorrelationIDs, should.NotBeEmpty)
-							a.So(msg, should.Resemble, rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay1).UnixNano()),
-							}, msg.CorrelationIDs...))
-							a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
-							return ttnpb.Empty, nil
-						},
-					}, nil
-
-				default:
-					t.Errorf("Unknown gateway `%s` requested", uid)
-				}
-				return nil, nil
-			},
-
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, popCallKey{}), should.Equal, 1) &&
-					a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1) &&
-					a.So(test.MustCounterFromContext(ctx, nsGsClientCallKey{}), should.Equal, 3) &&
-					a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
-			},
-		},
-
-		{
-			Name: "1.1/Rx2/join accept/non-empty application downlink queue",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return context.WithValue(ctx, deviceKey{}, &ttnpb.EndDevice{
-					FrequencyPlanID: test.EUFrequencyPlanID,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
-					Session: &ttnpb.Session{
-						DevAddr: DevAddr,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
-							},
-							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
-							},
-							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
-							},
-						},
-					},
-					MACState: &ttnpb.MACState{
-						CurrentParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
+							Rx1Delay:          ttnpb.RxDelay(band.JoinAcceptDelay1),
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Rx2Frequency:      42,
 							Channels:          channels[:],
 						},
 						DesiredParameters: ttnpb.MACParameters{
-							Rx1Delay:          3,
+							Rx1Delay:          ttnpb.RxDelay(band.JoinAcceptDelay1),
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
 							Rx2Frequency:      42,
 							Channels:          channels[:],
 						},
-						QueuedJoinAccept: []byte("testJoinAccept"),
-						LoRaWANVersion:   ttnpb.MAC_V1_1,
+						DeviceClass:        ttnpb.CLASS_A,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
+						QueuedJoinAccept:   []byte("testJoinAccept"),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{{
-						RxMetadata: []*ttnpb.RxMetadata{
-							{
-								GatewayIdentifiers: gateways[0],
-								Timestamp:          123,
-								SNR:                8.1,
+					MACSettings: &ttnpb.MACSettings{},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
+						{
+							RxMetadata: []*ttnpb.RxMetadata{
+								{
+									GatewayIdentifiers: gateways[0],
+									SNR:                8.1,
+									UplinkToken:        []byte("testToken0"),
+								},
+								{
+									GatewayIdentifiers: gateways[1],
+									SNR:                4,
+									UplinkToken:        []byte("testToken1"),
+								},
+								{
+									GatewayIdentifiers: gateways[2],
+									SNR:                -1,
+									UplinkToken:        []byte("testToken2"),
+								},
 							},
-							{
-								GatewayIdentifiers: gateways[1],
-								Timestamp:          124,
-								SNR:                4,
+							Settings: ttnpb.TxSettings{
+								DataRateIndex: ttnpb.DATA_RATE_0,
+								ChannelIndex:  3,
 							},
-							{
-								GatewayIdentifiers: gateways[2],
-								Timestamp:          42,
-								SNR:                -1,
+							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
+							ReceivedAt:     time.Now().Add(time.Hour),
+							Payload: &ttnpb.Message{
+								MHDR: ttnpb.MHDR{
+									MType: ttnpb.MType_JOIN_REQUEST,
+								},
+								Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{}},
 							},
-						},
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_JOIN_REQUEST,
-							},
-							Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{}},
-						},
-						Settings: ttnpb.TxSettings{
-							DataRateIndex:      ttnpb.DATA_RATE_0,
-							CodingRate:         "4/5",
-							InvertPolarization: false,
-							ChannelIndex:       3,
-						},
-					}},
+						}},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							SessionKeyID:   "testKeyID",
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
-							CorrelationIDs: []string{"testCorrelationID1", "testCorrelationID2"},
+							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
 						},
 					},
 				})
@@ -1296,8 +1264,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
-
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID})
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1309,19 +1275,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				})
 
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+
 				pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-
-				expected := CopyEndDevice(pb)
-				expected.MACState.QueuedJoinAccept = nil
-				expected.RecentDownlinks = append(expected.RecentDownlinks,
-					rx2Downlink(pb.MACState.QueuedJoinAccept, 42, ttnpb.DATA_RATE_1, ttnpb.TxMetadata{
-						GatewayIdentifiers: gateways[2],
-						Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay2).UnixNano()),
-					}),
-				)
 
 				ret, paths, err := f(CopyEndDevice(pb))
 				a.So(err, should.BeNil)
@@ -1331,11 +1290,45 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"recent_downlinks",
 					"session",
 				})
-				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) || !a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 1) {
+				if !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
 					t.FailNow()
 				}
-				expected.RecentDownlinks[0].CorrelationIDs = ret.RecentDownlinks[0].CorrelationIDs
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.HaveLength, 3)
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID1")
+				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID2")
+
+				expected := CopyEndDevice(pb)
+				expected.MACState.PendingApplicationDownlink = nil
+				expected.MACState.PendingRequests = nil
+				expected.MACState.QueuedJoinAccept = nil
+				expected.MACState.QueuedResponses = nil
+				expected.MACState.RxWindowsAvailable = false
+				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
+					RawPayload:     []byte("testJoinAccept"),
+					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
+					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+						DeviceID:               DeviceID,
+						DevAddr:                &DevAddr,
+					},
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+							Rx2Frequency:     42,
+							DownlinkPaths: []*ttnpb.DownlinkPath{
+								{
+									Path: &ttnpb.DownlinkPath_UplinkToken{
+										UplinkToken: []byte("testToken2"),
+									},
+								},
+							},
+						},
+					},
+				})
 				a.So(ret, should.Resemble, expected)
+
 				return ret, nil
 			},
 
@@ -1347,15 +1340,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					defer test.MustIncrementContextCounter(ctx, nsGsClientCallKey{}, 1)
 
-					pb, ok := ctx.Value(deviceKey{}).(*ttnpb.EndDevice)
-					if !a.So(ok, should.BeTrue) {
-						t.Fatal("Invalid context")
-					}
-
 					ns, ok := ctx.Value(nsKey{}).(*NetworkServer)
 					if !a.So(ok, should.BeTrue) {
 						t.Fatal("Invalid context")
 					}
+					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 
 					switch uid := unique.ID(ctx, id); uid {
 					case unique.ID(ctx, gateways[0]):
@@ -1377,13 +1367,34 @@ func TestProcessDownlinkTask(t *testing.T) {
 									defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 									a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
-
-									a.So(msg.CorrelationIDs, should.NotBeEmpty)
-									a.So(msg, should.Resemble, rx2Downlink(pb.MACState.QueuedJoinAccept, 42, ttnpb.DATA_RATE_1, ttnpb.TxMetadata{
-										GatewayIdentifiers: gateways[1],
-										Timestamp:          uint64(time.Unix(0, 124).Add(band.JoinAcceptDelay2).UnixNano()),
-									}, msg.CorrelationIDs...))
-									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+									a.So(msg.CorrelationIDs, should.HaveLength, 3)
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+										RawPayload:     []byte("testJoinAccept"),
+										CorrelationIDs: msg.CorrelationIDs,
+										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+											DeviceID:               DeviceID,
+											DevAddr:                &DevAddr,
+										},
+										Settings: &ttnpb.DownlinkMessage_Request{
+											Request: &ttnpb.TxRequest{
+												Class:            ttnpb.CLASS_A,
+												Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+												Rx2Frequency:     42,
+												DownlinkPaths: []*ttnpb.DownlinkPath{
+													{
+														Path: &ttnpb.DownlinkPath_UplinkToken{
+															UplinkToken: []byte("testToken1"),
+														},
+													},
+												},
+											},
+										},
+									})
+									a.So(opts, should.Contain, ns.WithClusterAuth())
 									return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 								},
 							}, nil
@@ -1398,12 +1409,33 @@ func TestProcessDownlinkTask(t *testing.T) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
-
-								a.So(msg.CorrelationIDs, should.NotBeEmpty)
-								a.So(msg, should.Resemble, rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-									GatewayIdentifiers: gateways[1],
-									Timestamp:          uint64(time.Unix(0, 124).Add(band.JoinAcceptDelay1).UnixNano()),
-								}, msg.CorrelationIDs...))
+								a.So(msg.CorrelationIDs, should.HaveLength, 3)
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+									RawPayload:     []byte("testJoinAccept"),
+									CorrelationIDs: msg.CorrelationIDs,
+									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+										DeviceID:               DeviceID,
+										DevAddr:                &DevAddr,
+									},
+									Settings: &ttnpb.DownlinkMessage_Request{
+										Request: &ttnpb.TxRequest{
+											Class:            ttnpb.CLASS_A,
+											Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+											Rx1DataRateIndex: rx1DRIdx,
+											Rx1Frequency:     rx1Freq,
+											DownlinkPaths: []*ttnpb.DownlinkPath{
+												{
+													Path: &ttnpb.DownlinkPath_UplinkToken{
+														UplinkToken: []byte("testToken1"),
+													},
+												},
+											},
+										},
+									},
+								})
 								a.So(opts, should.Contain, ns.WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
@@ -1422,13 +1454,34 @@ func TestProcessDownlinkTask(t *testing.T) {
 									defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 									a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 3)
-
-									a.So(msg.CorrelationIDs, should.NotBeEmpty)
-									a.So(msg, should.Resemble, rx2Downlink(pb.MACState.QueuedJoinAccept, 42, ttnpb.DATA_RATE_1, ttnpb.TxMetadata{
-										GatewayIdentifiers: gateways[2],
-										Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay2).UnixNano()),
-									}, msg.CorrelationIDs...))
-									a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+									a.So(msg.CorrelationIDs, should.HaveLength, 3)
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+										RawPayload:     []byte("testJoinAccept"),
+										CorrelationIDs: msg.CorrelationIDs,
+										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+											DeviceID:               DeviceID,
+											DevAddr:                &DevAddr,
+										},
+										Settings: &ttnpb.DownlinkMessage_Request{
+											Request: &ttnpb.TxRequest{
+												Class:            ttnpb.CLASS_A,
+												Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+												Rx2Frequency:     42,
+												DownlinkPaths: []*ttnpb.DownlinkPath{
+													{
+														Path: &ttnpb.DownlinkPath_UplinkToken{
+															UplinkToken: []byte("testToken2"),
+														},
+													},
+												},
+											},
+										},
+									})
+									a.So(opts, should.Contain, ns.WithClusterAuth())
 									return ttnpb.Empty, nil
 								},
 							}, nil
@@ -1443,19 +1496,40 @@ func TestProcessDownlinkTask(t *testing.T) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
-
-								a.So(msg.CorrelationIDs, should.NotBeEmpty)
-								a.So(msg, should.Resemble, rx1Downlink(pb.MACState.QueuedJoinAccept, 3, ttnpb.DATA_RATE_0, 2, false, ttnpb.TxMetadata{
-									GatewayIdentifiers: gateways[2],
-									Timestamp:          uint64(time.Unix(0, 42).Add(band.JoinAcceptDelay1).UnixNano()),
-								}, msg.CorrelationIDs...))
-								a.So(opts, should.Contain, ctx.Value(nsKey{}).(*NetworkServer).WithClusterAuth())
+								a.So(msg.CorrelationIDs, should.HaveLength, 3)
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
+								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
+								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+									RawPayload:     []byte("testJoinAccept"),
+									CorrelationIDs: msg.CorrelationIDs,
+									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+										DeviceID:               DeviceID,
+										DevAddr:                &DevAddr,
+									},
+									Settings: &ttnpb.DownlinkMessage_Request{
+										Request: &ttnpb.TxRequest{
+											Class:            ttnpb.CLASS_A,
+											Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+											Rx1DataRateIndex: rx1DRIdx,
+											Rx1Frequency:     rx1Freq,
+											DownlinkPaths: []*ttnpb.DownlinkPath{
+												{
+													Path: &ttnpb.DownlinkPath_UplinkToken{
+														UplinkToken: []byte("testToken2"),
+													},
+												},
+											},
+										},
+									},
+								})
+								a.So(opts, should.Contain, ns.WithClusterAuth())
 								return nil, fmt.Errorf("`%s` ScheduleDownlink error", uid)
 							},
 						}, nil
 
 					default:
-						t.Errorf("Unknown gateway `%s` requested", uid)
+						t.Fatalf("Unknown gateway `%s` requested", uid)
 					}
 					return nil, nil
 				}

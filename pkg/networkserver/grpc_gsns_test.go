@@ -983,8 +983,9 @@ func handleUplinkTest() func(t *testing.T) {
 
 					case we := <-collectionDoneCh:
 						close(we.ch)
-						a.So(<-errch, should.BeNil)
-						t.Fatal("Downlink (n)ack not sent to AS")
+						err := <-errch
+						a.So(err, should.BeNil)
+						t.Fatalf("Downlink (n)ack not sent to AS: %v", errors.Stack(err))
 
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
@@ -1044,6 +1045,7 @@ func handleUplinkTest() func(t *testing.T) {
 							t.FailNow()
 						}
 					}
+					pb.MACState.RxWindowsAvailable = true
 					pb.MACState.PendingApplicationDownlink = nil
 
 					msg := CopyUplinkMessage(tc.UplinkMessage)
@@ -1593,6 +1595,7 @@ func handleJoinTest() func(t *testing.T) {
 							t.FailNow()
 						}
 
+						pb.MACState.RxWindowsAvailable = true
 						pb.MACState.QueuedJoinAccept = resp.RawPayload
 						pb.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
 						pb.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
