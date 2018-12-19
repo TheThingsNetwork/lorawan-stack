@@ -57,6 +57,7 @@ The component or topic is typically a few characters long and should always be p
 - `as`: Application Server
 - `is`: Identity Server
 - `console`: Console
+- `cli`: Command-line Interface
 - `util`: utilities
 - `ci`: CI instructions, e.g. Travis file
 - `doc`: documentation
