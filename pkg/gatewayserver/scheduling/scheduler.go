@@ -111,7 +111,7 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 	if settings.Time != nil {
 		relative = s.clock.GatewayTime(*settings.Time)
 	} else {
-		relative = ConcentratorTime(time.Duration(settings.Timestamp) * time.Microsecond)
+		relative = s.clock.TimestampTime(settings.Timestamp)
 	}
 	return NewEmission(relative, d), nil
 }

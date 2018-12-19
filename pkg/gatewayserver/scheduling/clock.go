@@ -25,6 +25,8 @@ type Clock interface {
 	ServerTime(server time.Time) ConcentratorTime
 	// GatewayTime returns an indication of the concentrator time at the given gateway time.
 	GatewayTime(time.Time) ConcentratorTime
+	// TimestampTime returns the concentrator time for the given timestamp.
+	TimestampTime(timestamp uint32) ConcentratorTime
 }
 
 // RolloverClock is a Clock that takes roll-over of uint32 concentrator time into account.
@@ -35,14 +37,10 @@ type RolloverClock struct {
 }
 
 // Sync synchronizes the clock with the given concentrator time v, the server time and the gateway time that
-// corresponds to the given v.
-func (c *RolloverClock) Sync(v uint32, server, gateway time.Time) {
-	passed := int64(v) - int64(c.relative)
-	if passed < 0 {
-		passed += math.MaxUint32
-	}
-	c.relative = v
-	c.absolute = c.absolute + ConcentratorTime(time.Duration(passed)*time.Microsecond)
+// corresponds to the given timestamp.
+func (c *RolloverClock) Sync(timestamp uint32, server, gateway time.Time) {
+	c.absolute = c.TimestampTime(timestamp)
+	c.relative = timestamp
 	c.server = server
 	c.gateway = gateway
 }
@@ -55,4 +53,13 @@ func (c *RolloverClock) ServerTime(server time.Time) ConcentratorTime {
 // GatewayTime implements Clock.
 func (c *RolloverClock) GatewayTime(gateway time.Time) ConcentratorTime {
 	return c.absolute + ConcentratorTime(gateway.Sub(c.gateway))
+}
+
+// TimestampTime implements Clock.
+func (c *RolloverClock) TimestampTime(timestamp uint32) ConcentratorTime {
+	passed := int64(timestamp) - int64(c.relative)
+	if passed < 0 {
+		passed += math.MaxUint32
+	}
+	return c.absolute + ConcentratorTime(time.Duration(passed)*time.Microsecond)
 }
