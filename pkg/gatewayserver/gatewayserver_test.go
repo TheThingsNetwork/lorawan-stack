@@ -694,10 +694,10 @@ func TestGatewayServer(t *testing.T) {
 				ctx := cluster.NewContext(test.Context(), nil)
 				downlinkCount := 0
 				for _, tc := range []struct {
-					Name                          string
-					Message                       *ttnpb.DownlinkMessage
-					AssertError                   func(error) bool
-					AssertScheduleRxWindowDetails []func(error) bool
+					Name                     string
+					Message                  *ttnpb.DownlinkMessage
+					ErrorAssertion           func(error) bool
+					RxWindowDetailsAssertion []func(error) bool
 				}{
 					{
 						Name: "InvalidSettingsType",
@@ -715,7 +715,7 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						AssertError: errors.IsInvalidArgument, // Network Server may send Tx request only.
+						ErrorAssertion: errors.IsInvalidArgument, // Network Server may send Tx request only.
 					},
 					{
 						Name: "NotConnected",
@@ -732,7 +732,7 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						AssertError: errors.IsAborted, // The gateway is not connected.
+						ErrorAssertion: errors.IsAborted, // The gateway is not connected.
 					},
 					{
 						Name: "ValidClassA",
@@ -779,8 +779,8 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						AssertError: errors.IsAborted,
-						AssertScheduleRxWindowDetails: []func(error) bool{
+						ErrorAssertion: errors.IsAborted,
+						RxWindowDetailsAssertion: []func(error) bool{
 							errors.IsResourceExhausted,  // Rx1 conflicts with previous.
 							errors.IsFailedPrecondition, // Rx2 not provided.
 						},
@@ -791,15 +791,15 @@ func TestGatewayServer(t *testing.T) {
 
 						_, err := gs.ScheduleDownlink(ctx, tc.Message)
 						if err != nil {
-							if tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue) {
+							if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 								t.Fatalf("Unexpected error: %v", err)
 							}
-							if tc.AssertScheduleRxWindowDetails != nil {
+							if tc.RxWindowDetailsAssertion != nil {
 								a.So(err, should.HaveSameErrorDefinitionAs, gatewayserver.ErrSchedule)
 								a.So(errors.Details(err), should.HaveLength, 1)
 								errSchedulePathCause := errors.Cause(errors.Details(err)[0].(error))
 								a.So(errors.IsAborted(errSchedulePathCause), should.BeTrue)
-								for i, assert := range tc.AssertScheduleRxWindowDetails {
+								for i, assert := range tc.RxWindowDetailsAssertion {
 									errRxWindow := errors.Details(errSchedulePathCause)[i].(error)
 									if !a.So(assert(errRxWindow), should.BeTrue) {
 										t.Fatalf("Unexpected Rx window %d error: %v", i+1, errRxWindow)
@@ -807,7 +807,7 @@ func TestGatewayServer(t *testing.T) {
 								}
 							}
 							return
-						} else if tc.AssertError != nil {
+						} else if tc.ErrorAssertion != nil {
 							t.Fatalf("Expected error")
 						}
 						downlinkCount++

@@ -128,16 +128,16 @@ func TestProtobufV2Uplinks(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name         string
-		Input        *legacyttnpb.UplinkMessage
-		InputPayload []byte
-		Expected     *ttnpb.UplinkMessage
-		AssertError  func(error) bool
+		Name           string
+		Input          *legacyttnpb.UplinkMessage
+		InputPayload   []byte
+		Expected       *ttnpb.UplinkMessage
+		ErrorAssertion func(error) bool
 	}{
 		{
-			Name:        "empty Input",
-			Input:       &legacyttnpb.UplinkMessage{},
-			AssertError: func(err error) bool { return err != nil },
+			Name:           "empty Input",
+			Input:          &legacyttnpb.UplinkMessage{},
+			ErrorAssertion: func(err error) bool { return err != nil },
 		},
 		{
 			Name: "correct Input",
@@ -176,7 +176,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 					},
 				},
 			},
-			AssertError: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name: "incorrect modulation",
@@ -191,7 +191,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 					},
 				},
 			},
-			AssertError: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
 		tcok := t.Run(tc.Name, func(t *testing.T) {
@@ -201,8 +201,8 @@ func TestProtobufV2Uplinks(t *testing.T) {
 				t.FailNow()
 			}
 			res, err := mqtt.ProtobufV2.ToUplink(buf)
-			if tc.AssertError != nil {
-				if !a.So(tc.AssertError(err), should.BeTrue) {
+			if tc.ErrorAssertion != nil {
+				if !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.FailNow()
 				}
 				return
@@ -220,10 +220,10 @@ func TestProtobufV2Uplinks(t *testing.T) {
 
 func TestProtobufV2Status(t *testing.T) {
 	for _, tc := range []struct {
-		Name        string
-		input       *legacyttnpb.StatusMessage
-		Expected    *ttnpb.GatewayStatus
-		AssertError func(error) bool
+		Name           string
+		input          *legacyttnpb.StatusMessage
+		Expected       *ttnpb.GatewayStatus
+		ErrorAssertion func(error) bool
 	}{
 		{
 			Name: "Simple",
@@ -351,8 +351,8 @@ func TestProtobufV2Status(t *testing.T) {
 				t.FailNow()
 			}
 			res, err := mqtt.ProtobufV2.ToStatus(buf)
-			if tc.AssertError != nil {
-				if !a.So(tc.AssertError(err), should.BeTrue) {
+			if tc.ErrorAssertion != nil {
+				if !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.FailNow()
 				}
 				return

@@ -47,11 +47,11 @@ func TestScheduleAt(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
-		PayloadSize int
-		Settings    ttnpb.TxSettings
-		Priority    ttnpb.TxSchedulePriority
-		ExpectedToa time.Duration
-		AssertError *errors.Definition
+		PayloadSize    int
+		Settings       ttnpb.TxSettings
+		Priority       ttnpb.TxSchedulePriority
+		ExpectedToa    time.Duration
+		ErrorAssertion *errors.Definition
 	}{
 		{
 			PayloadSize: 51,
@@ -66,7 +66,7 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedToa: 2465792 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Exceeding dwell time of 2 seconds.
-			AssertError: &scheduling.ErrDwellTime,
+			ErrorAssertion: &scheduling.ErrDwellTime,
 		},
 		{
 			PayloadSize: 10,
@@ -94,7 +94,7 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Overlapping with previous transmission.
-			AssertError: &scheduling.ErrConflict,
+			ErrorAssertion: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -109,7 +109,7 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Right after previous transmission; not respecting time-off-air and queue delay.
-			AssertError: &scheduling.ErrConflict,
+			ErrorAssertion: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -124,7 +124,7 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Right after previous transmission; not respecting queue delay.
-			AssertError: &scheduling.ErrConflict,
+			ErrorAssertion: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -152,7 +152,7 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedToa: 1318912 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Exceeds duty-cycle limitation of 1% in 868.0 - 868.6.
-			AssertError: &scheduling.ErrDutyCycle,
+			ErrorAssertion: &scheduling.ErrDutyCycle,
 		},
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -161,10 +161,10 @@ func TestScheduleAt(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)
 			_, err = scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, tc.Priority)
-			if err != nil && tc.AssertError == nil {
+			if err != nil && tc.ErrorAssertion == nil {
 				a.So(err, should.BeNil)
 			} else if err != nil {
-				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.AssertError) {
+				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ErrorAssertion) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
 			} else {

@@ -117,11 +117,11 @@ func Test(t *testing.T) {
 
 	received := 0
 	for _, tc := range []struct {
-		Name          string
-		Path          *ttnpb.DownlinkPath
-		Message       *ttnpb.DownlinkMessage
-		AssertError   func(error) bool
-		AssertDetails []func(error) bool
+		Name            string
+		Path            *ttnpb.DownlinkPath
+		Message         *ttnpb.DownlinkMessage
+		ErrorAssertion  func(error) bool
+		DetailAssertion []func(error) bool
 	}{
 		{
 			Name: "Invalid/NoRequest",
@@ -134,7 +134,7 @@ func Test(t *testing.T) {
 					},
 				},
 			},
-			AssertError: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name: "ValidClassA",
@@ -169,8 +169,8 @@ func Test(t *testing.T) {
 					},
 				},
 			},
-			AssertError: errors.IsAborted,
-			AssertDetails: []func(error) bool{
+			ErrorAssertion: errors.IsAborted,
+			DetailAssertion: []func(error) bool{
 				errors.IsResourceExhausted,  // Rx1 conflicts with previous.
 				errors.IsFailedPrecondition, // Rx2 not provided.
 			},
@@ -221,7 +221,7 @@ func Test(t *testing.T) {
 					},
 				},
 			},
-			AssertError: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name: "InvalidDownlinkChannel",
@@ -237,24 +237,24 @@ func Test(t *testing.T) {
 					},
 				},
 			},
-			AssertError: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			err := conn.SendDown(tc.Path, tc.Message)
 			if err != nil {
-				if tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue) {
+				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
-				for i, assert := range tc.AssertDetails {
+				for i, assert := range tc.DetailAssertion {
 					errDetail := errors.Details(err)[i].(error)
 					if !a.So(assert(errDetail), should.BeTrue) {
 						t.Fatalf("Unexpected Rx window %d error: %v", i+1, errDetail)
 					}
 				}
 				return
-			} else if tc.AssertError != nil {
+			} else if tc.ErrorAssertion != nil {
 				t.Fatal("Expected error but got none")
 			}
 

@@ -15,7 +15,7 @@
 package scheduling
 
 var (
-	ErrConflict = errConflict
+	ErrConflict  = errConflict
 	ErrDwellTime = errDwellTime
 	ErrDutyCycle = errDutyCycle
 )

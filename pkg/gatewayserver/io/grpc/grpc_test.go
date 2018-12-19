@@ -238,9 +238,9 @@ func TestTraffic(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		for i, tc := range []struct {
-			Path        *ttnpb.DownlinkPath
-			Message     *ttnpb.DownlinkMessage
-			AssertError func(error) bool
+			Path           *ttnpb.DownlinkPath
+			Message        *ttnpb.DownlinkMessage
+			ErrorAssertion func(error) bool
 		}{
 			{
 				Path: &ttnpb.DownlinkPath{
@@ -277,7 +277,7 @@ func TestTraffic(t *testing.T) {
 						},
 					},
 				},
-				AssertError: errors.IsInvalidArgument, // Does not support scheduled downlink; the Gateway Server or gateway will take care of that.
+				ErrorAssertion: errors.IsInvalidArgument, // Does not support scheduled downlink; the Gateway Server or gateway will take care of that.
 			},
 			{
 				Path: &ttnpb.DownlinkPath{
@@ -286,25 +286,25 @@ func TestTraffic(t *testing.T) {
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
 				},
-				AssertError: errors.IsInvalidArgument, // Tx request missing.
+				ErrorAssertion: errors.IsInvalidArgument, // Tx request missing.
 			},
 		} {
 			t.Run(strconv.Itoa(i), func(t *testing.T) {
 				a := assertions.New(t)
 
 				err := conn.SendDown(tc.Path, tc.Message)
-				if err != nil && (tc.AssertError == nil || !a.So(tc.AssertError(err), should.BeTrue)) {
+				if err != nil && (tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue)) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
 				select {
 				case down := <-downCh:
-					if tc.AssertError == nil {
+					if tc.ErrorAssertion == nil {
 						a.So(down, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Unexpected message: %v", down)
 					}
 				case <-time.After(timeout):
-					if tc.AssertError == nil {
+					if tc.ErrorAssertion == nil {
 						t.Fatal("Receive expected downlink timeout")
 					}
 				}
