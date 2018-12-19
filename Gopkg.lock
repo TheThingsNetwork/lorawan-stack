@@ -397,6 +397,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:f81c8d7354cc0c6340f2f7a48724ee6c2b3db3e918ecd441c985b4d2d97dd3e7"
+  name = "github.com/howeyc/gopass"
+  packages = ["."]
+  pruneopts = ""
+  revision = "bf9dde6d0d2c004a008c27aaee91170c786f6db8"
+
+[[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
@@ -809,6 +817,7 @@
     "acme",
     "acme/autocert",
     "pbkdf2",
+    "ssh/terminal",
   ]
   pruneopts = ""
   revision = "eb0de9b17e854e9b1ccd9963efafc79862359959"
@@ -861,7 +870,10 @@
   branch = "master"
   digest = "1:f358024b019f87eecaadcb098113a40852c94fe58ea670ef3c3e2d2c7bd93db1"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows",
+  ]
   pruneopts = ""
   revision = "4ed8d59d0b35e1e29334a206d1b3f38b1e5dfb31"
 
@@ -1056,6 +1068,7 @@
     "github.com/grpc-ecosystem/go-grpc-prometheus",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
+    "github.com/howeyc/gopass",
     "github.com/jacobsa/crypto/cmac",
     "github.com/jaytaylor/html2text",
     "github.com/kr/pretty",

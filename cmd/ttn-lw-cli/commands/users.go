@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"github.com/gogo/protobuf/types"
+	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -159,6 +160,50 @@ var (
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}
+	usersUpdatePasswordCommand = &cobra.Command{
+		Use:     "update-password",
+		Aliases: []string{"change-password"},
+		Short:   "Update a user password",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			old, _ := cmd.Flags().GetString("old")
+			if old == "" {
+				pw, err := gopass.GetPasswdPrompt("Please enter old password:", true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
+				old = string(pw)
+			}
+
+			new, _ := cmd.Flags().GetString("new")
+			if new == "" {
+				pw, err := gopass.GetPasswdPrompt("Please enter new password:", true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
+				new = string(pw)
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserRegistryClient(is).UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+				UserIdentifiers: *usrID,
+				Old:             old,
+				New:             new,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res)
+		},
+	}
 	usersDeleteCommand = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete a user",
@@ -194,6 +239,10 @@ func init() {
 	usersUpdateCommand.Flags().AddFlagSet(setUserFlags)
 	usersUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	usersCommand.AddCommand(usersUpdateCommand)
+	usersUpdatePasswordCommand.Flags().AddFlagSet(userIDFlags())
+	usersUpdatePasswordCommand.Flags().String("old", "", "")
+	usersUpdatePasswordCommand.Flags().String("new", "", "")
+	usersCommand.AddCommand(usersUpdatePasswordCommand)
 	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersDeleteCommand)
 	Root.AddCommand(usersCommand)
