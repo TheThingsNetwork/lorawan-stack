@@ -90,6 +90,32 @@ var (
 			return io.Write(os.Stdout, config.Format, res.Clients)
 		},
 	}
+	clientsSearchCommand = &cobra.Command{
+		Use:   "search",
+		Short: "Search for clients",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			paths := util.SelectFieldMask(cmd.Flags(), selectClientFlags)
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, will select everything")
+				selectClientFlags.VisitAll(func(flag *pflag.Flag) {
+					paths = append(paths, flag.Name)
+				})
+			}
+			req := getSearchEntitiesRequest(cmd.Flags())
+			req.FieldMask.Paths = paths
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchClients(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.Clients)
+		},
+	}
 	clientsGetCommand = &cobra.Command{
 		Use:     "get",
 		Aliases: []string{"info"},
@@ -220,6 +246,9 @@ func init() {
 	clientsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	clientsListCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsCommand.AddCommand(clientsListCommand)
+	clientsSearchCommand.Flags().AddFlagSet(searchFlags())
+	clientsSearchCommand.Flags().AddFlagSet(selectClientFlags)
+	clientsCommand.AddCommand(clientsSearchCommand)
 	clientsGetCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsGetCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsCommand.AddCommand(clientsGetCommand)

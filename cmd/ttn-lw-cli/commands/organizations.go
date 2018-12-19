@@ -90,6 +90,32 @@ var (
 			return io.Write(os.Stdout, config.Format, res.Organizations)
 		},
 	}
+	organizationsSearchCommand = &cobra.Command{
+		Use:   "search",
+		Short: "Search for organizations",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			paths := util.SelectFieldMask(cmd.Flags(), selectOrganizationFlags)
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, will select everything")
+				selectOrganizationFlags.VisitAll(func(flag *pflag.Flag) {
+					paths = append(paths, flag.Name)
+				})
+			}
+			req := getSearchEntitiesRequest(cmd.Flags())
+			req.FieldMask.Paths = paths
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchOrganizations(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.Organizations)
+		},
+	}
 	organizationsGetCommand = &cobra.Command{
 		Use:     "get",
 		Aliases: []string{"info"},
@@ -216,6 +242,9 @@ func init() {
 	organizationsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	organizationsListCommand.Flags().AddFlagSet(selectOrganizationFlags)
 	organizationsCommand.AddCommand(organizationsListCommand)
+	organizationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	organizationsSearchCommand.Flags().AddFlagSet(selectOrganizationFlags)
+	organizationsCommand.AddCommand(organizationsSearchCommand)
 	organizationsGetCommand.Flags().AddFlagSet(organizationIDFlags())
 	organizationsGetCommand.Flags().AddFlagSet(selectOrganizationFlags)
 	organizationsCommand.AddCommand(organizationsGetCommand)

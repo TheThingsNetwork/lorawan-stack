@@ -104,3 +104,25 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string) string {
 	}
 	return apiKeyID
 }
+
+func searchFlags() *pflag.FlagSet {
+	flagSet := new(pflag.FlagSet)
+	flagSet.String("id-contains", "", "")
+	flagSet.String("name-contains", "", "")
+	flagSet.String("description-contains", "", "")
+	flagSet.StringToString("attributes-contain", nil, "(key=value)")
+	return flagSet
+}
+
+func getSearchEntitiesRequest(flagSet *pflag.FlagSet) *ttnpb.SearchEntitiesRequest {
+	idContains, _ := flagSet.GetString("id-contains")
+	nameContains, _ := flagSet.GetString("name-contains")
+	descriptionContains, _ := flagSet.GetString("description-contains")
+	attributesContain, _ := flagSet.GetStringToString("attributes-contain")
+	return &ttnpb.SearchEntitiesRequest{
+		IDContains:          idContains,
+		NameContains:        nameContains,
+		DescriptionContains: descriptionContains,
+		AttributesContain:   attributesContain,
+	}
+}

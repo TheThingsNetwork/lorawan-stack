@@ -63,6 +63,32 @@ var (
 		Aliases: []string{"user", "usr", "u"},
 		Short:   "User commands",
 	}
+	usersSearchCommand = &cobra.Command{
+		Use:   "search",
+		Short: "Search for users",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, will select everything")
+				selectUserFlags.VisitAll(func(flag *pflag.Flag) {
+					paths = append(paths, flag.Name)
+				})
+			}
+			req := getSearchEntitiesRequest(cmd.Flags())
+			req.FieldMask.Paths = paths
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchUsers(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.Users)
+		},
+	}
 	usersGetCommand = &cobra.Command{
 		Use:     "get",
 		Aliases: []string{"info"},
@@ -228,6 +254,9 @@ var (
 )
 
 func init() {
+	usersSearchCommand.Flags().AddFlagSet(searchFlags())
+	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
+	usersCommand.AddCommand(usersSearchCommand)
 	usersGetCommand.Flags().AddFlagSet(userIDFlags())
 	usersGetCommand.Flags().AddFlagSet(selectUserFlags)
 	usersCommand.AddCommand(usersGetCommand)

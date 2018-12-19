@@ -90,6 +90,32 @@ var (
 			return io.Write(os.Stdout, config.Format, res.Applications)
 		},
 	}
+	applicationsSearchCommand = &cobra.Command{
+		Use:   "search",
+		Short: "Search for applications",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, will select everything")
+				selectApplicationFlags.VisitAll(func(flag *pflag.Flag) {
+					paths = append(paths, flag.Name)
+				})
+			}
+			req := getSearchEntitiesRequest(cmd.Flags())
+			req.FieldMask.Paths = paths
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchApplications(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.Applications)
+		},
+	}
 	applicationsGetCommand = &cobra.Command{
 		Use:     "get",
 		Aliases: []string{"info"},
@@ -216,6 +242,9 @@ func init() {
 	applicationsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	applicationsListCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsCommand.AddCommand(applicationsListCommand)
+	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
+	applicationsCommand.AddCommand(applicationsSearchCommand)
 	applicationsGetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsGetCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsCommand.AddCommand(applicationsGetCommand)

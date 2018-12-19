@@ -90,6 +90,32 @@ var (
 			return io.Write(os.Stdout, config.Format, res.Gateways)
 		},
 	}
+	gatewaysSearchCommand = &cobra.Command{
+		Use:   "search",
+		Short: "Search for gateways",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, will select everything")
+				selectGatewayFlags.VisitAll(func(flag *pflag.Flag) {
+					paths = append(paths, flag.Name)
+				})
+			}
+			req := getSearchEntitiesRequest(cmd.Flags())
+			req.FieldMask.Paths = paths
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchGateways(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.Gateways)
+		},
+	}
 	gatewaysGetCommand = &cobra.Command{
 		Use:     "get",
 		Aliases: []string{"info"},
@@ -216,6 +242,9 @@ func init() {
 	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)
+	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
+	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
+	gatewaysCommand.AddCommand(gatewaysSearchCommand)
 	gatewaysGetCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysGetCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysGetCommand)
