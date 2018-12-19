@@ -179,9 +179,9 @@ var (
 		Use:   "push",
 		Short: "Push to the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID := getEndDeviceID(cmd.Flags(), args)
-			if devID == nil {
-				return errNoEndDeviceID
+			devID, err := getEndDeviceID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			var downlink ttnpb.ApplicationDownlink
@@ -206,9 +206,9 @@ var (
 		Use:   "replace",
 		Short: "Replace the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID := getEndDeviceID(cmd.Flags(), args)
-			if devID == nil {
-				return errNoEndDeviceID
+			devID, err := getEndDeviceID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			var downlink ttnpb.ApplicationDownlink
@@ -233,9 +233,9 @@ var (
 		Use:   "clear",
 		Short: "Clear the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID := getEndDeviceID(cmd.Flags(), args)
-			if devID == nil {
-				return errNoEndDeviceID
+			devID, err := getEndDeviceID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
@@ -256,9 +256,9 @@ var (
 		Use:   "list",
 		Short: "List the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID := getEndDeviceID(cmd.Flags(), args)
-			if devID == nil {
-				return errNoEndDeviceID
+			devID, err := getEndDeviceID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
@@ -297,5 +297,10 @@ func init() {
 	applicationsDownlinkCommand.AddCommand(applicationsDownlinkClearCommand)
 	applicationsDownlinkListCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	applicationsDownlinkCommand.AddCommand(applicationsDownlinkListCommand)
-	applicationsCommand.AddCommand(applicationsDownlinkCommand)
+
+	// The applicationsDownlinkCommand is placed under the end device command
+	// It's aliased here, but hidden from the documentation.
+	hiddenDownlink := *applicationsDownlinkCommand
+	hiddenDownlink.Hidden = true
+	applicationsCommand.AddCommand(&hiddenDownlink)
 }
