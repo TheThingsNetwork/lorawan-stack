@@ -51,13 +51,16 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		return nil, errNestedOrganizations
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		orgStore := store.GetOrganizationStore(db)
-		org, err = orgStore.CreateOrganization(ctx, &req.Organization)
+		org, err = store.GetOrganizationStore(db).CreateOrganization(ctx, &req.Organization)
 		if err != nil {
 			return err
 		}
-		memberStore := store.GetMembershipStore(db)
-		if err = memberStore.SetMember(ctx, &req.Collaborator, org.OrganizationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL)); err != nil {
+		if err = store.GetMembershipStore(db).SetMember(
+			ctx,
+			&req.Collaborator,
+			org.OrganizationIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL),
+		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -89,8 +92,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		orgStore := store.GetOrganizationStore(db)
-		org, err = orgStore.GetOrganization(ctx, &req.OrganizationIdentifiers, &req.FieldMask)
+		org, err = store.GetOrganizationStore(db).GetOrganization(ctx, &req.OrganizationIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -142,8 +144,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	orgs = &ttnpb.Organizations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if orgRights == nil {
-			memberStore := store.GetMembershipStore(db)
-			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "organization")
+			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "organization")
 			if err != nil {
 				return err
 			}
@@ -163,8 +164,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 			}
 			orgIDs = append(orgIDs, &orgID)
 		}
-		orgStore := store.GetOrganizationStore(db)
-		orgs.Organizations, err = orgStore.FindOrganizations(ctx, orgIDs, &req.FieldMask)
+		orgs.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -186,8 +186,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		orgStore := store.GetOrganizationStore(db)
-		org, err = orgStore.UpdateOrganization(ctx, &req.Organization, &req.FieldMask)
+		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, &req.Organization, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -212,8 +211,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		orgStore := store.GetOrganizationStore(db)
-		return orgStore.DeleteOrganization(ctx, ids)
+		return store.GetOrganizationStore(db).DeleteOrganization(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

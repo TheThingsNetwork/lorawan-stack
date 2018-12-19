@@ -287,7 +287,12 @@ func (p *Populator) populateAPIKeys(ctx context.Context, db *gorm.DB) (err error
 func (p *Populator) populateMemberships(ctx context.Context, db *gorm.DB) (err error) {
 	for entityID, members := range p.Memberships {
 		for _, member := range members {
-			if err = GetMembershipStore(db).SetMember(ctx, &member.OrganizationOrUserIdentifiers, entityID, ttnpb.RightsFrom(member.Rights...)); err != nil {
+			if err = GetMembershipStore(db).SetMember(
+				ctx,
+				&member.OrganizationOrUserIdentifiers,
+				entityID,
+				ttnpb.RightsFrom(member.Rights...),
+			); err != nil {
 				return err
 			}
 		}

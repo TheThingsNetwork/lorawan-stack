@@ -74,13 +74,16 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cliStore := store.GetClientStore(db)
-		cli, err = cliStore.CreateClient(ctx, &req.Client)
+		cli, err = store.GetClientStore(db).CreateClient(ctx, &req.Client)
 		if err != nil {
 			return err
 		}
-		memberStore := store.GetMembershipStore(db)
-		if err = memberStore.SetMember(ctx, &req.Collaborator, cli.ClientIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL)); err != nil {
+		if err = store.GetMembershipStore(db).SetMember(
+			ctx,
+			&req.Collaborator,
+			cli.ClientIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
+		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -115,8 +118,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cliStore := store.GetClientStore(db)
-		cli, err = cliStore.GetClient(ctx, &req.ClientIdentifiers, &req.FieldMask)
+		cli, err = store.GetClientStore(db).GetClient(ctx, &req.ClientIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -170,8 +172,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	clis = &ttnpb.Clients{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if cliRights == nil {
-			memberStore := store.GetMembershipStore(db)
-			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "client")
+			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "client")
 			if err != nil {
 				return err
 			}
@@ -191,8 +192,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			}
 			cliIDs = append(cliIDs, &cliID)
 		}
-		cliStore := store.GetClientStore(db)
-		clis.Clients, err = cliStore.FindClients(ctx, cliIDs, &req.FieldMask)
+		clis.Clients, err = store.GetClientStore(db).FindClients(ctx, cliIDs, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -224,8 +224,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cliStore := store.GetClientStore(db)
-		cli, err = cliStore.UpdateClient(ctx, &req.Client, &req.FieldMask)
+		cli, err = store.GetClientStore(db).UpdateClient(ctx, &req.Client, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -250,8 +249,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		cliStore := store.GetClientStore(db)
-		return cliStore.DeleteClient(ctx, ids)
+		return store.GetClientStore(db).DeleteClient(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

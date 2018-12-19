@@ -128,9 +128,8 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		invitationStore := store.GetInvitationStore(db)
 		if req.InvitationToken != "" {
-			invitationToken, err := invitationStore.GetInvitation(ctx, req.InvitationToken)
+			invitationToken, err := store.GetInvitationStore(db).GetInvitation(ctx, req.InvitationToken)
 			if err != nil {
 				return err
 			}
@@ -139,8 +138,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			}
 		}
 
-		usrStore := store.GetUserStore(db)
-		usr, err = usrStore.CreateUser(ctx, &req.User)
+		usr, err = store.GetUserStore(db).CreateUser(ctx, &req.User)
 		if err != nil {
 			return err
 		}
@@ -154,7 +152,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		}
 
 		if req.InvitationToken != "" {
-			if err = invitationStore.SetInvitationAcceptedBy(ctx, req.InvitationToken, &usr.UserIdentifiers); err != nil {
+			if err = store.GetInvitationStore(db).SetInvitationAcceptedBy(ctx, req.InvitationToken, &usr.UserIdentifiers); err != nil {
 				return err
 			}
 		}
@@ -186,8 +184,7 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usrStore := store.GetUserStore(db)
-		usr, err = usrStore.GetUser(ctx, &req.UserIdentifiers, &req.FieldMask)
+		usr, err = store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -244,14 +241,13 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usrStore := store.GetUserStore(db)
 		if hasField(req.FieldMask.Paths, "primary_email_address") {
 			// TODO: if updating primary_email_address, get existing contact info and set primary_email_address_validated_at
 			// depending on existing contact info. Until then, the primary email address can only be updated by admins.
 			req.PrimaryEmailAddressValidatedAt = nil
 			req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
 		}
-		usr, err = usrStore.UpdateUser(ctx, &req.User, &req.FieldMask)
+		usr, err = store.GetUserStore(db).UpdateUser(ctx, &req.User, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -296,8 +292,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	}
 	updateMask := updatePasswordFieldMask
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		usrStore := store.GetUserStore(db)
-		usr, err := usrStore.GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
+		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
 			return err
 		}
@@ -329,7 +324,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			updateMask = temporaryPasswordFieldMask
 		}
 		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = string(hashedPassword), time.Now(), false
-		usr, err = usrStore.UpdateUser(ctx, usr, updateMask)
+		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
 		return err
 	})
 	if err != nil {
@@ -352,8 +347,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		usrStore := store.GetUserStore(db)
-		usr, err := usrStore.GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
+		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
 			return err
 		}
@@ -363,7 +357,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		usr.TemporaryPassword = string(hashedTemporaryPassword)
 		expires := now.Add(time.Hour)
 		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = &now, &expires
-		usr, err = usrStore.UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
+		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
 	})
 	if err != nil {
@@ -383,8 +377,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		usrStore := store.GetUserStore(db)
-		return usrStore.DeleteUser(ctx, ids)
+		return store.GetUserStore(db).DeleteUser(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

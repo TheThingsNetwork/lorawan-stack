@@ -50,13 +50,16 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		appStore := store.GetApplicationStore(db)
-		app, err = appStore.CreateApplication(ctx, &req.Application)
+		app, err = store.GetApplicationStore(db).CreateApplication(ctx, &req.Application)
 		if err != nil {
 			return err
 		}
-		memberStore := store.GetMembershipStore(db)
-		if err = memberStore.SetMember(ctx, &req.Collaborator, app.ApplicationIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL)); err != nil {
+		if err = store.GetMembershipStore(db).SetMember(
+			ctx,
+			&req.Collaborator,
+			app.ApplicationIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL),
+		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -88,8 +91,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		appStore := store.GetApplicationStore(db)
-		app, err = appStore.GetApplication(ctx, &req.ApplicationIdentifiers, &req.FieldMask)
+		app, err = store.GetApplicationStore(db).GetApplication(ctx, &req.ApplicationIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -143,8 +145,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 	apps = &ttnpb.Applications{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if appRights == nil {
-			memberStore := store.GetMembershipStore(db)
-			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "application")
+			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "application")
 			if err != nil {
 				return err
 			}
@@ -164,8 +165,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 			}
 			appIDs = append(appIDs, &appID)
 		}
-		appStore := store.GetApplicationStore(db)
-		apps.Applications, err = appStore.FindApplications(ctx, appIDs, &req.FieldMask)
+		apps.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, appIDs, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -187,8 +187,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		appStore := store.GetApplicationStore(db)
-		app, err = appStore.UpdateApplication(ctx, &req.Application, &req.FieldMask)
+		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, &req.Application, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -213,8 +212,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		appStore := store.GetApplicationStore(db)
-		return appStore.DeleteApplication(ctx, ids)
+		return store.GetApplicationStore(db).DeleteApplication(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

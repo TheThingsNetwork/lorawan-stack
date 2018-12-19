@@ -50,13 +50,16 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtwStore := store.GetGatewayStore(db)
-		gtw, err = gtwStore.CreateGateway(ctx, &req.Gateway)
+		gtw, err = store.GetGatewayStore(db).CreateGateway(ctx, &req.Gateway)
 		if err != nil {
 			return err
 		}
-		memberStore := store.GetMembershipStore(db)
-		if err = memberStore.SetMember(ctx, &req.Collaborator, gtw.GatewayIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL)); err != nil {
+		if err = store.GetMembershipStore(db).SetMember(
+			ctx,
+			&req.Collaborator,
+			gtw.GatewayIdentifiers.EntityIdentifiers(),
+			ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL),
+		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
@@ -88,8 +91,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtwStore := store.GetGatewayStore(db)
-		gtw, err = gtwStore.GetGateway(ctx, &req.GatewayIdentifiers, &req.FieldMask)
+		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -143,8 +145,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	gtws = &ttnpb.Gateways{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		if gtwRights == nil {
-			memberStore := store.GetMembershipStore(db)
-			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "gateway")
+			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "gateway")
 			if err != nil {
 				return err
 			}
@@ -164,8 +165,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			}
 			gtwIDs = append(gtwIDs, &gtwID)
 		}
-		gtwStore := store.GetGatewayStore(db)
-		gtws.Gateways, err = gtwStore.FindGateways(ctx, gtwIDs, &req.FieldMask)
+		gtws.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, gtwIDs, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -187,8 +187,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtwStore := store.GetGatewayStore(db)
-		gtw, err = gtwStore.UpdateGateway(ctx, &req.Gateway, &req.FieldMask)
+		gtw, err = store.GetGatewayStore(db).UpdateGateway(ctx, &req.Gateway, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -213,8 +212,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		gtwStore := store.GetGatewayStore(db)
-		return gtwStore.DeleteGateway(ctx, ids)
+		return store.GetGatewayStore(db).DeleteGateway(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

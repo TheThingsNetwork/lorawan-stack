@@ -43,8 +43,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devStore := store.GetEndDeviceStore(db)
-		dev, err = devStore.CreateEndDevice(ctx, &req.EndDevice)
+		dev, err = store.GetEndDeviceStore(db).CreateEndDevice(ctx, &req.EndDevice)
 		if err != nil {
 			return err
 		}
@@ -62,8 +61,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devStore := store.GetEndDeviceStore(db)
-		dev, err = devStore.GetEndDevice(ctx, &req.EndDeviceIdentifiers, &req.FieldMask)
+		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, &req.EndDeviceIdentifiers, &req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -85,8 +83,7 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 	}()
 	devs = &ttnpb.EndDevices{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devStore := store.GetEndDeviceStore(db)
-		devs.EndDevices, err = devStore.ListEndDevices(ctx, &req.ApplicationIdentifiers, &req.FieldMask)
+		devs.EndDevices, err = store.GetEndDeviceStore(db).ListEndDevices(ctx, &req.ApplicationIdentifiers, &req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -103,8 +100,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devStore := store.GetEndDeviceStore(db)
-		dev, err = devStore.UpdateEndDevice(ctx, &req.EndDevice, &req.FieldMask)
+		dev, err = store.GetEndDeviceStore(db).UpdateEndDevice(ctx, &req.EndDevice, &req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -119,8 +115,7 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		devStore := store.GetEndDeviceStore(db)
-		return devStore.DeleteEndDevice(ctx, ids)
+		return store.GetEndDeviceStore(db).DeleteEndDevice(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

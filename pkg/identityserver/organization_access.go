@@ -60,8 +60,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		keyStore := store.GetAPIKeyStore(db)
-		return keyStore.CreateAPIKey(ctx, req.OrganizationIdentifiers.EntityIdentifiers(), key)
+		return store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.OrganizationIdentifiers.EntityIdentifiers(), key)
 	})
 	if err != nil {
 		return nil, err
@@ -77,8 +76,7 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, ids *ttnp
 	}
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keyStore := store.GetAPIKeyStore(db)
-		keys.APIKeys, err = keyStore.FindAPIKeys(ctx, ids.EntityIdentifiers())
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, ids.EntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -100,8 +98,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keyStore := store.GetAPIKeyStore(db)
-		key, err = keyStore.UpdateAPIKey(ctx, req.OrganizationIdentifiers.EntityIdentifiers(), &req.APIKey)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.OrganizationIdentifiers.EntityIdentifiers(), &req.APIKey)
 		return err
 	})
 	if err != nil {
@@ -129,8 +126,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberStore := store.GetMembershipStore(db)
-		return memberStore.SetMember(
+		return store.GetMembershipStore(db).SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
 			req.OrganizationIdentifiers.EntityIdentifiers(),
@@ -154,8 +150,7 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, ids
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		memberStore := store.GetMembershipStore(db)
-		memberRights, err := memberStore.FindMembers(ctx, ids.EntityIdentifiers())
+		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, ids.EntityIdentifiers())
 		if err != nil {
 			return err
 		}

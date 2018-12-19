@@ -65,9 +65,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 	var pendingContactInfo []*ttnpb.ContactInfo
 	if len(emailValidations) > 0 {
 		err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-			store := store.GetContactInfoStore(db)
 			for email, validation := range emailValidations {
-				validation, err = store.CreateValidation(ctx, validation)
+				validation, err = store.GetContactInfoStore(db).CreateValidation(ctx, validation)
 				if err != nil {
 					return err
 				}

@@ -57,8 +57,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		keyStore := store.GetAPIKeyStore(db)
-		return keyStore.CreateAPIKey(ctx, req.UserIdentifiers.EntityIdentifiers(), key)
+		return store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.UserIdentifiers.EntityIdentifiers(), key)
 	})
 	if err != nil {
 		return nil, err
@@ -74,8 +73,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, ids *ttnpb.UserId
 	}
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keyStore := store.GetAPIKeyStore(db)
-		keys.APIKeys, err = keyStore.FindAPIKeys(ctx, ids.EntityIdentifiers())
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, ids.EntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -97,8 +95,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keyStore := store.GetAPIKeyStore(db)
-		key, err = keyStore.UpdateAPIKey(ctx, req.UserIdentifiers.EntityIdentifiers(), &req.APIKey)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers.EntityIdentifiers(), &req.APIKey)
 		return err
 	})
 	if err != nil {
