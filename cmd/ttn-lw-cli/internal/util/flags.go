@@ -15,6 +15,7 @@
 package util
 
 import (
+	"encoding/hex"
 	"fmt"
 	"reflect"
 	"strings"
@@ -158,6 +159,8 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			}
 			fs.String(name, "", strings.Join(values, "|"))
 		}
+	} else if (t.Kind() == reflect.Slice || t.Kind() == reflect.Array) && t.Elem().Kind() == reflect.Uint8 {
+		fs.String(name, "", "(hex)")
 	} else {
 		switch t.Name() {
 		case "Time":
@@ -283,6 +286,29 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 						panic(err)
 					}
 					field.Set(reflect.ValueOf(d))
+				case ft.Kind() == reflect.Slice && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
+					s := strings.TrimPrefix(v.String(), "0x")
+					buf, err := hex.DecodeString(s)
+					if err != nil {
+						panic(err)
+					}
+					field.Set(reflect.ValueOf(buf))
+				case ft.Kind() == reflect.Array && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
+					s := strings.TrimPrefix(v.String(), "0x")
+					buf, err := hex.DecodeString(s)
+					if err != nil {
+						panic(err)
+					}
+					if len(buf) > 0 {
+						if len(buf) != ft.Len() {
+							panic(fmt.Errorf(`bytes of "%s" do not fit in [%d]byte`, v.String(), ft.Len()))
+						}
+						for i := 0; i < ft.Len(); i++ {
+							field.Index(i).Set(reflect.ValueOf(buf[i]))
+						}
+					} else {
+						field.Set(reflect.Zero(ft))
+					}
 				default:
 					panic(fmt.Sprintf("%v is not assingable to %v\n", ft, vt))
 				}
