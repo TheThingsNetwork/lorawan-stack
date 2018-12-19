@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package ttnredis provides a general Redis client and component registry implementations.
+// Package redis provides a general Redis client and component registry implementations.
 package redis
 
 import (
@@ -95,10 +95,12 @@ func (cl *Client) Key(ks ...string) string {
 	return Key(append([]string{cl.namespace}, ks...)...)
 }
 
+// ProtoCmd is a command, which can unmarshal its result into a protocol buffer.
 type ProtoCmd struct {
 	result func() (string, error)
 }
 
+// ScanProto scans command result into proto.Message pb.
 func (cmd ProtoCmd) ScanProto(pb proto.Message) error {
 	s, err := cmd.result()
 	if err != nil {
@@ -123,6 +125,8 @@ func SetProto(r redis.Cmdable, k string, pb proto.Message, expiration time.Durat
 	return r.Set(k, s, expiration), nil
 }
 
+// FindProto finds the protocol buffer stored under the key stored under k.
+// The external key is constructed using keyCmd.
 func FindProto(r WatchCmdable, k string, keyCmd func(...string) string) *ProtoCmd {
 	var result func() (string, error)
 	if err := r.Watch(func(tx *redis.Tx) error {
@@ -138,10 +142,14 @@ func FindProto(r WatchCmdable, k string, keyCmd func(...string) string) *ProtoCm
 	return &ProtoCmd{result: result}
 }
 
+// ProtoCmd is a command, which can unmarshal its result into multiple protocol buffers.
 type ProtosCmd struct {
 	result func() ([]string, error)
 }
 
+// Range ranges over command result and unmarshals it into a protocol buffer.
+// f must return a new empty proto.Message of the type expected to be present in the command.
+// The function returned by f will be called after the commands result is unmarshaled into the message returned by f.
 func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error {
 	ss, err := cmd.result()
 	if err != nil {
