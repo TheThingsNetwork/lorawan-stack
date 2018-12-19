@@ -114,6 +114,17 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	if up.Settings.Time != nil {
 		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
 	}
+	downlinkPath := &ttnpb.DownlinkPath{
+		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+			GatewayIdentifiers: c.gateway.GatewayIdentifiers,
+			AntennaIndex:       0,
+		},
+		UplinkTimestamp: up.Settings.Timestamp,
+	}
+	uplinkToken, err := PathToUplinkToken(downlinkPath)
+	if err == nil {
+		up.UplinkToken = uplinkToken
+	}
 
 	select {
 	case <-c.ctx.Done():

@@ -202,7 +202,9 @@ func TestTraffic(t *testing.T) {
 				case up := <-conn.Up():
 					if tc.OK {
 						a.So(time.Since(up.ReceivedAt), should.BeLessThan, timeout)
+						a.So(up.UplinkToken, should.NotBeEmpty)
 						up.ReceivedAt = time.Time{}
+						up.UplinkToken = nil
 						a.So(up, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Did not expect uplink message, but have %v", up)
