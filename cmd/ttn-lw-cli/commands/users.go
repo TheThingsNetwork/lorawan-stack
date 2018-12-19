@@ -251,6 +251,13 @@ var (
 			return nil
 		},
 	}
+	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
+		usrID := getUserID(cmd.Flags(), nil)
+		if usrID == nil {
+			return nil, errNoUserID
+		}
+		return usrID.EntityIdentifiers(), nil
+	})
 )
 
 func init() {
@@ -274,5 +281,7 @@ func init() {
 	usersCommand.AddCommand(usersUpdatePasswordCommand)
 	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersDeleteCommand)
+	usersContactInfoCommand.PersistentFlags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(usersContactInfoCommand)
 	Root.AddCommand(usersCommand)
 }

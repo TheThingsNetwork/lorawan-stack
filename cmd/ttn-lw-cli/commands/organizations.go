@@ -236,6 +236,13 @@ var (
 			return nil
 		},
 	}
+	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
+		orgID := getOrganizationID(cmd.Flags(), nil)
+		if orgID == nil {
+			return nil, errNoOrganizationID
+		}
+		return orgID.EntityIdentifiers(), nil
+	})
 )
 
 func init() {
@@ -259,5 +266,7 @@ func init() {
 	organizationsCommand.AddCommand(organizationsUpdateCommand)
 	organizationsDeleteCommand.Flags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationsDeleteCommand)
+	organizationsContactInfoCommand.PersistentFlags().AddFlagSet(organizationIDFlags())
+	organizationsCommand.AddCommand(organizationsContactInfoCommand)
 	Root.AddCommand(organizationsCommand)
 }

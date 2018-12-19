@@ -236,6 +236,13 @@ var (
 			return nil
 		},
 	}
+	applicationsContactInfoCommand = contactInfoCommands("application", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
+		appID := getApplicationID(cmd.Flags(), nil)
+		if appID == nil {
+			return nil, errNoApplicationID
+		}
+		return appID.EntityIdentifiers(), nil
+	})
 )
 
 func init() {
@@ -259,5 +266,7 @@ func init() {
 	applicationsCommand.AddCommand(applicationsUpdateCommand)
 	applicationsDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsDeleteCommand)
+	applicationsContactInfoCommand.PersistentFlags().AddFlagSet(applicationIDFlags())
+	applicationsCommand.AddCommand(applicationsContactInfoCommand)
 	Root.AddCommand(applicationsCommand)
 }

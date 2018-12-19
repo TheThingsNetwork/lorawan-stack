@@ -257,6 +257,13 @@ var (
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}
+	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
+		gtwID := getGatewayID(cmd.Flags(), nil)
+		if gtwID == nil {
+			return nil, errNoGatewayID
+		}
+		return gtwID.EntityIdentifiers(), nil
+	})
 )
 
 func init() {
@@ -282,5 +289,7 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysDeleteCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
+	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
+	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
 	Root.AddCommand(gatewaysCommand)
 }

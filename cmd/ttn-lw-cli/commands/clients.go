@@ -240,6 +240,13 @@ var (
 			return nil
 		},
 	}
+	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
+		cliID := getClientID(cmd.Flags(), nil)
+		if cliID == nil {
+			return nil, errNoClientID
+		}
+		return cliID.EntityIdentifiers(), nil
+	})
 )
 
 func init() {
@@ -263,5 +270,7 @@ func init() {
 	clientsCommand.AddCommand(clientsUpdateCommand)
 	clientsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsDeleteCommand)
+	clientsContactInfoCommand.PersistentFlags().AddFlagSet(clientIDFlags())
+	clientsCommand.AddCommand(clientsContactInfoCommand)
 	Root.AddCommand(clientsCommand)
 }
