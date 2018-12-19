@@ -76,8 +76,7 @@ var (
 			api.SetLogger(logger)
 			api.SetInsecure(config.Insecure)
 			if config.CA != "" {
-				err = api.SetCA(config.CA)
-				if err != nil {
+				if err = api.SetCA(config.CA); err != nil {
 					return err
 				}
 			}

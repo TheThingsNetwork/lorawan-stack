@@ -155,8 +155,7 @@ var (
 						streamErr = err
 						return
 					}
-					err = io.Write(os.Stdout, config.Format, up)
-					if err != nil {
+					if err = io.Write(os.Stdout, config.Format, up); err != nil {
 						streamErr = err
 						return
 					}

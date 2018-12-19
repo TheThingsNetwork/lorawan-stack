@@ -97,8 +97,7 @@ func GetCache() (cache Cache, err error) {
 		return cache, err
 	}
 	defer f.Close() // ignore errors
-	err = json.NewDecoder(f).Decode(&cache.data)
-	if err != nil {
+	if err = json.NewDecoder(f).Decode(&cache.data); err != nil {
 		return cache, err
 	}
 	return cache, nil
@@ -131,9 +130,5 @@ func SaveCache(cache Cache) (err error) {
 			os.Remove(cacheFile)
 		}
 	}()
-	err = json.NewEncoder(f).Encode(&cache.data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return json.NewEncoder(f).Encode(&cache.data)
 }

@@ -69,8 +69,7 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 	}
 	n := rv.Len()
 	for i := 0; i < n; i++ {
-		err = writeItem(rv.Index(i).Interface())
-		if err != nil {
+		if err = writeItem(rv.Index(i).Interface()); err != nil {
 			return err
 		}
 		if sep != nil && i != n-1 {
