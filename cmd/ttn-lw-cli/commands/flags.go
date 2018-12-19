@@ -68,3 +68,39 @@ func mergeAttributes(attributes map[string]string, flagSet *pflag.FlagSet) map[s
 	}
 	return out
 }
+
+func rightsFlags(filter func(string) bool) *pflag.FlagSet {
+	flagSet := new(pflag.FlagSet)
+	for right := range ttnpb.Right_value {
+		right := strings.Replace(strings.ToLower(right), "_", "-", -1)
+		if filter == nil || filter(right) {
+			flagSet.Bool(right, false, "")
+		}
+	}
+	return flagSet
+}
+
+func getRights(flagSet *pflag.FlagSet) (rights []ttnpb.Right) {
+	for right, value := range ttnpb.Right_value {
+		right := strings.Replace(strings.ToLower(right), "_", "-", -1)
+		if set, _ := flagSet.GetBool(right); set {
+			rights = append(rights, ttnpb.Right(value))
+		}
+	}
+	return
+}
+
+var errNoAPIKeyID = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
+
+func getAPIKeyID(flagSet *pflag.FlagSet, args []string) string {
+	var apiKeyID string
+	if len(args) > 0 {
+		if len(args) > 1 {
+			logger.Warn("multiple IDs found in arguments, considering only the first")
+		}
+		apiKeyID = args[0]
+	} else {
+		apiKeyID, _ = flagSet.GetString("api-key-id")
+	}
+	return apiKeyID
+}

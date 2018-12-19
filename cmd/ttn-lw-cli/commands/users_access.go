@@ -1,0 +1,168 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package commands
+
+import (
+	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	userRights = &cobra.Command{
+		Use:   "rights",
+		Short: "List the rights to a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserAccessClient(is).ListRights(ctx, usrID)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.Rights)
+		},
+	}
+	userAPIKeys = &cobra.Command{
+		Use:     "api-keys",
+		Aliases: []string{"api-key"},
+		Short:   "Manage user API keys",
+	}
+	userAPIKeysList = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List user API keys",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, usrID)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res.APIKeys)
+		},
+	}
+	userAPIKeysCreate = &cobra.Command{
+		Use:     "create",
+		Aliases: []string{"add", "generate"},
+		Short:   "Create a user API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), nil)
+			if usrID == nil {
+				return errNoUserID
+			}
+			name, _ := cmd.Flags().GetString("name")
+
+			rights := getRights(cmd.Flags())
+			if len(rights) == 0 {
+				logger.Info("No rights selected, won't create API key")
+				return nil
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
+				UserIdentifiers: *usrID,
+				Name:            name,
+				Rights:          rights,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res)
+		},
+	}
+	userAPIKeysUpdate = &cobra.Command{
+		Use:     "update",
+		Aliases: []string{"set"},
+		Short:   "Update a user API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id := getAPIKeyID(cmd.Flags(), args)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+			usrID := getUserID(cmd.Flags(), nil)
+			if usrID == nil {
+				return errNoUserID
+			}
+			name, _ := cmd.Flags().GetString("name")
+
+			rights := getRights(cmd.Flags())
+			if len(rights) == 0 {
+				logger.Info("No rights selected, will remove API key")
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+				UserIdentifiers: *usrID,
+				APIKey: ttnpb.APIKey{
+					ID:     id,
+					Name:   name,
+					Rights: rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+)
+
+var userRightsFlags = rightsFlags(func(flag string) bool {
+	return strings.HasPrefix(flag, "right-user")
+})
+
+func init() {
+	userRights.Flags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(userRights)
+
+	userAPIKeys.AddCommand(userAPIKeysList)
+	userAPIKeysCreate.Flags().String("name", "", "")
+	userAPIKeysCreate.Flags().AddFlagSet(userRightsFlags)
+	userAPIKeys.AddCommand(userAPIKeysCreate)
+	userAPIKeysUpdate.Flags().String("api-key-id", "", "")
+	userAPIKeysUpdate.Flags().String("name", "", "")
+	userAPIKeysUpdate.Flags().AddFlagSet(userRightsFlags)
+	userAPIKeys.AddCommand(userAPIKeysUpdate)
+	userAPIKeys.PersistentFlags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(userAPIKeys)
+}
