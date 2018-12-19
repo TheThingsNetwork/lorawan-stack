@@ -154,6 +154,7 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 }
 
 var (
+	errNotAllowed       = errors.DefineFailedPrecondition("not_allowed", "downlink not allowed")
 	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
@@ -165,6 +166,9 @@ var (
 // SendDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
 func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) error {
+	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+		return errNotAllowed
+	}
 	request := msg.GetRequest()
 	if request == nil {
 		return errNotTxRequest
