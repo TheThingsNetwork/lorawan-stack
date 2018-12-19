@@ -165,6 +165,11 @@ var (
 				return err
 			}
 
+			logger.Infof("API key ID: %s", res.ID)
+			logger.Infof("API key value: %s", res.Key)
+			logger.Warn("The API key value will never be shown again")
+			logger.Warn("Make sure to copy it to a safe place")
+
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}

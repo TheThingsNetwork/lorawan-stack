@@ -152,6 +152,10 @@ var (
 				return err
 			}
 
+			logger.Infof("Client secret: %s", res.Secret)
+			logger.Warn("The Client secret will never be shown again")
+			logger.Warn("Make sure to copy it to a safe place")
+
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}
