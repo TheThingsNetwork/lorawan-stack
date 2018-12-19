@@ -236,6 +236,27 @@ var (
 			return nil
 		},
 	}
+	gatewaysConnectionStats = &cobra.Command{
+		Use:   "connection-stats",
+		Short: "Get connection stats for a gateway",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID := getGatewayID(cmd.Flags(), args)
+			if gtwID == nil {
+				return errNoGatewayID
+			}
+
+			gs, err := api.Dial(ctx, config.GatewayServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewGsClient(gs).GetGatewayConnectionStats(ctx, gtwID)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res)
+		},
+	}
 )
 
 func init() {
@@ -259,5 +280,7 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysUpdateCommand)
 	gatewaysDeleteCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysDeleteCommand)
+	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
+	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	Root.AddCommand(gatewaysCommand)
 }
