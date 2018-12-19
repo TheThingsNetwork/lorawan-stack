@@ -105,7 +105,10 @@ class Tabular extends React.Component {
                 centered={header.centered}
                 small={small}
               >
-                {row[headers[index].name]}
+                {headers[index].render
+                  ? headers[index].render(row[headers[index].name])
+                  : row[headers[index].name]
+                }
               </Table.DataCell>
             ))
           }
@@ -198,6 +201,7 @@ Tabular.propTypes = {
   headers: PropTypes.arrayOf(PropTypes.shape({
     displayName: PropTypes.message.isRequired,
     name: PropTypes.string.isRequired,
+    render: PropTypes.func,
     centered: PropTypes.bool,
     sortable: PropTypes.bool,
   })),
