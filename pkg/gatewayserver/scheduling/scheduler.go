@@ -107,11 +107,11 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 	if !s.respectsDwellTime(true, settings.Frequency, d) {
 		return Emission{}, errDwellTime
 	}
-	var relative time.Duration
+	var relative ConcentratorTime
 	if settings.Time != nil {
 		relative = s.RolloverClock.ConcentratorTime(*settings.Time)
 	} else {
-		relative = time.Duration(settings.Timestamp) * time.Microsecond
+		relative = ConcentratorTime(time.Duration(settings.Timestamp) * time.Microsecond)
 	}
 	return NewEmission(relative, d), nil
 }
@@ -152,7 +152,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	now := s.RolloverClock.Now(time.Now())
 	if settings.Timestamp == 0 && settings.Time == nil {
-		settings.Timestamp = uint32((now + ScheduleTimeLong) / time.Microsecond)
+		settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
 	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
@@ -165,7 +165,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	s.emissionsMu.Lock()
 	defer s.emissionsMu.Unlock()
 	i := 0
-	next := func() time.Duration {
+	next := func() ConcentratorTime {
 		if len(s.emissions) == 0 {
 			// No emissions; schedule at the requested time.
 			return em.t
@@ -175,12 +175,12 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 			prevConflicts := s.emissions[i].AfterWithOffAir(em, s.timeOffAir)-QueueDelay < 0
 			if prevConflicts {
 				// Schedule right after previous to resolve conflict.
-				em.t = s.emissions[i].EndsWithOffAir(s.timeOffAir) + QueueDelay
+				em.t = s.emissions[i].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
 			}
 			nextConflicts := em.BeforeWithOffAir(s.emissions[i+1], s.timeOffAir)-QueueDelay < 0
 			if nextConflicts {
 				// If it conflicts with the next, try the next window.
-				em.t = s.emissions[i+1].EndsWithOffAir(s.timeOffAir) + QueueDelay
+				em.t = s.emissions[i+1].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
 				i++
 				continue
 			}
@@ -190,13 +190,13 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 			return em.t
 		}
 		// No emissions to schedule in between; schedule after last emission.
-		return s.emissions[len(s.emissions)-1].EndsWithOffAir(s.timeOffAir) + QueueDelay
+		return s.emissions[len(s.emissions)-1].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
 	}
 	em, err = sb.ScheduleAnytime(em.d, next, priority)
 	if err != nil {
 		return Emission{}, err
 	}
-	if delta := em.Starts() - now; delta < ScheduleTimeShort {
+	if delta := time.Duration(em.Starts() - now); delta < ScheduleTimeShort {
 		log.FromContext(ctx).WithField("delta", delta).Warn("The scheduled time is late for transmission")
 	}
 	s.emissions = s.emissions.Insert(em)

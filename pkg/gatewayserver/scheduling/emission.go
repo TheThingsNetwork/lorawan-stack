@@ -20,21 +20,25 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 )
 
+// ConcentratorTime is the time relative to the concentrator start time (nanoseconds).
+type ConcentratorTime int64
+
 // NewEmission returns a new Emission with the given values.
-func NewEmission(starts, duration time.Duration) Emission {
+func NewEmission(starts ConcentratorTime, duration time.Duration) Emission {
 	return Emission{t: starts, d: duration}
 }
 
 // Emission contains the scheduled time and duration of an emission.
 type Emission struct {
-	t, d time.Duration
+	t ConcentratorTime
+	d time.Duration
 }
 
 // Starts returns the time when the emission starts.
-func (em Emission) Starts() time.Duration { return em.t }
+func (em Emission) Starts() ConcentratorTime { return em.t }
 
 // Ends returns the time when the emission ends.
-func (em Emission) Ends() time.Duration { return em.t + em.d }
+func (em Emission) Ends() ConcentratorTime { return em.t + ConcentratorTime(em.d) }
 
 // Duration returns the duration of the emission.
 func (em Emission) Duration() time.Duration { return em.d }
@@ -49,29 +53,29 @@ func (em Emission) OffAir(toa frequencyplans.TimeOffAir) time.Duration {
 }
 
 // Within returns the duration of the emission that happens within the given window.
-func (em Emission) Within(from, to time.Duration) time.Duration {
+func (em Emission) Within(from, to ConcentratorTime) time.Duration {
 	if em.Ends() < from || em.t > to {
 		return 0
 	}
 	if em.t < from {
-		return em.Ends() - from
+		return time.Duration(em.Ends() - from)
 	}
 	return em.d
 }
 
 // EndsWithOffAir returns the time when the emission ends plus the time-off-air.
-func (em Emission) EndsWithOffAir(toa frequencyplans.TimeOffAir) time.Duration {
-	return em.Ends() + em.OffAir(toa)
+func (em Emission) EndsWithOffAir(toa frequencyplans.TimeOffAir) ConcentratorTime {
+	return em.Ends() + ConcentratorTime(em.OffAir(toa))
 }
 
 // BeforeWithOffAir returns the time between the end of this emission to the start of the given other emission, considering time-off-air.
 func (em Emission) BeforeWithOffAir(other Emission, toa frequencyplans.TimeOffAir) time.Duration {
-	return other.Starts() - em.EndsWithOffAir(toa)
+	return time.Duration(other.Starts() - em.EndsWithOffAir(toa))
 }
 
 // AfterWithOffAir returns the time between the end of the given other emission to the start of this emission, considering time-off-air.
 func (em Emission) AfterWithOffAir(other Emission, toa frequencyplans.TimeOffAir) time.Duration {
-	return em.Starts() - other.EndsWithOffAir(toa)
+	return time.Duration(em.Starts() - other.EndsWithOffAir(toa))
 }
 
 // Emissions is an list of emissions.

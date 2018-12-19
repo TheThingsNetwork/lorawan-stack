@@ -26,16 +26,16 @@ import (
 
 func TestEmission(t *testing.T) {
 	a := assertions.New(t)
-	em := scheduling.NewEmission(10*time.Second, time.Second)
+	em := scheduling.NewEmission(scheduling.ConcentratorTime(10*time.Second), time.Second)
 
 	a.So(em.Starts(), should.Equal, 10*time.Second)
 	a.So(em.Ends(), should.Equal, 11*time.Second)
 	a.So(em.Duration(), should.Equal, time.Second)
 
-	a.So(em.Within(10*time.Second, 20*time.Second), should.Equal, time.Second)
-	a.So(em.Within(11*time.Second, 20*time.Second), should.Equal, 0)
-	a.So(em.Within(0*time.Second, 10*time.Second), should.Equal, time.Second)
-	a.So(em.Within(0*time.Second, 11*time.Second), should.Equal, time.Second)
+	a.So(em.Within(scheduling.ConcentratorTime(10*time.Second), scheduling.ConcentratorTime(20*time.Second)), should.Equal, time.Second)
+	a.So(em.Within(scheduling.ConcentratorTime(11*time.Second), scheduling.ConcentratorTime(20*time.Second)), should.Equal, 0)
+	a.So(em.Within(scheduling.ConcentratorTime(0*time.Second), scheduling.ConcentratorTime(10*time.Second)), should.Equal, time.Second)
+	a.So(em.Within(scheduling.ConcentratorTime(0*time.Second), scheduling.ConcentratorTime(11*time.Second)), should.Equal, time.Second)
 
 	a.So(em.OffAir(frequencyplans.TimeOffAir{Fraction: 0.5, Duration: 2 * time.Second}), should.Equal, 2*time.Second)
 	a.So(em.OffAir(frequencyplans.TimeOffAir{Fraction: 0.5, Duration: 0}), should.Equal, 500*time.Millisecond)
@@ -43,31 +43,31 @@ func TestEmission(t *testing.T) {
 	toa := frequencyplans.TimeOffAir{Duration: 2 * time.Second}
 
 	// No conflicts.
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(13*time.Second, time.Second), toa), should.Equal, 0)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(13*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(20*time.Second, time.Second), toa), should.Equal, 7*time.Second)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(20*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(7*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(7*time.Second, time.Second), toa), should.Equal, 0)
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(5*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(5*time.Second, time.Second), toa), should.Equal, 2*time.Second)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(13*time.Second), time.Second), toa), should.Equal, 0)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(13*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(20*time.Second), time.Second), toa), should.Equal, 7*time.Second)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(20*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(7*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(7*time.Second), time.Second), toa), should.Equal, 0)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(5*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(5*time.Second), time.Second), toa), should.Equal, 2*time.Second)
 
 	// Conflicts.
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(9*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(9*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(10*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(10*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.BeforeWithOffAir(scheduling.NewEmission(11*time.Second, time.Second), toa), should.BeLessThan, 0)
-	a.So(em.AfterWithOffAir(scheduling.NewEmission(11*time.Second, time.Second), toa), should.BeLessThan, 0)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(9*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(9*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(10*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(10*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(11*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(11*time.Second), time.Second), toa), should.BeLessThan, 0)
 }
 
 func TestEmissions(t *testing.T) {
 	a := assertions.New(t)
 	var ems scheduling.Emissions
-	ems = ems.Insert(scheduling.NewEmission(10*time.Second, time.Second))
-	ems = ems.Insert(scheduling.NewEmission(6*time.Second, time.Second))
-	ems = ems.Insert(scheduling.NewEmission(8*time.Second, time.Second))
-	ems = ems.Insert(scheduling.NewEmission(12*time.Second, time.Second))
+	ems = ems.Insert(scheduling.NewEmission(scheduling.ConcentratorTime(10*time.Second), time.Second))
+	ems = ems.Insert(scheduling.NewEmission(scheduling.ConcentratorTime(6*time.Second), time.Second))
+	ems = ems.Insert(scheduling.NewEmission(scheduling.ConcentratorTime(8*time.Second), time.Second))
+	ems = ems.Insert(scheduling.NewEmission(scheduling.ConcentratorTime(12*time.Second), time.Second))
 
 	a.So(ems, should.HaveLength, 4)
 	a.So(ems[0].Starts(), should.Equal, 6*time.Second)

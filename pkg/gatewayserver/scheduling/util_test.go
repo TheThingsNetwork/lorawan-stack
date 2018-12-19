@@ -21,14 +21,14 @@ import (
 )
 
 type mockClock struct {
-	t time.Duration
+	t scheduling.ConcentratorTime
 }
 
-func (c *mockClock) Now(_ time.Time) time.Duration {
+func (c *mockClock) Now(_ time.Time) scheduling.ConcentratorTime {
 	return c.t
 }
-func (c *mockClock) ConcentratorTime(t time.Time) time.Duration {
-	return t.Sub(time.Unix(0, 0))
+func (c *mockClock) ConcentratorTime(t time.Time) scheduling.ConcentratorTime {
+	return scheduling.ConcentratorTime(t.Sub(time.Unix(0, 0)))
 }
 
 func boolPtr(v bool) *bool                       { return &v }

@@ -36,40 +36,40 @@ func TestSubBandScheduleUnrestricted(t *testing.T) {
 	clock := &mockClock{}
 	sb := scheduling.NewSubBand(ctx, band, clock, nil)
 	for i, tc := range []struct {
-		Starts            time.Duration
+		Starts            scheduling.ConcentratorTime
 		Duration          time.Duration
 		ExpectUtilization float32
 	}{
 		{
-			Starts:            1 * time.Second,
+			Starts:            scheduling.ConcentratorTime(1 * time.Second),
 			Duration:          2 * time.Second,
 			ExpectUtilization: 0.2,
 			// [11                  ]
 			//  ^^
 		},
 		{
-			Starts:            4 * time.Second,
+			Starts:            scheduling.ConcentratorTime(4 * time.Second),
 			Duration:          1 * time.Second,
 			ExpectUtilization: 0.3,
 			// [11 2                ]
 			//  ^^^^
 		},
 		{
-			Starts:            11 * time.Second,
+			Starts:            scheduling.ConcentratorTime(11 * time.Second),
 			Duration:          1 * time.Second,
 			ExpectUtilization: 0.3,
 			// [11 2      3         ]
 			//   ^^^^^^^^^^
 		},
 		{
-			Starts:            13 * time.Second,
+			Starts:            scheduling.ConcentratorTime(13 * time.Second),
 			Duration:          1 * time.Second,
 			ExpectUtilization: 0.3,
 			// [11 2      3 4       ]
 			//     ^^^^^^^^^^
 		},
 		{
-			Starts:            15 * time.Second,
+			Starts:            scheduling.ConcentratorTime(15 * time.Second),
 			Duration:          3 * time.Second,
 			ExpectUtilization: 0.5,
 			// [11 2      3 4 555   ]
@@ -83,7 +83,7 @@ func TestSubBandScheduleUnrestricted(t *testing.T) {
 			err := sb.Schedule(em, ttnpb.TxSchedulePriority_NORMAL)
 			a.So(err, should.BeNil)
 
-			clock.t = tc.Starts + tc.Duration
+			clock.t = tc.Starts + scheduling.ConcentratorTime(tc.Duration)
 			utilization := sb.DutyCycleUtilization()
 			a.So(utilization, should.Equal, tc.ExpectUtilization)
 		})
@@ -102,14 +102,14 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 	}
 	sb := scheduling.NewSubBand(ctx, band, clock, ceilings)
 	for i, tc := range []struct {
-		Starts            time.Duration
+		Starts            scheduling.ConcentratorTime
 		Duration          time.Duration
 		Priority          ttnpb.TxSchedulePriority
 		ExpectError       func(error) bool
 		ExpectUtilization float32
 	}{
 		{
-			Starts:            6 * time.Second,
+			Starts:            scheduling.ConcentratorTime(6 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
 			ExpectUtilization: 0.1 / 0.5,
@@ -117,7 +117,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			//  ^^^^^^
 		},
 		{
-			Starts:            14 * time.Second,
+			Starts:            scheduling.ConcentratorTime(14 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
 			ExpectUtilization: 0.2 / 0.5,
@@ -125,7 +125,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			//      ^^^^^^^^^^
 		},
 		{
-			Starts:            18 * time.Second,
+			Starts:            scheduling.ConcentratorTime(18 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
 			ExpectUtilization: 0.2 / 0.5,
@@ -133,7 +133,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			//          ^^^^^^^^^^
 		},
 		{
-			Starts:            11 * time.Second,
+			Starts:            scheduling.ConcentratorTime(11 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
 			ExpectError:       errors.IsResourceExhausted,
@@ -143,7 +143,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			//            ^^^^^^^^^^
 		},
 		{
-			Starts:            11 * time.Second,
+			Starts:            scheduling.ConcentratorTime(11 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_HIGHEST,
 			ExpectUtilization: 0.2 / 0.5,
@@ -163,7 +163,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 				a.So(err, should.BeNil)
 			}
 
-			clock.t = tc.Starts + tc.Duration
+			clock.t = tc.Starts + scheduling.ConcentratorTime(tc.Duration)
 			utilization := sb.DutyCycleUtilization()
 			a.So(utilization, should.Equal, tc.ExpectUtilization)
 		})
@@ -183,7 +183,11 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 	}
 	sb := scheduling.NewSubBand(ctx, band, clock, ceilings)
 
-	for _, t := range []time.Duration{6 * time.Second, 14 * time.Second, 18 * time.Second} {
+	for _, t := range []scheduling.ConcentratorTime{
+		scheduling.ConcentratorTime(6 * time.Second),
+		scheduling.ConcentratorTime(14 * time.Second),
+		scheduling.ConcentratorTime(18 * time.Second),
+	} {
 		em := scheduling.NewEmission(t, time.Second)
 		err := sb.Schedule(em, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
@@ -192,10 +196,10 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 
 	// Step naively 1 second.
 	{
-		from := 11 * time.Second
-		next := func() time.Duration {
+		from := scheduling.ConcentratorTime(11 * time.Second)
+		next := func() scheduling.ConcentratorTime {
 			res := from
-			from += time.Second
+			from += scheduling.ConcentratorTime(time.Second)
 			return res
 		}
 		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
@@ -208,8 +212,8 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 
 	// Get the first available option after all transmissions.
 	{
-		next := func() time.Duration {
-			return 19 * time.Second
+		next := func() scheduling.ConcentratorTime {
+			return scheduling.ConcentratorTime(19 * time.Second)
 		}
 		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
@@ -220,8 +224,8 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 
 	// Fail when the emission hits any duty-cycle limitation.
 	{
-		next := func() time.Duration {
-			return 19 * time.Second
+		next := func() scheduling.ConcentratorTime {
+			return scheduling.ConcentratorTime(19 * time.Second)
 		}
 		_, err := sb.ScheduleAnytime(5*time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrDutyCycle)

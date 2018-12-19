@@ -75,7 +75,7 @@ func (sb *SubBand) gc(ctx context.Context) error {
 			ticker.Stop()
 			return ctx.Err()
 		case <-ticker.C:
-			from := sb.clock.Now(time.Now()) - DutyCycleWindow
+			from := sb.clock.Now(time.Now()) - ConcentratorTime(DutyCycleWindow)
 			sb.mu.Lock()
 			expired := 0
 			for _, em := range sb.emissions {
@@ -93,7 +93,7 @@ func (sb *SubBand) gc(ctx context.Context) error {
 
 // sum returns the total emission durations in the given window.
 // This method requires the read lock to be held.
-func (sb *SubBand) sum(from, to time.Duration) time.Duration {
+func (sb *SubBand) sum(from, to ConcentratorTime) time.Duration {
 	total := time.Duration(0)
 	for _, em := range sb.emissions {
 		total += em.Within(from, to)
@@ -105,7 +105,7 @@ func (sb *SubBand) sum(from, to time.Duration) time.Duration {
 func (sb *SubBand) DutyCycleUtilization() float32 {
 	now := sb.clock.Now(time.Now())
 	sb.mu.RLock()
-	val := sb.sum(now-DutyCycleWindow, now)
+	val := sb.sum(now-ConcentratorTime(DutyCycleWindow), now)
 	sb.mu.RUnlock()
 	return float32(val) / float32(DutyCycleWindow) / sb.Value
 }
@@ -130,8 +130,8 @@ func (sb *SubBand) Schedule(em Emission, p ttnpb.TxSchedulePriority) error {
 	if sb.Value < 1 {
 		usable := sb.prioritizedDutyCycle(p)
 		// Check the window before and after the emission for availability.
-		for _, to := range []time.Duration{em.Ends(), em.t + DutyCycleWindow} {
-			used := float32(sb.sum(to-DutyCycleWindow, to)+em.d) / float32(DutyCycleWindow)
+		for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
+			used := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
 			if used > usable {
 				return errDutyCycle.WithAttributes(
 					"used", fmt.Sprintf("%.1f", used*100),
@@ -148,7 +148,7 @@ func (sb *SubBand) Schedule(em Emission, p ttnpb.TxSchedulePriority) error {
 // ScheduleAnytime schedules the given duration at a time when there is availability by accounting for duty-cycle.
 // The given next callback should return the next option that does not conflict with other scheduled downlinks.
 // If there is no duty-cycle limitation, this method returns the first option.
-func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() time.Duration, p ttnpb.TxSchedulePriority) (Emission, error) {
+func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime, p ttnpb.TxSchedulePriority) (Emission, error) {
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
 	em := NewEmission(next(), d)
@@ -165,8 +165,8 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() time.Duration, p
 		for {
 			conflicts := false
 			// Check the window before and after the emission for availability.
-			for _, to := range []time.Duration{em.Ends(), em.t + DutyCycleWindow} {
-				sum := float32(sb.sum(to-DutyCycleWindow, to)+em.d) / float32(DutyCycleWindow)
+			for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
+				sum := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
 				conflicts = conflicts || sum > usable
 			}
 			if !conflicts {
@@ -181,7 +181,7 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() time.Duration, p
 				other := sb.emissions[i]
 				used += float32(other.d) / float32(DutyCycleWindow)
 				if used > usable {
-					em.t = other.Ends() + DutyCycleWindow - em.d
+					em.t = other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
 					break
 				}
 			}
