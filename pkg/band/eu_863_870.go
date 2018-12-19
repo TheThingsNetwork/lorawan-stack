@@ -37,33 +37,40 @@ func init() {
 		UplinkChannels:   defaultChannels,
 		DownlinkChannels: defaultChannels,
 
+		// See ETSI EN 300.220-2 V3.1.1 (2017-02)
 		BandDutyCycles: []DutyCycle{
 			{
+				// Band K
 				MinFrequency: 863000000,
 				MaxFrequency: 865000000,
 				Value:        0.001,
 			},
 			{
+				// Band L
 				MinFrequency: 865000000,
 				MaxFrequency: 868000000,
 				Value:        0.01,
 			},
 			{
+				// Band M
 				MinFrequency: 868000000,
 				MaxFrequency: 868600000,
 				Value:        0.01,
 			},
 			{
+				// Band N
 				MinFrequency: 868700000,
 				MaxFrequency: 869200000,
 				Value:        0.001,
 			},
 			{
+				// Band O
 				MinFrequency: 869400000,
 				MaxFrequency: 869650000,
 				Value:        0.1,
 			},
 			{
+				// Band P
 				MinFrequency: 869700000,
 				MaxFrequency: 870000000,
 				Value:        0.01,
