@@ -22,6 +22,7 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -53,12 +54,12 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		paths = fixed.Paths
 	} else if uplinkTokens := request.GetUplinkTokens(); uplinkTokens != nil {
 		for _, data := range uplinkTokens.Tokens {
-			var path ttnpb.DownlinkPath
-			if err := path.Unmarshal(data); err != nil {
-				details = append(details, errUplinkToken) // Hide the error; uplink tokens are opaque.
-				continue
+			path, err := io.UplinkTokenToPath(data)
+			if err != nil {
+				details = append(details, errUplinkToken) // Do not add the cause; uplink tokens are opaque.
+			} else {
+				paths = append(paths, path)
 			}
-			paths = append(paths, &path)
 		}
 	}
 
