@@ -1,0 +1,200 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package commands
+
+import (
+	"os"
+
+	"github.com/gogo/protobuf/types"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	selectUserFlags = util.FieldMaskFlags(&ttnpb.User{})
+	setUserFlags    = util.FieldFlags(&ttnpb.User{})
+)
+
+func userIDFlags() *pflag.FlagSet {
+	flagSet := new(pflag.FlagSet)
+	flagSet.String("user-id", "", "")
+	return flagSet
+}
+
+var errNoUserID = errors.DefineInvalidArgument("no_user_id", "no user ID set")
+
+func getUserID(flagSet *pflag.FlagSet, args []string) *ttnpb.UserIdentifiers {
+	var userID string
+	if len(args) > 0 {
+		if len(args) > 1 {
+			logger.Warn("multiple IDs found in arguments, considering only the first")
+		}
+		userID = args[0]
+	} else {
+		userID, _ = flagSet.GetString("user-id")
+	}
+	if userID == "" {
+		return nil
+	}
+	return &ttnpb.UserIdentifiers{UserID: userID}
+}
+
+var (
+	usersCommand = &cobra.Command{
+		Use:     "users",
+		Aliases: []string{"user", "usr", "u"},
+		Short:   "User commands",
+	}
+	usersGetCommand = &cobra.Command{
+		Use:     "get",
+		Aliases: []string{"info"},
+		Short:   "Get a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, will select everything")
+				selectUserFlags.VisitAll(func(flag *pflag.Flag) {
+					paths = append(paths, flag.Name)
+				})
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{
+				UserIdentifiers: *usrID,
+				FieldMask:       types.FieldMask{Paths: paths},
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res)
+		},
+	}
+	usersCreateCommand = &cobra.Command{
+		Use:     "create",
+		Aliases: []string{"add", "register"},
+		Short:   "Create a user",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			api.SetAuth("", "") // Unset auth on this call
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+			var user ttnpb.User
+			util.SetFields(&user, setUserFlags)
+			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
+			user.UserIdentifiers = *usrID
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserRegistryClient(is).Create(ctx, &ttnpb.CreateUserRequest{
+				User: user,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res)
+		},
+	}
+	usersUpdateCommand = &cobra.Command{
+		Use:     "update",
+		Aliases: []string{"set"},
+		Short:   "Update a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+			paths := util.UpdateFieldMask(cmd.Flags(), setUserFlags, attributesFlags())
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, won't update anything")
+				return nil
+			}
+			var user ttnpb.User
+			util.SetFields(&user, setUserFlags)
+			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
+			user.UserIdentifiers = *usrID
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserRegistryClient(is).Update(ctx, &ttnpb.UpdateUserRequest{
+				User:      user,
+				FieldMask: types.FieldMask{Paths: paths},
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.Format, res)
+		},
+	}
+	usersDeleteCommand = &cobra.Command{
+		Use:   "delete",
+		Short: "Delete a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserRegistryClient(is).Delete(ctx, usrID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+)
+
+func init() {
+	usersGetCommand.Flags().AddFlagSet(userIDFlags())
+	usersGetCommand.Flags().AddFlagSet(selectUserFlags)
+	usersCommand.AddCommand(usersGetCommand)
+	usersCreateCommand.Flags().AddFlagSet(userIDFlags())
+	usersCreateCommand.Flags().AddFlagSet(setUserFlags)
+	usersCreateCommand.Flags().AddFlagSet(attributesFlags())
+	usersCommand.AddCommand(usersCreateCommand)
+	usersUpdateCommand.Flags().AddFlagSet(userIDFlags())
+	usersUpdateCommand.Flags().AddFlagSet(setUserFlags)
+	usersUpdateCommand.Flags().AddFlagSet(attributesFlags())
+	usersCommand.AddCommand(usersUpdateCommand)
+	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(usersDeleteCommand)
+	Root.AddCommand(usersCommand)
+}
