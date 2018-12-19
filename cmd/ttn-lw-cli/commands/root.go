@@ -70,6 +70,7 @@ var (
 			if err != nil {
 				return err
 			}
+			ctx = log.NewContext(ctx, logger)
 
 			// prepare the API
 			api.SetLogger(logger)
