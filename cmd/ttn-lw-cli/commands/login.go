@@ -21,6 +21,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"golang.org/x/oauth2"
 )
 
@@ -74,17 +76,34 @@ var (
 		Short: "Logout",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
+				is, err := api.Dial(ctx, config.IdentityServerAddress)
+				if err != nil {
+					return err
+				}
+
+				if res, err := ttnpb.NewEntityAccessClient(is).AuthInfo(ctx, ttnpb.Empty); err == nil {
+					if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
+						_, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
+							UserIDs:   tokenInfo.UserIDs,
+							ClientIDs: tokenInfo.ClientIDs,
+							ID:        tokenInfo.ID,
+						})
+						if err != nil {
+							logger.Warn("We could not revoke the OAuth token on the server")
+							if time.Until(token.Expiry) > 0 {
+								logger.Warnf("The OAuth token expires at %s", token.Expiry.Truncate(time.Minute).Format(time.Kitchen))
+							}
+							if token.RefreshToken != "" {
+								logger.Warn("The OAuth token can still be refreshed after expiry")
+							}
+							logger.Warn("Please contact support if this token was compromised")
+						}
+					}
+				}
+
 				cache.Set("oauth_token", (*oauth2.Token)(nil))
-				logger.Info("Removed OAuth token from cache")
-				expiresIn := time.Until(token.Expiry)
-				if expiresIn > 0 {
-					logger.Warnf("The OAuth token expires at %s", token.Expiry.Truncate(time.Minute).Format(time.Kitchen))
-				}
-				if token.RefreshToken != "" {
-					logger.Warn("The OAuth token can still be refreshed after expiry")
-				}
-				logger.Warn("We can not (yet) revoke the OAuth token on the server")
-				logger.Warn("Please contact support if this token was compromised")
+
+				logger.Info("Logged out")
 			}
 			if _, ok := cache.Get("api_key").(string); ok {
 				cache.Set("api_key", "")
