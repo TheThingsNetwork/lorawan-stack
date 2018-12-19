@@ -28,6 +28,7 @@ import (
 
 const redirectURISeparator = ";"
 
+// osinClient type is the same as ttnpb.Client, while implementing the osin.Client interface.
 type osinClient ttnpb.Client
 
 func (cli osinClient) GetId() string {
@@ -52,11 +53,13 @@ func (cli osinClient) GetRedirectUri() string {
 
 func (cli osinClient) GetUserData() interface{} { return nil }
 
+// userData is used as the UserData interface in osin structs.
 type userData struct {
 	ttnpb.UserIdentifiers
 	ID string
 }
 
+// storage wraps IS stores, while implementing the osin.Storage interface.
 type storage struct {
 	ctx     context.Context
 	clients store.ClientStore
