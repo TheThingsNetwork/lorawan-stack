@@ -68,6 +68,7 @@ export default class ApplicationsTable extends Component {
         searchItemsAction={searchApplicationsList}
         tabs={tabs}
         baseDataSelector={this.baseDataSelector}
+        searchable
         {...this.props}
       />
     )

@@ -184,6 +184,7 @@ class FetchTable extends Component {
       tableTitle,
       headers,
       tabs,
+      searchable,
     } = this.props
     const { page, query, tab } = this.state
 
@@ -208,12 +209,14 @@ class FetchTable extends Component {
             <div className={style.tableTitle}>{tableTitle}</div>
           </div>
           <div className={style.filtersRight}>
-            <Input
-              value={query}
-              icon="search"
-              loading={fetchingSearch}
-              onChange={this.onQueryChange}
-            />
+            { searchable && (
+              <Input
+                value={query}
+                icon="search"
+                loading={fetchingSearch}
+                onChange={this.onQueryChange}
+              />
+            )}
             <Button
               onClick={this.onItemAdd}
               className={style.addButton}
