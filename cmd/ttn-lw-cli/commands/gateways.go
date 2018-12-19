@@ -70,10 +70,8 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			if len(paths) == 0 {
-				logger.Warn("No fields selected, will select everything")
-				selectGatewayFlags.VisitAll(func(flag *pflag.Flag) {
-					paths = append(paths, flag.Name)
-				})
+				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
+				paths = append(paths, defaultGetPaths...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -97,10 +95,8 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			if len(paths) == 0 {
-				logger.Warn("No fields selected, will select everything")
-				selectGatewayFlags.VisitAll(func(flag *pflag.Flag) {
-					paths = append(paths, flag.Name)
-				})
+				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
+				paths = append(paths, defaultGetPaths...)
 			}
 			req := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
@@ -128,10 +124,8 @@ var (
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			if len(paths) == 0 {
-				logger.Warn("No fields selected, will select everything")
-				selectGatewayFlags.VisitAll(func(flag *pflag.Flag) {
-					paths = append(paths, flag.Name)
-				})
+				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
+				paths = append(paths, defaultGetPaths...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)

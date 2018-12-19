@@ -22,6 +22,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+var defaultGetPaths = []string{"name"}
+
 func collaboratorFlags() *pflag.FlagSet {
 	flagSet := new(pflag.FlagSet)
 	flagSet.String("user-id", "", "")
