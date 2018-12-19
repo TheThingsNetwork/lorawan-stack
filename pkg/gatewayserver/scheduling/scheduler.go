@@ -50,7 +50,7 @@ var (
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Scheduler, error) {
 	s := &Scheduler{
-		RolloverClock:     &RolloverClock{},
+		clock:             &RolloverClock{},
 		respectsDwellTime: fp.RespectsDwellTime,
 		timeOffAir:        fp.TimeOffAir,
 	}
@@ -60,7 +60,7 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 			return nil, err
 		}
 		for _, subBand := range band.BandDutyCycles {
-			sb := NewSubBand(ctx, subBand, s.RolloverClock, nil)
+			sb := NewSubBand(ctx, subBand, s.clock, nil)
 			s.subBands = append(s.subBands, sb)
 		}
 	} else {
@@ -68,7 +68,7 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 			MinFrequency: 0,
 			MaxFrequency: math.MaxUint64,
 			Value:        1,
-		}, s.RolloverClock, nil)
+		}, s.clock, nil)
 		s.subBands = append(s.subBands, sb)
 	}
 	return s, nil
@@ -76,11 +76,11 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 
 // Scheduler is a packet scheduler that takes time conflicts and sub-band restrictions into account.
 type Scheduler struct {
-	*RolloverClock
+	clock             *RolloverClock
 	respectsDwellTime func(isDownlink bool, frequency uint64, duration time.Duration) bool
 	timeOffAir        frequencyplans.TimeOffAir
 	subBands          []*SubBand
-	emissionsMu       sync.Mutex
+	mu                sync.Mutex
 	emissions         Emissions
 }
 
@@ -109,7 +109,7 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 	}
 	var relative ConcentratorTime
 	if settings.Time != nil {
-		relative = s.RolloverClock.GatewayTime(*settings.Time)
+		relative = s.clock.GatewayTime(*settings.Time)
 	} else {
 		relative = ConcentratorTime(time.Duration(settings.Timestamp) * time.Microsecond)
 	}
@@ -120,6 +120,8 @@ var errConflict = errors.DefineResourceExhausted("conflict", "scheduling conflic
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
 func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
 		return Emission{}, err
@@ -128,8 +130,6 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	if err != nil {
 		return Emission{}, err
 	}
-	s.emissionsMu.Lock()
-	defer s.emissionsMu.Unlock()
 	for _, other := range s.emissions {
 		if em.AfterWithOffAir(other, s.timeOffAir)-QueueDelay < 0 && em.BeforeWithOffAir(other, s.timeOffAir)-QueueDelay < 0 {
 			return Emission{}, errConflict
@@ -150,7 +150,9 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
-	now := s.RolloverClock.ServerTime(time.Now())
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	now := s.clock.ServerTime(time.Now())
 	if settings.Timestamp == 0 && settings.Time == nil {
 		settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
 	}
@@ -162,8 +164,6 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	if err != nil {
 		return Emission{}, err
 	}
-	s.emissionsMu.Lock()
-	defer s.emissionsMu.Unlock()
 	i := 0
 	next := func() ConcentratorTime {
 		if len(s.emissions) == 0 {
@@ -201,4 +201,12 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	}
 	s.emissions = s.emissions.Insert(em)
 	return em, nil
+}
+
+// Sync synchronizes the clock with the given concentrator time v, the server time and the gateway time that
+// corresponds to the given v.
+func (s *Scheduler) Sync(v uint32, server, gateway time.Time) {
+	s.mu.Lock()
+	s.clock.Sync(v, server, gateway)
+	s.mu.Unlock()
 }
