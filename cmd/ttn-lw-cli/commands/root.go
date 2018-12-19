@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -70,6 +71,16 @@ var (
 				return err
 			}
 
+			// prepare the API
+			api.SetLogger(logger)
+			api.SetInsecure(config.Insecure)
+			if config.CA != "" {
+				err = api.SetCA(config.CA)
+				if err != nil {
+					return err
+				}
+			}
+
 			// OAuth
 			oauth2Config = &oauth2.Config{
 				ClientID: "cli",
@@ -80,8 +91,9 @@ var (
 			}
 
 			// Access
-			if _, ok := cache.Get("api_key").(string); ok {
+			if apiKey, ok := cache.Get("api_key").(string); ok {
 				logger.Debug("Using API key")
+				api.SetAuth("bearer", apiKey)
 			} else if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
 				freshToken, err := oauth2Config.TokenSource(ctx, token).Token()
 				if freshToken != token {
@@ -95,6 +107,7 @@ var (
 					logger.WithError(err).Warn("No valid access token present")
 				} else {
 					logger.Debugf("Using access token (valid until %s)", freshToken.Expiry.Truncate(time.Minute).Format(time.Kitchen))
+					api.SetAuth(freshToken.TokenType, freshToken.AccessToken)
 				}
 			} else {
 				logger.Warn("No access token present")
@@ -103,6 +116,9 @@ var (
 			return nil
 		},
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+			// clean up the API
+			api.CloseAll()
+
 			err := util.SaveCache(cache)
 			if err != nil {
 				return err
