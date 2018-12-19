@@ -28,9 +28,8 @@ import (
 func init() {
 	applicationAccessUser.Admin = false
 	applicationAccessUser.State = ttnpb.STATE_APPROVED
-	APIKeys := userAPIKeys(&applicationAccessUser.UserIdentifiers)
-	for _, APIKey := range APIKeys.APIKeys {
-		APIKey.Rights = []ttnpb.Right{
+	for _, apiKey := range userAPIKeys(&applicationAccessUser.UserIdentifiers).APIKeys {
+		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
 			ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
 		}
@@ -47,14 +46,14 @@ func TestApplicationAccessNotFound(t *testing.T) {
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
-		APIKey := ttnpb.APIKey{
+		apiKey := ttnpb.APIKey{
 			ID:   "does-not-exist-id",
 			Name: "test-application-api-key-name",
 		}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			APIKey:                 APIKey,
+			APIKey:                 apiKey,
 		}, creds)
 
 		a.So(updated, should.BeNil)

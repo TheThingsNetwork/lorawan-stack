@@ -28,9 +28,8 @@ import (
 func init() {
 	gatewayAccessUser.Admin = false
 	gatewayAccessUser.State = ttnpb.STATE_APPROVED
-	APIKeys := userAPIKeys(&gatewayAccessUser.UserIdentifiers)
-	for _, APIKey := range APIKeys.APIKeys {
-		APIKey.Rights = []ttnpb.Right{
+	for _, apiKey := range userAPIKeys(&gatewayAccessUser.UserIdentifiers).APIKeys {
+		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 		}
@@ -47,14 +46,14 @@ func TestGatewayAccessNotFound(t *testing.T) {
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
-		APIKey := ttnpb.APIKey{
+		apiKey := ttnpb.APIKey{
 			ID:   "does-not-exist-id",
 			Name: "test-gateway-api-key-name",
 		}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			APIKey:             APIKey,
+			APIKey:             apiKey,
 		}, creds)
 
 		a.So(updated, should.BeNil)

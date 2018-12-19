@@ -28,9 +28,8 @@ import (
 func init() {
 	organizationAccessUser.Admin = false
 	organizationAccessUser.State = ttnpb.STATE_APPROVED
-	APIKeys := userAPIKeys(&organizationAccessUser.UserIdentifiers)
-	for _, APIKey := range APIKeys.APIKeys {
-		APIKey.Rights = []ttnpb.Right{
+	for _, apiKey := range userAPIKeys(&organizationAccessUser.UserIdentifiers).APIKeys {
+		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
 			ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
 		}
@@ -47,14 +46,14 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
-		APIKey := ttnpb.APIKey{
+		apiKey := ttnpb.APIKey{
 			ID:   "does-not-exist-id",
 			Name: "test-application-api-key-name",
 		}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			APIKey:                  APIKey,
+			APIKey:                  apiKey,
 		}, creds)
 
 		a.So(updated, should.BeNil)

@@ -29,9 +29,8 @@ import (
 func init() {
 	userAccessUser.Admin = false
 	userAccessUser.State = ttnpb.STATE_APPROVED
-	APIKeys := userAPIKeys(&userAccessUser.UserIdentifiers)
-	for _, APIKey := range APIKeys.APIKeys {
-		APIKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_SETTINGS_API_KEYS}
+	for _, apiKey := range userAPIKeys(&userAccessUser.UserIdentifiers).APIKeys {
+		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_SETTINGS_API_KEYS}
 	}
 }
 
@@ -44,14 +43,14 @@ func TestUserAccessNotFound(t *testing.T) {
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
-		APIKey := ttnpb.APIKey{
+		apiKey := ttnpb.APIKey{
 			ID:   "does-not-exist-id",
 			Name: "test-user-api-key-name",
 		}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
-			APIKey:          APIKey,
+			APIKey:          apiKey,
 		}, creds)
 
 		a.So(updated, should.BeNil)
