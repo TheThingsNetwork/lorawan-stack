@@ -31,6 +31,7 @@ type Config struct {
 	Format                   string `name:"format" shorthand:"f" description:"Output format"`
 	OAuthServerAddress       string `name:"oauth-server-address" description:"OAuth Server Address"`
 	IdentityServerAddress    string `name:"identity-server-address" description:"Identity Server Address"`
+	GatewayServerAddress     string `name:"gateway-server-address" description:"Gateway Server Address"`
 	NetworkServerAddress     string `name:"network-server-address" description:"Network Server Address"`
 	ApplicationServerAddress string `name:"application-server-address" description:"Application Server Address"`
 	JoinServerAddress        string `name:"join-server-address" description:"Join Server Address"`
@@ -48,6 +49,7 @@ var DefaultConfig = Config{
 	Format:                   "json",
 	OAuthServerAddress:       clusterHTTPAddress,
 	IdentityServerAddress:    clusterGRPCAddress,
+	GatewayServerAddress:     clusterGRPCAddress,
 	NetworkServerAddress:     clusterGRPCAddress,
 	ApplicationServerAddress: clusterGRPCAddress,
 	JoinServerAddress:        clusterGRPCAddress,

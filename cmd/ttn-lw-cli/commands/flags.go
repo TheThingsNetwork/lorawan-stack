@@ -126,3 +126,58 @@ func getSearchEntitiesRequest(flagSet *pflag.FlagSet) *ttnpb.SearchEntitiesReque
 		AttributesContain:   attributesContain,
 	}
 }
+
+var errNoIDs = errors.DefineInvalidArgument("no_ids", "no IDs set")
+
+func combinedIdentifiersFlags() *pflag.FlagSet {
+	flagSet := new(pflag.FlagSet)
+	flagSet.StringSlice("application-id", nil, "")
+	flagSet.StringSlice("client-id", nil, "")
+	flagSet.StringSlice("device-id", nil, "")
+	flagSet.StringSlice("gateway-id", nil, "")
+	flagSet.StringSlice("organization-id", nil, "")
+	flagSet.StringSlice("user-id", nil, "")
+	return flagSet
+}
+
+func getCombinedIdentifiers(flagSet *pflag.FlagSet) *ttnpb.CombinedIdentifiers {
+	applicationIDs, _ := flagSet.GetStringSlice("application-id")
+	clientIDs, _ := flagSet.GetStringSlice("client-id")
+	deviceIDs, _ := flagSet.GetStringSlice("device-id")
+	gatewayIDs, _ := flagSet.GetStringSlice("gateway-id")
+	organizationIDs, _ := flagSet.GetStringSlice("organization-id")
+	userIDs, _ := flagSet.GetStringSlice("user-id")
+
+	ids := new(ttnpb.CombinedIdentifiers)
+	if len(deviceIDs) > 0 {
+		if len(clientIDs)+len(gatewayIDs)+len(organizationIDs)+len(userIDs) > 0 {
+			logger.Warn("considering only devices")
+		}
+		for _, deviceID := range deviceIDs {
+			for _, applicationID := range applicationIDs {
+				ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+					DeviceID:               deviceID,
+				}.EntityIdentifiers())
+			}
+		}
+		return ids
+	}
+
+	for _, applicationID := range applicationIDs {
+		ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.ApplicationIdentifiers{ApplicationID: applicationID}.EntityIdentifiers())
+	}
+	for _, clientID := range clientIDs {
+		ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.ClientIdentifiers{ClientID: clientID}.EntityIdentifiers())
+	}
+	for _, gatewayID := range gatewayIDs {
+		ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.GatewayIdentifiers{GatewayID: gatewayID}.EntityIdentifiers())
+	}
+	for _, organizationID := range organizationIDs {
+		ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.OrganizationIdentifiers{OrganizationID: organizationID}.EntityIdentifiers())
+	}
+	for _, userID := range userIDs {
+		ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.UserIdentifiers{UserID: userID}.EntityIdentifiers())
+	}
+	return ids
+}
