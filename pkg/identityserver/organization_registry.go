@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -27,8 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -138,7 +135,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	ctx = store.SetTotalCount(ctx, &total)
 	defer func() {
 		if err == nil {
-			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
+			setTotalHeader(ctx, total)
 		}
 	}()
 	orgs = &ttnpb.Organizations{}

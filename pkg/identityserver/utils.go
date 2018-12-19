@@ -15,9 +15,13 @@
 package identityserver
 
 import (
+	"context"
+	"strconv"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func topLevelFields(paths []string) []string {
@@ -60,4 +64,8 @@ func cleanContactInfo(info []*ttnpb.ContactInfo) {
 	for _, info := range info {
 		info.ValidatedAt = nil
 	}
+}
+
+func setTotalHeader(ctx context.Context, total uint64) {
+	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 }
