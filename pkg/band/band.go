@@ -190,16 +190,14 @@ type Band struct {
 
 // DutyCycle contains the sub-band frequency range and its duty cycle.
 type DutyCycle struct {
-	// MinFrequency is the inclusive minimum frequency.
 	MinFrequency uint64
-	// MaxFrequency is the exlusive maximum frequency.
 	MaxFrequency uint64
 	Value        float32
 }
 
 // Comprises returns whether the duty cycle applies to the given frequency.
 func (d DutyCycle) Comprises(frequency uint64) bool {
-	return frequency >= d.MinFrequency && frequency < d.MaxFrequency
+	return frequency >= d.MinFrequency && frequency <= d.MaxFrequency
 }
 
 // MaxEmissionDuring the period passed as parameter, that is allowed by that duty cycle.
