@@ -450,7 +450,10 @@
 [[projects]]
   digest = "1:d269638dbd514822446c3c818b6389c880058af79ec54d97731818b34fe66921"
   name = "github.com/jinzhu/gorm"
-  packages = ["."]
+  packages = [
+    ".",
+    "dialects/postgres",
+  ]
   pruneopts = ""
   revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
   version = "v1.9.1"
@@ -523,6 +526,7 @@
   name = "github.com/lib/pq"
   packages = [
     ".",
+    "hstore",
     "oid",
   ]
   pruneopts = ""
@@ -1125,6 +1129,7 @@
     "github.com/jacobsa/crypto/cmac",
     "github.com/jaytaylor/html2text",
     "github.com/jinzhu/gorm",
+    "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/kr/pretty",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",

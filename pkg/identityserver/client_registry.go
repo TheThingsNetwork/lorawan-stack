@@ -1,0 +1,215 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package identityserver
+
+import (
+	"context"
+	"strconv"
+
+	"github.com/gogo/protobuf/types"
+	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+)
+
+func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
+	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_CREATE); err != nil {
+			return nil, err
+		}
+	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
+		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_CLIENTS_CREATE); err != nil {
+			return nil, err
+		}
+	}
+
+	secret := req.Client.Secret
+	if secret == "" {
+		secret, err = auth.GenerateKey(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+	hashedSecret, err := auth.Hash(secret)
+	if err != nil {
+		return nil, err
+	}
+	req.Client.Secret = string(hashedSecret)
+
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		cliStore := store.GetClientStore(db)
+		cli, err = cliStore.CreateClient(ctx, &req.Client)
+		if err != nil {
+			return err
+		}
+		memberStore := store.GetMembershipStore(db)
+		err = memberStore.SetMember(ctx, &req.Collaborator, cli.ClientIdentifiers.EntityIdentifiers(), ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	cli.Secret = secret // Return the unhashed secret, in case it was generated.
+
+	return cli, nil
+}
+
+func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientRequest) (cli *ttnpb.Client, err error) {
+	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Filter FieldMask by Rights
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		cliStore := store.GetClientStore(db)
+		cli, err = cliStore.GetClient(ctx, &req.ClientIdentifiers, &req.FieldMask)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cli, nil
+}
+
+func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
+	var cliRights map[string]*ttnpb.Rights
+	if req.Collaborator == nil {
+		rights, ok := rights.FromContext(ctx)
+		if !ok {
+			return &ttnpb.Clients{}, nil
+		}
+		cliRights = rights.ClientRights
+		if len(cliRights) == 0 {
+			return &ttnpb.Clients{}, nil
+		}
+	}
+	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_LIST); err != nil {
+			return nil, err
+		}
+	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
+		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_CLIENTS_LIST); err != nil {
+			return nil, err
+		}
+	}
+	var total uint64
+	ctx = store.SetTotalCount(ctx, &total)
+	defer func() {
+		if err == nil {
+			grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
+		}
+	}()
+	clis = new(ttnpb.Clients)
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if cliRights == nil {
+			memberStore := store.GetMembershipStore(db)
+			rights, err := memberStore.FindMemberRights(ctx, req.Collaborator, "client")
+			if err != nil {
+				return err
+			}
+			cliRights = make(map[string]*ttnpb.Rights, len(rights))
+			for ids, rights := range rights {
+				cliRights[unique.ID(ctx, ids)] = rights
+			}
+		}
+		if len(cliRights) == 0 {
+			return nil
+		}
+		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(cliRights))
+		for uid := range cliRights {
+			cliID, err := unique.ToClientID(uid)
+			if err != nil {
+				continue
+			}
+			cliIDs = append(cliIDs, &cliID)
+		}
+		cliStore := store.GetClientStore(db)
+		clis.Clients, err = cliStore.FindClients(ctx, cliIDs, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		for _, cli := range clis.Clients {
+			// TODO: Filter FieldMask by Rights
+			_ = cliRights[unique.ID(ctx, cli.ClientIdentifiers)]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return clis, nil
+}
+
+func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
+	err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Filter FieldMask by Rights
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		cliStore := store.GetClientStore(db)
+		cli, err = cliStore.UpdateClient(ctx, &req.Client, &req.FieldMask)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cli, nil
+}
+
+func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*types.Empty, error) {
+	err := rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL)
+	if err != nil {
+		return nil, err
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		cliStore := store.GetClientStore(db)
+		err = cliStore.DeleteClient(ctx, ids)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
+}
+
+type clientRegistry struct {
+	*IdentityServer
+}
+
+func (cr *clientRegistry) Create(ctx context.Context, req *ttnpb.CreateClientRequest) (*ttnpb.Client, error) {
+	return cr.createClient(ctx, req)
+}
+func (cr *clientRegistry) Get(ctx context.Context, req *ttnpb.GetClientRequest) (*ttnpb.Client, error) {
+	return cr.getClient(ctx, req)
+}
+func (cr *clientRegistry) List(ctx context.Context, req *ttnpb.ListClientsRequest) (*ttnpb.Clients, error) {
+	return cr.listClients(ctx, req)
+}
+func (cr *clientRegistry) Update(ctx context.Context, req *ttnpb.UpdateClientRequest) (*ttnpb.Client, error) {
+	return cr.updateClient(ctx, req)
+}
+func (cr *clientRegistry) Delete(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {
+	return cr.deleteClient(ctx, req)
+}

@@ -2447,6 +2447,42 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver:nested_organizations": {
+    "translations": {
+      "en": "organizations can not be nested"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
+  "error:pkg/identityserver:old_password": {
+    "translations": {
+      "en": "incorrect old password"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:temporary_password_expired": {
+    "translations": {
+      "en": "temporary password expired"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:temporary_password_still_valid": {
+    "translations": {
+      "en": "previous temporary password still valid"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/joinserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
@@ -3228,6 +3264,87 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/oauth:auth_cookie": {
+    "translations": {
+      "en": "could not get auth cookie"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/oauth:no_access_token": {
+    "translations": {
+      "en": "the provided token is not an access token`"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/oauth:no_refresh_token": {
+    "translations": {
+      "en": "the provided token is not a refresh token`"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/oauth:not_authenticated": {
+    "translations": {
+      "en": "not authenticated"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "middleware.go"
+    }
+  },
+  "error:pkg/oauth:password": {
+    "translations": {
+      "en": "incorrect password"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/oauth:session_expired": {
+    "translations": {
+      "en": "session expired"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/oauth:token": {
+    "translations": {
+      "en": "invalid token"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/oauth:token_mismatch": {
+    "translations": {
+      "en": "refresh token ID `{refresh_token_id}` does not match access token ID `{access_token_id}`"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/oauth:token_parts": {
+    "translations": {
+      "en": "token does not consist of three parts"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "storage.go"
     }
   },
   "error:pkg/redis:missing_key": {
@@ -4389,6 +4506,51 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
+    }
+  },
+  "event:oauth.authorize": {
+    "translations": {
+      "en": "authorize OAuth client"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "events.go"
+    }
+  },
+  "event:oauth.token.exchange": {
+    "translations": {
+      "en": "exchange OAuth Access Token"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "events.go"
+    }
+  },
+  "event:oauth.user.login": {
+    "translations": {
+      "en": "successful user login"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "events.go"
+    }
+  },
+  "event:oauth.user.login_failed": {
+    "translations": {
+      "en": "failed user login"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "events.go"
+    }
+  },
+  "event:oauth.user.logout": {
+    "translations": {
+      "en": "user logout"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "events.go"
     }
   }
 }

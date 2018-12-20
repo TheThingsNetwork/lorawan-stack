@@ -128,6 +128,11 @@ func (c *Component) Logger() log.Stack {
 	return c.logger
 }
 
+// LogDebug returns whether the component should log debug messages.
+func (c *Component) LogDebug() bool {
+	return c.config.Log.Level == log.DebugLevel
+}
+
 // Context returns the context of the component
 func (c *Component) Context() context.Context {
 	return c.ctx

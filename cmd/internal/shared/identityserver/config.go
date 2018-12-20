@@ -15,10 +15,27 @@
 package identityserver
 
 import (
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/pkg/oauth"
+	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
 // DefaultIdentityServerConfig is the default configuration for the Identity Server.
 var DefaultIdentityServerConfig = identityserver.Config{
-	DatabaseURI: "postgresql://root@localhost:26257/is_development?sslmode=disable",
+	DatabaseURI: "postgresql://root@localhost:26257/ttn_lorawan_dev?sslmode=disable",
+	OAuth: oauth.Config{
+		Mount: "/oauth",
+		UI: oauth.UIConfig{
+			TemplateData: webui.TemplateData{
+				SiteName:      "The Things Network",
+				Language:      "en",
+				CanonicalURL:  shared.DefaultOAuthPublicURL,
+				AssetsBaseURL: shared.DefaultAssetsBaseURL,
+				IconPrefix:    "oauth-",
+				CSSFiles:      []string{"oauth.css"},
+				JSFiles:       []string{"oauth.js"},
+			},
+		},
+	},
 }

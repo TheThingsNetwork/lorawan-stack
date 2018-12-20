@@ -14,17 +14,34 @@
 
 package identityserver
 
-import "go.thethings.network/lorawan-stack/pkg/component"
+import (
+	"context"
 
-// Config for the Identity Server.
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/oauth"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
+)
+
+// Config for the Identity Server
 type Config struct {
-	DatabaseURI string `name:"database-uri" description:"Database connection URI"`
+	DatabaseURI string       `name:"database-uri" description:"Database connection URI"`
+	OAuth       oauth.Config `name:"oauth"`
 }
 
 // IdentityServer implements the Identity Server component.
+//
+// The Identity Server exposes the Registry and Access services for Applications,
+// OAuth Clients, Gateways, Organizations and Users.
 type IdentityServer struct {
 	*component.Component
 	config *Config
+	db     *gorm.DB
+	oauth  oauth.Server
 }
 
 // New returns new *IdentityServer.
@@ -33,5 +50,68 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		Component: c,
 		config:    config,
 	}
+	is.db, err = gorm.Open("postgres", is.config.DatabaseURI)
+	if err != nil {
+		return nil, err
+	}
+	if c.LogDebug() {
+		is.db = is.db.Debug()
+	}
+	err = store.Check(is.db)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		<-is.Context().Done()
+		is.db.Close()
+	}()
+
+	is.oauth = oauth.NewServer(is.Context(), struct {
+		store.UserStore
+		store.UserSessionStore
+		store.ClientStore
+		store.OAuthStore
+	}{
+		UserStore:        store.GetUserStore(is.db),
+		UserSessionStore: store.GetUserSessionStore(is.db),
+		ClientStore:      store.GetClientStore(is.db),
+		OAuthStore:       store.GetOAuthStore(is.db),
+	}, is.config.OAuth)
+
+	c.RegisterGRPC(is)
+	c.RegisterWeb(is.oauth)
+
 	return is, nil
+}
+
+func (is *IdentityServer) withDatabase(ctx context.Context, f func(*gorm.DB) error) error {
+	return store.Transact(ctx, is.db, f)
+}
+
+// RegisterServices registers services provided by is at s.
+func (is *IdentityServer) RegisterServices(s *grpc.Server) {
+	ttnpb.RegisterApplicationRegistryServer(s, &applicationRegistry{IdentityServer: is})
+	ttnpb.RegisterClientRegistryServer(s, &clientRegistry{IdentityServer: is})
+	ttnpb.RegisterGatewayRegistryServer(s, &gatewayRegistry{IdentityServer: is})
+	ttnpb.RegisterOrganizationRegistryServer(s, &organizationRegistry{IdentityServer: is})
+	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
+}
+
+// RegisterHandlers registers gRPC handlers.
+func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterApplicationRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterApplicationAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterClientRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterClientAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterGatewayRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterGatewayAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterOrganizationRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterOrganizationAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterUserAccessHandler(is.Context(), s, conn)
+}
+
+// Roles returns the roles that the Identity Server fulfills.
+func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
+	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY}
 }
