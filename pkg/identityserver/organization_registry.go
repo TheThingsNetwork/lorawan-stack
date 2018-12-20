@@ -37,7 +37,7 @@ var (
 var errNestedOrganizations = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")
 
 func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	if err := blacklist.Check(ctx, req.OrganizationID); err != nil {
+	if err = blacklist.Check(ctx, req.OrganizationID); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {

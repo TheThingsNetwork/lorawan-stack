@@ -34,7 +34,7 @@ var (
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err := blacklist.Check(ctx, req.ApplicationID); err != nil {
+	if err = blacklist.Check(ctx, req.ApplicationID); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {

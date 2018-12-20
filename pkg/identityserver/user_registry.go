@@ -84,7 +84,7 @@ func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err err
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
 	createdByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
 
-	if err := blacklist.Check(ctx, req.UserID); err != nil {
+	if err = blacklist.Check(ctx, req.UserID); err != nil {
 		return nil, err
 	}
 	if req.InvitationToken == "" && is.configFromContext(ctx).UserRegistration.Invitation.Required && !createdByAdmin {

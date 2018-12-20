@@ -34,7 +34,7 @@ var (
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
-	if err := blacklist.Check(ctx, req.GatewayID); err != nil {
+	if err = blacklist.Check(ctx, req.GatewayID); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
