@@ -20,6 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/email"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -30,7 +31,7 @@ func TestSendGrid(t *testing.T) {
 	apiKey := os.Getenv("SENDGRID_API_KEY")
 
 	sg, err := New(
-		test.GetLogger(t),
+		log.NewContext(test.Context(), test.GetLogger(t)),
 		email.Config{
 			SenderName:    "Unit Test",
 			SenderAddress: "unit@test.local",

@@ -16,6 +16,8 @@
 package sendgrid
 
 import (
+	"context"
+
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.thethings.network/lorawan-stack/pkg/email"
@@ -38,9 +40,9 @@ type SendGrid struct {
 }
 
 // New creates a SendGrid email provider.
-func New(logger log.Interface, emailConfig email.Config, sgConfig Config) (email.Sender, error) {
+func New(ctx context.Context, emailConfig email.Config, sgConfig Config) (email.Sender, error) {
 	provider := &SendGrid{
-		logger:    logger.WithField("email_provider", "SendGrid"),
+		logger:    log.FromContext(ctx).WithField("email_provider", "SendGrid"),
 		config:    sgConfig,
 		client:    sendgrid.NewSendClient(sgConfig.APIKey),
 		fromEmail: mail.NewEmail(emailConfig.SenderName, emailConfig.SenderAddress),
