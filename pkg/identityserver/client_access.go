@@ -65,6 +65,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateClientCollaborator(ctx, req.ClientIdentifiers, nil))
+		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	} else {
 		events.Publish(evtDeleteClientCollaborator(ctx, req.ClientIdentifiers, nil))
 	}

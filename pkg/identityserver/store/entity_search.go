@@ -41,18 +41,18 @@ func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntiti
 	}
 	db = db.Select(fmt.Sprintf("%s AS id", idField)).Where(fmt.Sprintf("%s.deleted_at IS NULL", table))
 	if req.IDContains != "" {
-		db = db.Where(fmt.Sprintf("%s LIKE ?", idField), "%"+req.IDContains+"%") // TODO: Escape wildcards.
+		db = db.Where(fmt.Sprintf("%s LIKE ?", idField), "%"+req.IDContains+"%") // TODO: Escape wildcards (https://github.com/TheThingsIndustries/lorawan-stack/issues/1396).
 	}
 	if req.NameContains != "" {
-		db = db.Where("name LIKE ?", "%"+req.NameContains+"%") // TODO: Escape wildcards.
+		db = db.Where("name LIKE ?", "%"+req.NameContains+"%") // TODO: Escape wildcards (https://github.com/TheThingsIndustries/lorawan-stack/issues/1396).
 	}
 	if req.DescriptionContains != "" {
-		db = db.Where("description LIKE ?", "%"+req.DescriptionContains+"%") // TODO: Escape wildcards.
+		db = db.Where("description LIKE ?", "%"+req.DescriptionContains+"%") // TODO: Escape wildcards (https://github.com/TheThingsIndustries/lorawan-stack/issues/1396).
 	}
 	if len(req.AttributesContain) > 0 {
 		sub := s.db.Scopes(withContext(ctx)).Table("attributes").Select("entity_id").Where("entity_type = ?", entityType)
 		for key, value := range req.AttributesContain {
-			sub = sub.Where("key = ? AND value LIKE ?", key, "%"+value+"%") // TODO: Escape wildcards.
+			sub = sub.Where("key = ? AND value LIKE ?", key, "%"+value+"%") // TODO: Escape wildcards (https://github.com/TheThingsIndustries/lorawan-stack/issues/1396).
 		}
 		db = db.Where(fmt.Sprintf("%s.id IN (?)", table), sub.QueryExpr())
 	}

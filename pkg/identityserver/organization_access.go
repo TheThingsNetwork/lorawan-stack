@@ -67,6 +67,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 	}
 	key.Key = token
 	events.Publish(evtCreateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+	// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	return key, nil
 }
 
@@ -110,6 +111,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 	key.Key = ""
 	if len(req.Rights) > 0 {
 		events.Publish(evtUpdateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	} else {
 		events.Publish(evtDeleteOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
 	}
@@ -138,6 +140,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateOrganizationCollaborator(ctx, req.OrganizationIdentifiers, nil))
+		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	} else {
 		events.Publish(evtDeleteOrganizationCollaborator(ctx, req.OrganizationIdentifiers, nil))
 	}

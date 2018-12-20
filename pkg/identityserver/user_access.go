@@ -64,6 +64,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	}
 	key.Key = token
 	events.Publish(evtCreateUserAPIKey(ctx, req.UserIdentifiers, nil))
+	// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	return key, nil
 }
 
@@ -107,6 +108,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	key.Key = ""
 	if len(req.Rights) > 0 {
 		events.Publish(evtUpdateUserAPIKey(ctx, req.UserIdentifiers, nil))
+		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	} else {
 		events.Publish(evtDeleteUserAPIKey(ctx, req.UserIdentifiers, nil))
 	}

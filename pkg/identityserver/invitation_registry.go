@@ -62,7 +62,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 		return nil, err
 	}
 	events.Publish(evtCreateInvitation(ctx, nil, invitation))
-	// TODO: Send Email
+	// TODO: Send invitation email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	return invitation, nil
 }
 

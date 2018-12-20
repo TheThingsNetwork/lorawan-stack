@@ -238,6 +238,8 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		return nil, err
 	}
 	events.Publish(evtUpdateClient(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
+	// TODO: Send emails (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// - If client state changed (approved, rejected, flagged, suspended)
 	return cli, nil
 }
 
@@ -252,7 +254,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 		return nil, err
 	}
 	events.Publish(evtDeleteClient(ctx, ids, nil))
-	// TODO: Invalidate rights of members
+	// TODO: Invalidate cached rights of members (https://github.com/TheThingsIndustries/lorawan-stack/issues/1393).
 	return ttnpb.Empty, nil
 }
 

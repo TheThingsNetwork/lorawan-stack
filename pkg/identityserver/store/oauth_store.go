@@ -139,7 +139,6 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 		return nil, errAuthorizationCodeNotFound
 	}
 	var codeModel AuthorizationCode
-	// TODO: preload only IDs.
 	err := s.db.Scopes(withContext(ctx)).Where(&AuthorizationCode{
 		Code: code,
 	}).Preload("Client").Preload("User.Account").First(&codeModel).Error
@@ -202,7 +201,6 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		return nil, errAccessTokenNotFound
 	}
 	var tokenModel AccessToken
-	// TODO: preload only IDs.
 	err := s.db.Scopes(withContext(ctx)).Where(&AccessToken{
 		TokenID: id,
 	}).Preload("Client").Preload("User.Account").First(&tokenModel).Error

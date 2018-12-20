@@ -67,6 +67,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	}
 	key.Key = token
 	events.Publish(evtCreateGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
+	// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	return key, nil
 }
 
@@ -110,6 +111,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	key.Key = ""
 	if len(req.Rights) > 0 {
 		events.Publish(evtUpdateGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
+		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	} else {
 		events.Publish(evtDeleteGatewayAPIKey(ctx, req.GatewayIdentifiers, nil))
 	}
@@ -138,6 +140,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateGatewayCollaborator(ctx, req.GatewayIdentifiers, nil))
+		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
 	} else {
 		events.Publish(evtDeleteGatewayCollaborator(ctx, req.GatewayIdentifiers, nil))
 	}
