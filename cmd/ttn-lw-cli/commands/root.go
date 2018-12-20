@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared/version"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
@@ -131,4 +132,5 @@ var (
 
 func init() {
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
+	Root.AddCommand(version.Print(name))
 }
