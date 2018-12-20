@@ -22,7 +22,7 @@ type Sender interface {
 
 // Config for sending emails
 type Config struct {
-	SenderName    string `name:"sender.name" description:"The name of the sender"`
-	SenderAddress string `name:"sender.address" description:"The address of the sender"`
+	SenderName    string `name:"sender-name" description:"The name of the sender"`
+	SenderAddress string `name:"sender-address" description:"The address of the sender"`
 	Provider      string `name:"provider" description:"Email provider to use"`
 }
