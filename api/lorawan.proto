@@ -267,8 +267,8 @@ message UplinkToken {
 }
 
 message DownlinkPath {
-  // Set uplink token for class A downlink to the uplink token received from the corresponding UplinkMessage. Uplink tokens are opaque to the Network Server.
-  // Set fixed to force using the specified gateway antenna identifiers for downlink. This can only be used for class C downlinks.
+  // Set uplink token for class A, B or C downlink to the uplink token received from the corresponding RxMetadata. Uplink tokens are opaque to the Network Server.
+  // Set fixed to force using the specified gateway antenna identifiers for downlink. This can only be used for class B or C downlinks.
   oneof path {
     bytes uplink_token = 1;
     GatewayAntennaIdentifiers fixed = 2;
@@ -284,8 +284,8 @@ message TxRequest {
 
   Class class = 1;
   // Downlink paths used to select a gateway for downlink.
-  // In class A, the downlink paths are required to contain only uplink tokens.
-  // In class B/C, the downlink paths may contain uplink tokens and fixed gateways.
+  // In class A, the downlink paths are required to only contain uplink tokens.
+  // In class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers.
   repeated DownlinkPath downlink_paths = 2;
 
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).

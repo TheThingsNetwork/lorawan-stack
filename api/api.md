@@ -3815,7 +3815,7 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | class | [Class](#ttn.lorawan.v3.Class) |  |  |
-| downlink_paths | [DownlinkPath](#ttn.lorawan.v3.DownlinkPath) | repeated | Downlink paths used to select a gateway for downlink. In class A, the downlink paths are required to contain only uplink tokens. In class B/C, the downlink paths may contain uplink tokens and fixed gateways. |
+| downlink_paths | [DownlinkPath](#ttn.lorawan.v3.DownlinkPath) | repeated | Downlink paths used to select a gateway for downlink. In class A, the downlink paths are required to only contain uplink tokens. In class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers. |
 | rx1_delay | [RxDelay](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay &#43; 1 second). |
 | rx1_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. |
 | rx1_frequency | [uint64](#uint64) |  | Frequency (Hz) for Rx1. |

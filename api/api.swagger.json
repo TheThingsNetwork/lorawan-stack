@@ -8064,7 +8064,7 @@
           "items": {
             "$ref": "#/definitions/v3DownlinkPath"
           },
-          "description": "Downlink paths used to select a gateway for downlink.\nIn class A, the downlink paths are required to contain only uplink tokens.\nIn class B/C, the downlink paths may contain uplink tokens and fixed gateways."
+          "description": "Downlink paths used to select a gateway for downlink.\nIn class A, the downlink paths are required to only contain uplink tokens.\nIn class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers."
         },
         "rx1_delay": {
           "$ref": "#/definitions/v3RxDelay",
