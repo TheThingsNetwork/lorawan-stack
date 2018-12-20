@@ -195,7 +195,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 				return err
 			}
 		}
-		return err
+		return nil
 	})
 	if err != nil {
 		return nil, err

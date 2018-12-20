@@ -194,7 +194,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 				return err
 			}
 		}
-		return err
+		return nil
 	})
 	if err != nil {
 		return nil, err

@@ -260,7 +260,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				return err
 			}
 		}
-		return err
+		return nil
 	})
 	if err != nil {
 		return nil, err

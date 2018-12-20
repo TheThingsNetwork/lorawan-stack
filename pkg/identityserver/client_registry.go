@@ -232,7 +232,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 				return err
 			}
 		}
-		return err
+		return nil
 	})
 	if err != nil {
 		return nil, err

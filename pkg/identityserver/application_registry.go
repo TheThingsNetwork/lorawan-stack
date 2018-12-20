@@ -195,7 +195,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 				return err
 			}
 		}
-		return err
+		return nil
 	})
 	if err != nil {
 		return nil, err
