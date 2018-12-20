@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -81,9 +82,21 @@ func Test(t *testing.T) {
 	a.So(conn.HasScheduler(), should.BeTrue)
 
 	{
-		frontend.Up <- &ttnpb.UplinkMessage{}
+		frontend.Up <- &ttnpb.UplinkMessage{
+			RxMetadata: []*ttnpb.RxMetadata{
+				{
+					AntennaIndex: 1,
+					Timestamp:    100,
+				},
+			},
+		}
 		select {
-		case <-conn.Up():
+		case up := <-conn.Up():
+			tokenIDs, timestamp, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
+			a.So(err, should.BeNil)
+			a.So(tokenIDs.GatewayIdentifiers, should.Resemble, ids)
+			a.So(tokenIDs.AntennaIndex, should.Equal, 1)
+			a.So(timestamp, should.Equal, 100)
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
 		}
@@ -124,8 +137,12 @@ func Test(t *testing.T) {
 		DetailAssertion []func(error) bool
 	}{
 		{
-			Name: "Invalid/NoRequest",
-			Path: &ttnpb.DownlinkPath{},
+			Name: "NoRequest",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
+			},
 			Message: &ttnpb.DownlinkMessage{
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
@@ -139,16 +156,18 @@ func Test(t *testing.T) {
 		{
 			Name: "ValidClassA",
 			Path: &ttnpb.DownlinkPath{
-				Timestamp: 100,
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
 			},
 			Message: &ttnpb.DownlinkMessage{
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
-						Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 					},
 				},
 			},
@@ -156,16 +175,18 @@ func Test(t *testing.T) {
 		{
 			Name: "ConflictClassA",
 			Path: &ttnpb.DownlinkPath{
-				Timestamp: 100, // Same as previous.
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100), // Same as previous.
+				},
 			},
 			Message: &ttnpb.DownlinkMessage{
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx1DataRateIndex: 5,         // Same as previous.
 						Rx1Frequency:     868100000, // Same as previous.
-						Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 					},
 				},
 			},
@@ -176,48 +197,127 @@ func Test(t *testing.T) {
 			},
 		},
 		{
-			Name: "ValidClassC",
-			Path: &ttnpb.DownlinkPath{},
-			Message: &ttnpb.DownlinkMessage{
-				RawPayload: []byte{0x01},
-				Settings: &ttnpb.DownlinkMessage_Request{
-					Request: &ttnpb.TxRequest{
-						Priority:         ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex: 5,
-						Rx2Frequency:     869525000,
-						Time:             &ttnpb.TxRequest_Any{Any: true},
-					},
-				},
-			},
-		},
-		{
-			Name: "ValidClassCAbsolute",
-			Path: &ttnpb.DownlinkPath{},
-			Message: &ttnpb.DownlinkMessage{
-				RawPayload: []byte{0x01},
-				Settings: &ttnpb.DownlinkMessage_Request{
-					Request: &ttnpb.TxRequest{
-						Priority:         ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex: 5,
-						Rx2Frequency:     869525000,
-						Time: &ttnpb.TxRequest_Absolute{
-							Absolute: timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+			Name: "NoUplinkTokenClassA",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_Fixed{
+					Fixed: &ttnpb.GatewayAntennaIdentifiers{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "foo-gateway",
 						},
 					},
 				},
 			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1DataRateIndex: 5,         // Same as previous.
+						Rx1Frequency:     868100000, // Same as previous.
+					},
+				},
+			},
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
-			Name: "InvalidDataRate",
+			Name: "ValidClassC/UplinkToken",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+					},
+				},
+			},
+		},
+		{
+			Name: "ValidClassC/FixedPath",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_Fixed{
+					Fixed: &ttnpb.GatewayAntennaIdentifiers{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "foo-gateway",
+						},
+					},
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+					},
+				},
+			},
+		},
+		{
+			Name: "ValidClassC/AbsoluteTime",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_Fixed{
+					Fixed: &ttnpb.GatewayAntennaIdentifiers{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "foo-gateway",
+						},
+					},
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+						AbsoluteTime:     timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+					},
+				},
+			},
+		},
+		{
+			Name: "NoPathClassC",
 			Path: &ttnpb.DownlinkPath{},
 			Message: &ttnpb.DownlinkMessage{
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+						AbsoluteTime:     timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+					},
+				},
+			},
+			ErrorAssertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "InvalidDataRate",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 10, // This one doesn't exist in the band.
 						Rx2Frequency:     869525000,
-						Time:             &ttnpb.TxRequest_Any{Any: true},
 					},
 				},
 			},
@@ -225,15 +325,19 @@ func Test(t *testing.T) {
 		},
 		{
 			Name: "InvalidDownlinkChannel",
-			Path: &ttnpb.DownlinkPath{},
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
+			},
 			Message: &ttnpb.DownlinkMessage{
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 2,
 						Rx2Frequency:     870000000, // This one doesn't exist in the frequency plan.
-						Time:             &ttnpb.TxRequest_Any{Any: true},
 					},
 				},
 			},

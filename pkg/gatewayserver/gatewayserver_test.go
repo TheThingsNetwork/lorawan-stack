@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -638,7 +639,12 @@ func TestGatewayServer(t *testing.T) {
 							select {
 							case msg := <-ns.upCh:
 								expected := tc.Up.UplinkMessages[msgIdx]
+								a.So(time.Since(msg.ReceivedAt), should.BeLessThan, timeout)
 								a.So(msg.Settings, should.Resemble, expected.Settings)
+								for _, md := range msg.RxMetadata {
+									a.So(md.UplinkToken, should.NotBeEmpty)
+									md.UplinkToken = nil
+								}
 								a.So(msg.RxMetadata, should.Resemble, expected.RxMetadata)
 								a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
 							case <-time.After(timeout):
@@ -722,13 +728,18 @@ func TestGatewayServer(t *testing.T) {
 						Message: &ttnpb.DownlinkMessage{
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: &ttnpb.TxRequest{
-									DownlinkPath: &ttnpb.TxRequest_Fixed{Fixed: &ttnpb.DownlinkPaths{Paths: []*ttnpb.DownlinkPath{{
-										GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-											GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-												GatewayID: "not-connected",
+									Class: ttnpb.CLASS_C,
+									DownlinkPaths: []*ttnpb.DownlinkPath{
+										{
+											Path: &ttnpb.DownlinkPath_Fixed{
+												Fixed: &ttnpb.GatewayAntennaIdentifiers{
+													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+														GatewayID: "not-connected",
+													},
+												},
 											},
 										},
-									}}}},
+									},
 								},
 							},
 						},
@@ -740,19 +751,22 @@ func TestGatewayServer(t *testing.T) {
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: &ttnpb.TxRequest{
-									DownlinkPath: &ttnpb.TxRequest_Fixed{Fixed: &ttnpb.DownlinkPaths{Paths: []*ttnpb.DownlinkPath{{
-										GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-											GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-												GatewayID: registeredGatewayID,
+									Class: ttnpb.CLASS_A,
+									DownlinkPaths: []*ttnpb.DownlinkPath{
+										{
+											Path: &ttnpb.DownlinkPath_UplinkToken{
+												UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{
+													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+														GatewayID: registeredGatewayID,
+													},
+												}, 100),
 											},
 										},
-										Timestamp: 100,
-									}}}},
+									},
 									Priority:         ttnpb.TxSchedulePriority_NORMAL,
 									Rx1Delay:         ttnpb.RX_DELAY_1,
 									Rx1DataRateIndex: 5,
 									Rx1Frequency:     868100000,
-									Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 								},
 							},
 						},
@@ -763,19 +777,22 @@ func TestGatewayServer(t *testing.T) {
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: &ttnpb.TxRequest{
-									DownlinkPath: &ttnpb.TxRequest_Fixed{Fixed: &ttnpb.DownlinkPaths{Paths: []*ttnpb.DownlinkPath{{
-										GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-											GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-												GatewayID: registeredGatewayID,
+									Class: ttnpb.CLASS_A,
+									DownlinkPaths: []*ttnpb.DownlinkPath{
+										{
+											Path: &ttnpb.DownlinkPath_UplinkToken{
+												UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{
+													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+														GatewayID: registeredGatewayID,
+													},
+												}, 100),
 											},
 										},
-										Timestamp: 100,
-									}}}},
+									},
 									Priority:         ttnpb.TxSchedulePriority_NORMAL,
 									Rx1Delay:         ttnpb.RX_DELAY_1,
 									Rx1DataRateIndex: 5,
 									Rx1Frequency:     868100000,
-									Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 								},
 							},
 						},
@@ -783,6 +800,32 @@ func TestGatewayServer(t *testing.T) {
 						RxWindowDetailsAssertion: []func(error) bool{
 							errors.IsResourceExhausted,  // Rx1 conflicts with previous.
 							errors.IsFailedPrecondition, // Rx2 not provided.
+						},
+					},
+					{
+						Name: "ValidClassC",
+						Message: &ttnpb.DownlinkMessage{
+							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
+							Settings: &ttnpb.DownlinkMessage_Request{
+								Request: &ttnpb.TxRequest{
+									Class: ttnpb.CLASS_C,
+									DownlinkPaths: []*ttnpb.DownlinkPath{
+										{
+											Path: &ttnpb.DownlinkPath_Fixed{
+												Fixed: &ttnpb.GatewayAntennaIdentifiers{
+													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+														GatewayID: registeredGatewayID,
+													},
+												},
+											},
+										},
+									},
+									Priority:         ttnpb.TxSchedulePriority_NORMAL,
+									Rx1Delay:         ttnpb.RX_DELAY_1,
+									Rx1DataRateIndex: 5,
+									Rx1Frequency:     868100000,
+								},
+							},
 						},
 					},
 				} {

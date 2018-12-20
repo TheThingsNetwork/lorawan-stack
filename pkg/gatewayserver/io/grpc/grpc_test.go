@@ -244,26 +244,30 @@ func TestTraffic(t *testing.T) {
 		}{
 			{
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: 100,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 100),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
 							Rx1Frequency:     868100000,
 							Rx2DataRateIndex: 0,
 							Rx2Frequency:     869525000,
-							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 						},
 					},
 				},
 			},
 			{
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: 100,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 100),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
@@ -281,7 +285,9 @@ func TestTraffic(t *testing.T) {
 			},
 			{
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: 100,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 100),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},

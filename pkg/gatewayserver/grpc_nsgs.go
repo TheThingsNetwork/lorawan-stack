@@ -16,6 +16,7 @@ package gatewayserver
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
@@ -49,30 +50,31 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 	}
 
 	var details []interface{}
-	var paths []*ttnpb.DownlinkPath
-	if fixed := request.GetFixed(); fixed != nil {
-		paths = fixed.Paths
-	} else if uplinkTokens := request.GetUplinkTokens(); uplinkTokens != nil {
-		for _, data := range uplinkTokens.Tokens {
-			path, err := io.UplinkTokenToPath(data)
-			if err != nil {
-				details = append(details, errUplinkToken) // Do not add the cause; uplink tokens are opaque.
-			} else {
-				paths = append(paths, path)
-			}
-		}
-	}
-
 	logger := log.FromContext(ctx)
-	for _, path := range paths {
-		uid := unique.ID(ctx, path.GatewayIdentifiers)
-		conn, ok := gs.GetConnection(ctx, path.GatewayIdentifiers)
+	for _, path := range request.DownlinkPaths {
+		var ids ttnpb.GatewayIdentifiers
+		switch p := path.Path.(type) {
+		case *ttnpb.DownlinkPath_Fixed:
+			ids = p.Fixed.GatewayIdentifiers
+		case *ttnpb.DownlinkPath_UplinkToken:
+			antennaIDs, _, err := io.ParseUplinkToken(p.UplinkToken)
+			if err != nil {
+				details = append(details, errUplinkToken) // Hide the cause as uplink tokens are opaque to the Network Server.
+				continue
+			}
+			ids = antennaIDs.GatewayIdentifiers
+		default:
+			panic(fmt.Sprintf("proto: unexpected type %T in oneof", path.Path))
+		}
+
+		uid := unique.ID(ctx, ids)
+		conn, ok := gs.GetConnection(ctx, ids)
 		if !ok {
 			details = append(details, errNotConnected.WithAttributes("gateway_uid", uid))
 			continue
 		}
-		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage
-		down.GetRequest().DownlinkPath = nil                 // And do not leak the downlink path to the gateway
+		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
+		down.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
 		if err := conn.SendDown(path, down); err != nil {
 			logger.WithField("gateway_uid", uid).WithError(err).Debug("Failed to schedule on path")
 			details = append(details, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))

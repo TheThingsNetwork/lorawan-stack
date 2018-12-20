@@ -16,16 +16,32 @@ package io
 
 import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-// PathToUplinkToken returns an opaque uplink token from the given downlink path.
-func PathToUplinkToken(path *ttnpb.DownlinkPath) ([]byte, error) {
-	return path.Marshal()
+// UplinkToken returns an uplink token from the given downlink path.
+func UplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32) ([]byte, error) {
+	token := ttnpb.UplinkToken{
+		GatewayAntennaIdentifiers: ids,
+		Timestamp:                 timestamp,
+	}
+	return token.Marshal()
 }
 
-// UplinkTokenToPath returns the downlink path from the giveno opaque uplink token.
-func UplinkTokenToPath(buf []byte) (*ttnpb.DownlinkPath, error) {
-	res := &ttnpb.DownlinkPath{}
-	if err := res.Unmarshal(buf); err != nil {
-		return nil, err
+// MustUplinkToken returns an uplink token from the given downlink path.
+// This function panics if an error occurs. Use UplinkToken to handle errors.
+func MustUplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32) []byte {
+	token, err := UplinkToken(ids, timestamp)
+	if err != nil {
+		panic(err)
 	}
-	return res, nil
+	return token
+}
+
+// ParseUplinkToken returns the downlink path from the given uplink token.
+func ParseUplinkToken(buf []byte) (ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32, err error) {
+	var token ttnpb.UplinkToken
+	if err = token.Unmarshal(buf); err != nil {
+		return
+	}
+	ids = token.GatewayAntennaIdentifiers
+	timestamp = token.Timestamp
+	return
 }

@@ -189,7 +189,7 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 				RSSIStandardDeviation: antenna.RSSIStandardDeviation,
 				SNR:                   antenna.SNR,
 				Time:                  &mdTime,
-				Timestamp:             uint64(gwMetadata.Timestamp),
+				Timestamp:             gwMetadata.Timestamp,
 			})
 		}
 	} else {
@@ -199,7 +199,7 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 			RSSI:               gwMetadata.RSSI,
 			SNR:                gwMetadata.SNR,
 			Time:               &mdTime,
-			Timestamp:          uint64(gwMetadata.Timestamp),
+			Timestamp:          gwMetadata.Timestamp,
 		})
 	}
 	uplink.Settings = settings

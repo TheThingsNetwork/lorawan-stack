@@ -26,20 +26,19 @@ import (
 func TestUplinkToken(t *testing.T) {
 	a := assertions.New(t)
 
-	expected := &ttnpb.DownlinkPath{
-		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "foo-gateway",
-			},
-			AntennaIndex: 0,
+	inIDs := ttnpb.GatewayAntennaIdentifiers{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+			GatewayID: "foo-gateway",
 		},
-		UplinkTimestamp: 12345678,
+		AntennaIndex: 0,
 	}
+	inTimestamp := uint32(12345678)
 
-	uplinkToken, err := io.PathToUplinkToken(expected)
+	uplinkToken, err := io.UplinkToken(inIDs, inTimestamp)
 	a.So(err, should.BeNil)
 
-	actual, err := io.UplinkTokenToPath(uplinkToken)
+	outIDs, outTimestamp, err := io.ParseUplinkToken(uplinkToken)
 	a.So(err, should.BeNil)
-	a.So(actual, should.Resemble, expected)
+	a.So(outIDs, should.Resemble, inIDs)
+	a.So(outTimestamp, should.Equal, inTimestamp)
 }

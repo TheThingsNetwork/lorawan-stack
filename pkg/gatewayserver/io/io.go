@@ -114,16 +114,15 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	if up.Settings.Time != nil {
 		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
 	}
-	downlinkPath := &ttnpb.DownlinkPath{
-		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+	for _, md := range up.RxMetadata {
+		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
 			GatewayIdentifiers: c.gateway.GatewayIdentifiers,
-			AntennaIndex:       0,
-		},
-		UplinkTimestamp: up.Settings.Timestamp,
-	}
-	uplinkToken, err := PathToUplinkToken(downlinkPath)
-	if err == nil {
-		up.UplinkToken = uplinkToken
+			AntennaIndex:       md.AntennaIndex,
+		}, md.Timestamp)
+		if err != nil {
+			return err
+		}
+		md.UplinkToken = buf
 	}
 
 	select {
@@ -167,12 +166,31 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 var (
 	errNotAllowed       = errors.DefineFailedPrecondition("not_allowed", "downlink not allowed")
 	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
+	errNoUplinkToken    = errors.DefineInvalidArgument("no_uplink_token", "no uplink token provided for class A downlink")
+	errDownlinkPath     = errors.DefineInvalidArgument("downlink_path", "invalid downlink path")
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
 	errDownlinkChannel  = errors.DefineInvalidArgument("downlink_channel", "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
+
+func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ids ttnpb.GatewayAntennaIdentifiers, uplinkTimestamp uint32, err error) {
+	buf := path.GetUplinkToken()
+	if buf == nil && class == ttnpb.CLASS_A {
+		err = errNoUplinkToken
+		return
+	}
+	if buf != nil {
+		return ParseUplinkToken(buf)
+	}
+	fixed := path.GetFixed()
+	if fixed == nil {
+		err = errDownlinkPath
+		return
+	}
+	return *fixed, 0, nil
+}
 
 // SendDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
@@ -187,6 +205,10 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
+		ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
+		if err != nil {
+			return err
+		}
 		band, err := band.GetByID(c.fp.BandID)
 		if err != nil {
 			return err
@@ -250,8 +272,8 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				TxPower:       int32(maxEirp),
 				ChannelIndex:  uint32(channelIndex),
 			}
-			if int(path.AntennaIndex) < len(c.gateway.Antennas) {
-				settings.TxPower -= int32(c.gateway.Antennas[path.AntennaIndex].Gain)
+			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
+				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)
 			}
 			if dataRate.LoRa != "" {
 				settings.Modulation = ttnpb.Modulation_LORA
@@ -272,18 +294,22 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				settings.BitRate = dataRate.FSK
 			}
 			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
-			switch t := request.Time.(type) {
-			case *ttnpb.TxRequest_RelativeToUplink:
+			switch request.Class {
+			case ttnpb.CLASS_A:
 				f = c.scheduler.ScheduleAt
-				settings.Timestamp = path.UplinkTimestamp + uint32(rxDelay/time.Microsecond)
-			case *ttnpb.TxRequest_Absolute:
-				f = c.scheduler.ScheduleAt
-				abs := *t.Absolute
-				settings.Time = &abs
-			case *ttnpb.TxRequest_Any:
+				settings.Timestamp = uplinkTimestamp + uint32(rxDelay/time.Microsecond)
+			case ttnpb.CLASS_B:
 				f = c.scheduler.ScheduleAnytime
+			case ttnpb.CLASS_C:
+				if request.AbsoluteTime != nil {
+					f = c.scheduler.ScheduleAt
+					abs := *request.AbsoluteTime
+					settings.Time = &abs
+				} else {
+					f = c.scheduler.ScheduleAnytime
+				}
 			default:
-				panic(fmt.Sprintf("proto: unexpected type %T in oneof", t))
+				panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
 			}
 			em, err := f(c.ctx, len(msg.RawPayload), settings, request.Priority)
 			if err != nil {

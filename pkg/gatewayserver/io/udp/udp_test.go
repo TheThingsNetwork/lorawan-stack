@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -350,17 +351,19 @@ func TestTraffic(t *testing.T) {
 				AckOK:         true,
 				ExpectConnect: false,
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: 5000000,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 5000000),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
 							Rx1Frequency:     868100000,
-							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 						},
 					},
 				},
@@ -375,17 +378,19 @@ func TestTraffic(t *testing.T) {
 				AckOK:         true,
 				ExpectConnect: false,
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: 10000000,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 10000000),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x02},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
 							Rx1Frequency:     868100000,
-							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 						},
 					},
 				},
@@ -401,17 +406,22 @@ func TestTraffic(t *testing.T) {
 				ExpectConnect: false,
 				SyncClock:     durationPtr(1 * time.Second), // Rx1 delay
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: uint32(testConfig.DownlinkPathExpires/time.Microsecond) * 150 / 100,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(
+							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							uint32(testConfig.DownlinkPathExpires/time.Microsecond)*150/100,
+						),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x03},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
 							Rx1Frequency:     868100000,
-							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 						},
 					},
 				},
@@ -427,17 +437,19 @@ func TestTraffic(t *testing.T) {
 				ExpectConnect: false,
 				SyncClock:     durationPtr(0),
 				Path: &ttnpb.DownlinkPath{
-					UplinkTimestamp: 15000000,
+					Path: &ttnpb.DownlinkPath_UplinkToken{
+						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 15000000),
+					},
 				},
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x04},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
 							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay:         ttnpb.RX_DELAY_1,
 							Rx1DataRateIndex: 5,
 							Rx1Frequency:     868100000,
-							Time:             &ttnpb.TxRequest_RelativeToUplink{RelativeToUplink: true},
 						},
 					},
 				},
