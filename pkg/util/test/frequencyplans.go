@@ -56,6 +56,9 @@ uplink-channels:
 - frequency: 868500000
   min-data-rate: 0
   max-data-rate: 5
+- frequency: 869525000
+  min-data-rate: 0
+  max-data-rate: 5
 downlink-channels:
 - frequency: 867100000
   min-data-rate: 0
