@@ -40,6 +40,13 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 			}
 
 			status := c.Response().Status
+
+			if err != nil {
+				if err, ok := err.(*echo.HTTPError); ok {
+					status = err.Code
+				}
+			}
+
 			w := logger.WithFields(log.Fields(
 				"duration", stop.Sub(start),
 				"method", req.Method,
