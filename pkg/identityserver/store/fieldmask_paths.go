@@ -14,8 +14,8 @@
 
 package store
 
-const ( // TODO: should probably move this to ttnpb
-	// please keep this sorted
+const (
+	// NOTE: please keep this sorted
 	adminField                          = "admin"
 	antennasField                       = "antennas"
 	applicationServerAddressField       = "application_server_address"
