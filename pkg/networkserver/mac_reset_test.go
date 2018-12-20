@@ -73,7 +73,7 @@ func TestHandleResetInd(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
-					panic(errors.New("failed to reset MACState").WithCause(err))
+					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 
 				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
@@ -127,7 +127,7 @@ func TestHandleResetInd(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
-					panic(errors.New("failed to reset MACState").WithCause(err))
+					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 
 				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1

@@ -88,7 +88,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) {
 		// NOTE: In case the spec changes and this assumption is not valid anymore,
 		// the implementation of this function won't be valid and has to be changed.
-		return errInvalidFrequencyPlan
+		panic("uplink/downlink channel length is inconsistent")
 	}
 
 	dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
@@ -96,7 +96,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 
 	for i, upCh := range band.UplinkChannels {
 		if len(upCh.DataRateIndexes) == 0 {
-			return errInvalidFrequencyPlan
+			panic(fmt.Sprintf("no uplink data rates defined for channel %d", i))
 		}
 
 		ch := &ttnpb.MACParameters_Channel{
@@ -112,7 +112,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 
 	for i, downCh := range band.DownlinkChannels {
 		if i >= len(dev.MACState.CurrentParameters.Channels) {
-			return errInvalidFrequencyPlan
+			panic("band downlink channel length is inconsistent")
 		}
 		dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
@@ -129,7 +129,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		}
 
 		if ch.MinDataRateIndex > ttnpb.DataRateIndex(upCh.MinDataRate) || ttnpb.DataRateIndex(upCh.MaxDataRate) > ch.MaxDataRateIndex {
-			return errInvalidFrequencyPlan
+			panic("data rate limits exceed band limitations")
 		}
 		ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
 		ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
@@ -138,7 +138,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 
 	for i, downCh := range fp.DownlinkChannels {
 		if i >= len(dev.MACState.DesiredParameters.Channels) {
-			return errInvalidFrequencyPlan
+			panic("frequency plan downlink channel length is inconsistent")
 		}
 		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
@@ -649,7 +649,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 			if stored.Session != ses {
 				// Sanity check
-				panic(fmt.Errorf("Session mismatch"))
+				panic("Session mismatch")
 			}
 			stored.MACState.RxWindowsAvailable = true
 
