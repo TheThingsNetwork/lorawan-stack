@@ -38,6 +38,7 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 			"network_server_address",
 			"api_key",
 			"default_formatters",
+			"allow_insecure",
 		},
 		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
 			as.startLinkTask(ctx, ids, target)
