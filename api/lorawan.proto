@@ -305,14 +305,11 @@ message TxRequest {
   // A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object.
   TxSchedulePriority priority = 8;
 
-  message AbsoluteTime {
-    google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true];
-  }
   // Time when the downlink message should be transmitted.
   // This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots.
   // This requires the gateway to have GPS time sychronization.
   // If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations.
-  AbsoluteTime absolute_time = 9;
+  google.protobuf.Timestamp absolute_time = 9 [(gogoproto.stdtime) = true];
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API

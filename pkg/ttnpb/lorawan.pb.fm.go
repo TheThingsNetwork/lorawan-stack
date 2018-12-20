@@ -1214,7 +1214,6 @@ func (dst *DownlinkPath) SetFields(src *DownlinkPath, paths ...string) error {
 
 var TxRequestFieldPathsNested = []string{
 	"absolute_time",
-	"absolute_time.time",
 	"advanced",
 	"class",
 	"downlink_paths",
@@ -1323,24 +1322,12 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 			}
 		case "absolute_time":
 			if len(subs) > 0 {
-				newDst := dst.AbsoluteTime
-				if newDst == nil {
-					newDst = &TxRequest_AbsoluteTime{}
-					dst.AbsoluteTime = newDst
-				}
-				var newSrc *TxRequest_AbsoluteTime
-				if src != nil {
-					newSrc = src.AbsoluteTime
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'absolute_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AbsoluteTime = src.AbsoluteTime
 			} else {
-				if src != nil {
-					dst.AbsoluteTime = src.AbsoluteTime
-				} else {
-					dst.AbsoluteTime = nil
-				}
+				dst.AbsoluteTime = nil
 			}
 		case "advanced":
 			if len(subs) > 0 {
@@ -1350,34 +1337,6 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 				dst.Advanced = src.Advanced
 			} else {
 				dst.Advanced = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-var TxRequest_AbsoluteTimeFieldPathsNested = []string{
-	"time",
-}
-
-var TxRequest_AbsoluteTimeFieldPathsTopLevel = []string{
-	"time",
-}
-
-func (dst *TxRequest_AbsoluteTime) SetFields(src *TxRequest_AbsoluteTime, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "time":
-			if len(subs) > 0 {
-				return fmt.Errorf("'time' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Time = src.Time
-			} else {
-				dst.Time = nil
 			}
 
 		default:

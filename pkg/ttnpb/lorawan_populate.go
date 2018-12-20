@@ -56,8 +56,7 @@ func NewPopulatedMACPayload(r randyLorawan, easy bool) *MACPayload {
 func NewPopulatedTxRequest(r randyLorawan, easy bool) *TxRequest {
 	out := &TxRequest{}
 	out.Class = []Class{CLASS_A, CLASS_B, CLASS_C}[r.Intn(3)]
-	switch out.Class {
-	case CLASS_A:
+	if out.Class == CLASS_A || r.Intn(2) == 0 {
 		uplinkToken := make([]byte, 10)
 		for i := 0; i < len(uplinkToken); i++ {
 			if r.Intn(2) == 0 {
@@ -73,7 +72,7 @@ func NewPopulatedTxRequest(r randyLorawan, easy bool) *TxRequest {
 				},
 			},
 		}
-	default:
+	} else {
 		out.DownlinkPaths = []*DownlinkPath{
 			{
 				Path: &DownlinkPath_Fixed{
@@ -84,11 +83,9 @@ func NewPopulatedTxRequest(r randyLorawan, easy bool) *TxRequest {
 				},
 			},
 		}
-		if r.Intn(2) == 0 {
+		if out.Class == CLASS_C && r.Intn(2) == 0 {
 			abs := time.Unix(r.Int63(), 0)
-			out.AbsoluteTime = &TxRequest_AbsoluteTime{
-				Time: &abs,
-			}
+			out.AbsoluteTime = &abs
 		}
 	}
 	out.Rx1Delay = []RxDelay{RX_DELAY_1, RX_DELAY_2, RX_DELAY_5}[r.Intn(3)]

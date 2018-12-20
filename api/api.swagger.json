@@ -4850,15 +4850,6 @@
       ],
       "default": "SUCCESS"
     },
-    "TxRequestAbsoluteTime": {
-      "type": "object",
-      "properties": {
-        "time": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "lorawanv3Location": {
       "type": "object",
       "properties": {
@@ -8093,7 +8084,8 @@
           "description": "Priority for scheduling.\nRequests with a higher priority are allocated more channel utilization time than messages with a lower priority, in duty-cycle limited regions.\nA priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object."
         },
         "absolute_time": {
-          "$ref": "#/definitions/TxRequestAbsoluteTime",
+          "type": "string",
+          "format": "date-time",
           "description": "Time when the downlink message should be transmitted.\nThis value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots.\nThis requires the gateway to have GPS time sychronization.\nIf the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations."
         },
         "advanced": {

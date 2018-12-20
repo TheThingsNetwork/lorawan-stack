@@ -144,7 +144,6 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.raw_payload",
 	"downlink_message.settings.request",
 	"downlink_message.settings.request.absolute_time",
-	"downlink_message.settings.request.absolute_time.time",
 	"downlink_message.settings.request.advanced",
 	"downlink_message.settings.request.class",
 	"downlink_message.settings.request.downlink_paths",

@@ -256,7 +256,6 @@ var DownlinkMessageFieldPathsNested = []string{
 	"settings",
 	"settings.request",
 	"settings.request.absolute_time",
-	"settings.request.absolute_time.time",
 	"settings.request.advanced",
 	"settings.request.class",
 	"settings.request.downlink_paths",
