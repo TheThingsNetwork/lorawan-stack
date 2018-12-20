@@ -189,9 +189,9 @@ func TestParseChMask(t *testing.T) {
 func TestGenerateChMask(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string
-		Generate func([]bool) (map[uint8][16]bool, error)
+		Generate func([]bool) ([]ChMaskCntlPair, error)
 		Mask     []bool
-		Expected map[uint8][16]bool
+		Expected []ChMaskCntlPair
 		Error    error
 	}{
 		{
@@ -200,8 +200,8 @@ func TestGenerateChMask(t *testing.T) {
 			Mask: []bool{
 				false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false,
 			},
-			Expected: map[uint8][16]bool{
-				0: {false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
+			Expected: []ChMaskCntlPair{
+				{0, [16]bool{false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}}},
 		},
 		{
 			Name:     "16 channels/all on",
@@ -209,12 +209,12 @@ func TestGenerateChMask(t *testing.T) {
 			Mask: []bool{
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
 			},
-			Expected: map[uint8][16]bool{
-				6: {},
+			Expected: []ChMaskCntlPair{
+				{6, [16]bool{}},
 			},
 		},
 		{
-			Name:     "72 channels/1-16 on, 42, 67, 69 on",
+			Name:     "72 channels/1-16 on, 42, 67, 69 on (Cntl5 off)",
 			Generate: makeGenerateChMask72(false),
 			Mask: []bool{
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
@@ -223,12 +223,32 @@ func TestGenerateChMask(t *testing.T) {
 				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
 				false, false, true, false, true, false, false, false,
 			},
-			Expected: map[uint8][16]bool{
-				0: {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
-				1: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-				2: {false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false},
-				3: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-				4: {false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false},
+			Expected: []ChMaskCntlPair{
+				{0, [16]bool{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true}},
+				{1, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{2, [16]bool{false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
+				{3, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{4, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
+			},
+		},
+		{
+			Name:     "72 channels/1-16 on, 42, 67, 69 on (Cntl5 on)",
+			Generate: makeGenerateChMask72(true),
+			Mask: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true}},
+				{2, [16]bool{false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
+				{4, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
 			},
 		},
 		{
@@ -241,8 +261,8 @@ func TestGenerateChMask(t *testing.T) {
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
 				false, true, false, true, false, false, false, false,
 			},
-			Expected: map[uint8][16]bool{
-				6: {false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false},
+			Expected: []ChMaskCntlPair{
+				{6, [16]bool{false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
 			},
 		},
 		{
@@ -255,8 +275,82 @@ func TestGenerateChMask(t *testing.T) {
 				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
 				false, false, true, false, true, false, false, false,
 			},
-			Expected: map[uint8][16]bool{
-				7: {false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false},
+			Expected: []ChMaskCntlPair{
+				{7, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
+			},
+		},
+		{
+			Name:     "72 channels/FSB 1 on",
+			Generate: makeGenerateChMask72(true),
+			Mask: []bool{
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, false, false, false, false, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}},
+			},
+		},
+		{
+			Name:     "72 channels/FSB 1 on, ch 2 off",
+			Generate: makeGenerateChMask72(true),
+			Mask: []bool{
+				true, false, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, false, false, false, false, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}},
+				{0, [16]bool{true, false, true, true, true, true, true, true, false, false, false, false, false, false, false, false}},
+			},
+		},
+		{
+			Name:     "72 channels/FSB 3, 4 on",
+			Generate: makeGenerateChMask72(true),
+			Mask: []bool{
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, true, true, false, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false}},
+			},
+		},
+		{
+			Name:     "72 channels/FSB 3, 4 on, ch 67,68 off",
+			Generate: makeGenerateChMask72(true),
+			Mask: []bool{
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false}},
+				{4, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
 			},
 		},
 		{
@@ -270,13 +364,13 @@ func TestGenerateChMask(t *testing.T) {
 				false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false,
 				true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
 			},
-			Expected: map[uint8][16]bool{
-				0: {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
-				1: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-				2: {false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false},
-				3: {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-				4: {false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false},
-				5: {true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+			Expected: []ChMaskCntlPair{
+				{0, [16]bool{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true}},
+				{1, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{2, [16]bool{false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
+				{3, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{4, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
+				{5, [16]bool{true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
 			},
 		},
 		{
@@ -290,8 +384,8 @@ func TestGenerateChMask(t *testing.T) {
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
 			},
-			Expected: map[uint8][16]bool{
-				6: {},
+			Expected: []ChMaskCntlPair{
+				{6, [16]bool{}},
 			},
 		},
 	} {
