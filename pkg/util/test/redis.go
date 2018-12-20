@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/go-redis/redis"
+	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 )
@@ -47,7 +48,7 @@ func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 			Database:  defaultDatabase,
 			Namespace: defaultNamespace[:],
 		},
-		Namespace: append(namespace, t.Name()),
+		Namespace: append(append([]string{ulid.MustNew(ulid.Now(), Randy).String()}, namespace...), t.Name()),
 	}
 
 	if addr := os.Getenv("REDIS_ADDRESS"); addr != "" {
