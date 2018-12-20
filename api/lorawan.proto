@@ -261,6 +261,11 @@ message GatewayAntennaIdentifiers {
   uint32 antenna_index = 2;
 }
 
+message UplinkToken {
+  GatewayAntennaIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 timestamp = 2;
+}
+
 message DownlinkPath {
   // Set uplink token for class A downlink to the uplink token received from the corresponding UplinkMessage. Uplink tokens are opaque to the Network Server.
   // Set fixed to force using the specified gateway antenna identifiers for downlink. This can only be used for class C downlinks.

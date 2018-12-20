@@ -311,6 +311,7 @@
     - [TxRequest](#ttn.lorawan.v3.TxRequest)
     - [TxRequest.AbsoluteTime](#ttn.lorawan.v3.TxRequest.AbsoluteTime)
     - [TxSettings](#ttn.lorawan.v3.TxSettings)
+    - [UplinkToken](#ttn.lorawan.v3.UplinkToken)
   
     - [ADRAckDelayExponent](#ttn.lorawan.v3.ADRAckDelayExponent)
     - [ADRAckLimitExponent](#ttn.lorawan.v3.ADRAckLimitExponent)
@@ -3867,6 +3868,22 @@ On downlink, this is a scheduled transmission.
 | enable_crc | [bool](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.UplinkToken"/>
+
+### UplinkToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [GatewayAntennaIdentifiers](#ttn.lorawan.v3.GatewayAntennaIdentifiers) |  |  |
+| timestamp | [uint32](#uint32) |  |  |
 
 
 

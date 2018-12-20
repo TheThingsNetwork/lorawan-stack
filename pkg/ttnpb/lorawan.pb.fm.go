@@ -1076,6 +1076,59 @@ func (dst *GatewayAntennaIdentifiers) SetFields(src *GatewayAntennaIdentifiers, 
 	return nil
 }
 
+var UplinkTokenFieldPathsNested = []string{
+	"ids",
+	"ids.antenna_index",
+	"ids.gateway_ids",
+	"ids.gateway_ids.eui",
+	"ids.gateway_ids.gateway_id",
+	"timestamp",
+}
+
+var UplinkTokenFieldPathsTopLevel = []string{
+	"ids",
+	"timestamp",
+}
+
+func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.GatewayAntennaIdentifiers
+				var newSrc *GatewayAntennaIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayAntennaIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayAntennaIdentifiers = src.GatewayAntennaIdentifiers
+				} else {
+					var zero GatewayAntennaIdentifiers
+					dst.GatewayAntennaIdentifiers = zero
+				}
+			}
+		case "timestamp":
+			if len(subs) > 0 {
+				return fmt.Errorf("'timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Timestamp = src.Timestamp
+			} else {
+				var zero uint32
+				dst.Timestamp = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 var DownlinkPathFieldPathsNested = []string{
 	"path",
 	"path.fixed",
