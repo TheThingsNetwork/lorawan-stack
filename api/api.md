@@ -4765,7 +4765,7 @@ a message corresponds to one RxMetadata.
 | gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | antenna_index | [uint32](#uint32) |  |  |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-| timestamp | [uint64](#uint64) |  | Gateway concentrator timestamp when the Rx finished (nanoseconds). NOTE: most gateways use microsecond timestamps, so conversion may be needed. |
+| timestamp | [uint32](#uint32) |  | Gateway concentrator timestamp when the Rx finished (microseconds). |
 | fine_timestamp | [uint64](#uint64) |  | Gateway&#39;s internal fine timestamp when the Rx finished (nanoseconds). |
 | encrypted_fine_timestamp | [bytes](#bytes) |  | Encrypted gateway&#39;s internal fine timestamp when the Rx finished (nanoseconds). |
 | encrypted_fine_timestamp_key_id | [string](#string) |  |  |

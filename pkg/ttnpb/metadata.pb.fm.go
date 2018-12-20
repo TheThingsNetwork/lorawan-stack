@@ -96,7 +96,7 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 			if src != nil {
 				dst.Timestamp = src.Timestamp
 			} else {
-				var zero uint64
+				var zero uint32
 				dst.Timestamp = zero
 			}
 		case "fine_timestamp":

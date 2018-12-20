@@ -30,9 +30,8 @@ message RxMetadata {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32 antenna_index = 2;
   google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
-  // Gateway concentrator timestamp when the Rx finished (nanoseconds).
-  // NOTE: most gateways use microsecond timestamps, so conversion may be needed.
-  uint64 timestamp = 4;
+  // Gateway concentrator timestamp when the Rx finished (microseconds).
+  uint32 timestamp = 4;
   // Gateway's internal fine timestamp when the Rx finished (nanoseconds).
   uint64 fine_timestamp = 5;
   // Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds).

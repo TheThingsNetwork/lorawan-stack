@@ -7795,9 +7795,9 @@
           "format": "date-time"
         },
         "timestamp": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Gateway concentrator timestamp when the Rx finished (nanoseconds).\nNOTE: most gateways use microsecond timestamps, so conversion may be needed."
+          "type": "integer",
+          "format": "int64",
+          "description": "Gateway concentrator timestamp when the Rx finished (microseconds)."
         },
         "fine_timestamp": {
           "type": "string",

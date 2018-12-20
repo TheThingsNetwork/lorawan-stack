@@ -119,7 +119,7 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 		{
 			GatewayIdentifiers: gatewayID,
 			AntennaIndex:       0,
-			Timestamp:          uint64(rx.Tmst) * 1000,
+			Timestamp:          rx.Tmst,
 			RSSI:               float32(rx.RSSI),
 			SNR:                float32(rx.LSNR),
 		},
@@ -132,7 +132,7 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 		signalMetadata := &ttnpb.RxMetadata{
 			GatewayIdentifiers:    gatewayID,
 			AntennaIndex:          uint32(signal.Ant),
-			Timestamp:             uint64(rx.Tmst) * 1000,
+			Timestamp:             rx.Tmst,
 			RSSI:                  float32(signal.RSSIS),
 			ChannelRSSI:           float32(signal.RSSIC),
 			RSSIStandardDeviation: float32(signal.RSSISD),
@@ -291,7 +291,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 			CodR: msg.Settings.CodingRate,
 			Size: uint16(len(msg.RawPayload)),
 			Data: base64.StdEncoding.EncodeToString(msg.RawPayload),
-			Tmst: uint32(msg.RxMetadata[0].Timestamp / 1000),
+			Tmst: msg.RxMetadata[0].Timestamp,
 			RSSI: int16(msg.RxMetadata[0].RSSI),
 			LSNR: float64(msg.RxMetadata[0].SNR),
 		})

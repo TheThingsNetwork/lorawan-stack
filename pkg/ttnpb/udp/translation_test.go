@@ -115,7 +115,7 @@ func TestToGatewayUp(t *testing.T) {
 	a.So(msg.Settings.Bandwidth, should.Equal, 125000)
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
 	a.So(msg.Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
-	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000000)
+	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
 }
 
@@ -198,9 +198,9 @@ func TestToGatewayUpRaw(t *testing.T) {
 	a.So(msg.Settings.CodingRate, should.Equal, "4/5")
 	a.So(msg.Settings.SpreadingFactor, should.Equal, 7)
 	a.So(msg.Settings.Bandwidth, should.Equal, 125000)
-	a.So(msg.Settings.Frequency, should.Equal, uint64(868100000))
+	a.So(msg.Settings.Frequency, should.Equal, 868100000)
 	a.So(msg.Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
-	a.So(msg.RxMetadata[0].Timestamp, should.Equal, uint64(368384825000))
+	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
 	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
 }
 
