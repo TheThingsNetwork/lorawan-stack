@@ -120,8 +120,8 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, stored, 0)
-				return nil
+				_, err := ttnredis.SetProto(p, k, stored, 0)
+				return err
 			}
 		}
 
@@ -216,21 +216,13 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string
 				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, stored, 0)
-				return nil
-			}
-		}
-
-		cmds, err := tx.Pipelined(f)
-		if err != nil {
-			return err
-		}
-		for _, cmd := range cmds {
-			if err := cmd.Err(); err != nil {
+				_, err := ttnredis.SetProto(p, k, stored, 0)
 				return err
 			}
 		}
-		return nil
+
+		_, err = tx.Pipelined(f)
+		return err
 	}, k)
 	if err != nil {
 		return nil, err

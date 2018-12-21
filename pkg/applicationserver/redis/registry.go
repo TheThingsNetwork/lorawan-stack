@@ -110,8 +110,8 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, stored, 0)
-				return nil
+				_, err := ttnredis.SetProto(p, k, stored, 0)
+				return err
 			}
 		}
 
@@ -240,21 +240,16 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				ttnredis.SetProto(p, k, stored, 0)
+				_, err := ttnredis.SetProto(p, k, stored, 0)
+				if err != nil {
+					return err
+				}
 				p.SAdd(r.Redis.Key(allKey), uid)
 				return nil
 			}
 		}
-		cmds, err := tx.Pipelined(f)
-		if err != nil {
-			return err
-		}
-		for _, cmd := range cmds {
-			if err := cmd.Err(); err != nil {
-				return err
-			}
-		}
-		return nil
+		_, err = tx.Pipelined(f)
+		return err
 	}, k)
 	if err != nil {
 		return nil, err

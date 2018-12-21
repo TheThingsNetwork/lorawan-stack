@@ -222,7 +222,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Set(ek, uid, 0)
 				}
 
-				ttnredis.SetProto(p, k, stored, 0)
+				if _, err := ttnredis.SetProto(p, k, stored, 0); err != nil {
+					return err
+				}
 
 				if oldAddrs.fallback != nil && !equalAddr(oldAddrs.fallback, newAddrs.fallback) && !equalAddr(oldAddrs.fallback, newAddrs.current) {
 					p.SRem(r.Redis.Key(addrKey, oldAddrs.fallback.String()), uid)
@@ -240,16 +242,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			}
 		}
 
-		cmds, err := tx.Pipelined(f)
-		if err != nil {
-			return err
-		}
-		for _, cmd := range cmds {
-			if err := cmd.Err(); err != nil {
-				return err
-			}
-		}
-		return nil
+		_, err = tx.Pipelined(f)
+		return err
 	}, k)
 	if err != nil {
 		return nil, err
