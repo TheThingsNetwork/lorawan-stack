@@ -24,9 +24,14 @@ import (
 func TestID(t *testing.T) {
 	a := assertions.New(t)
 	a.So(ID("app-test"), should.BeNil)
+	a.So(ID("dddsdddjjjjdddsdddsdsdsdsdsdsdsdsdfw"), should.BeNil)
+	a.So(ID("-app-test"), should.NotBeNil)
+	a.So(ID("app-test-"), should.NotBeNil)
 	a.So(ID("app_test"), should.NotBeNil)
 	a.So(ID("_dd"), should.NotBeNil)
 	a.So(ID("A"), should.NotBeNil)
 	a.So(ID(1), should.NotBeNil)
-	a.So(ID("dddsdddjjjjđsdddsdsdsdsdsdsdsdsdfddfdfsuif"), should.NotBeNil)
+	a.So(ID("dddsdddjjjjdddsdddsdsdsdsdsdsdsdsdf-w"), should.NotBeNil)
+	a.So(ID("d-d-d-s-d-d-d-j-j-l-k-j-k-j-k-j-k-j-k-j-k-l-j-k-l-j-k-f-j-d-s-k-f-j-d-s"), should.NotBeNil)
+
 }
