@@ -16,8 +16,8 @@ package ttnpb
 
 import (
 	"fmt"
-	time "time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -77,15 +77,14 @@ func NewPopulatedTxRequest(r randyLorawan, easy bool) *TxRequest {
 			{
 				Path: &DownlinkPath_Fixed{
 					Fixed: &GatewayAntennaIdentifiers{
-						GatewayIdentifiers: *NewPopulatedGatewayIdentifiers(r, true),
+						GatewayIdentifiers: *NewPopulatedGatewayIdentifiers(r, false),
 						AntennaIndex:       uint32(r.Intn(2)),
 					},
 				},
 			},
 		}
 		if out.Class == CLASS_C && r.Intn(2) == 0 {
-			abs := time.Unix(r.Int63(), 0)
-			out.AbsoluteTime = &abs
+			out.AbsoluteTime = pbtypes.NewPopulatedStdTime(r, false)
 		}
 	}
 	out.Rx1Delay = []RxDelay{RX_DELAY_1, RX_DELAY_2, RX_DELAY_5}[r.Intn(3)]
@@ -214,7 +213,7 @@ func macMICPayload(mhdr MHDR, fhdr FHDR, fPort byte, frmPayload []byte, isUplink
 		return nil, err
 	}
 	if isUplink {
-		b, err = PopulatorConfig.LoRaWAN.AppendFHDR(b, fhdr, true)
+		b, err = PopulatorConfig.LoRaWAN.AppendFHDR(b, fhdr, false)
 	} else {
 		b, err = PopulatorConfig.LoRaWAN.AppendFHDR(b, fhdr, false)
 	}
@@ -242,7 +241,7 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 		Ack:       r.Intn(2) == 0,
 	}
 
-	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, true)
+	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, false)
 	if err != nil {
 		panic(fmt.Sprintf("failed to compute payload for MIC computation: %s", err))
 	}
@@ -345,15 +344,15 @@ func NewPopulatedMessage(r randyLorawan, easy bool) *Message {
 	case MType_UNCONFIRMED_UP:
 		return NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), false)
 	case MType_CONFIRMED_UP:
-		return NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), true)
+		return NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), false)
 	case MType_UNCONFIRMED_DOWN:
 		return NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), false)
 	case MType_CONFIRMED_DOWN:
-		return NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), true)
+		return NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), false)
 	case MType_JOIN_REQUEST:
 		return NewPopulatedMessageJoinRequest(r)
 	case MType_JOIN_ACCEPT:
-		return NewPopulatedMessageJoinAccept(r, true)
+		return NewPopulatedMessageJoinAccept(r, false)
 	case MType_REJOIN_REQUEST:
 		return NewPopulatedMessageRejoinRequest(r, RejoinType(r.Intn(3)))
 	}
