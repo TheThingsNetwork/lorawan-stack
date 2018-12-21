@@ -63,31 +63,6 @@ func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 		}
 	}
 
-	flushNamespace := func() {
-		logger := GetLogger(t)
-
-		cl := ttnredis.New(conf)
-		defer cl.Close()
-
-		q := cl.Key("*")
-		keys, err := cl.Client.Keys(q).Result()
-		if err != nil {
-			logger.WithField("query", q).Fatal("Failed to query Redis for keys")
-			return
-		}
-
-		if len(keys) > 0 {
-			n, err := cl.Client.Del(keys...).Result()
-			if err != nil {
-				logger.WithError(err).Fatal("Failed to delete existing keys")
-				return
-			}
-			logger.WithField("n", n).Debug("Deleted old keys")
-		}
-	}
-
-	flushNamespace()
-
 	cl := ttnredis.New(conf)
 
 	if err := cl.Ping().Err(); err != nil {
@@ -125,5 +100,31 @@ func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 			return p(cmds)
 		}
 	})
+
+	flushNamespace := func() {
+		logger := GetLogger(t)
+
+		cl := ttnredis.New(conf)
+		defer cl.Close()
+
+		q := cl.Key("*")
+		keys, err := cl.Client.Keys(q).Result()
+		if err != nil {
+			logger.WithField("query", q).Fatal("Failed to query Redis for keys")
+			return
+		}
+
+		if len(keys) > 0 {
+			n, err := cl.Client.Del(keys...).Result()
+			if err != nil {
+				logger.WithError(err).Fatal("Failed to delete existing keys")
+				return
+			}
+			logger.WithField("n", n).Debug("Deleted old keys")
+		}
+	}
+
+	flushNamespace()
+
 	return cl, flushNamespace
 }
