@@ -3818,9 +3818,9 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | rx1_delay | [RxDelay](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay &#43; 1 second). |
 | rx1_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. |
 | rx1_frequency | [uint64](#uint64) |  | Frequency (Hz) for Rx1. |
-| rx2_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. Rx2 parameters are used for class B/C downlink. |
-| rx2_frequency | [uint64](#uint64) |  | Frequency (Hz) for Rx2. Rx2 parameters are used for class B/C downlink. |
-| priority | [TxSchedulePriority](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel utilization time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
+| rx2_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. |
+| rx2_frequency | [uint64](#uint64) |  | Frequency (Hz) for Rx2. |
+| priority | [TxSchedulePriority](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
 | absolute_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |
 | advanced | [google.protobuf.Struct](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 

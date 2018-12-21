@@ -8072,16 +8072,16 @@
         },
         "rx2_data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex",
-          "description": "LoRaWAN data rate index for Rx2.\nRx2 parameters are used for class B/C downlink."
+          "description": "LoRaWAN data rate index for Rx2."
         },
         "rx2_frequency": {
           "type": "string",
           "format": "uint64",
-          "description": "Frequency (Hz) for Rx2.\nRx2 parameters are used for class B/C downlink."
+          "description": "Frequency (Hz) for Rx2."
         },
         "priority": {
           "$ref": "#/definitions/v3TxSchedulePriority",
-          "description": "Priority for scheduling.\nRequests with a higher priority are allocated more channel utilization time than messages with a lower priority, in duty-cycle limited regions.\nA priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object."
+          "description": "Priority for scheduling.\nRequests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions.\nA priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object."
         },
         "absolute_time": {
           "type": "string",
