@@ -1665,8 +1665,12 @@ func TestGenerateDownlink(t *testing.T) {
 			Name:    "1.1/no app downlink/no MAC/no ack",
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
-				MACSettings:          &ttnpb.MACSettings{},
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+				},
+				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -1689,7 +1693,11 @@ func TestGenerateDownlink(t *testing.T) {
 			Name:    "1.1/no app downlink/status after 1 downlink/no ack",
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: 3,
 				},
@@ -1718,7 +1726,11 @@ func TestGenerateDownlink(t *testing.T) {
 			Name:    "1.1/no app downlink/status after an hour/no ack",
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: 24 * time.Hour,
 				},
@@ -1745,7 +1757,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
@@ -1806,7 +1820,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
@@ -1870,7 +1886,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
@@ -1940,7 +1958,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
@@ -2005,7 +2025,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{},
 				MACState: &ttnpb.MACState{
@@ -2076,7 +2098,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: 3,
@@ -2140,7 +2164,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Context: test.Context(),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &DevAddr,
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: time.Nanosecond,
