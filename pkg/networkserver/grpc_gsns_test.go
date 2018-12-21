@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -165,90 +166,235 @@ type windowEnd struct {
 
 func handleUplinkTest() func(t *testing.T) {
 	return func(t *testing.T) {
-		a := assertions.New(t)
-
 		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
-
-		redisClient, flush := test.NewRedis(t, "networkserver_test")
-		defer flush()
-		defer redisClient.Close()
-		devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), &component.Config{}),
-			&Config{
-				Devices:             devReg,
-				DeduplicationWindow: 42,
-				CooldownWindow:      42,
-				DownlinkTasks:       &MockDownlinkTaskQueue{},
-			})).(*NetworkServer)
-		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
-		test.Must(nil, ns.Start())
-		defer ns.Close()
-
-		pb := &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-				DeviceID:               DeviceID,
-				DevAddr:                &DevAddr,
-				JoinEUI:                &JoinEUI,
-				DevEUI:                 &DevEUI,
-			},
-			LoRaWANVersion: ttnpb.MAC_V1_1,
-			Session: &ttnpb.Session{
-				DevAddr: DevAddr,
-				SessionKeys: ttnpb.SessionKeys{
-					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: FNwkSIntKey[:],
-					},
-					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: SNwkSIntKey[:],
-					},
-				},
-			},
-			FrequencyPlanID: test.EUFrequencyPlanID,
-		}
-
-		ret, err := CreateDevice(authorizedCtx, devReg, pb)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-
-		pb.CreatedAt = ret.CreatedAt
-		pb.UpdatedAt = ret.UpdatedAt
-		a.So(ret, should.Resemble, pb)
 
 		t.Run("Empty DevAddr", func(t *testing.T) {
 			a := assertions.New(t)
 
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
+				})).(*NetworkServer)
+			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			test.Must(nil, ns.Start())
+			defer ns.Close()
+
+			pb := &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+					JoinEUI:                &JoinEUI,
+					DevEUI:                 &DevEUI,
+				},
+				LoRaWANVersion: ttnpb.MAC_V1_1,
+				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
+					SessionKeys: ttnpb.SessionKeys{
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: FNwkSIntKey[:],
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: SNwkSIntKey[:],
+						},
+					},
+				},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+			}
+
+			ret, err := CreateDevice(authorizedCtx, devReg, pb)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			pb.CreatedAt = ret.CreatedAt
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(ret, should.Resemble, pb)
+
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = types.DevAddr{}
-			_, err := ns.HandleUplink(authorizedCtx, msg)
+			_, err = ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
 		t.Run("FCnt too high", func(t *testing.T) {
 			a := assertions.New(t)
 
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
+				})).(*NetworkServer)
+			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			test.Must(nil, ns.Start())
+			defer ns.Close()
+
+			pb := &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+					JoinEUI:                &JoinEUI,
+					DevEUI:                 &DevEUI,
+				},
+				LoRaWANVersion: ttnpb.MAC_V1_1,
+				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
+					SessionKeys: ttnpb.SessionKeys{
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: FNwkSIntKey[:],
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: SNwkSIntKey[:],
+						},
+					},
+				},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+			}
+
+			ret, err := CreateDevice(authorizedCtx, devReg, pb)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			pb.CreatedAt = ret.CreatedAt
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(ret, should.Resemble, pb)
+
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Payload.GetMACPayload().FCnt = math.MaxUint16 + 1
-			_, err := ns.HandleUplink(authorizedCtx, msg)
+			_, err = ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
 		t.Run("ChannelIndex too high", func(t *testing.T) {
 			a := assertions.New(t)
 
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
+				})).(*NetworkServer)
+			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			test.Must(nil, ns.Start())
+			defer ns.Close()
+
+			pb := &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+					JoinEUI:                &JoinEUI,
+					DevEUI:                 &DevEUI,
+				},
+				LoRaWANVersion: ttnpb.MAC_V1_1,
+				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
+					SessionKeys: ttnpb.SessionKeys{
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: FNwkSIntKey[:],
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: SNwkSIntKey[:],
+						},
+					},
+				},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+			}
+
+			ret, err := CreateDevice(authorizedCtx, devReg, pb)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			pb.CreatedAt = ret.CreatedAt
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(ret, should.Resemble, pb)
+
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
 			msg.Settings.ChannelIndex = math.MaxUint8 + 1
-			_, err := ns.HandleUplink(authorizedCtx, msg)
+			_, err = ns.HandleUplink(authorizedCtx, msg)
 			a.So(err, should.NotBeNil)
 		})
 
 		t.Run("DataRateIndex too high", func(t *testing.T) {
 			a := assertions.New(t)
+
+			redisClient, flush := test.NewRedis(t, "networkserver_test")
+			defer flush()
+			defer redisClient.Close()
+			devReg := &redis.DeviceRegistry{Redis: redisClient}
+
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices:             devReg,
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
+				})).(*NetworkServer)
+			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			test.Must(nil, ns.Start())
+			defer ns.Close()
+
+			pb := &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
+					DeviceID:               DeviceID,
+					DevAddr:                &DevAddr,
+					JoinEUI:                &JoinEUI,
+					DevEUI:                 &DevEUI,
+				},
+				LoRaWANVersion: ttnpb.MAC_V1_1,
+				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
+					SessionKeys: ttnpb.SessionKeys{
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: FNwkSIntKey[:],
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: SNwkSIntKey[:],
+						},
+					},
+				},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+			}
+
+			ret, err := CreateDevice(authorizedCtx, devReg, pb)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			pb.CreatedAt = ret.CreatedAt
+			pb.UpdatedAt = ret.UpdatedAt
+			a.So(ret, should.Resemble, pb)
 
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
@@ -265,7 +411,7 @@ func handleUplinkTest() func(t *testing.T) {
 			UplinkMessage *ttnpb.UplinkMessage
 		}{
 			{
-				"1.0/unconfirmed",
+				"1.0/unconfirmed/no ack/FCnt does not reset",
 				&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
@@ -330,7 +476,7 @@ func handleUplinkTest() func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.0/unconfirmed/FCnt resets",
+				"1.0/unconfirmed/no ack/FCnt resets",
 				&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
@@ -395,7 +541,7 @@ func handleUplinkTest() func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.0/confirmed/ack",
+				"1.0/confirmed/ack/FCnt does not reset",
 				&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
@@ -536,7 +682,7 @@ func handleUplinkTest() func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1/unconfirmed",
+				"1.1/unconfirmed/no ack/FCnt does not reset",
 				&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
@@ -605,7 +751,7 @@ func handleUplinkTest() func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1/confirmed/ack",
+				"1.1/confirmed/ack/FCnt does not reset",
 				&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
@@ -686,7 +832,7 @@ func handleUplinkTest() func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1/unconfirmed/FCnt resets",
+				"1.1/unconfirmed/no ack/FCnt resets",
 				&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
@@ -867,7 +1013,7 @@ func handleUplinkTest() func(t *testing.T) {
 				// Fill DeviceRegistry with devices
 				for i := 0; i < DeviceCount; i++ {
 					pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-					for pb.Equal(tc.Device) {
+					for unique.ID(ctx, pb.EndDeviceIdentifiers) == unique.ID(ctx, tc.Device.EndDeviceIdentifiers) {
 						pb = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 					}
 
@@ -875,6 +1021,7 @@ func handleUplinkTest() func(t *testing.T) {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
+						pb.EndDeviceIdentifiers.DevAddr = &s.DevAddr
 						for pb.PendingSession != nil && pb.PendingSession.DevAddr.Equal(s.DevAddr) {
 							pb.PendingSession.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
 						}
@@ -884,12 +1031,13 @@ func handleUplinkTest() func(t *testing.T) {
 						s.DevAddr = DevAddr
 						for pb.Session != nil && pb.Session.DevAddr.Equal(s.DevAddr) {
 							pb.Session.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
+							pb.EndDeviceIdentifiers.DevAddr = &pb.Session.DevAddr
 						}
 					}
 
 					ret, err := CreateDevice(ctx, devReg, pb)
 					if !a.So(err, should.BeNil) {
-						t.FailNow()
+						t.Fatalf("Failed to create device %+v", pb)
 					}
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
@@ -1262,7 +1410,7 @@ func handleJoinTest() func(t *testing.T) {
 
 		_, err = CreateDevice(authorizedCtx, devReg, pb)
 		if !a.So(err, should.BeNil) {
-			t.FailNow()
+			t.Fatalf("Failed to create device %+v", pb)
 		}
 
 		_, err = ns.HandleUplink(authorizedCtx, req)
@@ -1424,7 +1572,7 @@ func handleJoinTest() func(t *testing.T) {
 
 					_, err = CreateDevice(authorizedCtx, devReg, pb)
 					if !a.So(err, should.BeNil) {
-						t.FailNow()
+						t.Fatalf("Failed to create device %+v", pb)
 					}
 				}
 
