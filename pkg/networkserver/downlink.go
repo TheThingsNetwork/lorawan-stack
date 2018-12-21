@@ -66,6 +66,8 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		return nil, errEmptySession
 	}
 
+	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+
 	spec := lorawan.DefaultMACCommands
 
 	cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
@@ -120,6 +122,9 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 			return nil, errEncodeMAC.WithCause(err)
 		}
 	}
+	if len(cmdBuf) > 0 {
+		logger.WithField("buf", cmdBuf).Debug("Generated MAC command buffer")
+	}
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
@@ -137,10 +142,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 			up = dev.RecentUplinks[i]
 			break
 		default:
-			log.FromContext(ctx).WithFields(log.Fields(
-				"m_type", up.Payload.MHDR.MType,
-				"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			)).Warn("Unknown MType stored in RecentUplinks")
+			logger.WithField("m_type", up.Payload.MHDR.MType).Warn("Unknown MType stored in RecentUplinks")
 		}
 	}
 	if !needsDownlink &&
