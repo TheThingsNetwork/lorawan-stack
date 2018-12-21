@@ -41,7 +41,7 @@ export default class ApplicationAccess extends React.Component {
     return (
       <Switch>
         <Route exact path={`${match.path}`} component={ApplicationAccessList} />
-        <Route exact path={`${match.path}/:apiKeyId`} component={ApplicationAccessEdit} />
+        <Route path={`${match.path}/:apiKeyId`} component={ApplicationAccessEdit} />
       </Switch>
     )
   }
