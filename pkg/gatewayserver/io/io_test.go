@@ -85,7 +85,7 @@ func Test(t *testing.T) {
 		frontend.Up <- &ttnpb.UplinkMessage{
 			RxMetadata: []*ttnpb.RxMetadata{
 				{
-					AntennaIndex: 1,
+					AntennaIndex: 0,
 					Timestamp:    100,
 				},
 			},
@@ -95,7 +95,7 @@ func Test(t *testing.T) {
 			tokenIDs, timestamp, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
 			a.So(tokenIDs.GatewayIdentifiers, should.Resemble, ids)
-			a.So(tokenIDs.AntennaIndex, should.Equal, 1)
+			a.So(tokenIDs.AntennaIndex, should.Equal, 0)
 			a.So(timestamp, should.Equal, 100)
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
