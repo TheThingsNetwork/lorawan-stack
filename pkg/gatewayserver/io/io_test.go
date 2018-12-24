@@ -15,6 +15,7 @@
 package io_test
 
 import (
+	"bytes"
 	"testing"
 	"time"
 
@@ -338,6 +339,26 @@ func Test(t *testing.T) {
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 2,
 						Rx2Frequency:     870000000, // This one doesn't exist in the frequency plan.
+					},
+				},
+			},
+			ErrorAssertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "TooLong",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: bytes.Repeat([]byte{0x01}, 80),
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 0,
+						Rx2Frequency:     869525000,
 					},
 				},
 			},

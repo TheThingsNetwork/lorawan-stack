@@ -179,6 +179,7 @@ var (
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
+	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_payload}` at data rate index `{data_rate_index}`")
 	errDownlinkChannel  = errors.DefineInvalidArgument("downlink_channel", "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
@@ -250,6 +251,15 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			dataRate := band.DataRates[rx.dataRateIndex].Rate
 			if dataRate == types.EmptyDataRate {
 				return errDataRate.WithAttributes("index", rx.dataRateIndex)
+			}
+			// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
+			maxPHYLength := band.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(true, c.fp.DwellTime.GetDownlinks()) + 5
+			if len(msg.RawPayload) > int(maxPHYLength) {
+				return errTooLong.WithAttributes(
+					"payload_length", len(msg.RawPayload),
+					"maximum_length", maxPHYLength,
+					"data_rate_index", rx.dataRateIndex,
+				)
 			}
 			var found bool
 			var channelIndex int
