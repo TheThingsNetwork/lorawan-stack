@@ -125,6 +125,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			return err
 		}
 		md.UplinkToken = buf
+		md.DownlinkPathConstraint = c.gateway.DownlinkPathConstraint
 	}
 
 	select {
