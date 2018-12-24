@@ -248,6 +248,5 @@ We do our utmost best to build secure systems, but we're human too, so we someti
 
 - Johan Stokking - [keybase.io/johanstokking](https://keybase.io/johanstokking) `5D21A572255E61C6`
 - Hylke Visser - [keybase.io/htdvisser](https://keybase.io/htdvisser) `A115FF80DC8A2270`
-- Eric Gourlaouen - [keybase.io/ericgo](https://keybase.io/ericgo) `A1368F9ED8110BFD`
 
 Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.

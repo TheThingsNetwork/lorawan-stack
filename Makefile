@@ -32,12 +32,6 @@ include .make/styl/main.make
 include .make/snap/main.make
 include .make/sdk/main.make
 
-ci.encrypt-variables:
-	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
-
-ci.decrypt-variables:
-	keybase decrypt -i ci/variables.yml.encrypted -o ci/variables.yml
-
 messages:
 	@$(GO) run ./cmd/internal/generate_i18n.go
 
