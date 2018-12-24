@@ -112,7 +112,9 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	if up.Settings.Time != nil {
-		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+		c.scheduler.SyncWithGateway(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+	} else {
+		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
 	}
 	for _, md := range up.RxMetadata {
 		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{

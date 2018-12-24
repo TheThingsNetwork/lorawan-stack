@@ -36,12 +36,17 @@ type RolloverClock struct {
 	server, gateway time.Time
 }
 
-// Sync synchronizes the clock with the given concentrator time v, the server time and the gateway time that
-// corresponds to the given timestamp.
-func (c *RolloverClock) Sync(timestamp uint32, server, gateway time.Time) {
+// Sync synchronizes the clock with the given concentrator time v and the server time.
+func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
 	c.absolute = c.TimestampTime(timestamp)
 	c.relative = timestamp
 	c.server = server
+}
+
+// SyncWithGateway synchronizes the clock with the given concentrator time v, the server time and the gateway time that
+// corresponds to the given timestamp.
+func (c *RolloverClock) SyncWithGateway(timestamp uint32, server, gateway time.Time) {
+	c.Sync(timestamp, server)
 	c.gateway = gateway
 }
 

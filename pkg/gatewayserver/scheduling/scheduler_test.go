@@ -45,7 +45,7 @@ func TestScheduleAt(t *testing.T) {
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	a.So(err, should.BeNil)
-	scheduler.Sync(0, time.Now(), time.Unix(0, 0))
+	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
 	for i, tc := range []struct {
 		PayloadSize    int
@@ -223,7 +223,7 @@ func TestScheduleAnytime(t *testing.T) {
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	a.So(err, should.BeNil)
-	scheduler.Sync(0, time.Now(), time.Unix(0, 0))
+	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
@@ -316,7 +316,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 	{
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 		a.So(err, should.BeNil)
-		scheduler.Sync(0, time.Now(), time.Unix(0, 0))
+		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
 		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)
@@ -326,7 +326,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 	{
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 		a.So(err, should.BeNil)
-		scheduler.Sync(0, time.Now(), time.Unix(0, 0))
+		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
 		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)

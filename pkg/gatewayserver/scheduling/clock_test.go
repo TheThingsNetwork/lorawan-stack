@@ -28,21 +28,21 @@ func TestConcentratorClock(t *testing.T) {
 	a := assertions.New(t)
 	clock := &scheduling.RolloverClock{}
 
-	clock.Sync(10000000, time.Unix(10, 0), time.Unix(0, 0)) // The gateway has no idea of time.
+	clock.SyncWithGateway(10000000, time.Unix(10, 0), time.Unix(0, 0)) // The gateway has no idea of time.
 	a.So(clock.ServerTime(time.Unix(10, 100)), should.Equal, 10000000*time.Microsecond+100)
 	a.So(clock.GatewayTime(time.Unix(0, 100)), should.Equal, 10000000*time.Microsecond+100)
 
 	{
 		// Test first roll-over to 4299967295 us (math.MaxUint32 + 5000000).
 		passed := time.Duration(time.Microsecond * (math.MaxUint32 + 5000000))
-		clock.Sync(5000000, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
+		clock.SyncWithGateway(5000000, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
 		a.So(clock.ServerTime(time.Unix(10, 100).Add(passed)), should.Equal, passed+100)
 	}
 
 	{
 		// Test second roll-over to 8589934590 us (2 * math.MaxUint32).
 		passed := time.Duration(time.Microsecond * 2 * math.MaxUint32)
-		clock.Sync(0, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
+		clock.SyncWithGateway(0, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
 		a.So(clock.ServerTime(time.Unix(10, 100).Add(passed)), should.Equal, passed+100)
 	}
 }

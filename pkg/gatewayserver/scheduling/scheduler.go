@@ -217,10 +217,17 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	return em, nil
 }
 
-// Sync synchronizes the clock with the given concentrator time v, the server time and the gateway time that
-// corresponds to the given v.
-func (s *Scheduler) Sync(v uint32, server, gateway time.Time) {
+// Sync synchronizes the clock with the given concentrator time v and the server time.
+func (s *Scheduler) Sync(v uint32, server time.Time) {
 	s.mu.Lock()
-	s.clock.Sync(v, server, gateway)
+	s.clock.Sync(v, server)
+	s.mu.Unlock()
+}
+
+// SyncWithGateway synchronizes the clock with the given concentrator time v, the server time and the gateway time that
+// corresponds to the given v.
+func (s *Scheduler) SyncWithGateway(v uint32, server, gateway time.Time) {
+	s.mu.Lock()
+	s.clock.SyncWithGateway(v, server, gateway)
 	s.mu.Unlock()
 }
