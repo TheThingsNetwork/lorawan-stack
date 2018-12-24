@@ -34,8 +34,11 @@ func init() {
 	eu_433 = Band{
 		ID: EU_433,
 
-		UplinkChannels:   defaultChannels,
-		DownlinkChannels: defaultChannels,
+		MaxUplinkChannels: 16,
+		UplinkChannels:    defaultChannels,
+
+		MaxDownlinkChannels: 16,
+		DownlinkChannels:    defaultChannels,
 
 		BandDutyCycles: []DutyCycle{
 			{

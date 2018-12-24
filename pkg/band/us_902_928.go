@@ -25,7 +25,7 @@ var us_902_928 Band
 const US_902_928 = "US_902_928"
 
 func init() {
-	uplinkChannels := make([]Channel, 0)
+	uplinkChannels := make([]Channel, 0, 72)
 	for i := 0; i < 64; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
 			Frequency:       uint64(902300000 + 200000*i),
@@ -39,7 +39,7 @@ func init() {
 		})
 	}
 
-	downlinkChannels := make([]Channel, 0)
+	downlinkChannels := make([]Channel, 0, 8)
 	for i := 0; i < 8; i++ {
 		downlinkChannels = append(downlinkChannels, Channel{
 			Frequency:       uint64(923300000 + 600000*i),
@@ -50,8 +50,11 @@ func init() {
 	us_902_928 = Band{
 		ID: US_902_928,
 
-		UplinkChannels:   uplinkChannels,
-		DownlinkChannels: downlinkChannels,
+		MaxUplinkChannels: 72,
+		UplinkChannels:    uplinkChannels,
+
+		MaxDownlinkChannels: 8,
+		DownlinkChannels:    downlinkChannels,
 
 		BandDutyCycles: []DutyCycle{
 			{

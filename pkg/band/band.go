@@ -123,9 +123,14 @@ type Band struct {
 
 	Beacon Beacon
 
-	// UplinkChannels by default.
+	// MaxUplinkChannels is the maximum amount of uplink channels that can be defined.
+	MaxUplinkChannels uint8
+	// UplinkChannels are the default uplink channels.
 	UplinkChannels []Channel
-	// DownlinkChannels by default.
+
+	// MaxDownlinkChannels is the maximum amount of downlink channels that can be defined.
+	MaxDownlinkChannels uint8
+	// DownlinkChannels are the default downlink channels.
 	DownlinkChannels []Channel
 
 	// BandDutyCycles define the sub-bands and their duty-cycle limit. The frequency ranges may not overlap.

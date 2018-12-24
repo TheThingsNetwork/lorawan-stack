@@ -34,8 +34,11 @@ func init() {
 	in_865_867 = Band{
 		ID: IN_865_867,
 
-		UplinkChannels:   defaultChannels,
-		DownlinkChannels: defaultChannels,
+		MaxUplinkChannels: 16,
+		UplinkChannels:    defaultChannels,
+
+		MaxDownlinkChannels: 16,
+		DownlinkChannels:    defaultChannels,
 
 		BandDutyCycles: []DutyCycle{
 			{

@@ -34,8 +34,11 @@ func init() {
 	eu_863_870 = Band{
 		ID: EU_863_870,
 
-		UplinkChannels:   defaultChannels,
-		DownlinkChannels: defaultChannels,
+		MaxUplinkChannels: 16,
+		UplinkChannels:    defaultChannels,
+
+		MaxDownlinkChannels: 16,
+		DownlinkChannels:    defaultChannels,
 
 		// See ETSI EN 300.220-2 V3.1.1 (2017-02)
 		BandDutyCycles: []DutyCycle{

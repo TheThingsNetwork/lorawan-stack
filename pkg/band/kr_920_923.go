@@ -34,8 +34,11 @@ func init() {
 	kr_920_923 = Band{
 		ID: KR_920_923,
 
-		UplinkChannels:   defaultChannels,
-		DownlinkChannels: defaultChannels,
+		MaxUplinkChannels: 16,
+		UplinkChannels:    defaultChannels,
+
+		MaxDownlinkChannels: 16,
+		DownlinkChannels:    defaultChannels,
 
 		BandDutyCycles: []DutyCycle{
 			{
