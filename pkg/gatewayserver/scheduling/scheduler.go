@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -37,9 +36,9 @@ var (
 	QueueDelay = 30 * time.Millisecond
 
 	// ScheduleTimeShort is a short time to send a downlink message to the gateway before it has to be transmitted.
-	// This time is comprised of a lower network latency and QueueDelay. This delay is used for logging a warning message
-	// when a message is scheduled shorter before transmission than this value.
-	ScheduleTimeShort = 30*time.Millisecond + QueueDelay
+	// This time is comprised of a lower network latency and QueueDelay. This delay is used to block scheduling when the
+	// schedule time to the estimated concentrator time is less than this value, see ScheduleAt.
+	ScheduleTimeShort = 100*time.Millisecond + QueueDelay
 
 	// ScheduleTimeLong is a long time to send a downlink message to the gateway before it has to be transmitted.
 	// This time is comprised of a higher network latency and QueueDelay. This delay is used for pseudo-immediate
@@ -116,12 +115,23 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 	return NewEmission(relative, d), nil
 }
 
-var errConflict = errors.DefineResourceExhausted("conflict", "scheduling conflict")
+var (
+	errConflict = errors.DefineResourceExhausted("conflict", "scheduling conflict")
+	errTooLate  = errors.DefineFailedPrecondition("too_short", "too late to transmission scheduled time (delta is `{delta}`)")
+)
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
 func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	now := s.clock.ServerTime(time.Now())
+	if settings.Time != nil {
+		if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
+			return Emission{}, errTooLate.WithAttributes("delta", delta)
+		}
+	} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - s.clock.ServerTime(time.Now())); delta < ScheduleTimeShort {
+		return Emission{}, errTooLate.WithAttributes("delta", delta)
+	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
 		return Emission{}, err
@@ -155,6 +165,13 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	now := s.clock.ServerTime(time.Now())
 	if settings.Timestamp == 0 && settings.Time == nil {
 		settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
+	} else if settings.Time != nil {
+		if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
+			t := settings.Time.Add(ScheduleTimeShort - delta)
+			settings.Time = &t
+		}
+	} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - now); delta < ScheduleTimeShort {
+		settings.Timestamp += uint32((ScheduleTimeShort - delta) / time.Microsecond)
 	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
@@ -195,9 +212,6 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	em, err = sb.ScheduleAnytime(em.d, next, priority)
 	if err != nil {
 		return Emission{}, err
-	}
-	if delta := time.Duration(em.Starts() - now); delta < ScheduleTimeShort {
-		log.FromContext(ctx).WithField("delta", delta).Warn("The scheduled time is late for transmission")
 	}
 	s.emissions = s.emissions.Insert(em)
 	return em, nil

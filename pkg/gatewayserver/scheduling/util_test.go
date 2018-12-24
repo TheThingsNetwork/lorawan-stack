@@ -36,6 +36,7 @@ func (c *mockClock) TimestampTime(timestamp uint32) scheduling.ConcentratorTime 
 
 func boolPtr(v bool) *bool                       { return &v }
 func durationPtr(d time.Duration) *time.Duration { return &d }
+func timePtr(t time.Time) *time.Time             { return &t }
 
 func init() {
 	scheduling.DutyCycleWindow = 10 * time.Second

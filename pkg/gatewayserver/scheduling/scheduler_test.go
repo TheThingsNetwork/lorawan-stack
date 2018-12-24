@@ -45,6 +45,7 @@ func TestScheduleAt(t *testing.T) {
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	a.So(err, should.BeNil)
+	scheduler.Sync(0, time.Now(), time.Unix(0, 0))
 
 	for i, tc := range []struct {
 		PayloadSize    int
@@ -65,6 +66,36 @@ func TestScheduleAt(t *testing.T) {
 			},
 			ExpectedToa: 2465792 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			// Too late for transmission.
+			ErrorAssertion: &scheduling.ErrTooLate,
+		},
+		{
+			PayloadSize: 51,
+			Settings: ttnpb.TxSettings{
+				Modulation:      ttnpb.Modulation_LORA,
+				Frequency:       869525000,
+				Bandwidth:       125000,
+				SpreadingFactor: 12,
+				CodingRate:      "4/5",
+				Time:            timePtr(time.Unix(0, int64(100*time.Millisecond))),
+			},
+			ExpectedToa: 2465792 * time.Microsecond,
+			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			// Too late for transmission.
+			ErrorAssertion: &scheduling.ErrTooLate,
+		},
+		{
+			PayloadSize: 51,
+			Settings: ttnpb.TxSettings{
+				Modulation:      ttnpb.Modulation_LORA,
+				Frequency:       869525000,
+				Bandwidth:       125000,
+				SpreadingFactor: 12,
+				CodingRate:      "4/5",
+				Timestamp:       20000000,
+			},
+			ExpectedToa: 2465792 * time.Microsecond,
+			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Exceeding dwell time of 2 seconds.
 			ErrorAssertion: &scheduling.ErrDwellTime,
 		},
@@ -76,7 +107,7 @@ func TestScheduleAt(t *testing.T) {
 				Bandwidth:       125000,
 				SpreadingFactor: 7,
 				CodingRate:      "4/5",
-				Timestamp:       100,
+				Timestamp:       20000000,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -89,7 +120,7 @@ func TestScheduleAt(t *testing.T) {
 				Bandwidth:       125000,
 				SpreadingFactor: 7,
 				CodingRate:      "4/5",
-				Timestamp:       100,
+				Timestamp:       20000000,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -104,7 +135,7 @@ func TestScheduleAt(t *testing.T) {
 				Bandwidth:       125000,
 				SpreadingFactor: 7,
 				CodingRate:      "4/5",
-				Timestamp:       100,
+				Timestamp:       20000000,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -119,7 +150,7 @@ func TestScheduleAt(t *testing.T) {
 				Bandwidth:       125000,
 				SpreadingFactor: 7,
 				CodingRate:      "4/5",
-				Timestamp:       100 + 41216 + 1000000, // time-on-air + time-off-air.
+				Timestamp:       20000000 + 41216 + 1000000, // time-on-air + time-off-air.
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -134,7 +165,7 @@ func TestScheduleAt(t *testing.T) {
 				Bandwidth:       125000,
 				SpreadingFactor: 7,
 				CodingRate:      "4/5",
-				Timestamp:       100 + 41216 + 1000000 + 30000, // time-on-air + time-off-air + queue delay
+				Timestamp:       20000000 + 41216 + 1000000 + 30000, // time-on-air + time-off-air + queue delay
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -147,7 +178,7 @@ func TestScheduleAt(t *testing.T) {
 				Bandwidth:       125000,
 				SpreadingFactor: 12,
 				CodingRate:      "4/5",
-				Timestamp:       20000000, // In next duty-cycle window; discard previous.
+				Timestamp:       30000000, // In next duty-cycle window; discard previous.
 			},
 			ExpectedToa: 1318912 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -192,6 +223,7 @@ func TestScheduleAnytime(t *testing.T) {
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	a.So(err, should.BeNil)
+	scheduler.Sync(0, time.Now(), time.Unix(0, 0))
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
@@ -252,4 +284,51 @@ func TestScheduleAnytime(t *testing.T) {
 	// It's 9.91% in a 1% duty-cycle sub-band, so it hits the duty-cycle limitation.
 	_, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(868100000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
 	a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrDutyCycle)
+}
+
+func TestScheduleAnytimeShort(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+	fp := &frequencyplans.FrequencyPlan{
+		BandID: band.EU_863_870,
+		TimeOffAir: frequencyplans.TimeOffAir{
+			Duration: time.Second,
+		},
+		DwellTime: frequencyplans.DwellTime{
+			Downlinks: boolPtr(true),
+			Duration:  durationPtr(2 * time.Second),
+		},
+	}
+
+	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) ttnpb.TxSettings {
+		return ttnpb.TxSettings{
+			Modulation:      ttnpb.Modulation_LORA,
+			Frequency:       frequency,
+			Bandwidth:       125000,
+			SpreadingFactor: sf,
+			CodingRate:      "4/5",
+			Time:            time,
+			Timestamp:       timestamp,
+		}
+	}
+
+	// Gateway time; too late (100 ms).
+	{
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+		a.So(err, should.BeNil)
+		scheduler.Sync(0, time.Now(), time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)
+	}
+
+	// Timestamp; too late (100 ms).
+	{
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+		a.So(err, should.BeNil)
+		scheduler.Sync(0, time.Now(), time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)
+	}
 }
