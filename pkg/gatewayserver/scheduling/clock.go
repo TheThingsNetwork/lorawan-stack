@@ -21,6 +21,8 @@ import (
 
 // Clock represents an absolute time source.
 type Clock interface {
+	// IsSynced returns whether the clock is synchronized.
+	IsSynced() bool
 	// ServerTime returns an indication of the concentrator time at the given server time.
 	ServerTime(server time.Time) ConcentratorTime
 	// GatewayTime returns an indication of the concentrator time at the given gateway time.
@@ -31,16 +33,21 @@ type Clock interface {
 
 // RolloverClock is a Clock that takes roll-over of uint32 concentrator time into account.
 type RolloverClock struct {
+	synced          bool
 	relative        uint32
 	absolute        ConcentratorTime
 	server, gateway time.Time
 }
+
+// IsSynced implements Clock.
+func (c *RolloverClock) IsSynced() bool { return c.synced }
 
 // Sync synchronizes the clock with the given concentrator time v and the server time.
 func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
 	c.absolute = c.TimestampTime(timestamp)
 	c.relative = timestamp
 	c.server = server
+	c.synced = true
 }
 
 // SyncWithGateway synchronizes the clock with the given concentrator time v, the server time and the gateway time that

@@ -55,16 +55,16 @@ func TestScheduleAt(t *testing.T) {
 		ErrorAssertion *errors.Definition
 	}{
 		{
-			PayloadSize: 51,
+			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				Modulation:      ttnpb.Modulation_LORA,
 				Frequency:       869525000,
 				Bandwidth:       125000,
-				SpreadingFactor: 12,
+				SpreadingFactor: 7,
 				CodingRate:      "4/5",
 				Timestamp:       100,
 			},
-			ExpectedToa: 2465792 * time.Microsecond,
+			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Too late for transmission.
 			ErrorAssertion: &scheduling.ErrTooLate,

@@ -24,6 +24,9 @@ type mockClock struct {
 	t scheduling.ConcentratorTime
 }
 
+func (c *mockClock) IsSynced() bool {
+	return c.t > 0
+}
 func (c *mockClock) ServerTime(_ time.Time) scheduling.ConcentratorTime {
 	return c.t
 }

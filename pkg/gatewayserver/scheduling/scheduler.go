@@ -117,20 +117,22 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings) (Emi
 
 var (
 	errConflict = errors.DefineResourceExhausted("conflict", "scheduling conflict")
-	errTooLate  = errors.DefineFailedPrecondition("too_short", "too late to transmission scheduled time (delta is `{delta}`)")
+	errTooLate  = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`)")
 )
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
 func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	now := s.clock.ServerTime(time.Now())
-	if settings.Time != nil {
-		if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
+	if s.clock.IsSynced() {
+		now := s.clock.ServerTime(time.Now())
+		if settings.Time != nil {
+			if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
+				return Emission{}, errTooLate.WithAttributes("delta", delta)
+			}
+		} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - s.clock.ServerTime(time.Now())); delta < ScheduleTimeShort {
 			return Emission{}, errTooLate.WithAttributes("delta", delta)
 		}
-	} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - s.clock.ServerTime(time.Now())); delta < ScheduleTimeShort {
-		return Emission{}, errTooLate.WithAttributes("delta", delta)
 	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
@@ -162,16 +164,18 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	now := s.clock.ServerTime(time.Now())
-	if settings.Timestamp == 0 && settings.Time == nil {
-		settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
-	} else if settings.Time != nil {
-		if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
-			t := settings.Time.Add(ScheduleTimeShort - delta)
-			settings.Time = &t
+	if s.clock.IsSynced() {
+		now := s.clock.ServerTime(time.Now())
+		if settings.Timestamp == 0 && settings.Time == nil {
+			settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
+		} else if settings.Time != nil {
+			if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
+				t := settings.Time.Add(ScheduleTimeShort - delta)
+				settings.Time = &t
+			}
+		} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - now); delta < ScheduleTimeShort {
+			settings.Timestamp += uint32((ScheduleTimeShort - delta) / time.Microsecond)
 		}
-	} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - now); delta < ScheduleTimeShort {
-		settings.Timestamp += uint32((ScheduleTimeShort - delta) / time.Microsecond)
 	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
