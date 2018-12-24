@@ -95,6 +95,7 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		ch.UplinkFrequency = req.Frequency
 		ch.MinDataRateIndex = req.MinDataRateIndex
 		ch.MaxDataRateIndex = req.MaxDataRateIndex
+		ch.EnableUplink = true
 		return nil
 
 	}, dev.MACState.PendingRequests...)

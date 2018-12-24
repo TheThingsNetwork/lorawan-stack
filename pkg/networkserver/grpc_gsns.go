@@ -85,14 +85,16 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	// NOTE: dev.MACState.CurrentParameters must not contain pointer values at this point.
 	dev.MACState.DesiredParameters = dev.MACState.CurrentParameters
 
-	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) {
+	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
+		len(band.UplinkChannels) > int(band.MaxUplinkChannels) || len(band.DownlinkChannels) > int(band.MaxDownlinkChannels) ||
+		len(fp.UplinkChannels) > int(band.MaxUplinkChannels) || len(fp.DownlinkChannels) > int(band.MaxDownlinkChannels) {
 		// NOTE: In case the spec changes and this assumption is not valid anymore,
 		// the implementation of this function won't be valid and has to be changed.
 		panic("uplink/downlink channel length is inconsistent")
 	}
 
 	dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
-	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(dev.MACState.CurrentParameters.Channels)), float64(len(fp.UplinkChannels)))))
+	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(band.UplinkChannels)), float64(len(fp.UplinkChannels)))))
 
 	for i, upCh := range band.UplinkChannels {
 		if len(upCh.DataRateIndexes) == 0 {
@@ -100,9 +102,10 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		}
 
 		ch := &ttnpb.MACParameters_Channel{
-			UplinkFrequency:  upCh.Frequency,
 			MinDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[0]),
 			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[len(upCh.DataRateIndexes)-1]),
+			UplinkFrequency:  upCh.Frequency,
+			EnableUplink:     true,
 		}
 		dev.MACState.CurrentParameters.Channels[i] = ch
 
@@ -111,9 +114,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	}
 
 	for i, downCh := range band.DownlinkChannels {
-		if i >= len(dev.MACState.CurrentParameters.Channels) {
-			panic("band downlink channel length is inconsistent")
-		}
+		// NOTE: len(band.DownlinkChannels) <= len(band.UplinkChannels) => i < len(dev.MACState.CurrentParameters.Channels)
 		dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
 
@@ -124,6 +125,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 				MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
 				MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
 				UplinkFrequency:  upCh.Frequency,
+				EnableUplink:     true,
 			}
 			continue
 		}
@@ -137,9 +139,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	}
 
 	for i, downCh := range fp.DownlinkChannels {
-		if i >= len(dev.MACState.DesiredParameters.Channels) {
-			panic("frequency plan downlink channel length is inconsistent")
-		}
+		// NOTE: len(fp.DownlinkChannels) <= len(fp.UplinkChannels) => i < len(dev.MACState.DesiredParameters.Channels)
 		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
 

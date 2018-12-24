@@ -263,6 +263,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					ns.Component.FrequencyPlans,
 				)).([]byte)
 
 				expected := CopyEndDevice(pb)
@@ -322,6 +323,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					ns.Component.FrequencyPlans,
 				)).([]byte)
 
 				switch uid := unique.ID(ctx, id); uid {
@@ -584,6 +586,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx2Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					ns.Component.FrequencyPlans,
 				)).([]byte)
 
 				expected := CopyEndDevice(pb)
@@ -645,10 +648,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+						ns.Component.FrequencyPlans,
 					)).([]byte)
 					rx2Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+						ns.Component.FrequencyPlans,
 					)).([]byte)
 
 					switch uid := unique.ID(ctx, id); uid {
@@ -2229,7 +2234,7 @@ func TestGenerateDownlink(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			b, err := generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
+			b, err := generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16, frequencyplans.NewStore(test.FrequencyPlansFetcher))
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

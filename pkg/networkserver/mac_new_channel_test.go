@@ -97,6 +97,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 								UplinkFrequency:   42,
 								MinDataRateIndex:  2,
 								MaxDataRateIndex:  3,
+								EnableUplink:      true,
 							},
 						},
 					},

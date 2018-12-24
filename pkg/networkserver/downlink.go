@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -57,7 +58,7 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) ([]byte, error) {
+func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) ([]byte, error) {
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
 	}
@@ -86,11 +87,14 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	var fPending bool
+	maxDownLen, maxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, fps)
+	if err != nil {
+		return nil, err
+	}
+	fPending := !ok
 	for _, f := range []func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool){
 		// LoRaWAN 1.0+
 		enqueueNewChannelReq,
-		enqueueLinkADRReq,
 		enqueueDutyCycleReq,
 		enqueueRxParamSetupReq,
 		enqueueDevStatusReq,
@@ -397,6 +401,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						rx1Payload, err = generateDownlink(ctx, rxDev,
 							band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 							maxUpLength,
+							ns.Component.FrequencyPlans,
 						)
 						if err != nil {
 							return nil, nil, err
@@ -466,6 +471,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						rx2Payload, err = generateDownlink(ctx, rxDev,
 							band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 							maxUpLength,
+							ns.Component.FrequencyPlans,
 						)
 						if err != nil {
 							return nil, nil, err
@@ -531,6 +537,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					b, err := generateDownlink(ctx, dev,
 						band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
 						maxUpLength,
+						ns.Component.FrequencyPlans,
 					)
 					if err != nil {
 						return nil, nil, err

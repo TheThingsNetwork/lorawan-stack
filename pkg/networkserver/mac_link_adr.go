@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -29,31 +30,73 @@ var (
 	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "ADR request")()
 )
 
-func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	if dev.MACState.DesiredParameters.ADRDataRateIndex == dev.MACState.CurrentParameters.ADRDataRateIndex &&
+func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (uint16, uint16, bool, error) {
+	needsMask := len(dev.MACState.CurrentParameters.Channels) > len(dev.MACState.DesiredParameters.Channels)
+	for i := 0; !needsMask && i < len(dev.MACState.CurrentParameters.Channels); i++ {
+		needsMask = dev.MACState.CurrentParameters.Channels[i].EnableUplink != dev.MACState.DesiredParameters.Channels[i].EnableUplink
+	}
+	if !needsMask &&
+		dev.MACState.DesiredParameters.ADRDataRateIndex == dev.MACState.CurrentParameters.ADRDataRateIndex &&
 		dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans &&
 		dev.MACState.DesiredParameters.ADRTxPowerIndex == dev.MACState.CurrentParameters.ADRTxPowerIndex {
-		return maxDownLen, maxUpLen, true
+		return maxDownLen, maxUpLen, true, nil
+	}
+
+	fp, err := fps.GetByID(dev.FrequencyPlanID)
+	if err != nil {
+		return maxDownLen, maxUpLen, false, err
+	}
+	band, err := band.GetByID(fp.BandID)
+	if err != nil {
+		return maxDownLen, maxUpLen, false, err
+	}
+
+	if len(dev.MACState.DesiredParameters.Channels) > int(band.MaxUplinkChannels) {
+		return maxDownLen, maxUpLen, false, errCorruptedMACState
+	}
+
+	desiredChs := make([]bool, band.MaxUplinkChannels)
+	for i, ch := range dev.MACState.DesiredParameters.Channels {
+		desiredChs[i] = ch.EnableUplink
+	}
+	desiredMasks, err := band.GenerateChMasks(desiredChs)
+	if err != nil {
+		return maxDownLen, maxUpLen, false, err
+	}
+	if len(desiredMasks) > math.MaxUint16 {
+		// Something is really wrong.
+		return maxDownLen, maxUpLen, false, errCorruptedMACState
 	}
 
 	var ok bool
 	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
-		if nDown < 1 || nUp < 1 {
+		if int(nDown) < len(desiredMasks) {
 			return nil, 0, false
 		}
-		pld := &ttnpb.MACCommand_LinkADRReq{
-			DataRateIndex: dev.MACState.DesiredParameters.ADRDataRateIndex,
-			NbTrans:       dev.MACState.DesiredParameters.ADRNbTrans,
-			TxPowerIndex:  dev.MACState.DesiredParameters.ADRTxPowerIndex,
-			// NOTE: This is invalid in most of the cases.
-			// TODO: Generate proper ChannelMask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1235)
-			ChannelMask: []bool{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+
+		uplinksNeeded := uint16(1)
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			uplinksNeeded = uint16(len(desiredMasks))
 		}
-		events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, pld))
-		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+		if nUp < uplinksNeeded {
+			return nil, 0, false
+		}
+		cmds := make([]*ttnpb.MACCommand, 0, len(desiredMasks))
+		for _, m := range desiredMasks {
+			pld := &ttnpb.MACCommand_LinkADRReq{
+				DataRateIndex:      dev.MACState.DesiredParameters.ADRDataRateIndex,
+				NbTrans:            dev.MACState.DesiredParameters.ADRNbTrans,
+				TxPowerIndex:       dev.MACState.DesiredParameters.ADRTxPowerIndex,
+				ChannelMaskControl: uint32(m.Cntl),
+				ChannelMask:        m.Mask[:],
+			}
+			cmds = append(cmds, pld.MACCommand())
+			events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, pld))
+		}
+		return cmds, uplinksNeeded, true
 
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return maxDownLen, maxUpLen, ok, nil
 }
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (err error) {
