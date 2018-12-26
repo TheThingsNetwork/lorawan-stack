@@ -2123,6 +2123,15 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/gatewayserver/io/mqtt:not_scheduled": {
+    "translations": {
+      "en": "not scheduled"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "format_protobufv2.go"
+    }
+  },
   "error:pkg/gatewayserver/io/mqtt:not_supported": {
     "translations": {
       "en": "not supported"
@@ -2177,85 +2186,139 @@
       "file": "io.go"
     }
   },
-  "error:pkg/gatewayserver/io:compute_toa": {
+  "error:pkg/gatewayserver/io:data_rate": {
     "translations": {
-      "en": "could not compute the time on air"
+      "en": "no data rate with index `{index}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
       "file": "io.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:duty_cycle_full": {
+  "error:pkg/gatewayserver/io:downlink_channel": {
     "translations": {
-      "en": "duty cycle between `{min_frequency}` and `{max_frequency}` full, exceeded quota of `{quota}`"
+      "en": "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:downlink_path": {
+    "translations": {
+      "en": "invalid downlink path"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:no_uplink_token": {
+    "translations": {
+      "en": "no uplink token provided for class A downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:not_allowed": {
+    "translations": {
+      "en": "downlink not allowed"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:not_tx_request": {
+    "translations": {
+      "en": "downlink message is not a Tx request"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:rx_empty": {
+    "translations": {
+      "en": "settings empty"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:rx_window_schedule": {
+    "translations": {
+      "en": "schedule in Rx window `{window}` failed"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:too_long": {
+    "translations": {
+      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_payload}` at data rate index `{data_rate_index}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:tx_schedule": {
+    "translations": {
+      "en": "failed to schedule"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:conflict": {
+    "translations": {
+      "en": "scheduling conflict"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
+      "file": "scheduler.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:duty_cycle": {
+    "translations": {
+      "en": "utilization `{used}%` would be higher than the available `{usable}%` for priority `{priority}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "sub_band.go"
     }
   },
   "error:pkg/gatewayserver/scheduling:dwell_time": {
     "translations": {
-      "en": "packet exceeded dwell time restrictions"
+      "en": "packet exceeds dwell time restriction"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
-    }
-  },
-  "error:pkg/gatewayserver/scheduling:negative_duration": {
-    "translations": {
-      "en": "duration cannot be negative"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
-    }
-  },
-  "error:pkg/gatewayserver/scheduling:retrieve_frequency_plan_band": {
-    "translations": {
-      "en": "failed to retrieve the band associated with the frequency plan"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
+      "file": "scheduler.go"
     }
   },
   "error:pkg/gatewayserver/scheduling:sub_band_not_found": {
     "translations": {
-      "en": "no sub-band found for frequency `{frequency}` Hz"
+      "en": "sub-band not found for frequency `{frequency}` Hz"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
+      "file": "scheduler.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:time_off_air_required": {
+  "error:pkg/gatewayserver/scheduling:too_late": {
     "translations": {
-      "en": "time-off-air constraints prevent scheduling"
+      "en": "too late to transmission scheduled time (delta is `{delta}`)"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
-      "file": "sub_band_scheduling.go"
-    }
-  },
-  "error:pkg/gatewayserver/scheduling:window_overlap": {
-    "translations": {
-      "en": "window overlap"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/scheduling",
-      "file": "scheduling.go"
-    }
-  },
-  "error:pkg/gatewayserver:antenna_not_found": {
-    "translations": {
-      "en": "antenna `{index}` not found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "grpc_nsgs.go"
+      "file": "scheduler.go"
     }
   },
   "error:pkg/gatewayserver:empty_identifiers": {
@@ -2319,6 +2382,42 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:not_tx_request": {
+    "translations": {
+      "en": "downlink message is not a Tx request"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "grpc_nsgs.go"
+    }
+  },
+  "error:pkg/gatewayserver:schedule": {
+    "translations": {
+      "en": "failed to schedule"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "grpc_nsgs.go"
+    }
+  },
+  "error:pkg/gatewayserver:schedule_path": {
+    "translations": {
+      "en": "failed to schedule on path `{gateway_uid}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "grpc_nsgs.go"
+    }
+  },
+  "error:pkg/gatewayserver:uplink_token": {
+    "translations": {
+      "en": "uplink token is not generated by this server"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "grpc_nsgs.go"
     }
   },
   "error:pkg/identityserver/blacklist:blacklisted_id": {
@@ -3629,6 +3728,15 @@
   "error:pkg/ttnpb/udp:no_eui": {
     "translations": {
       "en": "packet is not long enough to contain the EUI"
+    },
+    "description": {
+      "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb/udp:not_scheduled": {
+    "translations": {
+      "en": "downlink message not scheduled"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
