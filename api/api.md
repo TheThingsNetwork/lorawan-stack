@@ -4658,7 +4658,7 @@ Uplink message from the end device to the network
 | end_device_ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | settings | [TxSettings](#ttn.lorawan.v3.TxSettings) |  |  |
 | rx_metadata | [RxMetadata](#ttn.lorawan.v3.RxMetadata) | repeated |  |
-| received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Server time when the Gateway Server received the message. |
+| received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Server time when a component received the message. The Gateway Server, Network Server and Application Server may set this value to their local server time of reception. |
 | correlation_ids | [string](#string) | repeated |  |
 
 

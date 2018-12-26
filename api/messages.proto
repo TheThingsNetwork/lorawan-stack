@@ -75,7 +75,8 @@ message UplinkMessage {
   EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
   TxSettings settings = 4 [(gogoproto.nullable) = false];
   repeated RxMetadata rx_metadata = 5;
-  // Server time when the Gateway Server received the message.
+  // Server time when a component received the message.
+  // The Gateway Server, Network Server and Application Server may set this value to their local server time of reception.
   google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   repeated string correlation_ids = 7 [(gogoproto.customname) = "CorrelationIDs"];
 }
