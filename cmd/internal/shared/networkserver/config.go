@@ -24,4 +24,9 @@ import (
 var DefaultNetworkServerConfig = networkserver.Config{
 	DeduplicationWindow: 200 * time.Millisecond,
 	CooldownWindow:      time.Second,
+	DownlinkPriorities: networkserver.DownlinkPriorityConfig{
+		JoinAccept:             "highest",
+		MACCommands:            "highest",
+		MaxApplicationDownlink: "high",
+	},
 }

@@ -3284,6 +3284,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:downlink_priority": {
+    "translations": {
+      "en": "invalid downlink priority `{value}`"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "config.go"
+    }
+  },
   "error:pkg/networkserver:duplicate_cid_handler": {
     "translations": {
       "en": "a handler for MAC command with CID {cid} is already registered"

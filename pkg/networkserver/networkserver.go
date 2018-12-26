@@ -109,12 +109,16 @@ func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
 	}
 }
 
-// Config represents the NetworkServer configuration.
-type Config struct {
-	Devices             DeviceRegistry    `name:"-"`
-	DownlinkTasks       DownlinkTaskQueue `name:"-"`
-	DeduplicationWindow time.Duration     `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow      time.Duration     `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+// DownlinkPriorities define the schedule priorities for the different types of downlink.
+type DownlinkPriorities struct {
+	// JoinAccept is the downlink priority for join-accept messages.
+	JoinAccept,
+	// MACCommands is the downlink priority for downlink messages with MAC commands as FRMPayload (FPort = 0) or as FOpts.
+	// If the MAC commands are carried in FOpts, the highest priority of this value and the concerning application
+	// downlink message's priority is used.
+	MACCommands,
+	// MaxApplicationDownlink is the highest priority permitted by the Network Server for application downlink.
+	MaxApplicationDownlink ttnpb.TxSchedulePriority
 }
 
 // NetworkServer implements the Network Server component.
@@ -135,8 +139,9 @@ type NetworkServer struct {
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
 
-	macHandlers   *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
-	downlinkTasks DownlinkTaskQueue
+	macHandlers        *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
+	downlinkTasks      DownlinkTaskQueue
+	downlinkPriorities DownlinkPriorities
 
 	deduplicationDone WindowEndFunc
 	collectionDone    WindowEndFunc
@@ -212,10 +217,15 @@ func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
 
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
+	downlinkPriorities, err := conf.DownlinkPriorities.Parse()
+	if err != nil {
+		return nil, err
+	}
 	ns := &NetworkServer{
 		Component:               c,
 		devices:                 conf.Devices,
 		downlinkTasks:           conf.DownlinkTasks,
+		downlinkPriorities:      downlinkPriorities,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
@@ -237,10 +247,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	switch {
 	case ns.deduplicationDone == nil && conf.DeduplicationWindow == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow is zero and WithDeduplicationDoneFunc not specified"))
-
 	case ns.collectionDone == nil && conf.DeduplicationWindow == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow is zero and WithCollectionDoneFunc not specified"))
-
 	case ns.collectionDone == nil && conf.CooldownWindow == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow is zero and WithCollectionDoneFunc not specified"))
 	}
