@@ -20,54 +20,8 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
-
-func GetUplink() ttnpb.UplinkMessage                   { return ttnpb.UplinkMessage{} }
-func SendDownlink(ttnpb.DownlinkMessage)               {}
-func ParseSpreadingFactor(types.DataRate) uint32       { return 7 }
-func ParseBandwidth(types.DataRate) uint32             { return 125000 }
-func ParseBitRate(types.DataRate) uint32               { return 0 }
-func ParseModulation(types.DataRate) ttnpb.Modulation  { return ttnpb.Modulation_LORA }
-func GetReceptionTimestamp(ttnpb.UplinkMessage) uint64 { return 0 }
-
-func Example() {
-	euBand, err := band.GetByID(band.EU_863_870)
-	if err != nil {
-		panic(err)
-	}
-
-	up := GetUplink()
-	sets := up.GetSettings()
-	drIdx, err := euBand.Rx1DataRate(sets.GetDataRateIndex(), 0, false)
-	if err != nil {
-		panic(err)
-	}
-
-	chIdx, err := euBand.Rx1Channel(sets.GetChannelIndex())
-	if err != nil {
-		panic(err)
-	}
-
-	dr := euBand.DataRates[drIdx]
-
-	downlink := ttnpb.DownlinkMessage{
-		Settings: ttnpb.TxSettings{
-			DataRateIndex:   ttnpb.DataRateIndex(drIdx),
-			Frequency:       euBand.DownlinkChannels[chIdx].Frequency,
-			ChannelIndex:    chIdx,
-			Modulation:      ParseModulation(dr.Rate),
-			SpreadingFactor: ParseSpreadingFactor(dr.Rate),
-			BitRate:         ParseBitRate(dr.Rate),
-			Bandwidth:       ParseBandwidth(dr.Rate),
-		},
-		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: GetReceptionTimestamp(up) + 1000000000*uint64(euBand.ReceiveDelay1),
-		},
-	}
-	SendDownlink(downlink)
-}
 
 func TestRx1DataRate(t *testing.T) {
 	a := assertions.New(t)
