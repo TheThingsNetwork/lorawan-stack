@@ -80,6 +80,7 @@ func TestUserSessionStore(t *testing.T) {
 			SessionID:       created.SessionID,
 			ExpiresAt:       &later,
 		})
+		a.So(err, should.BeNil)
 		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(updated.UpdatedAt, should.NotEqual, created.UpdatedAt)
 		a.So(updated.ExpiresAt, should.NotBeNil)

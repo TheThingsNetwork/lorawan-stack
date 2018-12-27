@@ -24,8 +24,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/randutil"
 )
 
+// NewPopulator returns a new database populator with a population of the given size.
+// It is seeded by the given seed.
 func NewPopulator(size int, seed int64) *Populator {
-	randy := rand.New(randutil.NewLockedSource(rand.NewSource(42)))
+	randy := rand.New(randutil.NewLockedSource(rand.NewSource(seed)))
 	p := &Populator{
 		APIKeys:     make(map[*ttnpb.EntityIdentifiers][]*ttnpb.APIKey),
 		Memberships: make(map[*ttnpb.EntityIdentifiers][]*ttnpb.Collaborator),
@@ -153,6 +155,7 @@ func NewPopulator(size int, seed int64) *Populator {
 	return p
 }
 
+// Populator is intended to populate a database with test data.
 type Populator struct {
 	Applications  []*ttnpb.Application
 	Clients       []*ttnpb.Client
@@ -164,6 +167,7 @@ type Populator struct {
 	Memberships map[*ttnpb.EntityIdentifiers][]*ttnpb.Collaborator
 }
 
+// Populate the database.
 func (p *Populator) Populate(ctx context.Context, db *gorm.DB) (err error) {
 	if err = p.populateApplications(ctx, db); err != nil {
 		return err

@@ -26,7 +26,10 @@ func generateAPIKey(ctx context.Context, name string, rights ...ttnpb.Right) (ke
 	if err != nil {
 		return nil, "", err
 	}
-	_, generatedID, generatedKey, _ := auth.SplitToken(token)
+	_, generatedID, generatedKey, err := auth.SplitToken(token)
+	if err != nil {
+		panic(err) // Bug in either Generate or SplitToken.
+	}
 	hashedKey, err := auth.Hash(generatedKey)
 	if err != nil {
 		return nil, "", err

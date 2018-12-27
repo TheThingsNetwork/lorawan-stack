@@ -203,6 +203,8 @@ func TestUsersCRUD(t *testing.T) {
 			FieldMask:       types.FieldMask{Paths: []string{"password", "password_updated_at"}},
 		}, creds)
 
+		a.So(err, should.BeNil)
+
 		oldPasswordMatch, err := auth.Password(pwUpdated.Password).Validate(oldPassword)
 		if err != nil {
 			panic(err)

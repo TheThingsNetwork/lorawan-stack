@@ -138,8 +138,6 @@ func (s *storage) RemoveAuthorize(code string) error {
 	return s.oauth.DeleteAuthorizationCode(s.ctx, code)
 }
 
-var errTokenParts = errors.DefineInvalidArgument("token_parts", "token does not consist of three parts")
-
 var errTokenMismatch = errors.DefineInternal(
 	"token_mismatch",
 	"refresh token ID `{refresh_token_id}` does not match access token ID `{access_token_id}`",

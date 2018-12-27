@@ -3545,15 +3545,6 @@
       "file": "storage.go"
     }
   },
-  "error:pkg/oauth:token_parts": {
-    "translations": {
-      "en": "token does not consist of three parts"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "storage.go"
-    }
-  },
   "error:pkg/redis:missing_key": {
     "translations": {
       "en": "missing key `{key}`"
@@ -4430,15 +4421,6 @@
   "event:invitation.create": {
     "translations": {
       "en": "Create invitation"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "invitation_registry.go"
-    }
-  },
-  "event:invitation.delete": {
-    "translations": {
-      "en": "Delete invitation"
     },
     "description": {
       "package": "pkg/identityserver",

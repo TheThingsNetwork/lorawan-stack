@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// GetOAuthStore returns an OAuthStore on the given db (or transaction).
 func GetOAuthStore(db *gorm.DB) OAuthStore {
 	return &oauthStore{db: db}
 }

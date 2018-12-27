@@ -27,10 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var (
-	evtCreateInvitation = events.Define("invitation.create", "Create invitation")
-	evtDeleteInvitation = events.Define("invitation.delete", "Delete invitation")
-)
+var evtCreateInvitation = events.Define("invitation.create", "Create invitation")
 
 var errNoInviteRights = errors.DefinePermissionDenied(
 	"no_invite_rights",
@@ -66,7 +63,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	return invitation, nil
 }
 
-func (is *IdentityServer) listInvitations(ctx context.Context, in *types.Empty) (invitations *ttnpb.Invitations, err error) {
+func (is *IdentityServer) listInvitations(ctx context.Context, _ *types.Empty) (invitations *ttnpb.Invitations, err error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return nil, err

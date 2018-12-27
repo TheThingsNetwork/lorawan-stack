@@ -29,6 +29,7 @@ func (is *IdentityServer) getRights(ctx context.Context) (map[*ttnpb.EntityIdent
 	return entityRights, err
 }
 
+// ApplicationRights returns the rights the caller has on the given application.
 func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := is.getRights(ctx)
 	if err != nil {
@@ -42,6 +43,7 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 	return &ttnpb.Rights{}, nil
 }
 
+// ClientRights returns the rights the caller has on the given client.
 func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := is.getRights(ctx)
 	if err != nil {
@@ -55,6 +57,7 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 	return &ttnpb.Rights{}, nil
 }
 
+// GatewayRights returns the rights the caller has on the given gateway.
 func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := is.getRights(ctx)
 	if err != nil {
@@ -68,6 +71,7 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 	return &ttnpb.Rights{}, nil
 }
 
+// OrganizationRights returns the rights the caller has on the given organization.
 func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := is.getRights(ctx)
 	if err != nil {
@@ -81,6 +85,7 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 	return &ttnpb.Rights{}, nil
 }
 
+// UserRights returns the rights the caller has on the given user.
 func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	rights, err := is.getRights(ctx)
 	if err != nil {

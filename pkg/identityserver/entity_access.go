@@ -207,6 +207,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	return res, nil
 }
 
+// RequireAuthenticated checks the request context for authentication presence
+// and returns an error if there is none.
 func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
@@ -220,6 +222,9 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	return errUnauthenticated
 }
 
+// UniversalRights returns the universal rights (that apply to any entity or
+// outside entity scope) contained in the request context. This is used to determine
+// admin rights.
 func (is *IdentityServer) UniversalRights(ctx context.Context) *ttnpb.Rights {
 	info, err := is.authInfo(ctx)
 	if err == nil {
