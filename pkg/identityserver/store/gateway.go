@@ -19,7 +19,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // Gateway model.
@@ -66,7 +65,7 @@ func init() {
 
 // functions to set fields from the gateway model into the gateway proto.
 var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
-	"ids.eui":        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EUI = (*types.EUI64)(gtw.GatewayEUI) }, // can we do this?
+	"ids.eui":        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EUI = gtw.GatewayEUI.toPB() },
 	nameField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
 	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
 	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
@@ -104,7 +103,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 
 // functions to set fields from the gateway proto into the gateway model.
 var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
-	"ids.eui":        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = (*EUI64)(pb.EUI) }, // can we do this?
+	"ids.eui":        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = eui(pb.EUI) },
 	nameField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Name = pb.Name },
 	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
 	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {

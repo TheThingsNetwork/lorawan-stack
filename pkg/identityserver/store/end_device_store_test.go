@@ -18,12 +18,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	ptypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
@@ -37,6 +38,8 @@ func TestEndDeviceStore(t *testing.T) {
 
 		deviceID := ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
+			JoinEUI:                &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+			DevEUI:                 &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
 			DeviceID:               "foo",
 		}
 
@@ -68,7 +71,7 @@ func TestEndDeviceStore(t *testing.T) {
 
 		got, err := store.GetEndDevice(ctx,
 			&deviceID,
-			&types.FieldMask{Paths: []string{"name", "attributes", "locations"}},
+			&ptypes.FieldMask{Paths: []string{"name", "attributes", "locations"}},
 		)
 		a.So(err, should.BeNil)
 		a.So(got.DeviceID, should.Equal, deviceID.DeviceID)
@@ -101,7 +104,7 @@ func TestEndDeviceStore(t *testing.T) {
 				"":    {Latitude: 12.3456, Longitude: 23.4567, Altitude: 1091, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY},
 				"geo": {Latitude: 12.345, Longitude: 23.456, Accuracy: 500, Source: ttnpb.SOURCE_LORA_RSSI_GEOLOCATION},
 			},
-		}, &types.FieldMask{Paths: []string{"description", "attributes", "locations"}})
+		}, &ptypes.FieldMask{Paths: []string{"description", "attributes", "locations"}})
 		a.So(err, should.BeNil)
 		a.So(updated.Description, should.Equal, "The Amazing Foobar EndDevice")
 		a.So(updated.Attributes, should.HaveLength, 3)
@@ -124,7 +127,7 @@ func TestEndDeviceStore(t *testing.T) {
 
 		list, err := store.ListEndDevices(ctx,
 			&deviceID.ApplicationIdentifiers,
-			&types.FieldMask{Paths: []string{"name"}},
+			&ptypes.FieldMask{Paths: []string{"name"}},
 		)
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
@@ -133,7 +136,7 @@ func TestEndDeviceStore(t *testing.T) {
 
 		devices, err := store.FindEndDevices(ctx,
 			[]*ttnpb.EndDeviceIdentifiers{&deviceID},
-			&types.FieldMask{Paths: []string{"name"}},
+			&ptypes.FieldMask{Paths: []string{"name"}},
 		)
 		a.So(err, should.BeNil)
 		if a.So(devices, should.HaveLength, 1) {

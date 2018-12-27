@@ -33,6 +33,22 @@ func (eui EUI64) Value() (driver.Value, error) {
 	return types.EUI64(eui).String(), nil
 }
 
+func eui(eui *types.EUI64) *EUI64 {
+	if eui == nil {
+		return nil
+	}
+	converted := EUI64(*eui)
+	return &converted
+}
+
+func (eui *EUI64) toPB() *types.EUI64 {
+	if eui == nil {
+		return nil
+	}
+	converted := types.EUI64(*eui)
+	return &converted
+}
+
 // Scan reads the value from the database into the EUI.
 func (eui *EUI64) Scan(src interface{}) (err error) {
 	var dto types.EUI64
