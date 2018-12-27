@@ -540,7 +540,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			}
 
 			stored.RecentUplinks = append(stored.RecentUplinks, up)
-			if len(stored.RecentUplinks) >= recentUplinkCount {
+			if len(stored.RecentUplinks) > recentUplinkCount {
 				stored.RecentUplinks = stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount+1:]
 			}
 			paths = append(paths, "recent_uplinks")
@@ -653,18 +653,18 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			}
 			stored.MACState.RxWindowsAvailable = true
 
+			paths = append(paths, "recent_adr_uplinks")
 			if !pld.FHDR.ADR {
-				dev.RecentADRUplinks = nil
+				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
 
-			dev.RecentADRUplinks = append(dev.RecentADRUplinks, up)
-			if len(dev.RecentADRUplinks) > recentDownlinkCount {
-				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentDownlinkCount:]...)
+			stored.RecentADRUplinks = append(stored.RecentADRUplinks, up)
+			if len(stored.RecentADRUplinks) > optimalADRUplinkCount {
+				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
 			}
-			paths = append(paths, "recent_adr_uplinks")
 
-			if err := adaptDataRate(ns.Component.FrequencyPlans, dev); err != nil {
+			if err := adaptDataRate(ns.Component.FrequencyPlans, stored); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}

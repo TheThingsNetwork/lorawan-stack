@@ -70,8 +70,8 @@ const drStep = 2.5
 // maxNbTrans is the maximum NbTrans parameter used by the algorithm.
 const maxNbTrans = 3
 
-// optimalUplinkCount is the amount of uplinks required to ensure optimal results from the algorithm.
-const optimalUplinkCount = 20
+// optimalADRUplinkCount is the amount of uplinks required to ensure optimal results from the ADR algorithm.
+const optimalADRUplinkCount = 20
 
 func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	ups := dev.RecentADRUplinks
@@ -115,7 +115,7 @@ func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	// configurable margin, and an extra safety margin if we're afraid that we
 	// don't have enough data for our decision.
 	margin := maxSNR - df - float32(dev.MACSettings.ADRMargin)
-	if len(ups) < optimalUplinkCount {
+	if len(ups) < optimalADRUplinkCount {
 		margin -= safetyMargin
 	}
 
