@@ -26,13 +26,18 @@ import (
 )
 
 func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
+	dbAddress := os.Getenv("SQL_DB_ADDRESS")
+	if dbAddress == "" {
+		dbAddress = "localhost:26257"
+	}
 	dbName := os.Getenv("TEST_DB_NAME")
 	randomDB := false
 	if dbName == "" {
 		dbName = fmt.Sprintf("%s_%d", strings.ToLower(t.Name()), time.Now().UnixNano())
 		randomDB = true
 	}
-	db, err := gorm.Open("postgres", fmt.Sprintf("postgresql://root@localhost:26257/%s?sslmode=disable", dbName))
+	dbConnString := fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
+	db, err := gorm.Open("postgres", dbConnString)
 	if err != nil {
 		panic(err)
 	}

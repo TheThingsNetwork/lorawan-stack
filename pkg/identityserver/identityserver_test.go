@@ -260,11 +260,15 @@ func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
 
 func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	setup.Do(func() {
+		dbAddress := os.Getenv("SQL_DB_ADDRESS")
+		if dbAddress == "" {
+			dbAddress = "localhost:26257"
+		}
 		dbName := os.Getenv("TEST_DB_NAME")
 		if dbName == "" {
 			dbName = "is_integration_test"
 		}
-		dbConnString = fmt.Sprintf("postgresql://root@localhost:26257/%s?sslmode=disable", dbName)
+		dbConnString = fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
 		db, err := gorm.Open("postgres", dbConnString)
 		if err != nil {
 			panic(err)
