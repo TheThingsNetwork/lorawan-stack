@@ -30,7 +30,7 @@ var DefaultConsoleConfig = console.Config{
 	},
 	UI: console.UIConfig{
 		TemplateData: webui.TemplateData{
-			SiteName:      "The Things Network",
+			SiteName:      "The Things Network Stack for LoRaWAN",
 			Title:         "Console",
 			SubTitle:      "The official configuration platform for The Things Network",
 			Language:      "en",
