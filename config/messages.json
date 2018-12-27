@@ -4955,7 +4955,7 @@
     },
     "description": {
       "package": "pkg/oauth",
-      "file": "events.go"
+      "file": "observability.go"
     }
   },
   "event:oauth.token.exchange": {
@@ -4964,7 +4964,7 @@
     },
     "description": {
       "package": "pkg/oauth",
-      "file": "events.go"
+      "file": "observability.go"
     }
   },
   "event:oauth.user.login": {
@@ -4973,7 +4973,7 @@
     },
     "description": {
       "package": "pkg/oauth",
-      "file": "events.go"
+      "file": "observability.go"
     }
   },
   "event:oauth.user.login_failed": {
@@ -4982,7 +4982,7 @@
     },
     "description": {
       "package": "pkg/oauth",
-      "file": "events.go"
+      "file": "observability.go"
     }
   },
   "event:oauth.user.logout": {
@@ -4991,7 +4991,7 @@
     },
     "description": {
       "package": "pkg/oauth",
-      "file": "events.go"
+      "file": "observability.go"
     }
   },
   "event:organization.api-key.create": {
