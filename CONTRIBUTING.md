@@ -205,7 +205,7 @@ The error name in snake case is a short and unique identifier of the error withi
 
 The error description in lower case, with only names in title case, is a concise plain English text that is human readable and understandable. Do not end the description with a dot. You may use attributes, in snake case, in the description defined between backticks (`` ` ``) by putting the key in curly braces (`{ }`). See below for naming conventions. Only provide primitive types as attribute values using `WithAttributes()`.
 
-### Logging field keys, event and error names and error attribute names
+### Logging field keys, event and error names, error attribute names and task identifiers
 
 Any `name` defined in the following statements:
 
@@ -213,6 +213,7 @@ Any `name` defined in the following statements:
 - Event name: `events.Define("name", "description")`
 - Error name: `errors.Define("name", "description")`
 - Error attribute: ``errors.Define("example", "description `{name}`")``
+- Task identifier: `c.RegisterTask("name", ...)`
 
 Shall be snake case, optionally having an event name prepended with a dotted namespace, see above. The spacer `_` shall be used in LoRaWAN terms: `DevAddr` is `dev_addr`, `AppSKey` is `app_s_key`, etc.
 
