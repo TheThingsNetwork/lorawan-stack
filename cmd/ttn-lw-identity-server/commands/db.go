@@ -25,7 +25,11 @@ import (
 )
 
 var (
-	initCommand = &cobra.Command{
+	dbCommand = &cobra.Command{
+		Use:   "db",
+		Short: "Manage the Identity Server database",
+	}
+	dbInitCommand = &cobra.Command{
 		Use:   "init",
 		Short: "Initialize the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -59,8 +63,38 @@ var (
 			return nil
 		},
 	}
+	dbMigrateCommand = &cobra.Command{
+		Use:   "migrate",
+		Short: "Migrate the Identity Server database",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			dbURI, err := url.Parse(config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			dbName := strings.TrimPrefix(dbURI.Path, "/")
+
+			logger.Info("Connecting to Identity Server database...")
+			db, err := gorm.Open("postgres", config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			defer db.Close()
+			store.SetLogger(db, logger)
+
+			logger.Infof("Migrating tables in \"%s\"...", dbName)
+			err = store.AutoMigrate(db).Error
+			if err != nil {
+				return err
+			}
+
+			logger.Info("Successfully migrated")
+			return nil
+		},
+	}
 )
 
 func init() {
-	Root.AddCommand(initCommand)
+	Root.AddCommand(dbCommand)
+	dbCommand.AddCommand(dbInitCommand)
+	dbCommand.AddCommand(dbMigrateCommand)
 }
