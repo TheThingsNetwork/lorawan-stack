@@ -75,8 +75,12 @@ ttn-lw-console: MAIN=./cmd/ttn-lw-console/main.go
 ttn-lw-console: js.build
 ttn-lw-console: $(RELEASE_DIR)/ttn-lw-console-$(GOOS)-$(GOARCH)
 
+# cli binary
+ttn-lw-cli: MAIN=./cmd/ttn-lw-cli/main.go
+ttn-lw-cli: $(RELEASE_DIR)/ttn-lw-cli-$(GOOS)-$(GOARCH)
+
 # All binaries
-build-all: ttn-lw-stack ttn-lw-identity-server ttn-lw-gateway-server ttn-lw-network-server ttn-lw-application-server ttn-lw-join-server ttn-lw-console
+build-all: ttn-lw-stack ttn-lw-identity-server ttn-lw-gateway-server ttn-lw-network-server ttn-lw-application-server ttn-lw-join-server ttn-lw-console ttn-lw-cli
 
 # All supported platforms
 build-all-platforms:
