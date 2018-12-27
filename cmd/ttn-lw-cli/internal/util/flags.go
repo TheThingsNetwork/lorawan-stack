@@ -238,6 +238,10 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
 			v, _ = flags.GetFloat64(flag.Name)
 		case "stringSlice":
 			v, _ = flags.GetStringSlice(flag.Name)
+		case "intSlice":
+			v, _ = flags.GetIntSlice(flag.Name)
+		case "uintSlice":
+			v, _ = flags.GetUintSlice(flag.Name)
 		case "duration":
 			v, _ = flags.GetDuration(flag.Name)
 		}
@@ -309,8 +313,18 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 					} else {
 						field.Set(reflect.Zero(ft))
 					}
+				case ft.Kind() == reflect.Slice && vt.Kind() == reflect.Slice:
+					if vt.Elem().ConvertibleTo(ft.Elem()) {
+						slice := reflect.MakeSlice(ft, v.Len(), v.Len())
+						for i := 0; i < v.Len(); i++ {
+							slice.Index(i).Set(v.Index(i).Convert(ft.Elem()))
+						}
+						field.Set(slice)
+					} else {
+						panic(fmt.Sprintf("%v is not convertible to %v\n", ft, vt))
+					}
 				default:
-					panic(fmt.Sprintf("%v is not assingable to %v\n", ft, vt))
+					panic(fmt.Sprintf("%v is not assignable to %v\n", ft, vt))
 				}
 				return
 			}
