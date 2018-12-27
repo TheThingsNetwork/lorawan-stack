@@ -80,10 +80,6 @@ var (
 				return errNoApplicationID
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationLinkFlags)
-			if len(paths) == 0 {
-				logger.Warn("No fields selected, won't update anything")
-				return nil
-			}
 
 			var link ttnpb.ApplicationLink
 			util.SetFields(&link, setApplicationLinkFlags)
