@@ -175,6 +175,14 @@
   version = "v3.2.0"
 
 [[projects]]
+  digest = "1:1edcb8e554be820ed5767bf936a933f692043a0e60b29a9a1d43f8594a6124d9"
+  name = "github.com/disintegration/imaging"
+  packages = ["."]
+  pruneopts = ""
+  revision = "0bd5694c78c9c3d9a3cd06a706a8f3c59296a9ac"
+  version = "v1.5.0"
+
+[[projects]]
   digest = "1:3fa846cb3feb4e65371fe3c347c299de9b5bc3e71e256c0d940cd19b767a6ba0"
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
@@ -879,6 +887,18 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:5af73a1d89fa7bcb0f7f3e49c8d7d1f7b3da80430424b2a2055de414b779f31a"
+  name = "golang.org/x/image"
+  packages = [
+    "bmp",
+    "tiff",
+    "tiff/lzw",
+  ]
+  pruneopts = ""
+  revision = "cd38e8056d9b27bb2f265effa37fb0ea6b8a7f0f"
+
+[[projects]]
+  branch = "master"
   digest = "1:d71c074889d0f0067cd945265ea0aa8237c163f7901f0b74e66c210c462f423e"
   name = "golang.org/x/net"
   packages = [
@@ -1095,6 +1115,7 @@
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/blang/semver",
+    "github.com/disintegration/imaging",
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/fsnotify/fsnotify",
     "github.com/getsentry/raven-go",

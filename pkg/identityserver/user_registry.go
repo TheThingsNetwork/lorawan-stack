@@ -15,6 +15,7 @@
 package identityserver
 
 import (
+	"bytes"
 	"context"
 	"time"
 
@@ -25,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/picture"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -44,6 +46,8 @@ var (
 	errInvitationTokenExpired  = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
 )
 
+const maxProfilePictureStoredDimensions = 1024
+
 func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err error) {
 	if usr.ProfilePicture == nil {
 		return
@@ -62,7 +66,11 @@ func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err err
 		}
 	}
 	if usr.ProfilePicture.Embedded != nil && len(usr.ProfilePicture.Embedded.Data) > 0 {
-		// TODO: Upload to blob store, set original to path.
+		usr.ProfilePicture, err = picture.MakeSquare(bytes.NewBuffer(usr.ProfilePicture.Embedded.Data), maxProfilePictureStoredDimensions)
+		if err != nil {
+			return err
+		}
+		// TODO: Upload to blob store, set original to path (https://github.com/TheThingsIndustries/lorawan-stack/issues/393).
 	}
 	if original != "" {
 		usr.ProfilePicture.Sizes = map[uint32]string{0: original}

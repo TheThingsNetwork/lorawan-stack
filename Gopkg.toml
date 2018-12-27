@@ -9,6 +9,10 @@ required = ["github.com/golang/dep"]
   version = "1.0.0"
 
 [[constraint]]
+  name = "github.com/disintegration/imaging"
+  version = "1.5.0"
+
+[[constraint]]
   branch = "master"
   name = "github.com/getsentry/raven-go"
 
