@@ -1690,9 +1690,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				}},
 			},
-			Bytes:      nil,
-			Error:      errNoDownlink,
-			DeviceDiff: nil,
+			Error: errNoDownlink,
 		},
 		{
 			Name:    "1.1/no app downlink/status after 1 downlink/no ack",
@@ -1723,9 +1721,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				}},
 			},
-			Bytes:      nil,
-			Error:      errNoDownlink,
-			DeviceDiff: nil,
+			Error: errNoDownlink,
 		},
 		{
 			Name:    "1.1/no app downlink/status after an hour/no ack",
@@ -1753,9 +1749,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				}},
 			},
-			Bytes:      nil,
-			Error:      errNoDownlink,
-			DeviceDiff: nil,
+			Error: errNoDownlink,
 		},
 		{
 			Name:    "1.1/no app downlink/no MAC/ack",
@@ -1811,11 +1805,9 @@ func TestGenerateDownlink(t *testing.T) {
 							},
 							FCnt: 42,
 						},
-						FPort: 0,
 					},
 				},
 			}, ttnpb.MAC_V1_1, 24),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.Session.LastNFCntDown++
 			},
@@ -1880,7 +1872,6 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 			}, ttnpb.MAC_V1_1, 0),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				i := len(dev.QueuedApplicationDownlinks) - 1
 				dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[:i]
@@ -1952,7 +1943,6 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 			}, ttnpb.MAC_V1_1, 24),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				i := len(dev.QueuedApplicationDownlinks) - 1
 				dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[:i]
@@ -2018,7 +2008,6 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 			}, ttnpb.MAC_V1_1, 0),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				i := len(dev.QueuedApplicationDownlinks) - 1
 				dev.QueuedApplicationDownlinks, dev.MACState.PendingApplicationDownlink = dev.QueuedApplicationDownlinks[:i], dev.QueuedApplicationDownlinks[i]
@@ -2091,7 +2080,6 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 			}, ttnpb.MAC_V1_1, 24),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				i := len(dev.QueuedApplicationDownlinks) - 1
 				dev.QueuedApplicationDownlinks, dev.MACState.PendingApplicationDownlink = dev.QueuedApplicationDownlinks[:i], dev.QueuedApplicationDownlinks[i]
@@ -2156,7 +2144,6 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 			}, ttnpb.MAC_V1_1, 0),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.PendingRequests = []*ttnpb.MACCommand{
 					ttnpb.CID_DEV_STATUS.MACCommand(),
@@ -2220,7 +2207,6 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 			}, ttnpb.MAC_V1_1, 0),
-			Error: nil,
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.PendingRequests = []*ttnpb.MACCommand{
 					ttnpb.CID_DEV_STATUS.MACCommand(),
