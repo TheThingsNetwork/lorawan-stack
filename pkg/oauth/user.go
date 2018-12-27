@@ -185,7 +185,7 @@ func (s *server) Login(c echo.Context) error {
 	userIDs := ttnpb.UserIdentifiers{UserID: req.UserID}
 	session, err := s.store.CreateSession(ctx, &ttnpb.UserSession{
 		UserIdentifiers: userIDs,
-		// TODO: Session duration.
+		// TODO: Session duration (https://github.com/TheThingsIndustries/lorawan-stack/issues/1411).
 	})
 	if err != nil {
 		return err
