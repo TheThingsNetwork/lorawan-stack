@@ -8,7 +8,7 @@ The **Identity Server** component of The Things Network Stack implements functio
 
 ## Gateways
 
-## OAuth Clients
+## OAuth clients
 
 ## Data Migrations
 

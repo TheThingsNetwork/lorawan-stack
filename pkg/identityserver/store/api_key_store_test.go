@@ -82,7 +82,7 @@ func TestAPIKeyStore(t *testing.T) {
 				key := &ttnpb.APIKey{
 					ID:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
 					Key:    strings.ToUpper(fmt.Sprintf("%sKEY", tt.Name)),
-					Name:   fmt.Sprintf("%s API Key", tt.Name),
+					Name:   fmt.Sprintf("%s API key", tt.Name),
 					Rights: tt.Rights,
 				}
 
@@ -102,7 +102,7 @@ func TestAPIKeyStore(t *testing.T) {
 
 				updated, err := store.UpdateAPIKey(ctx, tt.Identifiers, &ttnpb.APIKey{
 					ID:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
-					Name:   fmt.Sprintf("Updated %s API Key", tt.Name),
+					Name:   fmt.Sprintf("Updated %s API key", tt.Name),
 					Rights: tt.Rights,
 				})
 				a.So(err, should.BeNil)

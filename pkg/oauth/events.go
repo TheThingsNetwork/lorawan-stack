@@ -23,5 +23,5 @@ var (
 	evtUserLoginFailed = events.Define("oauth.user.login_failed", "failed user login")
 	evtUserLogout      = events.Define("oauth.user.logout", "user logout")
 	evtAuthorize       = events.Define("oauth.authorize", "authorize OAuth client")
-	evtTokenExchange   = events.Define("oauth.token.exchange", "exchange OAuth Access Token")
+	evtTokenExchange   = events.Define("oauth.token.exchange", "exchange OAuth access token")
 )

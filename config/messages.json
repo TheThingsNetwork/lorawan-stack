@@ -4960,7 +4960,7 @@
   },
   "event:oauth.token.exchange": {
     "translations": {
-      "en": "exchange OAuth Access Token"
+      "en": "exchange OAuth access token"
     },
     "description": {
       "package": "pkg/oauth",

@@ -53,7 +53,7 @@ type Config struct {
 // IdentityServer implements the Identity Server component.
 //
 // The Identity Server exposes the Registry and Access services for Applications,
-// OAuth Clients, Gateways, Organizations and Users.
+// OAuth clients, Gateways, Organizations and Users.
 type IdentityServer struct {
 	*component.Component
 	config *Config
