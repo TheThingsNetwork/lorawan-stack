@@ -24,16 +24,16 @@ import (
 type ContactInfo struct {
 	ID string `gorm:"type:UUID;primary_key;default:gen_random_uuid()"`
 
-	ContactType   int    `gorm:"not_null"`
-	ContactMethod int    `gorm:"not_null"`
+	ContactType   int    `gorm:"not null"`
+	ContactMethod int    `gorm:"not null"`
 	Value         string `gorm:"type:VARCHAR"`
 
 	Public bool
 
 	ValidatedAt *time.Time
 
-	EntityID   string `gorm:"type:UUID;index:entity"`
-	EntityType string `gorm:"index:entity"`
+	EntityID   string `gorm:"type:UUID;index:entity;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
 }
 
 func init() {

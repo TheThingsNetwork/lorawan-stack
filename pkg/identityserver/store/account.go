@@ -28,8 +28,8 @@ type Account struct {
 
 	UID string `gorm:"type:VARCHAR(36);unique_index:id"`
 
-	AccountID   string `gorm:"type:UUID;index:account"`
-	AccountType string `gorm:"type:VARCHAR;index:account"` // user or organization
+	AccountID   string `gorm:"type:UUID;index:account;not null"`
+	AccountType string `gorm:"type:VARCHAR(32);index:account;not null"` // user or organization
 
 	Memberships []*Membership
 }

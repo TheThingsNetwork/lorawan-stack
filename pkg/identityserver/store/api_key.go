@@ -26,8 +26,8 @@ type APIKey struct {
 	Rights Rights `gorm:"type:INT ARRAY"`
 	Name   string `gorm:"type:VARCHAR"`
 
-	EntityID   string `gorm:"type:UUID;index:entity"`
-	EntityType string `gorm:"type:VARCHAR;index:entity"`
+	EntityID   string `gorm:"type:UUID;index:entity;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
 }
 
 func init() {

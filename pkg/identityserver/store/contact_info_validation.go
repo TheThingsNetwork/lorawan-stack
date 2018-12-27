@@ -27,10 +27,10 @@ type ContactInfoValidation struct {
 	Reference string `gorm:"type:VARCHAR;index:id"`
 	Token     string `gorm:"type:VARCHAR;index:id"`
 
-	EntityID   string `gorm:"type:UUID;index:entity"`
-	EntityType string `gorm:"index:entity"`
+	EntityID   string `gorm:"type:UUID;index:entity;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
 
-	ContactMethod int    `gorm:"not_null"`
+	ContactMethod int    `gorm:"not null"`
 	Value         string `gorm:"type:VARCHAR"`
 
 	ExpiresAt time.Time
