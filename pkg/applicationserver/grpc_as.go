@@ -39,9 +39,12 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 		return nil, err
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	link, err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-		return &req.ApplicationLink, req.FieldMask.Paths, nil
-	})
+	// Get all the fields here for starting the link task.
+	link, err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
+		func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+			return &req.ApplicationLink, req.FieldMask.Paths, nil
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +52,13 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
 	}
 	linkCtx := as.Context()
-	as.startLinkTask(linkCtx, req.ApplicationIdentifiers, &req.ApplicationLink)
-	return link, nil
+	as.startLinkTask(linkCtx, req.ApplicationIdentifiers, link)
+
+	res := &ttnpb.ApplicationLink{}
+	if err := res.SetFields(link, req.FieldMask.Paths...); err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // DeleteLink implements ttnpb.AsServer.
