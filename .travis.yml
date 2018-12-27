@@ -34,8 +34,8 @@ script:
 - make headers.check
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make translations; fi # only on pull requests
 - make git.diff
-- GOARCH=amd64 TEST_SLOWDOWN=16 TEST_REDIS=1 make test
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then GOARCH=386 TEST_SLOWDOWN=16 TEST_REDIS=1 make test; fi # only on pull requests
+- GOARCH=amd64 TEST_SLOWDOWN=8 TEST_REDIS=1 make test
+- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then GOARCH=386 TEST_SLOWDOWN=8 TEST_REDIS=1 make test; fi # only on pull requests
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make build-all; fi # only on pull requests
 - make js.lint
 - make js.test
