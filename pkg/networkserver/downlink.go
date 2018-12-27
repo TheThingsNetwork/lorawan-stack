@@ -51,6 +51,7 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink and error if any.
 // generateDownlink mutates the dev.MACState.PendingRequests and dev.MACState.QueuedApplicationDownlinks.
+// maxDownLen and maxUpLen represent the maximum length of PHYPayload for the downlink and corresponding uplink respectively.
 // If no downlink could be generated - nil, errNoDownlink is returned.
 // generateDownlink does not perform validation of dev.MACState.DesiredParameters,
 // hence, it could potentially generate MAC command(s), which are not suported by the
@@ -66,6 +67,12 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	if dev.Session == nil {
 		return nil, errEmptySession
 	}
+
+	// NOTE: len(MHDR) + len(MIC) = 1 + 4 = 5
+	if maxDownLen < 5 || maxUpLen < 5 {
+		panic("Payload length limits too short to generate downlink")
+	}
+	maxDownLen, maxUpLen = maxDownLen-5, maxUpLen-5
 
 	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 
