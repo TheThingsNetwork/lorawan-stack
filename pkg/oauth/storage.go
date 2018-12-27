@@ -85,7 +85,7 @@ func (s *storage) GetClient(id string) (osin.Client, error) {
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	userIDs := data.UserData.(userData).UserIdentifiers
 	client := ttnpb.Client(data.Client.(osinClient))
-	rights := RightsFromScope(data.Scope)
+	rights := rightsFromScope(data.Scope)
 	_, err := s.oauth.Authorize(s.ctx, &ttnpb.OAuthClientAuthorization{
 		ClientIDs: client.ClientIdentifiers,
 		UserIDs:   userIDs,
@@ -126,7 +126,7 @@ func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err erro
 		Client:      client,
 		Code:        code,
 		ExpiresIn:   int32(authorizationCode.ExpiresAt.Sub(authorizationCode.CreatedAt).Seconds()),
-		Scope:       RightsToScope(authorizationCode.Rights...),
+		Scope:       rightsToScope(authorizationCode.Rights...),
 		RedirectUri: authorizationCode.RedirectURI,
 		State:       authorizationCode.State,
 		CreatedAt:   authorizationCode.CreatedAt,
@@ -188,7 +188,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 	}
 	userIDs := data.UserData.(userData).UserIdentifiers
 	client := ttnpb.Client(data.Client.(osinClient))
-	rights := RightsFromScope(data.Scope)
+	rights := rightsFromScope(data.Scope)
 	if data.CreatedAt.IsZero() {
 		data.CreatedAt = time.Now()
 	}
@@ -228,7 +228,7 @@ func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
 		AccessToken:  accessToken.AccessToken,
 		RefreshToken: accessToken.RefreshToken,
 		ExpiresIn:    int32(accessToken.ExpiresAt.Sub(accessToken.CreatedAt).Seconds()),
-		Scope:        RightsToScope(accessToken.Rights...),
+		Scope:        rightsToScope(accessToken.Rights...),
 		CreatedAt:    accessToken.CreatedAt,
 		UserData:     userData{UserIdentifiers: accessToken.UserIDs, ID: id},
 	}, nil

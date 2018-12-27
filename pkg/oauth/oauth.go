@@ -28,7 +28,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func RightsToScope(rights ...ttnpb.Right) string {
+// rightsToScope transforms the list of rights into a string "scope".
+// This function is only used for compatibility with osin.
+func rightsToScope(rights ...ttnpb.Right) string {
 	rights = ttnpb.RightsFrom(rights...).Sorted().GetRights()
 	rightStrings := make([]string, len(rights))
 	for i, right := range rights {
@@ -37,7 +39,9 @@ func RightsToScope(rights ...ttnpb.Right) string {
 	return strings.Join(rightStrings, " ")
 }
 
-func RightsFromScope(scope string) []ttnpb.Right {
+// rightsFromScope is the opposite of RightsToScope. It transforms the string "scope" back into a list of rights.
+// This function is only used for compatibility with osin.
+func rightsFromScope(scope string) []ttnpb.Right {
 	scopes := strings.Split(scope, " ")
 	rights := make([]ttnpb.Right, 0, len(scopes))
 	for _, scope := range scopes {
@@ -88,7 +92,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			return s.output(c, resp)
 		}
 		ar.Authorized = client.SkipAuthorization
-		ar.Scope = RightsToScope(client.Rights...)
+		ar.Scope = rightsToScope(client.Rights...)
 		if !ar.Authorized {
 			authorization, err := s.store.GetAuthorization(
 				req.Context(),
