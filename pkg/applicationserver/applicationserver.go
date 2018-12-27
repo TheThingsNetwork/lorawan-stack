@@ -505,7 +505,6 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
-			"pending_session",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -553,8 +552,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 // recalculateDownlinkQueue decrypts items in the given invalid downlink queue, encrypts the items with frame counters
 // starting from the given frame counter, and replaces the downlink queue in the Network Server.
 // If re-encrypting a message fails, the message is skipped.
-// This method requires the given end device's session and pending session to be set. This method mutates the end device's
-// session LastAFCntDown.
+// This method requires the given end device's session to be set. This method mutates the end device's session LastAFCntDown.
 // This method does not change the contents of the given invalid downlink queue.
 func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, previousSession *ttnpb.Session, invalid []*ttnpb.ApplicationDownlink, nextAFCntDown uint32, link *link) (err error) {
 	logger := log.FromContext(ctx)
