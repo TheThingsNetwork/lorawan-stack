@@ -631,7 +631,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, dev.Session.DevAddr, newItem.FCnt, frmPayload)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to encrypt")
-			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, newItem, err)
+			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
 		valid = append(valid, newItem)
