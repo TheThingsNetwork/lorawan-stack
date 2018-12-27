@@ -826,6 +826,23 @@ func TestApplicationServer(t *testing.T) {
 								},
 							})
 						},
+						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
+							a := assertions.New(t)
+							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
+								{
+									SessionKeyID: "session3",
+									FPort:        11,
+									FCnt:         1,
+									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+								},
+								{
+									SessionKeyID: "session3",
+									FPort:        22,
+									FCnt:         2,
+									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+								},
+							})
+						},
 					},
 					{
 						Name: "RegisteredDevice/JoinAccept/WithAppSKey/WithQueue/WithPendingSession",

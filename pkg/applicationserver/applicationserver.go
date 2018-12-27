@@ -355,8 +355,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_DownlinkAck:
 		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck)
 	case *ttnpb.ApplicationUp_DownlinkNack:
-		// TODO: Retry using a policy (https://github.com/TheThingsIndustries/lorawan-stack/issues/794)
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkNack)
+		return as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
 	default:
 		return nil
 	}
@@ -521,6 +520,14 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
+	if err := as.decryptDownlinkMessage(ctx, ids, msg); err != nil {
+		return err
+	}
+	// TODO: Insert downlink message in queue (https://github.com/TheThingsIndustries/lorawan-stack/issues/1282).
 	return nil
 }
 
