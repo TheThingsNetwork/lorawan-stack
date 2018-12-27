@@ -105,7 +105,7 @@ var (
 			if err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			ns.Component.RegisterTask(nsDownlinkTasks.Run, component.TaskRestartOnFailure)
+			ns.Component.RegisterTask("queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {

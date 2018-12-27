@@ -55,7 +55,7 @@ var (
 			if err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			ns.Component.RegisterTask(nsDownlinkTasks.Run, component.TaskRestartOnFailure)
+			ns.Component.RegisterTask("queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 
 			logger.Info("Starting Network Server...")
 			return c.Run()
