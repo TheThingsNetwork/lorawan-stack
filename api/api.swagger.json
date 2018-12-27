@@ -6078,7 +6078,7 @@
         },
         "version_ids": {
           "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
-          "description": "Version Identifiers. Stored in Entity Registry."
+          "description": "Version Identifiers. Stored in Entity Registry and Application Server."
         },
         "service_profile_id": {
           "type": "string",

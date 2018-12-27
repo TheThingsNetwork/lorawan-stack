@@ -253,7 +253,7 @@ message EndDevice {
   // Attributes of the device. Stored in Entity Registry.
   map<string,string> attributes = 6;
 
-  // Version Identifiers. Stored in Entity Registry.
+  // Version Identifiers. Stored in Entity Registry and Application Server.
   EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
 
   // Default service profile. Stored in Entity Registry.
