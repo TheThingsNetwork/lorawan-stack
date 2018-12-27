@@ -17,6 +17,8 @@ package component
 import (
 	"context"
 	"time"
+
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // TaskFunc is the task function.
@@ -42,14 +44,16 @@ var defaultTaskBackoff = [...]time.Duration{
 }
 
 type task struct {
+	id      string
 	fn      TaskFunc
 	restart TaskRestart
 	backoff []time.Duration
 }
 
 // RegisterTask registers a task, optionally with restart policy and backoff, to be started after the component started.
-func (c *Component) RegisterTask(fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+func (c *Component) RegisterTask(id string, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
 	c.tasks = append(c.tasks, task{
+		id:      id,
 		fn:      fn,
 		restart: restart,
 		backoff: backoff,
@@ -57,7 +61,8 @@ func (c *Component) RegisterTask(fn TaskFunc, restart TaskRestart, backoff ...ti
 }
 
 // StartTask starts the specified task function, optionally with restart policy and backoff.
-func (c *Component) StartTask(ctx context.Context, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+	logger := log.FromContext(ctx).WithField("task_id", id)
 	if len(backoff) == 0 {
 		backoff = defaultTaskBackoff[:]
 	}
@@ -67,7 +72,7 @@ func (c *Component) StartTask(ctx context.Context, fn TaskFunc, restart TaskRest
 			invocation++
 			err := fn(ctx)
 			if err != nil {
-				c.logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
+				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
 			}
 			switch restart {
 			case TaskRestartNever:
@@ -94,6 +99,6 @@ func (c *Component) StartTask(ctx context.Context, fn TaskFunc, restart TaskRest
 
 func (c *Component) startTasks() {
 	for _, t := range c.tasks {
-		c.StartTask(c.ctx, t.fn, t.restart, t.backoff...)
+		c.StartTask(c.ctx, t.id, t.fn, t.restart, t.backoff...)
 	}
 }
