@@ -50,8 +50,9 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 var linkBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
 
 func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) {
+	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
 	// TODO: Add jitter to the backoff (https://github.com/TheThingsIndustries/lorawan-stack/issues/1227)
-	as.StartTask(ctx, func(ctx context.Context) error {
+	as.StartTask(ctx, "link", func(ctx context.Context) error {
 		err := as.link(ctx, ids, target)
 		switch {
 		case errors.IsFailedPrecondition(err), errors.IsUnauthenticated(err), errors.IsPermissionDenied(err):

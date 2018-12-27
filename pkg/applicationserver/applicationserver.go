@@ -150,7 +150,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	c.RegisterGRPC(as)
 	if as.linkMode == LinkAll {
-		c.RegisterTask(as.linkAll, component.TaskRestartOnFailure)
+		c.RegisterTask("link_all", as.linkAll, component.TaskRestartOnFailure)
 	}
 	return as, nil
 }
