@@ -70,7 +70,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 
 	// NOTE: len(MHDR) + len(MIC) = 1 + 4 = 5
 	if maxDownLen < 5 || maxUpLen < 5 {
-		panic("Payload length limits too short to generate downlink")
+		panic("payload length limits too short to generate downlink")
 	}
 	maxDownLen, maxUpLen = maxDownLen-5, maxUpLen-5
 
@@ -203,7 +203,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		var key types.AES128Key
 		if dev.Session.NwkSEncKey.KEKLabel != "" {
 			// TODO: (https://github.com/TheThingsIndustries/lorawan-stack/issues/271)
-			panic("Unsupported")
+			panic("unsupported")
 		}
 		copy(key[:], dev.Session.NwkSEncKey.Key[:])
 
@@ -261,7 +261,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 
 		if dev.Session.NwkSEncKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-			panic("Unsupported")
+			panic("unsupported")
 		}
 		copy(key[:], dev.Session.NwkSEncKey.Key[:])
 	} else {
@@ -270,7 +270,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		}
 		if dev.Session.SNwkSIntKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-			panic("Unsupported")
+			panic("unsupported")
 		}
 		copy(key[:], dev.Session.SNwkSIntKey.Key[:])
 	}

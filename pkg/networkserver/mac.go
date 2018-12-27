@@ -29,7 +29,7 @@ func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint
 	maxUp := maxUpLen / (1 + desc.UplinkLength)
 	enq, nUp, ok := f(maxDown, maxUp)
 	if len(enq) > int(maxDown) || nUp > maxUp {
-		panic("Invalid amount of MAC commands enqueued")
+		panic("invalid amount of MAC commands enqueued")
 	}
 	return append(cmds, enq...), maxDownLen - uint16(len(enq))*desc.DownlinkLength, maxUpLen - nUp*desc.UplinkLength, ok
 }

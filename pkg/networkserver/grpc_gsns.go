@@ -331,7 +331,7 @@ outer:
 		var fNwkSIntKey types.AES128Key
 		if dev.matchedSession.FNwkSIntKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-			panic("Unsupported")
+			panic("unsupported")
 		}
 		copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
 
@@ -356,7 +356,7 @@ outer:
 			var sNwkSIntKey types.AES128Key
 			if dev.matchedSession.SNwkSIntKey.KEKLabel != "" {
 				// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-				panic("Unsupported")
+				panic("unsupported")
 			}
 			copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
 
@@ -455,7 +455,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		var key types.AES128Key
 		if ses.NwkSEncKey.KEKLabel != "" {
 			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-			panic("Unsupported")
+			panic("unsupported")
 		}
 		copy(key[:], ses.NwkSEncKey.Key[:])
 
@@ -649,7 +649,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 			if stored.Session != ses {
 				// Sanity check
-				panic("Session mismatch")
+				panic("session mismatch")
 			}
 			stored.MACState.RxWindowsAvailable = true
 
