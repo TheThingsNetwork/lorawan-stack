@@ -523,10 +523,33 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 }
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
+	client := ttnpb.NewAsNsClient(link.conn)
+	res, err := client.DownlinkQueueList(ctx, &ids, link.connCallOpts...)
+	if err != nil {
+		log.WithError(err).Warn("Failed to list the downlink queue for inserting nacked downlink message")
+		registerDropDownlink(ctx, ids, msg, err)
+	} else {
+		queue := append([]*ttnpb.ApplicationDownlink{msg}, res.Downlinks...)
+		_, err := as.deviceRegistry.Set(ctx, ids,
+			[]string{
+				"session",
+			},
+			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				if err := as.recalculateDownlinkQueue(ctx, dev, nil, queue, msg.FCnt, link); err != nil {
+					return nil, nil, err
+				}
+				return dev, []string{"session"}, nil
+			},
+		)
+		if err != nil {
+			log.WithError(err).Warn("Failed to recalculate downlink queue with inserted nacked downlink message")
+			registerDropDownlink(ctx, ids, msg, err)
+		}
+	}
+	// Decrypt the message as it will be sent to upstream after handling it.
 	if err := as.decryptDownlinkMessage(ctx, ids, msg); err != nil {
 		return err
 	}
-	// TODO: Insert downlink message in queue (https://github.com/TheThingsIndustries/lorawan-stack/issues/1282).
 	return nil
 }
 

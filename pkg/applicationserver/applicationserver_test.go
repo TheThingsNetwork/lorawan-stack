@@ -472,6 +472,7 @@ func TestApplicationServer(t *testing.T) {
 				for _, tc := range []struct {
 					Name          string
 					IDs           ttnpb.EndDeviceIdentifiers
+					ResetQueue    []*ttnpb.ApplicationDownlink
 					Message       *ttnpb.ApplicationUp
 					ExpectTimeout bool
 					AssertUp      func(t *testing.T, up *ttnpb.ApplicationUp)
@@ -801,14 +802,22 @@ func TestApplicationServer(t *testing.T) {
 					{
 						Name: "RegisteredDevice/DownlinkMessage/Nack",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
+						ResetQueue: []*ttnpb.ApplicationDownlink{ // Pop the first item; it will be inserted because of the nack.
+							{
+								SessionKeyID: "session3",
+								FPort:        22,
+								FCnt:         2,
+								FRMPayload:   []byte{0x92, 0xfe, 0x93, 0xf5},
+							},
+						},
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkNack{
 								DownlinkNack: &ttnpb.ApplicationDownlink{
 									SessionKeyID: "session3",
-									FPort:        42,
-									FCnt:         42,
-									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+									FPort:        11,
+									FCnt:         1,
+									FRMPayload:   []byte{0x5f, 0x38, 0x7c, 0xb0},
 								},
 							},
 						},
@@ -819,8 +828,8 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_DownlinkNack{
 									DownlinkNack: &ttnpb.ApplicationDownlink{
 										SessionKeyID: "session3",
-										FPort:        42,
-										FCnt:         42,
+										FPort:        11,
+										FCnt:         1,
 										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									},
 								},
@@ -829,7 +838,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
-								{
+								{ // The nacked item is inserted first.
 									SessionKeyID: "session3",
 									FPort:        11,
 									FCnt:         1,
@@ -1181,6 +1190,15 @@ func TestApplicationServer(t *testing.T) {
 					},
 				} {
 					tcok := t.Run(tc.Name, func(t *testing.T) {
+						if tc.ResetQueue != nil {
+							_, err := ns.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
+								EndDeviceIdentifiers: tc.IDs,
+								Downlinks:            tc.ResetQueue,
+							})
+							if err != nil {
+								t.Fatalf("Unexpected error when resetting queue: %v", err)
+							}
+						}
 						ns.upCh <- tc.Message
 						select {
 						case msg := <-chs.up:
