@@ -76,27 +76,13 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	}
 }
 
+// NsJsClientFunc is the function used to get Join Server.
+type NsJsClientFunc func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error)
+
 // PeerGetter is the interface, which wraps GetPeer method.
 type PeerGetter interface {
 	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer
 }
-
-// NsGsClientFunc is the function used to get Gateway Server.
-type NsGsClientFunc func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error)
-
-// NewGatewayServerPeerGetterFunc returns a NsGsClientFunc, which uses g to retrieve Gateway Server clients.
-func NewGatewayServerPeerGetterFunc(g PeerGetter) NsGsClientFunc {
-	return func(ctx context.Context, ids ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
-		p := g.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, ids)
-		if p == nil {
-			return nil, errGatewayServerNotFound
-		}
-		return ttnpb.NewNsGsClient(p.Conn()), nil
-	}
-}
-
-// NsJsClientFunc is the function used to get Join Server.
-type NsJsClientFunc func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error)
 
 // NewJoinServerPeerGetterFunc returns a NsJsClientFunc, which uses g to retrieve Join Server clients.
 func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
@@ -146,7 +132,6 @@ type NetworkServer struct {
 	deduplicationDone WindowEndFunc
 	collectionDone    WindowEndFunc
 
-	gsClient NsGsClientFunc
 	jsClient NsJsClientFunc
 
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
@@ -168,14 +153,6 @@ func WithDeduplicationDoneFunc(f WindowEndFunc) Option {
 func WithCollectionDoneFunc(f WindowEndFunc) Option {
 	return func(ns *NetworkServer) {
 		ns.collectionDone = f
-	}
-}
-
-// WithNsGsClientFunc overrides the default NsGsClientFunc, which
-// is used to get the Gateway Server by gateway identifiers.
-func WithNsGsClientFunc(f NsGsClientFunc) Option {
-	return func(ns *NetworkServer) {
-		ns.gsClient = f
 	}
 }
 
@@ -264,9 +241,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
 	}
 
-	if ns.gsClient == nil {
-		ns.gsClient = NewGatewayServerPeerGetterFunc(ns.Component)
-	}
 	if ns.jsClient == nil {
 		ns.jsClient = NewJoinServerPeerGetterFunc(ns.Component)
 	}

@@ -1622,9 +1622,6 @@ func handleJoinTest() func(t *testing.T) {
 						collectionDoneCh <- windowEnd{ctx, msg, ch}
 						return ch
 					}),
-					WithNsGsClientFunc(func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
-						return &MockNsGsClient{}, nil
-					}),
 					WithNsJsClientFunc(func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
 						return &MockNsJsClient{
 							GetNwkSKeysFunc: func(ctx context.Context, req *ttnpb.SessionKeyRequest, _ ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
