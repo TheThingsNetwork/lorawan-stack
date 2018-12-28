@@ -28,6 +28,7 @@ include .make/go/main.make
 include .make/protos/main.make
 include .make/js/main.make
 include .make/dev.make
+include .make/ci.make
 include .make/styl/main.make
 include .make/snap/main.make
 include .make/sdk/main.make

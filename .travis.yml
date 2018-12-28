@@ -1,6 +1,16 @@
 language: go
 go:
 - "1.11"
+conditions: v1
+matrix:
+  include:
+    - env: RUNTYPE=js
+    - env: RUNTYPE=go.lint
+    - env: RUNTYPE=go.test.amd64
+    - if: type != "push"
+      env: RUNTYPE=go.test.386
+    - if: type != "push"
+      env: RUNTYPE=build-all
 go_import_path: go.thethings.network/lorawan-stack
 sudo: required
 services:
@@ -22,26 +32,8 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 - openssl aes-256-cbc -K $encrypted_fc3d5d829302_key -iv $encrypted_fc3d5d829302_iv -in pkg/blob/testdata/gcloud.json.enc -out pkg/blob/testdata/gcloud.json -d
-install:
-- make dev-deps
-- make deps
-- make dev.certs
-before_script:
-- make dev.databases.start
+install: true
 script:
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make protos.clean protos; fi # only on pull requests
-- make go.misspell
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.unconvert; fi # only on pull requests
-- make go.fmt
-- make go.depfmt
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.lint-travis || true; fi # only on pull requests
-- make headers.check
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make translations; fi # only on pull requests
-- make git.diff
-- GOARCH=amd64 TEST_SLOWDOWN=8 TEST_REDIS=1 make go.test
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then GOARCH=386 TEST_SLOWDOWN=8 TEST_REDIS=1 make go.test; fi # only on pull requests
-- make js.lint
-- make js.test
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make build-all; fi # only on pull requests
+- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make ci.$RUNTYPE.full; else make ci.$RUNTYPE.simple; fi
 after_success:
-- make go.coveralls
+- if [[ $RUNTYPE == go.test.amd64 ]]; then make go.coveralls; fi
