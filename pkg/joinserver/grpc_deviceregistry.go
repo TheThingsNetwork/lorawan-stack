@@ -18,7 +18,7 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -28,19 +28,21 @@ type jsEndDeviceRegistryServer struct {
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	// TODO: Change JsEndDeviceRegistry to not work with EndDeviceIdentifiers (https://github.com/TheThingsIndustries/lorawan-stack/pull/1374)
-	if err := clusterauth.Authorized(ctx); err != nil {
+	// TODO: Do we allow reading keys here? If so, enforce READ_KEYS.
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
+	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
 	return s.JS.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
 }
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	// TODO: Change JsEndDeviceRegistry to not work with EndDeviceIdentifiers (https://github.com/TheThingsIndustries/lorawan-stack/pull/1374)
-	if err := clusterauth.Authorized(ctx); err != nil {
+	// TODO: Do we allow writing keys here? If so, enforce WRITE_KEYS.
+	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
+	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
 	return s.JS.devices.SetByEUI(ctx, *req.Device.EndDeviceIdentifiers.JoinEUI, *req.Device.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return &req.Device, req.FieldMask.Paths, nil
 	})
@@ -48,10 +50,10 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	// TODO: Change JsEndDeviceRegistry to not work with EndDeviceIdentifiers (https://github.com/TheThingsIndustries/lorawan-stack/pull/1374)
-	if err := clusterauth.Authorized(ctx); err != nil {
+	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
+	// TODO: How do we enforce that JoinEUI and DevEUI are set here?
 	_, err := s.JS.devices.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return nil, nil, nil
 	})

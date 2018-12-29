@@ -20,12 +20,13 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -55,6 +56,9 @@ func TestDeviceRegistry(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: "foo-app",
+					},
 					DeviceID: "id-test",
 					DevEUI:   &types.EUI64{0x43, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -72,6 +76,9 @@ func TestDeviceRegistry(t *testing.T) {
 				a.So(devEUI, should.Resemble, types.EUI64{0x43, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: "foo-app",
+						},
 						DeviceID: "id-test",
 						DevEUI:   &types.EUI64{0x43, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					},
@@ -79,6 +86,9 @@ func TestDeviceRegistry(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: "foo-app",
+					},
 					DeviceID: "id-test",
 					DevEUI:   &types.EUI64{0x43, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -86,6 +96,9 @@ func TestDeviceRegistry(t *testing.T) {
 			},
 			DeviceResponse: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: "foo-app",
+					},
 					DeviceID: "id-test",
 					DevEUI:   &types.EUI64{0x43, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
@@ -95,7 +108,15 @@ func TestDeviceRegistry(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ctx := clusterauth.NewContext(test.ContextWithT(test.Context(), t), nil)
+			ctx := test.ContextWithT(test.Context(), t)
+			ctx = rights.NewContext(ctx, rights.Rights{
+				ApplicationRights: map[string]*ttnpb.Rights{
+					unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}): ttnpb.RightsFrom(
+						ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					),
+				},
+			})
 			if tc.Context != nil {
 				ctx = tc.Context(ctx)
 			}
