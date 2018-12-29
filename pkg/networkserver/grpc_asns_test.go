@@ -21,15 +21,20 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
+
+func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
 
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
@@ -52,7 +57,15 @@ func TestLinkApplication(t *testing.T) {
 	test.Must(nil, ns.Start())
 	defer ns.Close()
 
-	id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
+	ids := ttnpb.ApplicationIdentifiers{
+		ApplicationID: "foo-app",
+	}
+	ctx := test.ContextWithT(test.Context(), t)
+	authorizedCtx := rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
+		},
+	})
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
@@ -63,11 +76,12 @@ func TestLinkApplication(t *testing.T) {
 	}
 
 	time.AfterFunc(test.Delay, func() {
-		err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
+		defer wg.Done()
+		err := ns.LinkApplication(&ids, &MockAsNsLinkApplicationStream{
 			MockServerStream: &test.MockServerStream{
 				MockStream: &test.MockStream{
 					ContextFunc: func() context.Context {
-						ctx, cancel := context.WithCancel(contextWithKey())
+						ctx, cancel := context.WithCancel(authorizedCtx)
 						time.AfterFunc(test.Delay, cancel)
 						return ctx
 					},
@@ -75,14 +89,17 @@ func TestLinkApplication(t *testing.T) {
 			},
 			SendFunc: sendFunc,
 		})
-		a.So(err, should.Resemble, context.Canceled)
-		wg.Done()
+		if !a.So(errors.IsCanceled(err), should.BeTrue) {
+			t.Fatalf("Unexpected error: %v", err)
+		}
 	})
 
-	err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
+	err := ns.LinkApplication(&ids, &MockAsNsLinkApplicationStream{
 		MockServerStream: &test.MockServerStream{
 			MockStream: &test.MockStream{
-				ContextFunc: contextWithKey,
+				ContextFunc: func() context.Context {
+					return authorizedCtx
+				},
 			},
 		},
 		SendFunc: sendFunc,
@@ -101,6 +118,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		JoinEUI:  &JoinEUI,
 		DevEUI:   &DevEUI,
 	}
+	ctx := test.Context()
+	authorizedCtx := rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
+		},
+	})
 
 	for _, tc := range []struct {
 		Name           string
@@ -110,9 +133,26 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			Name:    "no device",
-			Context: test.Context(),
+			Name:    "wrong auth",
+			Context: authorizedCtx,
 			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
+		{
+			Name:    "no device",
+			Context: authorizedCtx,
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ids.ApplicationIdentifiers,
+					DeviceID:               "non-existent",
+					JoinEUI:                eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+					DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)},
+			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
@@ -120,7 +160,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 		{
 			Name:    "empty queue/empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers:       ids,
 				QueuedApplicationDownlinks: nil,
@@ -132,7 +172,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 		{
 			Name:    "empty queue/non-empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers:       ids,
 				QueuedApplicationDownlinks: nil,
@@ -148,7 +188,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 		{
 			Name:    "non-empty queue/empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -164,7 +204,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 		{
 			Name:    "non-empty queue/non-empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -278,6 +318,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 		JoinEUI:  &JoinEUI,
 		DevEUI:   &DevEUI,
 	}
+	ctx := test.Context()
+	authorizedCtx := rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
+		},
+	})
 
 	for _, tc := range []struct {
 		Name           string
@@ -287,9 +333,26 @@ func TestDownlinkQueuePush(t *testing.T) {
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			Name:    "no device",
-			Context: test.Context(),
+			Name:    "wrong auth",
+			Context: authorizedCtx,
 			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
+		{
+			Name:    "no device",
+			Context: authorizedCtx,
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ids.ApplicationIdentifiers,
+					DeviceID:               "non-existent",
+					JoinEUI:                eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+					DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)},
+			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
@@ -297,7 +360,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 		{
 			Name:    "empty queue/empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers:       ids,
 				QueuedApplicationDownlinks: nil,
@@ -309,7 +372,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 		{
 			Name:    "empty queue/non-empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers:       ids,
 				QueuedApplicationDownlinks: nil,
@@ -325,7 +388,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 		{
 			Name:    "non-empty queue/empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -341,7 +404,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 		{
 			Name:    "non-empty queue/non-empty request",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -455,6 +518,12 @@ func TestDownlinkQueueList(t *testing.T) {
 		JoinEUI:  &JoinEUI,
 		DevEUI:   &DevEUI,
 	}
+	ctx := test.Context()
+	authorizedCtx := rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
+		},
+	})
 
 	for _, tc := range []struct {
 		Name           string
@@ -464,30 +533,31 @@ func TestDownlinkQueueList(t *testing.T) {
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			Name:    "no device",
-			Context: test.Context(),
+			Name:    "wrong auth",
+			Context: authorizedCtx,
 			Request: ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
+		{
+			Name:    "no device",
+			Context: authorizedCtx,
+			Request: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ids.ApplicationIdentifiers,
+				DeviceID:               "non-existent",
+				JoinEUI:                eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+				DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
 			},
 		},
 		{
-			Name:    "empty identifiers",
-			Context: test.Context(),
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers:       ids,
-				QueuedApplicationDownlinks: nil,
-			},
-			Request: &ttnpb.EndDeviceIdentifiers{},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsInvalidArgument(err), should.BeTrue)
-			},
-		},
-		{
 			Name:    "empty queue",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers:       ids,
 				QueuedApplicationDownlinks: nil,
@@ -496,7 +566,7 @@ func TestDownlinkQueueList(t *testing.T) {
 		},
 		{
 			Name:    "non-empty queue",
-			Context: test.Context(),
+			Context: authorizedCtx,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
