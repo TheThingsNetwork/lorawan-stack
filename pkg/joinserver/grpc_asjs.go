@@ -27,7 +27,7 @@ type asJsServer struct {
 
 // GetAppSKey returns the AppSKey associated with session keys identified by the supplied request.
 func (srv asJsServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	// TODO: Authorize using ApplicationIdentifiers. (https://github.com/TheThingsIndustries/lorawan-stack/issues/505)
+	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsIndustries/lorawan-stack/issues/244)
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
