@@ -126,8 +126,8 @@ message EndDeviceModel {
 
 // Identifies an end device model with version information.
 message EndDeviceVersionIdentifiers {
-  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
-  string model_id = 2 [(gogoproto.customname) = "ModelID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$|^$"}];
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,}$|^$", length_lt: 37}];
+  string model_id = 2 [(gogoproto.customname) = "ModelID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,}$|^$", length_lt: 37}];
   string hardware_version = 3;
   string firmware_version = 4;
 }

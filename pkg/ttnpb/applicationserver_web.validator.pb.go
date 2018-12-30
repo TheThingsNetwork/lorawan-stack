@@ -23,14 +23,17 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-var _regex_ApplicationWebhookIdentifiers_WebhookID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,35}$`)
+var _regex_ApplicationWebhookIdentifiers_WebhookID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){1,}$`)
 
 func (this *ApplicationWebhookIdentifiers) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ApplicationIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationIdentifiers", err)
 	}
 	if !_regex_ApplicationWebhookIdentifiers_WebhookID.MatchString(this.WebhookID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("WebhookID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,35}$"`, this.WebhookID))
+		return github_com_mwitkow_go_proto_validators.FieldError("WebhookID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){1,}$"`, this.WebhookID))
+	}
+	if !(len(this.WebhookID) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("WebhookID", fmt.Errorf(`value '%v' must length be less than '37'`, this.WebhookID))
 	}
 	return nil
 }

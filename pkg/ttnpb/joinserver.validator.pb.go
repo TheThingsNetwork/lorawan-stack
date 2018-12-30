@@ -27,6 +27,9 @@ func (this *SessionKeyRequest) Validate() error {
 	if !_regex_SessionKeyRequest_SessionKeyID.MatchString(this.SessionKeyID) {
 		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$"`, this.SessionKeyID))
 	}
+	if !(len(this.SessionKeyID) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must length be less than '37'`, this.SessionKeyID))
+	}
 	return nil
 }
 func (this *NwkSKeysResponse) Validate() error {

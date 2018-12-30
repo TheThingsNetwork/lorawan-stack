@@ -79,6 +79,9 @@ func (this *ApplicationUplink) Validate() error {
 	if !_regex_ApplicationUplink_SessionKeyID.MatchString(this.SessionKeyID) {
 		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$"`, this.SessionKeyID))
 	}
+	if !(len(this.SessionKeyID) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must length be less than '37'`, this.SessionKeyID))
+	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("DecodedPayload", err)
@@ -110,6 +113,9 @@ func (this *ApplicationJoinAccept) Validate() error {
 	if !_regex_ApplicationJoinAccept_SessionKeyID.MatchString(this.SessionKeyID) {
 		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$"`, this.SessionKeyID))
 	}
+	if !(len(this.SessionKeyID) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must length be less than '37'`, this.SessionKeyID))
+	}
 	if this.AppSKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.AppSKey); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("AppSKey", err)
@@ -133,6 +139,9 @@ var _regex_ApplicationDownlink_SessionKeyID = regexp.MustCompile(`(?:0[xX])?([0-
 func (this *ApplicationDownlink) Validate() error {
 	if !_regex_ApplicationDownlink_SessionKeyID.MatchString(this.SessionKeyID) {
 		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$"`, this.SessionKeyID))
+	}
+	if !(len(this.SessionKeyID) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must length be less than '37'`, this.SessionKeyID))
 	}
 	if this.DecodedPayload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DecodedPayload); err != nil {
