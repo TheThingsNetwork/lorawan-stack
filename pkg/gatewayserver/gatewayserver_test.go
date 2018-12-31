@@ -632,7 +632,11 @@ func TestGatewayServer(t *testing.T) {
 					t.Run(tc.Name, func(t *testing.T) {
 						a := assertions.New(t)
 
-						upCh <- tc.Up
+						select {
+						case upCh <- tc.Up:
+						case <-time.After(timeout):
+							t.Fatalf("Failed to send message to upstream channel")
+						}
 						uplinkCount += len(tc.Up.UplinkMessages)
 
 						for _, msgIdx := range tc.Forwards {
@@ -843,6 +847,9 @@ func TestGatewayServer(t *testing.T) {
 								errSchedulePathCause := errors.Cause(errors.Details(err)[0].(error))
 								a.So(errors.IsAborted(errSchedulePathCause), should.BeTrue)
 								for i, assert := range tc.RxWindowDetailsAssertion {
+									if i >= len(errors.Details(errSchedulePathCause)) {
+										t.Fatalf("Expected error in Rx window %d", i+1)
+									}
 									errRxWindow := errors.Details(errSchedulePathCause)[i].(error)
 									if !a.So(assert(errRxWindow), should.BeTrue) {
 										t.Fatalf("Unexpected Rx window %d error: %v", i+1, errRxWindow)
