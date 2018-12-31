@@ -135,7 +135,7 @@ func TestTraffic(t *testing.T) {
 			OK      bool
 		}{
 			{
-				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayUID),
 				Message: &ttnpb.UplinkMessage{
 					RawPayload: []byte{0x01},
 				},
@@ -149,7 +149,7 @@ func TestTraffic(t *testing.T) {
 				OK: false, // invalid gateway ID
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayUID),
 				Message: &ttnpb.DownlinkMessage{
 					RawPayload: []byte{0x04},
 				},
@@ -163,14 +163,14 @@ func TestTraffic(t *testing.T) {
 				OK: false, // invalid gateway ID + publish to downlink not permitted
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayUID),
 				Message: &ttnpb.GatewayStatus{
 					IP: []string{"1.1.1.1"},
 				},
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/down/ack", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/down/ack", registeredGatewayUID),
 				Message: &ttnpb.TxAcknowledgment{
 					Result: ttnpb.TxAcknowledgment_SUCCESS,
 				},
@@ -239,7 +239,7 @@ func TestTraffic(t *testing.T) {
 			ErrorAssertion func(error) bool
 		}{
 			{
-				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayUID),
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 100),
@@ -261,7 +261,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayUID),
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 100),
@@ -282,7 +282,7 @@ func TestTraffic(t *testing.T) {
 				ErrorAssertion: errors.IsInvalidArgument, // Does not support scheduled downlink; the Gateway Server or gateway will take care of that.
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayID.GatewayID),
+				Topic: fmt.Sprintf("v3/%v/down", registeredGatewayUID),
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 100),

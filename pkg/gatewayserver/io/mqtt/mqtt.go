@@ -187,6 +187,10 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	if err != nil {
 		return nil, err
 	}
+	ctx, err = unique.WithContext(ctx, info.Username)
+	if err != nil {
+		return nil, err
+	}
 
 	md := metadata.New(map[string]string{
 		"id":            ids.GatewayID,
