@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -156,9 +157,14 @@ func FromIncomingContext(ctx context.Context) (m MD) {
 	return FromMetadata(md)
 }
 
+var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "the context is not authenticated")
+
 // WithForwardedAuth returns a grpc.CallOption with authentication from the incoming context ctx.
-func WithForwardedAuth(ctx context.Context, allowInsecure bool) grpc.CallOption {
+func WithForwardedAuth(ctx context.Context, allowInsecure bool) (grpc.CallOption, error) {
 	md := FromIncomingContext(ctx)
+	if md.AuthType == "" || md.AuthValue == "" {
+		return nil, errUnauthenticated
+	}
 	md.AllowInsecure = allowInsecure
-	return grpc.PerRPCCredentials(md)
+	return grpc.PerRPCCredentials(md), nil
 }

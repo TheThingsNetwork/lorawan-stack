@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -80,13 +81,23 @@ func TestMD(t *testing.T) {
 			"authorization": "Key foo",
 			"host":          "test.local",
 		}))
-		callOpt := WithForwardedAuth(ctx, true).(grpc.PerRPCCredsCallOption)
-		requestMD, err := callOpt.Creds.GetRequestMetadata(ctx)
+		callOpt, err := WithForwardedAuth(ctx, true)
+		a.So(err, should.BeNil)
+		requestMD, err := callOpt.(grpc.PerRPCCredsCallOption).Creds.GetRequestMetadata(ctx)
 		a.So(err, should.BeNil)
 		a.So(requestMD, should.Resemble, map[string]string{
 			"id":            "some-id",
 			"authorization": "Key foo",
 		})
+	}
+
+	{
+		ctx := metadata.NewIncomingContext(test.Context(), metadata.New(map[string]string{
+			"id":   "some-id",
+			"host": "test.local",
+		}))
+		_, err := WithForwardedAuth(ctx, true)
+		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	}
 
 	{

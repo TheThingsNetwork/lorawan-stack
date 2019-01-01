@@ -1529,15 +1529,6 @@
       "file": "require.go"
     }
   },
-  "error:pkg/auth/rights:unauthenticated": {
-    "translations": {
-      "en": "no authentication found in call headers"
-    },
-    "description": {
-      "package": "pkg/auth/rights",
-      "file": "fetcher.go"
-    }
-  },
   "error:pkg/auth:invalid_hash": {
     "translations": {
       "en": "invalid password hash"
@@ -3687,6 +3678,15 @@
     "description": {
       "package": "pkg/redis",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/rpcmetadata:unauthenticated": {
+    "translations": {
+      "en": "the context is not authenticated"
+    },
+    "description": {
+      "package": "pkg/rpcmetadata",
+      "file": "request.go"
     }
   },
   "error:pkg/rpcserver:rpc_recovered": {
