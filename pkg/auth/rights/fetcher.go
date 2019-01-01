@@ -106,29 +106,18 @@ type accessFetcher struct {
 	allowInsecure bool
 }
 
-var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "no authentication found in call headers")
-
 var errNoISConn = errors.DefineUnavailable("no_identity_server_conn", "no connection to Identity Server")
-
-func (f accessFetcher) forwardAuth(ctx context.Context) (context.Context, rpcmetadata.MD, error) {
-	md := rpcmetadata.FromIncomingContext(ctx)
-	if md.AuthType == "" || md.AuthValue == "" {
-		return ctx, md, errUnauthenticated
-	}
-	md.AllowInsecure = f.allowInsecure
-	return md.ToOutgoingContext(ctx), md, nil
-}
 
 func (f accessFetcher) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	cc := f.getConn(ctx)
 	if cc == nil {
 		return nil, errNoISConn
 	}
-	ctx, md, err := f.forwardAuth(ctx)
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, f.allowInsecure)
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewApplicationAccessClient(cc).ListRights(ctx, &appID, grpc.PerRPCCredentials(md))
+	rights, err := ttnpb.NewApplicationAccessClient(cc).ListRights(ctx, &appID, callOpt)
 	registerRightsFetch(ctx, "application", rights, err)
 	if err != nil {
 		return nil, err
@@ -141,11 +130,11 @@ func (f accessFetcher) ClientRights(ctx context.Context, clientID ttnpb.ClientId
 	if cc == nil {
 		return nil, errNoISConn
 	}
-	ctx, md, err := f.forwardAuth(ctx)
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, f.allowInsecure)
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewClientAccessClient(cc).ListRights(ctx, &clientID, grpc.PerRPCCredentials(md))
+	rights, err := ttnpb.NewClientAccessClient(cc).ListRights(ctx, &clientID, callOpt)
 	registerRightsFetch(ctx, "client", rights, err)
 	if err != nil {
 		return nil, err
@@ -158,11 +147,11 @@ func (f accessFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIde
 	if cc == nil {
 		return nil, errNoISConn
 	}
-	ctx, md, err := f.forwardAuth(ctx)
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, f.allowInsecure)
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewGatewayAccessClient(cc).ListRights(ctx, &gtwID, grpc.PerRPCCredentials(md))
+	rights, err := ttnpb.NewGatewayAccessClient(cc).ListRights(ctx, &gtwID, callOpt)
 	registerRightsFetch(ctx, "gateway", rights, err)
 	if err != nil {
 		return nil, err
@@ -175,11 +164,11 @@ func (f accessFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.Organ
 	if cc == nil {
 		return nil, errNoISConn
 	}
-	ctx, md, err := f.forwardAuth(ctx)
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, f.allowInsecure)
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewOrganizationAccessClient(cc).ListRights(ctx, &orgID, grpc.PerRPCCredentials(md))
+	rights, err := ttnpb.NewOrganizationAccessClient(cc).ListRights(ctx, &orgID, callOpt)
 	registerRightsFetch(ctx, "organization", rights, err)
 	if err != nil {
 		return nil, err
@@ -192,11 +181,11 @@ func (f accessFetcher) UserRights(ctx context.Context, userID ttnpb.UserIdentifi
 	if cc == nil {
 		return nil, errNoISConn
 	}
-	ctx, md, err := f.forwardAuth(ctx)
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, f.allowInsecure)
 	if err != nil {
 		return nil, err
 	}
-	rights, err := ttnpb.NewUserAccessClient(cc).ListRights(ctx, &userID, grpc.PerRPCCredentials(md))
+	rights, err := ttnpb.NewUserAccessClient(cc).ListRights(ctx, &userID, callOpt)
 	registerRightsFetch(ctx, "user", rights, err)
 	if err != nil {
 		return nil, err
