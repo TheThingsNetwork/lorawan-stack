@@ -211,7 +211,7 @@ func TestGatewayServer(t *testing.T) {
 									errCh <- err
 									return
 								}
-								if token := client.Publish(fmt.Sprintf("v3/%v/up", ids.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
+								if token := client.Publish(fmt.Sprintf("v3/%v/up", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
 									errCh <- token.Error()
 									return
 								}
@@ -222,7 +222,7 @@ func TestGatewayServer(t *testing.T) {
 									errCh <- err
 									return
 								}
-								if token := client.Publish(fmt.Sprintf("v3/%v/status", ids.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
+								if token := client.Publish(fmt.Sprintf("v3/%v/status", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
 									errCh <- token.Error()
 									return
 								}
@@ -233,7 +233,7 @@ func TestGatewayServer(t *testing.T) {
 									errCh <- err
 									return
 								}
-								if token := client.Publish(fmt.Sprintf("v3/%v/down/ack", ids.GatewayID), 1, false, buf); token.Wait() && token.Error() != nil {
+								if token := client.Publish(fmt.Sprintf("v3/%v/down/ack", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
 									errCh <- token.Error()
 									return
 								}
@@ -242,7 +242,7 @@ func TestGatewayServer(t *testing.T) {
 					}
 				}()
 				// Read downstream.
-				token := client.Subscribe(fmt.Sprintf("v3/%v/down", ids.GatewayID), 1, func(_ mqtt.Client, raw mqtt.Message) {
+				token := client.Subscribe(fmt.Sprintf("v3/%v/down", unique.ID(ctx, ids)), 1, func(_ mqtt.Client, raw mqtt.Message) {
 					var msg ttnpb.GatewayDown
 					if err := msg.Unmarshal(raw.Payload()); err != nil {
 						errCh <- err
