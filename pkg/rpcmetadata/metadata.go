@@ -20,8 +20,6 @@ import (
 	"strconv"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -46,17 +44,6 @@ type MD struct {
 
 	// URI is the URI the request is directed to.
 	URI string
-}
-
-// GetRequestMetadata returns the request metadata with per-rpc credentials
-func (m MD) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
-	if m.AuthType == "" || m.AuthValue == "" {
-		return nil, nil
-	}
-	return map[string]string{
-		"id":            m.ID,
-		"authorization": m.AuthType + " " + m.AuthValue,
-	}, nil
 }
 
 // RequireTransportSecurity returns true if authentication is configured
@@ -155,16 +142,4 @@ func FromOutgoingContext(ctx context.Context) (m MD) {
 func FromIncomingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	return FromMetadata(md)
-}
-
-var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "the context is not authenticated")
-
-// WithForwardedAuth returns a grpc.CallOption with authentication from the incoming context ctx.
-func WithForwardedAuth(ctx context.Context, allowInsecure bool) (grpc.CallOption, error) {
-	md := FromIncomingContext(ctx)
-	if md.AuthType == "" || md.AuthValue == "" {
-		return nil, errUnauthenticated
-	}
-	md.AllowInsecure = allowInsecure
-	return grpc.PerRPCCredentials(md), nil
 }
