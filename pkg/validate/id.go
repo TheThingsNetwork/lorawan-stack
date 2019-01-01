@@ -22,14 +22,14 @@ import (
 )
 
 var (
-	idRegex     = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){1,}$")
+	idRegex     = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 	idMaxLength = 36
 
-	errID = errors.DefineInvalidArgument("id", "`{id}` must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash or contain two or more consecutive dashes")
+	errID = errors.DefineInvalidArgument("id", "`{id}` must be at least 3 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash or contain two or more consecutive dashes")
 )
 
 // ID checks whether the input value is a valid ID according:
-//		- Length must be between 2 and 36
+//		- Length must be between 3 and 36
 //		- It consists only of numbers, dashes and lowercase letters
 //		- Must start by a number or lowercase letter
 //		- It cannot match any of the blacklisted IDs

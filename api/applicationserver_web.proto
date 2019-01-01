@@ -28,7 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ApplicationWebhookIdentifiers {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string webhook_id = 2 [(gogoproto.customname) = "WebhookID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){1,}$" , length_lt: 37}];
+  string webhook_id = 2 [(gogoproto.customname) = "WebhookID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
 }
 
 message ApplicationWebhook {

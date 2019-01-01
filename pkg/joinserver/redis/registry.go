@@ -38,9 +38,7 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 	if err := dst.SetFields(src, append(paths, "ids")...); err != nil {
 		return nil, err
 	}
-	if err := dst.EndDeviceIdentifiers.Validate(); err != nil {
-		return nil, err
-	}
+	// TODO: Validation after applying fieldmasks https://github.com/TheThingsIndustries/lorawan-stack/issues/1440
 	return dst, nil
 }
 

@@ -22,8 +22,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-// ValidateContext is used as validator function by the GRPC validator interceptor.
-// TODO: Adapt to genetrated validators (https://github.com/TheThingsIndustries/lorawan-stack/issues/1335)
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+// TODO: Adapt to generated validators (https://github.com/TheThingsIndustries/lorawan-stack/issues/1335)
 func (s TxSettings) ValidateContext(ctx context.Context) error {
 	if s.GetDataRateIndex() > math.MaxUint8 {
 		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
@@ -31,7 +31,7 @@ func (s TxSettings) ValidateContext(ctx context.Context) error {
 	return s.Validate()
 }
 
-// ValidateContext is used as validator function by the GRPC validator interceptor.
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (p MACPayload) ValidateContext(context.Context) error {
 	if p.DevAddr.IsZero() {
 		return errMissing("DevAddr")
@@ -39,7 +39,7 @@ func (p MACPayload) ValidateContext(context.Context) error {
 	return p.Validate()
 }
 
-// ValidateContext is used as validator function by the GRPC validator interceptor.
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (p JoinRequestPayload) ValidateContext(context.Context) error {
 	if p.DevEUI.IsZero() {
 		return errMissing("DevEUI")
@@ -55,7 +55,7 @@ var (
 	errMissingRawPayload   = errors.DefineInvalidArgument("raw_payload", "missing raw payload")
 )
 
-// ValidateContext is used as validator function by the GRPC validator interceptor.
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UplinkMessage) ValidateContext(context.Context) error {
 	if p := m.GetPayload(); p.Payload == nil {
 		if len(m.GetRawPayload()) == 0 {
@@ -88,12 +88,12 @@ func (m *UplinkMessage) ValidateContext(context.Context) error {
 	return m.Validate()
 }
 
-// ValidateContext reports whether cmd represents a valid *MACCommand.
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (cmd *MACCommand) ValidateContext(context.Context) error {
 	return cmd.CID.Validate()
 }
 
-// Validate reports whether cid represents a valid MACCommandIdentifier.
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 // TODO: Move to generated validators (https://github.com/TheThingsIndustries/lorawan-stack/issues/1335)
 func (cid MACCommandIdentifier) Validate() error {
 	if cid < 0x00 || cid > 0xff {

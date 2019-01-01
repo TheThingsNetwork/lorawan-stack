@@ -3,10 +3,9 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-import regexp "regexp"
-import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/empty"
@@ -21,15 +20,7 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-var _regex_SessionKeyRequest_SessionKeyID = regexp.MustCompile(`(?:0[xX])?([0-9a-fA-F]{2})+$`)
-
 func (this *SessionKeyRequest) Validate() error {
-	if !_regex_SessionKeyRequest_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$"`, this.SessionKeyID))
-	}
-	if !(len(this.SessionKeyID) < 37) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must length be less than '37'`, this.SessionKeyID))
-	}
 	return nil
 }
 func (this *NwkSKeysResponse) Validate() error {

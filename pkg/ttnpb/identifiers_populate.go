@@ -23,7 +23,7 @@ import (
 const validIDChars = "abcdefghijklmnopqrstuvwxyz1234567890"
 
 func NewPopulatedID(r randyIdentifiers) string {
-	b := make([]byte, 2+r.Intn(35))
+	b := make([]byte, 3+r.Intn(34))
 	for i := 0; i < len(b); i++ {
 		b[i] = validIDChars[r.Intn(len(validIDChars))]
 	}

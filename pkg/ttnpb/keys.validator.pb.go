@@ -3,7 +3,6 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-import regexp "regexp"
 import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
@@ -38,16 +37,7 @@ func (this *RootKeys) Validate() error {
 	}
 	return nil
 }
-
-var _regex_SessionKeys_SessionKeyID = regexp.MustCompile(`(?:0[xX])?([0-9a-fA-F]{2})+$`)
-
 func (this *SessionKeys) Validate() error {
-	if !_regex_SessionKeys_SessionKeyID.MatchString(this.SessionKeyID) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must be a string conforming to regex "(?:0[xX])?([0-9a-fA-F]{2})+$"`, this.SessionKeyID))
-	}
-	if !(len(this.SessionKeyID) < 37) {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeyID", fmt.Errorf(`value '%v' must length be less than '37'`, this.SessionKeyID))
-	}
 	if this.FNwkSIntKey != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.FNwkSIntKey); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("FNwkSIntKey", err)
