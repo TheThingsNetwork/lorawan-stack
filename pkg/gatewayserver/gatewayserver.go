@@ -212,6 +212,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	if er == nil {
 		return nil, errEntityRegistryNotFound
 	}
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
+	if err != nil {
+		return nil, err
+	}
 	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask: types.FieldMask{
@@ -222,7 +226,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 				"downlink_path_constraint",
 			},
 		},
-	}, rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()))
+	}, callOpt)
 	if errors.IsNotFound(err) {
 		if gs.config.RequireRegisteredGateways {
 			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
@@ -329,10 +333,14 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	if er == nil {
 		return nil, errEntityRegistryNotFound
 	}
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
+	if err != nil {
+		return nil, err
+	}
 	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          types.FieldMask{Paths: []string{"frequency_plan_id"}},
-	}, rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()))
+	}, callOpt)
 	if err != nil {
 		return nil, err
 	}
