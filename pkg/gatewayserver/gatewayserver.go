@@ -159,25 +159,25 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
 
-// CustomIdentifiersFiller fills the given identifiers.
-var CustomIdentifiersFiller func(context.Context, ttnpb.GatewayIdentifiers) (ttnpb.GatewayIdentifiers, error)
+// CustomContextFromIdentifier returns a derived context based on the given identifiers to use for the connection.
+var CustomContextFromIdentifier func(context.Context, ttnpb.GatewayIdentifiers) (context.Context, error)
 
 var errEmptyIdentifiers = errors.Define("empty_identifiers", "empty identifiers")
 
 // FillGatewayContext fills the given context and identifiers.
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
-	if filler := CustomIdentifiersFiller; filler != nil {
-		var err error
-		if ids, err = filler(ctx, ids); err != nil {
-			return nil, ttnpb.GatewayIdentifiers{}, err
-		}
-	}
 	if ids.IsZero() {
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
 	}
 	if ids.GatewayID == "" {
 		ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+	}
+	if filler := CustomContextFromIdentifier; filler != nil {
+		var err error
+		if ctx, err = filler(ctx, ids); err != nil {
+			return nil, ttnpb.GatewayIdentifiers{}, err
+		}
 	}
 	return ctx, ids, nil
 }
