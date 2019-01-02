@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -148,7 +149,7 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/up", registeredDeviceID.ApplicationID, registeredDeviceID.DeviceID),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/up", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceID),
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -158,7 +159,7 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/join", registeredDeviceID.ApplicationID, registeredDeviceID.DeviceID),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceID),
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -226,7 +227,7 @@ func TestTraffic(t *testing.T) {
 			Expected []*ttnpb.ApplicationDownlink
 		}{
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", registeredDeviceID.ApplicationID, registeredDeviceID.DeviceID),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceID),
 				IDs:   registeredDeviceID,
 				Message: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{
@@ -244,7 +245,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/down/replace", registeredDeviceID.ApplicationID, registeredDeviceID.DeviceID),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/down/replace", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceID),
 				IDs:   registeredDeviceID,
 				Message: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{
@@ -262,7 +263,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", registeredDeviceID.ApplicationID, "invalid-device"),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), "invalid-device"),
 				IDs:   registeredDeviceID,
 				Message: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{
