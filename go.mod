@@ -51,6 +51,7 @@ require (
 	github.com/golang/protobuf v1.3.1
 	github.com/goreleaser/goreleaser v0.111.0
 	github.com/gorilla/securecookie v1.1.1
+	github.com/gorilla/websocket v1.4.0
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
 	github.com/gotnospirit/messageformat v0.0.0-20180622080451-0eab1176a3fb
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
