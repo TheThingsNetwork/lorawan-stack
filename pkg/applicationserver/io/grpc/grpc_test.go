@@ -83,6 +83,7 @@ func TestAuthentication(t *testing.T) {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				err := srv.Subscribe(&tc.ID, stream)
 				if tc.OK && !a.So(errors.IsCanceled(err), should.BeTrue) {
 					t.Fatalf("Unexpected link error: %v", err)
@@ -90,7 +91,6 @@ func TestAuthentication(t *testing.T) {
 				if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
 					t.FailNow()
 				}
-				wg.Done()
 			}()
 
 			cancelCtx()
