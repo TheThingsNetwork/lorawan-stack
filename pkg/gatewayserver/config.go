@@ -22,7 +22,7 @@ import (
 // MQTTConfig contains MQTT configuration of the Gateway Server.
 type MQTTConfig struct {
 	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
-	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the MQTT frontend to listen on (with TLS)"`
 }
 
 // UDPConfig defines the UDP configuration of the Gateway Server.
@@ -31,15 +31,19 @@ type UDPConfig struct {
 	Listeners  map[string]string `name:"listeners" description:"Listen addresses with (optional) fallback frequency plan ID for non-registered gateways"`
 }
 
+// BasicStationConfig defines the Basic Station configuration of the Gateway Server.
+type BasicStationConfig struct {
+	FallbackFrequencyPlanID string `name:"fallback-frequency-plan-id" description:"Fallback frequency plan ID for non-registered gateways"`
+}
+
 // Config represents the Gateway Server configuration.
 type Config struct {
 	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
 
-	Forward map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
-
-	MQTT   MQTTConfig `name:"mqtt"`
-	MQTTV2 MQTTConfig `name:"mqtt-v2"`
-	UDP    UDPConfig  `name:"udp"`
+	MQTT         MQTTConfig         `name:"mqtt"`
+	MQTTV2       MQTTConfig         `name:"mqtt-v2"`
+	UDP          UDPConfig          `name:"udp"`
+	BasicStation BasicStationConfig `name:"basic-station"`
 }
 
 // ForwardDevAddrPrefixes parses the configured forward map.
