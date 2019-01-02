@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstation"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
@@ -144,6 +145,12 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 			mqtt.Start(ctx, gs, netLis, version.Format, lis.Protocol)
 		}
 	}
+
+	bsCtx := gs.FillContext(ctx)
+	if conf.BasicStation.FallbackFrequencyPlanID != "" {
+		bsCtx = frequencyplans.WithFallbackID(bsCtx, conf.BasicStation.FallbackFrequencyPlanID)
+	}
+	c.RegisterWeb(basicstation.New(bsCtx, gs))
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
