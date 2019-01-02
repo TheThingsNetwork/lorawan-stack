@@ -1168,7 +1168,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 		Context func(context.Context) context.Context
 
-		GetByID     func(context.Context, types.EUI64, string, []string) (*ttnpb.SessionKeys, error)
+		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.NwkSKeysResponse
 
@@ -1176,10 +1176,10 @@ func TestGetNwkSKeys(t *testing.T) {
 	}{
 		{
 			Name: "Registry error",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"f_nwk_s_int_key",
 					"nwk_s_enc_key",
@@ -1189,7 +1189,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1202,10 +1202,10 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No SNwkSIntKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"f_nwk_s_int_key",
 					"nwk_s_enc_key",
@@ -1218,7 +1218,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1227,10 +1227,10 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No NwkSEncKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"f_nwk_s_int_key",
 					"nwk_s_enc_key",
@@ -1243,7 +1243,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1252,10 +1252,10 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No FNwkSIntKey",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"f_nwk_s_int_key",
 					"nwk_s_enc_key",
@@ -1268,7 +1268,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1277,17 +1277,17 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "Matching request",
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-				a.So(id, should.Resemble, "test-id")
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"f_nwk_s_int_key",
 					"nwk_s_enc_key",
 					"s_nwk_s_int_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: "test",
+					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel: "FNwkSIntKey-kek",
@@ -1304,7 +1304,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: "test-id",
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: &ttnpb.NwkSKeysResponse{
 				FNwkSIntKey: ttnpb.KeyEnvelope{

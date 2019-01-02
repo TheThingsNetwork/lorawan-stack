@@ -307,7 +307,7 @@ func startMockJS(ctx context.Context) (*mockJS, string) {
 	return js, lis.Addr().String()
 }
 
-func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID string, key ttnpb.KeyEnvelope) {
+func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID []byte, key ttnpb.KeyEnvelope) {
 	js.keys[fmt.Sprintf("%v:%v", devEUI, sessionKeyID)] = key
 }
 

@@ -175,7 +175,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 
 	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	pb := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
-	pb.SessionKeyID = "test-keys"
+	pb.SessionKeyID = []byte{0x11, 0x22, 0x33, 0x44}
 
 	ret, err := reg.GetByID(ctx, devEUI, pb.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {

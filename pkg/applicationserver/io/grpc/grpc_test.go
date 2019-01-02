@@ -203,7 +203,7 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
-						SessionKeyID:   "test", // This gets discarded.
+						SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44}, // This gets discarded.
 						FPort:          1,
 						FCnt:           100, // This gets discarded.
 						FRMPayload:     []byte{0x01, 0x01, 0x01},

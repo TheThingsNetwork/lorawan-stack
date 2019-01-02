@@ -48,17 +48,17 @@ func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (
 }
 
 type KeyRegistry interface {
-	GetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error)
-	SetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
+	GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error)
+	SetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 }
 
-func DeleteKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, id string) error {
+func DeleteKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, id []byte) error {
 	_, err := r.SetByID(ctx, devEUI, id, ttnpb.SessionKeysFieldPathsTopLevel, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) { return nil, nil, nil })
 	return err
 }
 
 func CreateKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, ks *ttnpb.SessionKeys) (*ttnpb.SessionKeys, error) {
-	if devEUI.IsZero() || ks.SessionKeyID == "" {
+	if devEUI.IsZero() || len(ks.SessionKeyID) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 	ks, err := r.SetByID(ctx, devEUI, ks.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel, func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {

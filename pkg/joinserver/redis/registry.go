@@ -153,24 +153,24 @@ type KeyRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id string, paths []string) (*ttnpb.SessionKeys, error) {
-	if devEUI.IsZero() || id == "" {
+func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 
 	pb := &ttnpb.SessionKeys{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(devEUI.String(), id)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(devEUI.String(), string(id))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyKeyFieldMask(&ttnpb.SessionKeys{}, pb, paths...)
 }
 
-func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id string, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
-	if devEUI.IsZero() || id == "" {
+func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
+	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 
-	k := r.Redis.Key(devEUI.String(), id)
+	k := r.Redis.Key(devEUI.String(), string(id))
 
 	var pb *ttnpb.SessionKeys
 	err := r.Redis.Watch(func(tx *redis.Tx) error {

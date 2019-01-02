@@ -186,7 +186,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							SessionKeyID:   "testKeyID",
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
@@ -511,7 +511,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							SessionKeyID:   "testKeyID",
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
@@ -931,7 +931,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							SessionKeyID:   "testKeyID",
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
@@ -1235,7 +1235,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							SessionKeyID:   "testKeyID",
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 							FPort:          1,
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),

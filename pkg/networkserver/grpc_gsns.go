@@ -517,7 +517,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				storedSes = stored.PendingSession
 			}
 
-			if storedSes.GetSessionKeyID() != ses.SessionKeyID {
+			if !bytes.Equal(storedSes.GetSessionKeyID(), ses.SessionKeyID) {
 				logger.Warn("Device changed session during uplink handling, dropping...")
 				handleErr = true
 				return nil, nil, errOutdatedData

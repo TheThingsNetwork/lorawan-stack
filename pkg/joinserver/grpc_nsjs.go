@@ -266,7 +266,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				res = &ttnpb.JoinResponse{
 					RawPayload: append(b[:1], enc...),
 					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: skID.String(),
+						SessionKeyID: skID[:],
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 							Key:      keyToBytes(crypto.DeriveFNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
@@ -305,10 +305,11 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				if err != nil {
 					return nil, nil, errEncryptPayload.WithCause(err)
 				}
+
 				res = &ttnpb.JoinResponse{
 					RawPayload: append(b[:1], enc...),
 					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: skID.String(),
+						SessionKeyID: skID[:],
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 							Key:      keyToBytes(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),

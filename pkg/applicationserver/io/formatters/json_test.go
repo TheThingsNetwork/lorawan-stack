@@ -43,7 +43,7 @@ func TestJSONUpstream(t *testing.T) {
 				},
 				Up: &ttnpb.ApplicationUp_UplinkMessage{
 					UplinkMessage: &ttnpb.ApplicationUplink{
-						SessionKeyID: "test",
+						SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 						FPort:        42,
 						FCnt:         42,
 						FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -59,7 +59,7 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"test","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{}}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"ESIzRA==","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{}}}`,
 		},
 		{
 			Message: &ttnpb.ApplicationUp{
@@ -71,13 +71,13 @@ func TestJSONUpstream(t *testing.T) {
 				},
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
-						SessionKeyID:     "test",
+						SessionKeyID:     []byte{0x11, 0x22, 0x33, 0x44},
 						PendingSession:   false,
 						SessionStartedAt: time.Date(2018, 11, 27, 15, 12, 0, 0, time.UTC),
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"test","session_started_at":"2018-11-27T15:12:00Z"}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA==","session_started_at":"2018-11-27T15:12:00Z"}}`,
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {

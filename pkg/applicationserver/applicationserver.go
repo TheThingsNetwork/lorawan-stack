@@ -15,6 +15,7 @@
 package applicationserver
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net"
@@ -319,7 +320,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 
 var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
-func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID string) (ttnpb.KeyEnvelope, error) {
+func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
 	// TODO: Lookup Join Server (https://github.com/TheThingsIndustries/lorawan-stack/issues/244)
 	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
 	if js == nil {
@@ -441,10 +442,10 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			if dev.Session == nil || dev.Session.SessionKeyID != uplink.SessionKeyID {
+			if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, uplink.SessionKeyID) {
 				logger := logger.WithField("session_key_id", uplink.SessionKeyID)
 				previousSession := dev.Session
-				if dev.PendingSession != nil && dev.PendingSession.SessionKeyID == uplink.SessionKeyID {
+				if dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, uplink.SessionKeyID) {
 					logger.Debug("Switching to pending session")
 					dev.Session = dev.PendingSession
 				} else {
@@ -558,7 +559,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	if err != nil {
 		return err
 	}
-	if dev.Session == nil || dev.Session.SessionKeyID != msg.SessionKeyID || dev.Session.AppSKey == nil {
+	if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID) || dev.Session.AppSKey == nil {
 		return errNoAppSKey
 	}
 	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
@@ -618,7 +619,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		))
 		var oldSession *ttnpb.Session
 		for _, s := range []*ttnpb.Session{previousSession, dev.Session} {
-			if s != nil && s.SessionKeyID == oldItem.SessionKeyID {
+			if s != nil && bytes.Equal(s.SessionKeyID, oldItem.SessionKeyID) {
 				oldSession = s
 				break
 			}
