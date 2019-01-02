@@ -485,7 +485,7 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			if src != nil {
 				dst.SessionKeyID = src.SessionKeyID
 			} else {
-				var zero string
+				var zero []byte
 				dst.SessionKeyID = zero
 			}
 		case "f_port":
@@ -655,7 +655,7 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 			if src != nil {
 				dst.SessionKeyID = src.SessionKeyID
 			} else {
-				var zero string
+				var zero []byte
 				dst.SessionKeyID = zero
 			}
 		case "app_s_key":
@@ -752,7 +752,7 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 			if src != nil {
 				dst.SessionKeyID = src.SessionKeyID
 			} else {
-				var zero string
+				var zero []byte
 				dst.SessionKeyID = zero
 			}
 		case "f_port":

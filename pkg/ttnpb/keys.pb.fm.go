@@ -158,7 +158,7 @@ func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
 			if src != nil {
 				dst.SessionKeyID = src.SessionKeyID
 			} else {
-				var zero string
+				var zero []byte
 				dst.SessionKeyID = zero
 			}
 		case "f_nwk_s_int_key":

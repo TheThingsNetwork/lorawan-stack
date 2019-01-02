@@ -2937,7 +2937,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| session_key_id | [string](#string) |  | Join Server issued identifier for the session keys. |
+| session_key_id | [bytes](#bytes) |  | Join Server issued identifier for the session keys. |
 | dev_eui | [bytes](#bytes) |  | LoRaWAN DevEUI. |
 
 
@@ -3037,7 +3037,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| session_key_id | [string](#string) |  | Join Server issued identifier for the session keys. This ID can be used to request the keys from the Join Server in case the are lost. |
+| session_key_id | [bytes](#bytes) |  | Join Server issued identifier for the session keys. This ID can be used to request the keys from the Join Server in case the are lost. |
 | f_nwk_s_int_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode). This key is stored by the (forwarding) Network Server. |
 | s_nwk_s_int_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Serving Network Session Integrity Key. This key is stored by the (serving) Network Server. |
 | nwk_s_enc_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Network Session Encryption Key. This key is stored by the (serving) Network Server. |
@@ -4399,7 +4399,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| session_key_id | [string](#string) |  | Join Server issued identifier for the session keys used by this downlink. |
+| session_key_id | [bytes](#bytes) |  | Join Server issued identifier for the session keys used by this downlink. |
 | f_port | [uint32](#uint32) |  |  |
 | f_cnt | [uint32](#uint32) |  |  |
 | frm_payload | [bytes](#bytes) |  |  |
@@ -4485,7 +4485,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| session_key_id | [string](#string) |  | Join Server issued identifier for the session keys negotiated in this join. |
+| session_key_id | [bytes](#bytes) |  | Join Server issued identifier for the session keys negotiated in this join. |
 | app_s_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | Encrypted Application Session Key (if Join Server sent it to Network Server). |
 | invalidated_downlinks | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) | repeated | Downlink messages in the queue that got invalidated because of the session change. |
 | pending_session | [bool](#bool) |  | Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a rejoin-request. |
@@ -4562,7 +4562,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| session_key_id | [string](#string) |  | Join Server issued identifier for the session keys used by this uplink. |
+| session_key_id | [bytes](#bytes) |  | Join Server issued identifier for the session keys used by this uplink. |
 | f_port | [uint32](#uint32) |  |  |
 | f_cnt | [uint32](#uint32) |  |  |
 | frm_payload | [bytes](#bytes) |  |  |

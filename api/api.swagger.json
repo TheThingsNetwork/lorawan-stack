@@ -5153,6 +5153,7 @@
       "properties": {
         "session_key_id": {
           "type": "string",
+          "format": "byte",
           "description": "Join Server issued identifier for the session keys used by this downlink."
         },
         "f_port": {
@@ -5240,6 +5241,7 @@
       "properties": {
         "session_key_id": {
           "type": "string",
+          "format": "byte",
           "description": "Join Server issued identifier for the session keys negotiated in this join."
         },
         "app_s_key": {
@@ -5349,6 +5351,7 @@
       "properties": {
         "session_key_id": {
           "type": "string",
+          "format": "byte",
           "description": "Join Server issued identifier for the session keys used by this uplink."
         },
         "f_port": {
@@ -7899,6 +7902,7 @@
       "properties": {
         "session_key_id": {
           "type": "string",
+          "format": "byte",
           "description": "Join Server issued identifier for the session keys.\nThis ID can be used to request the keys from the Join Server in case the are lost."
         },
         "f_nwk_s_int_key": {

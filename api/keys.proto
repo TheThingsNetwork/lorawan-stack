@@ -45,7 +45,7 @@ message SessionKeys {
 
   // Join Server issued identifier for the session keys.
   // This ID can be used to request the keys from the Join Server in case the are lost.
-  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
+  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
   // This key is stored by the (forwarding) Network Server.
   KeyEnvelope f_nwk_s_int_key = 2;

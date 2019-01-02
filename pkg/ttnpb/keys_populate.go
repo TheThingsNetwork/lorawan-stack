@@ -16,7 +16,7 @@ package ttnpb
 
 func NewPopulatedSessionKeys(r randyKeys, easy bool) *SessionKeys {
 	out := &SessionKeys{}
-	out.SessionKeyID = randStringKeys(r)
+	out.SessionKeyID = []byte(randStringKeys(r))
 	out.FNwkSIntKey = NewPopulatedKeyEnvelope(r, easy)
 	out.SNwkSIntKey = NewPopulatedKeyEnvelope(r, easy)
 	out.NwkSEncKey = NewPopulatedKeyEnvelope(r, easy)

@@ -27,7 +27,7 @@ func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string)
 			if src != nil {
 				dst.SessionKeyID = src.SessionKeyID
 			} else {
-				var zero string
+				var zero []byte
 				dst.SessionKeyID = zero
 			}
 		case "dev_eui":
