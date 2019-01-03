@@ -380,8 +380,10 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		case <-healthCheck.C:
 			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 			if time.Since(lastSeenPull) > s.config.DownlinkPathExpires {
-				logger.Debug("Downlink path expired")
-				s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
+				logger.Warn("Downlink path expired")
+				if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+					logger.WithError(err).Error("Failed to unclaim downlink")
+				}
 				state.lastDownlinkPath.Store(downlinkPath{})
 				state.startHandleDownMu.Lock()
 				state.startHandleDown = &sync.Once{}
