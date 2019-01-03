@@ -38,6 +38,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.0.4 // indirect
 	github.com/goreleaser/goreleaser v0.103.1
 	github.com/gorilla/securecookie v1.1.1
+	github.com/gorilla/websocket v1.4.0
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
 	github.com/gotnospirit/messageformat v0.0.0-20180622080451-0eab1176a3fb
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
@@ -60,6 +61,7 @@ require (
 	github.com/jinzhu/now v1.0.0 // indirect
 	github.com/kamilsk/retry/v4 v4.0.2 // indirect
 	github.com/kr/pretty v0.1.0
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.0.0
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.0.0

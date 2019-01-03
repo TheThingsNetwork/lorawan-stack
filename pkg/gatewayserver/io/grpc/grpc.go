@@ -38,6 +38,9 @@ func New(server io.Server) ttnpb.GtwGsServer {
 	return &impl{server}
 }
 
+func (*impl) Protocol() string   { return "grpc" }
+func (*impl) HasScheduler() bool { return false }
+
 var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
 
 // LinkGateway links the gateway to the Gateway Server.
@@ -64,7 +67,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
-	conn, err := s.server.Connect(ctx, "grpc", ids)
+	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)

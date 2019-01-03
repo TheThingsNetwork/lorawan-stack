@@ -235,14 +235,17 @@ var (
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
-func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 
 	uid := unique.ID(ctx, ids)
-	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"protocol", frontend.Protocol(),
+		"gateway_uid", uid,
+	))
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_conn:%s", events.NewCorrelationID()))
 
 	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
 	if er == nil {
@@ -289,12 +292,16 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	if err != nil {
 		return nil, err
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle)
-	if err != nil {
-		return nil, err
+	var scheduler *scheduling.Scheduler
+	if !frontend.HasScheduler() {
+		var err error
+		scheduler, err = scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	conn := io.NewConnection(ctx, protocol, gtw, fp, scheduler)
+	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
 	gs.connections.Store(uid, conn)
 	registerGatewayConnect(ctx, ids)
 	logger.Info("Connected")
