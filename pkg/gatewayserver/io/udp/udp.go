@@ -76,6 +76,9 @@ type srv struct {
 	firewall    Firewall
 }
 
+func (*srv) Protocol() string   { return "udp" }
+func (*srv) HasScheduler() bool { return false }
+
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/udp")
@@ -212,7 +215,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				},
 			},
 		})
-		io, err = s.server.Connect(ctx, "udp", ids)
+		io, err = s.server.Connect(ctx, s, ids)
 		if err != nil {
 			return nil, err
 		}
