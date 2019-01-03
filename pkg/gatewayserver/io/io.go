@@ -34,13 +34,23 @@ const (
 	maxRTTs    = 1 << 5
 )
 
+// Frontend provides supported features by the gateway frontend.
+type Frontend interface {
+	// Protocol returns the protocol used in the frontend.
+	Protocol() string
+	// HasScheduler indicates whether the gateway has a scheduler.
+	// If so, downlink requests are sent to the gateway.
+	// If not, the Gateway Server scheduler schedules the request, and the transmission settings are sent to the gateway.
+	HasScheduler() bool
+}
+
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
 	// FillGatewayContext fills the given context and identifiers.
 	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
-	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*Connection, error)
+	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
 	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
@@ -295,15 +305,8 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			settings := ttnpb.TxSettings{
 				DataRateIndex: rx.dataRateIndex,
 				Frequency:     rx.frequency,
-<<<<<<< HEAD
 				Downlink: &ttnpb.TxSettings_Downlink{
 					TxPower:      eirp,
-=======
-				TxPower:       eirp,
-				RequestInfo: &ttnpb.RequestInfo{
-					RxWindow:     uint32(i),
-					Class:        request.Class,
->>>>>>> gs: Add values to TxSettings.Scheduled
 					AntennaIndex: ids.AntennaIndex,
 				},
 			}
