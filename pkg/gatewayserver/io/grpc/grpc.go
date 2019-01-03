@@ -69,12 +69,15 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)
 	}
-	logger.Info("Connected")
-	defer logger.Info("Disconnected")
 	if err = s.server.ClaimDownlink(ctx, ids); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink")
 		return
 	}
+	defer func() {
+		if err := s.server.UnclaimDownlink(ctx, ids); err != nil {
+			logger.WithError(err).Error("Failed to unclaim downlink")
+		}
+	}()
 
 	go func() {
 		for {
