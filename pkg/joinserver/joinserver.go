@@ -81,6 +81,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
 
+	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsIndustries/lorawan-stack/issues/244).
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 
