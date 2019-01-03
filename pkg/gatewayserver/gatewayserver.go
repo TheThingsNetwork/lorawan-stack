@@ -25,6 +25,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -37,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
@@ -139,6 +141,8 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 			mqtt.Start(ctx, gs, netLis, version.Format, lis.Protocol)
 		}
 	}
+
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(gs)
 	return gs, nil
