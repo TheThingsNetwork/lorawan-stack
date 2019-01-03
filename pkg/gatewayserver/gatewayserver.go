@@ -351,10 +351,19 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 		GatewayIdentifiers: ids,
 		FieldMask:          types.FieldMask{Paths: []string{"frequency_plan_id"}},
 	}, callOpts...)
-	if err != nil {
+	var fpID string
+	if err == nil {
+		fpID = gtw.FrequencyPlanID
+	} else if errors.IsNotFound(err) {
+		var ok bool
+		fpID, ok = frequencyplans.FallbackIDFromContext(ctx)
+		if !ok {
+			return nil, err
+		}
+	} else {
 		return nil, err
 	}
-	return gs.FrequencyPlans.GetByID(gtw.FrequencyPlanID)
+	return gs.FrequencyPlans.GetByID(fpID)
 }
 
 // ClaimDownlink claims the downlink path for the given gateway.
