@@ -64,8 +64,10 @@ type DataRate struct {
 type Channel struct {
 	// Frequency indicates the frequency of the channel.
 	Frequency uint64
-	// DataRateIndexes indicates the data rates accepted on this channel.
-	DataRateIndexes []int
+	// MinDataRate indicates the index of the minimal data rates accepted on this channel.
+	MinDataRate ttnpb.DataRateIndex
+	// MinDataRate indicates the index of the maximal data rates accepted on this channel.
+	MaxDataRate ttnpb.DataRateIndex
 }
 
 // Rx2Parameters contains downlink datarate index and channel.

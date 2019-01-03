@@ -97,13 +97,9 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(band.UplinkChannels)), float64(len(fp.UplinkChannels)))))
 
 	for i, upCh := range band.UplinkChannels {
-		if len(upCh.DataRateIndexes) == 0 {
-			panic(fmt.Sprintf("no uplink data rates defined for channel %d", i))
-		}
-
 		ch := &ttnpb.MACParameters_Channel{
-			MinDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[0]),
-			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.DataRateIndexes[len(upCh.DataRateIndexes)-1]),
+			MinDataRateIndex: upCh.MinDataRate,
+			MaxDataRateIndex: upCh.MaxDataRate,
 			UplinkFrequency:  upCh.Frequency,
 			EnableUplink:     true,
 		}

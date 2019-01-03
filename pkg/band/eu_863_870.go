@@ -26,9 +26,9 @@ const EU_863_870 = "EU_863_870"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 868100000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 868300000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 868500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 868100000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 868300000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 868500000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	euBeaconChannel := uint32(869525000)
 	eu_863_870 = Band{

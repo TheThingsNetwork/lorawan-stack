@@ -26,8 +26,8 @@ const AS_923 = "AS_923"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 923200000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 923400000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 923200000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 923400000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	asBeaconChannel := uint32(923400000)
 	as_923 = Band{

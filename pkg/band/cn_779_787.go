@@ -26,12 +26,12 @@ const CN_779_787 = "CN_779_787"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 779500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 779500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 779900000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 780500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 780700000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 780900000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 779500000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 779500000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 779900000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 780500000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 780700000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 780900000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	cnBeaconChannel := uint32(785000000)
 	cn_779_787 = Band{

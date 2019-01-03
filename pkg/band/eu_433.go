@@ -26,9 +26,9 @@ const EU_433 = "EU_433"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 433175000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 433375000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 433575000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 433175000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 433375000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 433575000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	eu433BeaconChannel := uint32(434655000)
 	eu_433 = Band{

@@ -28,22 +28,25 @@ func init() {
 	uplinkChannels := make([]Channel, 0, 72)
 	for i := 0; i < 64; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
-			Frequency:       uint64(915200000 + 200000*i),
-			DataRateIndexes: []int{0, 1, 2, 3},
+			Frequency:   uint64(915200000 + 200000*i),
+			MinDataRate: 0,
+			MaxDataRate: 3,
 		})
 	}
 	for i := 0; i < 8; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
-			Frequency:       uint64(915900000 + 1600000*i),
-			DataRateIndexes: []int{4},
+			Frequency:   uint64(915900000 + 1600000*i),
+			MinDataRate: 4,
+			MaxDataRate: 4,
 		})
 	}
 
 	downlinkChannels := make([]Channel, 0, 8)
 	for i := 0; i < 8; i++ {
 		downlinkChannels = append(downlinkChannels, Channel{
-			Frequency:       uint64(923300000 + 600000*i),
-			DataRateIndexes: []int{8, 9, 10, 11, 12, 13},
+			Frequency:   uint64(923300000 + 600000*i),
+			MinDataRate: 8,
+			MaxDataRate: 13,
 		})
 	}
 

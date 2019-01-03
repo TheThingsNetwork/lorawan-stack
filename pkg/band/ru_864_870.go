@@ -26,8 +26,8 @@ const RU_864_870 = "RU_864_870"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 868900000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 869100000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 868900000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 869100000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	ru_864_870 = Band{
 		ID: RU_864_870,

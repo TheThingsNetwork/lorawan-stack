@@ -26,9 +26,9 @@ const KR_920_923 = "KR_920_923"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 922100000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 922300000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 922500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 922100000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 922300000, MinDataRate: 0, MaxDataRate: 5},
+		{Frequency: 922500000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	krBeaconChannel := uint32(923100000)
 	kr_920_923 = Band{
