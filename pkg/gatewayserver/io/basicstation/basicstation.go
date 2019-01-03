@@ -36,6 +36,9 @@ type srv struct {
 	upgrader *websocket.Upgrader
 }
 
+func (*srv) Protocol() string   { return "basicstation" }
+func (*srv) HasScheduler() bool { return true }
+
 // New returns a new Basic Station frontend that can be registered in the web server.
 func New(ctx context.Context, server io.Server) web.Registerer {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
@@ -139,7 +142,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			},
 		},
 	})
-	conn, err := s.server.Connect(ctx, "basicstation", ids)
+	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return err

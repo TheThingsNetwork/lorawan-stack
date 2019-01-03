@@ -30,18 +30,21 @@ type Frontend struct {
 	Down   chan *ttnpb.DownlinkMessage
 }
 
+func (*Frontend) Protocol() string   { return "mock" }
+func (*Frontend) HasScheduler() bool { return false }
+
 // ConnectFrontend connects a new mock front-end to the given server.
 // The gateway time starts at Unix epoch.
 func ConnectFrontend(ctx context.Context, ids ttnpb.GatewayIdentifiers, server io.Server) (*Frontend, error) {
-	conn, err := server.Connect(ctx, "mock", ids)
-	if err != nil {
-		return nil, err
-	}
 	f := &Frontend{
 		Up:     make(chan *ttnpb.UplinkMessage, 1),
 		Status: make(chan *ttnpb.GatewayStatus, 1),
 		TxAck:  make(chan *ttnpb.TxAcknowledgment, 1),
 		Down:   make(chan *ttnpb.DownlinkMessage, 1),
+	}
+	conn, err := server.Connect(ctx, f, ids)
+	if err != nil {
+		return nil, err
 	}
 	started := time.Now()
 	go func() {
