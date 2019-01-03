@@ -32,8 +32,9 @@ type DiscoverResponse struct {
 }
 
 const (
-	TypeVersion    = "version"
-	TypeRouterInfo = "router_config"
+	TypeVersion      = "version"
+	TypeRouterConfig = "router_config"
+	TypeJoinRequest  = "jreq"
 )
 
 // Type returns the message type of the given data.
