@@ -361,7 +361,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if dev.RecentUplinks[i].Payload.GetMACPayload().FHDR.FCtrl.ADR {
 							upDR = dev.RecentUplinks[i].Settings.DataRateIndex
 						}
-						maxUpLength = band.DataRates[upDR].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks())
+						maxUpLength = band.DataRates[upDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 						break
 					}
 				}
@@ -406,7 +406,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						rxDev = deepcopy.Copy(dev).(*ttnpb.EndDevice)
 						rx1Delay = rxDev.MACState.CurrentParameters.Rx1Delay
 						rx1Payload, err = generateDownlink(ctx, rxDev,
-							band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+							band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 							ns.Component.FrequencyPlans,
 						)
@@ -476,7 +476,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if up.Payload.MHDR.MType != ttnpb.MType_JOIN_REQUEST && up.Payload.MHDR.MType != ttnpb.MType_REJOIN_REQUEST {
 						rxDev = deepcopy.Copy(dev).(*ttnpb.EndDevice)
 						rx2Payload, err = generateDownlink(ctx, rxDev,
-							band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+							band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 							ns.Component.FrequencyPlans,
 						)
@@ -542,7 +542,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					// Class C Rx2
 
 					b, err := generateDownlink(ctx, dev,
-						band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
+						band.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						maxUpLength,
 						ns.Component.FrequencyPlans,
 					)

@@ -48,14 +48,14 @@ func init() {
 		},
 
 		DataRates: [16]DataRate{
-			{Rate: types.DataRate{LoRa: "SF12BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 0}, NoRepeaterMaxSize: dwellTimePayloadSize{59, 0}},
-			{Rate: types.DataRate{LoRa: "SF11BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 0}, NoRepeaterMaxSize: dwellTimePayloadSize{59, 0}},
-			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 19}, NoRepeaterMaxSize: dwellTimePayloadSize{59, 19}},
-			{Rate: types.DataRate{LoRa: "SF9BW125"}, DefaultMaxSize: dwellTimePayloadSize{123, 61}, NoRepeaterMaxSize: dwellTimePayloadSize{123, 61}},
-			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: dwellTimePayloadSize{230, 133}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 133}},
-			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
-			{Rate: types.DataRate{LoRa: "SF7BW250"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
-			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
+			{Rate: types.DataRate{LoRa: "SF12BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 0}},
+			{Rate: types.DataRate{LoRa: "SF11BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 0}},
+			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 19}},
+			{Rate: types.DataRate{LoRa: "SF9BW125"}, DefaultMaxSize: dwellTimePayloadSize{123, 61}},
+			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: dwellTimePayloadSize{230, 133}},
+			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}},
+			{Rate: types.DataRate{LoRa: "SF7BW250"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}},
+			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: dwellTimePayloadSize{230, 250}},
 			{}, {}, {}, {}, {}, {}, {}, // RFU
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},

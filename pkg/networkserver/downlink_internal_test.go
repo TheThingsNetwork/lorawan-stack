@@ -261,8 +261,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 				rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					ns.Component.FrequencyPlans,
 				)).([]byte)
 
@@ -321,8 +321,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 				rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					ns.Component.FrequencyPlans,
 				)).([]byte)
 
@@ -584,8 +584,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx2Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					ns.Component.FrequencyPlans,
 				)).([]byte)
 
@@ -646,13 +646,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 					rx1Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 						ns.Component.FrequencyPlans,
 					)).([]byte)
 					rx2Payload := test.Must(GenerateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(true, fp.DwellTime.GetUplinks()),
+						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 						ns.Component.FrequencyPlans,
 					)).([]byte)
 

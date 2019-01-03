@@ -26,19 +26,15 @@ import (
 
 // PayloadSizer abstracts the acceptable payload size depending on contextual parameters.
 type PayloadSizer interface {
-	PayloadSize(emptyFOpt, dwellTime bool) uint16
+	PayloadSize(dwellTime bool) uint16
 }
 
 type maxPayloadSize struct {
-	EmptyFOpt    uint16
-	NotEmptyFOpt uint16
+	uint16
 }
 
-func (p maxPayloadSize) PayloadSize(emptyFOpt, _ bool) uint16 {
-	if emptyFOpt {
-		return p.EmptyFOpt
-	}
-	return p.NotEmptyFOpt
+func (p maxPayloadSize) PayloadSize(_ bool) uint16 {
+	return p.uint16
 }
 
 type dwellTimePayloadSize struct {
@@ -46,7 +42,7 @@ type dwellTimePayloadSize struct {
 	DwellTime   uint16
 }
 
-func (p dwellTimePayloadSize) PayloadSize(_, dwellTime bool) uint16 {
+func (p dwellTimePayloadSize) PayloadSize(dwellTime bool) uint16 {
 	if dwellTime {
 		return p.DwellTime
 	}
@@ -55,9 +51,8 @@ func (p dwellTimePayloadSize) PayloadSize(_, dwellTime bool) uint16 {
 
 // DataRate indicates the properties of a band's data rate.
 type DataRate struct {
-	Rate              types.DataRate
-	DefaultMaxSize    PayloadSizer
-	NoRepeaterMaxSize PayloadSizer
+	Rate           types.DataRate
+	DefaultMaxSize PayloadSizer
 }
 
 // Channel abstracts a band's channel properties.

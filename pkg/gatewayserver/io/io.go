@@ -253,7 +253,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				return errDataRate.WithAttributes("index", rx.dataRateIndex)
 			}
 			// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-			maxPHYLength := band.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(true, c.fp.DwellTime.GetDownlinks()) + 5
+			maxPHYLength := band.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
 			if len(msg.RawPayload) > int(maxPHYLength) {
 				return errTooLong.WithAttributes(
 					"payload_length", len(msg.RawPayload),
