@@ -208,14 +208,20 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+	logger := log.FromContext(ctx)
 	c.io, err = c.server.Connect(ctx, "mqtt", ids)
 	if err != nil {
 		return nil, err
 	}
 	if err = c.server.ClaimDownlink(ctx, ids); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to claim downlink")
+		logger.WithError(err).Error("Failed to claim downlink")
 		return nil, err
 	}
+	defer func() {
+		if err := c.server.UnclaimDownlink(ctx, ids); err != nil {
+			logger.WithError(err).Error("Failed to unclaim downlink")
+		}
+	}()
 
 	access := topicAccess{
 		gtwUID: uid,
