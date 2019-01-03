@@ -38,9 +38,13 @@ import (
 )
 
 var (
+<<<<<<< HEAD
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
+=======
+	registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+>>>>>>> gs: Remove obsolete testing variables in UDP frontend
 
 	timeout = (1 << 4) * test.Delay
 
