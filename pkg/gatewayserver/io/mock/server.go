@@ -75,7 +75,7 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 }
 
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *server) Connect(ctx context.Context, protocol string, ids ttnpb.Gateway
 	if err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, protocol, gtw, fp, scheduler)
+	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
 	s.connections[unique.ID(ctx, ids)] = conn
 	select {
 	case s.connectionsCh <- conn:

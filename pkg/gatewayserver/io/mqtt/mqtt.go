@@ -86,6 +86,9 @@ type connection struct {
 	io      *io.Connection
 }
 
+func (*connection) Protocol() string   { return "mqtt" }
+func (*connection) HasScheduler() bool { return false }
+
 func (c *connection) setup(ctx context.Context) error {
 	ctx = auth.NewContextWithInterface(ctx, c)
 	c.session = session.New(ctx, c.mqtt, c.deliver)
@@ -208,7 +211,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
-	c.io, err = c.server.Connect(ctx, "mqtt", ids)
+	c.io, err = c.server.Connect(ctx, c, ids)
 	if err != nil {
 		return nil, err
 	}
