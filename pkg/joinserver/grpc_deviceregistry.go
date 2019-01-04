@@ -28,6 +28,12 @@ type jsEndDeviceRegistryServer struct {
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
+	if req.JoinEUI == nil || req.JoinEUI.IsZero() {
+		return nil, errNoJoinEUI
+	}
+	if req.DevEUI == nil || req.DevEUI.IsZero() {
+		return nil, errNoDevEUI
+	}
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
@@ -42,6 +48,12 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if req.Device.JoinEUI == nil || req.Device.JoinEUI.IsZero() {
+		return nil, errNoJoinEUI
+	}
+	if req.Device.DevEUI == nil || req.Device.DevEUI.IsZero() {
+		return nil, errNoDevEUI
+	}
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -58,10 +70,15 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
+		return nil, errNoJoinEUI
+	}
+	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
+		return nil, errNoDevEUI
+	}
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	// TODO: How do we enforce that JoinEUI and DevEUI are set here?
 	_, err := s.Registry.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return nil, nil, nil
 	})
