@@ -22,15 +22,18 @@ import (
 
 type tKey struct{}
 
-// ContextWithT saves the test state in the context.
+// ContextWithT saves the testing.T in the context.
 func ContextWithT(ctx context.Context, t *testing.T) context.Context {
 	return context.WithValue(ctx, tKey{}, t)
 }
 
-// TFromContext returns the test state from the context.
+// TFromContext returns the testing.T saved using ContextWithT from the context.
 func TFromContext(ctx context.Context) (*testing.T, bool) {
 	t, ok := ctx.Value(tKey{}).(*testing.T)
-	return t, ok
+	if !ok {
+		return nil, false
+	}
+	return t, true
 }
 
 // MustTFromContext returns the test state from the context, and panics if it was not saved in the context.

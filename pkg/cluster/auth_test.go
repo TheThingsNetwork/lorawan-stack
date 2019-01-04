@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cluster
+package cluster_test
 
 import (
 	"encoding/hex"
@@ -22,6 +22,8 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	. "go.thethings.network/lorawan-stack/pkg/cluster"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -31,12 +33,18 @@ import (
 func TestVerifySource(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
+	a := assertions.New(t)
+
 	key := []byte{0x2A, 0x9C, 0x2C, 0x3C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C}
 
-	c := cluster{
-		self: &peer{name: "self"},
-		keys: [][]byte{key},
-	}
+	c, err := New(ctx, &config.ServiceBase{
+		Cluster: config.Cluster{
+			Keys: []string{
+				hex.EncodeToString(key),
+			},
+		},
+	})
+	a.So(err, should.BeNil)
 
 	t.Run("empty secret", func(t *testing.T) {
 		a := assertions.New(t)
