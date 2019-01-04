@@ -77,42 +77,49 @@ func TestHandleJoin(t *testing.T) {
 		)).(*JoinServer),
 	}
 
+	// Invalid payload.
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
 	res, err := js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
+	// No DevAddr.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.EndDeviceIdentifiers.DevAddr = nil
 	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
+	// No payload.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
 	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
+	// JoinEUI out of range.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
 	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
+	// Empty JoinEUI.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{}
 	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
+	// Empty DevEUI.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().DevEUI = types.EUI64{}
 	res, err = js.HandleJoin(authorizedCtx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
+	// Random payload is invalid.
 	res, err = js.HandleJoin(authorizedCtx, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
