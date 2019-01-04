@@ -77,7 +77,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropyMu: &sync.Mutex{},
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
-	js.grpc.jsDevices = jsEndDeviceRegistryServer{JS: js}
+	js.grpc.jsDevices = jsEndDeviceRegistryServer{Registry: js.devices}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
 
