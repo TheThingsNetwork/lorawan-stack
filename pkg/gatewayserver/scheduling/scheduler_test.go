@@ -319,7 +319,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)
+		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay>>6)
 	}
 
 	// Timestamp; too late (100 ms).
