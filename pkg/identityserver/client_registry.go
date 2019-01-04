@@ -108,7 +108,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		return nil, err
 	}
 	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
-		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicClientFields) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicClientFields...) {
 			defer func() { cli = cli.PublicSafe() }()
 		} else {
 			return nil, err
@@ -119,7 +119,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cli.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, cli.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -216,7 +216,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
 
-	if hasField(req.FieldMask.Paths, "grants") && !updatedByAdmin {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "grants") && !updatedByAdmin {
 		return nil, errUpdateClientAdminField.WithAttributes("field", "grants")
 	}
 
@@ -225,7 +225,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

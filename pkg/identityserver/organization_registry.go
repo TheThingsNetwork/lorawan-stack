@@ -82,7 +82,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 		return nil, err
 	}
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO); err != nil {
-		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicOrganizationFields) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicOrganizationFields...) {
 			defer func() { org = org.PublicSafe() }()
 		} else {
 			return nil, err
@@ -93,7 +93,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			org.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, org.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -187,7 +187,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

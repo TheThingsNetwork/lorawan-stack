@@ -81,7 +81,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		return nil, err
 	}
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
-		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicGatewayFields) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicGatewayFields...) {
 			defer func() { gtw = gtw.PublicSafe() }()
 		} else {
 			return nil, err
@@ -92,7 +92,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			gtw.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, gtw.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -188,7 +188,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			gtw.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, gtw.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {

@@ -81,7 +81,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 		return nil, err
 	}
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
-		if hasOnlyAllowedFields(topLevelFields(req.FieldMask.Paths), ttnpb.PublicApplicationFields) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicApplicationFields...) {
 			defer func() { app = app.PublicSafe() }()
 		} else {
 			return nil, err
@@ -92,7 +92,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			app.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, app.EntityIdentifiers())
 			if err != nil {
 				return err
@@ -188,7 +188,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		if err != nil {
 			return err
 		}
-		if hasField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {
