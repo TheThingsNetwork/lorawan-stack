@@ -16,6 +16,7 @@ package redis
 
 import (
 	"context"
+	"encoding/base64"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -159,7 +160,7 @@ func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte
 	}
 
 	pb := &ttnpb.SessionKeys{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(devEUI.String(), string(id))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(devEUI.String(), base64.RawStdEncoding.EncodeToString(id))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyKeyFieldMask(&ttnpb.SessionKeys{}, pb, paths...)
@@ -170,7 +171,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		return nil, errInvalidIdentifiers
 	}
 
-	k := r.Redis.Key(devEUI.String(), string(id))
+	k := r.Redis.Key(devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
 
 	var pb *ttnpb.SessionKeys
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
