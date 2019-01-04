@@ -21,6 +21,7 @@ import "google/protobuf/empty.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/join.proto";
+import "lorawan-stack/api/lorawan.proto";
 import "lorawan-stack/api/keys.proto";
 
 package ttn.lorawan.v3;
@@ -57,6 +58,44 @@ message AppSKeyResponse {
 // The AsJs service connects an Application Server to a Join Server.
 service AsJs {
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
+}
+
+message CryptoServicePayloadRequest {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
+  bytes payload = 3;
+}
+
+message CryptoServicePayloadResponse {
+  bytes payload = 1;
+}
+
+message JoinAcceptMICRequest {
+  CryptoServicePayloadRequest payload_request = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  uint32 join_request_type = 2;
+  bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevNonce"];
+}
+
+message DeriveSessionKeysRequest {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
+  bytes join_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.JoinNonce"];
+  bytes dev_nonce = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevNonce"];
+  bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
+}
+
+// Service for network layer cryptographic operations.
+service NetworkCryptoService {
+  rpc JoinRequestMIC(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
+  rpc JoinAcceptMIC(JoinAcceptMICRequest) returns (CryptoServicePayloadResponse);
+  rpc EncryptJoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
+  rpc EncryptRejoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
+  rpc DeriveNwkSKeys(DeriveSessionKeysRequest) returns (NwkSKeysResponse);
+}
+
+// Service for application layer cryptographic operations.
+service ApplicationCryptoService {
+  rpc DeriveAppSKey(DeriveSessionKeysRequest) returns (AppSKeyResponse);
 }
 
 // The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.

@@ -41,3 +41,24 @@ func (this *AppSKeyResponse) Validate() error {
 	}
 	return nil
 }
+func (this *CryptoServicePayloadRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIdentifiers", err)
+	}
+	return nil
+}
+func (this *CryptoServicePayloadResponse) Validate() error {
+	return nil
+}
+func (this *JoinAcceptMICRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.CryptoServicePayloadRequest)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("CryptoServicePayloadRequest", err)
+	}
+	return nil
+}
+func (this *DeriveSessionKeysRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIdentifiers", err)
+	}
+	return nil
+}

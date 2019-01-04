@@ -51,7 +51,7 @@ type SessionKeyRequest struct {
 func (m *SessionKeyRequest) Reset()      { *m = SessionKeyRequest{} }
 func (*SessionKeyRequest) ProtoMessage() {}
 func (*SessionKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_a35d3a300f6dd1ab, []int{0}
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{0}
 }
 func (m *SessionKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -101,7 +101,7 @@ type NwkSKeysResponse struct {
 func (m *NwkSKeysResponse) Reset()      { *m = NwkSKeysResponse{} }
 func (*NwkSKeysResponse) ProtoMessage() {}
 func (*NwkSKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_a35d3a300f6dd1ab, []int{1}
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{1}
 }
 func (m *NwkSKeysResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -161,7 +161,7 @@ type AppSKeyResponse struct {
 func (m *AppSKeyResponse) Reset()      { *m = AppSKeyResponse{} }
 func (*AppSKeyResponse) ProtoMessage() {}
 func (*AppSKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_a35d3a300f6dd1ab, []int{2}
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{2}
 }
 func (m *AppSKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -197,6 +197,201 @@ func (m *AppSKeyResponse) GetAppSKey() KeyEnvelope {
 	return KeyEnvelope{}
 }
 
+type CryptoServicePayloadRequest struct {
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	LoRaWANVersion       MACVersion `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
+	Payload              []byte     `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *CryptoServicePayloadRequest) Reset()      { *m = CryptoServicePayloadRequest{} }
+func (*CryptoServicePayloadRequest) ProtoMessage() {}
+func (*CryptoServicePayloadRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{3}
+}
+func (m *CryptoServicePayloadRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CryptoServicePayloadRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CryptoServicePayloadRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *CryptoServicePayloadRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CryptoServicePayloadRequest.Merge(dst, src)
+}
+func (m *CryptoServicePayloadRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *CryptoServicePayloadRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CryptoServicePayloadRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CryptoServicePayloadRequest proto.InternalMessageInfo
+
+func (m *CryptoServicePayloadRequest) GetLoRaWANVersion() MACVersion {
+	if m != nil {
+		return m.LoRaWANVersion
+	}
+	return MAC_UNKNOWN
+}
+
+func (m *CryptoServicePayloadRequest) GetPayload() []byte {
+	if m != nil {
+		return m.Payload
+	}
+	return nil
+}
+
+type CryptoServicePayloadResponse struct {
+	Payload              []byte   `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CryptoServicePayloadResponse) Reset()      { *m = CryptoServicePayloadResponse{} }
+func (*CryptoServicePayloadResponse) ProtoMessage() {}
+func (*CryptoServicePayloadResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{4}
+}
+func (m *CryptoServicePayloadResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CryptoServicePayloadResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CryptoServicePayloadResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *CryptoServicePayloadResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CryptoServicePayloadResponse.Merge(dst, src)
+}
+func (m *CryptoServicePayloadResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *CryptoServicePayloadResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CryptoServicePayloadResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CryptoServicePayloadResponse proto.InternalMessageInfo
+
+func (m *CryptoServicePayloadResponse) GetPayload() []byte {
+	if m != nil {
+		return m.Payload
+	}
+	return nil
+}
+
+type JoinAcceptMICRequest struct {
+	CryptoServicePayloadRequest `protobuf:"bytes,1,opt,name=payload_request,json=payloadRequest,proto3,embedded=payload_request" json:"payload_request"`
+	JoinRequestType             uint32                                                `protobuf:"varint,2,opt,name=join_request_type,json=joinRequestType,proto3" json:"join_request_type,omitempty"`
+	DevNonce                    go_thethings_network_lorawan_stack_pkg_types.DevNonce `protobuf:"bytes,3,opt,name=dev_nonce,json=devNonce,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevNonce" json:"dev_nonce"`
+	XXX_NoUnkeyedLiteral        struct{}                                              `json:"-"`
+	XXX_sizecache               int32                                                 `json:"-"`
+}
+
+func (m *JoinAcceptMICRequest) Reset()      { *m = JoinAcceptMICRequest{} }
+func (*JoinAcceptMICRequest) ProtoMessage() {}
+func (*JoinAcceptMICRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{5}
+}
+func (m *JoinAcceptMICRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *JoinAcceptMICRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_JoinAcceptMICRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *JoinAcceptMICRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JoinAcceptMICRequest.Merge(dst, src)
+}
+func (m *JoinAcceptMICRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *JoinAcceptMICRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_JoinAcceptMICRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JoinAcceptMICRequest proto.InternalMessageInfo
+
+func (m *JoinAcceptMICRequest) GetJoinRequestType() uint32 {
+	if m != nil {
+		return m.JoinRequestType
+	}
+	return 0
+}
+
+type DeriveSessionKeysRequest struct {
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	LoRaWANVersion       MACVersion                                             `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
+	JoinNonce            go_thethings_network_lorawan_stack_pkg_types.JoinNonce `protobuf:"bytes,3,opt,name=join_nonce,json=joinNonce,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.JoinNonce" json:"join_nonce"`
+	DevNonce             go_thethings_network_lorawan_stack_pkg_types.DevNonce  `protobuf:"bytes,4,opt,name=dev_nonce,json=devNonce,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevNonce" json:"dev_nonce"`
+	NetID                go_thethings_network_lorawan_stack_pkg_types.NetID     `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id"`
+	XXX_NoUnkeyedLiteral struct{}                                               `json:"-"`
+	XXX_sizecache        int32                                                  `json:"-"`
+}
+
+func (m *DeriveSessionKeysRequest) Reset()      { *m = DeriveSessionKeysRequest{} }
+func (*DeriveSessionKeysRequest) ProtoMessage() {}
+func (*DeriveSessionKeysRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_joinserver_a91a7cd313536ffa, []int{6}
+}
+func (m *DeriveSessionKeysRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DeriveSessionKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DeriveSessionKeysRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *DeriveSessionKeysRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeriveSessionKeysRequest.Merge(dst, src)
+}
+func (m *DeriveSessionKeysRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DeriveSessionKeysRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeriveSessionKeysRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeriveSessionKeysRequest proto.InternalMessageInfo
+
+func (m *DeriveSessionKeysRequest) GetLoRaWANVersion() MACVersion {
+	if m != nil {
+		return m.LoRaWANVersion
+	}
+	return MAC_UNKNOWN
+}
+
 func init() {
 	proto.RegisterType((*SessionKeyRequest)(nil), "ttn.lorawan.v3.SessionKeyRequest")
 	golang_proto.RegisterType((*SessionKeyRequest)(nil), "ttn.lorawan.v3.SessionKeyRequest")
@@ -204,6 +399,14 @@ func init() {
 	golang_proto.RegisterType((*NwkSKeysResponse)(nil), "ttn.lorawan.v3.NwkSKeysResponse")
 	proto.RegisterType((*AppSKeyResponse)(nil), "ttn.lorawan.v3.AppSKeyResponse")
 	golang_proto.RegisterType((*AppSKeyResponse)(nil), "ttn.lorawan.v3.AppSKeyResponse")
+	proto.RegisterType((*CryptoServicePayloadRequest)(nil), "ttn.lorawan.v3.CryptoServicePayloadRequest")
+	golang_proto.RegisterType((*CryptoServicePayloadRequest)(nil), "ttn.lorawan.v3.CryptoServicePayloadRequest")
+	proto.RegisterType((*CryptoServicePayloadResponse)(nil), "ttn.lorawan.v3.CryptoServicePayloadResponse")
+	golang_proto.RegisterType((*CryptoServicePayloadResponse)(nil), "ttn.lorawan.v3.CryptoServicePayloadResponse")
+	proto.RegisterType((*JoinAcceptMICRequest)(nil), "ttn.lorawan.v3.JoinAcceptMICRequest")
+	golang_proto.RegisterType((*JoinAcceptMICRequest)(nil), "ttn.lorawan.v3.JoinAcceptMICRequest")
+	proto.RegisterType((*DeriveSessionKeysRequest)(nil), "ttn.lorawan.v3.DeriveSessionKeysRequest")
+	golang_proto.RegisterType((*DeriveSessionKeysRequest)(nil), "ttn.lorawan.v3.DeriveSessionKeysRequest")
 }
 func (this *SessionKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
@@ -282,6 +485,126 @@ func (this *AppSKeyResponse) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.AppSKey.Equal(&that1.AppSKey) {
+		return false
+	}
+	return true
+}
+func (this *CryptoServicePayloadRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CryptoServicePayloadRequest)
+	if !ok {
+		that2, ok := that.(CryptoServicePayloadRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
+		return false
+	}
+	if this.LoRaWANVersion != that1.LoRaWANVersion {
+		return false
+	}
+	if !bytes.Equal(this.Payload, that1.Payload) {
+		return false
+	}
+	return true
+}
+func (this *CryptoServicePayloadResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CryptoServicePayloadResponse)
+	if !ok {
+		that2, ok := that.(CryptoServicePayloadResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Payload, that1.Payload) {
+		return false
+	}
+	return true
+}
+func (this *JoinAcceptMICRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*JoinAcceptMICRequest)
+	if !ok {
+		that2, ok := that.(JoinAcceptMICRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.CryptoServicePayloadRequest.Equal(&that1.CryptoServicePayloadRequest) {
+		return false
+	}
+	if this.JoinRequestType != that1.JoinRequestType {
+		return false
+	}
+	if !this.DevNonce.Equal(that1.DevNonce) {
+		return false
+	}
+	return true
+}
+func (this *DeriveSessionKeysRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DeriveSessionKeysRequest)
+	if !ok {
+		that2, ok := that.(DeriveSessionKeysRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
+		return false
+	}
+	if this.LoRaWANVersion != that1.LoRaWANVersion {
+		return false
+	}
+	if !this.JoinNonce.Equal(that1.JoinNonce) {
+		return false
+	}
+	if !this.DevNonce.Equal(that1.DevNonce) {
+		return false
+	}
+	if !this.NetID.Equal(that1.NetID) {
 		return false
 	}
 	return true
@@ -450,6 +773,266 @@ var _AsJs_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAppSKey",
 			Handler:    _AsJs_GetAppSKey_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "lorawan-stack/api/joinserver.proto",
+}
+
+// NetworkCryptoServiceClient is the client API for NetworkCryptoService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type NetworkCryptoServiceClient interface {
+	JoinRequestMIC(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	JoinAcceptMIC(ctx context.Context, in *JoinAcceptMICRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	EncryptJoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	EncryptRejoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	DeriveNwkSKeys(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*NwkSKeysResponse, error)
+}
+
+type networkCryptoServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewNetworkCryptoServiceClient(cc *grpc.ClientConn) NetworkCryptoServiceClient {
+	return &networkCryptoServiceClient{cc}
+}
+
+func (c *networkCryptoServiceClient) JoinRequestMIC(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error) {
+	out := new(CryptoServicePayloadResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.NetworkCryptoService/JoinRequestMIC", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *networkCryptoServiceClient) JoinAcceptMIC(ctx context.Context, in *JoinAcceptMICRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error) {
+	out := new(CryptoServicePayloadResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.NetworkCryptoService/JoinAcceptMIC", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *networkCryptoServiceClient) EncryptJoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error) {
+	out := new(CryptoServicePayloadResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.NetworkCryptoService/EncryptJoinAccept", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *networkCryptoServiceClient) EncryptRejoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error) {
+	out := new(CryptoServicePayloadResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.NetworkCryptoService/EncryptRejoinAccept", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *networkCryptoServiceClient) DeriveNwkSKeys(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*NwkSKeysResponse, error) {
+	out := new(NwkSKeysResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.NetworkCryptoService/DeriveNwkSKeys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// NetworkCryptoServiceServer is the server API for NetworkCryptoService service.
+type NetworkCryptoServiceServer interface {
+	JoinRequestMIC(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
+	JoinAcceptMIC(context.Context, *JoinAcceptMICRequest) (*CryptoServicePayloadResponse, error)
+	EncryptJoinAccept(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
+	EncryptRejoinAccept(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
+	DeriveNwkSKeys(context.Context, *DeriveSessionKeysRequest) (*NwkSKeysResponse, error)
+}
+
+func RegisterNetworkCryptoServiceServer(s *grpc.Server, srv NetworkCryptoServiceServer) {
+	s.RegisterService(&_NetworkCryptoService_serviceDesc, srv)
+}
+
+func _NetworkCryptoService_JoinRequestMIC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CryptoServicePayloadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkCryptoServiceServer).JoinRequestMIC(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.NetworkCryptoService/JoinRequestMIC",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkCryptoServiceServer).JoinRequestMIC(ctx, req.(*CryptoServicePayloadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkCryptoService_JoinAcceptMIC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinAcceptMICRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkCryptoServiceServer).JoinAcceptMIC(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.NetworkCryptoService/JoinAcceptMIC",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkCryptoServiceServer).JoinAcceptMIC(ctx, req.(*JoinAcceptMICRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkCryptoService_EncryptJoinAccept_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CryptoServicePayloadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkCryptoServiceServer).EncryptJoinAccept(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.NetworkCryptoService/EncryptJoinAccept",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkCryptoServiceServer).EncryptJoinAccept(ctx, req.(*CryptoServicePayloadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkCryptoService_EncryptRejoinAccept_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CryptoServicePayloadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkCryptoServiceServer).EncryptRejoinAccept(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.NetworkCryptoService/EncryptRejoinAccept",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkCryptoServiceServer).EncryptRejoinAccept(ctx, req.(*CryptoServicePayloadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkCryptoService_DeriveNwkSKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeriveSessionKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkCryptoServiceServer).DeriveNwkSKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.NetworkCryptoService/DeriveNwkSKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkCryptoServiceServer).DeriveNwkSKeys(ctx, req.(*DeriveSessionKeysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _NetworkCryptoService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.NetworkCryptoService",
+	HandlerType: (*NetworkCryptoServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "JoinRequestMIC",
+			Handler:    _NetworkCryptoService_JoinRequestMIC_Handler,
+		},
+		{
+			MethodName: "JoinAcceptMIC",
+			Handler:    _NetworkCryptoService_JoinAcceptMIC_Handler,
+		},
+		{
+			MethodName: "EncryptJoinAccept",
+			Handler:    _NetworkCryptoService_EncryptJoinAccept_Handler,
+		},
+		{
+			MethodName: "EncryptRejoinAccept",
+			Handler:    _NetworkCryptoService_EncryptRejoinAccept_Handler,
+		},
+		{
+			MethodName: "DeriveNwkSKeys",
+			Handler:    _NetworkCryptoService_DeriveNwkSKeys_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "lorawan-stack/api/joinserver.proto",
+}
+
+// ApplicationCryptoServiceClient is the client API for ApplicationCryptoService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type ApplicationCryptoServiceClient interface {
+	DeriveAppSKey(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
+}
+
+type applicationCryptoServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewApplicationCryptoServiceClient(cc *grpc.ClientConn) ApplicationCryptoServiceClient {
+	return &applicationCryptoServiceClient{cc}
+}
+
+func (c *applicationCryptoServiceClient) DeriveAppSKey(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error) {
+	out := new(AppSKeyResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationCryptoService/DeriveAppSKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ApplicationCryptoServiceServer is the server API for ApplicationCryptoService service.
+type ApplicationCryptoServiceServer interface {
+	DeriveAppSKey(context.Context, *DeriveSessionKeysRequest) (*AppSKeyResponse, error)
+}
+
+func RegisterApplicationCryptoServiceServer(s *grpc.Server, srv ApplicationCryptoServiceServer) {
+	s.RegisterService(&_ApplicationCryptoService_serviceDesc, srv)
+}
+
+func _ApplicationCryptoService_DeriveAppSKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeriveSessionKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationCryptoServiceServer).DeriveAppSKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationCryptoService/DeriveAppSKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationCryptoServiceServer).DeriveAppSKey(ctx, req.(*DeriveSessionKeysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _ApplicationCryptoService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.ApplicationCryptoService",
+	HandlerType: (*ApplicationCryptoServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "DeriveAppSKey",
+			Handler:    _ApplicationCryptoService_DeriveAppSKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -696,6 +1279,161 @@ func (m *AppSKeyResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *CryptoServicePayloadRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CryptoServicePayloadRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
+	n6, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n6
+	if m.LoRaWANVersion != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintJoinserver(dAtA, i, uint64(m.LoRaWANVersion))
+	}
+	if len(m.Payload) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.Payload)))
+		i += copy(dAtA[i:], m.Payload)
+	}
+	return i, nil
+}
+
+func (m *CryptoServicePayloadResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CryptoServicePayloadResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Payload) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.Payload)))
+		i += copy(dAtA[i:], m.Payload)
+	}
+	return i, nil
+}
+
+func (m *JoinAcceptMICRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JoinAcceptMICRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.CryptoServicePayloadRequest.Size()))
+	n7, err := m.CryptoServicePayloadRequest.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n7
+	if m.JoinRequestType != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinRequestType))
+	}
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.DevNonce.Size()))
+	n8, err := m.DevNonce.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n8
+	return i, nil
+}
+
+func (m *DeriveSessionKeysRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DeriveSessionKeysRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
+	n9, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n9
+	if m.LoRaWANVersion != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintJoinserver(dAtA, i, uint64(m.LoRaWANVersion))
+	}
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinNonce.Size()))
+	n10, err := m.JoinNonce.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n10
+	dAtA[i] = 0x22
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.DevNonce.Size()))
+	n11, err := m.DevNonce.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n11
+	dAtA[i] = 0x2a
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.NetID.Size()))
+	n12, err := m.NetID.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n12
+	return i, nil
+}
+
 func encodeVarintJoinserver(dAtA []byte, offset int, v uint64) int {
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -741,6 +1479,61 @@ func NewPopulatedAppSKeyResponse(r randyJoinserver, easy bool) *AppSKeyResponse 
 	return this
 }
 
+func NewPopulatedCryptoServicePayloadRequest(r randyJoinserver, easy bool) *CryptoServicePayloadRequest {
+	this := &CryptoServicePayloadRequest{}
+	v7 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v7
+	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	v8 := r.Intn(100)
+	this.Payload = make([]byte, v8)
+	for i := 0; i < v8; i++ {
+		this.Payload[i] = byte(r.Intn(256))
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedCryptoServicePayloadResponse(r randyJoinserver, easy bool) *CryptoServicePayloadResponse {
+	this := &CryptoServicePayloadResponse{}
+	v9 := r.Intn(100)
+	this.Payload = make([]byte, v9)
+	for i := 0; i < v9; i++ {
+		this.Payload[i] = byte(r.Intn(256))
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedJoinAcceptMICRequest(r randyJoinserver, easy bool) *JoinAcceptMICRequest {
+	this := &JoinAcceptMICRequest{}
+	v10 := NewPopulatedCryptoServicePayloadRequest(r, easy)
+	this.CryptoServicePayloadRequest = *v10
+	this.JoinRequestType = r.Uint32()
+	v11 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedDevNonce(r)
+	this.DevNonce = *v11
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedDeriveSessionKeysRequest(r randyJoinserver, easy bool) *DeriveSessionKeysRequest {
+	this := &DeriveSessionKeysRequest{}
+	v12 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v12
+	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	v13 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedJoinNonce(r)
+	this.JoinNonce = *v13
+	v14 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedDevNonce(r)
+	this.DevNonce = *v14
+	v15 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedNetID(r)
+	this.NetID = *v15
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 type randyJoinserver interface {
 	Float32() float32
 	Float64() float64
@@ -760,9 +1553,9 @@ func randUTF8RuneJoinserver(r randyJoinserver) rune {
 	return rune(ru + 61)
 }
 func randStringJoinserver(r randyJoinserver) string {
-	v7 := r.Intn(100)
-	tmps := make([]rune, v7)
-	for i := 0; i < v7; i++ {
+	v16 := r.Intn(100)
+	tmps := make([]rune, v16)
+	for i := 0; i < v16; i++ {
 		tmps[i] = randUTF8RuneJoinserver(r)
 	}
 	return string(tmps)
@@ -784,11 +1577,11 @@ func randFieldJoinserver(dAtA []byte, r randyJoinserver, fieldNumber int, wire i
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(key))
-		v8 := r.Int63()
+		v17 := r.Int63()
 		if r.Intn(2) == 0 {
-			v8 *= -1
+			v17 *= -1
 		}
-		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(v8))
+		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(v17))
 	case 1:
 		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -854,6 +1647,73 @@ func (m *AppSKeyResponse) Size() (n int) {
 	return n
 }
 
+func (m *CryptoServicePayloadRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	if m.LoRaWANVersion != 0 {
+		n += 1 + sovJoinserver(uint64(m.LoRaWANVersion))
+	}
+	l = len(m.Payload)
+	if l > 0 {
+		n += 1 + l + sovJoinserver(uint64(l))
+	}
+	return n
+}
+
+func (m *CryptoServicePayloadResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Payload)
+	if l > 0 {
+		n += 1 + l + sovJoinserver(uint64(l))
+	}
+	return n
+}
+
+func (m *JoinAcceptMICRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CryptoServicePayloadRequest.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	if m.JoinRequestType != 0 {
+		n += 1 + sovJoinserver(uint64(m.JoinRequestType))
+	}
+	l = m.DevNonce.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	return n
+}
+
+func (m *DeriveSessionKeysRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	if m.LoRaWANVersion != 0 {
+		n += 1 + sovJoinserver(uint64(m.LoRaWANVersion))
+	}
+	l = m.JoinNonce.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	l = m.DevNonce.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	l = m.NetID.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	return n
+}
+
 func sovJoinserver(x uint64) (n int) {
 	for {
 		n++
@@ -896,6 +1756,54 @@ func (this *AppSKeyResponse) String() string {
 	}
 	s := strings.Join([]string{`&AppSKeyResponse{`,
 		`AppSKey:` + strings.Replace(strings.Replace(this.AppSKey.String(), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CryptoServicePayloadRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CryptoServicePayloadRequest{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
+		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CryptoServicePayloadResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CryptoServicePayloadResponse{`,
+		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *JoinAcceptMICRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&JoinAcceptMICRequest{`,
+		`CryptoServicePayloadRequest:` + strings.Replace(strings.Replace(this.CryptoServicePayloadRequest.String(), "CryptoServicePayloadRequest", "CryptoServicePayloadRequest", 1), `&`, ``, 1) + `,`,
+		`JoinRequestType:` + fmt.Sprintf("%v", this.JoinRequestType) + `,`,
+		`DevNonce:` + fmt.Sprintf("%v", this.DevNonce) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DeriveSessionKeysRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DeriveSessionKeysRequest{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
+		`JoinNonce:` + fmt.Sprintf("%v", this.JoinNonce) + `,`,
+		`DevNonce:` + fmt.Sprintf("%v", this.DevNonce) + `,`,
+		`NetID:` + fmt.Sprintf("%v", this.NetID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1239,6 +2147,535 @@ func (m *AppSKeyResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *CryptoServicePayloadRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJoinserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CryptoServicePayloadRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CryptoServicePayloadRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANVersion", wireType)
+			}
+			m.LoRaWANVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LoRaWANVersion |= (MACVersion(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Payload = append(m.Payload[:0], dAtA[iNdEx:postIndex]...)
+			if m.Payload == nil {
+				m.Payload = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJoinserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CryptoServicePayloadResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJoinserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CryptoServicePayloadResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CryptoServicePayloadResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Payload = append(m.Payload[:0], dAtA[iNdEx:postIndex]...)
+			if m.Payload == nil {
+				m.Payload = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJoinserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JoinAcceptMICRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJoinserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JoinAcceptMICRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JoinAcceptMICRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CryptoServicePayloadRequest", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CryptoServicePayloadRequest.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JoinRequestType", wireType)
+			}
+			m.JoinRequestType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.JoinRequestType |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DevNonce", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DevNonce.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJoinserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeriveSessionKeysRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJoinserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeriveSessionKeysRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeriveSessionKeysRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANVersion", wireType)
+			}
+			m.LoRaWANVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LoRaWANVersion |= (MACVersion(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JoinNonce", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.JoinNonce.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DevNonce", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DevNonce.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NetID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.NetID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJoinserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipJoinserver(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1345,65 +2782,89 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_a35d3a300f6dd1ab)
+	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_a91a7cd313536ffa)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_a35d3a300f6dd1ab)
+	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_a91a7cd313536ffa)
 }
 
-var fileDescriptor_joinserver_a35d3a300f6dd1ab = []byte{
-	// 833 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x68, 0x1b, 0x47,
-	0x14, 0x9e, 0xb1, 0x8d, 0x43, 0xc7, 0x6e, 0x92, 0x6e, 0xa1, 0xa4, 0x8a, 0x19, 0xa5, 0x4a, 0x0f,
-	0xc5, 0xd4, 0xbb, 0xa0, 0x14, 0x1f, 0x02, 0x3d, 0xc4, 0x68, 0x51, 0x65, 0xd1, 0x10, 0x24, 0x02,
-	0x25, 0xa5, 0x2c, 0x6b, 0xed, 0xf3, 0x7a, 0xb2, 0xf2, 0xcc, 0x76, 0x67, 0xb4, 0x62, 0x29, 0x81,
-	0xd0, 0x53, 0x8e, 0x85, 0x52, 0xe8, 0xb1, 0xb4, 0x97, 0xd0, 0x5e, 0x42, 0x4e, 0x39, 0xe6, 0xe8,
-	0x63, 0xa0, 0x97, 0xd0, 0x83, 0x1b, 0xed, 0xf6, 0x10, 0x7a, 0xca, 0x31, 0xf4, 0x54, 0xf6, 0xc7,
-	0x96, 0xb2, 0x92, 0x41, 0x82, 0xdc, 0x66, 0xe6, 0x7d, 0xef, 0x7b, 0xdf, 0x7b, 0x33, 0xf3, 0x91,
-	0x5a, 0x5f, 0x04, 0xf6, 0xd0, 0xe6, 0x5b, 0x52, 0xd9, 0x3d, 0xcf, 0xb0, 0x7d, 0x66, 0xdc, 0x15,
-	0x8c, 0x4b, 0x08, 0x42, 0x08, 0x74, 0x3f, 0x10, 0x4a, 0x68, 0xe7, 0x95, 0xe2, 0x7a, 0x81, 0xd3,
-	0xc3, 0x6b, 0x95, 0x2d, 0x97, 0xa9, 0x83, 0xc1, 0x9e, 0xde, 0x13, 0x87, 0x86, 0x2b, 0x5c, 0x61,
-	0x64, 0xb0, 0xbd, 0xc1, 0x7e, 0xb6, 0xcb, 0x36, 0xd9, 0x2a, 0x4f, 0xaf, 0x6c, 0x4f, 0xc0, 0x0f,
-	0x87, 0x4c, 0x79, 0x62, 0x68, 0xb8, 0x62, 0x2b, 0x0b, 0x6e, 0x85, 0x76, 0x9f, 0x39, 0xb6, 0x12,
-	0x81, 0x34, 0x4e, 0x97, 0x45, 0xde, 0x86, 0x2b, 0x84, 0xdb, 0x87, 0x4c, 0x93, 0xcd, 0xb9, 0x50,
-	0xb6, 0x62, 0x82, 0xcb, 0x22, 0x7a, 0xb9, 0x88, 0x9e, 0xd6, 0x86, 0x43, 0x5f, 0x45, 0x45, 0x70,
-	0x46, 0x57, 0xc0, 0x1d, 0xcb, 0x81, 0x90, 0xf5, 0xa0, 0xc0, 0x5c, 0x9d, 0xc6, 0x30, 0x07, 0xb8,
-	0x62, 0xfb, 0x0c, 0x82, 0x93, 0x2a, 0x1b, 0xb3, 0xc7, 0x73, 0x76, 0xd4, 0x83, 0xa8, 0xc8, 0xad,
-	0xfd, 0x8e, 0xc9, 0x7b, 0x5d, 0x90, 0x92, 0x09, 0xde, 0x86, 0xa8, 0x03, 0xdf, 0x0e, 0x40, 0x2a,
-	0x6d, 0x9b, 0x9c, 0x97, 0xf9, 0xa1, 0xe5, 0x41, 0x64, 0x31, 0xe7, 0x12, 0xbe, 0x82, 0x3f, 0x59,
-	0xdf, 0xb9, 0x18, 0x1f, 0x57, 0xd7, 0xc7, 0xf0, 0x56, 0xa3, 0xb3, 0x2e, 0xc7, 0x3b, 0x47, 0xfb,
-	0x86, 0x9c, 0x73, 0x20, 0xb4, 0x60, 0xc0, 0x2e, 0x2d, 0x65, 0x09, 0x8d, 0xa3, 0xe3, 0x2a, 0xfa,
-	0xeb, 0xb8, 0x5a, 0x77, 0x85, 0xae, 0x0e, 0x40, 0x1d, 0x30, 0xee, 0x4a, 0x9d, 0x83, 0x1a, 0x8a,
-	0xc0, 0x33, 0xde, 0x54, 0xe6, 0x7b, 0xae, 0xa1, 0x22, 0x1f, 0xa4, 0x6e, 0xde, 0x6e, 0x6d, 0x7f,
-	0x16, 0x1f, 0x57, 0x57, 0x1b, 0x10, 0x9a, 0xb7, 0x5b, 0x9d, 0x55, 0x07, 0x42, 0x73, 0xc0, 0x6a,
-	0xff, 0x62, 0x72, 0xf1, 0xe6, 0xd0, 0xeb, 0xb6, 0x21, 0x92, 0x1d, 0x90, 0xbe, 0xe0, 0x12, 0xb4,
-	0x26, 0xb9, 0xb0, 0x6f, 0xf1, 0xa1, 0x67, 0x49, 0x8b, 0x71, 0x95, 0xea, 0xcd, 0xc4, 0xae, 0xd5,
-	0x2f, 0xeb, 0x6f, 0x3e, 0x09, 0xbd, 0x0d, 0x91, 0xc9, 0x43, 0xe8, 0x0b, 0x1f, 0x76, 0x56, 0x52,
-	0x61, 0x9d, 0xb5, 0xfd, 0x94, 0xae, 0xc5, 0x55, 0x1b, 0xa2, 0x94, 0x48, 0x96, 0x88, 0x96, 0xe6,
-	0x26, 0x92, 0x13, 0x44, 0x0d, 0xf2, 0x6e, 0x4e, 0x03, 0xbc, 0x97, 0xd1, 0x2c, 0xcf, 0x4b, 0x43,
-	0xf8, 0xd0, 0xeb, 0x9a, 0xbc, 0xd7, 0x86, 0xa8, 0x76, 0x8b, 0x5c, 0xb8, 0xe1, 0xfb, 0xdd, 0xec,
-	0x56, 0x8a, 0x56, 0x3f, 0x27, 0xef, 0xd8, 0xbe, 0x6f, 0xc9, 0xc5, 0x9a, 0x3c, 0x67, 0xe7, 0x34,
-	0xf5, 0xdf, 0x30, 0x59, 0xb9, 0x29, 0x77, 0xa5, 0xd6, 0x24, 0xe4, 0x0b, 0x9b, 0x3b, 0x7d, 0xd8,
-	0x15, 0x8c, 0x6b, 0x53, 0x14, 0xe9, 0x69, 0xf1, 0x12, 0x2a, 0x1b, 0xb3, 0x83, 0x85, 0xa0, 0x0e,
-	0x59, 0x6b, 0x82, 0x3a, 0xb9, 0x12, 0xed, 0xa3, 0x32, 0x78, 0xea, 0x65, 0x55, 0xae, 0x94, 0x21,
-	0xe5, 0xfb, 0xac, 0x7f, 0x45, 0x56, 0x6e, 0xa4, 0x22, 0x6f, 0x11, 0xd2, 0x04, 0x55, 0x8c, 0x60,
-	0x1e, 0xea, 0x6a, 0x19, 0x52, 0x1a, 0x5f, 0xfd, 0xef, 0x15, 0xf2, 0xfe, 0xae, 0x34, 0xb9, 0xd3,
-	0xc8, 0xbe, 0x58, 0x07, 0x5c, 0x26, 0x55, 0x10, 0x69, 0x8f, 0x31, 0x59, 0x6e, 0x82, 0xd2, 0xae,
-	0x96, 0x09, 0x9a, 0xa0, 0x26, 0xd0, 0x79, 0x95, 0x0f, 0xcb, 0xa0, 0x53, 0x44, 0xcd, 0xfb, 0xfe,
-	0xcf, 0x7f, 0x7e, 0x5c, 0x02, 0xad, 0x67, 0xdc, 0x95, 0x86, 0xed, 0xfb, 0x7d, 0xd6, 0xcb, 0xdd,
-	0xc0, 0xf8, 0x6e, 0xfc, 0xb1, 0x2d, 0xe6, 0x48, 0x7d, 0x22, 0x38, 0x63, 0x7f, 0xcf, 0xc8, 0xa1,
-	0xd3, 0x79, 0xa7, 0xcb, 0x7b, 0xda, 0x7f, 0x98, 0x2c, 0x77, 0x67, 0x89, 0xee, 0x2e, 0x26, 0xfa,
-	0x31, 0xce, 0x54, 0xff, 0x81, 0x2b, 0x5f, 0x4f, 0xcb, 0x2e, 0xbc, 0x68, 0x21, 0xc9, 0x13, 0x39,
-	0x63, 0xb9, 0xd7, 0xf1, 0xe6, 0x9d, 0x56, 0xad, 0xf1, 0x36, 0x2a, 0x5c, 0xc7, 0x9b, 0xda, 0x4f,
-	0x98, 0xac, 0x36, 0xa0, 0x0f, 0x0a, 0xb4, 0x8f, 0xcf, 0x6c, 0xad, 0x35, 0x36, 0xca, 0xca, 0x07,
-	0x7a, 0xee, 0xc4, 0xfa, 0x89, 0x13, 0xeb, 0x66, 0xea, 0xc4, 0xb5, 0x2f, 0xb3, 0xe6, 0x9b, 0x9b,
-	0xe6, 0xb4, 0xb2, 0x05, 0x1b, 0x4e, 0xcf, 0x76, 0x7e, 0xc5, 0x47, 0x23, 0x8a, 0x9f, 0x8d, 0x28,
-	0x7e, 0x3e, 0xa2, 0xe8, 0xc5, 0x88, 0xa2, 0x97, 0x23, 0x8a, 0x5e, 0x8d, 0x28, 0x7a, 0x3d, 0xa2,
-	0xf8, 0x7e, 0x4c, 0xf1, 0x83, 0x98, 0xa2, 0x87, 0x31, 0xc5, 0x8f, 0x62, 0x8a, 0x9e, 0xc4, 0x14,
-	0x3d, 0x8d, 0x29, 0x3a, 0x8a, 0x29, 0x7e, 0x16, 0x53, 0xfc, 0x3c, 0xa6, 0xe8, 0x45, 0x4c, 0xf1,
-	0xcb, 0x98, 0xa2, 0x57, 0x31, 0xc5, 0xaf, 0x63, 0x8a, 0xee, 0x27, 0x14, 0x3d, 0x48, 0x28, 0xfe,
-	0x21, 0xa1, 0xe8, 0xe7, 0x84, 0xe2, 0x5f, 0x12, 0x8a, 0x1e, 0x26, 0x14, 0x3d, 0x4a, 0x28, 0x7e,
-	0x92, 0x50, 0xfc, 0x34, 0xa1, 0xf8, 0xce, 0xa7, 0xf3, 0xba, 0xab, 0xe2, 0xfe, 0xde, 0xde, 0x6a,
-	0x36, 0x83, 0x6b, 0xff, 0x07, 0x00, 0x00, 0xff, 0xff, 0x6d, 0x67, 0x34, 0x27, 0x56, 0x07, 0x00,
-	0x00,
+var fileDescriptor_joinserver_a91a7cd313536ffa = []byte{
+	// 1227 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x57, 0x41, 0x6c, 0x1b, 0x45,
+	0x17, 0xde, 0x69, 0xd2, 0xb4, 0x9d, 0x26, 0x4e, 0xbb, 0xad, 0x7e, 0xe5, 0x77, 0xa3, 0x71, 0x71,
+	0x7b, 0xa8, 0x42, 0xb3, 0x96, 0x52, 0x88, 0x50, 0xa5, 0x22, 0x92, 0xd8, 0x32, 0x4e, 0x88, 0x55,
+	0xad, 0x29, 0x45, 0x81, 0x62, 0x6d, 0xbc, 0x2f, 0xee, 0xc6, 0xee, 0xcc, 0xb2, 0x33, 0x59, 0x6b,
+	0x85, 0x2a, 0x55, 0x9c, 0x7a, 0x44, 0x42, 0x48, 0x1c, 0x11, 0x5c, 0x2a, 0xb8, 0x54, 0x3d, 0xf5,
+	0xd8, 0x63, 0x0f, 0x1c, 0x2a, 0xb8, 0x54, 0x1c, 0x4c, 0xbd, 0xe6, 0x50, 0x71, 0xea, 0xb1, 0xe2,
+	0x80, 0xd0, 0xee, 0x8e, 0x63, 0x7b, 0xed, 0x82, 0x8d, 0x0a, 0x12, 0xb7, 0x99, 0x79, 0xdf, 0xfb,
+	0xde, 0x7b, 0xdf, 0xbe, 0x79, 0xbb, 0x8b, 0xd3, 0x75, 0xe6, 0x18, 0x0d, 0x83, 0x2e, 0x72, 0x61,
+	0x54, 0x6a, 0x19, 0xc3, 0xb6, 0x32, 0xbb, 0xcc, 0xa2, 0x1c, 0x1c, 0x17, 0x1c, 0xcd, 0x76, 0x98,
+	0x60, 0x6a, 0x42, 0x08, 0xaa, 0x49, 0x9c, 0xe6, 0x5e, 0x48, 0x2e, 0x56, 0x2d, 0x71, 0x7d, 0x6f,
+	0x5b, 0xab, 0xb0, 0x1b, 0x99, 0x2a, 0xab, 0xb2, 0x4c, 0x08, 0xdb, 0xde, 0xdb, 0x09, 0x77, 0xe1,
+	0x26, 0x5c, 0x45, 0xee, 0xc9, 0xe5, 0x1e, 0xf8, 0x8d, 0x86, 0x25, 0x6a, 0xac, 0x91, 0xa9, 0xb2,
+	0xc5, 0xd0, 0xb8, 0xe8, 0x1a, 0x75, 0xcb, 0x34, 0x04, 0x73, 0x78, 0x66, 0x7f, 0x29, 0xfd, 0xe6,
+	0xab, 0x8c, 0x55, 0xeb, 0x10, 0xe6, 0x64, 0x50, 0xca, 0x84, 0x21, 0x2c, 0x46, 0xb9, 0xb4, 0x9e,
+	0x92, 0xd6, 0xfd, 0xd8, 0x70, 0xc3, 0x16, 0x9e, 0x34, 0x0e, 0xa9, 0x0a, 0xa8, 0x59, 0x36, 0xc1,
+	0xb5, 0x2a, 0x20, 0x31, 0x67, 0x06, 0x31, 0x96, 0x09, 0x54, 0x58, 0x3b, 0x16, 0x38, 0x9d, 0x28,
+	0xf3, 0xc3, 0xe5, 0x91, 0xd6, 0xd4, 0xa0, 0xb5, 0x23, 0xd3, 0x0b, 0xdd, 0x6b, 0xe0, 0x49, 0xf2,
+	0xf4, 0xb7, 0x08, 0x1f, 0x2f, 0x01, 0xe7, 0x16, 0xa3, 0x1b, 0xe0, 0xe9, 0xf0, 0xf1, 0x1e, 0x70,
+	0xa1, 0x2e, 0xe3, 0x04, 0x8f, 0x0e, 0xcb, 0x35, 0xf0, 0xca, 0x96, 0x39, 0x87, 0x4e, 0xa3, 0x73,
+	0xd3, 0xab, 0xc7, 0xfc, 0x66, 0x6a, 0xba, 0x0b, 0x2f, 0x64, 0xf5, 0x69, 0xde, 0xdd, 0x99, 0xea,
+	0x35, 0x7c, 0xc8, 0x04, 0xb7, 0x0c, 0x7b, 0xd6, 0xdc, 0x81, 0xd0, 0x21, 0xfb, 0xb0, 0x99, 0x52,
+	0x7e, 0x6a, 0xa6, 0x96, 0xaa, 0x4c, 0x13, 0xd7, 0x41, 0x5c, 0xb7, 0x68, 0x95, 0x6b, 0x14, 0x44,
+	0x83, 0x39, 0xb5, 0x4c, 0x7f, 0x66, 0x76, 0xad, 0x9a, 0x11, 0x9e, 0x0d, 0x5c, 0xcb, 0x5d, 0x29,
+	0x2c, 0xbf, 0xe6, 0x37, 0x53, 0x53, 0x59, 0x70, 0x73, 0x57, 0x0a, 0xfa, 0x94, 0x09, 0x6e, 0x6e,
+	0xcf, 0x4a, 0xff, 0x8a, 0xf0, 0xb1, 0x62, 0xa3, 0x56, 0xda, 0x00, 0x8f, 0xeb, 0xc0, 0x6d, 0x46,
+	0x39, 0xa8, 0x79, 0x3c, 0xbb, 0x53, 0xa6, 0x8d, 0x5a, 0x99, 0x97, 0x2d, 0x2a, 0x82, 0x7c, 0xc3,
+	0x64, 0x8f, 0x2e, 0x9d, 0xd2, 0xfa, 0x7b, 0x46, 0xdb, 0x00, 0x2f, 0x47, 0x5d, 0xa8, 0x33, 0x1b,
+	0x56, 0x27, 0x83, 0xc4, 0xf4, 0xa3, 0x3b, 0x01, 0x5d, 0x81, 0x8a, 0x0d, 0xf0, 0x02, 0x22, 0x1e,
+	0x23, 0x3a, 0x30, 0x32, 0x11, 0xef, 0x21, 0xca, 0xe2, 0x99, 0x88, 0x06, 0x68, 0x25, 0xa4, 0x99,
+	0x18, 0x95, 0x06, 0xd3, 0x46, 0xad, 0x94, 0xa3, 0x95, 0x0d, 0xf0, 0xd2, 0x97, 0xf1, 0xec, 0x8a,
+	0x6d, 0x97, 0xc2, 0xa7, 0x22, 0x4b, 0xbd, 0x84, 0x8f, 0x18, 0xb6, 0x5d, 0xe6, 0xe3, 0x15, 0x79,
+	0xc8, 0x88, 0x68, 0xd2, 0x3f, 0x20, 0x7c, 0x6a, 0xcd, 0xf1, 0x6c, 0xc1, 0x4a, 0xe0, 0x04, 0x5d,
+	0x78, 0xd9, 0xf0, 0xea, 0xcc, 0x30, 0x3b, 0x4f, 0xfd, 0x2d, 0x3c, 0x61, 0x99, 0x5c, 0x12, 0x9f,
+	0x8d, 0x13, 0xe7, 0xa8, 0x99, 0x0d, 0x7b, 0xb7, 0xd0, 0xed, 0xd0, 0xd5, 0xc3, 0x41, 0x84, 0x47,
+	0xcd, 0x14, 0xd2, 0x03, 0x57, 0xf5, 0x2a, 0x9e, 0x95, 0x1e, 0x65, 0x17, 0x9c, 0xa0, 0x2f, 0x42,
+	0x09, 0x13, 0x4b, 0xc9, 0x38, 0xdb, 0xe6, 0xca, 0xda, 0x7b, 0x11, 0x62, 0x55, 0xf5, 0x9b, 0xa9,
+	0xc4, 0x3b, 0x4c, 0x37, 0xae, 0xae, 0x14, 0xe5, 0x99, 0x9e, 0x90, 0x50, 0xb9, 0x57, 0xe7, 0xf0,
+	0x21, 0x3b, 0x4a, 0x36, 0x14, 0x73, 0x5a, 0xef, 0x6c, 0xd3, 0x6f, 0xe0, 0xf9, 0xe1, 0x35, 0x49,
+	0xcd, 0x7a, 0x3c, 0x51, 0xbf, 0xe7, 0xef, 0x08, 0x9f, 0x5c, 0x67, 0x16, 0x5d, 0xa9, 0x54, 0xc0,
+	0x16, 0x9b, 0x85, 0xb5, 0x8e, 0x0e, 0x1f, 0xe1, 0x59, 0x89, 0x29, 0x3b, 0xd1, 0x91, 0xd4, 0xe4,
+	0xd5, 0x78, 0x15, 0x7f, 0xa2, 0x66, 0x8f, 0x34, 0x09, 0xbb, 0x5f, 0xe7, 0x05, 0x7c, 0x3c, 0xb8,
+	0xc0, 0x1d, 0xf2, 0x72, 0xd0, 0xf4, 0xa1, 0x4e, 0x33, 0xfa, 0x6c, 0x60, 0x90, 0xb8, 0x77, 0x3d,
+	0x1b, 0xd4, 0x2d, 0x7c, 0x24, 0xb8, 0x51, 0x94, 0xd1, 0x0a, 0x44, 0xa5, 0xaf, 0x5e, 0x92, 0x77,
+	0xea, 0xf5, 0xb1, 0xee, 0x54, 0x16, 0xdc, 0x62, 0x40, 0xa2, 0x1f, 0x36, 0xe5, 0x2a, 0xfd, 0xfd,
+	0x04, 0x9e, 0xcb, 0x82, 0x63, 0xb9, 0xd0, 0xbd, 0xd2, 0xfc, 0x3f, 0xd0, 0x0c, 0xd7, 0x30, 0x0e,
+	0xf5, 0xeb, 0x15, 0xe5, 0x4d, 0x29, 0xca, 0xf2, 0x58, 0xa2, 0x04, 0x8f, 0x3f, 0x52, 0xe5, 0xc8,
+	0x6e, 0x67, 0xd9, 0x2f, 0xf9, 0xe4, 0x4b, 0x95, 0x5c, 0xdd, 0xc2, 0x53, 0x14, 0x44, 0x30, 0x50,
+	0x0f, 0x86, 0xc4, 0x6b, 0x7f, 0x6b, 0x3e, 0x16, 0x41, 0x14, 0xb2, 0x7e, 0x33, 0x75, 0x30, 0x5c,
+	0xe8, 0x07, 0x29, 0x88, 0x82, 0xb9, 0xf4, 0x0d, 0xc2, 0x93, 0x45, 0xbe, 0xce, 0xd5, 0x3c, 0xc6,
+	0x6f, 0x1b, 0xd4, 0xac, 0x43, 0x50, 0x9e, 0x3a, 0x30, 0x21, 0xd6, 0xbb, 0x2d, 0x96, 0x9c, 0x1f,
+	0x6e, 0x94, 0x77, 0x47, 0xc7, 0x47, 0xf3, 0x20, 0x3a, 0x13, 0x57, 0x7d, 0x25, 0x0e, 0x1e, 0x78,
+	0x71, 0x24, 0x4f, 0xc7, 0x21, 0xf1, 0x71, 0xbd, 0xf4, 0x3e, 0x9e, 0x5c, 0x09, 0x92, 0xbc, 0x8c,
+	0x71, 0x1e, 0x84, 0x9c, 0x70, 0xa3, 0x50, 0xa7, 0xe2, 0x90, 0xd8, 0x74, 0x5c, 0xba, 0x33, 0x89,
+	0x4f, 0x16, 0x23, 0xe5, 0xfa, 0xee, 0xa5, 0x5a, 0xc3, 0x89, 0x9e, 0x9a, 0x37, 0x0b, 0x6b, 0xea,
+	0x38, 0x17, 0x39, 0x79, 0x7e, 0x34, 0xb0, 0xd4, 0xac, 0x82, 0x67, 0xfa, 0x86, 0x8a, 0x7a, 0x76,
+	0x98, 0xc4, 0xf1, 0x99, 0x33, 0x66, 0x10, 0x8a, 0x8f, 0xe7, 0x68, 0x25, 0x40, 0x74, 0xc9, 0xfe,
+	0xc9, 0xa2, 0x6c, 0x7c, 0x42, 0xc6, 0xd3, 0x61, 0xf7, 0x5f, 0x89, 0xf8, 0x21, 0x4e, 0x44, 0xa3,
+	0x69, 0xbf, 0xfb, 0xce, 0xc5, 0xfd, 0x5f, 0x34, 0xba, 0x46, 0x68, 0x42, 0x17, 0xcf, 0xad, 0xd8,
+	0x76, 0xdd, 0xaa, 0x84, 0x9f, 0x73, 0xfd, 0xdd, 0xb2, 0x85, 0x67, 0x22, 0xe6, 0x4e, 0x6f, 0x8e,
+	0x1e, 0xf8, 0x2f, 0x5b, 0xf4, 0xe7, 0x49, 0x7c, 0x62, 0x9d, 0xef, 0x0f, 0x4f, 0x1d, 0xaa, 0x16,
+	0x17, 0x8e, 0xa7, 0xde, 0x43, 0x78, 0x22, 0x0f, 0x42, 0x3d, 0x13, 0x27, 0xc8, 0x83, 0xe8, 0x41,
+	0x47, 0x51, 0xfe, 0xff, 0xc2, 0x61, 0x9c, 0xae, 0x7d, 0xfa, 0xe3, 0x2f, 0x9f, 0x1f, 0x00, 0xb5,
+	0x92, 0xd9, 0xe5, 0x19, 0xa3, 0x5b, 0x21, 0xcf, 0x7c, 0xd2, 0xfd, 0xf6, 0x2c, 0x5b, 0x26, 0xd7,
+	0x7a, 0x8c, 0x43, 0xf6, 0x37, 0x33, 0x11, 0x74, 0xd0, 0x6f, 0x7f, 0x79, 0x53, 0xfd, 0x0d, 0xe1,
+	0x89, 0xd2, 0xb0, 0xa4, 0x4b, 0xe3, 0x25, 0x7d, 0x0f, 0x85, 0x59, 0x7f, 0x87, 0x92, 0x1f, 0x0c,
+	0xa6, 0x2d, 0x3f, 0x97, 0xc7, 0x4a, 0xb9, 0xc7, 0xa7, 0x9b, 0xee, 0x45, 0xb4, 0xb0, 0x55, 0x48,
+	0x67, 0x5f, 0x46, 0x84, 0x8b, 0x68, 0x41, 0xfd, 0x02, 0xe1, 0xa9, 0x2c, 0xd4, 0x41, 0x80, 0x3a,
+	0xd2, 0xcb, 0x31, 0xf9, 0x3f, 0x2d, 0xfa, 0x59, 0xd0, 0x3a, 0x3f, 0x0b, 0x5a, 0x2e, 0xf8, 0x59,
+	0x48, 0x6f, 0x86, 0xc5, 0xe7, 0x17, 0x72, 0x83, 0x99, 0x8d, 0x59, 0x70, 0x70, 0xb6, 0xfa, 0x35,
+	0x7a, 0xd8, 0x22, 0xe8, 0x51, 0x8b, 0xa0, 0xc7, 0x2d, 0xa2, 0x3c, 0x69, 0x11, 0xe5, 0x69, 0x8b,
+	0x28, 0xcf, 0x5a, 0x44, 0x79, 0xde, 0x22, 0xe8, 0x96, 0x4f, 0xd0, 0x6d, 0x9f, 0x28, 0x77, 0x7c,
+	0x82, 0xee, 0xfa, 0x44, 0xb9, 0xef, 0x13, 0xe5, 0x81, 0x4f, 0x94, 0x87, 0x3e, 0x41, 0x8f, 0x7c,
+	0x82, 0x1e, 0xfb, 0x44, 0x79, 0xe2, 0x13, 0xf4, 0xd4, 0x27, 0xca, 0x33, 0x9f, 0xa0, 0xe7, 0x3e,
+	0x51, 0x6e, 0xb5, 0x89, 0x72, 0xbb, 0x4d, 0xd0, 0x67, 0x6d, 0xa2, 0x7c, 0xd9, 0x26, 0xe8, 0xab,
+	0x36, 0x51, 0xee, 0xb4, 0x89, 0x72, 0xb7, 0x4d, 0xd0, 0xfd, 0x36, 0x41, 0x0f, 0xda, 0x04, 0x6d,
+	0x9d, 0x1f, 0xf5, 0xfd, 0x25, 0xa8, 0xbd, 0xbd, 0x3d, 0x15, 0x6a, 0x70, 0xe1, 0x8f, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0x65, 0xe7, 0x8b, 0x7a, 0xf9, 0x0d, 0x00, 0x00,
 }

@@ -245,13 +245,19 @@
 
 - [lorawan-stack/api/joinserver.proto](#lorawan-stack/api/joinserver.proto)
     - [AppSKeyResponse](#ttn.lorawan.v3.AppSKeyResponse)
+    - [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest)
+    - [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadResponse)
+    - [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest)
+    - [JoinAcceptMICRequest](#ttn.lorawan.v3.JoinAcceptMICRequest)
     - [NwkSKeysResponse](#ttn.lorawan.v3.NwkSKeysResponse)
     - [SessionKeyRequest](#ttn.lorawan.v3.SessionKeyRequest)
   
   
   
+    - [ApplicationCryptoService](#ttn.lorawan.v3.ApplicationCryptoService)
     - [AsJs](#ttn.lorawan.v3.AsJs)
     - [JsEndDeviceRegistry](#ttn.lorawan.v3.JsEndDeviceRegistry)
+    - [NetworkCryptoService](#ttn.lorawan.v3.NetworkCryptoService)
     - [NsJs](#ttn.lorawan.v3.NsJs)
   
 
@@ -2912,6 +2918,74 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
+<a name="ttn.lorawan.v3.CryptoServicePayloadRequest"/>
+
+### CryptoServicePayloadRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| lorawan_version | [MACVersion](#ttn.lorawan.v3.MACVersion) |  |  |
+| payload | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.CryptoServicePayloadResponse"/>
+
+### CryptoServicePayloadResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payload | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.DeriveSessionKeysRequest"/>
+
+### DeriveSessionKeysRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| lorawan_version | [MACVersion](#ttn.lorawan.v3.MACVersion) |  |  |
+| join_nonce | [bytes](#bytes) |  |  |
+| dev_nonce | [bytes](#bytes) |  |  |
+| net_id | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.JoinAcceptMICRequest"/>
+
+### JoinAcceptMICRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payload_request | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |  |
+| join_request_type | [uint32](#uint32) |  |  |
+| dev_nonce | [bytes](#bytes) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.NwkSKeysResponse"/>
 
 ### NwkSKeysResponse
@@ -2951,6 +3025,16 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
  
 
 
+<a name="ttn.lorawan.v3.ApplicationCryptoService"/>
+
+### ApplicationCryptoService
+Service for application layer cryptographic operations.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| DeriveAppSKey | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [AppSKeyResponse](#ttn.lorawan.v3.DeriveSessionKeysRequest) |  |
+
+
 <a name="ttn.lorawan.v3.AsJs"/>
 
 ### AsJs
@@ -2971,6 +3055,20 @@ The JsEndDeviceRegistry service allows clients to manage their end devices on th
 | Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 | Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
 | Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+
+
+<a name="ttn.lorawan.v3.NetworkCryptoService"/>
+
+### NetworkCryptoService
+Service for network layer cryptographic operations.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| JoinRequestMIC | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
+| JoinAcceptMIC | [JoinAcceptMICRequest](#ttn.lorawan.v3.JoinAcceptMICRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.JoinAcceptMICRequest) |  |
+| EncryptJoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
+| EncryptRejoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
+| DeriveNwkSKeys | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [NwkSKeysResponse](#ttn.lorawan.v3.DeriveSessionKeysRequest) |  |
 
 
 <a name="ttn.lorawan.v3.NsJs"/>

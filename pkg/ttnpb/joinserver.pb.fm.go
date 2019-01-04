@@ -170,3 +170,260 @@ func (dst *AppSKeyResponse) SetFields(src *AppSKeyResponse, paths ...string) err
 	}
 	return nil
 }
+
+var CryptoServicePayloadRequestFieldPathsNested = []string{
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_addr",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"lorawan_version",
+	"payload",
+}
+
+var CryptoServicePayloadRequestFieldPathsTopLevel = []string{
+	"ids",
+	"lorawan_version",
+	"payload",
+}
+
+func (dst *CryptoServicePayloadRequest) SetFields(src *CryptoServicePayloadRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "lorawan_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LoRaWANVersion = src.LoRaWANVersion
+			} else {
+				var zero MACVersion
+				dst.LoRaWANVersion = zero
+			}
+		case "payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Payload = src.Payload
+			} else {
+				var zero []byte
+				dst.Payload = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var CryptoServicePayloadResponseFieldPathsNested = []string{
+	"payload",
+}
+
+var CryptoServicePayloadResponseFieldPathsTopLevel = []string{
+	"payload",
+}
+
+func (dst *CryptoServicePayloadResponse) SetFields(src *CryptoServicePayloadResponse, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Payload = src.Payload
+			} else {
+				var zero []byte
+				dst.Payload = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var JoinAcceptMICRequestFieldPathsNested = []string{
+	"dev_nonce",
+	"join_request_type",
+	"payload_request",
+	"payload_request.ids",
+	"payload_request.ids.application_ids",
+	"payload_request.ids.application_ids.application_id",
+	"payload_request.ids.dev_addr",
+	"payload_request.ids.dev_eui",
+	"payload_request.ids.device_id",
+	"payload_request.ids.join_eui",
+	"payload_request.lorawan_version",
+	"payload_request.payload",
+}
+
+var JoinAcceptMICRequestFieldPathsTopLevel = []string{
+	"dev_nonce",
+	"join_request_type",
+	"payload_request",
+}
+
+func (dst *JoinAcceptMICRequest) SetFields(src *JoinAcceptMICRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "payload_request":
+			if len(subs) > 0 {
+				newDst := &dst.CryptoServicePayloadRequest
+				var newSrc *CryptoServicePayloadRequest
+				if src != nil {
+					newSrc = &src.CryptoServicePayloadRequest
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CryptoServicePayloadRequest = src.CryptoServicePayloadRequest
+				} else {
+					var zero CryptoServicePayloadRequest
+					dst.CryptoServicePayloadRequest = zero
+				}
+			}
+		case "join_request_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_request_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinRequestType = src.JoinRequestType
+			} else {
+				var zero uint32
+				dst.JoinRequestType = zero
+			}
+		case "dev_nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevNonce = src.DevNonce
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevNonce
+				dst.DevNonce = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var DeriveSessionKeysRequestFieldPathsNested = []string{
+	"dev_nonce",
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_addr",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"join_nonce",
+	"lorawan_version",
+	"net_id",
+}
+
+var DeriveSessionKeysRequestFieldPathsTopLevel = []string{
+	"dev_nonce",
+	"ids",
+	"join_nonce",
+	"lorawan_version",
+	"net_id",
+}
+
+func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "lorawan_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LoRaWANVersion = src.LoRaWANVersion
+			} else {
+				var zero MACVersion
+				dst.LoRaWANVersion = zero
+			}
+		case "join_nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinNonce = src.JoinNonce
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.JoinNonce
+				dst.JoinNonce = zero
+			}
+		case "dev_nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevNonce = src.DevNonce
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevNonce
+				dst.DevNonce = zero
+			}
+		case "net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetID = src.NetID
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
+				dst.NetID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

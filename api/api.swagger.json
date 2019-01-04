@@ -5879,6 +5879,30 @@
         }
       }
     },
+    "v3CryptoServicePayloadRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "lorawan_version": {
+          "$ref": "#/definitions/v3MACVersion"
+        },
+        "payload": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v3CryptoServicePayloadResponse": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "v3DLSettings": {
       "type": "object",
       "properties": {
