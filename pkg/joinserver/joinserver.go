@@ -46,6 +46,9 @@ type JoinServer struct {
 	entropyMu *sync.Mutex
 	entropy   io.Reader
 
+	networkCryptoService     NetworkCryptoService
+	applicationCryptoService ApplicationCryptoService
+
 	grpc struct {
 		nsJs      nsJsServer
 		asJs      asJsServer
@@ -70,9 +73,25 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropyMu: &sync.Mutex{},
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
+
 	js.grpc.jsDevices = jsEndDeviceRegistryServer{Registry: js.devices}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
+
+	if conf.NetworkCryptoService.Enabled {
+		var err error
+		js.networkCryptoService, err = conf.DialNetworkCryptoService(js.Context(), c.KeyVault)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if conf.ApplicationCryptoService.Enabled {
+		var err error
+		js.applicationCryptoService, err = conf.DialApplicationCryptoService(js.Context(), c.KeyVault)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsIndustries/lorawan-stack/issues/244).
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
