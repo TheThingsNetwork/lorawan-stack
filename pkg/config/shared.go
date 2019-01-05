@@ -40,12 +40,6 @@ type Sentry struct {
 	DSN string `name:"dsn" description:"Sentry Data Source Name"`
 }
 
-// TLS represents TLS configuration.
-type TLS struct {
-	Certificate string `name:"certificate" description:"Location of TLS certificate"`
-	Key         string `name:"key" description:"Location of TLS private key"`
-}
-
 // Cluster represents clustering configuration.
 type Cluster struct {
 	Join              []string `name:"join" description:"Addresses of cluster peers to join"`
