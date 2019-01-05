@@ -17,6 +17,8 @@ package config
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"sync/atomic"
 	"time"
 
@@ -28,6 +30,7 @@ import (
 
 // TLS represents TLS configuration.
 type TLS struct {
+	RootCA      string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
 	Certificate string `name:"certificate" description:"Location of TLS client certificate"`
 	Key         string `name:"key" description:"Location of TLS private key"`
 }
@@ -54,6 +57,16 @@ func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 	if err := loadCertificate(); err != nil {
 		return nil, err
 	}
+	var rootCAs *x509.CertPool
+	if t.RootCA != "" {
+		pem, err := ioutil.ReadFile(t.RootCA)
+		if err != nil {
+			return nil, err
+		}
+		rootCAs = x509.NewCertPool()
+		rootCAs.AppendCertsFromPEM(pem)
+	}
+
 	debounce := make(chan struct{}, 1)
 	fs.Watch(t.Certificate, events.HandlerFunc(func(evt events.Event) {
 		if evt.Name() != "fs.write" {
@@ -74,6 +87,7 @@ func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 	}))
 
 	return &tls.Config{
+		RootCAs: rootCAs,
 		GetConfigForClient: func(info *tls.ClientHelloInfo) (*tls.Config, error) {
 			tlsConfig := &tls.Config{
 				Certificates:             cv.Load().([]tls.Certificate),
