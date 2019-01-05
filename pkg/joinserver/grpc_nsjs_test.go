@@ -851,7 +851,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			JoinResponse: nil,
-			ValidError:   errors.IsDataLoss,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
 			Name: "1.0.0/not a join request payload",
@@ -895,7 +895,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			JoinResponse: nil,
-			ValidError:   errors.IsDataLoss,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
 			Name: "1.0.0/unsupported LoRaWAN version",
@@ -989,7 +989,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			JoinResponse: nil,
-			ValidError:   errors.IsDataLoss,
+			ValidError:   errors.IsInvalidArgument,
 		},
 		{
 			Name: "1.0.0/raw payload that can't be unmarshalled",
