@@ -53,13 +53,6 @@ type JoinServer struct {
 	}
 }
 
-// Config represents the JoinServer configuration.
-type Config struct {
-	Devices         DeviceRegistry      `name:"-"`
-	Keys            KeyRegistry         `name:"-"`
-	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
-}
-
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	if conf.Keys == nil || conf.Devices == nil {
