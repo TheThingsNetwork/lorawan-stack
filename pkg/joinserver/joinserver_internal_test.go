@@ -42,6 +42,7 @@ var (
 type AsJsServer = asJsServer
 type NsJsServer = nsJsServer
 type JsDeviceServer = jsEndDeviceRegistryServer
+type MemCryptoService = memCryptoService
 
 type MockDeviceRegistry struct {
 	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error)
