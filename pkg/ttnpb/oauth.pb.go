@@ -42,7 +42,7 @@ type OAuthClientAuthorizationIdentifiers struct {
 func (m *OAuthClientAuthorizationIdentifiers) Reset()      { *m = OAuthClientAuthorizationIdentifiers{} }
 func (*OAuthClientAuthorizationIdentifiers) ProtoMessage() {}
 func (*OAuthClientAuthorizationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{0}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{0}
 }
 func (m *OAuthClientAuthorizationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -98,7 +98,7 @@ type OAuthClientAuthorization struct {
 func (m *OAuthClientAuthorization) Reset()      { *m = OAuthClientAuthorization{} }
 func (*OAuthClientAuthorization) ProtoMessage() {}
 func (*OAuthClientAuthorization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{1}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{1}
 }
 func (m *OAuthClientAuthorization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -171,7 +171,7 @@ type OAuthClientAuthorizations struct {
 func (m *OAuthClientAuthorizations) Reset()      { *m = OAuthClientAuthorizations{} }
 func (*OAuthClientAuthorizations) ProtoMessage() {}
 func (*OAuthClientAuthorizations) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{2}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{2}
 }
 func (m *OAuthClientAuthorizations) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -223,7 +223,7 @@ type ListOAuthClientAuthorizationsRequest struct {
 func (m *ListOAuthClientAuthorizationsRequest) Reset()      { *m = ListOAuthClientAuthorizationsRequest{} }
 func (*ListOAuthClientAuthorizationsRequest) ProtoMessage() {}
 func (*ListOAuthClientAuthorizationsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{3}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{3}
 }
 func (m *ListOAuthClientAuthorizationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -289,7 +289,7 @@ type OAuthAuthorizationCode struct {
 func (m *OAuthAuthorizationCode) Reset()      { *m = OAuthAuthorizationCode{} }
 func (*OAuthAuthorizationCode) ProtoMessage() {}
 func (*OAuthAuthorizationCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{4}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{4}
 }
 func (m *OAuthAuthorizationCode) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -385,7 +385,7 @@ type OAuthAccessTokenIdentifiers struct {
 func (m *OAuthAccessTokenIdentifiers) Reset()      { *m = OAuthAccessTokenIdentifiers{} }
 func (*OAuthAccessTokenIdentifiers) ProtoMessage() {}
 func (*OAuthAccessTokenIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{5}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{5}
 }
 func (m *OAuthAccessTokenIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -451,7 +451,7 @@ type OAuthAccessToken struct {
 func (m *OAuthAccessToken) Reset()      { *m = OAuthAccessToken{} }
 func (*OAuthAccessToken) ProtoMessage() {}
 func (*OAuthAccessToken) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{6}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{6}
 }
 func (m *OAuthAccessToken) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -545,7 +545,7 @@ type OAuthAccessTokens struct {
 func (m *OAuthAccessTokens) Reset()      { *m = OAuthAccessTokens{} }
 func (*OAuthAccessTokens) ProtoMessage() {}
 func (*OAuthAccessTokens) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{7}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{7}
 }
 func (m *OAuthAccessTokens) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -598,7 +598,7 @@ type ListOAuthAccessTokensRequest struct {
 func (m *ListOAuthAccessTokensRequest) Reset()      { *m = ListOAuthAccessTokensRequest{} }
 func (*ListOAuthAccessTokensRequest) ProtoMessage() {}
 func (*ListOAuthAccessTokensRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_oauth_aa8f2a05ea2d4edd, []int{8}
+	return fileDescriptor_oauth_c8a6878985e94c8c, []int{8}
 }
 func (m *ListOAuthAccessTokensRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3717,13 +3717,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_aa8f2a05ea2d4edd)
+	proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_c8a6878985e94c8c)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_aa8f2a05ea2d4edd)
+	golang_proto.RegisterFile("lorawan-stack/api/oauth.proto", fileDescriptor_oauth_c8a6878985e94c8c)
 }
 
-var fileDescriptor_oauth_aa8f2a05ea2d4edd = []byte{
+var fileDescriptor_oauth_c8a6878985e94c8c = []byte{
 	// 816 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x56, 0x3d, 0x70, 0x1b, 0x45,
 	0x18, 0xdd, 0x95, 0x6c, 0xd9, 0x5a, 0xd9, 0x0e, 0xb9, 0x81, 0x8c, 0x30, 0xb0, 0xa7, 0x9c, 0x29,

@@ -61,7 +61,7 @@ var PeerInfo_Role_value = map[string]int32{
 }
 
 func (PeerInfo_Role) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_cluster_b691a31fa19c033a, []int{0, 0}
+	return fileDescriptor_cluster_08109e41d445b164, []int{0, 0}
 }
 
 // PeerInfo
@@ -81,7 +81,7 @@ type PeerInfo struct {
 func (m *PeerInfo) Reset()      { *m = PeerInfo{} }
 func (*PeerInfo) ProtoMessage() {}
 func (*PeerInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cluster_b691a31fa19c033a, []int{0}
+	return fileDescriptor_cluster_08109e41d445b164, []int{0}
 }
 func (m *PeerInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -811,13 +811,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/cluster.proto", fileDescriptor_cluster_b691a31fa19c033a)
+	proto.RegisterFile("lorawan-stack/api/cluster.proto", fileDescriptor_cluster_08109e41d445b164)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/cluster.proto", fileDescriptor_cluster_b691a31fa19c033a)
+	golang_proto.RegisterFile("lorawan-stack/api/cluster.proto", fileDescriptor_cluster_08109e41d445b164)
 }
 
-var fileDescriptor_cluster_b691a31fa19c033a = []byte{
+var fileDescriptor_cluster_08109e41d445b164 = []byte{
 	// 516 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x92, 0x31, 0x68, 0xdb, 0x40,
 	0x18, 0x85, 0xef, 0x2c, 0xc7, 0xb5, 0x2f, 0xad, 0x63, 0xae, 0xa5, 0xb8, 0x81, 0xfe, 0x36, 0x9e,

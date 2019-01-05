@@ -48,7 +48,7 @@ type SessionKeyRequest struct {
 func (m *SessionKeyRequest) Reset()      { *m = SessionKeyRequest{} }
 func (*SessionKeyRequest) ProtoMessage() {}
 func (*SessionKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_05b9dc06e7471e43, []int{0}
+	return fileDescriptor_joinserver_a35d3a300f6dd1ab, []int{0}
 }
 func (m *SessionKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -98,7 +98,7 @@ type NwkSKeysResponse struct {
 func (m *NwkSKeysResponse) Reset()      { *m = NwkSKeysResponse{} }
 func (*NwkSKeysResponse) ProtoMessage() {}
 func (*NwkSKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_05b9dc06e7471e43, []int{1}
+	return fileDescriptor_joinserver_a35d3a300f6dd1ab, []int{1}
 }
 func (m *NwkSKeysResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -158,7 +158,7 @@ type AppSKeyResponse struct {
 func (m *AppSKeyResponse) Reset()      { *m = AppSKeyResponse{} }
 func (*AppSKeyResponse) ProtoMessage() {}
 func (*AppSKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_joinserver_05b9dc06e7471e43, []int{2}
+	return fileDescriptor_joinserver_a35d3a300f6dd1ab, []int{2}
 }
 func (m *AppSKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1333,13 +1333,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_05b9dc06e7471e43)
+	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_a35d3a300f6dd1ab)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_05b9dc06e7471e43)
+	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_joinserver_a35d3a300f6dd1ab)
 }
 
-var fileDescriptor_joinserver_05b9dc06e7471e43 = []byte{
+var fileDescriptor_joinserver_a35d3a300f6dd1ab = []byte{
 	// 833 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x68, 0x1b, 0x47,
 	0x14, 0x9e, 0xb1, 0x8d, 0x43, 0xc7, 0x6e, 0x92, 0x6e, 0xa1, 0xa4, 0x8a, 0x19, 0xa5, 0x4a, 0x0f,

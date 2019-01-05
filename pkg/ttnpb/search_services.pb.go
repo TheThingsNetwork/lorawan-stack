@@ -50,7 +50,7 @@ type SearchEntitiesRequest struct {
 func (m *SearchEntitiesRequest) Reset()      { *m = SearchEntitiesRequest{} }
 func (*SearchEntitiesRequest) ProtoMessage() {}
 func (*SearchEntitiesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_search_services_cbf9614fd2a7943b, []int{0}
+	return fileDescriptor_search_services_8548a8c7795e28db, []int{0}
 }
 func (m *SearchEntitiesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -138,7 +138,7 @@ type SearchEndDevicesRequest struct {
 func (m *SearchEndDevicesRequest) Reset()      { *m = SearchEndDevicesRequest{} }
 func (*SearchEndDevicesRequest) ProtoMessage() {}
 func (*SearchEndDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_search_services_cbf9614fd2a7943b, []int{1}
+	return fileDescriptor_search_services_8548a8c7795e28db, []int{1}
 }
 func (m *SearchEndDevicesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1804,13 +1804,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/search_services.proto", fileDescriptor_search_services_cbf9614fd2a7943b)
+	proto.RegisterFile("lorawan-stack/api/search_services.proto", fileDescriptor_search_services_8548a8c7795e28db)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/search_services.proto", fileDescriptor_search_services_cbf9614fd2a7943b)
+	golang_proto.RegisterFile("lorawan-stack/api/search_services.proto", fileDescriptor_search_services_8548a8c7795e28db)
 }
 
-var fileDescriptor_search_services_cbf9614fd2a7943b = []byte{
+var fileDescriptor_search_services_8548a8c7795e28db = []byte{
 	// 965 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x3d, 0x6c, 0x23, 0x45,
 	0x14, 0xde, 0x89, 0x9d, 0x90, 0x8c, 0x89, 0xed, 0x4c, 0x92, 0xb3, 0x65, 0xe5, 0xc6, 0x91, 0x0f,

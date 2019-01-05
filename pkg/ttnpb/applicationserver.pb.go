@@ -51,7 +51,7 @@ type ApplicationLink struct {
 func (m *ApplicationLink) Reset()      { *m = ApplicationLink{} }
 func (*ApplicationLink) ProtoMessage() {}
 func (*ApplicationLink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_adeb84391e2c2094, []int{0}
+	return fileDescriptor_applicationserver_62f59f6115e1b29f, []int{0}
 }
 func (m *ApplicationLink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -118,7 +118,7 @@ type GetApplicationLinkRequest struct {
 func (m *GetApplicationLinkRequest) Reset()      { *m = GetApplicationLinkRequest{} }
 func (*GetApplicationLinkRequest) ProtoMessage() {}
 func (*GetApplicationLinkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_adeb84391e2c2094, []int{1}
+	return fileDescriptor_applicationserver_62f59f6115e1b29f, []int{1}
 }
 func (m *GetApplicationLinkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -165,7 +165,7 @@ type SetApplicationLinkRequest struct {
 func (m *SetApplicationLinkRequest) Reset()      { *m = SetApplicationLinkRequest{} }
 func (*SetApplicationLinkRequest) ProtoMessage() {}
 func (*SetApplicationLinkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_adeb84391e2c2094, []int{2}
+	return fileDescriptor_applicationserver_62f59f6115e1b29f, []int{2}
 }
 func (m *SetApplicationLinkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1630,13 +1630,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_adeb84391e2c2094)
+	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_62f59f6115e1b29f)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_adeb84391e2c2094)
+	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_62f59f6115e1b29f)
 }
 
-var fileDescriptor_applicationserver_adeb84391e2c2094 = []byte{
+var fileDescriptor_applicationserver_62f59f6115e1b29f = []byte{
 	// 992 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x96, 0x4f, 0x6c, 0x1b, 0x45,
 	0x14, 0xc6, 0x77, 0x92, 0x34, 0x69, 0x26, 0x22, 0x55, 0x87, 0xaa, 0x4a, 0x0c, 0x4c, 0xac, 0x4d,

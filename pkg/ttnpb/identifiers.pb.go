@@ -38,7 +38,7 @@ type ApplicationIdentifiers struct {
 func (m *ApplicationIdentifiers) Reset()      { *m = ApplicationIdentifiers{} }
 func (*ApplicationIdentifiers) ProtoMessage() {}
 func (*ApplicationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{0}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{0}
 }
 func (m *ApplicationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -83,7 +83,7 @@ type ClientIdentifiers struct {
 func (m *ClientIdentifiers) Reset()      { *m = ClientIdentifiers{} }
 func (*ClientIdentifiers) ProtoMessage() {}
 func (*ClientIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{1}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{1}
 }
 func (m *ClientIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -135,7 +135,7 @@ type EndDeviceIdentifiers struct {
 func (m *EndDeviceIdentifiers) Reset()      { *m = EndDeviceIdentifiers{} }
 func (*EndDeviceIdentifiers) ProtoMessage() {}
 func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{2}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{2}
 }
 func (m *EndDeviceIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -182,7 +182,7 @@ type GatewayIdentifiers struct {
 func (m *GatewayIdentifiers) Reset()      { *m = GatewayIdentifiers{} }
 func (*GatewayIdentifiers) ProtoMessage() {}
 func (*GatewayIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{3}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{3}
 }
 func (m *GatewayIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -228,7 +228,7 @@ type OrganizationIdentifiers struct {
 func (m *OrganizationIdentifiers) Reset()      { *m = OrganizationIdentifiers{} }
 func (*OrganizationIdentifiers) ProtoMessage() {}
 func (*OrganizationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{4}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{4}
 }
 func (m *OrganizationIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -276,7 +276,7 @@ type UserIdentifiers struct {
 func (m *UserIdentifiers) Reset()      { *m = UserIdentifiers{} }
 func (*UserIdentifiers) ProtoMessage() {}
 func (*UserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{5}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{5}
 }
 func (m *UserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -332,7 +332,7 @@ type OrganizationOrUserIdentifiers struct {
 func (m *OrganizationOrUserIdentifiers) Reset()      { *m = OrganizationOrUserIdentifiers{} }
 func (*OrganizationOrUserIdentifiers) ProtoMessage() {}
 func (*OrganizationOrUserIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{6}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{6}
 }
 func (m *OrganizationOrUserIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -490,7 +490,7 @@ type EntityIdentifiers struct {
 func (m *EntityIdentifiers) Reset()      { *m = EntityIdentifiers{} }
 func (*EntityIdentifiers) ProtoMessage() {}
 func (*EntityIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{7}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{7}
 }
 func (m *EntityIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -762,7 +762,7 @@ type CombinedIdentifiers struct {
 func (m *CombinedIdentifiers) Reset()      { *m = CombinedIdentifiers{} }
 func (*CombinedIdentifiers) ProtoMessage() {}
 func (*CombinedIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identifiers_2832cf56d1c3dd82, []int{8}
+	return fileDescriptor_identifiers_4cebea0e91b300a8, []int{8}
 }
 func (m *CombinedIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3423,13 +3423,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_2832cf56d1c3dd82)
+	proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_4cebea0e91b300a8)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_2832cf56d1c3dd82)
+	golang_proto.RegisterFile("lorawan-stack/api/identifiers.proto", fileDescriptor_identifiers_4cebea0e91b300a8)
 }
 
-var fileDescriptor_identifiers_2832cf56d1c3dd82 = []byte{
+var fileDescriptor_identifiers_4cebea0e91b300a8 = []byte{
 	// 943 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x4d, 0x6c, 0x1b, 0x45,
 	0x14, 0x9e, 0xa9, 0x13, 0xff, 0x8c, 0x89, 0x4d, 0xb6, 0x15, 0x58, 0x95, 0x98, 0x0d, 0xa6, 0x40,

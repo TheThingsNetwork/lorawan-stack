@@ -239,13 +239,13 @@ var _EndDeviceRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/end_device_services.proto", fileDescriptor_end_device_services_b4236e652d3f349b)
+	proto.RegisterFile("lorawan-stack/api/end_device_services.proto", fileDescriptor_end_device_services_89507d8adcb25d08)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/end_device_services.proto", fileDescriptor_end_device_services_b4236e652d3f349b)
+	golang_proto.RegisterFile("lorawan-stack/api/end_device_services.proto", fileDescriptor_end_device_services_89507d8adcb25d08)
 }
 
-var fileDescriptor_end_device_services_b4236e652d3f349b = []byte{
+var fileDescriptor_end_device_services_89507d8adcb25d08 = []byte{
 	// 546 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x93, 0x31, 0x6c, 0xd3, 0x40,
 	0x14, 0x86, 0xef, 0x00, 0x65, 0xf0, 0x80, 0x84, 0x07, 0x24, 0x0c, 0x7a, 0x43, 0x0a, 0x0c, 0x85,

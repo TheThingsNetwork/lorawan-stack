@@ -84,7 +84,7 @@ var LocationSource_value = map[string]int32{
 }
 
 func (LocationSource) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_af4346ecd0af042e, []int{0}
+	return fileDescriptor_metadata_8f259ff0d4005ede, []int{0}
 }
 
 // Contains metadata for a received message. Each antenna that receives
@@ -127,7 +127,7 @@ type RxMetadata struct {
 func (m *RxMetadata) Reset()      { *m = RxMetadata{} }
 func (*RxMetadata) ProtoMessage() {}
 func (*RxMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_af4346ecd0af042e, []int{0}
+	return fileDescriptor_metadata_8f259ff0d4005ede, []int{0}
 }
 func (m *RxMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -279,7 +279,7 @@ type Location struct {
 func (m *Location) Reset()      { *m = Location{} }
 func (*Location) ProtoMessage() {}
 func (*Location) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_af4346ecd0af042e, []int{1}
+	return fileDescriptor_metadata_8f259ff0d4005ede, []int{1}
 }
 func (m *Location) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1579,13 +1579,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_af4346ecd0af042e)
+	proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_8f259ff0d4005ede)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_af4346ecd0af042e)
+	golang_proto.RegisterFile("lorawan-stack/api/metadata.proto", fileDescriptor_metadata_8f259ff0d4005ede)
 }
 
-var fileDescriptor_metadata_af4346ecd0af042e = []byte{
+var fileDescriptor_metadata_8f259ff0d4005ede = []byte{
 	// 961 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x94, 0x31, 0x50, 0x1b, 0xc7,
 	0x17, 0xc6, 0x6f, 0x41, 0x80, 0x58, 0x81, 0x60, 0xf6, 0x3f, 0xd8, 0x87, 0xe0, 0xbf, 0x77, 0xc1,

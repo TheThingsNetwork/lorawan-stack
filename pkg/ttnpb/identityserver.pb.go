@@ -44,7 +44,7 @@ type AuthInfoResponse struct {
 func (m *AuthInfoResponse) Reset()      { *m = AuthInfoResponse{} }
 func (*AuthInfoResponse) ProtoMessage() {}
 func (*AuthInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identityserver_d0b36d67e1504cb1, []int{0}
+	return fileDescriptor_identityserver_f7dc84ee4809122e, []int{0}
 }
 func (m *AuthInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -202,7 +202,7 @@ type AuthInfoResponse_APIKeyAccess struct {
 func (m *AuthInfoResponse_APIKeyAccess) Reset()      { *m = AuthInfoResponse_APIKeyAccess{} }
 func (*AuthInfoResponse_APIKeyAccess) ProtoMessage() {}
 func (*AuthInfoResponse_APIKeyAccess) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identityserver_d0b36d67e1504cb1, []int{0, 0}
+	return fileDescriptor_identityserver_f7dc84ee4809122e, []int{0, 0}
 }
 func (m *AuthInfoResponse_APIKeyAccess) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1110,13 +1110,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/identityserver.proto", fileDescriptor_identityserver_d0b36d67e1504cb1)
+	proto.RegisterFile("lorawan-stack/api/identityserver.proto", fileDescriptor_identityserver_f7dc84ee4809122e)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/identityserver.proto", fileDescriptor_identityserver_d0b36d67e1504cb1)
+	golang_proto.RegisterFile("lorawan-stack/api/identityserver.proto", fileDescriptor_identityserver_f7dc84ee4809122e)
 }
 
-var fileDescriptor_identityserver_d0b36d67e1504cb1 = []byte{
+var fileDescriptor_identityserver_f7dc84ee4809122e = []byte{
 	// 581 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0x3f, 0x48, 0x1c, 0x4f,
 	0x14, 0x9e, 0x51, 0xf0, 0xa7, 0xf3, 0x33, 0xf1, 0xb2, 0x04, 0x91, 0x4b, 0xf2, 0xce, 0x18, 0x08,

@@ -48,7 +48,7 @@ type ApplicationWebhookIdentifiers struct {
 func (m *ApplicationWebhookIdentifiers) Reset()      { *m = ApplicationWebhookIdentifiers{} }
 func (*ApplicationWebhookIdentifiers) ProtoMessage() {}
 func (*ApplicationWebhookIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{0}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{0}
 }
 func (m *ApplicationWebhookIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -110,7 +110,7 @@ type ApplicationWebhook struct {
 func (m *ApplicationWebhook) Reset()      { *m = ApplicationWebhook{} }
 func (*ApplicationWebhook) ProtoMessage() {}
 func (*ApplicationWebhook) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{1}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{1}
 }
 func (m *ApplicationWebhook) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -240,7 +240,7 @@ type ApplicationWebhook_Message struct {
 func (m *ApplicationWebhook_Message) Reset()      { *m = ApplicationWebhook_Message{} }
 func (*ApplicationWebhook_Message) ProtoMessage() {}
 func (*ApplicationWebhook_Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{1, 1}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{1, 1}
 }
 func (m *ApplicationWebhook_Message) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -285,7 +285,7 @@ type ApplicationWebhooks struct {
 func (m *ApplicationWebhooks) Reset()      { *m = ApplicationWebhooks{} }
 func (*ApplicationWebhooks) ProtoMessage() {}
 func (*ApplicationWebhooks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{2}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{2}
 }
 func (m *ApplicationWebhooks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -331,7 +331,7 @@ type ApplicationWebhookFormats struct {
 func (m *ApplicationWebhookFormats) Reset()      { *m = ApplicationWebhookFormats{} }
 func (*ApplicationWebhookFormats) ProtoMessage() {}
 func (*ApplicationWebhookFormats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{3}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{3}
 }
 func (m *ApplicationWebhookFormats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -377,7 +377,7 @@ type GetApplicationWebhookRequest struct {
 func (m *GetApplicationWebhookRequest) Reset()      { *m = GetApplicationWebhookRequest{} }
 func (*GetApplicationWebhookRequest) ProtoMessage() {}
 func (*GetApplicationWebhookRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{4}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{4}
 }
 func (m *GetApplicationWebhookRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -423,7 +423,7 @@ type ListApplicationWebhooksRequest struct {
 func (m *ListApplicationWebhooksRequest) Reset()      { *m = ListApplicationWebhooksRequest{} }
 func (*ListApplicationWebhooksRequest) ProtoMessage() {}
 func (*ListApplicationWebhooksRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{5}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{5}
 }
 func (m *ListApplicationWebhooksRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -469,7 +469,7 @@ type SetApplicationWebhookRequest struct {
 func (m *SetApplicationWebhookRequest) Reset()      { *m = SetApplicationWebhookRequest{} }
 func (*SetApplicationWebhookRequest) ProtoMessage() {}
 func (*SetApplicationWebhookRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_web_d4b8b5699e336da3, []int{6}
+	return fileDescriptor_applicationserver_web_cae7911b27bddc2a, []int{6}
 }
 func (m *SetApplicationWebhookRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3299,13 +3299,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/applicationserver_web.proto", fileDescriptor_applicationserver_web_d4b8b5699e336da3)
+	proto.RegisterFile("lorawan-stack/api/applicationserver_web.proto", fileDescriptor_applicationserver_web_cae7911b27bddc2a)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/applicationserver_web.proto", fileDescriptor_applicationserver_web_d4b8b5699e336da3)
+	golang_proto.RegisterFile("lorawan-stack/api/applicationserver_web.proto", fileDescriptor_applicationserver_web_cae7911b27bddc2a)
 }
 
-var fileDescriptor_applicationserver_web_d4b8b5699e336da3 = []byte{
+var fileDescriptor_applicationserver_web_cae7911b27bddc2a = []byte{
 	// 1179 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x97, 0x41, 0x6c, 0xd3, 0x56,
 	0x1c, 0xc6, 0xfd, 0x48, 0x69, 0x9a, 0x17, 0x28, 0xd3, 0x63, 0x43, 0x5e, 0x80, 0x97, 0xca, 0x6c,

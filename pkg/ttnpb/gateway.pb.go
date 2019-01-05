@@ -47,7 +47,7 @@ type GatewayBrand struct {
 func (m *GatewayBrand) Reset()      { *m = GatewayBrand{} }
 func (*GatewayBrand) ProtoMessage() {}
 func (*GatewayBrand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{0}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{0}
 }
 func (m *GatewayBrand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -115,7 +115,7 @@ type GatewayModel struct {
 func (m *GatewayModel) Reset()      { *m = GatewayModel{} }
 func (*GatewayModel) ProtoMessage() {}
 func (*GatewayModel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{1}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{1}
 }
 func (m *GatewayModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -178,7 +178,7 @@ type GatewayVersionIdentifiers struct {
 func (m *GatewayVersionIdentifiers) Reset()      { *m = GatewayVersionIdentifiers{} }
 func (*GatewayVersionIdentifiers) ProtoMessage() {}
 func (*GatewayVersionIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{2}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{2}
 }
 func (m *GatewayVersionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -248,7 +248,7 @@ type GatewayRadio struct {
 func (m *GatewayRadio) Reset()      { *m = GatewayRadio{} }
 func (*GatewayRadio) ProtoMessage() {}
 func (*GatewayRadio) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{3}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{3}
 }
 func (m *GatewayRadio) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -323,7 +323,7 @@ type GatewayRadio_TxConfiguration struct {
 func (m *GatewayRadio_TxConfiguration) Reset()      { *m = GatewayRadio_TxConfiguration{} }
 func (*GatewayRadio_TxConfiguration) ProtoMessage() {}
 func (*GatewayRadio_TxConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{3, 0}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{3, 0}
 }
 func (m *GatewayRadio_TxConfiguration) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -388,7 +388,7 @@ type GatewayVersion struct {
 func (m *GatewayVersion) Reset()      { *m = GatewayVersion{} }
 func (*GatewayVersion) ProtoMessage() {}
 func (*GatewayVersion) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{4}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{4}
 }
 func (m *GatewayVersion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -478,7 +478,7 @@ type Gateway struct {
 func (m *Gateway) Reset()      { *m = Gateway{} }
 func (*Gateway) ProtoMessage() {}
 func (*Gateway) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{5}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{5}
 }
 func (m *Gateway) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -628,7 +628,7 @@ type Gateways struct {
 func (m *Gateways) Reset()      { *m = Gateways{} }
 func (*Gateways) ProtoMessage() {}
 func (*Gateways) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{6}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{6}
 }
 func (m *Gateways) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -674,7 +674,7 @@ type GetGatewayRequest struct {
 func (m *GetGatewayRequest) Reset()      { *m = GetGatewayRequest{} }
 func (*GetGatewayRequest) ProtoMessage() {}
 func (*GetGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{7}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{7}
 }
 func (m *GetGatewayRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -727,7 +727,7 @@ type ListGatewaysRequest struct {
 func (m *ListGatewaysRequest) Reset()      { *m = ListGatewaysRequest{} }
 func (*ListGatewaysRequest) ProtoMessage() {}
 func (*ListGatewaysRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{8}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{8}
 }
 func (m *ListGatewaysRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -802,7 +802,7 @@ type CreateGatewayRequest struct {
 func (m *CreateGatewayRequest) Reset()      { *m = CreateGatewayRequest{} }
 func (*CreateGatewayRequest) ProtoMessage() {}
 func (*CreateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{9}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{9}
 }
 func (m *CreateGatewayRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -848,7 +848,7 @@ type UpdateGatewayRequest struct {
 func (m *UpdateGatewayRequest) Reset()      { *m = UpdateGatewayRequest{} }
 func (*UpdateGatewayRequest) ProtoMessage() {}
 func (*UpdateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{10}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{10}
 }
 func (m *UpdateGatewayRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -895,7 +895,7 @@ type CreateGatewayAPIKeyRequest struct {
 func (m *CreateGatewayAPIKeyRequest) Reset()      { *m = CreateGatewayAPIKeyRequest{} }
 func (*CreateGatewayAPIKeyRequest) ProtoMessage() {}
 func (*CreateGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{11}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{11}
 }
 func (m *CreateGatewayAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -948,7 +948,7 @@ type UpdateGatewayAPIKeyRequest struct {
 func (m *UpdateGatewayAPIKeyRequest) Reset()      { *m = UpdateGatewayAPIKeyRequest{} }
 func (*UpdateGatewayAPIKeyRequest) ProtoMessage() {}
 func (*UpdateGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{12}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{12}
 }
 func (m *UpdateGatewayAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -987,7 +987,7 @@ type SetGatewayCollaboratorRequest struct {
 func (m *SetGatewayCollaboratorRequest) Reset()      { *m = SetGatewayCollaboratorRequest{} }
 func (*SetGatewayCollaboratorRequest) ProtoMessage() {}
 func (*SetGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{13}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{13}
 }
 func (m *SetGatewayCollaboratorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1037,7 +1037,7 @@ type GatewayAntenna struct {
 func (m *GatewayAntenna) Reset()      { *m = GatewayAntenna{} }
 func (*GatewayAntenna) ProtoMessage() {}
 func (*GatewayAntenna) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{14}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{14}
 }
 func (m *GatewayAntenna) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1124,7 +1124,7 @@ type GatewayStatus struct {
 func (m *GatewayStatus) Reset()      { *m = GatewayStatus{} }
 func (*GatewayStatus) ProtoMessage() {}
 func (*GatewayStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{15}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{15}
 }
 func (m *GatewayStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1219,7 +1219,7 @@ type GatewayConnectionStats struct {
 func (m *GatewayConnectionStats) Reset()      { *m = GatewayConnectionStats{} }
 func (*GatewayConnectionStats) ProtoMessage() {}
 func (*GatewayConnectionStats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gateway_82ab6659311d6a71, []int{16}
+	return fileDescriptor_gateway_8cb54e866cc95416, []int{16}
 }
 func (m *GatewayConnectionStats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -7630,13 +7630,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/gateway.proto", fileDescriptor_gateway_82ab6659311d6a71)
+	proto.RegisterFile("lorawan-stack/api/gateway.proto", fileDescriptor_gateway_8cb54e866cc95416)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/gateway.proto", fileDescriptor_gateway_82ab6659311d6a71)
+	golang_proto.RegisterFile("lorawan-stack/api/gateway.proto", fileDescriptor_gateway_8cb54e866cc95416)
 }
 
-var fileDescriptor_gateway_82ab6659311d6a71 = []byte{
+var fileDescriptor_gateway_8cb54e866cc95416 = []byte{
 	// 1940 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0x3d, 0x70, 0x1b, 0xc7,
 	0x15, 0xc6, 0x01, 0x10, 0x01, 0x3c, 0x90, 0x20, 0xb5, 0x66, 0xe8, 0x33, 0x2c, 0x1d, 0x68, 0x38,

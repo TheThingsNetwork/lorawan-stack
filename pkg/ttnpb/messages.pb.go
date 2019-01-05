@@ -69,7 +69,7 @@ var PayloadFormatter_value = map[string]int32{
 }
 
 func (PayloadFormatter) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{0}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{0}
 }
 
 type TxAcknowledgment_Result int32
@@ -110,7 +110,7 @@ var TxAcknowledgment_Result_value = map[string]int32{
 }
 
 func (TxAcknowledgment_Result) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{2, 0}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{2, 0}
 }
 
 // Uplink message from the end device to the network
@@ -130,7 +130,7 @@ type UplinkMessage struct {
 func (m *UplinkMessage) Reset()      { *m = UplinkMessage{} }
 func (*UplinkMessage) ProtoMessage() {}
 func (*UplinkMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{0}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{0}
 }
 func (m *UplinkMessage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -218,7 +218,7 @@ type DownlinkMessage struct {
 func (m *DownlinkMessage) Reset()      { *m = DownlinkMessage{} }
 func (*DownlinkMessage) ProtoMessage() {}
 func (*DownlinkMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{1}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{1}
 }
 func (m *DownlinkMessage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -397,7 +397,7 @@ type TxAcknowledgment struct {
 func (m *TxAcknowledgment) Reset()      { *m = TxAcknowledgment{} }
 func (*TxAcknowledgment) ProtoMessage() {}
 func (*TxAcknowledgment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{2}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{2}
 }
 func (m *TxAcknowledgment) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -456,7 +456,7 @@ type ApplicationUplink struct {
 func (m *ApplicationUplink) Reset()      { *m = ApplicationUplink{} }
 func (*ApplicationUplink) ProtoMessage() {}
 func (*ApplicationUplink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{3}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{3}
 }
 func (m *ApplicationUplink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -545,7 +545,7 @@ type ApplicationLocation struct {
 func (m *ApplicationLocation) Reset()      { *m = ApplicationLocation{} }
 func (*ApplicationLocation) ProtoMessage() {}
 func (*ApplicationLocation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{4}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{4}
 }
 func (m *ApplicationLocation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -607,7 +607,7 @@ type ApplicationJoinAccept struct {
 func (m *ApplicationJoinAccept) Reset()      { *m = ApplicationJoinAccept{} }
 func (*ApplicationJoinAccept) ProtoMessage() {}
 func (*ApplicationJoinAccept) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{5}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{5}
 }
 func (m *ApplicationJoinAccept) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -693,7 +693,7 @@ type ApplicationDownlink struct {
 func (m *ApplicationDownlink) Reset()      { *m = ApplicationDownlink{} }
 func (*ApplicationDownlink) ProtoMessage() {}
 func (*ApplicationDownlink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{6}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{6}
 }
 func (m *ApplicationDownlink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -803,7 +803,7 @@ type ApplicationDownlink_ClassBC struct {
 func (m *ApplicationDownlink_ClassBC) Reset()      { *m = ApplicationDownlink_ClassBC{} }
 func (*ApplicationDownlink_ClassBC) ProtoMessage() {}
 func (*ApplicationDownlink_ClassBC) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{6, 0}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{6, 0}
 }
 func (m *ApplicationDownlink_ClassBC) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -855,7 +855,7 @@ type ApplicationDownlinks struct {
 func (m *ApplicationDownlinks) Reset()      { *m = ApplicationDownlinks{} }
 func (*ApplicationDownlinks) ProtoMessage() {}
 func (*ApplicationDownlinks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{7}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{7}
 }
 func (m *ApplicationDownlinks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -901,7 +901,7 @@ type ApplicationDownlinkFailed struct {
 func (m *ApplicationDownlinkFailed) Reset()      { *m = ApplicationDownlinkFailed{} }
 func (*ApplicationDownlinkFailed) ProtoMessage() {}
 func (*ApplicationDownlinkFailed) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{8}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{8}
 }
 func (m *ApplicationDownlinkFailed) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -947,7 +947,7 @@ type ApplicationInvalidatedDownlinks struct {
 func (m *ApplicationInvalidatedDownlinks) Reset()      { *m = ApplicationInvalidatedDownlinks{} }
 func (*ApplicationInvalidatedDownlinks) ProtoMessage() {}
 func (*ApplicationInvalidatedDownlinks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{9}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{9}
 }
 func (m *ApplicationInvalidatedDownlinks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1011,7 +1011,7 @@ type ApplicationUp struct {
 func (m *ApplicationUp) Reset()      { *m = ApplicationUp{} }
 func (*ApplicationUp) ProtoMessage() {}
 func (*ApplicationUp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{10}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{10}
 }
 func (m *ApplicationUp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1385,7 +1385,7 @@ type MessagePayloadFormatters struct {
 func (m *MessagePayloadFormatters) Reset()      { *m = MessagePayloadFormatters{} }
 func (*MessagePayloadFormatters) ProtoMessage() {}
 func (*MessagePayloadFormatters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{11}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{11}
 }
 func (m *MessagePayloadFormatters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1452,7 +1452,7 @@ type DownlinkQueueRequest struct {
 func (m *DownlinkQueueRequest) Reset()      { *m = DownlinkQueueRequest{} }
 func (*DownlinkQueueRequest) ProtoMessage() {}
 func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_c2c5f1fefa1946d8, []int{12}
+	return fileDescriptor_messages_a9f2b0485e6afed8, []int{12}
 }
 func (m *DownlinkQueueRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -6939,13 +6939,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_c2c5f1fefa1946d8)
+	proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_a9f2b0485e6afed8)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_c2c5f1fefa1946d8)
+	golang_proto.RegisterFile("lorawan-stack/api/messages.proto", fileDescriptor_messages_a9f2b0485e6afed8)
 }
 
-var fileDescriptor_messages_c2c5f1fefa1946d8 = []byte{
+var fileDescriptor_messages_a9f2b0485e6afed8 = []byte{
 	// 1878 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x58, 0x4d, 0x6c, 0x1b, 0xc7,
 	0x15, 0xde, 0xa5, 0x28, 0x91, 0x7c, 0xa4, 0xa8, 0xcd, 0x44, 0x71, 0x19, 0xd5, 0x5d, 0xaa, 0x4c,

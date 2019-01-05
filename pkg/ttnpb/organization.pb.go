@@ -48,7 +48,7 @@ type Organization struct {
 func (m *Organization) Reset()      { *m = Organization{} }
 func (*Organization) ProtoMessage() {}
 func (*Organization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{0}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{0}
 }
 func (m *Organization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -128,7 +128,7 @@ type Organizations struct {
 func (m *Organizations) Reset()      { *m = Organizations{} }
 func (*Organizations) ProtoMessage() {}
 func (*Organizations) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{1}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{1}
 }
 func (m *Organizations) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -174,7 +174,7 @@ type GetOrganizationRequest struct {
 func (m *GetOrganizationRequest) Reset()      { *m = GetOrganizationRequest{} }
 func (*GetOrganizationRequest) ProtoMessage() {}
 func (*GetOrganizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{2}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{2}
 }
 func (m *GetOrganizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -229,7 +229,7 @@ type ListOrganizationsRequest struct {
 func (m *ListOrganizationsRequest) Reset()      { *m = ListOrganizationsRequest{} }
 func (*ListOrganizationsRequest) ProtoMessage() {}
 func (*ListOrganizationsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{3}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{3}
 }
 func (m *ListOrganizationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -306,7 +306,7 @@ type CreateOrganizationRequest struct {
 func (m *CreateOrganizationRequest) Reset()      { *m = CreateOrganizationRequest{} }
 func (*CreateOrganizationRequest) ProtoMessage() {}
 func (*CreateOrganizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{4}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{4}
 }
 func (m *CreateOrganizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -352,7 +352,7 @@ type UpdateOrganizationRequest struct {
 func (m *UpdateOrganizationRequest) Reset()      { *m = UpdateOrganizationRequest{} }
 func (*UpdateOrganizationRequest) ProtoMessage() {}
 func (*UpdateOrganizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{5}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{5}
 }
 func (m *UpdateOrganizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -399,7 +399,7 @@ type CreateOrganizationAPIKeyRequest struct {
 func (m *CreateOrganizationAPIKeyRequest) Reset()      { *m = CreateOrganizationAPIKeyRequest{} }
 func (*CreateOrganizationAPIKeyRequest) ProtoMessage() {}
 func (*CreateOrganizationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{6}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{6}
 }
 func (m *CreateOrganizationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -452,7 +452,7 @@ type UpdateOrganizationAPIKeyRequest struct {
 func (m *UpdateOrganizationAPIKeyRequest) Reset()      { *m = UpdateOrganizationAPIKeyRequest{} }
 func (*UpdateOrganizationAPIKeyRequest) ProtoMessage() {}
 func (*UpdateOrganizationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{7}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{7}
 }
 func (m *UpdateOrganizationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -491,7 +491,7 @@ type SetOrganizationCollaboratorRequest struct {
 func (m *SetOrganizationCollaboratorRequest) Reset()      { *m = SetOrganizationCollaboratorRequest{} }
 func (*SetOrganizationCollaboratorRequest) ProtoMessage() {}
 func (*SetOrganizationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_organization_f4f1a272c94d5253, []int{8}
+	return fileDescriptor_organization_956fac6cd9b16990, []int{8}
 }
 func (m *SetOrganizationCollaboratorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3139,13 +3139,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_f4f1a272c94d5253)
+	proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_956fac6cd9b16990)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_f4f1a272c94d5253)
+	golang_proto.RegisterFile("lorawan-stack/api/organization.proto", fileDescriptor_organization_956fac6cd9b16990)
 }
 
-var fileDescriptor_organization_f4f1a272c94d5253 = []byte{
+var fileDescriptor_organization_956fac6cd9b16990 = []byte{
 	// 857 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x3d, 0x8c, 0x1b, 0x45,
 	0x14, 0x9e, 0xb1, 0x2f, 0x0e, 0x1e, 0x9f, 0x93, 0x68, 0x05, 0xd1, 0xc6, 0x44, 0x63, 0x6b, 0x41,

@@ -54,7 +54,7 @@ type Event struct {
 func (m *Event) Reset()      { *m = Event{} }
 func (*Event) ProtoMessage() {}
 func (*Event) Descriptor() ([]byte, []int) {
-	return fileDescriptor_events_2158ad07cf4faa90, []int{0}
+	return fileDescriptor_events_b4f706794a1378d0, []int{0}
 }
 func (m *Event) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -149,7 +149,7 @@ type StreamEventsRequest struct {
 func (m *StreamEventsRequest) Reset()      { *m = StreamEventsRequest{} }
 func (*StreamEventsRequest) ProtoMessage() {}
 func (*StreamEventsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_events_2158ad07cf4faa90, []int{1}
+	return fileDescriptor_events_b4f706794a1378d0, []int{1}
 }
 func (m *StreamEventsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1368,13 +1368,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/events.proto", fileDescriptor_events_2158ad07cf4faa90)
+	proto.RegisterFile("lorawan-stack/api/events.proto", fileDescriptor_events_b4f706794a1378d0)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/events.proto", fileDescriptor_events_2158ad07cf4faa90)
+	golang_proto.RegisterFile("lorawan-stack/api/events.proto", fileDescriptor_events_b4f706794a1378d0)
 }
 
-var fileDescriptor_events_2158ad07cf4faa90 = []byte{
+var fileDescriptor_events_b4f706794a1378d0 = []byte{
 	// 629 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0x31, 0x4c, 0x1b, 0x4b,
 	0x10, 0xdd, 0xc5, 0x67, 0xf3, 0x59, 0xf8, 0x24, 0xda, 0x90, 0xe8, 0x62, 0x45, 0x63, 0xcb, 0x34,

@@ -430,13 +430,13 @@ var _NsEndDeviceRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_daea2533dd4e7b4b)
+	proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_016d8dfd970b8a10)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_daea2533dd4e7b4b)
+	golang_proto.RegisterFile("lorawan-stack/api/networkserver.proto", fileDescriptor_networkserver_016d8dfd970b8a10)
 }
 
-var fileDescriptor_networkserver_daea2533dd4e7b4b = []byte{
+var fileDescriptor_networkserver_016d8dfd970b8a10 = []byte{
 	// 629 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x31, 0x48, 0x1c, 0x4d,
 	0x14, 0xc7, 0x67, 0x54, 0x2c, 0x96, 0x8f, 0x2f, 0x64, 0x13, 0x02, 0xb9, 0xc4, 0x47, 0x38, 0x4d,

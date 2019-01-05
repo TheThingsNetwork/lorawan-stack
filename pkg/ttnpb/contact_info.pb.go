@@ -61,7 +61,7 @@ var ContactType_value = map[string]int32{
 }
 
 func (ContactType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_contact_info_b1dd7d4d4fa78416, []int{0}
+	return fileDescriptor_contact_info_f691564c1312437d, []int{0}
 }
 
 type ContactMethod int32
@@ -84,7 +84,7 @@ var ContactMethod_value = map[string]int32{
 }
 
 func (ContactMethod) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_contact_info_b1dd7d4d4fa78416, []int{1}
+	return fileDescriptor_contact_info_f691564c1312437d, []int{1}
 }
 
 type ContactInfo struct {
@@ -100,7 +100,7 @@ type ContactInfo struct {
 func (m *ContactInfo) Reset()      { *m = ContactInfo{} }
 func (*ContactInfo) ProtoMessage() {}
 func (*ContactInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_contact_info_b1dd7d4d4fa78416, []int{0}
+	return fileDescriptor_contact_info_f691564c1312437d, []int{0}
 }
 func (m *ContactInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -178,7 +178,7 @@ type ContactInfoValidation struct {
 func (m *ContactInfoValidation) Reset()      { *m = ContactInfoValidation{} }
 func (*ContactInfoValidation) ProtoMessage() {}
 func (*ContactInfoValidation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_contact_info_b1dd7d4d4fa78416, []int{1}
+	return fileDescriptor_contact_info_f691564c1312437d, []int{1}
 }
 func (m *ContactInfoValidation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1340,13 +1340,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/contact_info.proto", fileDescriptor_contact_info_b1dd7d4d4fa78416)
+	proto.RegisterFile("lorawan-stack/api/contact_info.proto", fileDescriptor_contact_info_f691564c1312437d)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/contact_info.proto", fileDescriptor_contact_info_b1dd7d4d4fa78416)
+	golang_proto.RegisterFile("lorawan-stack/api/contact_info.proto", fileDescriptor_contact_info_f691564c1312437d)
 }
 
-var fileDescriptor_contact_info_b1dd7d4d4fa78416 = []byte{
+var fileDescriptor_contact_info_f691564c1312437d = []byte{
 	// 763 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x3f, 0x6c, 0xfb, 0x44,
 	0x14, 0xbe, 0x73, 0xf3, 0x8b, 0x7e, 0xb9, 0xb4, 0x55, 0x30, 0x25, 0xb2, 0x5c, 0xb8, 0x86, 0x00,

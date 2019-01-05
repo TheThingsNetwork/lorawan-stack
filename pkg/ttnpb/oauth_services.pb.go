@@ -198,13 +198,13 @@ var _OAuthAuthorizationRegistry_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/oauth_services.proto", fileDescriptor_oauth_services_bcff1bd505256de5)
+	proto.RegisterFile("lorawan-stack/api/oauth_services.proto", fileDescriptor_oauth_services_2c9599c371504e40)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/oauth_services.proto", fileDescriptor_oauth_services_bcff1bd505256de5)
+	golang_proto.RegisterFile("lorawan-stack/api/oauth_services.proto", fileDescriptor_oauth_services_2c9599c371504e40)
 }
 
-var fileDescriptor_oauth_services_bcff1bd505256de5 = []byte{
+var fileDescriptor_oauth_services_2c9599c371504e40 = []byte{
 	// 518 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x93, 0x3f, 0x68, 0x14, 0x41,
 	0x14, 0xc6, 0x67, 0x44, 0x53, 0xac, 0x60, 0x31, 0x85, 0xc5, 0xaa, 0x0f, 0x4c, 0x21, 0x7a, 0x26,

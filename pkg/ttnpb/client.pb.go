@@ -59,7 +59,7 @@ var GrantType_value = map[string]int32{
 }
 
 func (GrantType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{0}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{0}
 }
 
 // An OAuth client on the network.
@@ -100,7 +100,7 @@ type Client struct {
 func (m *Client) Reset()      { *m = Client{} }
 func (*Client) ProtoMessage() {}
 func (*Client) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{0}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{0}
 }
 func (m *Client) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -229,7 +229,7 @@ type Clients struct {
 func (m *Clients) Reset()      { *m = Clients{} }
 func (*Clients) ProtoMessage() {}
 func (*Clients) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{1}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{1}
 }
 func (m *Clients) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -275,7 +275,7 @@ type GetClientRequest struct {
 func (m *GetClientRequest) Reset()      { *m = GetClientRequest{} }
 func (*GetClientRequest) ProtoMessage() {}
 func (*GetClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{2}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{2}
 }
 func (m *GetClientRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -328,7 +328,7 @@ type ListClientsRequest struct {
 func (m *ListClientsRequest) Reset()      { *m = ListClientsRequest{} }
 func (*ListClientsRequest) ProtoMessage() {}
 func (*ListClientsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{3}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{3}
 }
 func (m *ListClientsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -403,7 +403,7 @@ type CreateClientRequest struct {
 func (m *CreateClientRequest) Reset()      { *m = CreateClientRequest{} }
 func (*CreateClientRequest) ProtoMessage() {}
 func (*CreateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{4}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{4}
 }
 func (m *CreateClientRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -449,7 +449,7 @@ type UpdateClientRequest struct {
 func (m *UpdateClientRequest) Reset()      { *m = UpdateClientRequest{} }
 func (*UpdateClientRequest) ProtoMessage() {}
 func (*UpdateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{5}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{5}
 }
 func (m *UpdateClientRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -495,7 +495,7 @@ type SetClientCollaboratorRequest struct {
 func (m *SetClientCollaboratorRequest) Reset()      { *m = SetClientCollaboratorRequest{} }
 func (*SetClientCollaboratorRequest) ProtoMessage() {}
 func (*SetClientCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_client_abb5ee55897b3f3a, []int{6}
+	return fileDescriptor_client_02751df5c6a7bb69, []int{6}
 }
 func (m *SetClientCollaboratorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3060,13 +3060,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/client.proto", fileDescriptor_client_abb5ee55897b3f3a)
+	proto.RegisterFile("lorawan-stack/api/client.proto", fileDescriptor_client_02751df5c6a7bb69)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/client.proto", fileDescriptor_client_abb5ee55897b3f3a)
+	golang_proto.RegisterFile("lorawan-stack/api/client.proto", fileDescriptor_client_02751df5c6a7bb69)
 }
 
-var fileDescriptor_client_abb5ee55897b3f3a = []byte{
+var fileDescriptor_client_02751df5c6a7bb69 = []byte{
 	// 1018 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0x4f, 0x6c, 0x1b, 0xc5,
 	0x17, 0xde, 0x89, 0x13, 0x27, 0x9e, 0xfc, 0xf9, 0xf9, 0x37, 0x81, 0xb2, 0x98, 0x30, 0x31, 0x06,

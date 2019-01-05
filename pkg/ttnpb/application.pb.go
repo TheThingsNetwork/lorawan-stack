@@ -50,7 +50,7 @@ type Application struct {
 func (m *Application) Reset()      { *m = Application{} }
 func (*Application) ProtoMessage() {}
 func (*Application) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{0}
+	return fileDescriptor_application_87323d8f274374f4, []int{0}
 }
 func (m *Application) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -130,7 +130,7 @@ type Applications struct {
 func (m *Applications) Reset()      { *m = Applications{} }
 func (*Applications) ProtoMessage() {}
 func (*Applications) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{1}
+	return fileDescriptor_application_87323d8f274374f4, []int{1}
 }
 func (m *Applications) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -176,7 +176,7 @@ type GetApplicationRequest struct {
 func (m *GetApplicationRequest) Reset()      { *m = GetApplicationRequest{} }
 func (*GetApplicationRequest) ProtoMessage() {}
 func (*GetApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{2}
+	return fileDescriptor_application_87323d8f274374f4, []int{2}
 }
 func (m *GetApplicationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -229,7 +229,7 @@ type ListApplicationsRequest struct {
 func (m *ListApplicationsRequest) Reset()      { *m = ListApplicationsRequest{} }
 func (*ListApplicationsRequest) ProtoMessage() {}
 func (*ListApplicationsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{3}
+	return fileDescriptor_application_87323d8f274374f4, []int{3}
 }
 func (m *ListApplicationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -304,7 +304,7 @@ type CreateApplicationRequest struct {
 func (m *CreateApplicationRequest) Reset()      { *m = CreateApplicationRequest{} }
 func (*CreateApplicationRequest) ProtoMessage() {}
 func (*CreateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{4}
+	return fileDescriptor_application_87323d8f274374f4, []int{4}
 }
 func (m *CreateApplicationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -350,7 +350,7 @@ type UpdateApplicationRequest struct {
 func (m *UpdateApplicationRequest) Reset()      { *m = UpdateApplicationRequest{} }
 func (*UpdateApplicationRequest) ProtoMessage() {}
 func (*UpdateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{5}
+	return fileDescriptor_application_87323d8f274374f4, []int{5}
 }
 func (m *UpdateApplicationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -397,7 +397,7 @@ type CreateApplicationAPIKeyRequest struct {
 func (m *CreateApplicationAPIKeyRequest) Reset()      { *m = CreateApplicationAPIKeyRequest{} }
 func (*CreateApplicationAPIKeyRequest) ProtoMessage() {}
 func (*CreateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{6}
+	return fileDescriptor_application_87323d8f274374f4, []int{6}
 }
 func (m *CreateApplicationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -450,7 +450,7 @@ type UpdateApplicationAPIKeyRequest struct {
 func (m *UpdateApplicationAPIKeyRequest) Reset()      { *m = UpdateApplicationAPIKeyRequest{} }
 func (*UpdateApplicationAPIKeyRequest) ProtoMessage() {}
 func (*UpdateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{7}
+	return fileDescriptor_application_87323d8f274374f4, []int{7}
 }
 func (m *UpdateApplicationAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -489,7 +489,7 @@ type SetApplicationCollaboratorRequest struct {
 func (m *SetApplicationCollaboratorRequest) Reset()      { *m = SetApplicationCollaboratorRequest{} }
 func (*SetApplicationCollaboratorRequest) ProtoMessage() {}
 func (*SetApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_application_a6b4ebba738dd36a, []int{8}
+	return fileDescriptor_application_87323d8f274374f4, []int{8}
 }
 func (m *SetApplicationCollaboratorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3137,13 +3137,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_a6b4ebba738dd36a)
+	proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_87323d8f274374f4)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_a6b4ebba738dd36a)
+	golang_proto.RegisterFile("lorawan-stack/api/application.proto", fileDescriptor_application_87323d8f274374f4)
 }
 
-var fileDescriptor_application_a6b4ebba738dd36a = []byte{
+var fileDescriptor_application_87323d8f274374f4 = []byte{
 	// 874 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x3d, 0x6c, 0x1c, 0x45,
 	0x14, 0x9e, 0xf1, 0x39, 0x0e, 0x37, 0xe7, 0x38, 0x68, 0x45, 0x60, 0x65, 0xa2, 0xe7, 0xe3, 0x40,
