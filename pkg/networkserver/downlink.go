@@ -458,6 +458,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				if err != nil {
 					return nil, nil, errUnknownBand.WithCause(err)
 				}
+				band, err = band.Version(dev.LoRaWANPHYVersion)
+				if err != nil {
+					return nil, nil, errUnknownBand.WithCause(err)
+				}
 
 				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 

@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
@@ -196,7 +197,8 @@ func handleUplinkTest() func(t *testing.T) {
 					JoinEUI:                &JoinEUI,
 					DevEUI:                 &DevEUI,
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -254,7 +256,8 @@ func handleUplinkTest() func(t *testing.T) {
 					JoinEUI:                &JoinEUI,
 					DevEUI:                 &DevEUI,
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -313,7 +316,8 @@ func handleUplinkTest() func(t *testing.T) {
 					JoinEUI:                &JoinEUI,
 					DevEUI:                 &DevEUI,
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -372,7 +376,8 @@ func handleUplinkTest() func(t *testing.T) {
 					JoinEUI:                &JoinEUI,
 					DevEUI:                 &DevEUI,
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -430,8 +435,9 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-					ResetsFCnt:     true,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
+					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -495,8 +501,9 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-					ResetsFCnt:     true,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
+					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -561,7 +568,8 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -631,8 +639,9 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_0,
-					ResetsFCnt:     true,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
+					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -701,7 +710,8 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -771,7 +781,8 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -851,8 +862,9 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_1,
-					ResetsFCnt:     true,
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -922,8 +934,9 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					LoRaWANVersion: ttnpb.MAC_V1_1,
-					ResetsFCnt:     true,
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -1425,7 +1438,8 @@ func handleJoinTest() func(t *testing.T) {
 			{
 				"1.1/nil session",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1451,7 +1465,8 @@ func handleJoinTest() func(t *testing.T) {
 			{
 				"1.1/active session",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1477,7 +1492,8 @@ func handleJoinTest() func(t *testing.T) {
 			{
 				"1.0.2",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0_2,
+					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1503,7 +1519,8 @@ func handleJoinTest() func(t *testing.T) {
 			{
 				"1.0.1",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0_1,
+					LoRaWANVersion:    ttnpb.MAC_V1_0_1,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1529,7 +1546,8 @@ func handleJoinTest() func(t *testing.T) {
 			{
 				"1.0",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1666,7 +1684,7 @@ func handleJoinTest() func(t *testing.T) {
 					NetID:              ns.NetID,
 					SelectedMACVersion: tc.Device.LoRaWANVersion,
 					RxDelay:            tc.Device.MACState.DesiredParameters.Rx1Delay,
-					CFList:             nil,
+					CFList:             frequencyplans.CFList(*test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan), pb.LoRaWANPHYVersion),
 					DownlinkSettings: ttnpb.DLSettings{
 						Rx1DROffset: tc.Device.MACState.DesiredParameters.Rx1DataRateOffset,
 						Rx2DR:       tc.Device.MACState.DesiredParameters.Rx2DataRateIndex,

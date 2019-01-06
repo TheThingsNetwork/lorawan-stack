@@ -50,6 +50,10 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
+	band, err = band.Version(dev.LoRaWANPHYVersion)
+	if err != nil {
+		return maxDownLen, maxUpLen, false, err
+	}
 
 	if len(dev.MACState.DesiredParameters.Channels) > int(band.MaxUplinkChannels) {
 		return maxDownLen, maxUpLen, false, errCorruptedMACState
@@ -116,6 +120,10 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	band, err := band.GetByID(fp.BandID)
+	if err != nil {
+		return err
+	}
+	band, err = band.Version(dev.LoRaWANPHYVersion)
 	if err != nil {
 		return err
 	}

@@ -87,7 +87,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 	// NOTE: This is only valid under assumption that test.EUFrequencyPlanID uses 868,
 	// and that all devices in test cases use test.EUFrequencyPlanID as the frequency plan.
-	band := test.Must(band.GetByID(band.EU_863_870)).(band.Band)
+	band := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
 
 	channels := [16]*ttnpb.MACParameters_Channel{
 		ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -148,6 +148,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
@@ -572,6 +573,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
@@ -985,6 +987,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
@@ -1539,6 +1542,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
@@ -2144,6 +2148,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 					LastDevStatusReceivedAt: TimePtr(time.Now().Add(time.Hour)),
 					MACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
@@ -2632,6 +2637,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -2663,6 +2669,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					LastFCntUp: 4,
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -2690,6 +2697,7 @@ func TestGenerateDownlink(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Now()),
 				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
@@ -2727,6 +2735,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -2795,6 +2804,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -2860,6 +2870,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -2931,6 +2942,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -2997,6 +3009,7 @@ func TestGenerateDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
+				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{

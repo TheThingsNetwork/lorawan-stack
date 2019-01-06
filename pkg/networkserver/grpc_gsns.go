@@ -65,6 +65,10 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	if err != nil {
 		return err
 	}
+	band, err = band.Version(dev.LoRaWANPHYVersion)
+	if err != nil {
+		return err
+	}
 
 	dev.MACState = &ttnpb.MACState{
 		LoRaWANVersion: dev.LoRaWANVersion,
@@ -207,6 +211,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	if err := ns.devices.RangeByAddr(pld.DevAddr,
 		[]string{
 			"frequency_plan_id",
+			"lorawan_phy_version",
 			"mac_state",
 			"pending_session",
 			"recent_downlinks",
@@ -273,6 +278,13 @@ outer:
 					logger.WithError(err).WithFields(log.Fields(
 						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 					)).Warn("Failed to get the band of the device in registry")
+					continue
+				}
+				band, err = band.Version(dev.LoRaWANPHYVersion)
+				if err != nil {
+					logger.WithError(err).WithFields(log.Fields(
+						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
+					)).Warn("Failed to convert band to the PHY version of the device in registry")
 					continue
 				}
 
@@ -726,6 +738,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 	dev, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
 		[]string{
 			"frequency_plan_id",
+			"lorawan_phy_version",
 			"lorawan_version",
 			"mac_state",
 			"session",
@@ -793,6 +806,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		[]string{
 			"default_mac_parameters",
 			"frequency_plan_id",
+			"lorawan_phy_version",
 			"lorawan_version",
 			"mac_state",
 			"queued_application_downlinks",

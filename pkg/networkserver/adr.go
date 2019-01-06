@@ -97,6 +97,10 @@ func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	if err != nil {
 		return err
 	}
+	band, err = band.Version(dev.LoRaWANPHYVersion)
+	if err != nil {
+		return err
+	}
 
 	up := ups[len(ups)-1]
 

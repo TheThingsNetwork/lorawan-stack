@@ -90,6 +90,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper",
 			Device: &ttnpb.EndDevice{
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRDataRateIndex: 0,

@@ -39,13 +39,15 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "nil payload",
 			DupCount: 0,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -60,13 +62,15 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "no request",
 			DupCount: 0,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -92,7 +96,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "1 request/all ack",
 			DupCount: 0,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -118,7 +123,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -160,7 +166,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "1.1/2 requests/all ack",
 			DupCount: 0,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -207,7 +214,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -254,7 +262,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "1.0.2/2 requests/all ack",
 			DupCount: 1,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: ttnpb.MACParameters{
@@ -301,7 +310,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: ttnpb.MACParameters{
@@ -348,7 +358,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "1.0/2 requests/all ack",
 			DupCount: 0,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: ttnpb.MACParameters{
@@ -395,7 +406,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: ttnpb.MACParameters{

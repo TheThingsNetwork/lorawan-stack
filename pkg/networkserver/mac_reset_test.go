@@ -38,12 +38,14 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin: false,
-				MACState:     &ttnpb.MACState{},
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				SupportsJoin:      false,
+				MACState:          &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin: false,
-				MACState:     &ttnpb.MACState{},
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				SupportsJoin:      false,
+				MACState:          &ttnpb.MACState{},
 			},
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
@@ -56,8 +58,9 @@ func TestHandleResetInd(t *testing.T) {
 				DefaultMACParameters: &ttnpb.MACParameters{
 					MaxEIRP: 42,
 				},
-				SupportsJoin:    false,
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				SupportsJoin:      false,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
@@ -69,8 +72,9 @@ func TestHandleResetInd(t *testing.T) {
 					DefaultMACParameters: &ttnpb.MACParameters{
 						MaxEIRP: 42,
 					},
-					SupportsJoin:    false,
-					FrequencyPlanID: test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					SupportsJoin:      false,
+					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
@@ -106,8 +110,9 @@ func TestHandleResetInd(t *testing.T) {
 				DefaultMACParameters: &ttnpb.MACParameters{
 					MaxEIRP: 42,
 				},
-				SupportsJoin:    false,
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				SupportsJoin:      false,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
@@ -123,8 +128,9 @@ func TestHandleResetInd(t *testing.T) {
 					DefaultMACParameters: &ttnpb.MACParameters{
 						MaxEIRP: 42,
 					},
-					SupportsJoin:    false,
-					FrequencyPlanID: test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					SupportsJoin:      false,
+					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
