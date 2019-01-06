@@ -3356,6 +3356,15 @@
       "file": "downlink.go"
     }
   },
+  "error:pkg/networkserver:no_downlink_path": {
+    "translations": {
+      "en": "no downlink path available"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:no_payload": {
     "translations": {
       "en": "no message payload specified"
@@ -3412,7 +3421,7 @@
   },
   "error:pkg/networkserver:schedule": {
     "translations": {
-      "en": "all Gateway Servers failed to schedule the downlink"
+      "en": "all downlink scheduling attempts failed"
     },
     "description": {
       "package": "pkg/networkserver",
