@@ -16,16 +16,20 @@ package joinserver_test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"net"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 )
 
 func TestCryptoServices(t *testing.T) {
@@ -53,8 +57,31 @@ func TestCryptoServices(t *testing.T) {
 		}
 	}
 
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		panic(err)
+	}
+	defer lis.Close()
+	s := grpc.NewServer()
+	srv := &mockCryptoServicesServer{
+		Network:     memSvc,
+		Application: memSvc,
+		KeyVault:    keyVault,
+	}
+	ttnpb.RegisterNetworkCryptoServiceServer(s, srv)
+	ttnpb.RegisterApplicationCryptoServiceServer(s, srv)
+	go s.Serve(lis)
+	conn, err := grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		panic(err)
+	}
+
 	for _, svc := range []joinserver.NetworkCryptoService{
 		memSvc,
+		&joinserver.RPCNetworkCryptoService{
+			Client:   ttnpb.NewNetworkCryptoServiceClient(conn),
+			KeyVault: keyVault,
+		},
 	} {
 		t.Run(fmt.Sprintf("%T", svc), func(t *testing.T) {
 			t.Run("JoinRequestMIC", func(t *testing.T) {
@@ -209,19 +236,6 @@ func TestCryptoServices(t *testing.T) {
 						a.So(res, should.Resemble, tc.Result)
 					})
 				}
-
-				for _, version := range []ttnpb.MACVersion{
-					ttnpb.MAC_V1_0_2,
-					ttnpb.MAC_V1_0_1,
-					ttnpb.MAC_V1_0,
-				} {
-					t.Run(fmt.Sprintf("%v", version), func(t *testing.T) {
-						a := assertions.New(t)
-						a.So(func() {
-							svc.EncryptRejoinAccept(ctx, makeIDs(version), bytes.Repeat([]byte{0x1}, 16))
-						}, should.Panic)
-					})
-				}
 			})
 
 			t.Run("DeriveNwkSKeys", func(t *testing.T) {
@@ -285,6 +299,10 @@ func TestCryptoServices(t *testing.T) {
 
 	for _, svc := range []joinserver.ApplicationCryptoService{
 		memSvc,
+		&joinserver.RPCApplicationCryptoService{
+			Client:   ttnpb.NewApplicationCryptoServiceClient(conn),
+			KeyVault: keyVault,
+		},
 	} {
 		t.Run(fmt.Sprintf("%T", svc), func(t *testing.T) {
 			t.Run("DeriveAppSKey", func(t *testing.T) {
@@ -333,4 +351,84 @@ func TestCryptoServices(t *testing.T) {
 			})
 		})
 	}
+}
+
+type mockCryptoServicesServer struct {
+	Network     joinserver.NetworkCryptoService
+	Application joinserver.ApplicationCryptoService
+	crypto.KeyVault
+}
+
+func (s *mockCryptoServicesServer) JoinRequestMIC(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
+	mic, err := s.Network.JoinRequestMIC(ctx, req.CryptoServiceEndDeviceIdentifiers, req.Payload)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.CryptoServicePayloadResponse{
+		Payload: mic[:],
+	}, nil
+}
+
+func (s *mockCryptoServicesServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.JoinAcceptMICRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
+	mic, err := s.Network.JoinAcceptMIC(ctx, req.CryptoServiceEndDeviceIdentifiers, byte(req.JoinRequestType), req.DevNonce, req.Payload)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.CryptoServicePayloadResponse{
+		Payload: mic[:],
+	}, nil
+}
+
+func (s *mockCryptoServicesServer) EncryptJoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
+	data, err := s.Network.EncryptJoinAccept(ctx, req.CryptoServiceEndDeviceIdentifiers, req.Payload)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.CryptoServicePayloadResponse{
+		Payload: data,
+	}, nil
+}
+
+func (s *mockCryptoServicesServer) EncryptRejoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
+	data, err := s.Network.EncryptRejoinAccept(ctx, req.CryptoServiceEndDeviceIdentifiers, req.Payload)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.CryptoServicePayloadResponse{
+		Payload: data,
+	}, nil
+}
+
+func (s *mockCryptoServicesServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.NwkSKeysResponse, error) {
+	fNwkSIntKey, sNwkSIntKey, nwkSEncKey, err := s.Network.DeriveNwkSKeys(ctx, req.CryptoServiceEndDeviceIdentifiers, req.JoinNonce, req.DevNonce, req.NetID)
+	if err != nil {
+		return nil, err
+	}
+	res := &ttnpb.NwkSKeysResponse{}
+	res.FNwkSIntKey, err = cryptoutil.WrapAES128Key(fNwkSIntKey, "", s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	res.SNwkSIntKey, err = cryptoutil.WrapAES128Key(sNwkSIntKey, "", s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	res.NwkSEncKey, err = cryptoutil.WrapAES128Key(nwkSEncKey, "", s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *mockCryptoServicesServer) DeriveAppSKey(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.AppSKeyResponse, error) {
+	appSKey, err := s.Application.DeriveAppSKey(ctx, req.CryptoServiceEndDeviceIdentifiers, req.JoinNonce, req.DevNonce, req.NetID)
+	if err != nil {
+		return nil, err
+	}
+	res := &ttnpb.AppSKeyResponse{}
+	res.AppSKey, err = cryptoutil.WrapAES128Key(appSKey, "", s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
