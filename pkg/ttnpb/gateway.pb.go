@@ -39,7 +39,7 @@ type GatewayBrand struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	URL  string `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
 	// Logos contains file names of brand logos.
-	Logos                []string `protobuf:"bytes,4,rep,name=logos" json:"logos,omitempty"`
+	Logos                []string `protobuf:"bytes,4,rep,name=logos,proto3" json:"logos,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -240,7 +240,7 @@ type GatewayRadio struct {
 	ChipType             string                        `protobuf:"bytes,2,opt,name=chip_type,json=chipType,proto3" json:"chip_type,omitempty"`
 	Frequency            uint64                        `protobuf:"varint,3,opt,name=frequency,proto3" json:"frequency,omitempty"`
 	RSSIOffset           float32                       `protobuf:"fixed32,4,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty"`
-	TxConfiguration      *GatewayRadio_TxConfiguration `protobuf:"bytes,5,opt,name=tx_configuration,json=txConfiguration" json:"tx_configuration,omitempty"`
+	TxConfiguration      *GatewayRadio_TxConfiguration `protobuf:"bytes,5,opt,name=tx_configuration,json=txConfiguration,proto3" json:"tx_configuration,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
 }
@@ -376,10 +376,10 @@ func (m *GatewayRadio_TxConfiguration) GetNotchFrequency() uint64 {
 // Template for creating gateways.
 type GatewayVersion struct {
 	// Version identifiers.
-	GatewayVersionIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	GatewayVersionIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
 	// Photos contains file names of gateway photos.
-	Photos               []string        `protobuf:"bytes,2,rep,name=photos" json:"photos,omitempty"`
-	Radios               []*GatewayRadio `protobuf:"bytes,3,rep,name=radios" json:"radios,omitempty"`
+	Photos               []string        `protobuf:"bytes,2,rep,name=photos,proto3" json:"photos,omitempty"`
+	Radios               []*GatewayRadio `protobuf:"bytes,3,rep,name=radios,proto3" json:"radios,omitempty"`
 	ClockSource          uint32          `protobuf:"varint,7,opt,name=clock_source,json=clockSource,proto3" json:"clock_source,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -440,14 +440,14 @@ func (m *GatewayVersion) GetClockSource() uint32 {
 
 // Gateway is the message that defines a gateway on the network.
 type Gateway struct {
-	GatewayIdentifiers        `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt                 time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt                 time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	GatewayIdentifiers        `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt                 time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt                 time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	Name                      string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Description               string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes                map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo               []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo" json:"contact_info,omitempty"`
-	GatewayVersionIdentifiers `protobuf:"bytes,8,opt,name=version_ids,json=versionIds,embedded=version_ids" json:"version_ids"`
+	Attributes                map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ContactInfo               []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
+	GatewayVersionIdentifiers `protobuf:"bytes,8,opt,name=version_ids,json=versionIds,proto3,embedded=version_ids" json:"version_ids"`
 	// The address of the Gateway Server to connect to.
 	// The typical format of the address is "host:port". If the port is omitted,
 	// the normal port inference (with DNS lookup, otherwise defaults) is used.
@@ -457,7 +457,7 @@ type Gateway struct {
 	AutoUpdate           bool             `protobuf:"varint,10,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
 	UpdateChannel        string           `protobuf:"bytes,11,opt,name=update_channel,json=updateChannel,proto3" json:"update_channel,omitempty"`
 	FrequencyPlanID      string           `protobuf:"bytes,12,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	Antennas             []GatewayAntenna `protobuf:"bytes,13,rep,name=antennas" json:"antennas"`
+	Antennas             []GatewayAntenna `protobuf:"bytes,13,rep,name=antennas,proto3" json:"antennas"`
 	// The status of this gateway may be publicly displayed.
 	StatusPublic bool `protobuf:"varint,14,opt,name=status_public,json=statusPublic,proto3" json:"status_public,omitempty"`
 	// The location of this gateway may be publicly displayed.
@@ -620,7 +620,7 @@ func (m *Gateway) GetDownlinkPathConstraint() DownlinkPathConstraint {
 }
 
 type Gateways struct {
-	Gateways             []*Gateway `protobuf:"bytes,1,rep,name=gateways" json:"gateways,omitempty"`
+	Gateways             []*Gateway `protobuf:"bytes,1,rep,name=gateways,proto3" json:"gateways,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_sizecache        int32      `json:"-"`
 }
@@ -665,8 +665,8 @@ func (m *Gateways) GetGateways() []*Gateway {
 }
 
 type GetGatewayRequest struct {
-	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -711,8 +711,8 @@ func (m *GetGatewayRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListGatewaysRequest struct {
-	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator" json:"collaborator,omitempty"`
-	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
+	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -792,9 +792,9 @@ func (m *ListGatewaysRequest) GetPage() uint32 {
 }
 
 type CreateGatewayRequest struct {
-	Gateway `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	Gateway `protobuf:"bytes,1,opt,name=gateway,proto3,embedded=gateway" json:"gateway"`
 	// Collaborator to grant all rights on the newly created gateway.
-	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
 }
@@ -839,8 +839,8 @@ func (m *CreateGatewayRequest) GetCollaborator() OrganizationOrUserIdentifiers {
 }
 
 type UpdateGatewayRequest struct {
-	Gateway              `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Gateway              `protobuf:"bytes,1,opt,name=gateway,proto3,embedded=gateway" json:"gateway"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -885,9 +885,9 @@ func (m *UpdateGatewayRequest) GetFieldMask() types.FieldMask {
 }
 
 type CreateGatewayAPIKeyRequest struct {
-	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Rights               []Right  `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights               []Right  `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -939,8 +939,8 @@ func (m *CreateGatewayAPIKeyRequest) GetRights() []Right {
 }
 
 type UpdateGatewayAPIKeyRequest struct {
-	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
-	APIKey               `protobuf:"bytes,2,opt,name=api_key,json=apiKey,embedded=api_key" json:"api_key"`
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	APIKey               `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -978,8 +978,8 @@ func (m *UpdateGatewayAPIKeyRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_UpdateGatewayAPIKeyRequest proto.InternalMessageInfo
 
 type SetGatewayCollaboratorRequest struct {
-	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
-	Collaborator         Collaborator `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	Collaborator         Collaborator `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
 }
@@ -1028,8 +1028,8 @@ type GatewayAntenna struct {
 	// gain is the antenna gain relative to this gateway, in dBi.
 	Gain float32 `protobuf:"fixed32,1,opt,name=gain,proto3" json:"gain,omitempty"`
 	// location is the antenna's location.
-	Location             Location          `protobuf:"bytes,2,opt,name=location" json:"location"`
-	Attributes           map[string]string `protobuf:"bytes,3,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Location             Location          `protobuf:"bytes,2,opt,name=location,proto3" json:"location"`
+	Attributes           map[string]string `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -1089,10 +1089,10 @@ func (m *GatewayAntenna) GetAttributes() map[string]string {
 
 type GatewayStatus struct {
 	// Current time of the gateway
-	Time time.Time `protobuf:"bytes,1,opt,name=time,stdtime" json:"time"`
+	Time time.Time `protobuf:"bytes,1,opt,name=time,proto3,stdtime" json:"time"`
 	// Boot time of the gateway
 	// - can be left out to save bandwidth; old value will be kept
-	BootTime time.Time `protobuf:"bytes,2,opt,name=boot_time,json=bootTime,stdtime" json:"boot_time"`
+	BootTime time.Time `protobuf:"bytes,2,opt,name=boot_time,json=bootTime,proto3,stdtime" json:"boot_time"`
 	// Versions of gateway subsystems
 	// - each field can be left out to save bandwidth; old value will be kept
 	// - map keys are written in snake_case
@@ -1102,21 +1102,21 @@ type GatewayStatus struct {
 	//     fpga: "48"
 	//     dsp: "27"
 	//     hal: "v2-3.5.0"
-	Versions map[string]string `protobuf:"bytes,3,rep,name=versions" json:"versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Versions map[string]string `protobuf:"bytes,3,rep,name=versions,proto3" json:"versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Location of each gateway's antenna
 	// - if left out, server uses registry-set location as fallback
-	AntennaLocations []*Location `protobuf:"bytes,4,rep,name=antenna_locations,json=antennaLocations" json:"antenna_locations,omitempty"`
+	AntennaLocations []*Location `protobuf:"bytes,4,rep,name=antenna_locations,json=antennaLocations,proto3" json:"antenna_locations,omitempty"`
 	// IP addresses of this gateway.
 	// Repeated addresses can be used to communicate addresses of multiple interfaces (LAN, Public IP, ...).
-	IP []string `protobuf:"bytes,5,rep,name=ip" json:"ip,omitempty"`
+	IP []string `protobuf:"bytes,5,rep,name=ip,proto3" json:"ip,omitempty"`
 	// Metrics
 	// - can be used for forwarding gateway metrics such as temperatures or performance metrics
 	// - map keys are written in snake_case
-	Metrics map[string]float32 `protobuf:"bytes,6,rep,name=metrics" json:"metrics,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"fixed32,2,opt,name=value,proto3"`
+	Metrics map[string]float32 `protobuf:"bytes,6,rep,name=metrics,proto3" json:"metrics,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"fixed32,2,opt,name=value,proto3"`
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced             *types.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced             *types.Struct `protobuf:"bytes,99,opt,name=advanced,proto3" json:"advanced,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -1204,13 +1204,13 @@ func (m *GatewayStatus) GetAdvanced() *types.Struct {
 
 // Connection stats as monitored by the Gateway Server.
 type GatewayConnectionStats struct {
-	ConnectedAt            *time.Time     `protobuf:"bytes,1,opt,name=connected_at,json=connectedAt,stdtime" json:"connected_at,omitempty"`
+	ConnectedAt            *time.Time     `protobuf:"bytes,1,opt,name=connected_at,json=connectedAt,proto3,stdtime" json:"connected_at,omitempty"`
 	Protocol               string         `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	LastStatusReceivedAt   *time.Time     `protobuf:"bytes,3,opt,name=last_status_received_at,json=lastStatusReceivedAt,stdtime" json:"last_status_received_at,omitempty"`
-	LastStatus             *GatewayStatus `protobuf:"bytes,4,opt,name=last_status,json=lastStatus" json:"last_status,omitempty"`
-	LastUplinkReceivedAt   *time.Time     `protobuf:"bytes,5,opt,name=last_uplink_received_at,json=lastUplinkReceivedAt,stdtime" json:"last_uplink_received_at,omitempty"`
+	LastStatusReceivedAt   *time.Time     `protobuf:"bytes,3,opt,name=last_status_received_at,json=lastStatusReceivedAt,proto3,stdtime" json:"last_status_received_at,omitempty"`
+	LastStatus             *GatewayStatus `protobuf:"bytes,4,opt,name=last_status,json=lastStatus,proto3" json:"last_status,omitempty"`
+	LastUplinkReceivedAt   *time.Time     `protobuf:"bytes,5,opt,name=last_uplink_received_at,json=lastUplinkReceivedAt,proto3,stdtime" json:"last_uplink_received_at,omitempty"`
 	UplinkCount            uint64         `protobuf:"varint,6,opt,name=uplink_count,json=uplinkCount,proto3" json:"uplink_count,omitempty"`
-	LastDownlinkReceivedAt *time.Time     `protobuf:"bytes,7,opt,name=last_downlink_received_at,json=lastDownlinkReceivedAt,stdtime" json:"last_downlink_received_at,omitempty"`
+	LastDownlinkReceivedAt *time.Time     `protobuf:"bytes,7,opt,name=last_downlink_received_at,json=lastDownlinkReceivedAt,proto3,stdtime" json:"last_downlink_received_at,omitempty"`
 	DownlinkCount          uint64         `protobuf:"varint,8,opt,name=downlink_count,json=downlinkCount,proto3" json:"downlink_count,omitempty"`
 	XXX_NoUnkeyedLiteral   struct{}       `json:"-"`
 	XXX_sizecache          int32          `json:"-"`
@@ -3422,6 +3422,9 @@ func encodeVarintPopulateGateway(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *GatewayBrand) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ID)
@@ -3446,6 +3449,9 @@ func (m *GatewayBrand) Size() (n int) {
 }
 
 func (m *GatewayModel) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.BrandID)
@@ -3464,6 +3470,9 @@ func (m *GatewayModel) Size() (n int) {
 }
 
 func (m *GatewayVersionIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.BrandID)
@@ -3486,6 +3495,9 @@ func (m *GatewayVersionIdentifiers) Size() (n int) {
 }
 
 func (m *GatewayRadio) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Enable {
@@ -3509,6 +3521,9 @@ func (m *GatewayRadio) Size() (n int) {
 }
 
 func (m *GatewayRadio_TxConfiguration) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.MinFrequency != 0 {
@@ -3524,6 +3539,9 @@ func (m *GatewayRadio_TxConfiguration) Size() (n int) {
 }
 
 func (m *GatewayVersion) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayVersionIdentifiers.Size()
@@ -3547,6 +3565,9 @@ func (m *GatewayVersion) Size() (n int) {
 }
 
 func (m *Gateway) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
@@ -3619,6 +3640,9 @@ func (m *Gateway) Size() (n int) {
 }
 
 func (m *Gateways) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Gateways) > 0 {
@@ -3631,6 +3655,9 @@ func (m *Gateways) Size() (n int) {
 }
 
 func (m *GetGatewayRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
@@ -3641,6 +3668,9 @@ func (m *GetGatewayRequest) Size() (n int) {
 }
 
 func (m *ListGatewaysRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Collaborator != nil {
@@ -3663,6 +3693,9 @@ func (m *ListGatewaysRequest) Size() (n int) {
 }
 
 func (m *CreateGatewayRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Gateway.Size()
@@ -3673,6 +3706,9 @@ func (m *CreateGatewayRequest) Size() (n int) {
 }
 
 func (m *UpdateGatewayRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Gateway.Size()
@@ -3683,6 +3719,9 @@ func (m *UpdateGatewayRequest) Size() (n int) {
 }
 
 func (m *CreateGatewayAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
@@ -3702,6 +3741,9 @@ func (m *CreateGatewayAPIKeyRequest) Size() (n int) {
 }
 
 func (m *UpdateGatewayAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
@@ -3712,6 +3754,9 @@ func (m *UpdateGatewayAPIKeyRequest) Size() (n int) {
 }
 
 func (m *SetGatewayCollaboratorRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
@@ -3722,6 +3767,9 @@ func (m *SetGatewayCollaboratorRequest) Size() (n int) {
 }
 
 func (m *GatewayAntenna) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Gain != 0 {
@@ -3741,6 +3789,9 @@ func (m *GatewayAntenna) Size() (n int) {
 }
 
 func (m *GatewayStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
@@ -3783,6 +3834,9 @@ func (m *GatewayStatus) Size() (n int) {
 }
 
 func (m *GatewayConnectionStats) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ConnectedAt != nil {
@@ -6349,6 +6403,10 @@ func (m *CreateGatewayAPIKeyRequest) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

@@ -14,8 +14,11 @@ import _ "google.golang.org/genproto/googleapis/api/annotations"
 
 import time "time"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
@@ -39,7 +42,7 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type ApplicationWebhookIdentifiers struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
 	WebhookID              string   `protobuf:"bytes,2,opt,name=webhook_id,json=webhookId,proto3" json:"webhook_id,omitempty"`
 	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
 	XXX_sizecache          int32    `json:"-"`
@@ -85,24 +88,24 @@ func (m *ApplicationWebhookIdentifiers) GetWebhookID() string {
 }
 
 type ApplicationWebhook struct {
-	ApplicationWebhookIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt                     time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt                     time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	ApplicationWebhookIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt                     time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt                     time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	// Base URL to which the message's path is appended.
 	BaseURL string `protobuf:"bytes,4,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
 	// HTTP headers to use.
-	Headers map[string]string `protobuf:"bytes,5,rep,name=headers" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Headers map[string]string `protobuf:"bytes,5,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// The format to use for the body.
 	// Supported values depend on the Application Server configuration.
 	Format               string                      `protobuf:"bytes,6,opt,name=format,proto3" json:"format,omitempty"`
-	UplinkMessage        *ApplicationWebhook_Message `protobuf:"bytes,7,opt,name=uplink_message,json=uplinkMessage" json:"uplink_message,omitempty"`
-	JoinAccept           *ApplicationWebhook_Message `protobuf:"bytes,8,opt,name=join_accept,json=joinAccept" json:"join_accept,omitempty"`
-	DownlinkAck          *ApplicationWebhook_Message `protobuf:"bytes,9,opt,name=downlink_ack,json=downlinkAck" json:"downlink_ack,omitempty"`
-	DownlinkNack         *ApplicationWebhook_Message `protobuf:"bytes,10,opt,name=downlink_nack,json=downlinkNack" json:"downlink_nack,omitempty"`
-	DownlinkSent         *ApplicationWebhook_Message `protobuf:"bytes,11,opt,name=downlink_sent,json=downlinkSent" json:"downlink_sent,omitempty"`
-	DownlinkFailed       *ApplicationWebhook_Message `protobuf:"bytes,12,opt,name=downlink_failed,json=downlinkFailed" json:"downlink_failed,omitempty"`
-	DownlinkQueued       *ApplicationWebhook_Message `protobuf:"bytes,13,opt,name=downlink_queued,json=downlinkQueued" json:"downlink_queued,omitempty"`
-	LocationSolved       *ApplicationWebhook_Message `protobuf:"bytes,14,opt,name=location_solved,json=locationSolved" json:"location_solved,omitempty"`
+	UplinkMessage        *ApplicationWebhook_Message `protobuf:"bytes,7,opt,name=uplink_message,json=uplinkMessage,proto3" json:"uplink_message,omitempty"`
+	JoinAccept           *ApplicationWebhook_Message `protobuf:"bytes,8,opt,name=join_accept,json=joinAccept,proto3" json:"join_accept,omitempty"`
+	DownlinkAck          *ApplicationWebhook_Message `protobuf:"bytes,9,opt,name=downlink_ack,json=downlinkAck,proto3" json:"downlink_ack,omitempty"`
+	DownlinkNack         *ApplicationWebhook_Message `protobuf:"bytes,10,opt,name=downlink_nack,json=downlinkNack,proto3" json:"downlink_nack,omitempty"`
+	DownlinkSent         *ApplicationWebhook_Message `protobuf:"bytes,11,opt,name=downlink_sent,json=downlinkSent,proto3" json:"downlink_sent,omitempty"`
+	DownlinkFailed       *ApplicationWebhook_Message `protobuf:"bytes,12,opt,name=downlink_failed,json=downlinkFailed,proto3" json:"downlink_failed,omitempty"`
+	DownlinkQueued       *ApplicationWebhook_Message `protobuf:"bytes,13,opt,name=downlink_queued,json=downlinkQueued,proto3" json:"downlink_queued,omitempty"`
+	LocationSolved       *ApplicationWebhook_Message `protobuf:"bytes,14,opt,name=location_solved,json=locationSolved,proto3" json:"location_solved,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
 }
@@ -277,7 +280,7 @@ func (m *ApplicationWebhook_Message) GetPath() string {
 }
 
 type ApplicationWebhooks struct {
-	Webhooks             []*ApplicationWebhook `protobuf:"bytes,1,rep,name=webhooks" json:"webhooks,omitempty"`
+	Webhooks             []*ApplicationWebhook `protobuf:"bytes,1,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
 }
@@ -323,7 +326,7 @@ func (m *ApplicationWebhooks) GetWebhooks() []*ApplicationWebhook {
 
 type ApplicationWebhookFormats struct {
 	// Format and description.
-	Formats              map[string]string `protobuf:"bytes,1,rep,name=formats" json:"formats,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Formats              map[string]string `protobuf:"bytes,1,rep,name=formats,proto3" json:"formats,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -368,8 +371,8 @@ func (m *ApplicationWebhookFormats) GetFormats() map[string]string {
 }
 
 type GetApplicationWebhookRequest struct {
-	ApplicationWebhookIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	FieldMask                     types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationWebhookIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	FieldMask                     types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral          struct{}        `json:"-"`
 	XXX_sizecache                 int32           `json:"-"`
 }
@@ -414,8 +417,8 @@ func (m *GetApplicationWebhookRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListApplicationWebhooksRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral   struct{}        `json:"-"`
 	XXX_sizecache          int32           `json:"-"`
 }
@@ -460,8 +463,8 @@ func (m *ListApplicationWebhooksRequest) GetFieldMask() types.FieldMask {
 }
 
 type SetApplicationWebhookRequest struct {
-	ApplicationWebhook   `protobuf:"bytes,1,opt,name=webhook,embedded=webhook" json:"webhook"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationWebhook   `protobuf:"bytes,1,opt,name=webhook,proto3,embedded=webhook" json:"webhook"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -794,8 +797,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ApplicationWebhookRegistry service
-
+// ApplicationWebhookRegistryClient is the client API for ApplicationWebhookRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationWebhookRegistryClient interface {
 	GetFormats(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*ApplicationWebhookFormats, error)
 	Get(ctx context.Context, in *GetApplicationWebhookRequest, opts ...grpc.CallOption) (*ApplicationWebhook, error)
@@ -857,8 +861,7 @@ func (c *applicationWebhookRegistryClient) Delete(ctx context.Context, in *Appli
 	return out, nil
 }
 
-// Server API for ApplicationWebhookRegistry service
-
+// ApplicationWebhookRegistryServer is the server API for ApplicationWebhookRegistry service.
 type ApplicationWebhookRegistryServer interface {
 	GetFormats(context.Context, *types.Empty) (*ApplicationWebhookFormats, error)
 	Get(context.Context, *GetApplicationWebhookRequest) (*ApplicationWebhook, error)
@@ -1571,6 +1574,9 @@ func encodeVarintPopulateApplicationserverWeb(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ApplicationWebhookIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1583,6 +1589,9 @@ func (m *ApplicationWebhookIdentifiers) Size() (n int) {
 }
 
 func (m *ApplicationWebhook) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationWebhookIdentifiers.Size()
@@ -1643,6 +1652,9 @@ func (m *ApplicationWebhook) Size() (n int) {
 }
 
 func (m *ApplicationWebhook_Message) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Path)
@@ -1653,6 +1665,9 @@ func (m *ApplicationWebhook_Message) Size() (n int) {
 }
 
 func (m *ApplicationWebhooks) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Webhooks) > 0 {
@@ -1665,6 +1680,9 @@ func (m *ApplicationWebhooks) Size() (n int) {
 }
 
 func (m *ApplicationWebhookFormats) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Formats) > 0 {
@@ -1679,6 +1697,9 @@ func (m *ApplicationWebhookFormats) Size() (n int) {
 }
 
 func (m *GetApplicationWebhookRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationWebhookIdentifiers.Size()
@@ -1689,6 +1710,9 @@ func (m *GetApplicationWebhookRequest) Size() (n int) {
 }
 
 func (m *ListApplicationWebhooksRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1699,6 +1723,9 @@ func (m *ListApplicationWebhooksRequest) Size() (n int) {
 }
 
 func (m *SetApplicationWebhookRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationWebhook.Size()

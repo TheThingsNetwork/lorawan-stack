@@ -33,8 +33,8 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type OAuthClientAuthorizationIdentifiers struct {
-	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3" json:"client_ids"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -86,11 +86,11 @@ func (m *OAuthClientAuthorizationIdentifiers) GetClientIDs() ClientIdentifiers {
 }
 
 type OAuthClientAuthorization struct {
-	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
-	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
-	CreatedAt            time.Time         `protobuf:"bytes,4,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt            time.Time         `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3" json:"client_ids"`
+	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	CreatedAt            time.Time         `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt            time.Time         `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -163,7 +163,7 @@ func (m *OAuthClientAuthorization) GetUpdatedAt() time.Time {
 }
 
 type OAuthClientAuthorizations struct {
-	Authorizations       []*OAuthClientAuthorization `protobuf:"bytes,1,rep,name=authorizations" json:"authorizations,omitempty"`
+	Authorizations       []*OAuthClientAuthorization `protobuf:"bytes,1,rep,name=authorizations,proto3" json:"authorizations,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
 }
@@ -208,7 +208,7 @@ func (m *OAuthClientAuthorizations) GetAuthorizations() []*OAuthClientAuthorizat
 }
 
 type ListOAuthClientAuthorizationsRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,2,opt,name=order,proto3" json:"order,omitempty"`
@@ -274,14 +274,14 @@ func (m *ListOAuthClientAuthorizationsRequest) GetPage() uint32 {
 }
 
 type OAuthAuthorizationCode struct {
-	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
-	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3" json:"client_ids"`
+	Rights               []Right           `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	Code                 string            `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
 	RedirectURI          string            `protobuf:"bytes,5,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
 	State                string            `protobuf:"bytes,6,opt,name=state,proto3" json:"state,omitempty"`
-	CreatedAt            time.Time         `protobuf:"bytes,7,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	ExpiresAt            time.Time         `protobuf:"bytes,8,opt,name=expires_at,json=expiresAt,stdtime" json:"expires_at"`
+	CreatedAt            time.Time         `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	ExpiresAt            time.Time         `protobuf:"bytes,8,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -375,8 +375,8 @@ func (m *OAuthAuthorizationCode) GetExpiresAt() time.Time {
 }
 
 type OAuthAccessTokenIdentifiers struct {
-	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3" json:"client_ids"`
 	ID                   string            `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -436,14 +436,14 @@ func (m *OAuthAccessTokenIdentifiers) GetID() string {
 }
 
 type OAuthAccessToken struct {
-	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
-	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	ClientIDs            ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3" json:"client_ids"`
 	ID                   string            `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	AccessToken          string            `protobuf:"bytes,4,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	RefreshToken         string            `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	Rights               []Right           `protobuf:"varint,6,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
-	CreatedAt            time.Time         `protobuf:"bytes,7,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	ExpiresAt            time.Time         `protobuf:"bytes,8,opt,name=expires_at,json=expiresAt,stdtime" json:"expires_at"`
+	Rights               []Right           `protobuf:"varint,6,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	CreatedAt            time.Time         `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	ExpiresAt            time.Time         `protobuf:"bytes,8,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -537,7 +537,7 @@ func (m *OAuthAccessToken) GetExpiresAt() time.Time {
 }
 
 type OAuthAccessTokens struct {
-	Tokens               []*OAuthAccessToken `protobuf:"bytes,1,rep,name=tokens" json:"tokens,omitempty"`
+	Tokens               []*OAuthAccessToken `protobuf:"bytes,1,rep,name=tokens,proto3" json:"tokens,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
 }
@@ -582,8 +582,8 @@ func (m *OAuthAccessTokens) GetTokens() []*OAuthAccessToken {
 }
 
 type ListOAuthAccessTokensRequest struct {
-	UserIDs   UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds" json:"user_ids"`
-	ClientIDs ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds" json:"client_ids"`
+	UserIDs   UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	ClientIDs ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3" json:"client_ids"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -1695,6 +1695,9 @@ func encodeVarintPopulateOauth(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *OAuthClientAuthorizationIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIDs.Size()
@@ -1705,6 +1708,9 @@ func (m *OAuthClientAuthorizationIdentifiers) Size() (n int) {
 }
 
 func (m *OAuthClientAuthorization) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIDs.Size()
@@ -1726,6 +1732,9 @@ func (m *OAuthClientAuthorization) Size() (n int) {
 }
 
 func (m *OAuthClientAuthorizations) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Authorizations) > 0 {
@@ -1738,6 +1747,9 @@ func (m *OAuthClientAuthorizations) Size() (n int) {
 }
 
 func (m *ListOAuthClientAuthorizationsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -1756,6 +1768,9 @@ func (m *ListOAuthClientAuthorizationsRequest) Size() (n int) {
 }
 
 func (m *OAuthAuthorizationCode) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIDs.Size()
@@ -1789,6 +1804,9 @@ func (m *OAuthAuthorizationCode) Size() (n int) {
 }
 
 func (m *OAuthAccessTokenIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIDs.Size()
@@ -1803,6 +1821,9 @@ func (m *OAuthAccessTokenIdentifiers) Size() (n int) {
 }
 
 func (m *OAuthAccessToken) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIDs.Size()
@@ -1836,6 +1857,9 @@ func (m *OAuthAccessToken) Size() (n int) {
 }
 
 func (m *OAuthAccessTokens) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Tokens) > 0 {
@@ -1848,6 +1872,9 @@ func (m *OAuthAccessTokens) Size() (n int) {
 }
 
 func (m *ListOAuthAccessTokensRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIDs.Size()
@@ -2245,6 +2272,10 @@ func (m *OAuthClientAuthorization) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right
@@ -2705,6 +2736,10 @@ func (m *OAuthAuthorizationCode) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right
@@ -3250,6 +3285,10 @@ func (m *OAuthAccessToken) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

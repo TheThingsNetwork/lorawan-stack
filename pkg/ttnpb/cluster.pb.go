@@ -71,9 +71,9 @@ type PeerInfo struct {
 	// Indicates whether the gRPC server uses TLS.
 	TLS bool `protobuf:"varint,2,opt,name=tls,proto3" json:"tls,omitempty"`
 	// Roles of the peer ()
-	Roles []PeerInfo_Role `protobuf:"varint,3,rep,packed,name=roles,enum=ttn.lorawan.v3.PeerInfo_Role" json:"roles,omitempty"`
+	Roles []PeerInfo_Role `protobuf:"varint,3,rep,packed,name=roles,proto3,enum=ttn.lorawan.v3.PeerInfo_Role" json:"roles,omitempty"`
 	// Tags of the peer
-	Tags                 map[string]string `protobuf:"bytes,4,rep,name=tags" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Tags                 map[string]string `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -366,6 +366,9 @@ func encodeVarintPopulateCluster(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *PeerInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.GRPCPort != 0 {
@@ -544,6 +547,10 @@ func (m *PeerInfo) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Roles) == 0 {
+					m.Roles = make([]PeerInfo_Role, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v PeerInfo_Role

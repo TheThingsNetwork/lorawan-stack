@@ -38,20 +38,20 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // User is the message that defines an user on the network.
 type User struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt       time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt       time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	UserIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt       time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt       time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	Name            string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Description     string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes      map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo     []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo" json:"contact_info,omitempty"`
+	Attributes      map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ContactInfo     []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	// Primary email address that can be used for logging in.
 	// This address is not public, use contact_info for that.
 	PrimaryEmailAddress            string     `protobuf:"bytes,8,opt,name=primary_email_address,json=primaryEmailAddress,proto3" json:"primary_email_address,omitempty"`
-	PrimaryEmailAddressValidatedAt *time.Time `protobuf:"bytes,9,opt,name=primary_email_address_validated_at,json=primaryEmailAddressValidatedAt,stdtime" json:"primary_email_address_validated_at,omitempty"`
+	PrimaryEmailAddressValidatedAt *time.Time `protobuf:"bytes,9,opt,name=primary_email_address_validated_at,json=primaryEmailAddressValidatedAt,proto3,stdtime" json:"primary_email_address_validated_at,omitempty"`
 	// Only used on create; never returned on API calls.
 	Password              string    `protobuf:"bytes,10,opt,name=password,proto3" json:"password,omitempty"`
-	PasswordUpdatedAt     time.Time `protobuf:"bytes,11,opt,name=password_updated_at,json=passwordUpdatedAt,stdtime" json:"password_updated_at"`
+	PasswordUpdatedAt     time.Time `protobuf:"bytes,11,opt,name=password_updated_at,json=passwordUpdatedAt,proto3,stdtime" json:"password_updated_at"`
 	RequirePasswordUpdate bool      `protobuf:"varint,12,opt,name=require_password_update,json=requirePasswordUpdate,proto3" json:"require_password_update,omitempty"`
 	// The reviewing state of the user.
 	// This field can only be modified by admins.
@@ -61,9 +61,9 @@ type User struct {
 	Admin bool `protobuf:"varint,14,opt,name=admin,proto3" json:"admin,omitempty"`
 	// The temporary password can only be used to update a user's password; never returned on API calls.
 	TemporaryPassword          string     `protobuf:"bytes,15,opt,name=temporary_password,json=temporaryPassword,proto3" json:"temporary_password,omitempty"`
-	TemporaryPasswordCreatedAt *time.Time `protobuf:"bytes,16,opt,name=temporary_password_created_at,json=temporaryPasswordCreatedAt,stdtime" json:"temporary_password_created_at,omitempty"`
-	TemporaryPasswordExpiresAt *time.Time `protobuf:"bytes,17,opt,name=temporary_password_expires_at,json=temporaryPasswordExpiresAt,stdtime" json:"temporary_password_expires_at,omitempty"`
-	ProfilePicture             *Picture   `protobuf:"bytes,18,opt,name=profile_picture,json=profilePicture" json:"profile_picture,omitempty"`
+	TemporaryPasswordCreatedAt *time.Time `protobuf:"bytes,16,opt,name=temporary_password_created_at,json=temporaryPasswordCreatedAt,proto3,stdtime" json:"temporary_password_created_at,omitempty"`
+	TemporaryPasswordExpiresAt *time.Time `protobuf:"bytes,17,opt,name=temporary_password_expires_at,json=temporaryPasswordExpiresAt,proto3,stdtime" json:"temporary_password_expires_at,omitempty"`
+	ProfilePicture             *Picture   `protobuf:"bytes,18,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
 	XXX_NoUnkeyedLiteral       struct{}   `json:"-"`
 	XXX_sizecache              int32      `json:"-"`
 }
@@ -222,9 +222,9 @@ func (m *User) GetProfilePicture() *Picture {
 type Picture struct {
 	// Embedded picture, always maximum 128px in size.
 	// Omitted if there are external URLs available (in sizes).
-	Embedded *Picture_Embedded `protobuf:"bytes,1,opt,name=embedded" json:"embedded,omitempty"`
+	Embedded *Picture_Embedded `protobuf:"bytes,1,opt,name=embedded,proto3" json:"embedded,omitempty"`
 	// URLs of the picture for different sizes, if available on a CDN.
-	Sizes                map[uint32]string `protobuf:"bytes,2,rep,name=sizes" json:"sizes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Sizes                map[uint32]string `protobuf:"bytes,2,rep,name=sizes,proto3" json:"sizes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -332,7 +332,7 @@ func (m *Picture_Embedded) GetData() []byte {
 }
 
 type Users struct {
-	Users                []*User  `protobuf:"bytes,1,rep,name=users" json:"users,omitempty"`
+	Users                []*User  `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -377,8 +377,8 @@ func (m *Users) GetUsers() []*User {
 }
 
 type GetUserRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -423,7 +423,7 @@ func (m *GetUserRequest) GetFieldMask() types.FieldMask {
 }
 
 type CreateUserRequest struct {
-	User                 `protobuf:"bytes,1,opt,name=user,embedded=user" json:"user"`
+	User                 `protobuf:"bytes,1,opt,name=user,proto3,embedded=user" json:"user"`
 	InvitationToken      string   `protobuf:"bytes,2,opt,name=invitation_token,json=invitationToken,proto3" json:"invitation_token,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -469,8 +469,8 @@ func (m *CreateUserRequest) GetInvitationToken() string {
 }
 
 type UpdateUserRequest struct {
-	User                 `protobuf:"bytes,1,opt,name=user,embedded=user" json:"user"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	User                 `protobuf:"bytes,1,opt,name=user,proto3,embedded=user" json:"user"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -515,7 +515,7 @@ func (m *UpdateUserRequest) GetFieldMask() types.FieldMask {
 }
 
 type CreateTemporaryPasswordRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -553,7 +553,7 @@ func (m *CreateTemporaryPasswordRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_CreateTemporaryPasswordRequest proto.InternalMessageInfo
 
 type UpdateUserPasswordRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	New                  string   `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
 	Old                  string   `protobuf:"bytes,3,opt,name=old,proto3" json:"old,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -607,9 +607,9 @@ func (m *UpdateUserPasswordRequest) GetOld() string {
 }
 
 type CreateUserAPIKeyRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Rights               []Right  `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights               []Right  `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -661,8 +661,8 @@ func (m *CreateUserAPIKeyRequest) GetRights() []Right {
 }
 
 type UpdateUserAPIKeyRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
-	APIKey               `protobuf:"bytes,2,opt,name=api_key,json=apiKey,embedded=api_key" json:"api_key"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	APIKey               `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -702,11 +702,11 @@ var xxx_messageInfo_UpdateUserAPIKeyRequest proto.InternalMessageInfo
 type Invitation struct {
 	Email                string           `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	Token                string           `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	ExpiresAt            time.Time        `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,stdtime" json:"expires_at"`
-	CreatedAt            time.Time        `protobuf:"bytes,4,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt            time.Time        `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
-	AcceptedAt           *time.Time       `protobuf:"bytes,6,opt,name=accepted_at,json=acceptedAt,stdtime" json:"accepted_at,omitempty"`
-	AcceptedBy           *UserIdentifiers `protobuf:"bytes,7,opt,name=accepted_by,json=acceptedBy" json:"accepted_by,omitempty"`
+	ExpiresAt            time.Time        `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at"`
+	CreatedAt            time.Time        `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt            time.Time        `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	AcceptedAt           *time.Time       `protobuf:"bytes,6,opt,name=accepted_at,json=acceptedAt,proto3,stdtime" json:"accepted_at,omitempty"`
+	AcceptedBy           *UserIdentifiers `protobuf:"bytes,7,opt,name=accepted_by,json=acceptedBy,proto3" json:"accepted_by,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
 }
@@ -793,7 +793,7 @@ func (m *Invitation) GetAcceptedBy() *UserIdentifiers {
 }
 
 type Invitations struct {
-	Invitations          []*Invitation `protobuf:"bytes,1,rep,name=invitations" json:"invitations,omitempty"`
+	Invitations          []*Invitation `protobuf:"bytes,1,rep,name=invitations,proto3" json:"invitations,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -928,7 +928,7 @@ func (m *DeleteInvitationRequest) GetEmail() string {
 }
 
 type UserSessionIdentifiers struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	SessionID            string   `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -974,11 +974,11 @@ func (m *UserSessionIdentifiers) GetSessionID() string {
 }
 
 type UserSession struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	SessionID            string     `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	CreatedAt            time.Time  `protobuf:"bytes,3,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt            time.Time  `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
-	ExpiresAt            *time.Time `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,stdtime" json:"expires_at,omitempty"`
+	CreatedAt            time.Time  `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt            time.Time  `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	ExpiresAt            *time.Time `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_sizecache        int32      `json:"-"`
 }
@@ -1044,7 +1044,7 @@ func (m *UserSession) GetExpiresAt() *time.Time {
 }
 
 type UserSessions struct {
-	Sessions             []*UserSession `protobuf:"bytes,1,rep,name=sessions" json:"sessions,omitempty"`
+	Sessions             []*UserSession `protobuf:"bytes,1,rep,name=sessions,proto3" json:"sessions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
 }
@@ -1089,7 +1089,7 @@ func (m *UserSessions) GetSessions() []*UserSession {
 }
 
 type ListUserSessionsRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,2,opt,name=order,proto3" json:"order,omitempty"`
@@ -3034,6 +3034,9 @@ func encodeVarintPopulateUser(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *User) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3107,6 +3110,9 @@ func (m *User) Size() (n int) {
 }
 
 func (m *Picture) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Embedded != nil {
@@ -3125,6 +3131,9 @@ func (m *Picture) Size() (n int) {
 }
 
 func (m *Picture_Embedded) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.MimeType)
@@ -3139,6 +3148,9 @@ func (m *Picture_Embedded) Size() (n int) {
 }
 
 func (m *Users) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Users) > 0 {
@@ -3151,6 +3163,9 @@ func (m *Users) Size() (n int) {
 }
 
 func (m *GetUserRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3161,6 +3176,9 @@ func (m *GetUserRequest) Size() (n int) {
 }
 
 func (m *CreateUserRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.User.Size()
@@ -3173,6 +3191,9 @@ func (m *CreateUserRequest) Size() (n int) {
 }
 
 func (m *UpdateUserRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.User.Size()
@@ -3183,6 +3204,9 @@ func (m *UpdateUserRequest) Size() (n int) {
 }
 
 func (m *CreateTemporaryPasswordRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3191,6 +3215,9 @@ func (m *CreateTemporaryPasswordRequest) Size() (n int) {
 }
 
 func (m *UpdateUserPasswordRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3207,6 +3234,9 @@ func (m *UpdateUserPasswordRequest) Size() (n int) {
 }
 
 func (m *CreateUserAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3226,6 +3256,9 @@ func (m *CreateUserAPIKeyRequest) Size() (n int) {
 }
 
 func (m *UpdateUserAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3236,6 +3269,9 @@ func (m *UpdateUserAPIKeyRequest) Size() (n int) {
 }
 
 func (m *Invitation) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Email)
@@ -3264,6 +3300,9 @@ func (m *Invitation) Size() (n int) {
 }
 
 func (m *Invitations) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Invitations) > 0 {
@@ -3276,6 +3315,9 @@ func (m *Invitations) Size() (n int) {
 }
 
 func (m *SendInvitationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Email)
@@ -3286,6 +3328,9 @@ func (m *SendInvitationRequest) Size() (n int) {
 }
 
 func (m *DeleteInvitationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Email)
@@ -3296,6 +3341,9 @@ func (m *DeleteInvitationRequest) Size() (n int) {
 }
 
 func (m *UserSessionIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3308,6 +3356,9 @@ func (m *UserSessionIdentifiers) Size() (n int) {
 }
 
 func (m *UserSession) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -3328,6 +3379,9 @@ func (m *UserSession) Size() (n int) {
 }
 
 func (m *UserSessions) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Sessions) > 0 {
@@ -3340,6 +3394,9 @@ func (m *UserSessions) Size() (n int) {
 }
 
 func (m *ListUserSessionsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.UserIdentifiers.Size()
@@ -5340,6 +5397,10 @@ func (m *CreateUserAPIKeyRequest) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

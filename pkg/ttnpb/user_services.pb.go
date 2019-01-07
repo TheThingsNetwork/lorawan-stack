@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for UserRegistry service
-
+// UserRegistryClient is the client API for UserRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserRegistryClient interface {
 	// Register a new user. This method may be restricted by network settings.
 	Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
@@ -113,8 +117,7 @@ func (c *userRegistryClient) Delete(ctx context.Context, in *UserIdentifiers, op
 	return out, nil
 }
 
-// Server API for UserRegistry service
-
+// UserRegistryServer is the server API for UserRegistry service.
 type UserRegistryServer interface {
 	// Register a new user. This method may be restricted by network settings.
 	Create(context.Context, *CreateUserRequest) (*User, error)
@@ -275,8 +278,9 @@ var _UserRegistry_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/user_services.proto",
 }
 
-// Client API for UserAccess service
-
+// UserAccessClient is the client API for UserAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserAccessClient interface {
 	ListRights(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*Rights, error)
 	CreateAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
@@ -331,8 +335,7 @@ func (c *userAccessClient) UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKe
 	return out, nil
 }
 
-// Server API for UserAccess service
-
+// UserAccessServer is the server API for UserAccess service.
 type UserAccessServer interface {
 	ListRights(context.Context, *UserIdentifiers) (*Rights, error)
 	CreateAPIKey(context.Context, *CreateUserAPIKeyRequest) (*APIKey, error)
@@ -444,8 +447,9 @@ var _UserAccess_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/user_services.proto",
 }
 
-// Client API for UserInvitationRegistry service
-
+// UserInvitationRegistryClient is the client API for UserInvitationRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserInvitationRegistryClient interface {
 	Send(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*Invitation, error)
 	List(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*Invitations, error)
@@ -487,8 +491,7 @@ func (c *userInvitationRegistryClient) Delete(ctx context.Context, in *DeleteInv
 	return out, nil
 }
 
-// Server API for UserInvitationRegistry service
-
+// UserInvitationRegistryServer is the server API for UserInvitationRegistry service.
 type UserInvitationRegistryServer interface {
 	Send(context.Context, *SendInvitationRequest) (*Invitation, error)
 	List(context.Context, *types.Empty) (*Invitations, error)
@@ -574,8 +577,9 @@ var _UserInvitationRegistry_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/user_services.proto",
 }
 
-// Client API for UserSessionRegistry service
-
+// UserSessionRegistryClient is the client API for UserSessionRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserSessionRegistryClient interface {
 	List(ctx context.Context, in *ListUserSessionsRequest, opts ...grpc.CallOption) (*UserSessions, error)
 	Delete(ctx context.Context, in *UserSessionIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
@@ -607,8 +611,7 @@ func (c *userSessionRegistryClient) Delete(ctx context.Context, in *UserSessionI
 	return out, nil
 }
 
-// Server API for UserSessionRegistry service
-
+// UserSessionRegistryServer is the server API for UserSessionRegistry service.
 type UserSessionRegistryServer interface {
 	List(context.Context, *ListUserSessionsRequest) (*UserSessions, error)
 	Delete(context.Context, *UserSessionIdentifiers) (*types.Empty, error)

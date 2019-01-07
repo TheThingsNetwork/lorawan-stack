@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for EndDeviceRegistry service
-
+// EndDeviceRegistryClient is the client API for EndDeviceRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EndDeviceRegistryClient interface {
 	// Create a new end device within an application.
 	Create(ctx context.Context, in *CreateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
@@ -101,8 +105,7 @@ func (c *endDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIdent
 	return out, nil
 }
 
-// Server API for EndDeviceRegistry service
-
+// EndDeviceRegistryServer is the server API for EndDeviceRegistry service.
 type EndDeviceRegistryServer interface {
 	// Create a new end device within an application.
 	Create(context.Context, *CreateEndDeviceRequest) (*EndDevice, error)

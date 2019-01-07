@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for GsNs service
-
+// GsNsClient is the client API for GsNs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GsNsClient interface {
 	HandleUplink(ctx context.Context, in *UplinkMessage, opts ...grpc.CallOption) (*types.Empty, error)
 }
@@ -57,8 +61,7 @@ func (c *gsNsClient) HandleUplink(ctx context.Context, in *UplinkMessage, opts .
 	return out, nil
 }
 
-// Server API for GsNs service
-
+// GsNsServer is the server API for GsNs service.
 type GsNsServer interface {
 	HandleUplink(context.Context, *UplinkMessage) (*types.Empty, error)
 }
@@ -98,8 +101,9 @@ var _GsNs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/networkserver.proto",
 }
 
-// Client API for AsNs service
-
+// AsNsClient is the client API for AsNs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsNsClient interface {
 	LinkApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (AsNs_LinkApplicationClient, error)
 	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*types.Empty, error)
@@ -174,8 +178,7 @@ func (c *asNsClient) DownlinkQueueList(ctx context.Context, in *EndDeviceIdentif
 	return out, nil
 }
 
-// Server API for AsNs service
-
+// AsNsServer is the server API for AsNs service.
 type AsNsServer interface {
 	LinkApplication(*ApplicationIdentifiers, AsNs_LinkApplicationServer) error
 	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
@@ -289,8 +292,9 @@ var _AsNs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/networkserver.proto",
 }
 
-// Client API for NsEndDeviceRegistry service
-
+// NsEndDeviceRegistryClient is the client API for NsEndDeviceRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NsEndDeviceRegistryClient interface {
 	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
@@ -337,8 +341,7 @@ func (c *nsEndDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-// Server API for NsEndDeviceRegistry service
-
+// NsEndDeviceRegistryServer is the server API for NsEndDeviceRegistry service.
 type NsEndDeviceRegistryServer interface {
 	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.

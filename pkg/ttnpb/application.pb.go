@@ -36,13 +36,13 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Application is the message that defines an Application in the network.
 type Application struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt              time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt              time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt              time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt              time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	Name                   string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Description            string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes             map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo            []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo" json:"contact_info,omitempty"`
+	Attributes             map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ContactInfo            []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	XXX_NoUnkeyedLiteral   struct{}          `json:"-"`
 	XXX_sizecache          int32             `json:"-"`
 }
@@ -122,7 +122,7 @@ func (m *Application) GetContactInfo() []*ContactInfo {
 }
 
 type Applications struct {
-	Applications         []*Application `protobuf:"bytes,1,rep,name=applications" json:"applications,omitempty"`
+	Applications         []*Application `protobuf:"bytes,1,rep,name=applications,proto3" json:"applications,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
 }
@@ -167,8 +167,8 @@ func (m *Applications) GetApplications() []*Application {
 }
 
 type GetApplicationRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral   struct{}        `json:"-"`
 	XXX_sizecache          int32           `json:"-"`
 }
@@ -213,8 +213,8 @@ func (m *GetApplicationRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListApplicationsRequest struct {
-	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator" json:"collaborator,omitempty"`
-	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
+	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -294,9 +294,9 @@ func (m *ListApplicationsRequest) GetPage() uint32 {
 }
 
 type CreateApplicationRequest struct {
-	Application `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	Application `protobuf:"bytes,1,opt,name=application,proto3,embedded=application" json:"application"`
 	// Collaborator to grant all rights on the newly created application.
-	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
 }
@@ -341,8 +341,8 @@ func (m *CreateApplicationRequest) GetCollaborator() OrganizationOrUserIdentifie
 }
 
 type UpdateApplicationRequest struct {
-	Application          `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Application          `protobuf:"bytes,1,opt,name=application,proto3,embedded=application" json:"application"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -387,9 +387,9 @@ func (m *UpdateApplicationRequest) GetFieldMask() types.FieldMask {
 }
 
 type CreateApplicationAPIKeyRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
 	Name                   string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Rights                 []Right  `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights                 []Right  `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
 	XXX_sizecache          int32    `json:"-"`
 }
@@ -441,8 +441,8 @@ func (m *CreateApplicationAPIKeyRequest) GetRights() []Right {
 }
 
 type UpdateApplicationAPIKeyRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	APIKey                 `protobuf:"bytes,2,opt,name=api_key,json=apiKey,embedded=api_key" json:"api_key"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	APIKey                 `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
 	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
 	XXX_sizecache          int32    `json:"-"`
 }
@@ -480,8 +480,8 @@ func (m *UpdateApplicationAPIKeyRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_UpdateApplicationAPIKeyRequest proto.InternalMessageInfo
 
 type SetApplicationCollaboratorRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	Collaborator           Collaborator `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	Collaborator           Collaborator `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral   struct{}     `json:"-"`
 	XXX_sizecache          int32        `json:"-"`
 }
@@ -1428,6 +1428,9 @@ func encodeVarintPopulateApplication(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *Application) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1462,6 +1465,9 @@ func (m *Application) Size() (n int) {
 }
 
 func (m *Applications) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Applications) > 0 {
@@ -1474,6 +1480,9 @@ func (m *Applications) Size() (n int) {
 }
 
 func (m *GetApplicationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1484,6 +1493,9 @@ func (m *GetApplicationRequest) Size() (n int) {
 }
 
 func (m *ListApplicationsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Collaborator != nil {
@@ -1506,6 +1518,9 @@ func (m *ListApplicationsRequest) Size() (n int) {
 }
 
 func (m *CreateApplicationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Application.Size()
@@ -1516,6 +1531,9 @@ func (m *CreateApplicationRequest) Size() (n int) {
 }
 
 func (m *UpdateApplicationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Application.Size()
@@ -1526,6 +1544,9 @@ func (m *UpdateApplicationRequest) Size() (n int) {
 }
 
 func (m *CreateApplicationAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1545,6 +1566,9 @@ func (m *CreateApplicationAPIKeyRequest) Size() (n int) {
 }
 
 func (m *UpdateApplicationAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1555,6 +1579,9 @@ func (m *UpdateApplicationAPIKeyRequest) Size() (n int) {
 }
 
 func (m *SetApplicationCollaboratorRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -2768,6 +2795,10 @@ func (m *CreateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

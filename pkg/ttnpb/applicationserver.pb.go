@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -39,7 +42,7 @@ type ApplicationLink struct {
 	NetworkServerAddress string `protobuf:"bytes,1,opt,name=network_server_address,json=networkServerAddress,proto3" json:"network_server_address,omitempty"`
 	// API key to use when linking to an external Network Server.
 	APIKey            string                    `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	DefaultFormatters *MessagePayloadFormatters `protobuf:"bytes,3,opt,name=default_formatters,json=defaultFormatters" json:"default_formatters,omitempty"`
+	DefaultFormatters *MessagePayloadFormatters `protobuf:"bytes,3,opt,name=default_formatters,json=defaultFormatters,proto3" json:"default_formatters,omitempty"`
 	// In true, no TLS is being used.
 	// If false, the connection to an external Network Server will be established with transport layer security (TLS).
 	// Custom certificate authorities may be configured out-of-band.
@@ -109,8 +112,8 @@ func (m *ApplicationLink) GetAllowInsecure() bool {
 }
 
 type GetApplicationLinkRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral   struct{}        `json:"-"`
 	XXX_sizecache          int32           `json:"-"`
 }
@@ -155,9 +158,9 @@ func (m *GetApplicationLinkRequest) GetFieldMask() types.FieldMask {
 }
 
 type SetApplicationLinkRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	ApplicationLink        `protobuf:"bytes,2,opt,name=link,embedded=link" json:"link"`
-	FieldMask              types.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	ApplicationLink        `protobuf:"bytes,2,opt,name=link,proto3,embedded=link" json:"link"`
+	FieldMask              types.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral   struct{}        `json:"-"`
 	XXX_sizecache          int32           `json:"-"`
 }
@@ -308,8 +311,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for As service
-
+// AsClient is the client API for As service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsClient interface {
 	GetLink(ctx context.Context, in *GetApplicationLinkRequest, opts ...grpc.CallOption) (*ApplicationLink, error)
 	SetLink(ctx context.Context, in *SetApplicationLinkRequest, opts ...grpc.CallOption) (*ApplicationLink, error)
@@ -351,8 +355,7 @@ func (c *asClient) DeleteLink(ctx context.Context, in *ApplicationIdentifiers, o
 	return out, nil
 }
 
-// Server API for As service
-
+// AsServer is the server API for As service.
 type AsServer interface {
 	GetLink(context.Context, *GetApplicationLinkRequest) (*ApplicationLink, error)
 	SetLink(context.Context, *SetApplicationLinkRequest) (*ApplicationLink, error)
@@ -438,8 +441,9 @@ var _As_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/applicationserver.proto",
 }
 
-// Client API for AppAs service
-
+// AppAsClient is the client API for AppAs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AppAsClient interface {
 	Subscribe(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (AppAs_SubscribeClient, error)
 	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*types.Empty, error)
@@ -514,8 +518,7 @@ func (c *appAsClient) DownlinkQueueList(ctx context.Context, in *EndDeviceIdenti
 	return out, nil
 }
 
-// Server API for AppAs service
-
+// AppAsServer is the server API for AppAs service.
 type AppAsServer interface {
 	Subscribe(*ApplicationIdentifiers, AppAs_SubscribeServer) error
 	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
@@ -629,8 +632,9 @@ var _AppAs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/applicationserver.proto",
 }
 
-// Client API for AsEndDeviceRegistry service
-
+// AsEndDeviceRegistryClient is the client API for AsEndDeviceRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsEndDeviceRegistryClient interface {
 	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
@@ -677,8 +681,7 @@ func (c *asEndDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-// Server API for AsEndDeviceRegistry service
-
+// AsEndDeviceRegistryServer is the server API for AsEndDeviceRegistry service.
 type AsEndDeviceRegistryServer interface {
 	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
@@ -1014,6 +1017,9 @@ func encodeVarintPopulateApplicationserver(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ApplicationLink) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.NetworkServerAddress)
@@ -1035,6 +1041,9 @@ func (m *ApplicationLink) Size() (n int) {
 }
 
 func (m *GetApplicationLinkRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -1045,6 +1054,9 @@ func (m *GetApplicationLinkRequest) Size() (n int) {
 }
 
 func (m *SetApplicationLinkRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()

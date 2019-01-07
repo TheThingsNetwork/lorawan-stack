@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for OAuthAuthorizationRegistry service
-
+// OAuthAuthorizationRegistryClient is the client API for OAuthAuthorizationRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type OAuthAuthorizationRegistryClient interface {
 	List(ctx context.Context, in *ListOAuthClientAuthorizationsRequest, opts ...grpc.CallOption) (*OAuthClientAuthorizations, error)
 	ListTokens(ctx context.Context, in *ListOAuthAccessTokensRequest, opts ...grpc.CallOption) (*OAuthAccessTokens, error)
@@ -87,8 +91,7 @@ func (c *oAuthAuthorizationRegistryClient) DeleteToken(ctx context.Context, in *
 	return out, nil
 }
 
-// Server API for OAuthAuthorizationRegistry service
-
+// OAuthAuthorizationRegistryServer is the server API for OAuthAuthorizationRegistry service.
 type OAuthAuthorizationRegistryServer interface {
 	List(context.Context, *ListOAuthClientAuthorizationsRequest) (*OAuthClientAuthorizations, error)
 	ListTokens(context.Context, *ListOAuthAccessTokensRequest) (*OAuthAccessTokens, error)

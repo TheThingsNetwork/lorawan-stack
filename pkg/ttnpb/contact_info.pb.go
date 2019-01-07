@@ -15,8 +15,11 @@ import time "time"
 
 import strconv "strconv"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
@@ -92,7 +95,7 @@ type ContactInfo struct {
 	ContactMethod        ContactMethod `protobuf:"varint,2,opt,name=contact_method,json=contactMethod,proto3,enum=ttn.lorawan.v3.ContactMethod" json:"contact_method,omitempty"`
 	Value                string        `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
 	Public               bool          `protobuf:"varint,4,opt,name=public,proto3" json:"public,omitempty"`
-	ValidatedAt          *time.Time    `protobuf:"bytes,5,opt,name=validated_at,json=validatedAt,stdtime" json:"validated_at,omitempty"`
+	ValidatedAt          *time.Time    `protobuf:"bytes,5,opt,name=validated_at,json=validatedAt,proto3,stdtime" json:"validated_at,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -167,10 +170,10 @@ func (m *ContactInfo) GetValidatedAt() *time.Time {
 type ContactInfoValidation struct {
 	ID                   string             `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Token                string             `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	Entity               *EntityIdentifiers `protobuf:"bytes,3,opt,name=entity" json:"entity,omitempty"`
-	ContactInfo          []*ContactInfo     `protobuf:"bytes,4,rep,name=contact_info,json=contactInfo" json:"contact_info,omitempty"`
-	CreatedAt            *time.Time         `protobuf:"bytes,5,opt,name=created_at,json=createdAt,stdtime" json:"created_at,omitempty"`
-	ExpiresAt            *time.Time         `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,stdtime" json:"expires_at,omitempty"`
+	Entity               *EntityIdentifiers `protobuf:"bytes,3,opt,name=entity,proto3" json:"entity,omitempty"`
+	ContactInfo          []*ContactInfo     `protobuf:"bytes,4,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
+	CreatedAt            *time.Time         `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at,omitempty"`
+	ExpiresAt            *time.Time         `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
 }
@@ -374,8 +377,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ContactInfoRegistry service
-
+// ContactInfoRegistryClient is the client API for ContactInfoRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ContactInfoRegistryClient interface {
 	// Request validation for the non-validated contact info for the given entity.
 	RequestValidation(ctx context.Context, in *EntityIdentifiers, opts ...grpc.CallOption) (*ContactInfoValidation, error)
@@ -409,8 +413,7 @@ func (c *contactInfoRegistryClient) Validate(ctx context.Context, in *ContactInf
 	return out, nil
 }
 
-// Server API for ContactInfoRegistry service
-
+// ContactInfoRegistryServer is the server API for ContactInfoRegistry service.
 type ContactInfoRegistryServer interface {
 	// Request validation for the non-validated contact info for the given entity.
 	RequestValidation(context.Context, *EntityIdentifiers) (*ContactInfoValidation, error)
@@ -722,6 +725,9 @@ func encodeVarintPopulateContactInfo(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ContactInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ContactType != 0 {
@@ -745,6 +751,9 @@ func (m *ContactInfo) Size() (n int) {
 }
 
 func (m *ContactInfoValidation) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ID)

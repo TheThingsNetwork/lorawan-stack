@@ -16,8 +16,11 @@ import go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawa
 
 import bytes "bytes"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -86,11 +89,11 @@ func (m *SessionKeyRequest) GetSessionKeyID() []byte {
 
 type NwkSKeysResponse struct {
 	// The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
-	FNwkSIntKey KeyEnvelope `protobuf:"bytes,1,opt,name=f_nwk_s_int_key,json=fNwkSIntKey" json:"f_nwk_s_int_key"`
+	FNwkSIntKey KeyEnvelope `protobuf:"bytes,1,opt,name=f_nwk_s_int_key,json=fNwkSIntKey,proto3" json:"f_nwk_s_int_key"`
 	// The (encrypted) Serving Network Session Integrity Key.
-	SNwkSIntKey KeyEnvelope `protobuf:"bytes,2,opt,name=s_nwk_s_int_key,json=sNwkSIntKey" json:"s_nwk_s_int_key"`
+	SNwkSIntKey KeyEnvelope `protobuf:"bytes,2,opt,name=s_nwk_s_int_key,json=sNwkSIntKey,proto3" json:"s_nwk_s_int_key"`
 	// The (encrypted) Network Session Encryption Key.
-	NwkSEncKey           KeyEnvelope `protobuf:"bytes,3,opt,name=nwk_s_enc_key,json=nwkSEncKey" json:"nwk_s_enc_key"`
+	NwkSEncKey           KeyEnvelope `protobuf:"bytes,3,opt,name=nwk_s_enc_key,json=nwkSEncKey,proto3" json:"nwk_s_enc_key"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_sizecache        int32       `json:"-"`
 }
@@ -150,7 +153,7 @@ func (m *NwkSKeysResponse) GetNwkSEncKey() KeyEnvelope {
 
 type AppSKeyResponse struct {
 	// The (encrypted) Application Session Key.
-	AppSKey              KeyEnvelope `protobuf:"bytes,1,opt,name=app_s_key,json=appSKey" json:"app_s_key"`
+	AppSKey              KeyEnvelope `protobuf:"bytes,1,opt,name=app_s_key,json=appSKey,proto3" json:"app_s_key"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_sizecache        int32       `json:"-"`
 }
@@ -292,8 +295,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for NsJs service
-
+// NsJsClient is the client API for NsJs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NsJsClient interface {
 	HandleJoin(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
 	GetNwkSKeys(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*NwkSKeysResponse, error)
@@ -325,8 +329,7 @@ func (c *nsJsClient) GetNwkSKeys(ctx context.Context, in *SessionKeyRequest, opt
 	return out, nil
 }
 
-// Server API for NsJs service
-
+// NsJsServer is the server API for NsJs service.
 type NsJsServer interface {
 	HandleJoin(context.Context, *JoinRequest) (*JoinResponse, error)
 	GetNwkSKeys(context.Context, *SessionKeyRequest) (*NwkSKeysResponse, error)
@@ -389,8 +392,9 @@ var _NsJs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/joinserver.proto",
 }
 
-// Client API for AsJs service
-
+// AsJsClient is the client API for AsJs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsJsClient interface {
 	GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
 }
@@ -412,8 +416,7 @@ func (c *asJsClient) GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts
 	return out, nil
 }
 
-// Server API for AsJs service
-
+// AsJsServer is the server API for AsJs service.
 type AsJsServer interface {
 	GetAppSKey(context.Context, *SessionKeyRequest) (*AppSKeyResponse, error)
 }
@@ -453,8 +456,9 @@ var _AsJs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/joinserver.proto",
 }
 
-// Client API for JsEndDeviceRegistry service
-
+// JsEndDeviceRegistryClient is the client API for JsEndDeviceRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type JsEndDeviceRegistryClient interface {
 	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
@@ -501,8 +505,7 @@ func (c *jsEndDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-// Server API for JsEndDeviceRegistry service
-
+// JsEndDeviceRegistryServer is the server API for JsEndDeviceRegistry service.
 type JsEndDeviceRegistryServer interface {
 	// Get returns the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
@@ -811,6 +814,9 @@ func encodeVarintPopulateJoinserver(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *SessionKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.SessionKeyID)
@@ -823,6 +829,9 @@ func (m *SessionKeyRequest) Size() (n int) {
 }
 
 func (m *NwkSKeysResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.FNwkSIntKey.Size()
@@ -835,6 +844,9 @@ func (m *NwkSKeysResponse) Size() (n int) {
 }
 
 func (m *AppSKeyResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.AppSKey.Size()

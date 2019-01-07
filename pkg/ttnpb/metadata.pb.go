@@ -90,9 +90,9 @@ func (LocationSource) EnumDescriptor() ([]byte, []int) {
 // Contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 type RxMetadata struct {
-	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
 	AntennaIndex       uint32     `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
-	Time               *time.Time `protobuf:"bytes,3,opt,name=time,stdtime" json:"time,omitempty"`
+	Time               *time.Time `protobuf:"bytes,3,opt,name=time,proto3,stdtime" json:"time,omitempty"`
 	// Gateway concentrator timestamp when the Rx finished (microseconds).
 	Timestamp uint32 `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Gateway's internal fine timestamp when the Rx finished (nanoseconds).
@@ -111,7 +111,7 @@ type RxMetadata struct {
 	// Frequency offset (Hz).
 	FrequencyOffset int64 `protobuf:"varint,12,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequency_offset,omitempty"`
 	// Antenna location; injected by the Gateway Server.
-	Location *Location `protobuf:"bytes,13,opt,name=location" json:"location,omitempty"`
+	Location *Location `protobuf:"bytes,13,opt,name=location,proto3" json:"location,omitempty"`
 	// Gateway downlink path constraint; injected by the Gateway Server.
 	DownlinkPathConstraint DownlinkPathConstraint `protobuf:"varint,14,opt,name=downlink_path_constraint,json=downlinkPathConstraint,proto3,enum=ttn.lorawan.v3.DownlinkPathConstraint" json:"downlink_path_constraint,omitempty"`
 	// Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS.
@@ -119,7 +119,7 @@ type RxMetadata struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced             *types.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced             *types.Struct `protobuf:"bytes,99,opt,name=advanced,proto3" json:"advanced,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -796,6 +796,9 @@ func encodeVarintPopulateMetadata(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *RxMetadata) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
@@ -855,6 +858,9 @@ func (m *RxMetadata) Size() (n int) {
 }
 
 func (m *Location) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Latitude != 0 {

@@ -15,8 +15,11 @@ import time "time"
 
 import bytes "bytes"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
@@ -41,12 +44,12 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type Event struct {
 	Name                 string               `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Time                 time.Time            `protobuf:"bytes,2,opt,name=time,stdtime" json:"time"`
-	Identifiers          *CombinedIdentifiers `protobuf:"bytes,3,opt,name=identifiers" json:"identifiers,omitempty"`
-	Data                 *types.Any           `protobuf:"bytes,4,opt,name=data" json:"data,omitempty"`
-	CorrelationIDs       []string             `protobuf:"bytes,5,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	Time                 time.Time            `protobuf:"bytes,2,opt,name=time,proto3,stdtime" json:"time"`
+	Identifiers          *CombinedIdentifiers `protobuf:"bytes,3,opt,name=identifiers,proto3" json:"identifiers,omitempty"`
+	Data                 *types.Any           `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	CorrelationIDs       []string             `protobuf:"bytes,5,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	Origin               string               `protobuf:"bytes,6,opt,name=origin,proto3" json:"origin,omitempty"`
-	Context              map[string][]byte    `protobuf:"bytes,7,rep,name=context" json:"context,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Context              map[string][]byte    `protobuf:"bytes,7,rep,name=context,proto3" json:"context,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
 }
@@ -133,7 +136,7 @@ func (m *Event) GetContext() map[string][]byte {
 }
 
 type StreamEventsRequest struct {
-	Identifiers CombinedIdentifiers `protobuf:"bytes,1,opt,name=identifiers" json:"identifiers"`
+	Identifiers CombinedIdentifiers `protobuf:"bytes,1,opt,name=identifiers,proto3" json:"identifiers"`
 	// If greater than zero, this will return historical events, up to this maximum when the stream starts.
 	// If used in combination with "after", the limit that is reached first, is used.
 	// The availability of historical events depends on server support and retention policy.
@@ -141,7 +144,7 @@ type StreamEventsRequest struct {
 	// If not empty, this will return historical events after the given time when the stream starts.
 	// If used in combination with "tail", the limit that is reached first, is used.
 	// The availability of historical events depends on server support and retention policy.
-	After                *time.Time `protobuf:"bytes,3,opt,name=after,stdtime" json:"after,omitempty"`
+	After                *time.Time `protobuf:"bytes,3,opt,name=after,proto3,stdtime" json:"after,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_sizecache        int32      `json:"-"`
 }
@@ -302,8 +305,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for Events service
-
+// EventsClient is the client API for Events service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EventsClient interface {
 	// Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
 	// Events may arrive out-of-order.
@@ -350,8 +354,7 @@ func (x *eventsStreamClient) Recv() (*Event, error) {
 	return m, nil
 }
 
-// Server API for Events service
-
+// EventsServer is the server API for Events service.
 type EventsServer interface {
 	// Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
 	// Events may arrive out-of-order.
@@ -663,6 +666,9 @@ func encodeVarintPopulateEvents(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *Event) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -705,6 +711,9 @@ func (m *Event) Size() (n int) {
 }
 
 func (m *StreamEventsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Identifiers.Size()

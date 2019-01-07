@@ -9,8 +9,11 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -30,9 +33,9 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type ProcessUplinkMessageRequest struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds" json:"end_device_version_ids"`
-	Message              ApplicationUplink           `protobuf:"bytes,3,opt,name=message" json:"message"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds,proto3" json:"end_device_version_ids"`
+	Message              ApplicationUplink           `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
 	Parameter            string                      `protobuf:"bytes,4,opt,name=parameter,proto3" json:"parameter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
@@ -92,9 +95,9 @@ func (m *ProcessUplinkMessageRequest) GetParameter() string {
 }
 
 type ProcessDownlinkMessageRequest struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds" json:"end_device_version_ids"`
-	Message              ApplicationDownlink         `protobuf:"bytes,3,opt,name=message" json:"message"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds,proto3" json:"end_device_version_ids"`
+	Message              ApplicationDownlink         `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
 	Parameter            string                      `protobuf:"bytes,4,opt,name=parameter,proto3" json:"parameter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
@@ -234,8 +237,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for UplinkMessageProcessor service
-
+// UplinkMessageProcessorClient is the client API for UplinkMessageProcessor service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UplinkMessageProcessorClient interface {
 	Process(ctx context.Context, in *ProcessUplinkMessageRequest, opts ...grpc.CallOption) (*ApplicationUplink, error)
 }
@@ -257,8 +261,7 @@ func (c *uplinkMessageProcessorClient) Process(ctx context.Context, in *ProcessU
 	return out, nil
 }
 
-// Server API for UplinkMessageProcessor service
-
+// UplinkMessageProcessorServer is the server API for UplinkMessageProcessor service.
 type UplinkMessageProcessorServer interface {
 	Process(context.Context, *ProcessUplinkMessageRequest) (*ApplicationUplink, error)
 }
@@ -298,8 +301,9 @@ var _UplinkMessageProcessor_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/message_services.proto",
 }
 
-// Client API for DownlinkMessageProcessor service
-
+// DownlinkMessageProcessorClient is the client API for DownlinkMessageProcessor service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DownlinkMessageProcessorClient interface {
 	Process(ctx context.Context, in *ProcessDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error)
 }
@@ -321,8 +325,7 @@ func (c *downlinkMessageProcessorClient) Process(ctx context.Context, in *Proces
 	return out, nil
 }
 
-// Server API for DownlinkMessageProcessor service
-
+// DownlinkMessageProcessorServer is the server API for DownlinkMessageProcessor service.
 type DownlinkMessageProcessorServer interface {
 	Process(context.Context, *ProcessDownlinkMessageRequest) (*ApplicationDownlink, error)
 }
@@ -568,6 +571,9 @@ func encodeVarintPopulateMessageServices(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ProcessUplinkMessageRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()
@@ -584,6 +590,9 @@ func (m *ProcessUplinkMessageRequest) Size() (n int) {
 }
 
 func (m *ProcessDownlinkMessageRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()

@@ -34,13 +34,13 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type Organization struct {
-	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt               time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt               time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt               time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt               time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	Name                    string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Description             string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes              map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo             []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo" json:"contact_info,omitempty"`
+	Attributes              map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ContactInfo             []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	XXX_NoUnkeyedLiteral    struct{}          `json:"-"`
 	XXX_sizecache           int32             `json:"-"`
 }
@@ -120,7 +120,7 @@ func (m *Organization) GetContactInfo() []*ContactInfo {
 }
 
 type Organizations struct {
-	Organizations        []*Organization `protobuf:"bytes,1,rep,name=organizations" json:"organizations,omitempty"`
+	Organizations        []*Organization `protobuf:"bytes,1,rep,name=organizations,proto3" json:"organizations,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -165,8 +165,8 @@ func (m *Organizations) GetOrganizations() []*Organization {
 }
 
 type GetOrganizationRequest struct {
-	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
-	FieldMask               types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,embedded=organization_ids" json:"organization_ids"`
+	FieldMask               types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral    struct{}        `json:"-"`
 	XXX_sizecache           int32           `json:"-"`
 }
@@ -213,8 +213,8 @@ func (m *GetOrganizationRequest) GetFieldMask() types.FieldMask {
 type ListOrganizationsRequest struct {
 	// NOTE: It is currently not possible to have organizations collaborating on
 	// other organizations.
-	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator" json:"collaborator,omitempty"`
-	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
+	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -294,11 +294,11 @@ func (m *ListOrganizationsRequest) GetPage() uint32 {
 }
 
 type CreateOrganizationRequest struct {
-	Organization `protobuf:"bytes,1,opt,name=organization,embedded=organization" json:"organization"`
+	Organization `protobuf:"bytes,1,opt,name=organization,proto3,embedded=organization" json:"organization"`
 	// Collaborator to grant all rights on the newly created application.
 	// NOTE: It is currently not possible to have organizations collaborating on
 	// other organizations.
-	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
 }
@@ -343,8 +343,8 @@ func (m *CreateOrganizationRequest) GetCollaborator() OrganizationOrUserIdentifi
 }
 
 type UpdateOrganizationRequest struct {
-	Organization         `protobuf:"bytes,1,opt,name=organization,embedded=organization" json:"organization"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Organization         `protobuf:"bytes,1,opt,name=organization,proto3,embedded=organization" json:"organization"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -389,9 +389,9 @@ func (m *UpdateOrganizationRequest) GetFieldMask() types.FieldMask {
 }
 
 type CreateOrganizationAPIKeyRequest struct {
-	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
+	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,embedded=organization_ids" json:"organization_ids"`
 	Name                    string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Rights                  []Right  `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights                  []Right  `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
 	XXX_sizecache           int32    `json:"-"`
 }
@@ -443,8 +443,8 @@ func (m *CreateOrganizationAPIKeyRequest) GetRights() []Right {
 }
 
 type UpdateOrganizationAPIKeyRequest struct {
-	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
-	APIKey                  `protobuf:"bytes,2,opt,name=api_key,json=apiKey,embedded=api_key" json:"api_key"`
+	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,embedded=organization_ids" json:"organization_ids"`
+	APIKey                  `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
 	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
 	XXX_sizecache           int32    `json:"-"`
 }
@@ -482,8 +482,8 @@ func (m *UpdateOrganizationAPIKeyRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_UpdateOrganizationAPIKeyRequest proto.InternalMessageInfo
 
 type SetOrganizationCollaboratorRequest struct {
-	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,embedded=organization_ids" json:"organization_ids"`
-	Collaborator            Collaborator `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,embedded=organization_ids" json:"organization_ids"`
+	Collaborator            Collaborator `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral    struct{}     `json:"-"`
 	XXX_sizecache           int32        `json:"-"`
 }
@@ -1430,6 +1430,9 @@ func encodeVarintPopulateOrganization(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *Organization) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.OrganizationIdentifiers.Size()
@@ -1464,6 +1467,9 @@ func (m *Organization) Size() (n int) {
 }
 
 func (m *Organizations) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Organizations) > 0 {
@@ -1476,6 +1482,9 @@ func (m *Organizations) Size() (n int) {
 }
 
 func (m *GetOrganizationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.OrganizationIdentifiers.Size()
@@ -1486,6 +1495,9 @@ func (m *GetOrganizationRequest) Size() (n int) {
 }
 
 func (m *ListOrganizationsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Collaborator != nil {
@@ -1508,6 +1520,9 @@ func (m *ListOrganizationsRequest) Size() (n int) {
 }
 
 func (m *CreateOrganizationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Organization.Size()
@@ -1518,6 +1533,9 @@ func (m *CreateOrganizationRequest) Size() (n int) {
 }
 
 func (m *UpdateOrganizationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Organization.Size()
@@ -1528,6 +1546,9 @@ func (m *UpdateOrganizationRequest) Size() (n int) {
 }
 
 func (m *CreateOrganizationAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.OrganizationIdentifiers.Size()
@@ -1547,6 +1568,9 @@ func (m *CreateOrganizationAPIKeyRequest) Size() (n int) {
 }
 
 func (m *UpdateOrganizationAPIKeyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.OrganizationIdentifiers.Size()
@@ -1557,6 +1581,9 @@ func (m *UpdateOrganizationAPIKeyRequest) Size() (n int) {
 }
 
 func (m *SetOrganizationCollaboratorRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.OrganizationIdentifiers.Size()
@@ -2770,6 +2797,10 @@ func (m *CreateOrganizationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

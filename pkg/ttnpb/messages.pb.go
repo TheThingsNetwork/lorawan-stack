@@ -116,13 +116,13 @@ func (TxAcknowledgment_Result) EnumDescriptor() ([]byte, []int) {
 // Uplink message from the end device to the network
 type UplinkMessage struct {
 	RawPayload []byte        `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	Payload    *Message      `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
-	Settings   TxSettings    `protobuf:"bytes,4,opt,name=settings" json:"settings"`
-	RxMetadata []*RxMetadata `protobuf:"bytes,5,rep,name=rx_metadata,json=rxMetadata" json:"rx_metadata,omitempty"`
+	Payload    *Message      `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	Settings   TxSettings    `protobuf:"bytes,4,opt,name=settings,proto3" json:"settings"`
+	RxMetadata []*RxMetadata `protobuf:"bytes,5,rep,name=rx_metadata,json=rxMetadata,proto3" json:"rx_metadata,omitempty"`
 	// Server time when a component received the message.
 	// The Gateway Server, Network Server and Application Server may set this value to their local server time of reception.
-	ReceivedAt           time.Time `protobuf:"bytes,6,opt,name=received_at,json=receivedAt,stdtime" json:"received_at"`
-	CorrelationIDs       []string  `protobuf:"bytes,7,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	ReceivedAt           time.Time `protobuf:"bytes,6,opt,name=received_at,json=receivedAt,proto3,stdtime" json:"received_at"`
+	CorrelationIDs       []string  `protobuf:"bytes,7,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
 }
@@ -204,13 +204,13 @@ func (m *UplinkMessage) GetCorrelationIDs() []string {
 // Downlink message from the network to the end device
 type DownlinkMessage struct {
 	RawPayload   []byte                `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	Payload      *Message              `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
-	EndDeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds" json:"end_device_ids,omitempty"`
+	Payload      *Message              `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	EndDeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds,proto3" json:"end_device_ids,omitempty"`
 	// Types that are valid to be assigned to Settings:
 	//	*DownlinkMessage_Request
 	//	*DownlinkMessage_Scheduled
 	Settings             isDownlinkMessage_Settings `protobuf_oneof:"settings"`
-	CorrelationIDs       []string                   `protobuf:"bytes,6,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	CorrelationIDs       []string                   `protobuf:"bytes,6,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_sizecache        int32                      `json:"-"`
 }
@@ -255,10 +255,10 @@ type isDownlinkMessage_Settings interface {
 }
 
 type DownlinkMessage_Request struct {
-	Request *TxRequest `protobuf:"bytes,4,opt,name=request,oneof"`
+	Request *TxRequest `protobuf:"bytes,4,opt,name=request,proto3,oneof"`
 }
 type DownlinkMessage_Scheduled struct {
-	Scheduled *TxSettings `protobuf:"bytes,5,opt,name=scheduled,oneof"`
+	Scheduled *TxSettings `protobuf:"bytes,5,opt,name=scheduled,proto3,oneof"`
 }
 
 func (*DownlinkMessage_Request) isDownlinkMessage_Settings()   {}
@@ -388,7 +388,7 @@ func _DownlinkMessage_OneofSizer(msg proto.Message) (n int) {
 }
 
 type TxAcknowledgment struct {
-	CorrelationIDs       []string                `protobuf:"bytes,1,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	CorrelationIDs       []string                `protobuf:"bytes,1,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	Result               TxAcknowledgment_Result `protobuf:"varint,2,opt,name=result,proto3,enum=ttn.lorawan.v3.TxAcknowledgment_Result" json:"result,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
 	XXX_sizecache        int32                   `json:"-"`
@@ -446,9 +446,9 @@ type ApplicationUplink struct {
 	FPort                uint32        `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
 	FCnt                 uint32        `protobuf:"varint,3,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
 	FRMPayload           []byte        `protobuf:"bytes,4,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
-	DecodedPayload       *types.Struct `protobuf:"bytes,5,opt,name=decoded_payload,json=decodedPayload" json:"decoded_payload,omitempty"`
-	RxMetadata           []*RxMetadata `protobuf:"bytes,6,rep,name=rx_metadata,json=rxMetadata" json:"rx_metadata,omitempty"`
-	Settings             TxSettings    `protobuf:"bytes,7,opt,name=settings" json:"settings"`
+	DecodedPayload       *types.Struct `protobuf:"bytes,5,opt,name=decoded_payload,json=decodedPayload,proto3" json:"decoded_payload,omitempty"`
+	RxMetadata           []*RxMetadata `protobuf:"bytes,6,rep,name=rx_metadata,json=rxMetadata,proto3" json:"rx_metadata,omitempty"`
+	Settings             TxSettings    `protobuf:"bytes,7,opt,name=settings,proto3" json:"settings"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -536,8 +536,8 @@ func (m *ApplicationUplink) GetSettings() TxSettings {
 
 type ApplicationLocation struct {
 	Service              string `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
-	Location             `protobuf:"bytes,2,opt,name=location,embedded=location" json:"location"`
-	Attributes           map[string]string `protobuf:"bytes,3,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Location             `protobuf:"bytes,2,opt,name=location,proto3,embedded=location" json:"location"`
+	Attributes           map[string]string `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -592,14 +592,14 @@ type ApplicationJoinAccept struct {
 	// Join Server issued identifier for the session keys negotiated in this join.
 	SessionKeyID []byte `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
 	// Encrypted Application Session Key (if Join Server sent it to Network Server).
-	AppSKey *KeyEnvelope `protobuf:"bytes,2,opt,name=app_s_key,json=appSKey" json:"app_s_key,omitempty"`
+	AppSKey *KeyEnvelope `protobuf:"bytes,2,opt,name=app_s_key,json=appSKey,proto3" json:"app_s_key,omitempty"`
 	// Downlink messages in the queue that got invalidated because of the session change.
-	InvalidatedDownlinks []*ApplicationDownlink `protobuf:"bytes,3,rep,name=invalidated_downlinks,json=invalidatedDownlinks" json:"invalidated_downlinks,omitempty"`
+	InvalidatedDownlinks []*ApplicationDownlink `protobuf:"bytes,3,rep,name=invalidated_downlinks,json=invalidatedDownlinks,proto3" json:"invalidated_downlinks,omitempty"`
 	// Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a
 	// rejoin-request.
 	PendingSession bool `protobuf:"varint,4,opt,name=pending_session,json=pendingSession,proto3" json:"pending_session,omitempty"`
 	// Server time when the session started.
-	SessionStartedAt     time.Time `protobuf:"bytes,5,opt,name=session_started_at,json=sessionStartedAt,stdtime" json:"session_started_at"`
+	SessionStartedAt     time.Time `protobuf:"bytes,5,opt,name=session_started_at,json=sessionStartedAt,proto3,stdtime" json:"session_started_at"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
 }
@@ -677,15 +677,15 @@ type ApplicationDownlink struct {
 	FPort          uint32        `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
 	FCnt           uint32        `protobuf:"varint,3,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
 	FRMPayload     []byte        `protobuf:"bytes,4,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
-	DecodedPayload *types.Struct `protobuf:"bytes,5,opt,name=decoded_payload,json=decodedPayload" json:"decoded_payload,omitempty"`
+	DecodedPayload *types.Struct `protobuf:"bytes,5,opt,name=decoded_payload,json=decodedPayload,proto3" json:"decoded_payload,omitempty"`
 	Confirmed      bool          `protobuf:"varint,6,opt,name=confirmed,proto3" json:"confirmed,omitempty"`
 	// Optional gateway and timing information for class B and C.
 	// If set, this downlink message will only be transmitted as class B or C downlink.
 	// If not set, this downlink message may be transmitted in class A, B and C.
-	ClassBC *ApplicationDownlink_ClassBC `protobuf:"bytes,7,opt,name=class_b_c,json=classBC" json:"class_b_c,omitempty"`
+	ClassBC *ApplicationDownlink_ClassBC `protobuf:"bytes,7,opt,name=class_b_c,json=classBC,proto3" json:"class_b_c,omitempty"`
 	// Priority for scheduling the downlink message.
 	Priority             TxSchedulePriority `protobuf:"varint,8,opt,name=priority,proto3,enum=ttn.lorawan.v3.TxSchedulePriority" json:"priority,omitempty"`
-	CorrelationIDs       []string           `protobuf:"bytes,9,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	CorrelationIDs       []string           `protobuf:"bytes,9,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
 }
@@ -790,12 +790,12 @@ type ApplicationDownlink_ClassBC struct {
 	// The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
 	// If none of the gateways can be selected, the downlink message fails.
 	// If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.
-	Gateways []*GatewayAntennaIdentifiers `protobuf:"bytes,7,rep,name=gateways" json:"gateways,omitempty"`
+	Gateways []*GatewayAntennaIdentifiers `protobuf:"bytes,7,rep,name=gateways,proto3" json:"gateways,omitempty"`
 	// Absolute time when the downlink message should be transmitted.
 	// This requires the gateway to have GPS time synchronization.
 	// If the time is in the past or if there is a scheduling conflict, the downlink message fails.
 	// If null, the time is selected based on slot availability. This is recommended in class B mode.
-	AbsoluteTime         *time.Time `protobuf:"bytes,8,opt,name=absolute_time,json=absoluteTime,stdtime" json:"absolute_time,omitempty"`
+	AbsoluteTime         *time.Time `protobuf:"bytes,8,opt,name=absolute_time,json=absoluteTime,proto3,stdtime" json:"absolute_time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_sizecache        int32      `json:"-"`
 }
@@ -847,7 +847,7 @@ func (m *ApplicationDownlink_ClassBC) GetAbsoluteTime() *time.Time {
 }
 
 type ApplicationDownlinks struct {
-	Downlinks            []*ApplicationDownlink `protobuf:"bytes,1,rep,name=downlinks" json:"downlinks,omitempty"`
+	Downlinks            []*ApplicationDownlink `protobuf:"bytes,1,rep,name=downlinks,proto3" json:"downlinks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
 }
@@ -892,8 +892,8 @@ func (m *ApplicationDownlinks) GetDownlinks() []*ApplicationDownlink {
 }
 
 type ApplicationDownlinkFailed struct {
-	ApplicationDownlink  `protobuf:"bytes,1,opt,name=downlink,embedded=downlink" json:"downlink"`
-	Error                ErrorDetails `protobuf:"bytes,2,opt,name=error" json:"error"`
+	ApplicationDownlink  `protobuf:"bytes,1,opt,name=downlink,proto3,embedded=downlink" json:"downlink"`
+	Error                ErrorDetails `protobuf:"bytes,2,opt,name=error,proto3" json:"error"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
 }
@@ -938,7 +938,7 @@ func (m *ApplicationDownlinkFailed) GetError() ErrorDetails {
 }
 
 type ApplicationInvalidatedDownlinks struct {
-	Downlinks            []*ApplicationDownlink `protobuf:"bytes,1,rep,name=downlinks" json:"downlinks,omitempty"`
+	Downlinks            []*ApplicationDownlink `protobuf:"bytes,1,rep,name=downlinks,proto3" json:"downlinks,omitempty"`
 	LastFCntDown         uint32                 `protobuf:"varint,2,opt,name=last_f_cnt_down,json=lastFCntDown,proto3" json:"last_f_cnt_down,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
@@ -991,8 +991,8 @@ func (m *ApplicationInvalidatedDownlinks) GetLastFCntDown() uint32 {
 }
 
 type ApplicationUp struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,embedded=end_device_ids" json:"end_device_ids"`
-	CorrelationIDs       []string `protobuf:"bytes,2,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3,embedded=end_device_ids" json:"end_device_ids"`
+	CorrelationIDs       []string `protobuf:"bytes,2,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	// Types that are valid to be assigned to Up:
 	//	*ApplicationUp_UplinkMessage
 	//	*ApplicationUp_JoinAccept
@@ -1048,31 +1048,31 @@ type isApplicationUp_Up interface {
 }
 
 type ApplicationUp_UplinkMessage struct {
-	UplinkMessage *ApplicationUplink `protobuf:"bytes,3,opt,name=uplink_message,json=uplinkMessage,oneof"`
+	UplinkMessage *ApplicationUplink `protobuf:"bytes,3,opt,name=uplink_message,json=uplinkMessage,proto3,oneof"`
 }
 type ApplicationUp_JoinAccept struct {
-	JoinAccept *ApplicationJoinAccept `protobuf:"bytes,4,opt,name=join_accept,json=joinAccept,oneof"`
+	JoinAccept *ApplicationJoinAccept `protobuf:"bytes,4,opt,name=join_accept,json=joinAccept,proto3,oneof"`
 }
 type ApplicationUp_DownlinkAck struct {
-	DownlinkAck *ApplicationDownlink `protobuf:"bytes,5,opt,name=downlink_ack,json=downlinkAck,oneof"`
+	DownlinkAck *ApplicationDownlink `protobuf:"bytes,5,opt,name=downlink_ack,json=downlinkAck,proto3,oneof"`
 }
 type ApplicationUp_DownlinkNack struct {
-	DownlinkNack *ApplicationDownlink `protobuf:"bytes,6,opt,name=downlink_nack,json=downlinkNack,oneof"`
+	DownlinkNack *ApplicationDownlink `protobuf:"bytes,6,opt,name=downlink_nack,json=downlinkNack,proto3,oneof"`
 }
 type ApplicationUp_DownlinkSent struct {
-	DownlinkSent *ApplicationDownlink `protobuf:"bytes,7,opt,name=downlink_sent,json=downlinkSent,oneof"`
+	DownlinkSent *ApplicationDownlink `protobuf:"bytes,7,opt,name=downlink_sent,json=downlinkSent,proto3,oneof"`
 }
 type ApplicationUp_DownlinkFailed struct {
-	DownlinkFailed *ApplicationDownlinkFailed `protobuf:"bytes,8,opt,name=downlink_failed,json=downlinkFailed,oneof"`
+	DownlinkFailed *ApplicationDownlinkFailed `protobuf:"bytes,8,opt,name=downlink_failed,json=downlinkFailed,proto3,oneof"`
 }
 type ApplicationUp_DownlinkQueued struct {
-	DownlinkQueued *ApplicationDownlink `protobuf:"bytes,9,opt,name=downlink_queued,json=downlinkQueued,oneof"`
+	DownlinkQueued *ApplicationDownlink `protobuf:"bytes,9,opt,name=downlink_queued,json=downlinkQueued,proto3,oneof"`
 }
 type ApplicationUp_DownlinkQueueInvalidated struct {
-	DownlinkQueueInvalidated *ApplicationInvalidatedDownlinks `protobuf:"bytes,10,opt,name=downlink_queue_invalidated,json=downlinkQueueInvalidated,oneof"`
+	DownlinkQueueInvalidated *ApplicationInvalidatedDownlinks `protobuf:"bytes,10,opt,name=downlink_queue_invalidated,json=downlinkQueueInvalidated,proto3,oneof"`
 }
 type ApplicationUp_LocationSolved struct {
-	LocationSolved *ApplicationLocation `protobuf:"bytes,11,opt,name=location_solved,json=locationSolved,oneof"`
+	LocationSolved *ApplicationLocation `protobuf:"bytes,11,opt,name=location_solved,json=locationSolved,proto3,oneof"`
 }
 
 func (*ApplicationUp_UplinkMessage) isApplicationUp_Up()            {}
@@ -1443,8 +1443,8 @@ func (m *MessagePayloadFormatters) GetDownFormatterParameter() string {
 }
 
 type DownlinkQueueRequest struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,embedded=end_device_ids" json:"end_device_ids"`
-	Downlinks            []*ApplicationDownlink `protobuf:"bytes,2,rep,name=downlinks" json:"downlinks,omitempty"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3,embedded=end_device_ids" json:"end_device_ids"`
+	Downlinks            []*ApplicationDownlink `protobuf:"bytes,2,rep,name=downlinks,proto3" json:"downlinks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
 }
@@ -3541,6 +3541,9 @@ func encodeVarintPopulateMessages(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *UplinkMessage) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.RawPayload)
@@ -3571,6 +3574,9 @@ func (m *UplinkMessage) Size() (n int) {
 }
 
 func (m *DownlinkMessage) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.RawPayload)
@@ -3598,6 +3604,9 @@ func (m *DownlinkMessage) Size() (n int) {
 }
 
 func (m *DownlinkMessage_Request) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Request != nil {
@@ -3607,6 +3616,9 @@ func (m *DownlinkMessage_Request) Size() (n int) {
 	return n
 }
 func (m *DownlinkMessage_Scheduled) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Scheduled != nil {
@@ -3616,6 +3628,9 @@ func (m *DownlinkMessage_Scheduled) Size() (n int) {
 	return n
 }
 func (m *TxAcknowledgment) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.CorrelationIDs) > 0 {
@@ -3631,6 +3646,9 @@ func (m *TxAcknowledgment) Size() (n int) {
 }
 
 func (m *ApplicationUplink) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.SessionKeyID)
@@ -3663,6 +3681,9 @@ func (m *ApplicationUplink) Size() (n int) {
 }
 
 func (m *ApplicationLocation) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Service)
@@ -3683,6 +3704,9 @@ func (m *ApplicationLocation) Size() (n int) {
 }
 
 func (m *ApplicationJoinAccept) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.SessionKeyID)
@@ -3708,6 +3732,9 @@ func (m *ApplicationJoinAccept) Size() (n int) {
 }
 
 func (m *ApplicationDownlink) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.SessionKeyID)
@@ -3748,6 +3775,9 @@ func (m *ApplicationDownlink) Size() (n int) {
 }
 
 func (m *ApplicationDownlink_ClassBC) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Gateways) > 0 {
@@ -3764,6 +3794,9 @@ func (m *ApplicationDownlink_ClassBC) Size() (n int) {
 }
 
 func (m *ApplicationDownlinks) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Downlinks) > 0 {
@@ -3776,6 +3809,9 @@ func (m *ApplicationDownlinks) Size() (n int) {
 }
 
 func (m *ApplicationDownlinkFailed) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationDownlink.Size()
@@ -3786,6 +3822,9 @@ func (m *ApplicationDownlinkFailed) Size() (n int) {
 }
 
 func (m *ApplicationInvalidatedDownlinks) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Downlinks) > 0 {
@@ -3801,6 +3840,9 @@ func (m *ApplicationInvalidatedDownlinks) Size() (n int) {
 }
 
 func (m *ApplicationUp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()
@@ -3818,6 +3860,9 @@ func (m *ApplicationUp) Size() (n int) {
 }
 
 func (m *ApplicationUp_UplinkMessage) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UplinkMessage != nil {
@@ -3827,6 +3872,9 @@ func (m *ApplicationUp_UplinkMessage) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_JoinAccept) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.JoinAccept != nil {
@@ -3836,6 +3884,9 @@ func (m *ApplicationUp_JoinAccept) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_DownlinkAck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkAck != nil {
@@ -3845,6 +3896,9 @@ func (m *ApplicationUp_DownlinkAck) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_DownlinkNack) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkNack != nil {
@@ -3854,6 +3908,9 @@ func (m *ApplicationUp_DownlinkNack) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_DownlinkSent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkSent != nil {
@@ -3863,6 +3920,9 @@ func (m *ApplicationUp_DownlinkSent) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_DownlinkFailed) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkFailed != nil {
@@ -3872,6 +3932,9 @@ func (m *ApplicationUp_DownlinkFailed) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_DownlinkQueued) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkQueued != nil {
@@ -3881,6 +3944,9 @@ func (m *ApplicationUp_DownlinkQueued) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_DownlinkQueueInvalidated) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkQueueInvalidated != nil {
@@ -3890,6 +3956,9 @@ func (m *ApplicationUp_DownlinkQueueInvalidated) Size() (n int) {
 	return n
 }
 func (m *ApplicationUp_LocationSolved) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.LocationSolved != nil {
@@ -3899,6 +3968,9 @@ func (m *ApplicationUp_LocationSolved) Size() (n int) {
 	return n
 }
 func (m *MessagePayloadFormatters) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UpFormatter != 0 {
@@ -3919,6 +3991,9 @@ func (m *MessagePayloadFormatters) Size() (n int) {
 }
 
 func (m *DownlinkQueueRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()

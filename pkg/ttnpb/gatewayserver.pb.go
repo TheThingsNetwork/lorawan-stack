@@ -10,8 +10,11 @@ import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -33,9 +36,9 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 type GatewayUp struct {
 	// UplinkMessages received by the gateway.
-	UplinkMessages       []*UplinkMessage  `protobuf:"bytes,1,rep,name=uplink_messages,json=uplinkMessages" json:"uplink_messages,omitempty"`
-	GatewayStatus        *GatewayStatus    `protobuf:"bytes,2,opt,name=gateway_status,json=gatewayStatus" json:"gateway_status,omitempty"`
-	TxAcknowledgment     *TxAcknowledgment `protobuf:"bytes,3,opt,name=tx_acknowledgment,json=txAcknowledgment" json:"tx_acknowledgment,omitempty"`
+	UplinkMessages       []*UplinkMessage  `protobuf:"bytes,1,rep,name=uplink_messages,json=uplinkMessages,proto3" json:"uplink_messages,omitempty"`
+	GatewayStatus        *GatewayStatus    `protobuf:"bytes,2,opt,name=gateway_status,json=gatewayStatus,proto3" json:"gateway_status,omitempty"`
+	TxAcknowledgment     *TxAcknowledgment `protobuf:"bytes,3,opt,name=tx_acknowledgment,json=txAcknowledgment,proto3" json:"tx_acknowledgment,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -96,7 +99,7 @@ func (m *GatewayUp) GetTxAcknowledgment() *TxAcknowledgment {
 // GatewayDown contains downlink messages for the gateway.
 type GatewayDown struct {
 	// DownlinkMessage for the gateway.
-	DownlinkMessage      *DownlinkMessage `protobuf:"bytes,1,opt,name=downlink_message,json=downlinkMessage" json:"downlink_message,omitempty"`
+	DownlinkMessage      *DownlinkMessage `protobuf:"bytes,1,opt,name=downlink_message,json=downlinkMessage,proto3" json:"downlink_message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
 }
@@ -214,8 +217,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for GtwGs service
-
+// GtwGsClient is the client API for GtwGs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GtwGsClient interface {
 	// Link the gateway to the Gateway Server.
 	LinkGateway(ctx context.Context, opts ...grpc.CallOption) (GtwGs_LinkGatewayClient, error)
@@ -271,8 +275,7 @@ func (c *gtwGsClient) GetConcentratorConfig(ctx context.Context, in *types.Empty
 	return out, nil
 }
 
-// Server API for GtwGs service
-
+// GtwGsServer is the server API for GtwGs service.
 type GtwGsServer interface {
 	// Link the gateway to the Gateway Server.
 	LinkGateway(GtwGs_LinkGatewayServer) error
@@ -348,8 +351,9 @@ var _GtwGs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/gatewayserver.proto",
 }
 
-// Client API for NsGs service
-
+// NsGsClient is the client API for NsGs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NsGsClient interface {
 	// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
 	// The Gateway Server may refuse if there are any conflicts in the schedule or
@@ -374,8 +378,7 @@ func (c *nsGsClient) ScheduleDownlink(ctx context.Context, in *DownlinkMessage, 
 	return out, nil
 }
 
-// Server API for NsGs service
-
+// NsGsServer is the server API for NsGs service.
 type NsGsServer interface {
 	// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
 	// The Gateway Server may refuse if there are any conflicts in the schedule or
@@ -418,8 +421,9 @@ var _NsGs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/gatewayserver.proto",
 }
 
-// Client API for Gs service
-
+// GsClient is the client API for Gs service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GsClient interface {
 	// Get statistics about the current gateway connection to the Gateway Server.
 	// This is not persisted between reconnects.
@@ -443,8 +447,7 @@ func (c *gsClient) GetGatewayConnectionStats(ctx context.Context, in *GatewayIde
 	return out, nil
 }
 
-// Server API for Gs service
-
+// GsServer is the server API for Gs service.
 type GsServer interface {
 	// Get statistics about the current gateway connection to the Gateway Server.
 	// This is not persisted between reconnects.
@@ -676,6 +679,9 @@ func encodeVarintPopulateGatewayserver(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *GatewayUp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.UplinkMessages) > 0 {
@@ -696,6 +702,9 @@ func (m *GatewayUp) Size() (n int) {
 }
 
 func (m *GatewayDown) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DownlinkMessage != nil {

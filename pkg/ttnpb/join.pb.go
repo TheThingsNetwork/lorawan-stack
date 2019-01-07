@@ -37,15 +37,15 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type JoinRequest struct {
 	RawPayload           []byte   `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	Payload              *Message `protobuf:"bytes,2,opt,name=payload" json:"payload,omitempty"`
-	EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds,embedded=end_device_ids" json:"end_device_ids"`
+	Payload              *Message `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device_ids,json=endDeviceIds,proto3,embedded=end_device_ids" json:"end_device_ids"`
 	SelectedMACVersion   MACVersion                                         `protobuf:"varint,4,opt,name=selected_mac_version,json=selectedMacVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"selected_mac_version,omitempty"`
 	NetID                go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id"`
-	DownlinkSettings     DLSettings                                         `protobuf:"bytes,6,opt,name=downlink_settings,json=downlinkSettings" json:"downlink_settings"`
+	DownlinkSettings     DLSettings                                         `protobuf:"bytes,6,opt,name=downlink_settings,json=downlinkSettings,proto3" json:"downlink_settings"`
 	RxDelay              RxDelay                                            `protobuf:"varint,7,opt,name=rx_delay,json=rxDelay,proto3,enum=ttn.lorawan.v3.RxDelay" json:"rx_delay,omitempty"`
 	// Optional CFList.
-	CFList               *CFList  `protobuf:"bytes,8,opt,name=cf_list,json=cfList" json:"cf_list,omitempty"`
-	CorrelationIDs       []string `protobuf:"bytes,10,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	CFList               *CFList  `protobuf:"bytes,8,opt,name=cf_list,json=cfList,proto3" json:"cf_list,omitempty"`
+	CorrelationIDs       []string `protobuf:"bytes,10,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -133,9 +133,9 @@ func (m *JoinRequest) GetCorrelationIDs() []string {
 
 type JoinResponse struct {
 	RawPayload           []byte `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
-	SessionKeys          `protobuf:"bytes,2,opt,name=session_keys,json=sessionKeys,embedded=session_keys" json:"session_keys"`
-	Lifetime             time.Duration `protobuf:"bytes,3,opt,name=lifetime,stdduration" json:"lifetime"`
-	CorrelationIDs       []string      `protobuf:"bytes,4,rep,name=correlation_ids,json=correlationIds" json:"correlation_ids,omitempty"`
+	SessionKeys          `protobuf:"bytes,2,opt,name=session_keys,json=sessionKeys,proto3,embedded=session_keys" json:"session_keys"`
+	Lifetime             time.Duration `protobuf:"bytes,3,opt,name=lifetime,proto3,stdduration" json:"lifetime"`
+	CorrelationIDs       []string      `protobuf:"bytes,4,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -541,6 +541,9 @@ func encodeVarintPopulateJoin(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *JoinRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.RawPayload)
@@ -577,6 +580,9 @@ func (m *JoinRequest) Size() (n int) {
 }
 
 func (m *JoinResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.RawPayload)

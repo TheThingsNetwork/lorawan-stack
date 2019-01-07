@@ -39,12 +39,12 @@ type ErrorDetails struct {
 	MessageFormat string `protobuf:"bytes,3,opt,name=message_format,json=messageFormat,proto3" json:"message_format,omitempty"`
 	// Attributes that should be filled into the message format. Any extra attributes
 	// can be displayed as error details.
-	Attributes *types.Struct `protobuf:"bytes,4,opt,name=attributes" json:"attributes,omitempty"`
+	Attributes *types.Struct `protobuf:"bytes,4,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	// The correlation ID of the error can be used to correlate the error to stack
 	// traces the network may (or may not) store about recent errors.
 	CorrelationID string `protobuf:"bytes,5,opt,name=correlation_id,json=correlationId,proto3" json:"correlation_id,omitempty"`
 	// The error that caused this error.
-	Cause                *ErrorDetails `protobuf:"bytes,6,opt,name=cause" json:"cause,omitempty"`
+	Cause                *ErrorDetails `protobuf:"bytes,6,opt,name=cause,proto3" json:"cause,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -327,6 +327,9 @@ func encodeVarintPopulateError(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ErrorDetails) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Namespace)

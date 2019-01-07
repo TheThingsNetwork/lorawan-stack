@@ -34,12 +34,12 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type ConcentratorConfig struct {
-	Channels             []*ConcentratorConfig_Channel           `protobuf:"bytes,1,rep,name=channels" json:"channels,omitempty"`
-	LoRaStandardChannel  *ConcentratorConfig_LoRaStandardChannel `protobuf:"bytes,2,opt,name=lora_standard_channel,json=loraStandardChannel" json:"lora_standard_channel,omitempty"`
-	FSKChannel           *ConcentratorConfig_FSKChannel          `protobuf:"bytes,3,opt,name=fsk_channel,json=fskChannel" json:"fsk_channel,omitempty"`
-	LBT                  *ConcentratorConfig_LBTConfiguration    `protobuf:"bytes,4,opt,name=lbt" json:"lbt,omitempty"`
-	PingSlot             *ConcentratorConfig_Channel             `protobuf:"bytes,5,opt,name=ping_slot,json=pingSlot" json:"ping_slot,omitempty"`
-	Radios               []*GatewayRadio                         `protobuf:"bytes,6,rep,name=radios" json:"radios,omitempty"`
+	Channels             []*ConcentratorConfig_Channel           `protobuf:"bytes,1,rep,name=channels,proto3" json:"channels,omitempty"`
+	LoRaStandardChannel  *ConcentratorConfig_LoRaStandardChannel `protobuf:"bytes,2,opt,name=lora_standard_channel,json=loraStandardChannel,proto3" json:"lora_standard_channel,omitempty"`
+	FSKChannel           *ConcentratorConfig_FSKChannel          `protobuf:"bytes,3,opt,name=fsk_channel,json=fskChannel,proto3" json:"fsk_channel,omitempty"`
+	LBT                  *ConcentratorConfig_LBTConfiguration    `protobuf:"bytes,4,opt,name=lbt,proto3" json:"lbt,omitempty"`
+	PingSlot             *ConcentratorConfig_Channel             `protobuf:"bytes,5,opt,name=ping_slot,json=pingSlot,proto3" json:"ping_slot,omitempty"`
+	Radios               []*GatewayRadio                         `protobuf:"bytes,6,rep,name=radios,proto3" json:"radios,omitempty"`
 	ClockSource          uint32                                  `protobuf:"varint,7,opt,name=clock_source,json=clockSource,proto3" json:"clock_source,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
 	XXX_sizecache        int32                                   `json:"-"`
@@ -181,7 +181,7 @@ func (m *ConcentratorConfig_Channel) GetRadio() uint32 {
 }
 
 type ConcentratorConfig_LoRaStandardChannel struct {
-	ConcentratorConfig_Channel `protobuf:"bytes,1,opt,name=channel,embedded=channel" json:"channel"`
+	ConcentratorConfig_Channel `protobuf:"bytes,1,opt,name=channel,proto3,embedded=channel" json:"channel"`
 	// Bandwidth (Hz).
 	Bandwidth            uint32   `protobuf:"varint,2,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
 	SpreadingFactor      uint32   `protobuf:"varint,3,opt,name=spreading_factor,json=spreadingFactor,proto3" json:"spreading_factor,omitempty"`
@@ -238,7 +238,7 @@ func (m *ConcentratorConfig_LoRaStandardChannel) GetSpreadingFactor() uint32 {
 }
 
 type ConcentratorConfig_FSKChannel struct {
-	ConcentratorConfig_Channel `protobuf:"bytes,1,opt,name=channel,embedded=channel" json:"channel"`
+	ConcentratorConfig_Channel `protobuf:"bytes,1,opt,name=channel,proto3,embedded=channel" json:"channel"`
 	// Bandwidth (Hz).
 	Bandwidth            uint32   `protobuf:"varint,2,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
 	BitRate              uint32   `protobuf:"varint,3,opt,name=bit_rate,json=bitRate,proto3" json:"bit_rate,omitempty"`
@@ -297,7 +297,7 @@ type ConcentratorConfig_LBTConfiguration struct {
 	RSSITarget float32 `protobuf:"fixed32,1,opt,name=rssi_target,json=rssiTarget,proto3" json:"rssi_target,omitempty"`
 	// Received signal strength offset (dBm).
 	RSSIOffset           float32       `protobuf:"fixed32,2,opt,name=rssi_offset,json=rssiOffset,proto3" json:"rssi_offset,omitempty"`
-	ScanTime             time.Duration `protobuf:"bytes,3,opt,name=scan_time,json=scanTime,stdduration" json:"scan_time"`
+	ScanTime             time.Duration `protobuf:"bytes,3,opt,name=scan_time,json=scanTime,proto3,stdduration" json:"scan_time"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -925,6 +925,9 @@ func encodeVarintPopulateRegional(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ConcentratorConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Channels) > 0 {
@@ -962,6 +965,9 @@ func (m *ConcentratorConfig) Size() (n int) {
 }
 
 func (m *ConcentratorConfig_Channel) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Frequency != 0 {
@@ -974,6 +980,9 @@ func (m *ConcentratorConfig_Channel) Size() (n int) {
 }
 
 func (m *ConcentratorConfig_LoRaStandardChannel) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ConcentratorConfig_Channel.Size()
@@ -988,6 +997,9 @@ func (m *ConcentratorConfig_LoRaStandardChannel) Size() (n int) {
 }
 
 func (m *ConcentratorConfig_FSKChannel) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ConcentratorConfig_Channel.Size()
@@ -1002,6 +1014,9 @@ func (m *ConcentratorConfig_FSKChannel) Size() (n int) {
 }
 
 func (m *ConcentratorConfig_LBTConfiguration) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.RSSITarget != 0 {

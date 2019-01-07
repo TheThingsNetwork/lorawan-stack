@@ -64,19 +64,19 @@ func (GrantType) EnumDescriptor() ([]byte, []int) {
 
 // An OAuth client on the network.
 type Client struct {
-	ClientIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt         time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt         time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt         time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt         time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	Name              string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Description       string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes        map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo       []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo" json:"contact_info,omitempty"`
+	Attributes        map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ContactInfo       []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	// The client secret is only visible to collaborators of the client.
 	Secret string `protobuf:"bytes,8,opt,name=secret,proto3" json:"secret,omitempty"`
 	// The allowed redirect URIs against which authorization requests are checked.
 	// If the authorization request does not pass a redirect URI, the first one
 	// from this list is taken.
-	RedirectURIs []string `protobuf:"bytes,9,rep,name=redirect_uris,json=redirectUris" json:"redirect_uris,omitempty"`
+	RedirectURIs []string `protobuf:"bytes,9,rep,name=redirect_uris,json=redirectUris,proto3" json:"redirect_uris,omitempty"`
 	// The reviewing state of the client.
 	// This field can only be modified by admins.
 	State State `protobuf:"varint,10,opt,name=state,proto3,enum=ttn.lorawan.v3.State" json:"state,omitempty"`
@@ -88,11 +88,11 @@ type Client struct {
 	Endorsed bool `protobuf:"varint,12,opt,name=endorsed,proto3" json:"endorsed,omitempty"`
 	// OAuth flows that can be used for the client to get a token.
 	// After a client is created, this field can only be modified by admins.
-	Grants []GrantType `protobuf:"varint,13,rep,packed,name=grants,enum=ttn.lorawan.v3.GrantType" json:"grants,omitempty"`
+	Grants []GrantType `protobuf:"varint,13,rep,packed,name=grants,proto3,enum=ttn.lorawan.v3.GrantType" json:"grants,omitempty"`
 	// Rights denotes what rights the client will have access to.
 	// Users that previously authorized this client will have to re-authorize the
 	// client after rights are added to this list.
-	Rights               []Right  `protobuf:"varint,14,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights               []Right  `protobuf:"varint,14,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -221,7 +221,7 @@ func (m *Client) GetRights() []Right {
 }
 
 type Clients struct {
-	Clients              []*Client `protobuf:"bytes,1,rep,name=clients" json:"clients,omitempty"`
+	Clients              []*Client `protobuf:"bytes,1,rep,name=clients,proto3" json:"clients,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
 }
@@ -266,8 +266,8 @@ func (m *Clients) GetClients() []*Client {
 }
 
 type GetClientRequest struct {
-	ClientIdentifiers    `protobuf:"bytes,1,opt,name=client_ids,json=clientIds,embedded=client_ids" json:"client_ids"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ClientIdentifiers    `protobuf:"bytes,1,opt,name=client_ids,json=clientIds,proto3,embedded=client_ids" json:"client_ids"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -312,8 +312,8 @@ func (m *GetClientRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListClientsRequest struct {
-	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator" json:"collaborator,omitempty"`
-	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
+	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -393,9 +393,9 @@ func (m *ListClientsRequest) GetPage() uint32 {
 }
 
 type CreateClientRequest struct {
-	Client `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	Client `protobuf:"bytes,1,opt,name=client,proto3,embedded=client" json:"client"`
 	// Collaborator to grant all rights on the newly created client.
-	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	Collaborator         OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
 }
@@ -440,8 +440,8 @@ func (m *CreateClientRequest) GetCollaborator() OrganizationOrUserIdentifiers {
 }
 
 type UpdateClientRequest struct {
-	Client               `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Client               `protobuf:"bytes,1,opt,name=client,proto3,embedded=client" json:"client"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -486,8 +486,8 @@ func (m *UpdateClientRequest) GetFieldMask() types.FieldMask {
 }
 
 type SetClientCollaboratorRequest struct {
-	ClientIdentifiers    `protobuf:"bytes,1,opt,name=client_ids,json=clientIds,embedded=client_ids" json:"client_ids"`
-	Collaborator         Collaborator `protobuf:"bytes,2,opt,name=collaborator" json:"collaborator"`
+	ClientIdentifiers    `protobuf:"bytes,1,opt,name=client_ids,json=clientIds,proto3,embedded=client_ids" json:"client_ids"`
+	Collaborator         Collaborator `protobuf:"bytes,2,opt,name=collaborator,proto3" json:"collaborator"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
 }
@@ -1403,6 +1403,9 @@ func encodeVarintPopulateClient(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *Client) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ClientIdentifiers.Size()
@@ -1470,6 +1473,9 @@ func (m *Client) Size() (n int) {
 }
 
 func (m *Clients) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Clients) > 0 {
@@ -1482,6 +1488,9 @@ func (m *Clients) Size() (n int) {
 }
 
 func (m *GetClientRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ClientIdentifiers.Size()
@@ -1492,6 +1501,9 @@ func (m *GetClientRequest) Size() (n int) {
 }
 
 func (m *ListClientsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Collaborator != nil {
@@ -1514,6 +1526,9 @@ func (m *ListClientsRequest) Size() (n int) {
 }
 
 func (m *CreateClientRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Client.Size()
@@ -1524,6 +1539,9 @@ func (m *CreateClientRequest) Size() (n int) {
 }
 
 func (m *UpdateClientRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Client.Size()
@@ -1534,6 +1552,9 @@ func (m *UpdateClientRequest) Size() (n int) {
 }
 
 func (m *SetClientCollaboratorRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ClientIdentifiers.Size()
@@ -2149,6 +2170,10 @@ func (m *Client) Unmarshal(dAtA []byte) error {
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
 				}
+				var elementCount int
+				if elementCount != 0 && len(m.Grants) == 0 {
+					m.Grants = make([]GrantType, 0, elementCount)
+				}
 				for iNdEx < postIndex {
 					var v GrantType
 					for shift := uint(0); ; shift += 7 {
@@ -2210,6 +2235,10 @@ func (m *Client) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

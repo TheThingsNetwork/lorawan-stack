@@ -121,7 +121,7 @@ func (m *ClientIdentifiers) GetClientID() string {
 
 type EndDeviceIdentifiers struct {
 	DeviceID               string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	ApplicationIdentifiers `protobuf:"bytes,2,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
+	ApplicationIdentifiers `protobuf:"bytes,2,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
 	// The LoRaWAN DevEUI.
 	DevEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"dev_eui,omitempty"`
 	// The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
@@ -369,10 +369,10 @@ type isOrganizationOrUserIdentifiers_Ids interface {
 }
 
 type OrganizationOrUserIdentifiers_OrganizationIDs struct {
-	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,oneof"`
+	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,oneof"`
 }
 type OrganizationOrUserIdentifiers_UserIDs struct {
-	UserIDs *UserIdentifiers `protobuf:"bytes,2,opt,name=user_ids,json=userIds,oneof"`
+	UserIDs *UserIdentifiers `protobuf:"bytes,2,opt,name=user_ids,json=userIds,proto3,oneof"`
 }
 
 func (*OrganizationOrUserIdentifiers_OrganizationIDs) isOrganizationOrUserIdentifiers_Ids() {}
@@ -527,22 +527,22 @@ type isEntityIdentifiers_Ids interface {
 }
 
 type EntityIdentifiers_ApplicationIDs struct {
-	ApplicationIDs *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,oneof"`
+	ApplicationIDs *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,oneof"`
 }
 type EntityIdentifiers_ClientIDs struct {
-	ClientIDs *ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,oneof"`
+	ClientIDs *ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3,oneof"`
 }
 type EntityIdentifiers_DeviceIDs struct {
-	DeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=device_ids,json=deviceIds,oneof"`
+	DeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=device_ids,json=deviceIds,proto3,oneof"`
 }
 type EntityIdentifiers_GatewayIDs struct {
-	GatewayIDs *GatewayIdentifiers `protobuf:"bytes,4,opt,name=gateway_ids,json=gatewayIds,oneof"`
+	GatewayIDs *GatewayIdentifiers `protobuf:"bytes,4,opt,name=gateway_ids,json=gatewayIds,proto3,oneof"`
 }
 type EntityIdentifiers_OrganizationIDs struct {
-	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,5,opt,name=organization_ids,json=organizationIds,oneof"`
+	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,5,opt,name=organization_ids,json=organizationIds,proto3,oneof"`
 }
 type EntityIdentifiers_UserIDs struct {
-	UserIDs *UserIdentifiers `protobuf:"bytes,6,opt,name=user_ids,json=userIds,oneof"`
+	UserIDs *UserIdentifiers `protobuf:"bytes,6,opt,name=user_ids,json=userIds,proto3,oneof"`
 }
 
 func (*EntityIdentifiers_ApplicationIDs) isEntityIdentifiers_Ids()  {}
@@ -754,7 +754,7 @@ func _EntityIdentifiers_OneofSizer(msg proto.Message) (n int) {
 // Combine the identifiers of multiple entities.
 // The main purpose of this message is its use in events.
 type CombinedIdentifiers struct {
-	EntityIdentifiers    []*EntityIdentifiers `protobuf:"bytes,1,rep,name=entity_identifiers,json=entityIdentifiers" json:"entity_identifiers,omitempty"`
+	EntityIdentifiers    []*EntityIdentifiers `protobuf:"bytes,1,rep,name=entity_identifiers,json=entityIdentifiers,proto3" json:"entity_identifiers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
 }
@@ -1839,6 +1839,9 @@ func encodeVarintPopulateIdentifiers(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ApplicationIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ApplicationID)
@@ -1849,6 +1852,9 @@ func (m *ApplicationIdentifiers) Size() (n int) {
 }
 
 func (m *ClientIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ClientID)
@@ -1859,6 +1865,9 @@ func (m *ClientIdentifiers) Size() (n int) {
 }
 
 func (m *EndDeviceIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.DeviceID)
@@ -1883,6 +1892,9 @@ func (m *EndDeviceIdentifiers) Size() (n int) {
 }
 
 func (m *GatewayIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.GatewayID)
@@ -1897,6 +1909,9 @@ func (m *GatewayIdentifiers) Size() (n int) {
 }
 
 func (m *OrganizationIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.OrganizationID)
@@ -1907,6 +1922,9 @@ func (m *OrganizationIdentifiers) Size() (n int) {
 }
 
 func (m *UserIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.UserID)
@@ -1921,6 +1939,9 @@ func (m *UserIdentifiers) Size() (n int) {
 }
 
 func (m *OrganizationOrUserIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Ids != nil {
@@ -1930,6 +1951,9 @@ func (m *OrganizationOrUserIdentifiers) Size() (n int) {
 }
 
 func (m *OrganizationOrUserIdentifiers_OrganizationIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.OrganizationIDs != nil {
@@ -1939,6 +1963,9 @@ func (m *OrganizationOrUserIdentifiers_OrganizationIDs) Size() (n int) {
 	return n
 }
 func (m *OrganizationOrUserIdentifiers_UserIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UserIDs != nil {
@@ -1948,6 +1975,9 @@ func (m *OrganizationOrUserIdentifiers_UserIDs) Size() (n int) {
 	return n
 }
 func (m *EntityIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Ids != nil {
@@ -1957,6 +1987,9 @@ func (m *EntityIdentifiers) Size() (n int) {
 }
 
 func (m *EntityIdentifiers_ApplicationIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ApplicationIDs != nil {
@@ -1966,6 +1999,9 @@ func (m *EntityIdentifiers_ApplicationIDs) Size() (n int) {
 	return n
 }
 func (m *EntityIdentifiers_ClientIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ClientIDs != nil {
@@ -1975,6 +2011,9 @@ func (m *EntityIdentifiers_ClientIDs) Size() (n int) {
 	return n
 }
 func (m *EntityIdentifiers_DeviceIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DeviceIDs != nil {
@@ -1984,6 +2023,9 @@ func (m *EntityIdentifiers_DeviceIDs) Size() (n int) {
 	return n
 }
 func (m *EntityIdentifiers_GatewayIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.GatewayIDs != nil {
@@ -1993,6 +2035,9 @@ func (m *EntityIdentifiers_GatewayIDs) Size() (n int) {
 	return n
 }
 func (m *EntityIdentifiers_OrganizationIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.OrganizationIDs != nil {
@@ -2002,6 +2047,9 @@ func (m *EntityIdentifiers_OrganizationIDs) Size() (n int) {
 	return n
 }
 func (m *EntityIdentifiers_UserIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UserIDs != nil {
@@ -2011,6 +2059,9 @@ func (m *EntityIdentifiers_UserIDs) Size() (n int) {
 	return n
 }
 func (m *CombinedIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.EntityIdentifiers) > 0 {

@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ApplicationRegistry service
-
+// ApplicationRegistryClient is the client API for ApplicationRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationRegistryClient interface {
 	// Create a new application. This also sets the given organization or user as
 	// first collaborator with all possible rights.
@@ -103,8 +107,7 @@ func (c *applicationRegistryClient) Delete(ctx context.Context, in *ApplicationI
 	return out, nil
 }
 
-// Server API for ApplicationRegistry service
-
+// ApplicationRegistryServer is the server API for ApplicationRegistry service.
 type ApplicationRegistryServer interface {
 	// Create a new application. This also sets the given organization or user as
 	// first collaborator with all possible rights.
@@ -242,8 +245,9 @@ var _ApplicationRegistry_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/application_services.proto",
 }
 
-// Client API for ApplicationAccess service
-
+// ApplicationAccessClient is the client API for ApplicationAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationAccessClient interface {
 	ListRights(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*Rights, error)
 	CreateAPIKey(ctx context.Context, in *CreateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
@@ -319,8 +323,7 @@ func (c *applicationAccessClient) ListCollaborators(ctx context.Context, in *App
 	return out, nil
 }
 
-// Server API for ApplicationAccess service
-
+// ApplicationAccessServer is the server API for ApplicationAccess service.
 type ApplicationAccessServer interface {
 	ListRights(context.Context, *ApplicationIdentifiers) (*Rights, error)
 	CreateAPIKey(context.Context, *CreateApplicationAPIKeyRequest) (*APIKey, error)

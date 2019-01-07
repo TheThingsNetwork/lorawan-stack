@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -41,8 +44,8 @@ type SearchEntitiesRequest struct {
 	// Find entities where the description contains this substring.
 	DescriptionContains string `protobuf:"bytes,3,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
 	// Find entities where the given attributes contain these substrings.
-	AttributesContain    map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	FieldMask            types.FieldMask   `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	AttributesContain    map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	FieldMask            types.FieldMask   `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -115,7 +118,7 @@ func (m *SearchEntitiesRequest) GetFieldMask() types.FieldMask {
 }
 
 type SearchEndDevicesRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
 	// Find end devices where the ID contains this substring.
 	IDContains string `protobuf:"bytes,2,opt,name=id_contains,json=idContains,proto3" json:"id_contains,omitempty"`
 	// Find end devices where the name contains this substring.
@@ -123,14 +126,14 @@ type SearchEndDevicesRequest struct {
 	// Find end devices where the description contains this substring.
 	DescriptionContains string `protobuf:"bytes,4,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
 	// Find end devices where the given attributes contain these substrings.
-	AttributesContain map[string]string `protobuf:"bytes,5,rep,name=attributes_contain,json=attributesContain" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	AttributesContain map[string]string `protobuf:"bytes,5,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Find end devices where the (hexadecimal) DevEUI contains this substring.
 	DevEUIContains string `protobuf:"bytes,6,opt,name=dev_eui_contains,json=devEuiContains,proto3" json:"dev_eui_contains,omitempty"`
 	// Find end devices where the (hexadecimal) JoinEUI contains this substring.
 	JoinEUIContains string `protobuf:"bytes,7,opt,name=join_eui_contains,json=joinEuiContains,proto3" json:"join_eui_contains,omitempty"`
 	// Find end devices where the (hexadecimal) DevAddr contains this substring.
 	DevAddrContains      string          `protobuf:"bytes,8,opt,name=dev_addr_contains,json=devAddrContains,proto3" json:"dev_addr_contains,omitempty"`
-	FieldMask            types.FieldMask `protobuf:"bytes,9,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	FieldMask            types.FieldMask `protobuf:"bytes,9,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -336,8 +339,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for EntityRegistrySearch service
-
+// EntityRegistrySearchClient is the client API for EntityRegistrySearch service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EntityRegistrySearchClient interface {
 	SearchApplications(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Applications, error)
 	SearchClients(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Clients, error)
@@ -399,8 +403,7 @@ func (c *entityRegistrySearchClient) SearchUsers(ctx context.Context, in *Search
 	return out, nil
 }
 
-// Server API for EntityRegistrySearch service
-
+// EntityRegistrySearchServer is the server API for EntityRegistrySearch service.
 type EntityRegistrySearchServer interface {
 	SearchApplications(context.Context, *SearchEntitiesRequest) (*Applications, error)
 	SearchClients(context.Context, *SearchEntitiesRequest) (*Clients, error)
@@ -532,8 +535,9 @@ var _EntityRegistrySearch_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/search_services.proto",
 }
 
-// Client API for EndDeviceRegistrySearch service
-
+// EndDeviceRegistrySearchClient is the client API for EndDeviceRegistrySearch service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EndDeviceRegistrySearchClient interface {
 	SearchEndDevices(ctx context.Context, in *SearchEndDevicesRequest, opts ...grpc.CallOption) (*EndDevices, error)
 }
@@ -555,8 +559,7 @@ func (c *endDeviceRegistrySearchClient) SearchEndDevices(ctx context.Context, in
 	return out, nil
 }
 
-// Server API for EndDeviceRegistrySearch service
-
+// EndDeviceRegistrySearchServer is the server API for EndDeviceRegistrySearch service.
 type EndDeviceRegistrySearchServer interface {
 	SearchEndDevices(context.Context, *SearchEndDevicesRequest) (*EndDevices, error)
 }
@@ -869,6 +872,9 @@ func encodeVarintPopulateSearchServices(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *SearchEntitiesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.IDContains)
@@ -897,6 +903,9 @@ func (m *SearchEntitiesRequest) Size() (n int) {
 }
 
 func (m *SearchEndDevicesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()

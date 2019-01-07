@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ClientRegistry service
-
+// ClientRegistryClient is the client API for ClientRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ClientRegistryClient interface {
 	// Create a new OAuth client. This also sets the given organization or user as
 	// first collaborator with all possible rights.
@@ -103,8 +107,7 @@ func (c *clientRegistryClient) Delete(ctx context.Context, in *ClientIdentifiers
 	return out, nil
 }
 
-// Server API for ClientRegistry service
-
+// ClientRegistryServer is the server API for ClientRegistry service.
 type ClientRegistryServer interface {
 	// Create a new OAuth client. This also sets the given organization or user as
 	// first collaborator with all possible rights.
@@ -242,8 +245,9 @@ var _ClientRegistry_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/client_services.proto",
 }
 
-// Client API for ClientAccess service
-
+// ClientAccessClient is the client API for ClientAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ClientAccessClient interface {
 	ListRights(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*Rights, error)
 	// Set the rights of a collaborator on the OAuth client. Users or organizations
@@ -288,8 +292,7 @@ func (c *clientAccessClient) ListCollaborators(ctx context.Context, in *ClientId
 	return out, nil
 }
 
-// Server API for ClientAccess service
-
+// ClientAccessServer is the server API for ClientAccess service.
 type ClientAccessServer interface {
 	ListRights(context.Context, *ClientIdentifiers) (*Rights, error)
 	// Set the rights of a collaborator on the OAuth client. Users or organizations

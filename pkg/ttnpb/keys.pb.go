@@ -90,9 +90,9 @@ type RootKeys struct {
 	// Join Server issued identifier for the root keys.
 	RootKeyID string `protobuf:"bytes,1,opt,name=root_key_id,json=rootKeyId,proto3" json:"root_key_id,omitempty"`
 	// The (encrypted) Application Key.
-	AppKey *KeyEnvelope `protobuf:"bytes,2,opt,name=app_key,json=appKey" json:"app_key,omitempty"`
+	AppKey *KeyEnvelope `protobuf:"bytes,2,opt,name=app_key,json=appKey,proto3" json:"app_key,omitempty"`
 	// The (encrypted) Network Key.
-	NwkKey               *KeyEnvelope `protobuf:"bytes,3,opt,name=nwk_key,json=nwkKey" json:"nwk_key,omitempty"`
+	NwkKey               *KeyEnvelope `protobuf:"bytes,3,opt,name=nwk_key,json=nwkKey,proto3" json:"nwk_key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
 }
@@ -158,16 +158,16 @@ type SessionKeys struct {
 	SessionKeyID []byte `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
 	// The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
 	// This key is stored by the (forwarding) Network Server.
-	FNwkSIntKey *KeyEnvelope `protobuf:"bytes,2,opt,name=f_nwk_s_int_key,json=fNwkSIntKey" json:"f_nwk_s_int_key,omitempty"`
+	FNwkSIntKey *KeyEnvelope `protobuf:"bytes,2,opt,name=f_nwk_s_int_key,json=fNwkSIntKey,proto3" json:"f_nwk_s_int_key,omitempty"`
 	// The (encrypted) Serving Network Session Integrity Key.
 	// This key is stored by the (serving) Network Server.
-	SNwkSIntKey *KeyEnvelope `protobuf:"bytes,3,opt,name=s_nwk_s_int_key,json=sNwkSIntKey" json:"s_nwk_s_int_key,omitempty"`
+	SNwkSIntKey *KeyEnvelope `protobuf:"bytes,3,opt,name=s_nwk_s_int_key,json=sNwkSIntKey,proto3" json:"s_nwk_s_int_key,omitempty"`
 	// The (encrypted) Network Session Encryption Key.
 	// This key is stored by the (serving) Network Server.
-	NwkSEncKey *KeyEnvelope `protobuf:"bytes,4,opt,name=nwk_s_enc_key,json=nwkSEncKey" json:"nwk_s_enc_key,omitempty"`
+	NwkSEncKey *KeyEnvelope `protobuf:"bytes,4,opt,name=nwk_s_enc_key,json=nwkSEncKey,proto3" json:"nwk_s_enc_key,omitempty"`
 	// The (encrypted) Application Session Key.
 	// This key is stored by the Application Server.
-	AppSKey              *KeyEnvelope `protobuf:"bytes,5,opt,name=app_s_key,json=appSKey" json:"app_s_key,omitempty"`
+	AppSKey              *KeyEnvelope `protobuf:"bytes,5,opt,name=app_s_key,json=appSKey,proto3" json:"app_s_key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
 }
@@ -587,6 +587,9 @@ func encodeVarintPopulateKeys(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *KeyEnvelope) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Key)
@@ -601,6 +604,9 @@ func (m *KeyEnvelope) Size() (n int) {
 }
 
 func (m *RootKeys) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.RootKeyID)
@@ -619,6 +625,9 @@ func (m *RootKeys) Size() (n int) {
 }
 
 func (m *SessionKeys) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.SessionKeyID)

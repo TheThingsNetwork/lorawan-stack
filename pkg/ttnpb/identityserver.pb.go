@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -36,7 +39,7 @@ type AuthInfoResponse struct {
 	//	*AuthInfoResponse_APIKey
 	//	*AuthInfoResponse_OAuthAccessToken
 	AccessMethod         isAuthInfoResponse_AccessMethod `protobuf_oneof:"access_method"`
-	UniversalRights      *Rights                         `protobuf:"bytes,3,opt,name=universal_rights,json=universalRights" json:"universal_rights,omitempty"`
+	UniversalRights      *Rights                         `protobuf:"bytes,3,opt,name=universal_rights,json=universalRights,proto3" json:"universal_rights,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                        `json:"-"`
 	XXX_sizecache        int32                           `json:"-"`
 }
@@ -81,10 +84,10 @@ type isAuthInfoResponse_AccessMethod interface {
 }
 
 type AuthInfoResponse_APIKey struct {
-	APIKey *AuthInfoResponse_APIKeyAccess `protobuf:"bytes,1,opt,name=api_key,json=apiKey,oneof"`
+	APIKey *AuthInfoResponse_APIKeyAccess `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3,oneof"`
 }
 type AuthInfoResponse_OAuthAccessToken struct {
-	OAuthAccessToken *OAuthAccessToken `protobuf:"bytes,2,opt,name=oauth_access_token,json=oauthAccessToken,oneof"`
+	OAuthAccessToken *OAuthAccessToken `protobuf:"bytes,2,opt,name=oauth_access_token,json=oauthAccessToken,proto3,oneof"`
 }
 
 func (*AuthInfoResponse_APIKey) isAuthInfoResponse_AccessMethod()           {}
@@ -193,8 +196,8 @@ func _AuthInfoResponse_OneofSizer(msg proto.Message) (n int) {
 }
 
 type AuthInfoResponse_APIKeyAccess struct {
-	APIKey               `protobuf:"bytes,1,opt,name=api_key,json=apiKey,embedded=api_key" json:"api_key"`
-	EntityIDs            EntityIdentifiers `protobuf:"bytes,2,opt,name=entity_ids,json=entityIds" json:"entity_ids"`
+	APIKey               `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
+	EntityIDs            EntityIdentifiers `protobuf:"bytes,2,opt,name=entity_ids,json=entityIds,proto3" json:"entity_ids"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -361,8 +364,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for EntityAccess service
-
+// EntityAccessClient is the client API for EntityAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EntityAccessClient interface {
 	// AuthInfo returns information about the authentication that is used on the request.
 	AuthInfo(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*AuthInfoResponse, error)
@@ -385,8 +389,7 @@ func (c *entityAccessClient) AuthInfo(ctx context.Context, in *types.Empty, opts
 	return out, nil
 }
 
-// Server API for EntityAccess service
-
+// EntityAccessServer is the server API for EntityAccess service.
 type EntityAccessServer interface {
 	// AuthInfo returns information about the authentication that is used on the request.
 	AuthInfo(context.Context, *types.Empty) (*AuthInfoResponse, error)
@@ -644,6 +647,9 @@ func encodeVarintPopulateIdentityserver(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *AuthInfoResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.AccessMethod != nil {
@@ -657,6 +663,9 @@ func (m *AuthInfoResponse) Size() (n int) {
 }
 
 func (m *AuthInfoResponse_APIKey) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.APIKey != nil {
@@ -666,6 +675,9 @@ func (m *AuthInfoResponse_APIKey) Size() (n int) {
 	return n
 }
 func (m *AuthInfoResponse_OAuthAccessToken) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.OAuthAccessToken != nil {
@@ -675,6 +687,9 @@ func (m *AuthInfoResponse_OAuthAccessToken) Size() (n int) {
 	return n
 }
 func (m *AuthInfoResponse_APIKeyAccess) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.APIKey.Size()

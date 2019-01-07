@@ -69,7 +69,7 @@ type Session struct {
 	// Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
 	// Known by Network Server, Application Server and Join Server. Owned by Network Server.
 	DevAddr     go_thethings_network_lorawan_stack_pkg_types.DevAddr `protobuf:"bytes,2,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevAddr" json:"dev_addr"`
-	SessionKeys `protobuf:"bytes,3,opt,name=keys,embedded=keys" json:"keys"`
+	SessionKeys `protobuf:"bytes,3,opt,name=keys,proto3,embedded=keys" json:"keys"`
 	// Last uplink frame counter value used. Network Server only. Application Server assumes the Network Server checked it.
 	LastFCntUp uint32 `protobuf:"varint,4,opt,name=last_f_cnt_up,json=lastFCntUp,proto3" json:"last_f_cnt_up,omitempty"`
 	// Last network downlink frame counter value used. Network Server only.
@@ -79,7 +79,7 @@ type Session struct {
 	// Frame counter of the last confirmed downlink message sent. Network Server only.
 	LastConfFCntDown uint32 `protobuf:"varint,7,opt,name=last_conf_f_cnt_down,json=lastConfFCntDown,proto3" json:"last_conf_f_cnt_down,omitempty"`
 	// Time when the session started. Network Server only.
-	StartedAt            time.Time `protobuf:"bytes,8,opt,name=started_at,json=startedAt,stdtime" json:"started_at"`
+	StartedAt            time.Time `protobuf:"bytes,8,opt,name=started_at,json=startedAt,proto3,stdtime" json:"started_at"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
 }
@@ -185,7 +185,7 @@ type MACParameters struct {
 	// Maximum uplink duty cycle (of all channels).
 	MaxDutyCycle AggregatedDutyCycle `protobuf:"varint,15,opt,name=max_duty_cycle,json=maxDutyCycle,proto3,enum=ttn.lorawan.v3.AggregatedDutyCycle" json:"max_duty_cycle,omitempty"`
 	// Configured uplink channels and optionally Rx1 frequency.
-	Channels []*MACParameters_Channel `protobuf:"bytes,16,rep,name=channels" json:"channels,omitempty"`
+	Channels []*MACParameters_Channel `protobuf:"bytes,16,rep,name=channels,proto3" json:"channels,omitempty"`
 	// Frequency of the class B ping slot (Hz).
 	PingSlotFrequency uint64 `protobuf:"varint,17,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
 	// Data rate index of the class B ping slot.
@@ -448,7 +448,7 @@ type EndDeviceBrand struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	URL  string `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
 	// Logos contains file names of brand logos.
-	Logos                []string `protobuf:"bytes,4,rep,name=logos" json:"logos,omitempty"`
+	Logos                []string `protobuf:"bytes,4,rep,name=logos,proto3" json:"logos,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -647,7 +647,7 @@ func (m *EndDeviceVersionIdentifiers) GetFirmwareVersion() string {
 // Template for creating end devices.
 type EndDeviceVersion struct {
 	// Version identifiers.
-	EndDeviceVersionIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	EndDeviceVersionIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
 	// LoRaWAN MAC version.
 	LoRaWANVersion MACVersion `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
 	// LoRaWAN PHY version.
@@ -655,13 +655,13 @@ type EndDeviceVersion struct {
 	// ID of the frequency plan used by this device.
 	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
 	// Photos contains file names of device photos.
-	Photos []string `protobuf:"bytes,5,rep,name=photos" json:"photos,omitempty"`
+	Photos []string `protobuf:"bytes,5,rep,name=photos,proto3" json:"photos,omitempty"`
 	// Whether the device supports class B.
 	SupportsClassB bool `protobuf:"varint,6,opt,name=supports_class_b,json=supportsClassB,proto3" json:"supports_class_b,omitempty"`
 	// Whether the device supports class C.
 	SupportsClassC bool `protobuf:"varint,7,opt,name=supports_class_c,json=supportsClassC,proto3" json:"supports_class_c,omitempty"`
 	// Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd).
-	DefaultMACParameters *MACParameters `protobuf:"bytes,8,opt,name=default_mac_parameters,json=defaultMacParameters" json:"default_mac_parameters,omitempty"`
+	DefaultMACParameters *MACParameters `protobuf:"bytes,8,opt,name=default_mac_parameters,json=defaultMacParameters,proto3" json:"default_mac_parameters,omitempty"`
 	// Minimum frequency the device is capable of using (Hz).
 	MinFrequency uint64 `protobuf:"varint,9,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
 	// Maximum frequency the device is capable of using (Hz).
@@ -675,7 +675,7 @@ type EndDeviceVersion struct {
 	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
 	ResetsJoinNonces bool `protobuf:"varint,14,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
 	// Default formatters defining the payload formats for this end device.
-	DefaultFormatters    MessagePayloadFormatters `protobuf:"bytes,15,opt,name=default_formatters,json=defaultFormatters" json:"default_formatters"`
+	DefaultFormatters    MessagePayloadFormatters `protobuf:"bytes,15,opt,name=default_formatters,json=defaultFormatters,proto3" json:"default_formatters"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
 }
@@ -816,11 +816,11 @@ type MACSettings struct {
 	// A bigger margin is less efficient, but gives a better chance of successful reception.
 	ADRMargin uint32 `protobuf:"varint,2,opt,name=adr_margin,json=adrMargin,proto3" json:"adr_margin,omitempty"`
 	// Deadline for the device to respond to requests from the Network Server.
-	ClassBTimeout time.Duration `protobuf:"bytes,3,opt,name=class_b_timeout,json=classBTimeout,stdduration" json:"class_b_timeout"`
+	ClassBTimeout time.Duration `protobuf:"bytes,3,opt,name=class_b_timeout,json=classBTimeout,proto3,stdduration" json:"class_b_timeout"`
 	// Deadline for the device to respond to requests from the Network Server.
-	ClassCTimeout time.Duration `protobuf:"bytes,4,opt,name=class_c_timeout,json=classCTimeout,stdduration" json:"class_c_timeout"`
+	ClassCTimeout time.Duration `protobuf:"bytes,4,opt,name=class_c_timeout,json=classCTimeout,proto3,stdduration" json:"class_c_timeout"`
 	// The interval after which a DevStatusReq MACCommand shall be sent.
-	StatusTimePeriodicity time.Duration `protobuf:"bytes,5,opt,name=status_time_periodicity,json=statusTimePeriodicity,stdduration" json:"status_time_periodicity"`
+	StatusTimePeriodicity time.Duration `protobuf:"bytes,5,opt,name=status_time_periodicity,json=statusTimePeriodicity,proto3,stdduration" json:"status_time_periodicity"`
 	// Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
 	StatusCountPeriodicity uint32   `protobuf:"varint,6,opt,name=status_count_periodicity,json=statusCountPeriodicity,proto3" json:"status_count_periodicity,omitempty"`
 	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
@@ -906,9 +906,9 @@ func (m *MACSettings) GetStatusCountPeriodicity() uint32 {
 // This is used internally by the Network Server and is read only.
 type MACState struct {
 	// Current LoRaWAN MAC parameters.
-	CurrentParameters MACParameters `protobuf:"bytes,1,opt,name=current_parameters,json=currentParameters" json:"current_parameters"`
+	CurrentParameters MACParameters `protobuf:"bytes,1,opt,name=current_parameters,json=currentParameters,proto3" json:"current_parameters"`
 	// Desired LoRaWAN MAC parameters.
-	DesiredParameters MACParameters `protobuf:"bytes,2,opt,name=desired_parameters,json=desiredParameters" json:"desired_parameters"`
+	DesiredParameters MACParameters `protobuf:"bytes,2,opt,name=desired_parameters,json=desiredParameters,proto3" json:"desired_parameters"`
 	// Currently active LoRaWAN device class
 	// - Device class is A by default
 	// - If device sets ClassB bit in uplink, this will be set to B
@@ -917,19 +917,19 @@ type MACState struct {
 	// LoRaWAN MAC version.
 	LoRaWANVersion MACVersion `protobuf:"varint,4,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
 	// Time when the last confirmed downlink message or MAC command was scheduled.
-	LastConfirmedDownlinkAt *time.Time `protobuf:"bytes,5,opt,name=last_confirmed_downlink_at,json=lastConfirmedDownlinkAt,stdtime" json:"last_confirmed_downlink_at,omitempty"`
+	LastConfirmedDownlinkAt *time.Time `protobuf:"bytes,5,opt,name=last_confirmed_downlink_at,json=lastConfirmedDownlinkAt,proto3,stdtime" json:"last_confirmed_downlink_at,omitempty"`
 	// Frame counter value of last uplink containing DevStatusAns.
 	LastDevStatusFCntUp uint32 `protobuf:"varint,6,opt,name=last_dev_status_f_cnt_up,json=lastDevStatusFCntUp,proto3" json:"last_dev_status_f_cnt_up,omitempty"`
 	// Periodicity of the class B ping slot.
 	PingSlotPeriodicity PingSlotPeriod `protobuf:"varint,7,opt,name=ping_slot_periodicity,json=pingSlotPeriodicity,proto3,enum=ttn.lorawan.v3.PingSlotPeriod" json:"ping_slot_periodicity,omitempty"`
 	// A confirmed application downlink, for which an acknowledgment is expected to arrive.
-	PendingApplicationDownlink *ApplicationDownlink `protobuf:"bytes,8,opt,name=pending_application_downlink,json=pendingApplicationDownlink" json:"pending_application_downlink,omitempty"`
+	PendingApplicationDownlink *ApplicationDownlink `protobuf:"bytes,8,opt,name=pending_application_downlink,json=pendingApplicationDownlink,proto3" json:"pending_application_downlink,omitempty"`
 	// Queued MAC responses.
 	// Regenerated on each uplink.
-	QueuedResponses []*MACCommand `protobuf:"bytes,9,rep,name=queued_responses,json=queuedResponses" json:"queued_responses,omitempty"`
+	QueuedResponses []*MACCommand `protobuf:"bytes,9,rep,name=queued_responses,json=queuedResponses,proto3" json:"queued_responses,omitempty"`
 	// Pending MAC requests(i.e. sent requests, for which no response has been received yet).
 	// Regenerated on each downlink.
-	PendingRequests []*MACCommand `protobuf:"bytes,10,rep,name=pending_requests,json=pendingRequests" json:"pending_requests,omitempty"`
+	PendingRequests []*MACCommand `protobuf:"bytes,10,rep,name=pending_requests,json=pendingRequests,proto3" json:"pending_requests,omitempty"`
 	// Queued join-accept payload.
 	// Set each time (re-)join request is received and removed each time a downlink is scheduled.
 	QueuedJoinAccept []byte `protobuf:"bytes,11,opt,name=queued_join_accept,json=queuedJoinAccept,proto3" json:"queued_join_accept,omitempty"`
@@ -1061,17 +1061,17 @@ func (m *MACState) GetRxWindowsAvailable() bool {
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
 type EndDevice struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	CreatedAt            time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	UpdatedAt            time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt            time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt            time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
 	// Friendly name of the device. Stored in Entity Registry.
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// Description of the device. Stored in Entity Registry.
 	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 	// Attributes of the device. Stored in Entity Registry.
-	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Version Identifiers. Stored in Entity Registry and Application Server.
-	VersionIDs *EndDeviceVersionIdentifiers `protobuf:"bytes,7,opt,name=version_ids,json=versionIds" json:"version_ids,omitempty"`
+	VersionIDs *EndDeviceVersionIdentifiers `protobuf:"bytes,7,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
 	// Default service profile. Stored in Entity Registry.
 	ServiceProfileID string `protobuf:"bytes,8,opt,name=service_profile_id,json=serviceProfileId,proto3" json:"service_profile_id,omitempty"`
 	// The address of the Network Server where this device is supposed to be registered.
@@ -1096,7 +1096,7 @@ type EndDevice struct {
 	// Custom certificate authorities may be configured out-of-band.
 	JoinServerAddress string `protobuf:"bytes,11,opt,name=join_server_address,json=joinServerAddress,proto3" json:"join_server_address,omitempty"`
 	// Location of the device. Stored in Entity Registry.
-	Locations map[string]*Location `protobuf:"bytes,12,rep,name=locations" json:"locations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	Locations map[string]*Location `protobuf:"bytes,12,rep,name=locations,proto3" json:"locations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Whether the device supports class B.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
 	SupportsClassB bool `protobuf:"varint,13,opt,name=supports_class_b,json=supportsClassB,proto3" json:"supports_class_b,omitempty"`
@@ -1114,7 +1114,7 @@ type EndDevice struct {
 	FrequencyPlanID string `protobuf:"bytes,17,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
 	// Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	DefaultMACParameters *MACParameters `protobuf:"bytes,18,opt,name=default_mac_parameters,json=defaultMacParameters" json:"default_mac_parameters,omitempty"`
+	DefaultMACParameters *MACParameters `protobuf:"bytes,18,opt,name=default_mac_parameters,json=defaultMacParameters,proto3" json:"default_mac_parameters,omitempty"`
 	// Minimum frequency the device is capable of using (Hz). Stored in Network Server.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
 	MinFrequency uint64 `protobuf:"varint,19,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
@@ -1134,17 +1134,17 @@ type EndDevice struct {
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
 	ResetsJoinNonces bool `protobuf:"varint,24,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
 	// Device root keys. Stored in Join Server.
-	RootKeys *RootKeys `protobuf:"bytes,25,opt,name=root_keys,json=rootKeys" json:"root_keys,omitempty"`
+	RootKeys *RootKeys `protobuf:"bytes,25,opt,name=root_keys,json=rootKeys,proto3" json:"root_keys,omitempty"`
 	// Home NetID. Stored in Join Server.
 	NetID *go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,26,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id,omitempty"`
 	// Settings for how the Network Server handles MAC for this device. Stored in Network Server.
-	MACSettings *MACSettings `protobuf:"bytes,27,opt,name=mac_settings,json=macSettings" json:"mac_settings,omitempty"`
+	MACSettings *MACSettings `protobuf:"bytes,27,opt,name=mac_settings,json=macSettings,proto3" json:"mac_settings,omitempty"`
 	// MAC state of the device. Stored in Network Server.
-	MACState *MACState `protobuf:"bytes,28,opt,name=mac_state,json=macState" json:"mac_state,omitempty"`
+	MACState *MACState `protobuf:"bytes,28,opt,name=mac_state,json=macState,proto3" json:"mac_state,omitempty"`
 	// Current session. Stored in Network Server and Application Server.
-	Session *Session `protobuf:"bytes,29,opt,name=session" json:"session,omitempty"`
+	Session *Session `protobuf:"bytes,29,opt,name=session,proto3" json:"session,omitempty"`
 	// Pending session. Stored in Network Server and Application Server until RekeyInd is received.
-	PendingSession *Session `protobuf:"bytes,30,opt,name=pending_session,json=pendingSession" json:"pending_session,omitempty"`
+	PendingSession *Session `protobuf:"bytes,30,opt,name=pending_session,json=pendingSession,proto3" json:"pending_session,omitempty"`
 	// Last DevNonce used.
 	// This field is only used for devices using LoRaWAN version 1.1 and later.
 	// Stored in Join Server.
@@ -1152,7 +1152,7 @@ type EndDevice struct {
 	// Used DevNonces sorted in ascending order.
 	// This field is only used for devices using LoRaWAN versions preceding 1.1.
 	// Stored in Join Server.
-	UsedDevNonces []uint32 `protobuf:"varint,32,rep,packed,name=used_dev_nonces,json=usedDevNonces" json:"used_dev_nonces,omitempty"`
+	UsedDevNonces []uint32 `protobuf:"varint,32,rep,packed,name=used_dev_nonces,json=usedDevNonces,proto3" json:"used_dev_nonces,omitempty"`
 	// Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used.
 	// Stored in Join Server.
 	LastJoinNonce uint32 `protobuf:"varint,33,opt,name=last_join_nonce,json=lastJoinNonce,proto3" json:"last_join_nonce,omitempty"`
@@ -1164,7 +1164,7 @@ type EndDevice struct {
 	LastRJCount1 uint32 `protobuf:"varint,35,opt,name=last_rj_count_1,json=lastRjCount1,proto3" json:"last_rj_count_1,omitempty"`
 	// Time when last DevStatus MAC command was received.
 	// Stored in Network Server.
-	LastDevStatusReceivedAt *time.Time `protobuf:"bytes,36,opt,name=last_dev_status_received_at,json=lastDevStatusReceivedAt,stdtime" json:"last_dev_status_received_at,omitempty"`
+	LastDevStatusReceivedAt *time.Time `protobuf:"bytes,36,opt,name=last_dev_status_received_at,json=lastDevStatusReceivedAt,proto3,stdtime" json:"last_dev_status_received_at,omitempty"`
 	// The power state of the device; whether it is battery-powered or connected to an external power source.
 	// Received via the DevStatus MAC command at status_received_at.
 	// Stored in Network Server.
@@ -1180,19 +1180,19 @@ type EndDevice struct {
 	// Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.
 	// The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.
 	// The number of messages stored is in the range [0,20];
-	RecentADRUplinks []*UplinkMessage `protobuf:"bytes,40,rep,name=recent_adr_uplinks,json=recentAdrUplinks" json:"recent_adr_uplinks,omitempty"`
+	RecentADRUplinks []*UplinkMessage `protobuf:"bytes,40,rep,name=recent_adr_uplinks,json=recentAdrUplinks,proto3" json:"recent_adr_uplinks,omitempty"`
 	// Recent uplink messages sorted by time. Stored in Network Server.
 	// The number of messages stored may depend on configuration.
-	RecentUplinks []*UplinkMessage `protobuf:"bytes,41,rep,name=recent_uplinks,json=recentUplinks" json:"recent_uplinks,omitempty"`
+	RecentUplinks []*UplinkMessage `protobuf:"bytes,41,rep,name=recent_uplinks,json=recentUplinks,proto3" json:"recent_uplinks,omitempty"`
 	// Recent downlink messages sorted by time. Stored in Network Server.
 	// The number of messages stored may depend on configuration.
-	RecentDownlinks []*DownlinkMessage `protobuf:"bytes,42,rep,name=recent_downlinks,json=recentDownlinks" json:"recent_downlinks,omitempty"`
+	RecentDownlinks []*DownlinkMessage `protobuf:"bytes,42,rep,name=recent_downlinks,json=recentDownlinks,proto3" json:"recent_downlinks,omitempty"`
 	// Queued Application downlink messages. Stored in Application Server,
 	// which sets them on the Network Server.
-	QueuedApplicationDownlinks []*ApplicationDownlink `protobuf:"bytes,43,rep,name=queued_application_downlinks,json=queuedApplicationDownlinks" json:"queued_application_downlinks,omitempty"`
+	QueuedApplicationDownlinks []*ApplicationDownlink `protobuf:"bytes,43,rep,name=queued_application_downlinks,json=queuedApplicationDownlinks,proto3" json:"queued_application_downlinks,omitempty"`
 	// The payload formatters for this end device. Stored in Application Server.
 	// Copied on creation from template identified by version_ids.
-	Formatters           *MessagePayloadFormatters `protobuf:"bytes,44,opt,name=formatters" json:"formatters,omitempty"`
+	Formatters           *MessagePayloadFormatters `protobuf:"bytes,44,opt,name=formatters,proto3" json:"formatters,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
 	XXX_sizecache        int32                     `json:"-"`
 }
@@ -1524,7 +1524,7 @@ func (m *EndDevice) GetFormatters() *MessagePayloadFormatters {
 }
 
 type EndDevices struct {
-	EndDevices           []*EndDevice `protobuf:"bytes,1,rep,name=end_devices,json=endDevices" json:"end_devices,omitempty"`
+	EndDevices           []*EndDevice `protobuf:"bytes,1,rep,name=end_devices,json=endDevices,proto3" json:"end_devices,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
 }
@@ -1569,7 +1569,7 @@ func (m *EndDevices) GetEndDevices() []*EndDevice {
 }
 
 type CreateEndDeviceRequest struct {
-	EndDevice            `protobuf:"bytes,1,opt,name=end_device,json=endDevice,embedded=end_device" json:"end_device"`
+	EndDevice            `protobuf:"bytes,1,opt,name=end_device,json=endDevice,proto3,embedded=end_device" json:"end_device"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -1607,8 +1607,8 @@ func (m *CreateEndDeviceRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_CreateEndDeviceRequest proto.InternalMessageInfo
 
 type UpdateEndDeviceRequest struct {
-	EndDevice            `protobuf:"bytes,1,opt,name=end_device,json=endDevice,embedded=end_device" json:"end_device"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	EndDevice            `protobuf:"bytes,1,opt,name=end_device,json=endDevice,proto3,embedded=end_device" json:"end_device"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -1653,8 +1653,8 @@ func (m *UpdateEndDeviceRequest) GetFieldMask() types.FieldMask {
 }
 
 type GetEndDeviceRequest struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,embedded=end_device_ids" json:"end_device_ids"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3,embedded=end_device_ids" json:"end_device_ids"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -1699,8 +1699,8 @@ func (m *GetEndDeviceRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListEndDevicesRequest struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,embedded=application_ids" json:"application_ids"`
-	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -1773,8 +1773,8 @@ func (m *ListEndDevicesRequest) GetPage() uint32 {
 }
 
 type SetEndDeviceRequest struct {
-	Device               EndDevice       `protobuf:"bytes,1,opt,name=device" json:"device"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	Device               EndDevice       `protobuf:"bytes,1,opt,name=device,proto3" json:"device"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -4277,6 +4277,9 @@ func encodeVarintPopulateEndDevice(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *Session) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.DevAddr.Size()
@@ -4301,6 +4304,9 @@ func (m *Session) Size() (n int) {
 }
 
 func (m *MACParameters) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.MaxEIRP != 0 {
@@ -4367,6 +4373,9 @@ func (m *MACParameters) Size() (n int) {
 }
 
 func (m *MACParameters_Channel) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UplinkFrequency != 0 {
@@ -4388,6 +4397,9 @@ func (m *MACParameters_Channel) Size() (n int) {
 }
 
 func (m *EndDeviceBrand) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ID)
@@ -4412,6 +4424,9 @@ func (m *EndDeviceBrand) Size() (n int) {
 }
 
 func (m *EndDeviceModel) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.BrandID)
@@ -4430,6 +4445,9 @@ func (m *EndDeviceModel) Size() (n int) {
 }
 
 func (m *EndDeviceVersionIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.BrandID)
@@ -4452,6 +4470,9 @@ func (m *EndDeviceVersionIdentifiers) Size() (n int) {
 }
 
 func (m *EndDeviceVersion) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceVersionIdentifiers.Size()
@@ -4506,6 +4527,9 @@ func (m *EndDeviceVersion) Size() (n int) {
 }
 
 func (m *MACSettings) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UseADR {
@@ -4527,6 +4551,9 @@ func (m *MACSettings) Size() (n int) {
 }
 
 func (m *MACState) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.CurrentParameters.Size()
@@ -4576,6 +4603,9 @@ func (m *MACState) Size() (n int) {
 }
 
 func (m *EndDevice) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()
@@ -4759,6 +4789,9 @@ func (m *EndDevice) Size() (n int) {
 }
 
 func (m *EndDevices) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.EndDevices) > 0 {
@@ -4771,6 +4804,9 @@ func (m *EndDevices) Size() (n int) {
 }
 
 func (m *CreateEndDeviceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDevice.Size()
@@ -4779,6 +4815,9 @@ func (m *CreateEndDeviceRequest) Size() (n int) {
 }
 
 func (m *UpdateEndDeviceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDevice.Size()
@@ -4789,6 +4828,9 @@ func (m *UpdateEndDeviceRequest) Size() (n int) {
 }
 
 func (m *GetEndDeviceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.EndDeviceIdentifiers.Size()
@@ -4799,6 +4841,9 @@ func (m *GetEndDeviceRequest) Size() (n int) {
 }
 
 func (m *ListEndDevicesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.ApplicationIdentifiers.Size()
@@ -4819,6 +4864,9 @@ func (m *ListEndDevicesRequest) Size() (n int) {
 }
 
 func (m *SetEndDeviceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.Device.Size()
@@ -8434,6 +8482,17 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.UsedDevNonces) == 0 {
+					m.UsedDevNonces = make([]uint32, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v uint32

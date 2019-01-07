@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -34,8 +37,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for OrganizationRegistry service
-
+// OrganizationRegistryClient is the client API for OrganizationRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type OrganizationRegistryClient interface {
 	// Create a new organization. This also sets the given user as
 	// first collaborator with all possible rights.
@@ -103,8 +107,7 @@ func (c *organizationRegistryClient) Delete(ctx context.Context, in *Organizatio
 	return out, nil
 }
 
-// Server API for OrganizationRegistry service
-
+// OrganizationRegistryServer is the server API for OrganizationRegistry service.
 type OrganizationRegistryServer interface {
 	// Create a new organization. This also sets the given user as
 	// first collaborator with all possible rights.
@@ -242,8 +245,9 @@ var _OrganizationRegistry_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/organization_services.proto",
 }
 
-// Client API for OrganizationAccess service
-
+// OrganizationAccessClient is the client API for OrganizationAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type OrganizationAccessClient interface {
 	ListRights(ctx context.Context, in *OrganizationIdentifiers, opts ...grpc.CallOption) (*Rights, error)
 	CreateAPIKey(ctx context.Context, in *CreateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
@@ -322,8 +326,7 @@ func (c *organizationAccessClient) ListCollaborators(ctx context.Context, in *Or
 	return out, nil
 }
 
-// Server API for OrganizationAccess service
-
+// OrganizationAccessServer is the server API for OrganizationAccess service.
 type OrganizationAccessServer interface {
 	ListRights(context.Context, *OrganizationIdentifiers) (*Rights, error)
 	CreateAPIKey(context.Context, *CreateOrganizationAPIKeyRequest) (*APIKey, error)

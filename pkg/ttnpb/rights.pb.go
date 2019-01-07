@@ -272,7 +272,7 @@ func (Right) EnumDescriptor() ([]byte, []int) {
 }
 
 type Rights struct {
-	Rights               []Right  `protobuf:"varint,1,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights               []Right  `protobuf:"varint,1,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -326,7 +326,7 @@ type APIKey struct {
 	// User-defined (friendly) name for the API key.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// Rights that are granted to this API key.
-	Rights               []Right  `protobuf:"varint,4,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	Rights               []Right  `protobuf:"varint,4,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -392,7 +392,7 @@ func (m *APIKey) GetRights() []Right {
 }
 
 type APIKeys struct {
-	APIKeys              []*APIKey `protobuf:"bytes,1,rep,name=api_keys,json=apiKeys" json:"api_keys,omitempty"`
+	APIKeys              []*APIKey `protobuf:"bytes,1,rep,name=api_keys,json=apiKeys,proto3" json:"api_keys,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
 }
@@ -437,8 +437,8 @@ func (m *APIKeys) GetAPIKeys() []*APIKey {
 }
 
 type Collaborator struct {
-	OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
-	Rights                        []Right  `protobuf:"varint,2,rep,packed,name=rights,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	Rights                        []Right  `protobuf:"varint,2,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	XXX_NoUnkeyedLiteral          struct{} `json:"-"`
 	XXX_sizecache                 int32    `json:"-"`
 }
@@ -483,7 +483,7 @@ func (m *Collaborator) GetRights() []Right {
 }
 
 type Collaborators struct {
-	Collaborators        []*Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators,omitempty"`
+	Collaborators        []*Collaborator `protobuf:"bytes,1,rep,name=collaborators,proto3" json:"collaborators,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -1047,6 +1047,9 @@ func encodeVarintPopulateRights(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *Rights) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Rights) > 0 {
@@ -1060,6 +1063,9 @@ func (m *Rights) Size() (n int) {
 }
 
 func (m *APIKey) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ID)
@@ -1085,6 +1091,9 @@ func (m *APIKey) Size() (n int) {
 }
 
 func (m *APIKeys) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.APIKeys) > 0 {
@@ -1097,6 +1106,9 @@ func (m *APIKeys) Size() (n int) {
 }
 
 func (m *Collaborator) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.OrganizationOrUserIdentifiers.Size()
@@ -1112,6 +1124,9 @@ func (m *Collaborator) Size() (n int) {
 }
 
 func (m *Collaborators) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Collaborators) > 0 {
@@ -1267,6 +1282,10 @@ func (m *Rights) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right
@@ -1466,6 +1485,10 @@ func (m *APIKey) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right
@@ -1689,6 +1712,10 @@ func (m *Collaborator) Unmarshal(dAtA []byte) error {
 				postIndex := iNdEx + packedLen
 				if postIndex > l {
 					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.Rights) == 0 {
+					m.Rights = make([]Right, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v Right

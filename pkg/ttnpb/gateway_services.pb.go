@@ -11,8 +11,11 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import types "github.com/gogo/protobuf/types"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
-import context "context"
-import grpc "google.golang.org/grpc"
+import (
+	context "context"
+
+	grpc "google.golang.org/grpc"
+)
 
 import strings "strings"
 import reflect "reflect"
@@ -32,8 +35,8 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type PullGatewayConfigurationRequest struct {
-	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,embedded=gateway_ids" json:"gateway_ids"`
-	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask" json:"field_mask"`
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
@@ -117,8 +120,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for GatewayRegistry service
-
+// GatewayRegistryClient is the client API for GatewayRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GatewayRegistryClient interface {
 	// Create a new gateway. This also sets the given organization or user as
 	// first collaborator with all possible rights.
@@ -186,8 +190,7 @@ func (c *gatewayRegistryClient) Delete(ctx context.Context, in *GatewayIdentifie
 	return out, nil
 }
 
-// Server API for GatewayRegistry service
-
+// GatewayRegistryServer is the server API for GatewayRegistry service.
 type GatewayRegistryServer interface {
 	// Create a new gateway. This also sets the given organization or user as
 	// first collaborator with all possible rights.
@@ -325,8 +328,9 @@ var _GatewayRegistry_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/gateway_services.proto",
 }
 
-// Client API for GatewayAccess service
-
+// GatewayAccessClient is the client API for GatewayAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GatewayAccessClient interface {
 	ListRights(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*Rights, error)
 	CreateAPIKey(ctx context.Context, in *CreateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
@@ -404,8 +408,7 @@ func (c *gatewayAccessClient) ListCollaborators(ctx context.Context, in *Gateway
 	return out, nil
 }
 
-// Server API for GatewayAccess service
-
+// GatewayAccessServer is the server API for GatewayAccess service.
 type GatewayAccessServer interface {
 	ListRights(context.Context, *GatewayIdentifiers) (*Rights, error)
 	CreateAPIKey(context.Context, *CreateGatewayAPIKeyRequest) (*APIKey, error)
@@ -566,8 +569,9 @@ var _GatewayAccess_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/gateway_services.proto",
 }
 
-// Client API for GatewayConfigurator service
-
+// GatewayConfiguratorClient is the client API for GatewayConfigurator service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GatewayConfiguratorClient interface {
 	PullConfiguration(ctx context.Context, in *PullGatewayConfigurationRequest, opts ...grpc.CallOption) (GatewayConfigurator_PullConfigurationClient, error)
 }
@@ -612,8 +616,7 @@ func (x *gatewayConfiguratorPullConfigurationClient) Recv() (*Gateway, error) {
 	return m, nil
 }
 
-// Server API for GatewayConfigurator service
-
+// GatewayConfiguratorServer is the server API for GatewayConfigurator service.
 type GatewayConfiguratorServer interface {
 	PullConfiguration(*PullGatewayConfigurationRequest, GatewayConfigurator_PullConfigurationServer) error
 }
@@ -784,6 +787,9 @@ func encodeVarintPopulateGatewayServices(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *PullGatewayConfigurationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = m.GatewayIdentifiers.Size()
