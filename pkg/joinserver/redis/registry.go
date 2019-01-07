@@ -27,8 +27,7 @@ import (
 )
 
 var (
-	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
-	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
+	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
@@ -42,10 +41,12 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 	return dst, nil
 }
 
+// DeviceRegistry is an implementation of joinserver.DeviceRegistry.
 type DeviceRegistry struct {
 	Redis *ttnredis.Client
 }
 
+// GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
@@ -58,6 +59,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	return applyDeviceFieldMask(&ttnpb.EndDevice{}, pb, paths...)
 }
 
+// SetByEUI sets device by joinEUI, devEUI.
 func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
@@ -148,10 +150,12 @@ func applyKeyFieldMask(dst, src *ttnpb.SessionKeys, paths ...string) (*ttnpb.Ses
 	return dst, dst.SetFields(src, append(paths, "session_key_id")...)
 }
 
+// KeyRegistry is an implementation of joinserver.KeyRegistry.
 type KeyRegistry struct {
 	Redis *ttnredis.Client
 }
 
+// GetByID gets session keys by devEUI, id.
 func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
@@ -164,6 +168,7 @@ func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte
 	return applyKeyFieldMask(&ttnpb.SessionKeys{}, pb, paths...)
 }
 
+// SetByID sets session keys by devEUI, id.
 func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
 	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers

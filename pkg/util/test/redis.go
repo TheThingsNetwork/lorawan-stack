@@ -36,6 +36,10 @@ var defaultNamespace = [...]string{
 	"redistest",
 }
 
+// NewRedis returns a new namespaced *redis.Client ready to use
+// and a flush function, which should be called after the client is not needed anymore to clean the namespace.
+// NewRedis respects TEST_REDIS, REDIS_ADDRESS and REDIS_DB environment variables.
+// Client returned logs commands executed.
 func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 	if os.Getenv("TEST_REDIS") != "1" {
 		t.Skip("TEST_REDIS is not set to `1`, skipping Redis tests")

@@ -21,16 +21,19 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
+// DeviceRegistry is a registry, containing devices.
 type DeviceRegistry interface {
 	GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
 	SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
+// DeleteDevice deletes device identified by joinEUI, devEUI from r.
 func DeleteDevice(ctx context.Context, r DeviceRegistry, joinEUI types.EUI64, devEUI types.EUI64) error {
 	_, err := r.SetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
 
+// CreateDevice creates device dev identified by joinEUI, devEUI from dev.EndDeviceIdentifiers at r.
 func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
 	if dev.EndDeviceIdentifiers.JoinEUI == nil || dev.EndDeviceIdentifiers.DevEUI == nil {
 		return nil, errInvalidIdentifiers
@@ -47,16 +50,19 @@ func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (
 	return dev, nil
 }
 
+// KeyRegistry is a registry, containing session keys.
 type KeyRegistry interface {
 	GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error)
 	SetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 }
 
+// DeleteKeys deletes session keys identified by devEUI, id pair from r.
 func DeleteKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, id []byte) error {
 	_, err := r.SetByID(ctx, devEUI, id, ttnpb.SessionKeysFieldPathsTopLevel, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) { return nil, nil, nil })
 	return err
 }
 
+// CreateKeys creates session keys ks identified by devEUI, ks.SessionKeyID at r.
 func CreateKeys(ctx context.Context, r KeyRegistry, devEUI types.EUI64, ks *ttnpb.SessionKeys) (*ttnpb.SessionKeys, error) {
 	if devEUI.IsZero() || len(ks.SessionKeyID) == 0 {
 		return nil, errInvalidIdentifiers

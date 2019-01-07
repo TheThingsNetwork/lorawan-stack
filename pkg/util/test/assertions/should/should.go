@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package should wraps assertions in github.com/smartystreets/assertions and util/test/assertions.
 package should
 
 import (

@@ -28,16 +28,13 @@ import (
 )
 
 var (
-	ErrDevNonceTooSmall     = errDevNonceTooSmall
-	ErrInvalidRequest       = errInvalidRequest
-	ErrNoAppSKey            = errNoAppSKey
-	ErrNoFNwkSIntKey        = errNoFNwkSIntKey
-	ErrNoNwkSEncKey         = errNoNwkSEncKey
-	ErrNoSessionKeyID       = errNoSessionKeyID
-	ErrNoSNwkSIntKey        = errNoSNwkSIntKey
-	ErrRegistryOperation    = errRegistryOperation
-	ErrReuseDevNonce        = errReuseDevNonce
-	ErrSessionKeyIDMismatch = errSessionKeyIDMismatch
+	ErrDevNonceTooSmall  = errDevNonceTooSmall
+	ErrNoAppSKey         = errNoAppSKey
+	ErrNoFNwkSIntKey     = errNoFNwkSIntKey
+	ErrNoNwkSEncKey      = errNoNwkSEncKey
+	ErrNoSNwkSIntKey     = errNoSNwkSIntKey
+	ErrRegistryOperation = errRegistryOperation
+	ErrReuseDevNonce     = errReuseDevNonce
 
 	KeyToBytes = keyToBytes
 )

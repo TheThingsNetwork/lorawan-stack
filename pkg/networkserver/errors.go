@@ -19,7 +19,6 @@ import (
 )
 
 var (
-	errChannelIndexTooHigh       = errors.DefineInvalidArgument("channel_index_too_high", "channel index is too high")
 	errCIDOutOfRange             = errors.DefineInvalidArgument("cid_out_of_range", "CID must be in range from {min} to {max}")
 	errComputeMIC                = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
 	errCorruptedMACState         = errors.DefineCorruption("corrupted_mac_state", "MAC state is corrupted")
@@ -37,11 +36,9 @@ var (
 	errGatewayServerNotFound     = errors.DefineNotFound("gateway_server_not_found", "Gateway Server not found")
 	errInvalidConfiguration      = errors.DefineInvalidArgument("configuration", "invalid configuration")
 	errInvalidDataRate           = errors.DefineInvalidArgument("data_rate", "invalid data rate")
-	errInvalidFrequencyPlan      = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
 	errInvalidPayload            = errors.DefineInvalidArgument("payload", "invalid payload")
 	errInvalidRx2DataRateIndex   = errors.DefineInvalidArgument("rx2_data_rate_index", "invalid Rx2 data rate index")
 	errJoinServerNotFound        = errors.DefineNotFound("join_server_not_found", "Join Server not found")
-	errLoRaAndFSK                = errors.DefineInvalidArgument("lora_and_fsk", "both LoRa and FSK modulation is specified")
 	errMACRequestNotFound        = errors.DefineInvalidArgument("mac_request_not_found", "MAC response received, but corresponding request not found")
 	errNoPayload                 = errors.DefineInvalidArgument("no_payload", "no message payload specified")
 	errNoRekey                   = errors.DefineInvalidArgument("no_rekey", "rekey not received after join-accept")
@@ -49,7 +46,6 @@ var (
 	errRawPayloadTooShort        = errors.Define("raw_payload_too_short", "length of RawPayload must not be less than 4")
 	errSchedule                  = errors.Define("schedule", "all Gateway Servers failed to schedule the downlink")
 	errScheduleTooSoon           = errors.DefineUnavailable("schedule_too_soon", "confirmed downlink is scheduled too soon")
-	errUnknownApplicationID      = errors.DefineNotFound("unknown_application_id", "application ID is unknown")
 	errUnknownBand               = errors.Define("unknown_band", "band is unknown")
 	errUnknownChannel            = errors.Define("unknown_chanel", "channel is unknown")
 	errUnknownFNwkSIntKey        = errors.DefineNotFound("unknown_f_nwk_s_int_key", "FNwkSIntKey is unknown")

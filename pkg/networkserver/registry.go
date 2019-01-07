@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
+// DeviceRegistry is a registry, containing devices.
 type DeviceRegistry interface {
 	GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
@@ -28,11 +29,13 @@ type DeviceRegistry interface {
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
+// DeleteDevice deletes device identified by appID, devID from r.
 func DeleteDevice(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string) error {
 	_, err := r.SetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
 
+// CreateDevice creates device dev identified by appID, devID from dev.EndDeviceIdentifiers at r.
 func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
 	dev, err := r.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {

@@ -50,10 +50,12 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 	return dst, nil
 }
 
+// DeviceRegistry is an implementation of networkserver.DeviceRegistry.
 type DeviceRegistry struct {
 	Redis *ttnredis.Client
 }
 
+// GetByID gets device by appID, devID.
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
@@ -70,6 +72,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
+// GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.FindProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()), r.Redis.Key).ScanProto(pb); err != nil {
@@ -78,6 +81,7 @@ func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64
 	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
+// RangeByAddr ranges over devices by addr.
 func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
 	return ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
@@ -123,6 +127,7 @@ func equalEUI(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
+// SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,

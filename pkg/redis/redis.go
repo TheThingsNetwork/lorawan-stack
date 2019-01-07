@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package redis provides a general Redis client and component registry implementations.
+// Package redis provides a general Redis client and utilities.
 package redis
 
 import (
@@ -52,7 +52,7 @@ func MarshalProto(pb proto.Message) (string, error) {
 	return encoding.EncodeToString(b), nil
 }
 
-// MarshalProto unmarshals string returned from MarshalProto into pb.
+// UnmarshalProto unmarshals string returned from MarshalProto into pb.
 func UnmarshalProto(s string, pb proto.Message) error {
 	b, err := encoding.DecodeString(s)
 	if err != nil {
@@ -142,7 +142,7 @@ func FindProto(r WatchCmdable, k string, keyCmd func(...string) string) *ProtoCm
 	return &ProtoCmd{result: result}
 }
 
-// ProtoCmd is a command, which can unmarshal its result into multiple protocol buffers.
+// ProtosCmd is a command, which can unmarshal its result into multiple protocol buffers.
 type ProtosCmd struct {
 	result func() ([]string, error)
 }

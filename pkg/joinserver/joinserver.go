@@ -89,7 +89,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	return js, nil
 }
 
-// Roles of the gRPC service
+// Roles of the gRPC service.
 func (js *JoinServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_JOIN_SERVER}
 }

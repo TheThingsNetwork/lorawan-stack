@@ -12,27 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides Redis implementations of interfaces used by networkserver.
 package redis
-
-import (
-	"github.com/go-redis/redis"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-)
-
-var (
-	errNotFound            = errors.DefineNotFound("not_found", "entity not found")
-	errStore               = errors.Define("store", "store error")
-	errInvalidKeyValueType = errors.DefineInvalidArgument("value_type", "invalid value type for key `{key}`")
-)
-
-// ConvertError converts Redis error into errors.Error.
-func ConvertError(err error) error {
-	switch err {
-	case nil:
-		return nil
-	case redis.Nil:
-		return errNotFound
-	default:
-		return errStore.WithCause(err)
-	}
-}

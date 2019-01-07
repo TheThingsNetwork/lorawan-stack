@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-// DownlinkTaskQueue is a Redis downlink task queue.
+// DownlinkTaskQueue is an implementation of networkserver.DownlinkTaskQueue.
 type DownlinkTaskQueue struct {
 	*ttnredis.TaskQueue
 }
