@@ -2780,15 +2780,6 @@
       "file": "user_registry.go"
     }
   },
-  "error:pkg/joinserver/redis:duplicate_identifiers": {
-    "translations": {
-      "en": "duplicate identifiers"
-    },
-    "description": {
-      "package": "pkg/joinserver/redis",
-      "file": "registry.go"
-    }
-  },
   "error:pkg/joinserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
@@ -2897,15 +2888,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:invalid_request": {
-    "translations": {
-      "en": "invalid request"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:join_nonce_too_high": {
     "translations": {
       "en": "JoinNonce is too high"
@@ -2918,15 +2900,6 @@
   "error:pkg/joinserver:lorawan_version": {
     "translations": {
       "en": "unsupported LoRaWAN version: {version}"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:mac_version_mismatch": {
-    "translations": {
-      "en": "Device MAC version mismatch, in registry: {registered}, selected: {selected}"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -3041,15 +3014,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:no_session_key_id": {
-    "translations": {
-      "en": "no SessionKeyID specified"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:payload_length": {
     "translations": {
       "en": "expected length of payload to be equal to 23 got {length}"
@@ -3080,15 +3044,6 @@
   "error:pkg/joinserver:reuse_dev_nonce": {
     "translations": {
       "en": "DevNonce has already been used"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:session_key_id_mismatch": {
-    "translations": {
-      "en": "SessionKeyID mismatch"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -3192,15 +3147,6 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "registry.go"
-    }
-  },
-  "error:pkg/networkserver:channel_index_too_high": {
-    "translations": {
-      "en": "channel index is too high"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
     }
   },
   "error:pkg/networkserver:cid_out_of_range": {
@@ -3356,15 +3302,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:frequency_plan": {
-    "translations": {
-      "en": "invalid frequency plan"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:gateway_server_not_found": {
     "translations": {
       "en": "Gateway Server not found"
@@ -3377,15 +3314,6 @@
   "error:pkg/networkserver:join_server_not_found": {
     "translations": {
       "en": "Join Server not found"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:lora_and_fsk": {
-    "translations": {
-      "en": "both LoRa and FSK modulation is specified"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -3476,15 +3404,6 @@
   "error:pkg/networkserver:schedule_too_soon": {
     "translations": {
       "en": "confirmed downlink is scheduled too soon"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:unknown_application_id": {
-    "translations": {
-      "en": "application ID is unknown"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -3642,15 +3561,6 @@
     "description": {
       "package": "pkg/oauth",
       "file": "storage.go"
-    }
-  },
-  "error:pkg/redis:missing_key": {
-    "translations": {
-      "en": "missing key `{key}`"
-    },
-    "description": {
-      "package": "pkg/redis",
-      "file": "errors.go"
     }
   },
   "error:pkg/redis:not_found": {
