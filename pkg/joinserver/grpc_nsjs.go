@@ -15,6 +15,7 @@
 package joinserver
 
 import (
+	"bytes"
 	"context"
 	"encoding/binary"
 	"math"
@@ -23,7 +24,6 @@ import (
 
 	"github.com/oklog/ulid"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -43,22 +43,6 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 
 func keyToBytes(k types.AES128Key) []byte {
 	return k[:]
-}
-
-func checkMIC(key types.AES128Key, rawPayload []byte) error {
-	if n := len(rawPayload); n != 23 {
-		return errPayloadLengthMismatch.WithAttributes("length", n)
-	}
-	computed, err := crypto.ComputeJoinRequestMIC(key, rawPayload[:19])
-	if err != nil {
-		return errComputeMIC
-	}
-	for i := 0; i < 4; i++ {
-		if computed[i] != rawPayload[19+i] {
-			return errMICMismatch
-		}
-	}
-	return nil
 }
 
 // HandleJoin is called by the Network Server to join a device.
@@ -90,16 +74,25 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errNoDevAddr
 	}
 
+	rawPayload := req.RawPayload
 	if req.GetPayload().GetPayload() == nil {
-		if req.RawPayload == nil {
+		if rawPayload == nil {
 			return nil, errNoPayload
 		}
 		if req.Payload == nil {
 			req.Payload = &ttnpb.Message{}
 		}
-		if err = lorawan.UnmarshalMessage(req.RawPayload, req.Payload); err != nil {
+		if err = lorawan.UnmarshalMessage(rawPayload, req.Payload); err != nil {
 			return nil, errDecodePayload.WithCause(err)
 		}
+	} else {
+		rawPayload, err = lorawan.MarshalMessage(*req.Payload)
+		if err != nil {
+			return nil, errEncodePayload.WithCause(err)
+		}
+	}
+	if n := len(rawPayload); n != 23 {
+		return nil, errPayloadLengthMismatch.WithAttributes("length", n)
 	}
 
 	if req.Payload.Major != ttnpb.Major_LORAWAN_R1 {
@@ -113,7 +106,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	if pld == nil {
 		return nil, errNoJoinRequest
 	}
-
 	if pld.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
@@ -121,12 +113,20 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errNoJoinEUI
 	}
 
-	rawPayload := req.RawPayload
-	if rawPayload == nil {
-		rawPayload, err = lorawan.MarshalMessage(*req.Payload)
-		if err != nil {
-			return nil, errEncodePayload.WithCause(err)
+	match := false
+	for _, p := range srv.JS.euiPrefixes {
+		if p.Matches(pld.JoinEUI) {
+			match = true
+			break
 		}
+	}
+	switch {
+	case !match && req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0:
+		return nil, errUnknownAppEUI
+	case !match:
+		// TODO: Determine the cluster containing the device.
+		// https://github.com/TheThingsIndustries/ttn/issues/244
+		return nil, errForwardJoinRequest
 	}
 
 	dev, err := srv.JS.devices.SetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
@@ -139,22 +139,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			paths := make([]string, 0, 3)
-
-			match := false
-			for _, p := range srv.JS.euiPrefixes {
-				if p.Matches(pld.JoinEUI) {
-					match = true
-					break
-				}
-			}
-			switch {
-			case !match && req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0:
-				return nil, nil, errUnknownAppEUI
-			case !match:
-				// TODO: Determine the cluster containing the device.
-				// https://github.com/TheThingsIndustries/ttn/issues/244
-				return nil, nil, errForwardJoinRequest
-			}
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
 			switch req.SelectedMACVersion {
@@ -219,17 +203,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errEncodePayload.WithCause(err)
 			}
 
-			if dev.RootKeys.AppKey == nil {
-				return nil, nil, errNoAppKey
-			}
-
-			var appKey types.AES128Key
-			if dev.RootKeys.AppKey.KEKLabel != "" {
-				// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-				panic("Unsupported")
-			}
-			copy(appKey[:], dev.RootKeys.AppKey.Key[:])
-
 			srv.JS.entropyMu.Lock()
 			skID, err := ulid.New(ulid.Timestamp(time.Now()), srv.JS.entropy)
 			srv.JS.entropyMu.Unlock()
@@ -237,98 +210,101 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errGenerateSessionKeyID
 			}
 
+			networkCryptoService := srv.JS.networkCryptoService
+			applicationCryptoService := srv.JS.applicationCryptoService
 			switch req.SelectedMACVersion {
 			case ttnpb.MAC_V1_1:
-				if dev.RootKeys.NwkKey == nil {
-					return nil, nil, errNoNwkKey
+				if dev.RootKeys != nil {
+					memCryptoService := &memCryptoService{
+						RootKeys: *dev.RootKeys,
+						KeyVault: srv.JS.KeyVault,
+					}
+					if dev.RootKeys.NwkKey != nil {
+						networkCryptoService = memCryptoService
+					}
+					if dev.RootKeys.AppKey != nil {
+						applicationCryptoService = memCryptoService
+					}
 				}
-
-				var nwkKey types.AES128Key
-				if dev.RootKeys.NwkKey.KEKLabel != "" {
-					// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-					panic("Unsupported")
-				}
-				copy(nwkKey[:], dev.RootKeys.NwkKey.Key[:])
-
-				if err := checkMIC(nwkKey, rawPayload); err != nil {
-					return nil, nil, errCheckMIC.WithCause(err)
-				}
-
-				mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(nwkKey, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
-				if err != nil {
-					return nil, nil, errComputeMIC.WithCause(err)
-				}
-
-				enc, err := crypto.EncryptJoinAccept(nwkKey, append(b[1:], mic[:]...))
-				if err != nil {
-					return nil, nil, errEncryptPayload.WithCause(err)
-				}
-
-				res = &ttnpb.JoinResponse{
-					RawPayload: append(b[:1], enc...),
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: skID[:],
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-							Key:      keyToBytes(crypto.DeriveFNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
-							KEKLabel: "",
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-							Key:      keyToBytes(crypto.DeriveSNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
-							KEKLabel: "",
-						},
-						NwkSEncKey: &ttnpb.KeyEnvelope{
-							// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-							Key:      keyToBytes(crypto.DeriveNwkSEncKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
-							KEKLabel: "",
-						},
-						AppSKey: &ttnpb.KeyEnvelope{
-							// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-							Key:      keyToBytes(crypto.DeriveAppSKey(appKey, jn, pld.JoinEUI, pld.DevNonce)),
-							KEKLabel: "",
-						},
-					},
-					Lifetime: 0,
-				}
-
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-				if err := checkMIC(appKey, rawPayload); err != nil {
-					return nil, nil, errCheckMIC.WithCause(err)
+				if dev.RootKeys != nil {
+					if dev.RootKeys.AppKey != nil {
+						memCryptoService := &memCryptoService{
+							RootKeys: *dev.RootKeys,
+							KeyVault: srv.JS.KeyVault,
+						}
+						networkCryptoService = memCryptoService
+						applicationCryptoService = memCryptoService
+					}
 				}
-
-				mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
-				if err != nil {
-					return nil, nil, errComputeMIC.WithCause(err)
-				}
-
-				enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
-				if err != nil {
-					return nil, nil, errEncryptPayload.WithCause(err)
-				}
-
-				res = &ttnpb.JoinResponse{
-					RawPayload: append(b[:1], enc...),
-					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: skID[:],
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-							Key:      keyToBytes(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
-							KEKLabel: "",
-						},
-						AppSKey: &ttnpb.KeyEnvelope{
-							// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-							Key:      keyToBytes(crypto.DeriveLegacyAppSKey(appKey, jn, req.NetID, pld.DevNonce)),
-							KEKLabel: "",
-						},
-					},
-					Lifetime: 0,
-				}
-
 			default:
 				panic("This statement is unreachable. Fix version check.")
 			}
+			if networkCryptoService == nil {
+				return nil, nil, errNoNwkKey
+			}
+			if applicationCryptoService == nil {
+				return nil, nil, errNoAppKey
+			}
 
+			cryptoIDs := ttnpb.CryptoServiceEndDeviceIdentifiers{
+				LoRaWANVersion: req.SelectedMACVersion,
+				JoinEUI:        pld.JoinEUI,
+				DevEUI:         pld.DevEUI,
+			}
+			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoIDs, rawPayload[:19])
+			if err != nil {
+				return nil, nil, errComputeMIC.WithCause(err)
+			}
+			if !bytes.Equal(reqMIC[:], rawPayload[19:]) {
+				return nil, nil, errMICMismatch
+			}
+			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoIDs, 0xff, pld.DevNonce, b)
+			if err != nil {
+				return nil, nil, errComputeMIC.WithCause(err)
+			}
+			enc, err := networkCryptoService.EncryptJoinAccept(ctx, cryptoIDs, append(b[1:], resMIC[:]...))
+			if err != nil {
+				return nil, nil, errEncryptPayload.WithCause(err)
+			}
+			fNwkSIntKey, sNwkSIntKey, nwkSEncKey, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoIDs, jn, pld.DevNonce, req.NetID)
+			if err != nil {
+				return nil, nil, errDeriveNwkSKeys.WithCause(err)
+			}
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoIDs, jn, pld.DevNonce, req.NetID)
+			if err != nil {
+				return nil, nil, errDeriveAppSKey.WithCause(err)
+			}
+			sessionKeys := ttnpb.SessionKeys{
+				SessionKeyID: skID[:],
+				FNwkSIntKey: &ttnpb.KeyEnvelope{
+					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					Key:      fNwkSIntKey[:],
+					KEKLabel: "",
+				},
+				AppSKey: &ttnpb.KeyEnvelope{
+					// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					Key:      appSKey[:],
+					KEKLabel: "",
+				},
+			}
+			if req.SelectedMACVersion == ttnpb.MAC_V1_1 {
+				sessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{
+					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					Key:      sNwkSIntKey[:],
+					KEKLabel: "",
+				}
+				sessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{
+					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					Key:      nwkSEncKey[:],
+					KEKLabel: "",
+				}
+			}
+
+			res = &ttnpb.JoinResponse{
+				RawPayload:  append(b[:1], enc...),
+				SessionKeys: sessionKeys,
+			}
 			_, err = CreateKeys(ctx, srv.JS.keys, *dev.EndDeviceIdentifiers.DevEUI, &res.SessionKeys)
 			if err != nil {
 				return nil, nil, err

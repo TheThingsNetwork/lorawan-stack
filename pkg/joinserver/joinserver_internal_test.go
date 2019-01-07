@@ -16,15 +16,10 @@ package joinserver
 
 import (
 	"context"
-	"testing"
 
-	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var (
@@ -82,20 +77,4 @@ func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []
 		return nil, errors.New("Not implemented")
 	}
 	return r.SetByIDFunc(ctx, devEUI, id, paths, f)
-}
-
-func TestMICCheck(t *testing.T) {
-	a := assertions.New(t)
-
-	pld := ttnpb.NewPopulatedJoinRequest(test.Randy, false).GetRawPayload()[:19]
-
-	k := types.NewPopulatedAES128Key(test.Randy)
-	computed, err := crypto.ComputeJoinRequestMIC(*k, pld)
-	if err != nil {
-		panic(err)
-	}
-	a.So(checkMIC(*k, append(pld, computed[:]...)), should.BeNil)
-	a.So(checkMIC(*k, append(append(pld[1:], pld[0]-1), computed[:]...)), should.NotBeNil)
-
-	a.So(errors.IsInvalidArgument(checkMIC(*k, []byte{})), should.BeTrue)
 }

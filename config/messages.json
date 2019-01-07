@@ -1673,6 +1673,15 @@
       "file": "hooks.go"
     }
   },
+  "error:pkg/config:no_key_pair": {
+    "translations": {
+      "en": "no TLS key pair"
+    },
+    "description": {
+      "package": "pkg/config",
+      "file": "tls.go"
+    }
+  },
   "error:pkg/console:no_oauth_config": {
     "translations": {
       "en": "no OAuth configuration found for the Console"
@@ -2834,6 +2843,24 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:derive_app_s_key": {
+    "translations": {
+      "en": "failed to derive application session key"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:derive_nwk_s_keys": {
+    "translations": {
+      "en": "failed to derive network session keys"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:dev_nonce_too_high": {
     "translations": {
       "en": "DevNonce is too high"
@@ -3017,6 +3044,15 @@
   "error:pkg/joinserver:no_payload": {
     "translations": {
       "en": "no message payload specified"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:no_root_keys": {
+    "translations": {
+      "en": "no root keys specified"
     },
     "description": {
       "package": "pkg/joinserver",
