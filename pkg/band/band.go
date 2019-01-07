@@ -29,20 +29,18 @@ type PayloadSizer interface {
 	PayloadSize(dwellTime bool) uint16
 }
 
-type maxPayloadSize struct {
-	uint16
+type constPayloadSizer uint16
+
+func (p constPayloadSizer) PayloadSize(_ bool) uint16 {
+	return uint16(p)
 }
 
-func (p maxPayloadSize) PayloadSize(_ bool) uint16 {
-	return p.uint16
-}
-
-type dwellTimePayloadSize struct {
+type dwellTimePayloadSizer struct {
 	NoDwellTime uint16
 	DwellTime   uint16
 }
 
-func (p dwellTimePayloadSize) PayloadSize(dwellTime bool) uint16 {
+func (p dwellTimePayloadSizer) PayloadSize(dwellTime bool) uint16 {
 	if dwellTime {
 		return p.DwellTime
 	}
