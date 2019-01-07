@@ -125,8 +125,6 @@ func (d *memCryptoService) DeriveNwkSKeys(ctx context.Context, ids ttnpb.CryptoS
 			return
 		}
 		fNwkSIntKey = crypto.DeriveLegacyNwkSKey(appKey, jn, nid, dn)
-		sNwkSIntKey = fNwkSIntKey
-		nwkSEncKey = fNwkSIntKey
 
 	default:
 		panic("This statement is unreachable. Fix version check.")
