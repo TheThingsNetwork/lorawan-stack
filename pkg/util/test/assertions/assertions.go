@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package assertions contains custom assertions compatible with github.com/smartystreets/assertions.
 package assertions
 
 const (

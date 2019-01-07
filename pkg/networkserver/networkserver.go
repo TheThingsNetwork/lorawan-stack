@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package networkserver provides a LoRaWAN 1.1-compliant Network Server implementation.
+// Package networkserver provides a LoRaWAN-compliant Network Server implementation.
 package networkserver
 
 import (

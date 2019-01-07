@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package scheduling implements a packet scheduling that detects and avoids conflicts and enforces regional
-// restrictions like duty-cycle and dwell time.
 package scheduling
 
 import (

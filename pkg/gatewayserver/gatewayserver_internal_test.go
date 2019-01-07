@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package gatewayserver contains the structs and methods necessary to start a gRPC Gateway Server
 package gatewayserver
 
 var (

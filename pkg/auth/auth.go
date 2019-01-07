@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package auth provides methods to generate valid authorization values and
+// to also decode them.
+//
+// It also provides methods to validate passwords.
 package auth
 
 import (

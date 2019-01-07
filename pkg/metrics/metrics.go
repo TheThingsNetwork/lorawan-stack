@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package metrics creates the metrics registry and exposes some common metrics.
 package metrics
 
 import (

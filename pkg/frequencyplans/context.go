@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package frequencyplans contains abstractions to fetch and manipulate frequency plans.
 package frequencyplans
 
 import "context"

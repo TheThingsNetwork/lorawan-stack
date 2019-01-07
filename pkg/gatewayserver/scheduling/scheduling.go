@@ -12,5 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package assertions contains custom assertions compatible with github.com/smartystreets/assertions.
-package assertions
+// Package scheduling implements a packet scheduling that detects and avoids conflicts and enforces regional
+// restrictions like duty-cycle and dwell time.
+package scheduling
