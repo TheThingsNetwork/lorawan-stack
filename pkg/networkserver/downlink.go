@@ -409,6 +409,25 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 	return nil, errSchedule
 }
 
+func (ns *NetworkServer) sendQueueInvalidationToAS(ctx context.Context, dev *ttnpb.EndDevice) (bool, error) {
+	ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+			DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+				Downlinks:    dev.QueuedApplicationDownlinks,
+				LastFCntDown: dev.Session.LastNFCntDown,
+			},
+		},
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to send application downlink queue invalidation to Application Server")
+	} else if !ok {
+		log.FromContext(ctx).Warn("Application Server not found")
+	}
+	return ok, err
+}
+
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
@@ -421,6 +440,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			"device_uid", unique.ID(ctx, devID),
 			"start_at", t,
 		))
+		ctx = log.NewContext(ctx, logger)
 		logger.Debug("Processing downlink task...")
 
 		dev, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
@@ -448,6 +468,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					logger.Warn("Class B downlink task scheduled, but Rx windows are not available")
 					return dev, nil, nil
 				}
+				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 				if err != nil {
@@ -462,8 +483,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				if err != nil {
 					return nil, nil, errUnknownBand.WithCause(err)
 				}
-
-				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 
 				// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
 				maxUpLength := band.DataRates[0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
@@ -573,6 +592,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if err != nil {
 							scheduleErr = true
 						} else {
+							if appDown == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+								go ns.sendQueueInvalidationToAS(ctx, dev)
+							}
 							dev.MACState.RxWindowsAvailable = false
 							dev.RecentDownlinks = append(dev.RecentDownlinks, down)
 							if len(dev.RecentDownlinks) > recentDownlinkCount {
@@ -639,7 +661,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								dev = devCopy
 								scheduleErr = true
 							} else {
-								dev.MACState.QueuedJoinAccept = nil
+								if appDown == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+									go ns.sendQueueInvalidationToAS(ctx, dev)
+								}
 								dev.MACState.RxWindowsAvailable = false
 								dev.RecentDownlinks = append(dev.RecentDownlinks, down)
 								if len(dev.RecentDownlinks) > recentDownlinkCount {
@@ -714,6 +738,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if err != nil {
 						scheduleErr = true
 					} else {
+						if appDown == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+							go ns.sendQueueInvalidationToAS(ctx, dev)
+						}
 						dev.RecentDownlinks = append(dev.RecentDownlinks, down)
 						if len(dev.RecentDownlinks) > recentDownlinkCount {
 							dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
