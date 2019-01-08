@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	. "go.thethings.network/lorawan-stack/pkg/unique"
@@ -167,6 +168,252 @@ func TestRoundtrip(t *testing.T) {
 				parsed, err := tc.Parser(tc.Expected)
 				if a.So(err, should.BeNil) {
 					a.So(parsed.CombinedIdentifiers(), should.Resemble, tc.ID.CombinedIdentifiers())
+				}
+			}
+		})
+	}
+}
+
+func TestValidatorForIdentifiers(t *testing.T) {
+	a := assertions.New(t)
+	for _, run := range []struct {
+		Name   string
+		ID     func(string) ttnpb.Identifiers
+		Parser func(string) (ttnpb.Identifiers, error)
+	}{
+		{
+			"ApplicationID",
+			func(uid string) ttnpb.Identifiers { return ttnpb.ApplicationIdentifiers{ApplicationID: uid} },
+			func(uid string) (ttnpb.Identifiers, error) { return ToApplicationID(uid) },
+		},
+		{
+			"ClientID",
+			func(uid string) ttnpb.Identifiers { return ttnpb.ClientIdentifiers{ClientID: uid} },
+			func(uid string) (ttnpb.Identifiers, error) { return ToClientID(uid) },
+		},
+		{
+			"GatewayID",
+			func(uid string) ttnpb.Identifiers { return ttnpb.GatewayIdentifiers{GatewayID: uid} },
+			func(uid string) (ttnpb.Identifiers, error) { return ToGatewayID(uid) },
+		},
+		{
+			"OrganizationID",
+			func(uid string) ttnpb.Identifiers { return ttnpb.OrganizationIdentifiers{OrganizationID: uid} },
+			func(uid string) (ttnpb.Identifiers, error) { return ToOrganizationID(uid) },
+		},
+		{
+			"UserID",
+			func(uid string) ttnpb.Identifiers { return ttnpb.UserIdentifiers{UserID: uid} },
+			func(uid string) (ttnpb.Identifiers, error) { return ToUserID(uid) },
+		},
+	} {
+		for _, tc := range []struct {
+			Name          string
+			InputUID      string
+			ExpectedError func(error) bool
+		}{
+			{
+				"ValidID",
+				"test",
+				nil,
+			},
+			{
+				"ValidMinLength",
+				"oza",
+				nil,
+			},
+			{
+				"ValidMaxLength",
+				"ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
+				nil,
+			},
+			{
+				"ValidNumerics",
+				"1id1",
+				nil,
+			},
+			{
+				"InvalidEmptyString",
+				"",
+				errors.IsInvalidArgument,
+			},
+			{
+				"InvalidDashes",
+				"-id",
+				errors.IsInvalidArgument,
+			},
+			{
+				"InvalidDashes1",
+				"id-",
+				errors.IsInvalidArgument,
+			},
+			{
+				"InvalidUnderscore",
+				"id_test",
+				errors.IsInvalidArgument,
+			},
+			{
+				"InvalidDot",
+				"id.test",
+				errors.IsInvalidArgument,
+			},
+			{
+				"InvalidMinLength",
+				"id",
+				errors.IsInvalidArgument,
+			},
+			{
+				"InvalidMaxLength",
+				"ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlbh",
+				errors.IsInvalidArgument,
+			},
+		} {
+			t.Run(fmt.Sprintf("%s/%s", run.Name, tc.Name), func(t *testing.T) {
+				if run.Parser == nil {
+					t.Fatal("Parser Not Defined")
+				}
+				parsed, err := run.Parser(tc.InputUID)
+				if tc.ExpectedError == nil {
+					a.So(err, should.BeNil)
+					if !a.So(parsed, should.Resemble, run.ID(tc.InputUID)) {
+						t.FailNow()
+					}
+				} else {
+					if !a.So(tc.ExpectedError(err), should.BeTrue) {
+						t.FailNow()
+					}
+				}
+			})
+		}
+	}
+
+}
+
+func TestValidatorForDeviceIDs(t *testing.T) {
+	a := assertions.New(t)
+	for _, tc := range []struct {
+		Name               string
+		InputUID           string
+		ExpectedIdentifier ttnpb.EndDeviceIdentifiers
+		ExpectedError      func(error) bool
+	}{
+		{
+			"ValidID",
+			"foo-app.foo-device",
+			ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: "foo-app",
+				},
+				DeviceID: "foo-device",
+			},
+			nil,
+		},
+		{
+			"ValidAppIDValidMinLength",
+			"foo-app.foo",
+			ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: "foo-app",
+				},
+				DeviceID: "foo",
+			},
+			nil,
+		},
+		{
+			"ValidAppIDValidMaxLength",
+			"foo-app.ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
+			ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: "foo-app",
+				},
+				DeviceID: "ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
+			},
+			nil,
+		},
+		{
+			"ValidAppIDValidNumerics",
+			"foo-app.1d1",
+			ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: "foo-app",
+				},
+				DeviceID: "1d1",
+			},
+			nil,
+		},
+		{
+			"InvalidFormat",
+			"foo-appfoo-device",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"InvalidAppID",
+			"foo_app.foo-device",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidEmptyString",
+			"foo-app.",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidEmptyString",
+			"foo-app.",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidDashes",
+			"foo-app.-foo",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidDashes1",
+			"foo-app.foo-",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidUnderscore",
+			"foo-app.foo_device",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidDot",
+			"foo-app.foo.device",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidMinLength",
+			"foo-app.id",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+		{
+			"ValidAppIDInvalidMaxLength",
+			"foo-app.ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlbh",
+			ttnpb.EndDeviceIdentifiers{},
+			errors.IsInvalidArgument,
+		},
+	} {
+		t.Run(fmt.Sprintf("%s", tc.Name), func(t *testing.T) {
+			devIDs, err := ToDeviceID(tc.InputUID)
+			if tc.ExpectedError == nil {
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				if !a.So(devIDs, should.Resemble, tc.ExpectedIdentifier) {
+					t.FailNow()
+				}
+			} else {
+				if !a.So(tc.ExpectedError(err), should.BeTrue) {
+					t.FailNow()
 				}
 			}
 		})

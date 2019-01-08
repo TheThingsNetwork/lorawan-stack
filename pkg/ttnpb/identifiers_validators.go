@@ -20,12 +20,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-var errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{name}`")
+var errIdentifiers = errors.DefineInvalidArgument("identifiers", "invalid identifiers")
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
 	if err := ids.Validate(); err != nil {
-		return errInvalidField.WithCause(err)
+		return errIdentifiers.WithCause(err)
 	}
 	return nil
 }
@@ -33,7 +33,23 @@ func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *ApplicationIdentifiers) ValidateContext(context.Context) error {
 	if err := ids.Validate(); err != nil {
-		return errInvalidField.WithCause(err)
+		return errIdentifiers.WithCause(err)
+	}
+	return nil
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.Validate(); err != nil {
+		return errIdentifiers.WithCause(err)
+	}
+	return nil
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (ids *UserIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.Validate(); err != nil {
+		return errIdentifiers.WithCause(err)
 	}
 	return nil
 }

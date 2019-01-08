@@ -30,7 +30,6 @@ func TestValidate(t *testing.T) {
 
 	a.So(All(
 		Field("", NotRequired, MinLength(10)),
-		Field("alice", ID),
 	), should.BeNil)
 
 	a.So(All(
@@ -38,11 +37,9 @@ func TestValidate(t *testing.T) {
 		Field("", Email).DescribeFieldName("Email"),
 		Field("", NotRequired),
 		Field("foo@bar.com", NotRequired, Email),
-		Field("foo-app", ID),
 	), should.NotBeNil)
 
 	a.So(All(
 		Field("", Required).DescribeFieldName("Whatever"),
-		Field("foo-app", ID),
 	), should.NotBeNil)
 }

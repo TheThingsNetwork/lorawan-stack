@@ -102,7 +102,7 @@ func unexpectedValue(err interface {
 var (
 	errFieldHasMax        = errors.DefineInvalidArgument("field_with_max", "`{lorawan_field}` should be lower or equal to `{max}`", valueKey)
 	errFieldBound         = errors.DefineInvalidArgument("field_bound", "`{lorawan_field}` should be between `{min}` and `{max}`", valueKey)
-	errMissingIdentifiers = errors.DefineInvalidArgument("identifiers", "missing identifiers")
+	errMissingIdentifiers = errors.DefineInvalidArgument("missing_identifiers", "missing identifiers")
 	errParse              = errors.DefineInvalidArgument("parse", "could not parse `{lorawan_field}`", valueKey)
 	errUnknownField       = errors.DefineInvalidArgument("unknown_field", "unknown `{lorawan_field}`", valueKey)
 )

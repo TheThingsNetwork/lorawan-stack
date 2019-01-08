@@ -22,10 +22,12 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
 const separator = "."
+
+var errUniqueIdentifier = errors.DefineInvalidArgument("unique_identifier", "invalid unique identifier `{uid}`")
+var errFormat = errors.DefineInvalidArgument("format", "invalid format in value `{value}`")
 
 // ID returns the unique identifier of the specified identifiers.
 // This function panics if id is nil, if it's zero, or if it's is not a
@@ -78,8 +80,6 @@ func ID(ctx context.Context, id ttnpb.Identifiers) (res string) {
 	return
 }
 
-var errFormat = errors.DefineInvalidArgument("format", "invalid format in value `{value}`")
-
 // WithContext returns the given context.
 func WithContext(ctx context.Context, uid string) (context.Context, error) {
 	return ctx, nil
@@ -87,51 +87,57 @@ func WithContext(ctx context.Context, uid string) (context.Context, error) {
 
 // ToApplicationID returns the application identifier of the specified unique ID.
 func ToApplicationID(uid string) (ttnpb.ApplicationIdentifiers, error) {
-	if err := validate.ID(uid); err != nil {
-		return ttnpb.ApplicationIdentifiers{}, err
+	ids := ttnpb.ApplicationIdentifiers{ApplicationID: uid}
+	if err := ids.Validate(); err != nil {
+		return ttnpb.ApplicationIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
-	return ttnpb.ApplicationIdentifiers{ApplicationID: uid}, nil
+	return ids, nil
 }
 
 // ToClientID returns the client identifier of the specified unique ID.
 func ToClientID(uid string) (ttnpb.ClientIdentifiers, error) {
-	if err := validate.ID(uid); err != nil {
-		return ttnpb.ClientIdentifiers{}, err
+	ids := ttnpb.ClientIdentifiers{ClientID: uid}
+	if err := ids.Validate(); err != nil {
+		return ttnpb.ClientIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
-	return ttnpb.ClientIdentifiers{ClientID: uid}, nil
+	return ids, nil
 }
 
 // ToDeviceID returns the end device identifier of the specified unique ID.
 func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
 	if parts := strings.SplitN(uid, separator, 2); len(parts) == 2 {
-		id.ApplicationID = parts[0]
-		id.DeviceID = parts[1]
-	} else {
-		err = errFormat.WithAttributes("value", uid)
+		devIDs := ttnpb.EndDeviceIdentifiers{DeviceID: parts[1], ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: parts[0]}}
+		if err := devIDs.Validate(); err != nil {
+			return ttnpb.EndDeviceIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		}
+		return devIDs, nil
 	}
-	return
+	return ttnpb.EndDeviceIdentifiers{}, errFormat.WithAttributes("uid", uid)
 }
 
 // ToGatewayID returns the gateway identifier of the specified unique ID.
 func ToGatewayID(uid string) (ttnpb.GatewayIdentifiers, error) {
-	if err := validate.ID(uid); err != nil {
-		return ttnpb.GatewayIdentifiers{}, err
+	ids := ttnpb.GatewayIdentifiers{GatewayID: uid}
+	if err := ids.Validate(); err != nil {
+		return ttnpb.GatewayIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
-	return ttnpb.GatewayIdentifiers{GatewayID: uid}, nil
+	return ids, nil
 }
 
 // ToOrganizationID returns the organization identifier of the specified unique ID.
 func ToOrganizationID(uid string) (ttnpb.OrganizationIdentifiers, error) {
-	if err := validate.ID(uid); err != nil {
-		return ttnpb.OrganizationIdentifiers{}, err
+	ids := ttnpb.OrganizationIdentifiers{OrganizationID: uid}
+	if err := ids.Validate(); err != nil {
+		return ttnpb.OrganizationIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
-	return ttnpb.OrganizationIdentifiers{OrganizationID: uid}, nil
+	return ids, nil
 }
 
 // ToUserID returns the user identifier of the specified unique ID.
 func ToUserID(uid string) (ttnpb.UserIdentifiers, error) {
-	if err := validate.ID(uid); err != nil {
-		return ttnpb.UserIdentifiers{}, err
+	ids := ttnpb.UserIdentifiers{UserID: uid}
+	if err := ids.Validate(); err != nil {
+		return ttnpb.UserIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
-	return ttnpb.UserIdentifiers{UserID: uid}, nil
+	return ids, nil
 }

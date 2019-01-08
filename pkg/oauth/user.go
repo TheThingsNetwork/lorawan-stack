@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/validate"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
 )
 
@@ -154,12 +153,13 @@ type loginRequest struct {
 var errIncorrectPassword = errors.DefineUnauthenticated("password", "incorrect password")
 
 func (s *server) doLogin(ctx context.Context, userID, password string) error {
-	if err := validate.ID(userID); err != nil {
+	ids := &ttnpb.UserIdentifiers{UserID: userID}
+	if err := ids.ValidateContext(ctx); err != nil {
 		return err
 	}
 	user, err := s.store.GetUser(
 		ctx,
-		&ttnpb.UserIdentifiers{UserID: userID},
+		ids,
 		&types.FieldMask{Paths: []string{"password"}},
 	)
 	if err != nil {

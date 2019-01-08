@@ -3806,15 +3806,6 @@
       "file": "message_validators.go"
     }
   },
-  "error:pkg/ttnpb:field": {
-    "translations": {
-      "en": "invalid field `{name}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "identifiers_validators.go"
-    }
-  },
   "error:pkg/ttnpb:field_bound": {
     "translations": {
       "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
@@ -3834,6 +3825,15 @@
     }
   },
   "error:pkg/ttnpb:identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "identifiers_validators.go"
+    }
+  },
+  "error:pkg/ttnpb:missing_identifiers": {
     "translations": {
       "en": "missing identifiers"
     },
@@ -3968,6 +3968,15 @@
       "file": "unique.go"
     }
   },
+  "error:pkg/unique:unique_identifier": {
+    "translations": {
+      "en": "invalid unique identifier `{uid}`"
+    },
+    "description": {
+      "package": "pkg/unique",
+      "file": "unique.go"
+    }
+  },
   "error:pkg/validate:bandwidth": {
     "translations": {
       "en": "invalid bandwidth"
@@ -4020,15 +4029,6 @@
     "description": {
       "package": "pkg/validate",
       "file": "fieldmask.go"
-    }
-  },
-  "error:pkg/validate:id": {
-    "translations": {
-      "en": "`{id}` must be at least 3 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash or contain two or more consecutive dashes"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "id.go"
     }
   },
   "error:pkg/validate:min_slice_length": {

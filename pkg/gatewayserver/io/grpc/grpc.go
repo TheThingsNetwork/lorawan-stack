@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/validate"
 	"google.golang.org/grpc/peer"
 )
 
@@ -48,7 +47,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	if err = validate.ID(ids.GatewayID); err != nil {
+	if err = ids.ValidateContext(ctx); err != nil {
 		return
 	}
 	if err = rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
@@ -137,7 +136,7 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	if err := validate.ID(ids.GatewayID); err != nil {
+	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
