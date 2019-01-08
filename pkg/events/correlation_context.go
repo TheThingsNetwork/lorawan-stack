@@ -17,51 +17,56 @@ package events
 import (
 	"context"
 	"crypto/rand"
+	"sort"
 
 	"github.com/oklog/ulid"
 )
 
-type correlationKeyType struct{}
+type correlationKey struct{}
 
-var correlationKey = &correlationKeyType{}
+// ContextWithCorrelationID returns a derived context with the correlation IDs if they were not already in there.
+func ContextWithCorrelationID(ctx context.Context, cids ...string) context.Context {
+	cids = append(cids[:0:0], cids...)
+	sort.Strings(cids)
 
-// ContextWithCorrelationID returns a derived context with the correlation IDs if they were't already in there.
-func ContextWithCorrelationID(ctx context.Context, cid ...string) context.Context {
-	if v := ctx.Value(correlationKey); v != nil {
-		if existing, ok := v.([]string); ok {
-			for _, cid := range cid {
-				for _, existing := range existing {
-					if cid == existing {
-						return ctx // Correlation ID already in context, just return the original context.
-					}
-				}
-				return context.WithValue(ctx, correlationKey, append(existing, cid)) // Correlation ID was not yet in the context; add cid.
-			}
+	existing, ok := ctx.Value(correlationKey{}).([]string)
+	if !ok {
+		return context.WithValue(ctx, correlationKey{}, cids)
+	}
+
+	// Since existing and cids are sorted, merging them will result in a sorted slice.
+	// See https://en.wikipedia.org/wiki/Merge_sort
+	merged := make([]string, 0, len(existing)+len(cids))
+	a, b := existing, cids
+	var i, j int
+	for i < len(a) && j < len(b) {
+		if a[i] < b[j] {
+			merged = append(merged, a[i])
+			i++
+		} else if a[i] > b[j] {
+			merged = append(merged, b[j])
+			j++
+		} else {
+			merged = append(merged, a[i])
+			i++
+			j++
 		}
 	}
-	return context.WithValue(ctx, correlationKey, cid) // Empty (or invalid) context; add cid.
+	if i < len(a) {
+		merged = append(merged, a[i:]...)
+	} else if j < len(b) {
+		merged = append(merged, b[j:]...)
+	}
+	return context.WithValue(ctx, correlationKey{}, merged)
 }
 
 // CorrelationIDsFromContext returns the correlation IDs that are attached to the context.
 func CorrelationIDsFromContext(ctx context.Context) []string {
-	if v := ctx.Value(correlationKey); v != nil {
-		if cids, ok := v.([]string); ok {
-			return cids
-		}
+	cids, ok := ctx.Value(correlationKey{}).([]string)
+	if !ok {
+		return nil
 	}
-	return nil
-}
-
-// ContextWithEnsuredCorrelationID ensures there is at least one correlation ID set in the context.
-// The returned context will either be the original context (if an ID was set)
-// or a derived context with a random correlation ID.
-func ContextWithEnsuredCorrelationID(ctx context.Context) context.Context {
-	if v := ctx.Value(correlationKey); v != nil {
-		if cids, ok := v.([]string); ok && len(cids) > 0 {
-			return ctx
-		}
-	}
-	return ContextWithCorrelationID(ctx, NewCorrelationID())
+	return cids
 }
 
 // NewCorrelationID returns a new random correlation ID.

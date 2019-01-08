@@ -27,25 +27,36 @@ func TestCorrelationContext(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := test.Context()
-	a.So(events.CorrelationIDsFromContext(ctx), should.BeEmpty)
-
-	// Add random correlation ID:
-	ctx = events.ContextWithEnsuredCorrelationID(ctx)
 	correlationIDs := events.CorrelationIDsFromContext(ctx)
-	a.So(correlationIDs, should.HaveLength, 1)
-
-	// Do not add random correlation ID again:
-	ctx = events.ContextWithEnsuredCorrelationID(ctx)
-	correlationIDs = events.CorrelationIDsFromContext(ctx)
-	a.So(correlationIDs, should.HaveLength, 1)
+	a.So(correlationIDs, should.BeEmpty)
 
 	// Add correlation ID:
 	ctx = events.ContextWithCorrelationID(ctx, "foo")
 	correlationIDs = events.CorrelationIDsFromContext(ctx)
-	a.So(correlationIDs, should.HaveLength, 2)
+	a.So(correlationIDs, should.Resemble, []string{"foo"})
 
-	// Do not add correlation ID again:
-	ctx = events.ContextWithCorrelationID(ctx, "foo")
+	// Add different correlation ID:
+	ctx = events.ContextWithCorrelationID(ctx, "baz")
 	correlationIDs = events.CorrelationIDsFromContext(ctx)
-	a.So(correlationIDs, should.HaveLength, 2)
+	a.So(correlationIDs, should.Resemble, []string{"baz", "foo"})
+
+	// Only add new correlation IDs:
+	ctx = events.ContextWithCorrelationID(ctx, "bar", "foo")
+	correlationIDs = events.CorrelationIDsFromContext(ctx)
+	a.So(correlationIDs, should.Resemble, []string{"bar", "baz", "foo"})
+
+	// Do not mutate the passed slice
+	base := []string{
+		"b",
+		"a",
+		"c",
+	}
+	ctx = events.ContextWithCorrelationID(ctx, base...)
+	correlationIDs = events.CorrelationIDsFromContext(ctx)
+	a.So(correlationIDs, should.Resemble, []string{"a", "b", "bar", "baz", "c", "foo"})
+	a.So(base, should.Resemble, []string{
+		"b",
+		"a",
+		"c",
+	})
 }

@@ -125,8 +125,8 @@ func Example() {
 	)
 
 	// It's nice to be able to correlate events; we use a Correlation ID for that.
-	// In most cases, there will already be a correlation ID in the context; this func will add one if there isn't.
-	ctx = events.ContextWithEnsuredCorrelationID(ctx)
+	// In most cases, there will already be a correlation ID in the context; this function will append a new one to the ones already in the context.
+	ctx = events.ContextWithCorrelationID(ctx, events.NewCorrelationID())
 
 	// Publishing an event to the events package will dispatch it on the "global" event pubsub.
 	events.Publish(adrSendEvent(ctx, dev.EndDeviceIdentifiers, requests))
