@@ -27,6 +27,50 @@ const applications = [ ...new Array(APPLICATIONS_COUNT).keys() ]
     updated_at: faker.date.recent(),
   }))
 
+const rights = {
+  application: [
+    'RIGHT_APPLICATION_INFO',
+    'RIGHT_APPLICATION_SETTINGS_BASIC',
+    'RIGHT_APPLICATION_SETTINGS_API_KEYS',
+    'RIGHT_APPLICATION_SETTINGS_COLLABORATORS',
+    'RIGHT_APPLICATION_DELETE',
+    'RIGHT_APPLICATION_DEVICES_READ',
+    'RIGHT_APPLICATION_DEVICES_WRITE',
+    'RIGHT_APPLICATION_DEVICES_READ_KEYS',
+    'RIGHT_APPLICATION_DEVICES_WRITE_KEYS',
+    'RIGHT_APPLICATION_TRAFFIC_READ',
+    'RIGHT_APPLICATION_TRAFFIC_UP_WRITE',
+    'RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE',
+    'RIGHT_APPLICATION_LINK',
+  ],
+}
+
+const getRights = function (from, min, max) {
+  const count = Math.floor(Math.random() * (max - min)) + min
+
+  const res = []
+  for (let i = 0; i < count; i++) {
+    res.push(from[i])
+  }
+
+  return res
+}
+
+const applicationsApiKeys = applications.reduce(function (acc, curr, idx, apps) {
+  const keysCount = Math.floor(Math.random() * 5) + 1
+
+  for (let i = 0; i < keysCount; i++) {
+    acc.push({
+      id: faker.random.uuid(),
+      application_id: curr.application_id,
+      name: faker.lorem.words(),
+      key: faker.random.uuid(),
+      rights: getRights(rights.application, 1, 5),
+    })
+  }
+
+  return acc
+}, [])
 
 const devices = [ ...new Array(DEVICES_COUNT).keys() ]
   .map(function () {
@@ -72,4 +116,4 @@ const gateways = [ ...new Array(GATEWAYS_COUNT).keys() ]
     antennas: [ gatewayAntennas[idx] ],
   }))
 
-export default { devices, applications, gateways }
+export default { devices, applications, gateways, applicationsApiKeys }
