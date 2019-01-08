@@ -141,7 +141,7 @@ class Tabular extends React.Component {
     return (
       <div className={className}>
         <Overlay visible={loading} loading={loading}>
-          <Table>
+          <Table className={style.tabular}>
             <Table.Head>
               {columns}
             </Table.Head>
