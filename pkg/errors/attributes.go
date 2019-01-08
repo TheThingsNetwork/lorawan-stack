@@ -15,10 +15,8 @@
 package errors
 
 import (
-	"encoding/hex"
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 type attributer interface {
@@ -37,51 +35,15 @@ func supported(v interface{}) interface{} {
 	}
 	rv := reflect.Indirect(reflect.ValueOf(v))
 	switch rv.Type().Kind() {
-	case reflect.Bool:
-		return rv.Bool()
 	case reflect.Int:
 		return int(rv.Int())
-	case reflect.Int8:
-		return int8(rv.Int())
-	case reflect.Int16:
-		return int16(rv.Int())
-	case reflect.Int32:
-		return int32(rv.Int())
-	case reflect.Int64:
-		return rv.Int()
-	case reflect.Uint:
-		return uint(rv.Uint())
-	case reflect.Uint8:
-		return uint8(rv.Uint())
-	case reflect.Uint16:
-		return uint16(rv.Uint())
-	case reflect.Uint32:
-		return uint32(rv.Uint())
-	case reflect.Uint64:
-		return rv.Uint()
-	case reflect.Uintptr:
-		return uintptr(rv.Uint())
-	case reflect.Float32:
-		return float32(rv.Float())
 	case reflect.Float64:
 		return rv.Float()
-	case reflect.Complex64:
-		return complex64(rv.Complex())
-	case reflect.Complex128:
-		return rv.Complex()
 	case reflect.String:
 		return rv.String()
-	case reflect.Slice, reflect.Array:
-		if rv.Type().Elem().Kind() != reflect.Uint8 {
-			break
-		}
-		buf := make([]byte, rv.Len())
-		for i := 0; i < rv.Len(); i++ {
-			buf[i] = byte(rv.Index(i).Uint())
-		}
-		return strings.ToUpper(hex.EncodeToString(buf))
+	default:
+		return fmt.Sprintf("%v", v)
 	}
-	panic(fmt.Sprintf("only primitive types are supported as error message format arguments (got %T)", v))
 }
 
 func kvToMap(kv ...interface{}) (map[string]interface{}, error) {

@@ -19,11 +19,10 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestAttributes(t *testing.T) {
+func TestAttributesError(t *testing.T) {
 	a := assertions.New(t)
 
 	var errInvalidFoo = errors.DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
@@ -45,30 +44,19 @@ func TestAttributes(t *testing.T) {
 	a.So(errors.PublicAttributes(err2), should.Resemble, map[string]interface{}{"foo": "bar"})
 }
 
-func TestSupportedAttributes(t *testing.T) {
+func TestAttributes(t *testing.T) {
 	tt := []struct {
 		Name   string
 		V      interface{}
 		Expect interface{}
 	}{
-		{"bool", false, false},
 		{"int", int(42), int(42)},
-		{"int8", int8(42), int8(42)},
-		{"int16", int16(42), int16(42)},
-		{"int32", int32(42), int32(42)},
-		{"int64", int64(42), int64(42)},
-		{"uint", uint(42), uint(42)},
-		{"uint8", uint8(42), uint8(42)},
-		{"uint16", uint16(42), uint16(42)},
-		{"uint32", uint32(42), uint32(42)},
-		{"uint64", uint64(42), uint64(42)},
-		{"uintptr", uintptr(42), uintptr(42)},
-		{"float32", float32(42), float32(42)},
 		{"float64", float64(42), float64(42)},
-		{"complex64", complex64(42), complex64(42)},
-		{"complex128", complex128(42), complex128(42)},
 		{"string", "foo", "foo"},
-		{"eui", types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}, "0102030405060708"},
+		{"nil", nil, "<nil>"},
+		{"complex64", complex(42, 42), "(42+42i)"},
+		{"uint32", uint32(42), "42"},
+		{"array", [5]int{1, 2, 3}, "[1 2 3 0 0]"},
 	}
 
 	for _, tt := range tt {
@@ -76,5 +64,4 @@ func TestSupportedAttributes(t *testing.T) {
 			assertions.New(t).So(errors.Supported(tt.V), should.Equal, tt.Expect)
 		})
 	}
-
 }
