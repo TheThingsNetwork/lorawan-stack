@@ -25,6 +25,7 @@ import (
 	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -46,8 +47,8 @@ type JoinServer struct {
 	entropyMu *sync.Mutex
 	entropy   io.Reader
 
-	networkCryptoService     NetworkCryptoService
-	applicationCryptoService ApplicationCryptoService
+	networkCryptoService     cryptoservices.Network
+	applicationCryptoService cryptoservices.Application
 
 	grpc struct {
 		nsJs      nsJsServer

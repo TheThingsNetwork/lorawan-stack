@@ -19,8 +19,8 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -65,27 +65,19 @@ func (c CryptoServiceConfig) dial(ctx context.Context) (*grpc.ClientConn, error)
 }
 
 // DialNetworkCryptoService dials the crypto service for network layer operations.
-func (c Config) DialNetworkCryptoService(ctx context.Context, keyVault crypto.KeyVault) (NetworkCryptoService, error) {
+func (c Config) DialNetworkCryptoService(ctx context.Context, keyVault crypto.KeyVault) (cryptoservices.Network, error) {
 	conn, err := c.NetworkCryptoService.dial(ctx)
 	if err != nil {
 		return nil, err
 	}
-	client := ttnpb.NewNetworkCryptoServiceClient(conn)
-	return &NetworkCryptoServiceRPCClient{
-		Client:   client,
-		KeyVault: keyVault,
-	}, nil
+	return cryptoservices.NewNetworkRPCClient(conn, keyVault), nil
 }
 
 // DialApplicationCryptoService dials the crypto service for application layer operations.
-func (c Config) DialApplicationCryptoService(ctx context.Context, keyVault crypto.KeyVault) (ApplicationCryptoService, error) {
+func (c Config) DialApplicationCryptoService(ctx context.Context, keyVault crypto.KeyVault) (cryptoservices.Application, error) {
 	conn, err := c.ApplicationCryptoService.dial(ctx)
 	if err != nil {
 		return nil, err
 	}
-	client := ttnpb.NewApplicationCryptoServiceClient(conn)
-	return &ApplicationCryptoServiceRPCClient{
-		Client:   client,
-		KeyVault: keyVault,
-	}, nil
+	return cryptoservices.NewApplicationRPCClient(conn, keyVault), nil
 }

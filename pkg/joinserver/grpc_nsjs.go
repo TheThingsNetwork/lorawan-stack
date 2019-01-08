@@ -24,6 +24,7 @@ import (
 
 	"github.com/oklog/ulid"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -215,10 +216,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			switch req.SelectedMACVersion {
 			case ttnpb.MAC_V1_1:
 				if dev.RootKeys != nil {
-					memCryptoService := &MemCryptoService{
-						RootKeys: *dev.RootKeys,
-						KeyVault: srv.JS.KeyVault,
-					}
+					memCryptoService := cryptoservices.NewMemory(*dev.RootKeys, srv.JS.KeyVault)
 					if dev.RootKeys.NwkKey != nil {
 						networkCryptoService = memCryptoService
 					}
@@ -229,10 +227,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 				if dev.RootKeys != nil {
 					if dev.RootKeys.AppKey != nil {
-						memCryptoService := &MemCryptoService{
-							RootKeys: *dev.RootKeys,
-							KeyVault: srv.JS.KeyVault,
-						}
+						memCryptoService := cryptoservices.NewMemory(*dev.RootKeys, srv.JS.KeyVault)
 						networkCryptoService = memCryptoService
 						applicationCryptoService = memCryptoService
 					}
@@ -247,31 +242,26 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errNoAppKey
 			}
 
-			cryptoIDs := ttnpb.CryptoServiceEndDeviceIdentifiers{
-				LoRaWANVersion: req.SelectedMACVersion,
-				JoinEUI:        pld.JoinEUI,
-				DevEUI:         pld.DevEUI,
-			}
-			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoIDs, rawPayload[:19])
+			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, rawPayload[:19])
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
 			if !bytes.Equal(reqMIC[:], rawPayload[19:]) {
 				return nil, nil, errMICMismatch
 			}
-			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoIDs, 0xff, pld.DevNonce, b)
+			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, 0xff, pld.DevNonce, b)
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
-			enc, err := networkCryptoService.EncryptJoinAccept(ctx, cryptoIDs, append(b[1:], resMIC[:]...))
+			enc, err := networkCryptoService.EncryptJoinAccept(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, append(b[1:], resMIC[:]...))
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			fNwkSIntKey, sNwkSIntKey, nwkSEncKey, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoIDs, jn, pld.DevNonce, req.NetID)
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoIDs, jn, pld.DevNonce, req.NetID)
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
@@ -279,7 +269,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				SessionKeyID: skID[:],
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-					Key:      fNwkSIntKey[:],
+					Key:      nwkSKeys.FNwkSIntKey[:],
 					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
@@ -291,12 +281,12 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			if req.SelectedMACVersion == ttnpb.MAC_V1_1 {
 				sessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-					Key:      sNwkSIntKey[:],
+					Key:      nwkSKeys.SNwkSIntKey[:],
 					KEKLabel: "",
 				}
 				sessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-					Key:      nwkSEncKey[:],
+					Key:      nwkSKeys.NwkSEncKey[:],
 					KEKLabel: "",
 				}
 			}
