@@ -31,12 +31,16 @@ const m = defineMessages({
 
 const headers = [
   {
-    name: 'name',
-    displayName: sharedMessages.name,
+    name: 'gateway_id',
+    displayName: m.gtwId,
   },
   {
-    name: 'description',
-    displayName: sharedMessages.description,
+    name: 'eui',
+    displayName: 'EUI',
+  },
+  {
+    name: 'name',
+    displayName: sharedMessages.name,
   },
   {
     name: 'antennasCount',
