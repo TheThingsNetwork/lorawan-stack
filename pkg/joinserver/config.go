@@ -71,7 +71,7 @@ func (c Config) DialNetworkCryptoService(ctx context.Context, keyVault crypto.Ke
 		return nil, err
 	}
 	client := ttnpb.NewNetworkCryptoServiceClient(conn)
-	return &rpcNetworkCryptoService{
+	return &NetworkCryptoServiceRPCClient{
 		Client:   client,
 		KeyVault: keyVault,
 	}, nil
@@ -84,7 +84,7 @@ func (c Config) DialApplicationCryptoService(ctx context.Context, keyVault crypt
 		return nil, err
 	}
 	client := ttnpb.NewApplicationCryptoServiceClient(conn)
-	return &rpcApplicationCryptoService{
+	return &ApplicationCryptoServiceRPCClient{
 		Client:   client,
 		KeyVault: keyVault,
 	}, nil

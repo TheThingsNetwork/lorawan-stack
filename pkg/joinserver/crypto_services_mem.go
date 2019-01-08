@@ -23,12 +23,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-type memCryptoService struct {
+type MemCryptoService struct {
 	crypto.KeyVault
 	ttnpb.RootKeys
 }
 
-func (d *memCryptoService) getNwkKey(ids ttnpb.CryptoServiceEndDeviceIdentifiers) (key types.AES128Key, err error) {
+func (d *MemCryptoService) getNwkKey(ids ttnpb.CryptoServiceEndDeviceIdentifiers) (key types.AES128Key, err error) {
 	switch ids.LoRaWANVersion {
 	case ttnpb.MAC_V1_1:
 		if d.NwkKey == nil {
@@ -51,7 +51,7 @@ func (d *memCryptoService) getNwkKey(ids ttnpb.CryptoServiceEndDeviceIdentifiers
 	}
 }
 
-func (d *memCryptoService) JoinRequestMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) (res [4]byte, err error) {
+func (d *MemCryptoService) JoinRequestMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) (res [4]byte, err error) {
 	key, err := d.getNwkKey(ids)
 	if err != nil {
 		return
@@ -59,7 +59,7 @@ func (d *memCryptoService) JoinRequestMIC(ctx context.Context, ids ttnpb.CryptoS
 	return crypto.ComputeJoinRequestMIC(key, payload)
 }
 
-func (d *memCryptoService) JoinAcceptMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, joinReqType byte, dn types.DevNonce, payload []byte) (res [4]byte, err error) {
+func (d *MemCryptoService) JoinAcceptMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, joinReqType byte, dn types.DevNonce, payload []byte) (res [4]byte, err error) {
 	key, err := d.getNwkKey(ids)
 	if err != nil {
 		return
@@ -75,7 +75,7 @@ func (d *memCryptoService) JoinAcceptMIC(ctx context.Context, ids ttnpb.CryptoSe
 	}
 }
 
-func (d *memCryptoService) EncryptJoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
+func (d *MemCryptoService) EncryptJoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
 	key, err := d.getNwkKey(ids)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (d *memCryptoService) EncryptJoinAccept(ctx context.Context, ids ttnpb.Cryp
 	return crypto.EncryptJoinAccept(key, payload)
 }
 
-func (d *memCryptoService) EncryptRejoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
+func (d *MemCryptoService) EncryptRejoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
 	if ids.LoRaWANVersion != ttnpb.MAC_V1_1 {
 		panic("This statement is unreachable. Please version check.")
 	}
@@ -98,7 +98,7 @@ func (d *memCryptoService) EncryptRejoinAccept(ctx context.Context, ids ttnpb.Cr
 	return crypto.EncryptJoinAccept(jsEncKey, payload)
 }
 
-func (d *memCryptoService) DeriveNwkSKeys(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (fNwkSIntKey, sNwkSIntKey, nwkSEncKey types.AES128Key, err error) {
+func (d *MemCryptoService) DeriveNwkSKeys(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (fNwkSIntKey, sNwkSIntKey, nwkSEncKey types.AES128Key, err error) {
 	switch ids.LoRaWANVersion {
 	case ttnpb.MAC_V1_1:
 		if d.NwkKey == nil {
@@ -132,7 +132,7 @@ func (d *memCryptoService) DeriveNwkSKeys(ctx context.Context, ids ttnpb.CryptoS
 	return
 }
 
-func (d *memCryptoService) DeriveAppSKey(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (appSKey types.AES128Key, err error) {
+func (d *MemCryptoService) DeriveAppSKey(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (appSKey types.AES128Key, err error) {
 	if d.AppKey == nil {
 		err = errNoAppKey
 		return

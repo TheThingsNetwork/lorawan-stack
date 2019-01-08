@@ -215,7 +215,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			switch req.SelectedMACVersion {
 			case ttnpb.MAC_V1_1:
 				if dev.RootKeys != nil {
-					memCryptoService := &memCryptoService{
+					memCryptoService := &MemCryptoService{
 						RootKeys: *dev.RootKeys,
 						KeyVault: srv.JS.KeyVault,
 					}
@@ -229,7 +229,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 				if dev.RootKeys != nil {
 					if dev.RootKeys.AppKey != nil {
-						memCryptoService := &memCryptoService{
+						memCryptoService := &MemCryptoService{
 							RootKeys: *dev.RootKeys,
 							KeyVault: srv.JS.KeyVault,
 						}

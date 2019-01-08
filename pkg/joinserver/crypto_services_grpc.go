@@ -23,12 +23,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-type rpcNetworkCryptoService struct {
+type NetworkCryptoServiceRPCClient struct {
 	Client ttnpb.NetworkCryptoServiceClient
 	crypto.KeyVault
 }
 
-func (s *rpcNetworkCryptoService) JoinRequestMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) (mic [4]byte, err error) {
+func (s *NetworkCryptoServiceRPCClient) JoinRequestMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) (mic [4]byte, err error) {
 	res, err := s.Client.JoinRequestMIC(ctx, &ttnpb.CryptoServicePayloadRequest{
 		CryptoServiceEndDeviceIdentifiers: ids,
 		Payload:                           payload,
@@ -40,7 +40,7 @@ func (s *rpcNetworkCryptoService) JoinRequestMIC(ctx context.Context, ids ttnpb.
 	return
 }
 
-func (s *rpcNetworkCryptoService) JoinAcceptMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, joinReqType byte, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
+func (s *NetworkCryptoServiceRPCClient) JoinAcceptMIC(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, joinReqType byte, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
 	res, err := s.Client.JoinAcceptMIC(ctx, &ttnpb.JoinAcceptMICRequest{
 		CryptoServicePayloadRequest: ttnpb.CryptoServicePayloadRequest{
 			CryptoServiceEndDeviceIdentifiers: ids,
@@ -56,7 +56,7 @@ func (s *rpcNetworkCryptoService) JoinAcceptMIC(ctx context.Context, ids ttnpb.C
 	return
 }
 
-func (s *rpcNetworkCryptoService) EncryptJoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
+func (s *NetworkCryptoServiceRPCClient) EncryptJoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
 	res, err := s.Client.EncryptJoinAccept(ctx, &ttnpb.CryptoServicePayloadRequest{
 		CryptoServiceEndDeviceIdentifiers: ids,
 		Payload:                           payload,
@@ -67,7 +67,7 @@ func (s *rpcNetworkCryptoService) EncryptJoinAccept(ctx context.Context, ids ttn
 	return res.Payload, nil
 }
 
-func (s *rpcNetworkCryptoService) EncryptRejoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
+func (s *NetworkCryptoServiceRPCClient) EncryptRejoinAccept(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, payload []byte) ([]byte, error) {
 	res, err := s.Client.EncryptRejoinAccept(ctx, &ttnpb.CryptoServicePayloadRequest{
 		CryptoServiceEndDeviceIdentifiers: ids,
 		Payload:                           payload,
@@ -78,7 +78,7 @@ func (s *rpcNetworkCryptoService) EncryptRejoinAccept(ctx context.Context, ids t
 	return res.Payload, nil
 }
 
-func (s *rpcNetworkCryptoService) DeriveNwkSKeys(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (fNwkSIntKey, sNwkSIntKey, nwkSEncKey types.AES128Key, err error) {
+func (s *NetworkCryptoServiceRPCClient) DeriveNwkSKeys(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (fNwkSIntKey, sNwkSIntKey, nwkSEncKey types.AES128Key, err error) {
 	res, err := s.Client.DeriveNwkSKeys(ctx, &ttnpb.DeriveSessionKeysRequest{
 		CryptoServiceEndDeviceIdentifiers: ids,
 		JoinNonce:                         jn,
@@ -103,12 +103,12 @@ func (s *rpcNetworkCryptoService) DeriveNwkSKeys(ctx context.Context, ids ttnpb.
 	return
 }
 
-type rpcApplicationCryptoService struct {
+type ApplicationCryptoServiceRPCClient struct {
 	Client ttnpb.ApplicationCryptoServiceClient
 	crypto.KeyVault
 }
 
-func (s *rpcApplicationCryptoService) DeriveAppSKey(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (appSKey types.AES128Key, err error) {
+func (s *ApplicationCryptoServiceRPCClient) DeriveAppSKey(ctx context.Context, ids ttnpb.CryptoServiceEndDeviceIdentifiers, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (appSKey types.AES128Key, err error) {
 	res, err := s.Client.DeriveAppSKey(ctx, &ttnpb.DeriveSessionKeysRequest{
 		CryptoServiceEndDeviceIdentifiers: ids,
 		JoinNonce:                         jn,

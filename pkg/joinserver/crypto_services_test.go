@@ -78,7 +78,7 @@ func TestCryptoServices(t *testing.T) {
 
 	for _, svc := range []joinserver.NetworkCryptoService{
 		memSvc,
-		&joinserver.RPCNetworkCryptoService{
+		&joinserver.NetworkCryptoServiceRPCClient{
 			Client:   ttnpb.NewNetworkCryptoServiceClient(conn),
 			KeyVault: keyVault,
 		},
@@ -293,7 +293,7 @@ func TestCryptoServices(t *testing.T) {
 
 	for _, svc := range []joinserver.ApplicationCryptoService{
 		memSvc,
-		&joinserver.RPCApplicationCryptoService{
+		&joinserver.ApplicationCryptoServiceRPCClient{
 			Client:   ttnpb.NewApplicationCryptoServiceClient(conn),
 			KeyVault: keyVault,
 		},
