@@ -45,6 +45,9 @@ export default {
       },
       application: {
         get: stubs.application.get,
+        apiKeys: {
+          list: stubs.application.apiKeys.list,
+        },
       },
       devices: {
         list: stubs.devices.list,

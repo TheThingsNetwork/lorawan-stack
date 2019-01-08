@@ -54,6 +54,15 @@ export default {
         }
       }, 750))
     },
+    apiKeys: {
+      list (applicationId, params) {
+        return genericSearch(
+          'applicationsApiKeys',
+          params,
+          k => k.application_id === applicationId
+        )
+      },
+    },
   },
   devices: {
     list (appId, params) {
