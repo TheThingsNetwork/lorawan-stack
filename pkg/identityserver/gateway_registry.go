@@ -109,7 +109,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
 	var gtwRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		callerRights, err := is.getRights(ctx)
+		callerRights, _, err := is.getRights(ctx)
 		if err != nil {
 			return nil, err
 		}

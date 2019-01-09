@@ -20,81 +20,85 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func (is *IdentityServer) getRights(ctx context.Context) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+func (is *IdentityServer) getRights(ctx context.Context) (entity map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, universal *ttnpb.Rights, err error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	entityRights, err := is.entityRights(ctx, authInfo)
-	return entityRights, err
+	entity, err = is.entityRights(ctx, authInfo)
+	if err != nil {
+		return nil, nil, err
+	}
+	universal = authInfo.UniversalRights
+	return
 }
 
 // ApplicationRights returns the rights the caller has on the given application.
 func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := is.getRights(ctx)
+	entity, universal, err := is.getRights(ctx)
 	if err != nil {
 		return nil, err
 	}
-	for ids, rights := range rights {
+	for ids, rights := range entity {
 		if ids := ids.GetApplicationIDs(); ids != nil && ids.ApplicationID == appIDs.ApplicationID {
-			return rights, nil
+			return rights.Union(universal), nil
 		}
 	}
-	return &ttnpb.Rights{}, nil
+	return universal, nil
 }
 
 // ClientRights returns the rights the caller has on the given client.
 func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := is.getRights(ctx)
+	entity, universal, err := is.getRights(ctx)
 	if err != nil {
 		return nil, err
 	}
-	for ids, rights := range rights {
+	for ids, rights := range entity {
 		if ids := ids.GetClientIDs(); ids != nil && ids.ClientID == cliIDs.ClientID {
-			return rights, nil
+			return rights.Union(universal), nil
 		}
 	}
-	return &ttnpb.Rights{}, nil
+	return universal, nil
 }
 
 // GatewayRights returns the rights the caller has on the given gateway.
 func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := is.getRights(ctx)
+	entity, universal, err := is.getRights(ctx)
 	if err != nil {
 		return nil, err
 	}
-	for ids, rights := range rights {
+	for ids, rights := range entity {
 		if ids := ids.GetGatewayIDs(); ids != nil && ids.GatewayID == gtwIDs.GatewayID {
-			return rights, nil
+			return rights.Union(universal), nil
 		}
 	}
-	return &ttnpb.Rights{}, nil
+	return universal, nil
 }
 
 // OrganizationRights returns the rights the caller has on the given organization.
 func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := is.getRights(ctx)
+	entity, universal, err := is.getRights(ctx)
 	if err != nil {
 		return nil, err
 	}
-	for ids, rights := range rights {
+	for ids, rights := range entity {
 		if ids := ids.GetOrganizationIDs(); ids != nil && ids.OrganizationID == orgIDs.OrganizationID {
-			return rights, nil
+			return rights.Union(universal), nil
 		}
 	}
-	return &ttnpb.Rights{}, nil
+	return universal, nil
 }
 
 // UserRights returns the rights the caller has on the given user.
 func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := is.getRights(ctx)
+	entity, universal, err := is.getRights(ctx)
 	if err != nil {
 		return nil, err
 	}
-	for ids, rights := range rights {
+	for ids, rights := range entity {
 		if ids := ids.GetUserIDs(); ids != nil && ids.UserID == userIDs.UserID {
-			return rights, nil
+			return rights.Union(universal), nil
 		}
 	}
-	return &ttnpb.Rights{}, nil
+	return universal, nil
 }

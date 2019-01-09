@@ -136,6 +136,23 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 	})
 }
 
+func TestUserAccessClusterAuth(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := population.Users[defaultUserIdx].UserIdentifiers
+
+		reg := ttnpb.NewUserAccessClient(cc)
+
+		rights, err := reg.ListRights(ctx, &userID, is.WithClusterAuth())
+
+		a.So(rights, should.NotBeNil)
+		a.So(ttnpb.AllRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+	})
+}
+
 func TestUserAccessCRUD(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()

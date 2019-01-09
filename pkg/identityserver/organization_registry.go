@@ -110,7 +110,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
 	var orgRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		callerRights, err := is.getRights(ctx)
+		callerRights, _, err := is.getRights(ctx)
 		if err != nil {
 			return nil, err
 		}

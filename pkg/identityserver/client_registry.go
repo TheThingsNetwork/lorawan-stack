@@ -136,7 +136,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
 	var cliRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		callerRights, err := is.getRights(ctx)
+		callerRights, _, err := is.getRights(ctx)
 		if err != nil {
 			return nil, err
 		}

@@ -172,6 +172,24 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 	})
 }
 
+func TestOrganizationAccessClusterAuth(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := defaultUser.UserIdentifiers
+		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
+
+		reg := ttnpb.NewOrganizationAccessClient(cc)
+
+		rights, err := reg.ListRights(ctx, &organizationID, is.WithClusterAuth())
+
+		a.So(rights, should.NotBeNil)
+		a.So(ttnpb.AllRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+	})
+}
+
 func TestOrganizationAccessCRUD(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()

@@ -109,7 +109,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (apps *ttnpb.Applications, err error) {
 	var appRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
-		callerRights, err := is.getRights(ctx)
+		callerRights, _, err := is.getRights(ctx)
 		if err != nil {
 			return nil, err
 		}

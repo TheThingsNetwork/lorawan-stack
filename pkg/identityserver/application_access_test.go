@@ -172,6 +172,24 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 	})
 }
 
+func TestApplicationAccessClusterAuth(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := defaultUser.UserIdentifiers
+		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
+
+		reg := ttnpb.NewApplicationAccessClient(cc)
+
+		rights, err := reg.ListRights(ctx, &applicationID, is.WithClusterAuth())
+
+		a.So(rights, should.NotBeNil)
+		a.So(ttnpb.AllRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+	})
+}
+
 func TestApplicationAccessCRUD(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()

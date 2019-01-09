@@ -172,6 +172,24 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 	})
 }
 
+func TestGatewayAccessClusterAuth(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := defaultUser.UserIdentifiers
+		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
+
+		reg := ttnpb.NewGatewayAccessClient(cc)
+
+		rights, err := reg.ListRights(ctx, &gatewayID, is.WithClusterAuth())
+
+		a.So(rights, should.NotBeNil)
+		a.So(ttnpb.AllRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+	})
+}
+
 func TestGatewayAccessCRUD(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()

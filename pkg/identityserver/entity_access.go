@@ -228,6 +228,9 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	} else if accessToken := authInfo.GetOAuthAccessToken(); accessToken != nil {
 		return nil
 	}
+	if len(authInfo.UniversalRights.GetRights()) > 0 {
+		return nil
+	}
 	return errUnauthenticated
 }
 
