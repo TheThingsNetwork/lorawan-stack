@@ -148,13 +148,15 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, ids ttnpb.EndD
 type networkRPCServer struct {
 	Network Network
 	crypto.KeyVault
+	KEKLabelFunc func(context.Context) (string, error)
 }
 
 // NewNetworkRPCServer returns a ttnpb.NetworkCryptoServiceServer using the given service and key vault.
-func NewNetworkRPCServer(network Network, keyVault crypto.KeyVault) ttnpb.NetworkCryptoServiceServer {
+func NewNetworkRPCServer(network Network, keyVault crypto.KeyVault, kekLabelFunc func(context.Context) (string, error)) ttnpb.NetworkCryptoServiceServer {
 	return &networkRPCServer{
-		Network:  network,
-		KeyVault: keyVault,
+		Network:      network,
+		KeyVault:     keyVault,
+		KEKLabelFunc: kekLabelFunc,
 	}
 }
 
@@ -203,16 +205,22 @@ func (s *networkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.Derive
 	if err != nil {
 		return nil, err
 	}
+	kekLabel := ""
+	if s.KEKLabelFunc != nil {
+		if kekLabel, err = s.KEKLabelFunc(ctx); err != nil {
+			return nil, err
+		}
+	}
 	res := &ttnpb.NwkSKeysResponse{}
-	res.FNwkSIntKey, err = cryptoutil.WrapAES128Key(nwkSKeys.FNwkSIntKey, "", s.KeyVault)
+	res.FNwkSIntKey, err = cryptoutil.WrapAES128Key(nwkSKeys.FNwkSIntKey, kekLabel, s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	res.SNwkSIntKey, err = cryptoutil.WrapAES128Key(nwkSKeys.SNwkSIntKey, "", s.KeyVault)
+	res.SNwkSIntKey, err = cryptoutil.WrapAES128Key(nwkSKeys.SNwkSIntKey, kekLabel, s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	res.NwkSEncKey, err = cryptoutil.WrapAES128Key(nwkSKeys.NwkSEncKey, "", s.KeyVault)
+	res.NwkSEncKey, err = cryptoutil.WrapAES128Key(nwkSKeys.NwkSEncKey, kekLabel, s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
@@ -222,13 +230,15 @@ func (s *networkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.Derive
 type applicationRPCServer struct {
 	Application Application
 	crypto.KeyVault
+	KEKLabelFunc func(context.Context) (string, error)
 }
 
-// NewApplicationRPCServer returns a ttnpb.ApplicationCryptoServiceServer using the given service and key vault.
-func NewApplicationRPCServer(application Application, keyVault crypto.KeyVault) ttnpb.ApplicationCryptoServiceServer {
+// NewApplicationRPCServer returns a ttnpb.ApplicationCryptoServiceServer using the given service, key vault and KEK label function.
+func NewApplicationRPCServer(application Application, keyVault crypto.KeyVault, kekLabelFunc func(context.Context) (string, error)) ttnpb.ApplicationCryptoServiceServer {
 	return &applicationRPCServer{
-		Application: application,
-		KeyVault:    keyVault,
+		Application:  application,
+		KeyVault:     keyVault,
+		KEKLabelFunc: kekLabelFunc,
 	}
 }
 
@@ -237,8 +247,14 @@ func (s *applicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb.Der
 	if err != nil {
 		return nil, err
 	}
+	kekLabel := ""
+	if s.KEKLabelFunc != nil {
+		if kekLabel, err = s.KEKLabelFunc(ctx); err != nil {
+			return nil, err
+		}
+	}
 	res := &ttnpb.AppSKeyResponse{}
-	res.AppSKey, err = cryptoutil.WrapAES128Key(appSKey, "", s.KeyVault)
+	res.AppSKey, err = cryptoutil.WrapAES128Key(appSKey, kekLabel, s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
