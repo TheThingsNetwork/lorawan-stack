@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import bind from 'autobind-decorator'
 
 import sharedMessages from '../../lib/shared-messages'
 import FetchTable from '../fetch-table'
@@ -53,7 +54,13 @@ const headers = [
   },
 ]
 
+@bind
 export default class GatewaysTable extends React.Component {
+
+  baseDataSelector ({ gateways }) {
+    return gateways
+  }
+
   render () {
     return (
       <FetchTable
@@ -62,6 +69,7 @@ export default class GatewaysTable extends React.Component {
         headers={headers}
         getItemsAction={getGatewaysList}
         searchItemsAction={searchGatewaysList}
+        baseDataSelector={this.baseDataSelector}
         {...this.props}
       />
     )
