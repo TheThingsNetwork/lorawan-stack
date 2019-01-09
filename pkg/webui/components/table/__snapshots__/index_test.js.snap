@@ -6,9 +6,7 @@ exports[`Table has clickable rows should match snapshot 1`] = `
     loading={false}
     visible={false}
   >
-    <Table
-      className="tabular"
-    >
+    <Table>
       <Component>
         <Row
           body={true}
@@ -86,9 +84,7 @@ exports[`Table has no data provided should match snapshot 1`] = `
     loading={false}
     visible={false}
   >
-    <Table
-      className="tabular"
-    >
+    <Table>
       <Component>
         <Row
           body={true}
@@ -126,9 +122,7 @@ exports[`Table is paginated should match snapshot 1`] = `
     loading={false}
     visible={false}
   >
-    <Table
-      className="tabular"
-    >
+    <Table>
       <Component>
         <Row
           body={true}
@@ -227,9 +221,7 @@ exports[`Table is sortable should match snapshot 1`] = `
     loading={false}
     visible={false}
   >
-    <Table
-      className="tabular"
-    >
+    <Table>
       <Component>
         <Row
           body={true}
