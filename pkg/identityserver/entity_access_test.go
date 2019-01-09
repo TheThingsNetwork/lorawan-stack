@@ -15,7 +15,6 @@
 package identityserver
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -52,7 +51,6 @@ func TestEntityAccess(t *testing.T) {
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(rejectedUserIdx), grpc.Header(&md))
 			a.So(err, should.BeNil)
-			fmt.Println(md.Get("warning"))
 			a.So(md.Get("warning"), should.Contain, "Restricted rights after account rejection")
 			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
 				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
@@ -65,7 +63,6 @@ func TestEntityAccess(t *testing.T) {
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(suspendedUserIdx), grpc.Header(&md))
 			a.So(err, should.BeNil)
-			fmt.Println(md.Get("warning"))
 			a.So(md.Get("warning"), should.Contain, "Restricted rights after account suspension")
 			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
 				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
@@ -100,6 +97,5 @@ func TestEntityAccess(t *testing.T) {
 
 			a.So(len(cachedEntityRights), should.Equal, len(entityRights))
 		})
-
 	})
 }
