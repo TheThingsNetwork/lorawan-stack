@@ -23,6 +23,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -68,11 +69,19 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	if md.AuthType == "" {
 		return &ttnpb.AuthInfoResponse{}, nil
 	}
+	if md.AuthType == clusterauth.AuthType {
+		if err := clusterauth.Authorized(ctx); err != nil {
+			return nil, err
+		}
+		return &ttnpb.AuthInfoResponse{
+			UniversalRights: ttnpb.AllRights.Implied(),
+		}, nil
+	}
 	if strings.ToLower(md.AuthType) != "bearer" {
 		return nil, errUnsupportedAuthorization
 	}
-	token := md.AuthValue
 
+	token := md.AuthValue
 	tokenType, tokenID, tokenKey, err := auth.SplitToken(token)
 	if err != nil {
 		return nil, err

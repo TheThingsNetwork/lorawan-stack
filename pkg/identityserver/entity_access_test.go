@@ -78,6 +78,14 @@ func TestEntityAccess(t *testing.T) {
 			a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
 		})
 
+		t.Run("Cluster Peer", func(t *testing.T) {
+			a := assertions.New(t)
+			var md metadata.MD
+			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, is.WithClusterAuth(), grpc.Header(&md))
+			a.So(err, should.BeNil)
+			a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
+		})
+
 		t.Run("Membership Cache", func(t *testing.T) {
 			a := assertions.New(t)
 

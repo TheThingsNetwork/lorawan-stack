@@ -22,6 +22,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
@@ -117,17 +118,26 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		return ctx
 	})
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationRegistry", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationAccess", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientRegistry", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientAccess", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.EndDeviceRegistry", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayRegistry", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayAccess", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationRegistry", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationAccess", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserRegistry", rights.HookName, rights.Hook)
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", rights.HookName, rights.Hook)
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{cluster.HookName, c.ClusterAuthUnaryHook()},
+		{rights.HookName, rights.Hook},
+	} {
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationRegistry", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationAccess", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientRegistry", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientAccess", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.EndDeviceRegistry", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayRegistry", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayAccess", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationRegistry", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationAccess", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserRegistry", hook.name, hook.middleware)
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", hook.name, hook.middleware)
+	}
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)
