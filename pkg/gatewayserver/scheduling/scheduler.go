@@ -56,15 +56,15 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 		if err != nil {
 			return nil, err
 		}
-		for _, subBand := range band.BandDutyCycles {
+		for _, subBand := range band.SubBands {
 			sb := NewSubBand(ctx, subBand, s.clock, nil)
 			s.subBands = append(s.subBands, sb)
 		}
 	} else {
-		sb := NewSubBand(ctx, band.DutyCycle{
+		sb := NewSubBand(ctx, band.SubBandParameters{
 			MinFrequency: 0,
 			MaxFrequency: math.MaxUint64,
-			Value:        1,
+			DutyCycle:    1,
 		}, s.clock, nil)
 		s.subBands = append(s.subBands, sb)
 	}

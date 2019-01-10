@@ -46,7 +46,7 @@ var DefaultDutyCycleCeilings DutyCycleCeilings = map[ttnpb.TxSchedulePriority]fl
 
 // SubBand tracks the utilization and controls the duty-cycle of a sub-band.
 type SubBand struct {
-	band.DutyCycle
+	band.SubBandParameters
 	mu        sync.RWMutex
 	clock     Clock
 	ceilings  DutyCycleCeilings
@@ -54,14 +54,14 @@ type SubBand struct {
 }
 
 // NewSubBand returns a new SubBand for the given band's duty-cycle, clock and optionally duty-cycle ceilings.
-func NewSubBand(ctx context.Context, band band.DutyCycle, clock Clock, ceilings DutyCycleCeilings) *SubBand {
+func NewSubBand(ctx context.Context, band band.SubBandParameters, clock Clock, ceilings DutyCycleCeilings) *SubBand {
 	if ceilings == nil {
 		ceilings = DefaultDutyCycleCeilings
 	}
 	sb := &SubBand{
-		DutyCycle: band,
-		clock:     clock,
-		ceilings:  ceilings,
+		SubBandParameters: band,
+		clock:             clock,
+		ceilings:          ceilings,
 	}
 	go sb.gc(ctx)
 	return sb
@@ -107,7 +107,7 @@ func (sb *SubBand) DutyCycleUtilization() float32 {
 	sb.mu.RLock()
 	val := sb.sum(now-ConcentratorTime(DutyCycleWindow), now)
 	sb.mu.RUnlock()
-	return float32(val) / float32(DutyCycleWindow) / sb.Value
+	return float32(val) / float32(DutyCycleWindow) / sb.DutyCycle
 }
 
 // prioritizedDutyCycle returns the duty-cycle given the scheduling priority.
@@ -117,7 +117,7 @@ func (sb *SubBand) prioritizedDutyCycle(p ttnpb.TxSchedulePriority) float32 {
 	if c, ok := sb.ceilings[p]; ok {
 		ceiling = c
 	}
-	return sb.Value * ceiling
+	return sb.DutyCycle * ceiling
 }
 
 var errDutyCycle = errors.DefineResourceExhausted("duty_cycle", "utilization `{used}%` would be higher than the available `{usable}%` for priority `{priority}`")
@@ -127,7 +127,7 @@ var errDutyCycle = errors.DefineResourceExhausted("duty_cycle", "utilization `{u
 func (sb *SubBand) Schedule(em Emission, p ttnpb.TxSchedulePriority) error {
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
-	if sb.Value < 1 {
+	if sb.DutyCycle < 1 {
 		usable := sb.prioritizedDutyCycle(p)
 		// Check the window before and after the emission for availability.
 		for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
@@ -152,7 +152,7 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
 	em := NewEmission(next(), d)
-	if sb.Value < 1 {
+	if sb.DutyCycle < 1 {
 		usable := sb.prioritizedDutyCycle(p)
 		used := float32(em.d) / float32(DutyCycleWindow)
 		if used > usable {

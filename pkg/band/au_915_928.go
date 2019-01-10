@@ -59,11 +59,13 @@ func init() {
 		MaxDownlinkChannels: 8,
 		DownlinkChannels:    downlinkChannels,
 
-		BandDutyCycles: []DutyCycle{
+		// See Radiocommunications (Low Interference Potential Devices) Class Licence 2015
+		SubBands: []SubBandParameters{
 			{
 				MinFrequency: 902000000,
 				MaxFrequency: 928000000,
-				Value:        1,
+				DutyCycle:    1,
+				MaxTxPower:   14.0,
 			},
 		},
 

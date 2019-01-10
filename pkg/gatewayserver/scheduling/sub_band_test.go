@@ -30,8 +30,8 @@ import (
 
 func TestSubBandScheduleUnrestricted(t *testing.T) {
 	ctx := test.Context()
-	band := band.DutyCycle{
-		Value: 1,
+	band := band.SubBandParameters{
+		DutyCycle: 1,
 	}
 	clock := &mockClock{}
 	sb := scheduling.NewSubBand(ctx, band, clock, nil)
@@ -92,8 +92,8 @@ func TestSubBandScheduleUnrestricted(t *testing.T) {
 
 func TestSubBandScheduleRestricted(t *testing.T) {
 	ctx := test.Context()
-	band := band.DutyCycle{
-		Value: 0.5,
+	band := band.SubBandParameters{
+		DutyCycle: 0.5,
 	}
 	clock := &mockClock{}
 	ceilings := map[ttnpb.TxSchedulePriority]float32{
@@ -173,8 +173,8 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 func TestScheduleAnytimeRestricted(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	band := band.DutyCycle{
-		Value: 0.5,
+	band := band.SubBandParameters{
+		DutyCycle: 0.5,
 	}
 	clock := &mockClock{}
 	ceilings := map[ttnpb.TxSchedulePriority]float32{

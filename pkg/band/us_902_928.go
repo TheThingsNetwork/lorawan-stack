@@ -59,11 +59,13 @@ func init() {
 		MaxDownlinkChannels: 8,
 		DownlinkChannels:    downlinkChannels,
 
-		BandDutyCycles: []DutyCycle{
+		// As per FCC Rules for Unlicensed Wireless Equipment operating in the ISM bands
+		SubBands: []SubBandParameters{
 			{
 				MinFrequency: 902000000,
 				MaxFrequency: 928000000,
-				Value:        1,
+				DutyCycle:    1,
+				MaxTxPower:   30.0,
 			},
 		},
 

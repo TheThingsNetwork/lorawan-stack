@@ -40,11 +40,13 @@ func init() {
 		MaxDownlinkChannels: 16,
 		DownlinkChannels:    defaultChannels,
 
-		BandDutyCycles: []DutyCycle{
+		// See ETSI EN 300.220-2 V3.1.1 (2017-02)
+		SubBands: []SubBandParameters{
 			{
 				MinFrequency: 433175000,
 				MaxFrequency: 434665000,
-				Value:        0.01,
+				DutyCycle:    0.1,
+				MaxTxPower:   10.0,
 			},
 		},
 

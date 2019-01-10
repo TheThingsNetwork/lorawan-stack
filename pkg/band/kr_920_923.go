@@ -40,11 +40,12 @@ func init() {
 		MaxDownlinkChannels: 16,
 		DownlinkChannels:    defaultChannels,
 
-		BandDutyCycles: []DutyCycle{
+		SubBands: []SubBandParameters{
 			{
 				MinFrequency: 920000000,
 				MaxFrequency: 923000000,
-				Value:        1,
+				DutyCycle:    1,
+				MaxTxPower:   14.0,
 			},
 		},
 

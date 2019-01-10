@@ -38,11 +38,13 @@ func init() {
 		MaxDownlinkChannels: 16,
 		DownlinkChannels:    defaultChannels,
 
-		BandDutyCycles: []DutyCycle{
+		// MaxTxPower as per Appendix 10 to the decision of GKRCh from 07.05. 2007
+		SubBands: []SubBandParameters{
 			{
 				MinFrequency: 864000000,
 				MaxFrequency: 870000000,
-				Value:        0.01,
+				DutyCycle:    0.01,
+				MaxTxPower:   20.0,
 			},
 		},
 
