@@ -449,9 +449,27 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_APPLICATION_DEVICES_READ_KEYS": {
+    "translations": {
+      "en": "view device keys in application"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_APPLICATION_DEVICES_WRITE": {
     "translations": {
       "en": "create devices in application"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_APPLICATION_DEVICES_WRITE_KEYS": {
+    "translations": {
+      "en": "edit device keys in application"
     },
     "description": {
       "package": "pkg/ttnpb",
