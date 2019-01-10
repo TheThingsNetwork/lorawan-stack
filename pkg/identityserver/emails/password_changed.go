@@ -14,27 +14,24 @@
 
 package emails
 
-// TemporaryPassword is the email that is sent when users request a temporary password.
-type TemporaryPassword struct {
+// PasswordChanged is the email that is sent when users change their password.
+type PasswordChanged struct {
 	Data
-	TemporaryPassword string
 }
 
 // TemplateName returns the name of the template to use for this email.
-func (TemporaryPassword) TemplateName() string { return "temporary_password" }
+func (PasswordChanged) TemplateName() string { return "password_changed" }
 
-const temporaryPasswordSubject = `Your temporary password`
+const passwordChangedSubject = `Your password for {{.User.ID}} was changed`
 
-const temporaryPasswordText = `Dear {{.User.Name}},
+const passwordChangedText = `Dear {{.User.Name}},
 
-A temporary password was requested for your user "{{.User.ID}}" on {{.Network.Name}}.
+The password of your user "{{.User.ID}}" on {{.Network.Name}} was just changed.
 
-This temporary password can only be used once, and only to change the password of your account.
-
-Temporary Password: {{.TemporaryPassword}}
+If this was not done by you, please contact us as soon as possible.
 `
 
 // DefaultTemplates returns the default templates for this email.
-func (TemporaryPassword) DefaultTemplates() (subject, html, text string) {
-	return temporaryPasswordSubject, "", temporaryPasswordText
+func (PasswordChanged) DefaultTemplates() (subject, html, text string) {
+	return passwordChangedSubject, "", passwordChangedText
 }

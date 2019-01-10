@@ -420,7 +420,12 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateMask))
-	// TODO: Send password update email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+		return &emails.PasswordChanged{Data: data}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send password change notification email")
+	}
 	return ttnpb.Empty, nil
 }
 
