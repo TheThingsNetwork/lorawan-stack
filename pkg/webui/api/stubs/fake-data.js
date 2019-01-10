@@ -188,4 +188,4 @@ const gateways = [ ...new Array(GATEWAYS_COUNT).keys() ]
     },
   }))
 
-export default { devices, applications, gateways, applicationsApiKeys }
+export default { devices, applications, gateways, applicationsApiKeys, rights }
