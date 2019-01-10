@@ -120,6 +120,8 @@ func init() {
 	defineEnum(RIGHT_APPLICATION_DELETE, "delete application")
 	defineEnum(RIGHT_APPLICATION_DEVICES_READ, "view devices in application")
 	defineEnum(RIGHT_APPLICATION_DEVICES_WRITE, "create devices in application")
+	defineEnum(RIGHT_APPLICATION_DEVICES_READ_KEYS, "view device keys in application")
+	defineEnum(RIGHT_APPLICATION_DEVICES_WRITE_KEYS, "edit device keys in application")
 	defineEnum(RIGHT_APPLICATION_TRAFFIC_READ, "read application traffic (uplink and downlink)")
 	defineEnum(RIGHT_APPLICATION_TRAFFIC_UP_WRITE, "write uplink application traffic")
 	defineEnum(RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE, "write downlink application traffic")
