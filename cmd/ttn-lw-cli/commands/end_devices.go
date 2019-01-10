@@ -46,7 +46,12 @@ func endDeviceIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var errNoEndDeviceID = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
+var (
+	errNoEndDeviceID            = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
+	errNoEndDeviceEUI           = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
+	errInconsistentEndDeviceEUI = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
+	errEndDeviceEUIUpdate       = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
+)
 
 func getEndDeviceID(flagSet *pflag.FlagSet, args []string) (*ttnpb.EndDeviceIdentifiers, error) {
 	applicationID, _ := flagSet.GetString("application-id")
@@ -170,7 +175,7 @@ var (
 
 			compareServerAddresses(device, config)
 
-			res, err := getEndDevice(*devID, nsPaths, asPaths, jsPaths, true)
+			res, err := getEndDevice(device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
 			}
@@ -239,14 +244,13 @@ var (
 			util.SetFields(&device, setEndDeviceFlags)
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			device.EndDeviceIdentifiers = *devID
-			if device.JoinEUI != nil {
-				paths = append(paths, "ids.join_eui")
-			}
-			if device.DevEUI != nil {
-				paths = append(paths, "ids.dev_eui")
-			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(paths...)
+
+			// Require EUIs for devices that need to be added to the Join Server.
+			if len(jsPaths) > 0 && (device.JoinEUI == nil || device.DevEUI == nil) {
+				return errNoEndDeviceEUI
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
@@ -314,6 +318,27 @@ var (
 				return err
 			}
 
+			// EUIs can not be updated, so we only accept EUI flags if they are equal to the existing ones.
+			if device.JoinEUI != nil {
+				if existingDevice.JoinEUI != nil && *device.JoinEUI != *existingDevice.JoinEUI {
+					return errEndDeviceEUIUpdate
+				}
+			} else {
+				device.JoinEUI = existingDevice.JoinEUI
+			}
+			if device.DevEUI != nil {
+				if existingDevice.DevEUI != nil && *device.DevEUI != *existingDevice.DevEUI {
+					return errEndDeviceEUIUpdate
+				}
+			} else {
+				device.DevEUI = existingDevice.DevEUI
+			}
+
+			// Require EUIs for devices that need to be updated in the Join Server.
+			if len(jsPaths) > 0 && (device.JoinEUI == nil || device.DevEUI == nil) {
+				return errNoEndDeviceEUI
+			}
+
 			compareServerAddresses(existingDevice, config)
 
 			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths)
@@ -349,6 +374,22 @@ var (
 				return err
 			}
 
+			// EUIs must match registered EUIs if set.
+			if devID.JoinEUI != nil {
+				if existingDevice.JoinEUI != nil && *devID.JoinEUI != *existingDevice.JoinEUI {
+					return errInconsistentEndDeviceEUI
+				}
+			} else {
+				devID.JoinEUI = existingDevice.JoinEUI
+			}
+			if devID.DevEUI != nil {
+				if existingDevice.DevEUI != nil && *devID.DevEUI != *existingDevice.DevEUI {
+					return errInconsistentEndDeviceEUI
+				}
+			} else {
+				devID.DevEUI = existingDevice.DevEUI
+			}
+
 			compareServerAddresses(existingDevice, config)
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
@@ -356,7 +397,9 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewAsEndDeviceRegistryClient(as).Delete(ctx, devID)
-			if err != nil {
+			if errors.IsNotFound(err) {
+				logger.WithError(err).Error("Could not delete end device from Application Server")
+			} else if err != nil {
 				return err
 			}
 
@@ -365,17 +408,23 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewNsEndDeviceRegistryClient(ns).Delete(ctx, devID)
-			if err != nil {
+			if errors.IsNotFound(err) {
+				logger.WithError(err).Error("Could not delete end device from Network Server")
+			} else if err != nil {
 				return err
 			}
 
-			js, err := api.Dial(ctx, config.JoinServerAddress)
-			if err != nil {
-				return err
-			}
-			_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
-			if err != nil {
-				return err
+			if devID.JoinEUI != nil && devID.DevEUI != nil {
+				js, err := api.Dial(ctx, config.JoinServerAddress)
+				if err != nil {
+					return err
+				}
+				_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
+				if errors.IsNotFound(err) {
+					logger.WithError(err).Error("Could not delete end device from Join Server")
+				} else if err != nil {
+					return err
+				}
 			}
 
 			_, err = ttnpb.NewEndDeviceRegistryClient(is).Delete(ctx, devID)
