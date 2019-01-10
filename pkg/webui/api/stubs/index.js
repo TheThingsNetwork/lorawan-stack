@@ -92,4 +92,9 @@ export default {
       )
     },
   },
+  rights: {
+    application () {
+      return fakeData.rights.application
+    },
+  },
 }

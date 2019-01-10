@@ -57,6 +57,9 @@ export default {
         list: stubs.gateways.list,
         search: stubs.gateways.search,
       },
+      rights: {
+        application: stubs.rights.application,
+      },
     },
   },
   console: {
