@@ -240,6 +240,7 @@ var (
 				return err
 			}
 
+			res.SetFields(&gateway, "ids")
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}

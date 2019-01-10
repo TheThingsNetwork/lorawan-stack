@@ -206,6 +206,7 @@ var (
 				return err
 			}
 
+			res.SetFields(&application, "ids")
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}

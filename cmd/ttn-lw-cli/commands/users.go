@@ -179,6 +179,7 @@ var (
 				return err
 			}
 
+			res.SetFields(&user, "ids")
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}

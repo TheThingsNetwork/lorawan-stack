@@ -210,6 +210,7 @@ var (
 				return err
 			}
 
+			res.SetFields(&client, "ids")
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}

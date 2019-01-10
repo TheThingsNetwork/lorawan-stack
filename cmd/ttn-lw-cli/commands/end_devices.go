@@ -346,6 +346,7 @@ var (
 				return err
 			}
 
+			res.SetFields(&device, "ids")
 			return io.Write(os.Stdout, config.Format, res)
 		},
 	}
