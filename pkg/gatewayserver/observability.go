@@ -176,16 +176,12 @@ func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.U
 }
 
 func registerForwardUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
-	events.Publish(evtForwardUp(ctx, ttnpb.CombineIdentifiers(gtw, devIDs), nil))
+	events.Publish(evtForwardUp(ctx, gtw, nil))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
-	var ids ttnpb.Identifiers = gtw
-	if !devIDs.IsZero() {
-		ids = ttnpb.CombineIdentifiers(ids, devIDs)
-	}
-	events.Publish(evtDropUp(ctx, ids, err))
+	events.Publish(evtDropUp(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
 		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
 	} else {
