@@ -27,7 +27,7 @@ var ApplicationLinkFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "network_server_address":
 			if len(subs) > 0 {
@@ -100,7 +100,7 @@ var GetApplicationLinkRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *GetApplicationLinkRequest) SetFields(src *GetApplicationLinkRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -160,7 +160,7 @@ var SetApplicationLinkRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {

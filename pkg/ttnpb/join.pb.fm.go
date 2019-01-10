@@ -90,7 +90,7 @@ var JoinRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "raw_payload":
 			if len(subs) > 0 {
@@ -255,7 +255,7 @@ var JoinResponseFieldPathsTopLevel = []string{
 }
 
 func (dst *JoinResponse) SetFields(src *JoinResponse, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "raw_payload":
 			if len(subs) > 0 {

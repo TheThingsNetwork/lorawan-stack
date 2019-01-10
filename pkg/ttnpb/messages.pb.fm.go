@@ -83,7 +83,7 @@ var UplinkMessageFieldPathsTopLevel = []string{
 }
 
 func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "raw_payload":
 			if len(subs) > 0 {
@@ -262,7 +262,7 @@ var DownlinkMessageFieldPathsTopLevel = []string{
 }
 
 func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "raw_payload":
 			if len(subs) > 0 {
@@ -413,7 +413,7 @@ var TxAcknowledgmentFieldPathsTopLevel = []string{
 }
 
 func (dst *TxAcknowledgment) SetFields(src *TxAcknowledgment, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "correlation_ids":
 			if len(subs) > 0 {
@@ -476,7 +476,7 @@ var ApplicationUplinkFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "session_key_id":
 			if len(subs) > 0 {
@@ -580,7 +580,7 @@ var ApplicationLocationFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationLocation) SetFields(src *ApplicationLocation, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "service":
 			if len(subs) > 0 {
@@ -646,7 +646,7 @@ var ApplicationJoinAcceptFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "session_key_id":
 			if len(subs) > 0 {
@@ -743,7 +743,7 @@ var ApplicationDownlinkFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "session_key_id":
 			if len(subs) > 0 {
@@ -863,7 +863,7 @@ var ApplicationDownlink_ClassBCFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationDownlink_ClassBC) SetFields(src *ApplicationDownlink_ClassBC, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateways":
 			if len(subs) > 0 {
@@ -900,7 +900,7 @@ var ApplicationDownlinksFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationDownlinks) SetFields(src *ApplicationDownlinks, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "downlinks":
 			if len(subs) > 0 {
@@ -952,7 +952,7 @@ var ApplicationDownlinkFailedFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationDownlinkFailed) SetFields(src *ApplicationDownlinkFailed, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "downlink":
 			if len(subs) > 0 {
@@ -1009,7 +1009,7 @@ var ApplicationInvalidatedDownlinksFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationInvalidatedDownlinks) SetFields(src *ApplicationInvalidatedDownlinks, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "downlinks":
 			if len(subs) > 0 {
@@ -1171,7 +1171,7 @@ var ApplicationUpFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {
@@ -1460,7 +1460,7 @@ var MessagePayloadFormattersFieldPathsTopLevel = []string{
 }
 
 func (dst *MessagePayloadFormatters) SetFields(src *MessagePayloadFormatters, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "up_formatter":
 			if len(subs) > 0 {
@@ -1527,7 +1527,7 @@ var DownlinkQueueRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *DownlinkQueueRequest) SetFields(src *DownlinkQueueRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {

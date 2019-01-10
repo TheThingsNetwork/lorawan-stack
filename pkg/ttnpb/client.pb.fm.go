@@ -45,7 +45,7 @@ var ClientFieldPathsTopLevel = []string{
 }
 
 func (dst *Client) SetFields(src *Client, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -207,7 +207,7 @@ var ClientsFieldPathsTopLevel = []string{
 }
 
 func (dst *Clients) SetFields(src *Clients, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "clients":
 			if len(subs) > 0 {
@@ -238,7 +238,7 @@ var GetClientRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "client_ids":
 			if len(subs) > 0 {
@@ -300,7 +300,7 @@ var ListClientsRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ListClientsRequest) SetFields(src *ListClientsRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
@@ -404,7 +404,7 @@ var CreateClientRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "client":
 			if len(subs) > 0 {
@@ -476,7 +476,7 @@ var UpdateClientRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "client":
 			if len(subs) > 0 {
@@ -535,7 +535,7 @@ var SetClientCollaboratorRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "client_ids":
 			if len(subs) > 0 {

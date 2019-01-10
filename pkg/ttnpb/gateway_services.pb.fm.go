@@ -21,7 +21,7 @@ var PullGatewayConfigurationRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *PullGatewayConfigurationRequest) SetFields(src *PullGatewayConfigurationRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {

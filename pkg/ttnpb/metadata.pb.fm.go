@@ -50,7 +50,7 @@ var RxMetadataFieldPathsTopLevel = []string{
 }
 
 func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
@@ -254,7 +254,7 @@ var LocationFieldPathsTopLevel = []string{
 }
 
 func (dst *Location) SetFields(src *Location, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "latitude":
 			if len(subs) > 0 {

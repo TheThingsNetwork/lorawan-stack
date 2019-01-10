@@ -62,7 +62,7 @@ var MessageFieldPathsTopLevel = []string{
 }
 
 func (dst *Message) SetFields(src *Message, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "m_hdr":
 			if len(subs) > 0 {
@@ -228,7 +228,7 @@ var MHDRFieldPathsTopLevel = []string{
 }
 
 func (dst *MHDR) SetFields(src *MHDR, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "m_type":
 			if len(subs) > 0 {
@@ -282,7 +282,7 @@ var MACPayloadFieldPathsTopLevel = []string{
 }
 
 func (dst *MACPayload) SetFields(src *MACPayload, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "f_hdr":
 			if len(subs) > 0 {
@@ -359,7 +359,7 @@ var FHDRFieldPathsTopLevel = []string{
 }
 
 func (dst *FHDR) SetFields(src *FHDR, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "dev_addr":
 			if len(subs) > 0 {
@@ -434,7 +434,7 @@ var FCtrlFieldPathsTopLevel = []string{
 }
 
 func (dst *FCtrl) SetFields(src *FCtrl, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "adr":
 			if len(subs) > 0 {
@@ -507,7 +507,7 @@ var JoinRequestPayloadFieldPathsTopLevel = []string{
 }
 
 func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "join_eui":
 			if len(subs) > 0 {
@@ -564,7 +564,7 @@ var RejoinRequestPayloadFieldPathsTopLevel = []string{
 }
 
 func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rejoin_type":
 			if len(subs) > 0 {
@@ -651,7 +651,7 @@ var JoinAcceptPayloadFieldPathsTopLevel = []string{
 }
 
 func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "encrypted":
 			if len(subs) > 0 {
@@ -763,7 +763,7 @@ var DLSettingsFieldPathsTopLevel = []string{
 }
 
 func (dst *DLSettings) SetFields(src *DLSettings, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rx1_dr_offset":
 			if len(subs) > 0 {
@@ -816,7 +816,7 @@ var CFListFieldPathsTopLevel = []string{
 }
 
 func (dst *CFList) SetFields(src *CFList, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "type":
 			if len(subs) > 0 {
@@ -887,7 +887,7 @@ var TxSettingsFieldPathsTopLevel = []string{
 }
 
 func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "modulation":
 			if len(subs) > 0 {
@@ -1039,7 +1039,7 @@ var GatewayAntennaIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayAntennaIdentifiers) SetFields(src *GatewayAntennaIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
@@ -1092,7 +1092,7 @@ var UplinkTokenFieldPathsTopLevel = []string{
 }
 
 func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -1145,7 +1145,7 @@ var DownlinkPathFieldPathsTopLevel = []string{
 }
 
 func (dst *DownlinkPath) SetFields(src *DownlinkPath, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 
 		case "path":
@@ -1240,7 +1240,7 @@ var TxRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "class":
 			if len(subs) > 0 {
@@ -1447,7 +1447,7 @@ var MACCommandFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "cid":
 			if len(subs) > 0 {
@@ -2230,7 +2230,7 @@ var MACCommand_ResetIndFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_ResetInd) SetFields(src *MACCommand_ResetInd, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "minor_version":
 			if len(subs) > 0 {
@@ -2259,7 +2259,7 @@ var MACCommand_ResetConfFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_ResetConf) SetFields(src *MACCommand_ResetConf, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "minor_version":
 			if len(subs) > 0 {
@@ -2290,7 +2290,7 @@ var MACCommand_LinkCheckAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_LinkCheckAns) SetFields(src *MACCommand_LinkCheckAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "margin":
 			if len(subs) > 0 {
@@ -2337,7 +2337,7 @@ var MACCommand_LinkADRReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_LinkADRReq) SetFields(src *MACCommand_LinkADRReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "data_rate_index":
 			if len(subs) > 0 {
@@ -2409,7 +2409,7 @@ var MACCommand_LinkADRAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_LinkADRAns) SetFields(src *MACCommand_LinkADRAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channel_mask_ack":
 			if len(subs) > 0 {
@@ -2458,7 +2458,7 @@ var MACCommand_DutyCycleReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DutyCycleReq) SetFields(src *MACCommand_DutyCycleReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "max_duty_cycle":
 			if len(subs) > 0 {
@@ -2491,7 +2491,7 @@ var MACCommand_RxParamSetupReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RxParamSetupReq) SetFields(src *MACCommand_RxParamSetupReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rx2_data_rate_index":
 			if len(subs) > 0 {
@@ -2544,7 +2544,7 @@ var MACCommand_RxParamSetupAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RxParamSetupAns) SetFields(src *MACCommand_RxParamSetupAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rx2_data_rate_index_ack":
 			if len(subs) > 0 {
@@ -2595,7 +2595,7 @@ var MACCommand_DevStatusAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DevStatusAns) SetFields(src *MACCommand_DevStatusAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "battery":
 			if len(subs) > 0 {
@@ -2640,7 +2640,7 @@ var MACCommand_NewChannelReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_NewChannelReq) SetFields(src *MACCommand_NewChannelReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channel_index":
 			if len(subs) > 0 {
@@ -2701,7 +2701,7 @@ var MACCommand_NewChannelAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_NewChannelAns) SetFields(src *MACCommand_NewChannelAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "frequency_ack":
 			if len(subs) > 0 {
@@ -2742,7 +2742,7 @@ var MACCommand_DLChannelReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DLChannelReq) SetFields(src *MACCommand_DLChannelReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channel_index":
 			if len(subs) > 0 {
@@ -2783,7 +2783,7 @@ var MACCommand_DLChannelAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DLChannelAns) SetFields(src *MACCommand_DLChannelAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channel_index_ack":
 			if len(subs) > 0 {
@@ -2822,7 +2822,7 @@ var MACCommand_RxTimingSetupReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RxTimingSetupReq) SetFields(src *MACCommand_RxTimingSetupReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "delay":
 			if len(subs) > 0 {
@@ -2855,7 +2855,7 @@ var MACCommand_TxParamSetupReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_TxParamSetupReq) SetFields(src *MACCommand_TxParamSetupReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "max_eirp_index":
 			if len(subs) > 0 {
@@ -2904,7 +2904,7 @@ var MACCommand_RekeyIndFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RekeyInd) SetFields(src *MACCommand_RekeyInd, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "minor_version":
 			if len(subs) > 0 {
@@ -2933,7 +2933,7 @@ var MACCommand_RekeyConfFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RekeyConf) SetFields(src *MACCommand_RekeyConf, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "minor_version":
 			if len(subs) > 0 {
@@ -2964,7 +2964,7 @@ var MACCommand_ADRParamSetupReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_ADRParamSetupReq) SetFields(src *MACCommand_ADRParamSetupReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "adr_ack_limit_exponent":
 			if len(subs) > 0 {
@@ -3003,7 +3003,7 @@ var MACCommand_DeviceTimeAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DeviceTimeAns) SetFields(src *MACCommand_DeviceTimeAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "time":
 			if len(subs) > 0 {
@@ -3038,7 +3038,7 @@ var MACCommand_ForceRejoinReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rejoin_type":
 			if len(subs) > 0 {
@@ -3099,7 +3099,7 @@ var MACCommand_RejoinParamSetupReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RejoinParamSetupReq) SetFields(src *MACCommand_RejoinParamSetupReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "max_count_exponent":
 			if len(subs) > 0 {
@@ -3138,7 +3138,7 @@ var MACCommand_RejoinParamSetupAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_RejoinParamSetupAns) SetFields(src *MACCommand_RejoinParamSetupAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "max_time_exponent_ack":
 			if len(subs) > 0 {
@@ -3167,7 +3167,7 @@ var MACCommand_PingSlotInfoReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_PingSlotInfoReq) SetFields(src *MACCommand_PingSlotInfoReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "period":
 			if len(subs) > 0 {
@@ -3198,7 +3198,7 @@ var MACCommand_PingSlotChannelReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_PingSlotChannelReq) SetFields(src *MACCommand_PingSlotChannelReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "frequency":
 			if len(subs) > 0 {
@@ -3239,7 +3239,7 @@ var MACCommand_PingSlotChannelAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_PingSlotChannelAns) SetFields(src *MACCommand_PingSlotChannelAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "frequency_ack":
 			if len(subs) > 0 {
@@ -3280,7 +3280,7 @@ var MACCommand_BeaconTimingAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_BeaconTimingAns) SetFields(src *MACCommand_BeaconTimingAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "delay":
 			if len(subs) > 0 {
@@ -3319,7 +3319,7 @@ var MACCommand_BeaconFreqReqFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_BeaconFreqReq) SetFields(src *MACCommand_BeaconFreqReq, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "frequency":
 			if len(subs) > 0 {
@@ -3348,7 +3348,7 @@ var MACCommand_BeaconFreqAnsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_BeaconFreqAns) SetFields(src *MACCommand_BeaconFreqAns, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "frequency_ack":
 			if len(subs) > 0 {
@@ -3377,7 +3377,7 @@ var MACCommand_DeviceModeIndFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DeviceModeInd) SetFields(src *MACCommand_DeviceModeInd, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "class":
 			if len(subs) > 0 {
@@ -3406,7 +3406,7 @@ var MACCommand_DeviceModeConfFieldPathsTopLevel = []string{
 }
 
 func (dst *MACCommand_DeviceModeConf) SetFields(src *MACCommand_DeviceModeConf, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "class":
 			if len(subs) > 0 {

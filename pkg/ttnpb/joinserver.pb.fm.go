@@ -19,7 +19,7 @@ var SessionKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "session_key_id":
 			if len(subs) > 0 {
@@ -68,7 +68,7 @@ var NwkSKeysResponseFieldPathsTopLevel = []string{
 }
 
 func (dst *NwkSKeysResponse) SetFields(src *NwkSKeysResponse, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "f_nwk_s_int_key":
 			if len(subs) > 0 {
@@ -143,7 +143,7 @@ var AppSKeyResponseFieldPathsTopLevel = []string{
 }
 
 func (dst *AppSKeyResponse) SetFields(src *AppSKeyResponse, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "app_s_key":
 			if len(subs) > 0 {

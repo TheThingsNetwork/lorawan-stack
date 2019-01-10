@@ -44,7 +44,7 @@ var SessionFieldPathsTopLevel = []string{
 }
 
 func (dst *Session) SetFields(src *Session, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "dev_addr":
 			if len(subs) > 0 {
@@ -177,7 +177,7 @@ var MACParametersFieldPathsTopLevel = []string{
 }
 
 func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "max_eirp":
 			if len(subs) > 0 {
@@ -393,7 +393,7 @@ var MACParameters_ChannelFieldPathsTopLevel = []string{
 }
 
 func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "uplink_frequency":
 			if len(subs) > 0 {
@@ -468,7 +468,7 @@ var EndDeviceBrandFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "id":
 			if len(subs) > 0 {
@@ -530,7 +530,7 @@ var EndDeviceModelFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "brand_id":
 			if len(subs) > 0 {
@@ -585,7 +585,7 @@ var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "brand_id":
 			if len(subs) > 0 {
@@ -699,7 +699,7 @@ var EndDeviceVersionFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -904,7 +904,7 @@ var MACSettingsFieldPathsTopLevel = []string{
 }
 
 func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "use_adr":
 			if len(subs) > 0 {
@@ -1054,7 +1054,7 @@ var MACStateFieldPathsTopLevel = []string{
 }
 
 func (dst *MACState) SetFields(src *MACState, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "current_parameters":
 			if len(subs) > 0 {
@@ -1450,7 +1450,7 @@ var EndDeviceFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -1996,7 +1996,7 @@ var EndDevicesFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDevices) SetFields(src *EndDevices, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "end_devices":
 			if len(subs) > 0 {
@@ -2215,7 +2215,7 @@ var CreateEndDeviceRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "end_device":
 			if len(subs) > 0 {
@@ -2445,7 +2445,7 @@ var UpdateEndDeviceRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "end_device":
 			if len(subs) > 0 {
@@ -2500,7 +2500,7 @@ var GetEndDeviceRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *GetEndDeviceRequest) SetFields(src *GetEndDeviceRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {
@@ -2556,7 +2556,7 @@ var ListEndDevicesRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -2826,7 +2826,7 @@ var SetEndDeviceRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "device":
 			if len(subs) > 0 {

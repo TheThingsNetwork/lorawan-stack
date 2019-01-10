@@ -49,7 +49,7 @@ var ProcessUplinkMessageRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -159,7 +159,7 @@ var ProcessDownlinkMessageRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ProcessDownlinkMessageRequest) SetFields(src *ProcessDownlinkMessageRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {

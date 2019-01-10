@@ -28,7 +28,7 @@ var ErrorDetailsFieldPathsTopLevel = []string{
 }
 
 func (dst *ErrorDetails) SetFields(src *ErrorDetails, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "namespace":
 			if len(subs) > 0 {

@@ -21,7 +21,7 @@ var ContactInfoFieldPathsTopLevel = []string{
 }
 
 func (dst *ContactInfo) SetFields(src *ContactInfo, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "contact_type":
 			if len(subs) > 0 {
@@ -120,7 +120,7 @@ var ContactInfoValidationFieldPathsTopLevel = []string{
 }
 
 func (dst *ContactInfoValidation) SetFields(src *ContactInfoValidation, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "id":
 			if len(subs) > 0 {

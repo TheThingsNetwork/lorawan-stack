@@ -56,7 +56,7 @@ var AuthInfoResponseFieldPathsTopLevel = []string{
 }
 
 func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "universal_rights":
 			if len(subs) > 0 {
@@ -192,7 +192,7 @@ var AuthInfoResponse_APIKeyAccessFieldPathsTopLevel = []string{
 }
 
 func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKeyAccess, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "api_key":
 			if len(subs) > 0 {

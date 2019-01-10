@@ -31,7 +31,7 @@ var ApplicationFieldPathsTopLevel = []string{
 }
 
 func (dst *Application) SetFields(src *Application, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -126,7 +126,7 @@ var ApplicationsFieldPathsTopLevel = []string{
 }
 
 func (dst *Applications) SetFields(src *Applications, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "applications":
 			if len(subs) > 0 {
@@ -157,7 +157,7 @@ var GetApplicationRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *GetApplicationRequest) SetFields(src *GetApplicationRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -219,7 +219,7 @@ var ListApplicationsRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ListApplicationsRequest) SetFields(src *ListApplicationsRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
@@ -316,7 +316,7 @@ var CreateApplicationRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application":
 			if len(subs) > 0 {
@@ -381,7 +381,7 @@ var UpdateApplicationRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application":
 			if len(subs) > 0 {
@@ -433,7 +433,7 @@ var CreateApplicationAPIKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateApplicationAPIKeyRequest) SetFields(src *CreateApplicationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -496,7 +496,7 @@ var UpdateApplicationAPIKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -563,7 +563,7 @@ var SetApplicationCollaboratorRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SetApplicationCollaboratorRequest) SetFields(src *SetApplicationCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {

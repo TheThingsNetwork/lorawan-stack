@@ -43,7 +43,7 @@ var ConcentratorConfigFieldPathsTopLevel = []string{
 }
 
 func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channels":
 			if len(subs) > 0 {
@@ -176,7 +176,7 @@ var ConcentratorConfig_ChannelFieldPathsTopLevel = []string{
 }
 
 func (dst *ConcentratorConfig_Channel) SetFields(src *ConcentratorConfig_Channel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "frequency":
 			if len(subs) > 0 {
@@ -221,7 +221,7 @@ var ConcentratorConfig_LoRaStandardChannelFieldPathsTopLevel = []string{
 }
 
 func (dst *ConcentratorConfig_LoRaStandardChannel) SetFields(src *ConcentratorConfig_LoRaStandardChannel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channel":
 			if len(subs) > 0 {
@@ -284,7 +284,7 @@ var ConcentratorConfig_FSKChannelFieldPathsTopLevel = []string{
 }
 
 func (dst *ConcentratorConfig_FSKChannel) SetFields(src *ConcentratorConfig_FSKChannel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "channel":
 			if len(subs) > 0 {
@@ -345,7 +345,7 @@ var ConcentratorConfig_LBTConfigurationFieldPathsTopLevel = []string{
 }
 
 func (dst *ConcentratorConfig_LBTConfiguration) SetFields(src *ConcentratorConfig_LBTConfiguration, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rssi_target":
 			if len(subs) > 0 {

@@ -58,7 +58,7 @@ var UserFieldPathsTopLevel = []string{
 }
 
 func (dst *User) SetFields(src *User, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -275,7 +275,7 @@ var PictureFieldPathsTopLevel = []string{
 }
 
 func (dst *Picture) SetFields(src *Picture, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "embedded":
 			if len(subs) > 0 {
@@ -326,7 +326,7 @@ var Picture_EmbeddedFieldPathsTopLevel = []string{
 }
 
 func (dst *Picture_Embedded) SetFields(src *Picture_Embedded, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "mime_type":
 			if len(subs) > 0 {
@@ -365,7 +365,7 @@ var UsersFieldPathsTopLevel = []string{
 }
 
 func (dst *Users) SetFields(src *Users, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "users":
 			if len(subs) > 0 {
@@ -397,7 +397,7 @@ var GetUserRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -470,7 +470,7 @@ var CreateUserRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user":
 			if len(subs) > 0 {
@@ -543,7 +543,7 @@ var UpdateUserRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user":
 			if len(subs) > 0 {
@@ -592,7 +592,7 @@ var CreateTemporaryPasswordRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswordRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -635,7 +635,7 @@ var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -698,7 +698,7 @@ var CreateUserAPIKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -762,7 +762,7 @@ var UpdateUserAPIKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -831,7 +831,7 @@ var InvitationFieldPathsTopLevel = []string{
 }
 
 func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "email":
 			if len(subs) > 0 {
@@ -930,7 +930,7 @@ var InvitationsFieldPathsTopLevel = []string{
 }
 
 func (dst *Invitations) SetFields(src *Invitations, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "invitations":
 			if len(subs) > 0 {
@@ -958,7 +958,7 @@ var SendInvitationRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SendInvitationRequest) SetFields(src *SendInvitationRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "email":
 			if len(subs) > 0 {
@@ -987,7 +987,7 @@ var DeleteInvitationRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *DeleteInvitationRequest) SetFields(src *DeleteInvitationRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "email":
 			if len(subs) > 0 {
@@ -1020,7 +1020,7 @@ var UserSessionIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -1077,7 +1077,7 @@ var UserSessionFieldPathsTopLevel = []string{
 }
 
 func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -1153,7 +1153,7 @@ var UserSessionsFieldPathsTopLevel = []string{
 }
 
 func (dst *UserSessions) SetFields(src *UserSessions, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "sessions":
 			if len(subs) > 0 {
@@ -1189,7 +1189,7 @@ var ListUserSessionsRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {

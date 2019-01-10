@@ -15,7 +15,7 @@ var KeyEnvelopeFieldPathsTopLevel = []string{
 }
 
 func (dst *KeyEnvelope) SetFields(src *KeyEnvelope, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "key":
 			if len(subs) > 0 {
@@ -62,7 +62,7 @@ var RootKeysFieldPathsTopLevel = []string{
 }
 
 func (dst *RootKeys) SetFields(src *RootKeys, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "root_key_id":
 			if len(subs) > 0 {
@@ -149,7 +149,7 @@ var SessionKeysFieldPathsTopLevel = []string{
 }
 
 func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "session_key_id":
 			if len(subs) > 0 {

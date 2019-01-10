@@ -24,7 +24,7 @@ var GatewayBrandFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "id":
 			if len(subs) > 0 {
@@ -86,7 +86,7 @@ var GatewayModelFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayModel) SetFields(src *GatewayModel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "brand_id":
 			if len(subs) > 0 {
@@ -141,7 +141,7 @@ var GatewayVersionIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayVersionIdentifiers) SetFields(src *GatewayVersionIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "brand_id":
 			if len(subs) > 0 {
@@ -211,7 +211,7 @@ var GatewayRadioFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "enable":
 			if len(subs) > 0 {
@@ -295,7 +295,7 @@ var GatewayRadio_TxConfigurationFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayRadio_TxConfiguration) SetFields(src *GatewayRadio_TxConfiguration, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "min_frequency":
 			if len(subs) > 0 {
@@ -354,7 +354,7 @@ var GatewayVersionFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -459,7 +459,7 @@ var GatewayFieldPathsTopLevel = []string{
 }
 
 func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -671,7 +671,7 @@ var GatewaysFieldPathsTopLevel = []string{
 }
 
 func (dst *Gateways) SetFields(src *Gateways, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateways":
 			if len(subs) > 0 {
@@ -703,7 +703,7 @@ var GetGatewayRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *GetGatewayRequest) SetFields(src *GetGatewayRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
@@ -765,7 +765,7 @@ var ListGatewaysRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *ListGatewaysRequest) SetFields(src *ListGatewaysRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
@@ -878,7 +878,7 @@ var CreateGatewayRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway":
 			if len(subs) > 0 {
@@ -959,7 +959,7 @@ var UpdateGatewayRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateGatewayRequest) SetFields(src *UpdateGatewayRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway":
 			if len(subs) > 0 {
@@ -1012,7 +1012,7 @@ var CreateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *CreateGatewayAPIKeyRequest) SetFields(src *CreateGatewayAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
@@ -1076,7 +1076,7 @@ var UpdateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
@@ -1144,7 +1144,7 @@ var SetGatewayCollaboratorRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
@@ -1208,7 +1208,7 @@ var GatewayAntennaFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayAntenna) SetFields(src *GatewayAntenna, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gain":
 			if len(subs) > 0 {
@@ -1276,7 +1276,7 @@ var GatewayStatusFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "time":
 			if len(subs) > 0 {
@@ -1381,7 +1381,7 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "connected_at":
 			if len(subs) > 0 {

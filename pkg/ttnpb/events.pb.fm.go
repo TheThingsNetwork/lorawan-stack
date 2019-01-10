@@ -29,7 +29,7 @@ var EventFieldPathsTopLevel = []string{
 }
 
 func (dst *Event) SetFields(src *Event, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "name":
 			if len(subs) > 0 {
@@ -131,7 +131,7 @@ var StreamEventsRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "identifiers":
 			if len(subs) > 0 {

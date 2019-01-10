@@ -26,7 +26,7 @@ var GatewayUpFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "uplink_messages":
 			if len(subs) > 0 {
@@ -177,7 +177,7 @@ var GatewayDownFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "downlink_message":
 			if len(subs) > 0 {

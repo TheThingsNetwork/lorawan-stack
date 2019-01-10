@@ -13,7 +13,7 @@ var ApplicationIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *ApplicationIdentifiers) SetFields(src *ApplicationIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_id":
 			if len(subs) > 0 {
@@ -42,7 +42,7 @@ var ClientIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *ClientIdentifiers) SetFields(src *ClientIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "client_id":
 			if len(subs) > 0 {
@@ -80,7 +80,7 @@ var EndDeviceIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "device_id":
 			if len(subs) > 0 {
@@ -156,7 +156,7 @@ var GatewayIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "gateway_id":
 			if len(subs) > 0 {
@@ -194,7 +194,7 @@ var OrganizationIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *OrganizationIdentifiers) SetFields(src *OrganizationIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "organization_id":
 			if len(subs) > 0 {
@@ -225,7 +225,7 @@ var UserIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *UserIdentifiers) SetFields(src *UserIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "user_id":
 			if len(subs) > 0 {
@@ -269,7 +269,7 @@ var OrganizationOrUserIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 
 		case "ids":
@@ -376,7 +376,7 @@ var EntityIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 
 		case "ids":
@@ -560,7 +560,7 @@ var CombinedIdentifiersFieldPathsTopLevel = []string{
 }
 
 func (dst *CombinedIdentifiers) SetFields(src *CombinedIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "entity_identifiers":
 			if len(subs) > 0 {

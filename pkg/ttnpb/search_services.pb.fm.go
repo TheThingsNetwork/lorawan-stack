@@ -25,7 +25,7 @@ var SearchEntitiesRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "id_contains":
 			if len(subs) > 0 {
@@ -110,7 +110,7 @@ var SearchEndDevicesRequestFieldPathsTopLevel = []string{
 }
 
 func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
