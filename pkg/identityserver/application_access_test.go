@@ -185,7 +185,7 @@ func TestApplicationAccessClusterAuth(t *testing.T) {
 		rights, err := reg.ListRights(ctx, &applicationID, is.WithClusterAuth())
 
 		a.So(rights, should.NotBeNil)
-		a.So(ttnpb.AllRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(ttnpb.AllReadRights.Sub(rights).Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 	})
 }

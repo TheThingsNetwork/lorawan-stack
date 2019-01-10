@@ -74,7 +74,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			return nil, err
 		}
 		return &ttnpb.AuthInfoResponse{
-			UniversalRights: ttnpb.AllRights.Implied(),
+			UniversalRights: ttnpb.AllReadRights.Implied(),
 		}, nil
 	}
 	if strings.ToLower(md.AuthType) != "bearer" {
