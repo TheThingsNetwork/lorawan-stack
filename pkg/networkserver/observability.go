@@ -162,13 +162,13 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 func mType(msg *ttnpb.UplinkMessage) string { return strings.ToLower(msg.Payload.MType.String()) }
 
 func registerReceiveUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUp(ctx, devIDs, nil))
+	events.Publish(evtReceiveUp(ctx, nil, nil))
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, mType(msg)).Inc()
 	nsMetrics.uplinkUniqueReceived.WithLabelValues(ctx, mType(msg)).Inc()
 }
 
 func registerReceiveUplinkDuplicate(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUpDuplicate(ctx, devIDs, nil))
+	events.Publish(evtReceiveUpDuplicate(ctx, nil, nil))
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, mType(msg)).Inc()
 }
 
@@ -189,14 +189,14 @@ func registerForwardUplink(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb
 }
 
 func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
-	if !devIDs.IsZero() {
-		switch msg.Payload.MType {
+	if payload := msg.GetPayload(); payload != nil {
+		switch payload.MType {
 		case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-			events.Publish(evtDropData(ctx, devIDs, err))
+			events.Publish(evtDropData(ctx, nil, err))
 		case ttnpb.MType_JOIN_REQUEST:
-			events.Publish(evtDropJoin(ctx, devIDs, err))
+			events.Publish(evtDropJoin(ctx, nil, err))
 		case ttnpb.MType_REJOIN_REQUEST:
-			events.Publish(evtDropRejoin(ctx, devIDs, err))
+			events.Publish(evtDropRejoin(ctx, nil, err))
 		}
 	}
 	if ttnErr, ok := errors.From(err); ok {
