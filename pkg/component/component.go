@@ -52,7 +52,8 @@ type Component struct {
 	logger log.Stack
 	sentry *raven.Client
 
-	cluster cluster.Cluster
+	cluster    cluster.Cluster
+	clusterNew func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (cluster.Cluster, error)
 
 	grpc           *rpcserver.Server
 	grpcSubsystems []rpcserver.Registerer
@@ -84,8 +85,16 @@ func MustNew(logger log.Stack, config *Config) *Component {
 	return c
 }
 
+type Option func(*Component)
+
+func WithClusterNew(f func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (cluster.Cluster, error)) Option {
+	return func(c *Component) {
+		c.clusterNew = f
+	}
+}
+
 // New returns a new component
-func New(logger log.Stack, config *Config) (*Component, error) {
+func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 	var err error
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -109,6 +118,13 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		c.sentry, _ = raven.New(config.Sentry.DSN)
 		c.sentry.SetIncludePaths([]string{"go.thethings.network/lorawan-stack"})
 		c.logger.Use(sentry.New(c.sentry))
+	}
+
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.clusterNew == nil {
+		c.clusterNew = cluster.New
 	}
 
 	c.web, err = web.New(c.ctx, config.HTTP)
