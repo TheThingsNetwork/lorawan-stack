@@ -150,7 +150,19 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
+
+			cli := ttnpb.NewGatewayRegistryClient(is)
+
+			if gtwID.GatewayID == "" && gtwID.EUI != nil {
+				gtwID, err = cli.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+					EUI: *gtwID.EUI,
+				})
+				if err != nil {
+					return err
+				}
+			}
+
+			res, err := cli.Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIdentifiers: *gtwID,
 				FieldMask:          types.FieldMask{Paths: paths},
 			})
