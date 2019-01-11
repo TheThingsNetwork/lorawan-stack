@@ -42,10 +42,6 @@ func TestHook(t *testing.T) {
 		"Panic:NoFetcher": {
 			ShouldPanic: true,
 		},
-		"Panic:NoIdentifiers": {
-			Fetcher:     &mockFetcher{},
-			ShouldPanic: true,
-		},
 		"Application:ISUnavailable": {
 			Fetcher: &mockFetcher{
 				applicationError: mockErr,
