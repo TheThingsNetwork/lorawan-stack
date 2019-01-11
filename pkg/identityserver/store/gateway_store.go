@@ -59,7 +59,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "gateway_id"), gatewayColumns...)...))
+	return query.Select(cleanFields(append(append(modelColumns, "gateway_id", "gateway_eui"), gatewayColumns...)...))
 }
 
 func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error) {
