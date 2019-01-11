@@ -194,8 +194,10 @@ var (
 			if err != nil {
 				return err
 			}
+			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
+
 			var device ttnpb.EndDevice
-			var paths []string
+
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
 			if setDefaults {
 				device.NetworkServerAddress = config.NetworkServerAddress
