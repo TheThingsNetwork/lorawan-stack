@@ -223,7 +223,8 @@ var (
 					NwkKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
 				}
 				paths = append(paths,
-					"root_keys",
+					"root_keys.app_key",
+					"root_keys.nwk_key",
 				)
 			}
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
@@ -239,7 +240,10 @@ var (
 				device.DevAddr = &device.Session.DevAddr
 				// TODO: Set device.NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
 				paths = append(paths,
-					"session.keys",
+					"session.keys.f_nwk_s_int_key",
+					"session.keys.s_nwk_s_int_key",
+					"session.keys.nwk_s_enc_key",
+					"session.keys.app_s_key",
 				)
 			}
 
