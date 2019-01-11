@@ -33,9 +33,9 @@ import (
 
 // Config represents the JoinServer configuration.
 type Config struct {
-	Devices         DeviceRegistry      `name:"-"`
-	Keys            KeyRegistry         `name:"-"`
-	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
+	Devices         DeviceRegistry       `name:"-"`
+	Keys            KeyRegistry          `name:"-"`
+	JoinEUIPrefixes []*types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
 }
 
 // JoinServer implements the Join Server component.
@@ -47,7 +47,7 @@ type JoinServer struct {
 	devices DeviceRegistry
 	keys    KeyRegistry
 
-	euiPrefixes []types.EUI64Prefix
+	euiPrefixes []*types.EUI64Prefix
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader

@@ -16,7 +16,12 @@ package joinserver
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // DefaultJoinServerConfig is the default configuration for the JoinServer
-var DefaultJoinServerConfig = joinserver.Config{}
+var DefaultJoinServerConfig = joinserver.Config{
+	JoinEUIPrefixes: []*types.EUI64Prefix{
+		{},
+	},
+}
