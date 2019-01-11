@@ -59,11 +59,8 @@ func TestCryptoServices(t *testing.T) {
 	}
 	defer lis.Close()
 	s := grpc.NewServer()
-	kekLabelFunc := func(context.Context) (string, error) {
-		return "", nil
-	}
-	ttnpb.RegisterNetworkCryptoServiceServer(s, NewNetworkRPCServer(memSvc, keyVault, kekLabelFunc))
-	ttnpb.RegisterApplicationCryptoServiceServer(s, NewApplicationRPCServer(memSvc, keyVault, kekLabelFunc))
+	ttnpb.RegisterNetworkCryptoServiceServer(s, &mockNetworkRPCServer{memSvc, keyVault})
+	ttnpb.RegisterApplicationCryptoServiceServer(s, &mockApplicationRPCServer{memSvc, keyVault})
 	go s.Serve(lis)
 	conn, err := grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
