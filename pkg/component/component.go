@@ -75,16 +75,6 @@ type Component struct {
 	tasks []task
 }
 
-// MustNew calls New and returns a new component or panics on an error.
-// In most cases, you should just use New.
-func MustNew(logger log.Stack, config *Config) *Component {
-	c, err := New(logger, config)
-	if err != nil {
-		panic(err)
-	}
-	return c
-}
-
 type Option func(*Component)
 
 func WithClusterNew(f func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (cluster.Cluster, error)) Option {
@@ -137,6 +127,16 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 	c.initGRPC()
 
 	return c, nil
+}
+
+// MustNew calls New and returns a new component or panics on an error.
+// In most cases, you should just use New.
+func MustNew(logger log.Stack, config *Config, opts ...Option) *Component {
+	c, err := New(logger, config, opts...)
+	if err != nil {
+		panic(err)
+	}
+	return c
 }
 
 // Logger returns the logger of the component
