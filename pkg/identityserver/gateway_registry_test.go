@@ -17,12 +17,13 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/gogo/protobuf/types"
+	ptypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
@@ -72,7 +73,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"},
-			FieldMask:          types.FieldMask{Paths: []string{"name"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -80,7 +81,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		}
 
 		listRes, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: ptypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		a.So(err, should.BeNil)
@@ -88,7 +89,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -100,7 +101,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"},
 				Name:               "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: ptypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -125,10 +126,15 @@ func TestGatewaysCRUD(t *testing.T) {
 		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
+		eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+
 		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
-				Name:               "Foo Gateway",
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "foo",
+					EUI:       &eui,
+				},
+				Name: "Foo Gateway",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -138,22 +144,32 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          types.FieldMask{Paths: []string{"name"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
+		if a.So(got.EUI, should.NotBeNil) {
+			a.So(*got.EUI, should.Equal, eui)
+		}
 		a.So(got.Name, should.Equal, created.Name)
+
+		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+			EUI: eui,
+		}, credsWithoutRights)
+
+		a.So(err, should.BeNil)
+		a.So(ids.GatewayID, should.Equal, created.GatewayID)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          types.FieldMask{Paths: []string{"attributes"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -165,7 +181,7 @@ func TestGatewaysCRUD(t *testing.T) {
 				GatewayIdentifiers: created.GatewayIdentifiers,
 				Name:               "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: ptypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -173,14 +189,14 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-				FieldMask:    types.FieldMask{Paths: []string{"name"}},
+				FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
 			a.So(err, should.BeNil)
 			if a.So(list.Gateways, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Gateways {
-					if item.GatewayIdentifiers == created.GatewayIdentifiers {
+					if item.GatewayID == created.GatewayID {
 						found = true
 						a.So(item.Name, should.Equal, updated.Name)
 					}
@@ -208,7 +224,7 @@ func TestGatewaysPagination(t *testing.T) {
 		ctx := md.ToOutgoingContext(test.Context())
 
 		list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
@@ -220,7 +236,7 @@ func TestGatewaysPagination(t *testing.T) {
 		ctx = md.ToOutgoingContext(test.Context())
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
@@ -232,7 +248,7 @@ func TestGatewaysPagination(t *testing.T) {
 		ctx = md.ToOutgoingContext(test.Context())
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
