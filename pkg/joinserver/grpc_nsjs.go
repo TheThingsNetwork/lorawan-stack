@@ -25,6 +25,7 @@ import (
 	"github.com/oklog/ulid"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -213,27 +214,24 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 			networkCryptoService := srv.JS.networkCryptoService
 			applicationCryptoService := srv.JS.applicationCryptoService
-			switch req.SelectedMACVersion {
-			case ttnpb.MAC_V1_1:
-				if dev.RootKeys != nil {
-					memCryptoService := cryptoservices.NewMemory(*dev.RootKeys, srv.JS.KeyVault)
-					if dev.RootKeys.NwkKey != nil {
-						networkCryptoService = memCryptoService
-					}
-					if dev.RootKeys.AppKey != nil {
-						applicationCryptoService = memCryptoService
-					}
+			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
+				// LoRaWAN 1.1 and higher use a NwkKey.
+				nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, srv.JS.KeyVault)
+				if err != nil {
+					return nil, nil, err
 				}
-			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-				if dev.RootKeys != nil {
-					if dev.RootKeys.AppKey != nil {
-						memCryptoService := cryptoservices.NewMemory(*dev.RootKeys, srv.JS.KeyVault)
-						networkCryptoService = memCryptoService
-						applicationCryptoService = memCryptoService
-					}
+				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
+			}
+			if dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
+				appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, srv.JS.KeyVault)
+				if err != nil {
+					return nil, nil, err
 				}
-			default:
-				panic("This statement is unreachable. Fix version check.")
+				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
+				if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+					// LoRaWAN 1.0.x use the AppKey for network security operations.
+					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
+				}
 			}
 			if networkCryptoService == nil {
 				return nil, nil, errNoNwkKey
