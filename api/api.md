@@ -180,6 +180,7 @@
     - [GatewayVersion](#ttn.lorawan.v3.GatewayVersion)
     - [GatewayVersionIdentifiers](#ttn.lorawan.v3.GatewayVersionIdentifiers)
     - [Gateways](#ttn.lorawan.v3.Gateways)
+    - [GetGatewayIdentifiersForEUIRequest](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest)
     - [GetGatewayRequest](#ttn.lorawan.v3.GetGatewayRequest)
     - [ListGatewaysRequest](#ttn.lorawan.v3.ListGatewaysRequest)
     - [SetGatewayCollaboratorRequest](#ttn.lorawan.v3.SetGatewayCollaboratorRequest)
@@ -2372,6 +2373,21 @@ Identifies an end device model with version information.
 
 
 
+<a name="ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest"/>
+
+### GetGatewayIdentifiersForEUIRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| eui | [bytes](#bytes) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.GetGatewayRequest"/>
 
 ### GetGatewayRequest
@@ -2529,6 +2545,7 @@ where the user or organization is collaborator on.
 | ----------- | ------------ | ------------- | ------------|
 | Create | [CreateGatewayRequest](#ttn.lorawan.v3.CreateGatewayRequest) | [Gateway](#ttn.lorawan.v3.CreateGatewayRequest) | Create a new gateway. This also sets the given organization or user as first collaborator with all possible rights. |
 | Get | [GetGatewayRequest](#ttn.lorawan.v3.GetGatewayRequest) | [Gateway](#ttn.lorawan.v3.GetGatewayRequest) | Get the gateway with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| GetIdentifiersForEUI | [GetGatewayIdentifiersForEUIRequest](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest) | [GatewayIdentifiers](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest) |  |
 | List | [ListGatewaysRequest](#ttn.lorawan.v3.ListGatewaysRequest) | [Gateways](#ttn.lorawan.v3.ListGatewaysRequest) | List gateways. See request message for details. |
 | Update | [UpdateGatewayRequest](#ttn.lorawan.v3.UpdateGatewayRequest) | [Gateway](#ttn.lorawan.v3.UpdateGatewayRequest) |  |
 | Delete | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.GatewayIdentifiers) |  |

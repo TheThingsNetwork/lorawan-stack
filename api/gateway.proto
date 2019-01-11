@@ -124,6 +124,10 @@ message GetGatewayRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
+message GetGatewayIdentifiersForEUIRequest {
+  bytes eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.nullable) = false, (gogoproto.customname) = "EUI"];
+}
+
 message ListGatewaysRequest {
   // By default we list all gateways the caller has rights on.
   // Set the user or the organization (not both) to instead list the gateways

@@ -106,6 +106,26 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	return gtw, nil
 }
 
+func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (ids *ttnpb.GatewayIdentifiers, err error) {
+	if err = is.RequireAuthenticated(ctx); err != nil {
+		return nil, err
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
+			EUI: &req.EUI,
+		}, &types.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui"}})
+		if err != nil {
+			return err
+		}
+		ids = &gtw.GatewayIdentifiers
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
 	var gtwRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
@@ -228,6 +248,9 @@ func (gr *gatewayRegistry) Create(ctx context.Context, req *ttnpb.CreateGatewayR
 }
 func (gr *gatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
 	return gr.getGateway(ctx, req)
+}
+func (gr *gatewayRegistry) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+	return gr.getGatewayIdentifiersForEUI(ctx, req)
 }
 func (gr *gatewayRegistry) List(ctx context.Context, req *ttnpb.ListGatewaysRequest) (*ttnpb.Gateways, error) {
 	return gr.listGateways(ctx, req)

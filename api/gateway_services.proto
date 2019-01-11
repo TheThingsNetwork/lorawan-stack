@@ -49,6 +49,8 @@ service GatewayRegistry {
     };
   };
 
+  rpc GetIdentifiersForEUI(GetGatewayIdentifiersForEUIRequest) returns (GatewayIdentifiers);
+
   // List gateways. See request message for details.
   rpc List(ListGatewaysRequest) returns (Gateways) {
     option (google.api.http) = {

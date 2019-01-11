@@ -16,7 +16,6 @@ package rights
 
 import (
 	"context"
-	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -56,7 +55,7 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		}
 		ids, ok := req.(ttnpb.Identifiers)
 		if !ok {
-			panic(fmt.Errorf("Could not execute rights hook: %T does not implement ttnpb.Identifiers", req))
+			return next(ctx, req)
 		}
 		fetchRights := func(entityIDs *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 			switch ids := entityIDs.Identifiers().(type) {
@@ -98,6 +97,9 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		for _, ids := range combined.GetEntityIdentifiers() {
 			if devIDs := ids.GetDeviceIDs(); devIDs != nil {
 				ids = devIDs.ApplicationIdentifiers.EntityIdentifiers()
+			}
+			if ids.IDString() == "" {
+				continue
 			}
 			rights, err := fetchRights(ids)
 			if err == nil {

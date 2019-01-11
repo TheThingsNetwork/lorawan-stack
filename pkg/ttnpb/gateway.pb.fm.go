@@ -7,6 +7,7 @@ import (
 	time "time"
 
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var GatewayBrandFieldPathsNested = []string{
@@ -732,6 +733,35 @@ func (dst *GetGatewayRequest) SetFields(src *GetGatewayRequest, paths ...string)
 			} else {
 				var zero github_com_gogo_protobuf_types.FieldMask
 				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var GetGatewayIdentifiersForEUIRequestFieldPathsNested = []string{
+	"eui",
+}
+
+var GetGatewayIdentifiersForEUIRequestFieldPathsTopLevel = []string{
+	"eui",
+}
+
+func (dst *GetGatewayIdentifiersForEUIRequest) SetFields(src *GetGatewayIdentifiersForEUIRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EUI = src.EUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.EUI = zero
 			}
 
 		default:

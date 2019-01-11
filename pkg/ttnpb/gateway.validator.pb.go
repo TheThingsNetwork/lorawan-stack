@@ -100,6 +100,9 @@ func (this *GetGatewayRequest) Validate() error {
 	}
 	return nil
 }
+func (this *GetGatewayIdentifiersForEUIRequest) Validate() error {
+	return nil
+}
 func (this *ListGatewaysRequest) Validate() error {
 	if this.Collaborator != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Collaborator); err != nil {
