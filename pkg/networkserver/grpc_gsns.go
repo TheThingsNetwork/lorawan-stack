@@ -454,7 +454,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 		mac = pld.FRMPayload
 	}
 
-	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
+	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.MACState != nil && dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if ses.NwkSEncKey == nil || len(ses.NwkSEncKey.Key) == 0 {
 			return errUnknownNwkSEncKey
 		}
@@ -757,6 +757,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 	fp, err := ns.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 	if err != nil {
 		return errUnknownFrequencyPlan.WithCause(err)
+	}
+
+	if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
+		logger.WithError(err).Error("Failed to reset device's MAC state")
+		return err
 	}
 
 	req := &ttnpb.JoinRequest{
