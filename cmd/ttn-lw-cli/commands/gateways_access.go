@@ -29,9 +29,9 @@ var (
 		Use:   "rights",
 		Short: "List the rights to a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -56,9 +56,9 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List gateway collaborators",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -77,9 +77,9 @@ var (
 		Use:   "set",
 		Short: "Set a gateway collaborator",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), nil)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -118,9 +118,9 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List gateway API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -140,9 +140,9 @@ var (
 		Aliases: []string{"add", "generate"},
 		Short:   "Create a gateway API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), nil)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -182,9 +182,9 @@ var (
 			if id == "" {
 				return errNoAPIKeyID
 			}
-			gtwID := getGatewayID(cmd.Flags(), nil)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 			name, _ := cmd.Flags().GetString("name")
 

@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	ttntypes "go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var (
@@ -36,25 +37,42 @@ var (
 func gatewayIDFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String("gateway-id", "", "")
+	flagSet.String("gateway-eui", "", "")
 	return flagSet
 }
 
 var errNoGatewayID = errors.DefineInvalidArgument("no_gateway_id", "no gateway ID set")
 
-func getGatewayID(flagSet *pflag.FlagSet, args []string) *ttnpb.GatewayIdentifiers {
-	var gatewayID string
-	if len(args) > 0 {
-		if len(args) > 1 {
-			logger.Warn("multiple IDs found in arguments, considering only the first")
-		}
+func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.GatewayIdentifiers, error) {
+	gatewayID, _ := flagSet.GetString("gateway-id")
+	gatewayEUIHex, _ := flagSet.GetString("gateway-eui")
+	switch len(args) {
+	case 0:
+	case 1:
 		gatewayID = args[0]
-	} else {
-		gatewayID, _ = flagSet.GetString("gateway-id")
+	case 2:
+		gatewayID = args[0]
+		gatewayEUIHex = args[1]
+	default:
+		logger.Warn("multiple IDs found in arguments, considering the first")
+		gatewayID = args[0]
+		gatewayEUIHex = args[1]
 	}
-	if gatewayID == "" {
-		return nil
+	if gatewayID == "" && gatewayEUIHex == "" {
+		return nil, errNoGatewayID
 	}
-	return &ttnpb.GatewayIdentifiers{GatewayID: gatewayID}
+	if gatewayID == "" && requireID {
+		return nil, errNoGatewayID
+	}
+	ids := &ttnpb.GatewayIdentifiers{GatewayID: gatewayID}
+	if gatewayEUIHex != "" {
+		var gatewayEUI ttntypes.EUI64
+		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
+			return nil, err
+		}
+		ids.EUI = &gatewayEUI
+	}
+	return ids, nil
 }
 
 var (
@@ -118,9 +136,9 @@ var (
 		Aliases: []string{"info"},
 		Short:   "Get a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, false)
+			if err != nil {
+				return err
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			if len(paths) == 0 {
@@ -148,9 +166,9 @@ var (
 		Aliases: []string{"add", "register"},
 		Short:   "Create a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -186,9 +204,9 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
 			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
@@ -248,9 +266,9 @@ var (
 		Use:   "delete",
 		Short: "Delete a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -269,9 +287,9 @@ var (
 		Use:   "connection-stats",
 		Short: "Get connection stats for a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID := getGatewayID(cmd.Flags(), args)
-			if gtwID == nil {
-				return errNoGatewayID
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
 			}
 
 			gs, err := api.Dial(ctx, config.GatewayServerAddress)
@@ -287,9 +305,9 @@ var (
 		},
 	}
 	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		gtwID := getGatewayID(cmd.Flags(), nil)
-		if gtwID == nil {
-			return nil, errNoGatewayID
+		gtwID, err := getGatewayID(cmd.Flags(), nil, true)
+		if err != nil {
+			return nil, err
 		}
 		return gtwID.EntityIdentifiers(), nil
 	})
