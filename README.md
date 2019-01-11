@@ -82,7 +82,7 @@ The simplest way to set up a private network is with our provided [`docker-compo
     ```
 5. Register the Console as an OAuth client:  
     ```sh
-    docker-compose run --rm stack ttn-lw-identity-server create-oauth-client \ 
+    docker-compose run --rm stack ttn-lw-identity-server create-oauth-client \
       --id console --name "Console" \
       --owner admin \
       --redirect-uri 'http://example.com:1885/console/oauth/callback' \
