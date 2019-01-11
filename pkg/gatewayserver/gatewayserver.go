@@ -166,7 +166,17 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 // CustomContextFromIdentifier returns a derived context based on the given identifiers to use for the connection.
 var CustomContextFromIdentifier func(context.Context, ttnpb.GatewayIdentifiers) (context.Context, error)
 
-var errEmptyIdentifiers = errors.Define("empty_identifiers", "empty identifiers")
+var (
+	errEntityRegistryNotFound = errors.DefineNotFound(
+		"entity_registry_not_found",
+		"Entity Registry not found",
+	)
+	errGatewayEUINotRegistered = errors.DefineNotFound(
+		"gateway_eui_not_registered",
+		"gateway EUI `{eui}` is not registered",
+	)
+	errEmptyIdentifiers = errors.Define("empty_identifiers", "empty identifiers")
+)
 
 // FillGatewayContext fills the given context and identifiers.
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
@@ -175,7 +185,23 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
 	}
 	if ids.GatewayID == "" {
-		ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+		er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
+		if er == nil {
+			return nil, ttnpb.GatewayIdentifiers{}, errEntityRegistryNotFound
+		}
+		extIDs, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+			EUI: *ids.EUI,
+		}, gs.WithClusterAuth())
+		if err == nil {
+			ids = *extIDs
+		} else if errors.IsNotFound(err) {
+			if gs.config.RequireRegisteredGateways {
+				return nil, ttnpb.GatewayIdentifiers{}, errGatewayEUINotRegistered.WithAttributes("eui", *ids.EUI).WithCause(err)
+			}
+			ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+		} else {
+			return nil, ttnpb.GatewayIdentifiers{}, err
+		}
 	}
 	if filler := CustomContextFromIdentifier; filler != nil {
 		var err error
@@ -187,10 +213,6 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 }
 
 var (
-	errEntityRegistryNotFound = errors.DefineNotFound(
-		"entity_registry_not_found",
-		"Entity Registry not found",
-	)
 	errGatewayNotRegistered = errors.DefineNotFound(
 		"gateway_not_registered",
 		"gateway `{gateway_uid}` is not registered",

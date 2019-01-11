@@ -2393,6 +2393,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:gateway_eui_not_registered": {
+    "translations": {
+      "en": "gateway EUI `{eui}` is not registered"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:gateway_not_registered": {
     "translations": {
       "en": "gateway `{gateway_uid}` is not registered"

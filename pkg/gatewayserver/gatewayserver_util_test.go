@@ -117,6 +117,16 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb
 	return gtw, nil
 }
 
+func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+	if req.EUI == registeredGatewayEUI {
+		return &ttnpb.GatewayIdentifiers{
+			GatewayID: registeredGatewayID,
+			EUI:       &registeredGatewayEUI,
+		}, nil
+	}
+	return nil, errNotFound
+}
+
 func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {
 	res = &ttnpb.Rights{}
 	md, ok := metadata.FromIncomingContext(ctx)

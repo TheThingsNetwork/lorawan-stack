@@ -45,7 +45,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = "eui-aaee000000000000"
+	registeredGatewayID  = "test-gateway"
 	registeredGatewayKey = "secret"
 	registeredGatewayEUI = types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
