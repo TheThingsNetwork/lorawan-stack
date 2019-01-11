@@ -218,6 +218,9 @@ func trimPrefix(path []string, prefix ...string) []string {
 func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
 	rv := reflect.Indirect(reflect.ValueOf(dst))
 	flags.VisitAll(func(flag *pflag.Flag) {
+		if !flag.Changed {
+			return
+		}
 		var v interface{}
 		switch flag.Value.Type() {
 		case "bool":
