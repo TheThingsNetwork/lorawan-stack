@@ -145,8 +145,8 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
 	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
 
-	if fp.Rx2 != nil {
-		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2.Frequency
+	if fp.Rx2Channel != nil {
+		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
 	}
 	if fp.DefaultRx2DataRate != nil {
 		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
