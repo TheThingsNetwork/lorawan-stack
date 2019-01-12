@@ -760,13 +760,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 	}
 
 	req := &ttnpb.JoinRequest{
-		RawPayload: up.RawPayload,
-		Payload:    up.Payload,
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			DevEUI:  &pld.DevEUI,
-			JoinEUI: &pld.JoinEUI,
-			DevAddr: &devAddr,
-		},
+		RawPayload:         up.RawPayload,
+		Payload:            up.Payload,
+		DevAddr:            devAddr,
 		NetID:              ns.NetID,
 		SelectedMACVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
 		RxDelay:            dev.MACState.DesiredParameters.Rx1Delay,

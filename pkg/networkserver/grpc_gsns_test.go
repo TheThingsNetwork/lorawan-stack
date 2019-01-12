@@ -1675,12 +1675,8 @@ func handleJoinTest() func(t *testing.T) {
 				a.So(ret, should.Resemble, pb)
 
 				expectedRequest := &ttnpb.JoinRequest{
-					RawPayload: tc.UplinkMessage.RawPayload,
-					Payload:    tc.UplinkMessage.Payload,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DevEUI:  &DevEUI,
-						JoinEUI: &JoinEUI,
-					},
+					RawPayload:         tc.UplinkMessage.RawPayload,
+					Payload:            tc.UplinkMessage.Payload,
 					NetID:              ns.NetID,
 					SelectedMACVersion: tc.Device.LoRaWANVersion,
 					RxDelay:            tc.Device.MACState.DesiredParameters.Rx1Delay,
@@ -1709,10 +1705,10 @@ func handleJoinTest() func(t *testing.T) {
 				select {
 				case req := <-handleJoinCh:
 					if ses := tc.Device.Session; ses != nil {
-						a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
+						a.So(req.req.DevAddr, should.NotResemble, ses.DevAddr)
 					}
 
-					expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
+					expectedRequest.DevAddr = req.req.DevAddr
 					a.So(req.req, should.Resemble, expectedRequest)
 
 					req.ch <- resp
@@ -1721,7 +1717,7 @@ func handleJoinTest() func(t *testing.T) {
 				case we := <-collectionDoneCh:
 					close(we.ch)
 					a.So(<-errch, should.BeNil)
-					t.Fatal("Join request not sent to JS")
+					t.Fatal("Join-request not sent to JS")
 
 				case <-time.After(Timeout):
 					t.Fatal("Timed out while waiting for join to be sent to JS")
@@ -1854,9 +1850,9 @@ func handleJoinTest() func(t *testing.T) {
 
 					select {
 					case req := <-handleJoinCh:
-						a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, pb.Session.DevAddr)
+						a.So(req.req.DevAddr, should.NotResemble, pb.Session.DevAddr)
 
-						expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
+						expectedRequest.DevAddr = req.req.DevAddr
 						a.So(req.req, should.Resemble, expectedRequest)
 
 						resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
@@ -1883,7 +1879,7 @@ func handleJoinTest() func(t *testing.T) {
 						a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
 							CorrelationIDs: up.CorrelationIDs,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
+								DevAddr:                &expectedRequest.DevAddr,
 								DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
 								DeviceID:               tc.Device.EndDeviceIdentifiers.DeviceID,
 								JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
@@ -1900,7 +1896,7 @@ func handleJoinTest() func(t *testing.T) {
 						t.Fatal("Timed out while waiting for join to be sent to AS")
 					}
 
-					pb.EndDeviceIdentifiers.DevAddr = expectedRequest.EndDeviceIdentifiers.DevAddr
+					pb.EndDeviceIdentifiers.DevAddr = &expectedRequest.DevAddr
 					select {
 					case req := <-downlinkAddCh:
 						a.So(req.ctx, should.HaveParentContext, ctx)
