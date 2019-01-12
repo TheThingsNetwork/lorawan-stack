@@ -27,8 +27,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func uint8Ptr(v uint8) *uint8                    { return &v }
+func uint64Ptr(v uint64) *uint64                 { return &v }
+func float32Ptr(v float32) *float32              { return &v }
+func boolPtr(v bool) *bool                       { return &v }
+func durationPtr(v time.Duration) *time.Duration { return &v }
+
 func Example() {
-	store := frequencyplans.NewStore(fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master", true))
+	store := frequencyplans.NewStore(fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true))
 
 	ids, err := store.GetAllIDs()
 	if err != nil {
@@ -221,28 +227,22 @@ uplink-channels:
 }
 
 func TestProtoConversion(t *testing.T) {
-	notchFrequency := uint64(920000000)
 	for i, tc := range []struct {
-		fp       *frequencyplans.FrequencyPlan
-		expected *ttnpb.ConcentratorConfig
+		Input  *frequencyplans.FrequencyPlan
+		Output *ttnpb.ConcentratorConfig
 	}{
 		{
-			fp: &frequencyplans.FrequencyPlan{
+			Input: &frequencyplans.FrequencyPlan{
+				BandID: "US_902_928",
 				UplinkChannels: []frequencyplans.Channel{
 					{Frequency: 922100000, Radio: 0},
 					{Frequency: 922300000, Radio: 0},
-					{
-						Frequency: 922500000,
-						Radio:     0,
-					},
+					{Frequency: 922500000, Radio: 0},
 				},
 				DownlinkChannels: []frequencyplans.Channel{
 					{Frequency: 922100000, Radio: 0},
 					{Frequency: 922300000, Radio: 0},
-					{
-						Frequency: 922500000,
-						Radio:     0,
-					},
+					{Frequency: 922500000, Radio: 0},
 				},
 				Radios: []frequencyplans.Radio{
 					{
@@ -252,7 +252,7 @@ func TestProtoConversion(t *testing.T) {
 						TxConfiguration: &frequencyplans.RadioTxConfiguration{
 							MinFrequency:   909000000,
 							MaxFrequency:   925000000,
-							NotchFrequency: &notchFrequency,
+							NotchFrequency: uint64Ptr(920000000),
 						},
 					},
 					{
@@ -263,14 +263,11 @@ func TestProtoConversion(t *testing.T) {
 				},
 				ClockSource: 1,
 			},
-			expected: &ttnpb.ConcentratorConfig{
+			Output: &ttnpb.ConcentratorConfig{
 				Channels: []*ttnpb.ConcentratorConfig_Channel{
 					{Frequency: 922100000, Radio: 0},
 					{Frequency: 922300000, Radio: 0},
-					{
-						Frequency: 922500000,
-						Radio:     0,
-					},
+					{Frequency: 922500000, Radio: 0},
 				},
 				Radios: []*ttnpb.GatewayRadio{
 					{
@@ -280,7 +277,7 @@ func TestProtoConversion(t *testing.T) {
 						TxConfiguration: &ttnpb.GatewayRadio_TxConfiguration{
 							MinFrequency:   909000000,
 							MaxFrequency:   925000000,
-							NotchFrequency: notchFrequency,
+							NotchFrequency: 920000000,
 						},
 					},
 					{
@@ -293,37 +290,35 @@ func TestProtoConversion(t *testing.T) {
 			},
 		},
 		{
-			fp: &frequencyplans.FrequencyPlan{
+			Input: &frequencyplans.FrequencyPlan{
+				BandID: "EU_863_870",
 				FSKChannel: &frequencyplans.FSKChannel{
-					Channel: frequencyplans.Channel{
-						Frequency: 901000000,
-						Radio:     1,
-					},
+					Frequency: 868800000,
+					Radio:     1,
+					DataRate:  7,
 				},
 				LoRaStandardChannel: &frequencyplans.LoRaStandardChannel{
-					Channel: frequencyplans.Channel{
-						Frequency: 900000000,
-						Radio:     0,
-					},
+					Frequency: 868300000,
+					Radio:     1,
+					DataRate:  6,
 				},
 			},
-			expected: &ttnpb.ConcentratorConfig{
+			Output: &ttnpb.ConcentratorConfig{
 				FSKChannel: &ttnpb.ConcentratorConfig_FSKChannel{
-					ConcentratorConfig_Channel: ttnpb.ConcentratorConfig_Channel{
-						Frequency: 901000000,
-						Radio:     1,
-					},
+					Frequency: 868800000,
+					Radio:     1,
 				},
 				LoRaStandardChannel: &ttnpb.ConcentratorConfig_LoRaStandardChannel{
-					ConcentratorConfig_Channel: ttnpb.ConcentratorConfig_Channel{
-						Frequency: 900000000,
-						Radio:     0,
-					},
+					Frequency:       868300000,
+					Radio:           1,
+					SpreadingFactor: 7,
+					Bandwidth:       250000,
 				},
 			},
 		},
 		{
-			fp: &frequencyplans.FrequencyPlan{
+			Input: &frequencyplans.FrequencyPlan{
+				BandID: "AS_923",
 				LBT: &frequencyplans.LBT{
 					ScanTime: 32,
 				},
@@ -332,7 +327,7 @@ func TestProtoConversion(t *testing.T) {
 					Radio:     1,
 				},
 			},
-			expected: &ttnpb.ConcentratorConfig{
+			Output: &ttnpb.ConcentratorConfig{
 				LBT: &ttnpb.ConcentratorConfig_LBTConfiguration{
 					ScanTime: 32,
 				},
@@ -345,7 +340,9 @@ func TestProtoConversion(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("Proto%d", i), func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(tc.fp.ToConcentratorConfig(), should.Resemble, tc.expected)
+			output, err := tc.Input.ToConcentratorConfig()
+			a.So(err, should.BeNil)
+			a.So(output, should.Resemble, tc.Output)
 		})
 	}
 }

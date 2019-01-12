@@ -46,6 +46,9 @@ func (lbt *LBT) Clone() *LBT {
 
 // ToConcentratorConfig returns the LBT configuration in the protobuf format.
 func (lbt *LBT) ToConcentratorConfig() *ttnpb.ConcentratorConfig_LBTConfiguration {
+	if lbt == nil {
+		return nil
+	}
 	return &ttnpb.ConcentratorConfig_LBTConfiguration{
 		RSSIOffset: lbt.RSSIOffset,
 		RSSITarget: lbt.RSSITarget,
@@ -53,19 +56,19 @@ func (lbt *LBT) ToConcentratorConfig() *ttnpb.ConcentratorConfig_LBTConfiguratio
 	}
 }
 
-// DwellTime contains the dwell time devices must abide to for a region.
+// DwellTime contains dwell time settings.
 type DwellTime struct {
 	Uplinks   *bool          `yaml:"uplinks,omitempty"`
 	Downlinks *bool          `yaml:"downlinks,omitempty"`
 	Duration  *time.Duration `yaml:"duration,omitempty"`
 }
 
-// GetUplinks returns whether the dwell time is enabled on uplinks.
+// GetUplinks returns whether the dwell time is applicable to uplinks.
 func (dt *DwellTime) GetUplinks() bool {
 	return dt != nil && dt.Uplinks != nil && *dt.Uplinks
 }
 
-// GetDownlinks returns whether the dwell time is enabled on downlinks.
+// GetDownlinks returns whether the dwell time is applicable to downlinks.
 func (dt *DwellTime) GetDownlinks() bool {
 	return dt != nil && dt.Downlinks != nil && *dt.Downlinks
 }
@@ -91,12 +94,13 @@ func (dt *DwellTime) Clone() *DwellTime {
 	return &ndt
 }
 
+// ChannelDwellTime contains dwell time settings for a channel.
 type ChannelDwellTime struct {
 	Enabled  *bool          `yaml:"enabled,omitempty"`
 	Duration *time.Duration `yaml:"duration,omitempty"`
 }
 
-// GetEnabled returns whether the dwell time is enabled.
+// GetEnabled returns whether dwell time is enabled.
 func (dt *ChannelDwellTime) GetEnabled() bool {
 	return dt != nil && dt.Enabled != nil && *dt.Enabled
 }
@@ -127,7 +131,7 @@ type Channel struct {
 	MaxDataRate uint8             `yaml:"max-data-rate"`
 }
 
-// Copy returns an identical channel configuration.
+// Clone returns a cloned Channel.
 func (c *Channel) Clone() *Channel {
 	if c == nil {
 		return nil
@@ -139,17 +143,21 @@ func (c *Channel) Clone() *Channel {
 
 // ToConcentratorConfig returns the channel configuration in the protobuf format.
 func (c *Channel) ToConcentratorConfig() *ttnpb.ConcentratorConfig_Channel {
+	if c == nil {
+		return nil
+	}
 	return &ttnpb.ConcentratorConfig_Channel{
 		Frequency: c.Frequency,
 		Radio:     uint32(c.Radio),
 	}
 }
 
-// LoRaStandardChannel contains the configuration of the LoRa standard channel on a gateway.
+// LoRaStandardChannel contains the configuration of the LoRa standard channel.
 type LoRaStandardChannel struct {
-	Channel
-	Bandwidth       uint32 `yaml:"bandwidth"`
-	SpreadingFactor uint32 `yaml:"spreading-factor"`
+	Frequency uint64            `yaml:"frequency"`
+	DwellTime *ChannelDwellTime `yaml:"dwell-time,omitempty"`
+	Radio     uint8             `yaml:"radio"`
+	DataRate  uint8             `yaml:"data-rate"`
 }
 
 // Clone returns a cloned LoRaStandardChannel.
@@ -158,24 +166,32 @@ func (lsc *LoRaStandardChannel) Clone() *LoRaStandardChannel {
 		return nil
 	}
 	nlsc := *lsc
-	nlsc.Channel = *lsc.Channel.Clone()
+	nlsc.DwellTime = lsc.DwellTime.Clone()
 	return &nlsc
 }
 
 // ToConcentratorConfig returns the LoRa standard channel configuration in the protobuf format.
-func (lsc *LoRaStandardChannel) ToConcentratorConfig() *ttnpb.ConcentratorConfig_LoRaStandardChannel {
+func (lsc *LoRaStandardChannel) ToConcentratorConfig(band band.Band) *ttnpb.ConcentratorConfig_LoRaStandardChannel {
+	if lsc == nil {
+		return nil
+	}
+	// TODO: Get values (https://github.com/TheThingsIndustries/lorawan-stack/issues/1384)
+	sf, _ := band.DataRates[lsc.DataRate].Rate.SpreadingFactor()
+	bw, _ := band.DataRates[lsc.DataRate].Rate.Bandwidth()
 	return &ttnpb.ConcentratorConfig_LoRaStandardChannel{
-		ConcentratorConfig_Channel: *lsc.Channel.ToConcentratorConfig(),
-		Bandwidth:                  lsc.Bandwidth,
-		SpreadingFactor:            lsc.SpreadingFactor,
+		Frequency:       lsc.Frequency,
+		Radio:           uint32(lsc.Radio),
+		SpreadingFactor: uint32(sf),
+		Bandwidth:       bw,
 	}
 }
 
-// FSKChannel contains the configuration of the FSKChannel on a gateway.
+// FSKChannel contains the configuration of an FSK channel.
 type FSKChannel struct {
-	Channel
-	Bandwidth uint32 `yaml:"bandwidth"`
-	BitRate   uint32 `yaml:"bit-rate"`
+	Frequency uint64            `yaml:"frequency"`
+	DwellTime *ChannelDwellTime `yaml:"dwell-time,omitempty"`
+	Radio     uint8             `yaml:"radio"`
+	DataRate  uint8             `yaml:"data-rate"`
 }
 
 // Clone returns a cloned FSKChannel.
@@ -184,20 +200,22 @@ func (fskc *FSKChannel) Clone() *FSKChannel {
 		return nil
 	}
 	nfskc := *fskc
-	nfskc.Channel = *fskc.Channel.Clone()
+	nfskc.DwellTime = fskc.DwellTime.Clone()
 	return &nfskc
 }
 
 // ToConcentratorConfig returns the FSK channel configuration in the protobuf format.
 func (fskc *FSKChannel) ToConcentratorConfig() *ttnpb.ConcentratorConfig_FSKChannel {
+	if fskc == nil {
+		return nil
+	}
 	return &ttnpb.ConcentratorConfig_FSKChannel{
-		ConcentratorConfig_Channel: *fskc.Channel.ToConcentratorConfig(),
-		Bandwidth:                  fskc.Bandwidth,
-		BitRate:                    fskc.BitRate,
+		Frequency: fskc.Frequency,
+		Radio:     uint32(fskc.Radio),
 	}
 }
 
-// TimeOffAir contains the time-off-air regulations that emissions must abide to.
+// TimeOffAir contains the time-off-air settings.
 type TimeOffAir struct {
 	Fraction float32       `yaml:"fraction,omitempty"`
 	Duration time.Duration `yaml:"duration,omitempty"`
@@ -212,13 +230,14 @@ func (toa *TimeOffAir) Clone() *TimeOffAir {
 	return &ntoa
 }
 
-// RadioTxConfiguration contains the Tx emission-configuration of a radio on a gateway.
+// RadioTxConfiguration contains the gateway radio transmission configuration.
 type RadioTxConfiguration struct {
 	MinFrequency   uint64  `yaml:"min-frequency"`
 	MaxFrequency   uint64  `yaml:"max-frequency"`
 	NotchFrequency *uint64 `yaml:"notch-frequency,omitempty"`
 }
 
+// Clone returns a cloned RadioTxConfiguration.
 func (txc *RadioTxConfiguration) Clone() *RadioTxConfiguration {
 	if txc == nil {
 		return nil
@@ -231,7 +250,7 @@ func (txc *RadioTxConfiguration) Clone() *RadioTxConfiguration {
 	return &ntxc
 }
 
-// Radio contains the configuration of a radio on a gateway.
+// Radio contains the gateway configuration of a radio.
 type Radio struct {
 	Enable          bool                  `yaml:"enable"`
 	ChipType        string                `yaml:"chip-type,omitempty"`
@@ -240,6 +259,7 @@ type Radio struct {
 	TxConfiguration *RadioTxConfiguration `yaml:"tx,omitempty"`
 }
 
+// Clone returns a cloned Radio.
 func (r *Radio) Clone() *Radio {
 	if r == nil {
 		return nil
@@ -269,7 +289,7 @@ func (r Radio) ToConcentratorConfig() *ttnpb.GatewayRadio {
 	return ccr
 }
 
-// FrequencyPlan contains the local regulations and settings for a region.
+// FrequencyPlan contains a frequency plan.
 type FrequencyPlan struct {
 	BandID string `yaml:"band-id,omitempty"`
 
@@ -285,11 +305,11 @@ type FrequencyPlan struct {
 	Radios      []Radio `yaml:"radios,omitempty"`
 	ClockSource uint8   `yaml:"clock-source,omitempty"`
 
-	// PingSlot allows override of default band settings for the class B ping slot.
+	// PingSlot overrides the default band settings for the class B ping slot.
 	PingSlot                *Channel `yaml:"ping-slot,omitempty"`
 	DefaultPingSlotDataRate *uint8   `yaml:"ping-slot-default-data-rate,omitempty"`
-	// Rx2 allows override of default band settings for Rx2.
-	Rx2                *Channel `yaml:"rx2,omitempty"`
+	// Rx2Channel overrides the default band settings for Rx2.
+	Rx2Channel         *Channel `yaml:"rx2-channel,omitempty"`
 	DefaultRx2DataRate *uint8   `yaml:"rx2-default-data-rate,omitempty"`
 	MaxEIRP            *float32 `yaml:"max-eirp,omitempty"`
 }
@@ -341,8 +361,8 @@ func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 		i = *ext.DefaultPingSlotDataRate
 		fp.DefaultPingSlotDataRate = &i
 	}
-	if ext.Rx2 != nil {
-		fp.Rx2 = ext.Rx2.Clone()
+	if ext.Rx2Channel != nil {
+		fp.Rx2Channel = ext.Rx2Channel.Clone()
 	}
 	if ext.DefaultRx2DataRate != nil {
 		var i uint8
@@ -387,85 +407,77 @@ func (fp FrequencyPlan) Validate() error {
 
 // RespectsDwellTime returns whether the transmission respects the frequency plan's dwell time restrictions.
 func (fp *FrequencyPlan) RespectsDwellTime(isDownlink bool, frequency uint64, duration time.Duration) bool {
+	var chDwellTime *ChannelDwellTime
 	var channels []Channel
 	if isDownlink {
 		channels = fp.DownlinkChannels
 	} else {
 		channels = fp.UplinkChannels
 	}
-	allChannels := make([]Channel, len(channels), len(channels)+2)
-	copy(allChannels, channels)
-	if fp.LoRaStandardChannel != nil {
-		allChannels = append(allChannels, fp.LoRaStandardChannel.Channel)
+	for _, ch := range channels {
+		if ch.Frequency == frequency {
+			chDwellTime = ch.DwellTime
+			break
+		}
 	}
-	if fp.FSKChannel != nil {
-		allChannels = append(allChannels, fp.FSKChannel.Channel)
+	if chDwellTime == nil && fp.LoRaStandardChannel != nil && fp.LoRaStandardChannel.Frequency == frequency {
+		chDwellTime = fp.LoRaStandardChannel.DwellTime
+	}
+	if chDwellTime == nil && fp.FSKChannel != nil && fp.FSKChannel.Frequency == frequency {
+		chDwellTime = fp.FSKChannel.DwellTime
 	}
 	fpdtEnabled := isDownlink && fp.DwellTime.GetDownlinks() || !isDownlink && fp.DwellTime.GetUplinks()
-	for _, ch := range allChannels {
-		if ch.Frequency != frequency {
-			continue
+	if fpdtEnabled && (chDwellTime == nil || chDwellTime.Enabled == nil) || chDwellTime.GetEnabled() {
+		var dwellTime time.Duration
+		if chDwellTime != nil && chDwellTime.Duration != nil {
+			dwellTime = *chDwellTime.Duration
+		} else {
+			dwellTime = *fp.DwellTime.Duration
 		}
-		if fpdtEnabled && (ch.DwellTime == nil || ch.DwellTime.Enabled == nil) || ch.DwellTime.GetEnabled() {
-			var dwellTime time.Duration
-			if ch.DwellTime != nil && ch.DwellTime.Duration != nil {
-				dwellTime = *ch.DwellTime.Duration
-			} else {
-				dwellTime = *fp.DwellTime.Duration
-			}
-			return duration <= dwellTime
-		}
-		return true
+		return duration <= dwellTime
 	}
-	if !fpdtEnabled {
-		return true
-	}
-	return duration <= *fp.DwellTime.Duration
+	return true
 }
 
 // ToConcentratorConfig returns the frequency plan in the protobuf format.
-func (fp *FrequencyPlan) ToConcentratorConfig() *ttnpb.ConcentratorConfig {
+func (fp *FrequencyPlan) ToConcentratorConfig() (*ttnpb.ConcentratorConfig, error) {
+	band, err := band.GetByID(fp.BandID)
+	if err != nil {
+		return nil, err
+	}
 	cc := &ttnpb.ConcentratorConfig{}
 	for _, channel := range fp.UplinkChannels {
 		cc.Channels = append(cc.Channels, channel.ToConcentratorConfig())
 	}
-	if fp.LoRaStandardChannel != nil {
-		cc.LoRaStandardChannel = fp.LoRaStandardChannel.ToConcentratorConfig()
-	}
-	if fp.FSKChannel != nil {
-		cc.FSKChannel = fp.FSKChannel.ToConcentratorConfig()
-	}
-	if fp.LBT != nil {
-		cc.LBT = fp.LBT.ToConcentratorConfig()
-	}
-	if fp.PingSlot != nil {
-		cc.PingSlot = fp.PingSlot.ToConcentratorConfig()
-	}
+	cc.LoRaStandardChannel = fp.LoRaStandardChannel.ToConcentratorConfig(band)
+	cc.FSKChannel = fp.FSKChannel.ToConcentratorConfig()
+	cc.LBT = fp.LBT.ToConcentratorConfig()
+	cc.PingSlot = fp.PingSlot.ToConcentratorConfig()
 	for _, radio := range fp.Radios {
 		cc.Radios = append(cc.Radios, radio.ToConcentratorConfig())
 	}
 	cc.ClockSource = uint32(fp.ClockSource)
-	return cc
+	return cc, nil
 }
 
 // FrequencyPlanDescription describes a frequency plan in the YAML format.
 type FrequencyPlanDescription struct {
-	// ID to identify the frequency plan.
+	// ID is the unique identifier of the frequency plan.
 	ID string `yaml:"id"`
-	// Description of the frequency plan.
-	Description string `yaml:"description"`
-	// BaseFrequency in Mhz.
+	// Name is a human readable name of the frequency plan.
+	Name string `yaml:"name"`
+	// BaseFrequency is the base frequency of the frequency plan (i.e. 868, 915)
 	BaseFrequency uint16 `yaml:"base-frequency"`
-	// Filename of the frequency plan within the repo.
-	Filename string `yaml:"file"`
-	// BaseID is the ID of the frequency plan that's the basis for this extended frequency plan.
+	// File is the file where the frequency plan is defined.
+	File string `yaml:"file"`
+	// BaseID is the frequency's base (optional).
 	BaseID string `yaml:"base,omitempty"`
 }
 
 var errFetchFailed = errors.Define("fetch", "fetching failed")
 
 func (d FrequencyPlanDescription) content(f fetch.Interface) ([]byte, error) {
-	content, err := f.File(d.Filename)
+	content, err := f.File(d.File)
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}
@@ -494,7 +506,6 @@ func (l frequencyPlanList) get(id string) (FrequencyPlanDescription, bool) {
 			return f, true
 		}
 	}
-
 	return FrequencyPlanDescription{}, false
 }
 

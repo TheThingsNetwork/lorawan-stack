@@ -20,11 +20,11 @@ import (
 
 const (
 	frequencyPlansDescription = `- id: EU_863_870
-  description: Europe 868MHz
+  name: Europe 863-870 MHz
   base-frequency: 868
   file: EU_863_870.yml
 - id: KR_920_923
-  description: Korea 920-923MHz
+  name: Korea 920-923 MHz
   base-frequency: 915
   file: KR_920_923.yml`
 
@@ -89,12 +89,11 @@ downlink-channels:
   max-data-rate: 5
 lora-standard-channel:
   frequency: 863000000
-  data-rate:
-    index: 6
+  data-rate: 6
 fsk-channel:
   frequency: 868800000
-  data-rate:
-    index: 7`
+  data-rate: 7
+`
 
 	// KRFrequencyPlanID available in the store.
 	KRFrequencyPlanID = "KR_920_923"
