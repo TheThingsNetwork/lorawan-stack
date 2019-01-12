@@ -36,5 +36,6 @@ func TestFrequencyPlans(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(krFP.UplinkChannels[0].Frequency, should.Equal, 922100000)
 
+	_, err = fp.GetByID(test.ExampleFrequencyPlanID)
 	a.So(err, should.BeNil)
 }
