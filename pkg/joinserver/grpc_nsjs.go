@@ -72,10 +72,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMACVersion)
 	}
 
-	if req.EndDeviceIdentifiers.DevAddr == nil {
-		return nil, errNoDevAddr
-	}
-
 	rawPayload := req.RawPayload
 	if req.GetPayload().GetPayload() == nil {
 		if rawPayload == nil {
@@ -197,7 +193,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				NetID:      req.NetID,
 				JoinNonce:  jn,
 				CFList:     req.CFList,
-				DevAddr:    *req.EndDeviceIdentifiers.DevAddr,
+				DevAddr:    req.DevAddr,
 				DLSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})
@@ -300,7 +296,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 			dev.Session = &ttnpb.Session{
 				StartedAt:   time.Now().UTC(),
-				DevAddr:     *req.EndDeviceIdentifiers.DevAddr,
+				DevAddr:     req.DevAddr,
 				SessionKeys: res.SessionKeys,
 			}
 			paths = append(paths, "session")

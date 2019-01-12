@@ -84,13 +84,6 @@ func TestHandleJoin(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
-	// No DevAddr.
-	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-	req.EndDeviceIdentifiers.DevAddr = nil
-	res, err = js.HandleJoin(authorizedCtx, req)
-	a.So(err, should.NotBeNil)
-	a.So(res, should.BeNil)
-
 	// No payload.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
@@ -177,10 +170,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -286,10 +277,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x6e, 0x54, 0x1b, 0x37,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -396,10 +385,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x6e, 0x54, 0x1b, 0x37,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -446,11 +433,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -535,11 +519,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -624,11 +605,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -715,11 +693,8 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -806,10 +781,6 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				NetID: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
@@ -844,11 +815,7 @@ func TestHandleJoin(t *testing.T) {
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
-				NetID: types.NetID{0x42, 0xff, 0xff},
+				NetID:              types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DROffset: 0x7,
@@ -882,10 +849,6 @@ func TestHandleJoin(t *testing.T) {
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -926,10 +889,6 @@ func TestHandleJoin(t *testing.T) {
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -971,10 +930,6 @@ func TestHandleJoin(t *testing.T) {
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_0,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -1023,10 +978,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
 				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				NetID: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1071,10 +1022,6 @@ func TestHandleJoin(t *testing.T) {
 							JoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 						},
 					},
-				},
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
 				NetID: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
@@ -1154,7 +1101,7 @@ func TestHandleJoin(t *testing.T) {
 			}
 			a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
 			pb.Session = &ttnpb.Session{
-				DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
+				DevAddr:     tc.JoinRequest.DevAddr,
 				SessionKeys: res.SessionKeys,
 				StartedAt:   ret.GetSession().GetStartedAt(),
 			}
