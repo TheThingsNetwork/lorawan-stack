@@ -1844,15 +1844,6 @@
       "file": "devicerepository.go"
     }
   },
-  "error:pkg/encoding/lorawan:cflist_frequencies": {
-    "translations": {
-      "en": "too many CFList frequencies: expected 15 or less"
-    },
-    "description": {
-      "package": "pkg/encoding/lorawan",
-      "file": "messages.go"
-    }
-  },
   "error:pkg/encoding/lorawan:decode": {
     "translations": {
       "en": "could not decode `{lorawan_field}`"
@@ -1972,7 +1963,7 @@
   },
   "error:pkg/encoding/lorawan:max_cflist_frequency": {
     "translations": {
-      "en": "expected CFList frequency to be less or equal to MaxUint24"
+      "en": "expected CFList frequency to be less or equal to 0xFFFFFF"
     },
     "description": {
       "package": "pkg/encoding/lorawan",

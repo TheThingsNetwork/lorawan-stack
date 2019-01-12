@@ -15,6 +15,7 @@
 package lorawan
 
 import (
+	"bytes"
 	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -210,21 +211,17 @@ func UnmarshalDLSettings(b []byte, msg *ttnpb.DLSettings) error {
 	return nil
 }
 
-var (
-	errTooManyCFListFrequencies = unexpectedValue(
-		errors.DefineInvalidArgument("cflist_frequencies", "too many CFList frequencies: expected 15 or less", valueKey),
-	)
-	errMaxCFListFrequency = unexpectedValue(
-		errors.DefineInvalidArgument("max_cflist_frequency", "expected CFList frequency to be less or equal to MaxUint24", valueKey),
-	)
+var errMaxCFListFrequency = unexpectedValue(
+	errors.DefineInvalidArgument("max_cflist_frequency", "expected CFList frequency to be less or equal to 0xFFFFFF", valueKey),
 )
 
 // AppendCFList appends encoded msg to dst.
 func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 	switch msg.Type {
 	case 0:
-		if len(msg.Freq) > 15 {
-			return nil, errTooManyCFListFrequencies(len(msg.Freq))
+		n := len(msg.Freq)
+		if n > 5 {
+			return nil, errExpectedLengthLowerOrEqual("CFListFreq", 5)(n)
 		}
 		for _, freq := range msg.Freq {
 			if freq > maxUint24 {
@@ -232,6 +229,8 @@ func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 			}
 			dst = appendUint32(dst, freq, 3)
 		}
+		// Fill remaining space with zeros.
+		dst = append(dst, bytes.Repeat([]byte{0x0}, 15-n*3)...)
 	case 1:
 		n := len(msg.ChMasks)
 		if n > 96 {
@@ -246,10 +245,8 @@ func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 			}
 			dst = append(dst, b)
 		}
-		// fill remaining space with 0's
-		for i := 0; i < 15-(n+7)/8; i++ {
-			dst = append(dst, 0)
-		}
+		// Fill remaining space with zeros.
+		dst = append(dst, bytes.Repeat([]byte{0x0}, 15-(n+7)/8)...)
 	}
 	dst = append(dst, byte(msg.Type))
 	return dst, nil
@@ -271,7 +268,10 @@ func UnmarshalCFList(b []byte, msg *ttnpb.CFList) error {
 	case 0:
 		msg.Freq = make([]uint32, 0, 5)
 		for i := 0; i < 15; i += 3 {
-			msg.Freq = append(msg.Freq, parseUint32(b[i:i+3]))
+			freq := parseUint32(b[i : i+3])
+			if freq != 0 {
+				msg.Freq = append(msg.Freq, freq)
+			}
 		}
 	case 1:
 		msg.ChMasks = make([]bool, 0, 96)

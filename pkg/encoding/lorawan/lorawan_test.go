@@ -652,7 +652,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 		Message *ttnpb.JoinAcceptPayload
 	}{
 		{
-			Name:    "JoinAcceptPayload(no CFList)",
+			Name:    "JoinAcceptPayload/NoCFList",
 			Message: ttnpb.NewPopulatedJoinAcceptPayload(r, false),
 		},
 	} {
@@ -687,7 +687,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		Bytes   []byte
 	}{
 		{
-			"JoinAcceptPayload(no CFList)",
+			"JoinAcceptPayload/NoCFList",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
 				NetID:     types.NetID{0x42, 0xff, 0xff},
@@ -713,7 +713,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			},
 		},
 		{
-			"JoinAcceptPayload(CFListType_FREQUENCIES)",
+			"JoinAcceptPayload/CFListFreq",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
 				NetID:     types.NetID{0x42, 0xff, 0xff},
@@ -726,7 +726,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 				RxDelay: 0x42,
 				CFList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
-					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff, 0xffffff},
+					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},
 			},
 			[]byte{
@@ -741,13 +741,13 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 				/* RxDelay */
 				0x42,
 				/* CFList */
-				0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+				0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0,
 				/* CFListType */
 				0x0,
 			},
 		},
 		{
-			"JoinAcceptPayload(CFListType_CHANNEL_MASKS)",
+			"JoinAcceptPayload/CFListChMask",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
 				NetID:     types.NetID{0x42, 0xff, 0xff},
