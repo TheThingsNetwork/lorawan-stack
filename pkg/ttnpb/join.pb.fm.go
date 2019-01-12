@@ -16,17 +16,11 @@ var JoinRequestFieldPathsNested = []string{
 	"cf_list.freq",
 	"cf_list.type",
 	"correlation_ids",
+	"dev_addr",
 	"downlink_settings",
 	"downlink_settings.opt_neg",
 	"downlink_settings.rx1_dr_offset",
 	"downlink_settings.rx2_dr",
-	"end_device_ids",
-	"end_device_ids.application_ids",
-	"end_device_ids.application_ids.application_id",
-	"end_device_ids.dev_addr",
-	"end_device_ids.dev_eui",
-	"end_device_ids.device_id",
-	"end_device_ids.join_eui",
 	"net_id",
 	"payload",
 	"payload.Payload.join_accept_payload",
@@ -80,8 +74,8 @@ var JoinRequestFieldPathsTopLevel = []string{
 	"Payload",
 	"cf_list",
 	"correlation_ids",
+	"dev_addr",
 	"downlink_settings",
-	"end_device_ids",
 	"net_id",
 	"payload",
 	"raw_payload",
@@ -123,23 +117,15 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 					dst.Payload = nil
 				}
 			}
-		case "end_device_ids":
+		case "dev_addr":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
 			} else {
-				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
-				} else {
-					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
-				}
+				var zero go_thethings_network_lorawan_stack_pkg_types.DevAddr
+				dst.DevAddr = zero
 			}
 		case "selected_mac_version":
 			if len(subs) > 0 {

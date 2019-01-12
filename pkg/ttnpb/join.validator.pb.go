@@ -24,9 +24,6 @@ func (this *JoinRequest) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("Payload", err)
 		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceIdentifiers)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIdentifiers", err)
-	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.DownlinkSettings)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("DownlinkSettings", err)
 	}

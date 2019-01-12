@@ -2873,7 +2873,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | raw_payload | [bytes](#bytes) |  |  |
 | payload | [Message](#ttn.lorawan.v3.Message) |  |  |
-| end_device_ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| dev_addr | [bytes](#bytes) |  |  |
 | selected_mac_version | [MACVersion](#ttn.lorawan.v3.MACVersion) |  |  |
 | net_id | [bytes](#bytes) |  |  |
 | downlink_settings | [DLSettings](#ttn.lorawan.v3.DLSettings) |  |  |

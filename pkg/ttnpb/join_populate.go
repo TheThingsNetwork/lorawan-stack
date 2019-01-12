@@ -45,8 +45,6 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	if err != nil {
 		panic(fmt.Sprintf("failed to encode join-request message to LoRaWAN: %s", err))
 	}
-	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
-	devEUI := msg.GetJoinRequestPayload().DevEUI
-	out.EndDeviceIdentifiers.DevEUI = &devEUI
+	out.DevAddr = *types.NewPopulatedDevAddr(r)
 	return out
 }
