@@ -147,5 +147,5 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	if err != nil {
 		return nil, err
 	}
-	return fp.ToConcentratorConfig(), nil
+	return fp.ToConcentratorConfig()
 }
