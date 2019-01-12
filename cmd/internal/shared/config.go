@@ -81,7 +81,7 @@ var DefaultBlobConfig = config.Blob{
 
 // DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
 var DefaultFrequencyPlansConfig = config.FrequencyPlans{
-	URL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
+	URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
 }
 
 // DefaultRightsConfig is the default config to fetch rights from the Identity Server.
