@@ -31,17 +31,17 @@ message ConcentratorConfig {
   repeated Channel channels = 1;
 
   message LoRaStandardChannel {
-    Channel channel = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-    // Bandwidth (Hz).
-    uint32 bandwidth = 2;
-    uint32 spreading_factor = 3;
+    // Frequency (Hz).
+    uint64 frequency = 1;
+    uint32 radio = 2;
+    uint32 bandwidth = 3;
+    uint32 spreading_factor = 4;
   }
   LoRaStandardChannel lora_standard_channel = 2 [(gogoproto.customname) = "LoRaStandardChannel"];
   message FSKChannel {
-    Channel channel = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-    // Bandwidth (Hz).
-    uint32 bandwidth = 2;
-    uint32 bit_rate = 3;
+    // Frequency (Hz).
+    uint64 frequency = 1;
+    uint32 radio = 2;
   }
   FSKChannel fsk_channel = 3 [(gogoproto.customname) = "FSKChannel"];
 

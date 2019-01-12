@@ -4341,15 +4341,12 @@
     "ConcentratorConfigFSKChannel": {
       "type": "object",
       "properties": {
-        "channel": {
-          "$ref": "#/definitions/v3ConcentratorConfigChannel"
+        "frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency (Hz)."
         },
-        "bandwidth": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Bandwidth (Hz)."
-        },
-        "bit_rate": {
+        "radio": {
           "type": "integer",
           "format": "int64"
         }
@@ -4376,13 +4373,18 @@
     "ConcentratorConfigLoRaStandardChannel": {
       "type": "object",
       "properties": {
-        "channel": {
-          "$ref": "#/definitions/v3ConcentratorConfigChannel"
+        "frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency (Hz)."
+        },
+        "radio": {
+          "type": "integer",
+          "format": "int64"
         },
         "bandwidth": {
           "type": "integer",
-          "format": "int64",
-          "description": "Bandwidth (Hz)."
+          "format": "int64"
         },
         "spreading_factor": {
           "type": "integer",

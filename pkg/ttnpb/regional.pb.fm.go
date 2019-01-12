@@ -11,20 +11,16 @@ var ConcentratorConfigFieldPathsNested = []string{
 	"channels",
 	"clock_source",
 	"fsk_channel",
-	"fsk_channel.bandwidth",
-	"fsk_channel.bit_rate",
-	"fsk_channel.channel",
-	"fsk_channel.channel.frequency",
-	"fsk_channel.channel.radio",
+	"fsk_channel.frequency",
+	"fsk_channel.radio",
 	"lbt",
 	"lbt.rssi_offset",
 	"lbt.rssi_target",
 	"lbt.scan_time",
 	"lora_standard_channel",
 	"lora_standard_channel.bandwidth",
-	"lora_standard_channel.channel",
-	"lora_standard_channel.channel.frequency",
-	"lora_standard_channel.channel.radio",
+	"lora_standard_channel.frequency",
+	"lora_standard_channel.radio",
 	"lora_standard_channel.spreading_factor",
 	"ping_slot",
 	"ping_slot.frequency",
@@ -208,38 +204,40 @@ func (dst *ConcentratorConfig_Channel) SetFields(src *ConcentratorConfig_Channel
 
 var ConcentratorConfig_LoRaStandardChannelFieldPathsNested = []string{
 	"bandwidth",
-	"channel",
-	"channel.frequency",
-	"channel.radio",
+	"frequency",
+	"radio",
 	"spreading_factor",
 }
 
 var ConcentratorConfig_LoRaStandardChannelFieldPathsTopLevel = []string{
 	"bandwidth",
-	"channel",
+	"frequency",
+	"radio",
 	"spreading_factor",
 }
 
 func (dst *ConcentratorConfig_LoRaStandardChannel) SetFields(src *ConcentratorConfig_LoRaStandardChannel, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "channel":
+		case "frequency":
 			if len(subs) > 0 {
-				newDst := &dst.ConcentratorConfig_Channel
-				var newSrc *ConcentratorConfig_Channel
-				if src != nil {
-					newSrc = &src.ConcentratorConfig_Channel
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
 			} else {
-				if src != nil {
-					dst.ConcentratorConfig_Channel = src.ConcentratorConfig_Channel
-				} else {
-					var zero ConcentratorConfig_Channel
-					dst.ConcentratorConfig_Channel = zero
-				}
+				var zero uint64
+				dst.Frequency = zero
+			}
+		case "radio":
+			if len(subs) > 0 {
+				return fmt.Errorf("'radio' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Radio = src.Radio
+			} else {
+				var zero uint32
+				dst.Radio = zero
 			}
 		case "bandwidth":
 			if len(subs) > 0 {
@@ -270,59 +268,37 @@ func (dst *ConcentratorConfig_LoRaStandardChannel) SetFields(src *ConcentratorCo
 }
 
 var ConcentratorConfig_FSKChannelFieldPathsNested = []string{
-	"bandwidth",
-	"bit_rate",
-	"channel",
-	"channel.frequency",
-	"channel.radio",
+	"frequency",
+	"radio",
 }
 
 var ConcentratorConfig_FSKChannelFieldPathsTopLevel = []string{
-	"bandwidth",
-	"bit_rate",
-	"channel",
+	"frequency",
+	"radio",
 }
 
 func (dst *ConcentratorConfig_FSKChannel) SetFields(src *ConcentratorConfig_FSKChannel, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "channel":
+		case "frequency":
 			if len(subs) > 0 {
-				newDst := &dst.ConcentratorConfig_Channel
-				var newSrc *ConcentratorConfig_Channel
-				if src != nil {
-					newSrc = &src.ConcentratorConfig_Channel
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.ConcentratorConfig_Channel = src.ConcentratorConfig_Channel
-				} else {
-					var zero ConcentratorConfig_Channel
-					dst.ConcentratorConfig_Channel = zero
-				}
-			}
-		case "bandwidth":
-			if len(subs) > 0 {
-				return fmt.Errorf("'bandwidth' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Bandwidth = src.Bandwidth
+				dst.Frequency = src.Frequency
 			} else {
-				var zero uint32
-				dst.Bandwidth = zero
+				var zero uint64
+				dst.Frequency = zero
 			}
-		case "bit_rate":
+		case "radio":
 			if len(subs) > 0 {
-				return fmt.Errorf("'bit_rate' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'radio' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BitRate = src.BitRate
+				dst.Radio = src.Radio
 			} else {
 				var zero uint32
-				dst.BitRate = zero
+				dst.Radio = zero
 			}
 
 		default:

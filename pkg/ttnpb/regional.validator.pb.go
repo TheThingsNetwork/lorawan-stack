@@ -59,15 +59,9 @@ func (this *ConcentratorConfig_Channel) Validate() error {
 	return nil
 }
 func (this *ConcentratorConfig_LoRaStandardChannel) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ConcentratorConfig_Channel)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ConcentratorConfig_Channel", err)
-	}
 	return nil
 }
 func (this *ConcentratorConfig_FSKChannel) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ConcentratorConfig_Channel)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ConcentratorConfig_Channel", err)
-	}
 	return nil
 }
 func (this *ConcentratorConfig_LBTConfiguration) Validate() error {

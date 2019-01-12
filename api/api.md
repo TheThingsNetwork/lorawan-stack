@@ -5454,9 +5454,8 @@ where the user or organization is collaborator on.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| channel | [ConcentratorConfig.Channel](#ttn.lorawan.v3.ConcentratorConfig.Channel) |  |  |
-| bandwidth | [uint32](#uint32) |  | Bandwidth (Hz). |
-| bit_rate | [uint32](#uint32) |  |  |
+| frequency | [uint64](#uint64) |  | Frequency (Hz). |
+| radio | [uint32](#uint32) |  |  |
 
 
 
@@ -5488,8 +5487,9 @@ where the user or organization is collaborator on.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| channel | [ConcentratorConfig.Channel](#ttn.lorawan.v3.ConcentratorConfig.Channel) |  |  |
-| bandwidth | [uint32](#uint32) |  | Bandwidth (Hz). |
+| frequency | [uint64](#uint64) |  | Frequency (Hz). |
+| radio | [uint32](#uint32) |  |  |
+| bandwidth | [uint32](#uint32) |  |  |
 | spreading_factor | [uint32](#uint32) |  |  |
 
 
