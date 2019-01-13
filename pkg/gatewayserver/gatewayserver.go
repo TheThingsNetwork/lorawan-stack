@@ -326,7 +326,11 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 			registerReceiveUplink(ctx, conn.Gateway(), msg)
 			drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
-				logger.WithError(err).Debug("Dropping message")
+				logger.WithError(err).WithFields(log.Fields(
+					"join_eui", ids.JoinEUI,
+					"dev_eui", ids.DevEUI,
+					"dev_addr", ids.DevAddr,
+				)).Debug("Dropping message")
 				registerDropUplink(ctx, ids, conn.Gateway(), msg, err)
 			}
 			ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
