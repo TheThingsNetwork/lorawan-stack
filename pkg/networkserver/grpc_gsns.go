@@ -244,6 +244,8 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 outer:
 	for _, dev := range devs {
+		logger := logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+
 		fCnt := pld.FCnt
 
 		switch {
@@ -267,24 +269,18 @@ outer:
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 				if err != nil {
-					logger.WithError(err).WithFields(log.Fields(
-						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-					)).Warn("Failed to get the frequency plan of the device in registry")
+					logger.WithError(err).Warn("Failed to get the frequency plan of the device in registry")
 					continue
 				}
 
 				band, err := band.GetByID(fp.BandID)
 				if err != nil {
-					logger.WithError(err).WithFields(log.Fields(
-						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-					)).Warn("Failed to get the band of the device in registry")
+					logger.WithError(err).Warn("Failed to get the band of the device in registry")
 					continue
 				}
 				band, err = band.Version(dev.LoRaWANPHYVersion)
 				if err != nil {
-					logger.WithError(err).WithFields(log.Fields(
-						"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-					)).Warn("Failed to convert band to the PHY version of the device in registry")
+					logger.WithError(err).Warn("Failed to convert band to the PHY version of the device in registry")
 					continue
 				}
 
@@ -320,6 +316,8 @@ outer:
 	b := up.RawPayload[:len(up.RawPayload)-4]
 
 	for _, dev := range matching {
+		logger := logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+
 		if pld.Ack {
 			if len(dev.RecentDownlinks) == 0 {
 				// Uplink acknowledges a downlink, but no downlink was sent to the device,
@@ -329,9 +327,7 @@ outer:
 		}
 
 		if dev.matchedSession.FNwkSIntKey == nil || len(dev.matchedSession.FNwkSIntKey.Key) == 0 {
-			logger.WithFields(log.Fields(
-				"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			)).Warn("Device missing FNwkSIntKey in registry")
+			logger.Warn("Device missing FNwkSIntKey in registry")
 			continue
 		}
 
@@ -354,9 +350,7 @@ outer:
 
 		} else {
 			if dev.matchedSession.SNwkSIntKey == nil || len(dev.matchedSession.SNwkSIntKey.Key) == 0 {
-				logger.WithFields(log.Fields(
-					"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-				)).Warn("Device missing SNwkSIntKey in registry")
+				logger.Warn("Device missing SNwkSIntKey in registry")
 				continue
 			}
 
@@ -384,9 +378,7 @@ outer:
 			)
 		}
 		if err != nil {
-			logger.WithError(err).WithFields(log.Fields(
-				"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			)).Error("Failed to compute MIC")
+			logger.WithError(err).Error("Failed to compute MIC")
 			continue
 		}
 		if !bytes.Equal(up.Payload.MIC, computedMIC[:]) {
