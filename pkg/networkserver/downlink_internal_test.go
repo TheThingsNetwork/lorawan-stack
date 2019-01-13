@@ -2314,7 +2314,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							Rx1DataRateIndex: rx1DRIdx,
-							Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+							Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
 							Rx1Frequency:     rx1Freq,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     42,
@@ -2383,7 +2383,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
 												Rx1DataRateIndex: rx1DRIdx,
-												Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+												Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
 												Rx1Frequency:     rx1Freq,
 												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 												Rx2Frequency:     42,
@@ -2419,7 +2419,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
 										Rx1DataRateIndex: rx1DRIdx,
-										Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+										Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
 										Rx1Frequency:     rx1Freq,
 										Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 										Rx2Frequency:     42,
@@ -2464,7 +2464,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
 											Rx1DataRateIndex: rx1DRIdx,
-											Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1),
+											Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
 											Rx1Frequency:     rx1Freq,
 											Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 											Rx2Frequency:     42,

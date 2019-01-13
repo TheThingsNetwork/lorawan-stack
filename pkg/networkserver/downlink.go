@@ -529,7 +529,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					switch {
 					case len(dev.MACState.QueuedJoinAccept) > 0:
 						// Join-accept downlink for Class A/B/C in Rx1/Rx2
-						req.Rx1Delay = ttnpb.RxDelay(band.JoinAcceptDelay1)
+						req.Rx1Delay = ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second)
 						req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
 						req.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
 
