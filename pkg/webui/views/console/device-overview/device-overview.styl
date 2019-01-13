@@ -14,10 +14,25 @@
 
 .id
   h2()
-  font-weight: bold
+  nudge('up', 3px)
+  line-height: 0.8
+  height: 1rem
+  white-space: no-break
+  margin: 0
+  font-weight: 600
+  display: inline-block
 
 .head
   margin-top: 0
+
+.title
+  margin: $ls.xxs 0 $ls.xxs
+  height: 2rem
+  display: flex
+  align-items: flex-end
+
+  button
+    nudge('down', .7rem)
 
 .table
   margin-top: $ls.xl
@@ -46,3 +61,35 @@
 
   .value
     flex-basis:50%
+
+.tabs
+  border-normal('bottom')
+  margin-top: $ls.s
+
+.overview-info
+  margin-top: $ls.s
+
+.locationPlaceholder, .activityPlaceholder
+  h4
+    one-liner(block)
+    height: 1rem
+    margin: 0
+
+  div
+    border-normal()
+    box-sizing: border-box
+    display: flex
+    align-items: center
+    justify-content: center
+    width: 100%
+    height: 16rem
+    margin-top: $ls.xxs
+    text-align: center
+    font-style: italic
+    color: $tc-subtle-gray
+
+.activityPlaceholder
+  margin-top: $ls.s
+
+.locationPlaceholder
+  margin-top: $ls.m
