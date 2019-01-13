@@ -80,7 +80,7 @@ func init() {
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
-		JoinAcceptDelay1: defaultJoinAcceptDelay2,
+		JoinAcceptDelay1: defaultJoinAcceptDelay1,
 		JoinAcceptDelay2: defaultJoinAcceptDelay2,
 		MaxFCntGap:       defaultMaxFCntGap,
 		ADRAckLimit:      defaultADRAckLimit,
