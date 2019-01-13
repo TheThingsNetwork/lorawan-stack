@@ -15,10 +15,14 @@
 package errors_test
 
 import (
+	stderrors "errors"
 	"fmt"
+	"testing"
 
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func Example() {
@@ -54,4 +58,19 @@ func Example() {
 
 	// Output:
 	// error:pkg/errors_test:could_not_create_device (Could not create Device)
+}
+
+func TestFields(t *testing.T) {
+	a := assertions.New(t)
+
+	errBack := stderrors.New("back")
+	errIntermediary := errors.Define("intermediary", "intermediary")
+	errFront := errors.Define("front", "front")
+
+	err := errFront.WithCause(errIntermediary.WithCause(errBack))
+	fields := err.Fields()
+	a.So(fields, should.HaveEmptyDiff, map[string]interface{}{
+		"error_cause":       "error:pkg/errors_test:intermediary (intermediary)",
+		"error_cause_cause": "back",
+	})
 }

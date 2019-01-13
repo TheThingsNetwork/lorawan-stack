@@ -51,6 +51,17 @@ func (e Error) String() string {
 // Error implements the error interface.
 func (e Error) Error() string { return e.String() }
 
+// Fields implements the log.Fielder interface.
+func (e Error) Fields() map[string]interface{} {
+	res := make(map[string]interface{})
+	pref := "error_cause"
+	for cause := Cause(e); cause != nil && !IsInternal(cause); cause = Cause(cause) {
+		res[pref] = cause.Error()
+		pref += "_cause"
+	}
+	return res
+}
+
 // Interface is the interface of an error.
 type Interface interface {
 	DefinitionInterface
