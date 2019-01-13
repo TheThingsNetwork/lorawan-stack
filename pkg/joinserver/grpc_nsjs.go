@@ -72,25 +72,15 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMACVersion)
 	}
 
-	rawPayload := req.RawPayload
-	if req.GetPayload().GetPayload() == nil {
-		if rawPayload == nil {
-			return nil, errNoPayload
-		}
-		if req.Payload == nil {
-			req.Payload = &ttnpb.Message{}
-		}
-		if err = lorawan.UnmarshalMessage(rawPayload, req.Payload); err != nil {
-			return nil, errDecodePayload.WithCause(err)
-		}
-	} else {
-		rawPayload, err = lorawan.MarshalMessage(*req.Payload)
-		if err != nil {
-			return nil, errEncodePayload.WithCause(err)
-		}
+	if req.RawPayload == nil {
+		return nil, errNoPayload
 	}
-	if n := len(rawPayload); n != 23 {
+	if n := len(req.RawPayload); n != 23 {
 		return nil, errPayloadLengthMismatch.WithAttributes("length", n)
+	}
+	req.Payload = &ttnpb.Message{}
+	if err = lorawan.UnmarshalMessage(req.RawPayload, req.Payload); err != nil {
+		return nil, errDecodePayload.WithCause(err)
 	}
 
 	if req.Payload.Major != ttnpb.Major_LORAWAN_R1 {
@@ -249,11 +239,11 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			if err := cryptoDev.SetFields(dev, "ids", "provisioner_id", "provisioning_data"); err != nil {
 				return nil, nil, err
 			}
-			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoDev, req.SelectedMACVersion, rawPayload[:19])
+			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoDev, req.SelectedMACVersion, req.RawPayload[:19])
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
-			if !bytes.Equal(reqMIC[:], rawPayload[19:]) {
+			if !bytes.Equal(reqMIC[:], req.RawPayload[19:]) {
 				return nil, nil, errMICMismatch
 			}
 			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMACVersion, 0xff, pld.DevNonce, b)
