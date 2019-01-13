@@ -14,22 +14,35 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import bind from 'autobind-decorator'
 
 import style from './checkbox.styl'
 
-const Checkbox = function ({ value, onChange, type, error, warning, ...rest }) {
-  return (
-    <label className={style.container}>
-      <input
-        className={style.input}
-        type="checkbox"
-        onChange={onChange}
-        {...rest}
-      />
-      <span className={style.checkmark} />
-    </label>
-  )
+@bind
+class Checkbox extends React.PureComponent {
+
+  onChange (evt) {
+    this.props.onChange(evt.target.checked)
+  }
+
+  render () {
+    const { value, onChange, ...rest } = this.props
+
+    return (
+      <label className={style.container}>
+        <input
+          className={style.input}
+          type="checkbox"
+          onChange={this.onChange}
+          checked={value}
+          {...rest}
+        />
+        <span className={style.checkmark} />
+      </label>
+    )
+  }
 }
+
 
 Checkbox.propTypes = {
   value: PropTypes.bool,
@@ -37,9 +50,6 @@ Checkbox.propTypes = {
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
-  readOnly: PropTypes.bool,
-  error: PropTypes.bool,
-  warning: PropTypes.bool,
 }
 
 Checkbox.defaultProps = {
