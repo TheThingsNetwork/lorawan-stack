@@ -27,6 +27,59 @@ import Message from '../../lib/components/message'
 
 import style from './field.styl'
 
+const inputAllowedProps = [
+  'name',
+  'placeholder',
+  'label',
+  'value',
+  'type',
+  'autoFocus',
+  'min',
+  'max',
+  'icon',
+  'onFocus',
+  'onBlur',
+  'onChange',
+  'onEnter',
+  'placeholder',
+  'error',
+  'warning',
+  'valid',
+  'disabled',
+  'readOnly',
+  'loading',
+]
+
+const checkboxAllowedProps = [
+  'value',
+  'onFocus',
+  'onBlur',
+  'onChange',
+  'disabled',
+]
+
+const getAllowedPropsByType = function (type) {
+  switch (type) {
+  case 'checkbox':
+    return checkboxAllowedProps
+  default:
+    return inputAllowedProps
+  }
+}
+
+const filterPropsByType = function (type, props) {
+  const allowedTypes = getAllowedPropsByType(type)
+
+  const res = {}
+  for (const key of allowedTypes) {
+    if (key in props) {
+      res[key] = props[key]
+    }
+  }
+
+  return res
+}
+
 const component = function (type) {
   switch (type) {
   case 'checkbox':
@@ -91,12 +144,23 @@ const Field = function (props) {
       errors = {},
     } = props
 
-    _value = values[name] || ''
+    // preserve default values for different inputs
+    // make sure the checkbox component gets `false` as a falsy value
+    _value = values[name] || (type === 'checkbox' ? false : '')
     _error = errors[name]
     _touched = touched[name]
     rest.value = _value
     rest.onChange = handleChange
     rest.onBlur = handleBlur
+
+    // restore the rest object for future per component filtering
+    rest.name = name
+    rest.readOnly = readOnly
+    rest.disabled = disabled
+    rest.error = _touched && Boolean(_error)
+    rest.warning = Boolean(warning)
+    rest.type = type
+    rest.placeholder = placeholder ? formatMessage(placeholder) : ''
   }
 
   const hasMessages = _touched && (_error || warning)
@@ -120,15 +184,8 @@ const Field = function (props) {
       </label>
       <Component
         className={style.component}
-        name={name}
         id={name}
-        readOnly={readOnly}
-        disabled={disabled}
-        error={_touched && Boolean(_error)}
-        warning={Boolean(warning)}
-        type={type}
-        placeholder={formatMessage(placeholder)}
-        {...rest}
+        {...filterPropsByType(type, rest)}
       />
       {hasMessages
         ? <div className={style.messages}>

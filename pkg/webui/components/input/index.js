@@ -22,29 +22,6 @@ import ByteInput from './byte'
 
 import style from './input.styl'
 
-const ok = [
-  'name',
-  'placeholder',
-  'label',
-  'value',
-  'type',
-  'autoFocus',
-  'min',
-  'max',
-]
-
-const filter = function (props) {
-  const res = {}
-  for (const key of ok) {
-    if (key in props) {
-      res[key] = props[key]
-    }
-  }
-
-  return res
-}
-
-
 @bind
 export default class Input extends React.Component {
   static propTypes = {
@@ -91,6 +68,7 @@ export default class Input extends React.Component {
       onChange,
       onFocus,
       onBlur,
+      onEnter,
       className,
       label,
       component = 'input',
@@ -132,7 +110,7 @@ export default class Input extends React.Component {
           placeholder={placeholder}
           disabled={disabled}
           readOnly={readOnly}
-          {...filter(rest)}
+          {...rest}
         />
         { v && <Valid show={v} /> }
         { loading && <Spinner className={style.spinner} small /> }
