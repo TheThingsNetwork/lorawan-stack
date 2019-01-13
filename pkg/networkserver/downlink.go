@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/mohae/deepcopy"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -470,16 +469,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 
-				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
-				if err != nil {
-					return nil, nil, errUnknownFrequencyPlan.WithCause(err)
-				}
-
-				band, err := band.GetByID(fp.BandID)
-				if err != nil {
-					return nil, nil, errUnknownBand.WithCause(err)
-				}
-				band, err = band.Version(dev.LoRaWANPHYVersion)
+				fp, band, err := getDeviceBandVersion(ns.FrequencyPlans, dev)
 				if err != nil {
 					return nil, nil, errUnknownBand.WithCause(err)
 				}

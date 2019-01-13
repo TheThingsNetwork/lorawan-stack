@@ -26,7 +26,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -56,16 +55,7 @@ var (
 )
 
 func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
-	fp, err := fps.GetByID(dev.FrequencyPlanID)
-	if err != nil {
-		return err
-	}
-
-	band, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return err
-	}
-	band, err = band.Version(dev.LoRaWANPHYVersion)
+	fp, band, err := getDeviceBandVersion(fps, dev)
 	if err != nil {
 		return err
 	}
@@ -267,23 +257,11 @@ outer:
 			gap = fCnt - dev.matchedSession.LastFCntUp
 
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
-				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
+				_, band, err := getDeviceBandVersion(ns.FrequencyPlans, dev.EndDevice)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to get the frequency plan of the device in registry")
+					logger.WithError(err).Warn("Failed to get device's versioned band")
 					continue
 				}
-
-				band, err := band.GetByID(fp.BandID)
-				if err != nil {
-					logger.WithError(err).Warn("Failed to get the band of the device in registry")
-					continue
-				}
-				band, err = band.Version(dev.LoRaWANPHYVersion)
-				if err != nil {
-					logger.WithError(err).Warn("Failed to convert band to the PHY version of the device in registry")
-					continue
-				}
-
 				if gap > uint32(band.MaxFCntGap) {
 					continue outer
 				}
@@ -746,14 +724,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		devAddr = ns.newDevAddr(ctx, dev)
 	}
 
-	fp, err := ns.FrequencyPlans.GetByID(dev.FrequencyPlanID)
-	if err != nil {
-		return errUnknownFrequencyPlan.WithCause(err)
-	}
-
 	if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
 		logger.WithError(err).Error("Failed to reset device's MAC state")
 		return err
+	}
+
+	fp, err := ns.FrequencyPlans.GetByID(dev.FrequencyPlanID)
+	if err != nil {
+		return errUnknownFrequencyPlan.WithCause(err)
 	}
 
 	req := &ttnpb.JoinRequest{

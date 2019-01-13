@@ -18,7 +18,6 @@ import (
 	"context"
 	"math"
 
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -42,15 +41,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		return maxDownLen, maxUpLen, true, nil
 	}
 
-	fp, err := fps.GetByID(dev.FrequencyPlanID)
-	if err != nil {
-		return maxDownLen, maxUpLen, false, err
-	}
-	band, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return maxDownLen, maxUpLen, false, err
-	}
-	band, err = band.Version(dev.LoRaWANPHYVersion)
+	_, band, err := getDeviceBandVersion(fps, dev)
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
@@ -114,16 +105,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
 	}
 
-	fp, err := fps.GetByID(dev.FrequencyPlanID)
-	if err != nil {
-		return err
-	}
-
-	band, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return err
-	}
-	band, err = band.Version(dev.LoRaWANPHYVersion)
+	_, band, err := getDeviceBandVersion(fps, dev)
 	if err != nil {
 		return err
 	}

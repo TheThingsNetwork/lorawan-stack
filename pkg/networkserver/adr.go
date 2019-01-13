@@ -15,7 +15,6 @@
 package networkserver
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -88,16 +87,7 @@ func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		}
 	}
 
-	fp, err := fps.GetByID(dev.FrequencyPlanID)
-	if err != nil {
-		return err
-	}
-
-	band, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return err
-	}
-	band, err = band.Version(dev.LoRaWANPHYVersion)
+	_, band, err := getDeviceBandVersion(fps, dev)
 	if err != nil {
 		return err
 	}
