@@ -38,13 +38,13 @@ export default {
       return genericSearch(
         'applications',
         params,
-        app => app.application_id.includes(query)
+        app => app.ids.application_id.includes(query)
       )
     },
   },
   application: {
     get (id) {
-      const app = fakeData.applications.find(a => a.application_id === id)
+      const app = fakeData.applications.find(a => a.ids.application_id === id)
 
       return new Promise((resolve, reject) => setTimeout(function () {
         if (app) {
@@ -66,7 +66,7 @@ export default {
   },
   devices: {
     list (appId, params) {
-      return genericSearch('devices', params, d => d.application_id === appId)
+      return genericSearch('devices', params, d => d.ids.application_ids.application_id === appId)
     },
     search (appId, params) {
       const query = params.query || ''
@@ -74,7 +74,7 @@ export default {
       return genericSearch(
         'devices',
         params,
-        d => d.application_id === appId && d.device_id.includes(query),
+        d => d.application_id === appId && d.ids.device_id.includes(query),
       )
     },
   },
