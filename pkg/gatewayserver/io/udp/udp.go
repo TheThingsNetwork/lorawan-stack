@@ -499,5 +499,8 @@ func (s *state) clock(timestamp uint32) (t time.Time, err error) {
 func (s *state) syncClock(timestamp uint32) {
 	t := time.Now().Add(-time.Duration(timestamp) * time.Microsecond)
 	atomic.StoreInt64(&s.timeOffset, t.UnixNano())
-	log.FromContext(s.io.Context()).WithField("time", t).Debug("Synchronized gateway time")
+	log.FromContext(s.io.Context()).WithFields(log.Fields(
+		"time", t,
+		"timestamp", timestamp,
+	)).Debug("Synchronized gateway time")
 }

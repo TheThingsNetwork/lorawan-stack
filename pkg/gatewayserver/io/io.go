@@ -213,6 +213,8 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
+		logger := log.FromContext(c.ctx).WithField("class", request.Class)
+		logger.Debug("Scheduling downlink")
 		ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
 		if err != nil {
 			return err
@@ -323,7 +325,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 				Scheduled: &settings,
 			}
-			log.FromContext(c.ctx).WithFields(log.Fields(
+			logger.WithFields(log.Fields(
 				"rx_window", i+1,
 				"frequency", rx.frequency,
 				"data_rate", rx.dataRateIndex,
