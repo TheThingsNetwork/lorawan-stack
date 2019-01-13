@@ -372,6 +372,35 @@ outer:
 	return nil, nil, errDeviceNotFound
 }
 
+func uplinkDataRateIndex(fps *frequencyplans.Store, dev *ttnpb.EndDevice, settings ttnpb.TxSettings) (ttnpb.DataRateIndex, error) {
+	fp, band, err := getDeviceBandVersion(fps, dev)
+	if err != nil {
+		return 0, errUnknownBand.WithCause(err)
+	}
+	switch settings.Modulation {
+	case ttnpb.Modulation_LORA:
+		for _, ch := range fp.UplinkChannels {
+			if ch.Frequency != settings.Frequency {
+				continue
+			}
+			for i := ch.MinDataRate; i <= ch.MaxDataRate; i++ {
+				dr := band.DataRates[i].Rate
+				// TODO: Get values (https://github.com/TheThingsIndustries/lorawan-stack/issues/1384)
+				sf, _ := dr.SpreadingFactor()
+				bw, _ := dr.Bandwidth()
+				if sf == uint8(settings.SpreadingFactor) && bw == settings.Bandwidth {
+					return ttnpb.DataRateIndex(i), nil
+				}
+			}
+		}
+	case ttnpb.Modulation_FSK:
+		if fp.FSKChannel != nil && fp.FSKChannel.Frequency == settings.Frequency {
+			return ttnpb.DataRateIndex(fp.FSKChannel.DataRate), nil
+		}
+	}
+	return 0, errInvalidDataRate
+}
+
 // MACHandler defines the behavior of a MAC command on a device.
 type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, up *ttnpb.UplinkMessage) error
 
@@ -472,6 +501,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 			"frequency_plan_id",
 			"last_dev_status_received_at",
 			"lorawan_version",
+			"lorawan_phy_version",
 			"mac_settings",
 			"mac_state",
 			"pending_session",
@@ -493,7 +523,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 			if ses != dev.Session {
 				storedSes = stored.PendingSession
 			}
-
 			if !bytes.Equal(storedSes.GetSessionKeyID(), ses.SessionKeyID) {
 				logger.Warn("Device changed session during uplink handling, dropping...")
 				handleErr = true
@@ -507,7 +536,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
-
 			if ses == dev.Session {
 				stored.Session = ses
 				paths = append(paths, "session")
@@ -516,6 +544,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				paths = append(paths, "pending_session")
 			}
 
+			drIdx, err := uplinkDataRateIndex(ns.FrequencyPlans, stored, up.Settings)
+			if err != nil {
+				return nil, nil, err
+			}
+			up.Settings.DataRateIndex = drIdx
 			stored.RecentUplinks = append(stored.RecentUplinks, up)
 			if len(stored.RecentUplinks) > recentUplinkCount {
 				stored.RecentUplinks = stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount+1:]
@@ -821,6 +854,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 			dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
 			paths = append(paths, "mac_state")
 
+			drIdx, err := uplinkDataRateIndex(ns.FrequencyPlans, dev, up.Settings)
+			if err != nil {
+				return nil, nil, err
+			}
+			up.Settings.DataRateIndex = drIdx
 			dev.RecentUplinks = append(dev.RecentUplinks, up)
 			if len(dev.RecentUplinks) > recentUplinkCount {
 				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
