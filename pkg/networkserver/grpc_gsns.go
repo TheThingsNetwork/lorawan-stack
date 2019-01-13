@@ -767,7 +767,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		DownlinkSettings: ttnpb.DLSettings{
 			Rx1DROffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
 			Rx2DR:       dev.MACState.DesiredParameters.Rx2DataRateIndex,
-			OptNeg:      true,
+			OptNeg:      dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 		},
 	}
 
