@@ -325,7 +325,6 @@ outer:
 				dev.fCnt,
 				b,
 			)
-
 		} else {
 			if dev.matchedSession.SNwkSIntKey == nil || len(dev.matchedSession.SNwkSIntKey.Key) == 0 {
 				logger.Warn("Device missing SNwkSIntKey in registry")
@@ -344,12 +343,18 @@ outer:
 				confFCnt = dev.matchedSession.LastConfFCntDown
 			}
 
+			txSettings := up.Settings
+			if err := setFrequencyPlanIndices(&txSettings, ns.FrequencyPlans, dev.EndDevice); err != nil {
+				logger.WithError(err).Warn("Failed to find data rate and channel index in device's frequency plan")
+				continue
+			}
+
 			computedMIC, err = crypto.ComputeUplinkMIC(
 				sNwkSIntKey,
 				fNwkSIntKey,
 				confFCnt,
-				uint8(up.Settings.DataRateIndex),
-				uint8(up.Settings.ChannelIndex),
+				uint8(txSettings.DataRateIndex),
+				uint8(txSettings.ChannelIndex),
 				pld.DevAddr,
 				dev.fCnt,
 				b,
@@ -372,33 +377,38 @@ outer:
 	return nil, nil, errDeviceNotFound
 }
 
-func uplinkDataRateIndex(fps *frequencyplans.Store, dev *ttnpb.EndDevice, settings ttnpb.TxSettings) (ttnpb.DataRateIndex, error) {
+// setFrequencyPlanIndices sets the DataRateIndex and ChannelIndex of the given TxSettings based on the given device's
+// frequency plan.
+func setFrequencyPlanIndices(settings *ttnpb.TxSettings, fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	fp, band, err := getDeviceBandVersion(fps, dev)
 	if err != nil {
-		return 0, errUnknownBand.WithCause(err)
+		return errUnknownBand.WithCause(err)
 	}
 	switch settings.Modulation {
 	case ttnpb.Modulation_LORA:
-		for _, ch := range fp.UplinkChannels {
+		for chIdx, ch := range fp.UplinkChannels {
 			if ch.Frequency != settings.Frequency {
 				continue
 			}
-			for i := ch.MinDataRate; i <= ch.MaxDataRate; i++ {
-				dr := band.DataRates[i].Rate
+			for drIdx := ch.MinDataRate; drIdx <= ch.MaxDataRate; drIdx++ {
+				dr := band.DataRates[drIdx].Rate
 				// TODO: Get values (https://github.com/TheThingsIndustries/lorawan-stack/issues/1384)
 				sf, _ := dr.SpreadingFactor()
 				bw, _ := dr.Bandwidth()
 				if sf == uint8(settings.SpreadingFactor) && bw == settings.Bandwidth {
-					return ttnpb.DataRateIndex(i), nil
+					settings.DataRateIndex = ttnpb.DataRateIndex(drIdx)
+					settings.ChannelIndex = uint32(chIdx)
+					return nil
 				}
 			}
 		}
 	case ttnpb.Modulation_FSK:
 		if fp.FSKChannel != nil && fp.FSKChannel.Frequency == settings.Frequency {
-			return ttnpb.DataRateIndex(fp.FSKChannel.DataRate), nil
+			settings.DataRateIndex = ttnpb.DataRateIndex(fp.FSKChannel.DataRate)
+			settings.ChannelIndex = 0
 		}
 	}
-	return 0, errInvalidDataRate
+	return errInvalidDataRate
 }
 
 // MACHandler defines the behavior of a MAC command on a device.
@@ -544,11 +554,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				paths = append(paths, "pending_session")
 			}
 
-			drIdx, err := uplinkDataRateIndex(ns.FrequencyPlans, stored, up.Settings)
-			if err != nil {
+			if err := setFrequencyPlanIndices(&up.Settings, ns.FrequencyPlans, stored); err != nil {
+				logger.WithError(err).Warn("Failed to find data rate and channel index in device's frequency plan")
 				return nil, nil, err
 			}
-			up.Settings.DataRateIndex = drIdx
 			stored.RecentUplinks = append(stored.RecentUplinks, up)
 			if len(stored.RecentUplinks) > recentUplinkCount {
 				stored.RecentUplinks = stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount+1:]
@@ -854,11 +863,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 			dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
 			paths = append(paths, "mac_state")
 
-			drIdx, err := uplinkDataRateIndex(ns.FrequencyPlans, dev, up.Settings)
-			if err != nil {
+			if err := setFrequencyPlanIndices(&up.Settings, ns.FrequencyPlans, dev); err != nil {
+				logger.WithError(err).Warn("Failed to find data rate and channel index in device's frequency plan")
 				return nil, nil, err
 			}
-			up.Settings.DataRateIndex = drIdx
 			dev.RecentUplinks = append(dev.RecentUplinks, up)
 			if len(dev.RecentUplinks) > recentUplinkCount {
 				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
