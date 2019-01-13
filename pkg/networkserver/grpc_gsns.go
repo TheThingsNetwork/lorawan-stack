@@ -524,7 +524,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 
 			if stored.MACState != nil {
 				stored.MACState.PendingApplicationDownlink = nil
-			} else if err := resetMACState(ns.Component.FrequencyPlans, stored); err != nil {
+			} else if err := resetMACState(ns.FrequencyPlans, stored); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -537,7 +537,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				cmd, cmds := cmds[0], cmds[1:]
 				switch cmd.CID {
 				case ttnpb.CID_RESET:
-					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.Component.FrequencyPlans)
+					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans)
 				case ttnpb.CID_LINK_CHECK:
 					err = handleLinkCheckReq(ctx, stored, up)
 				case ttnpb.CID_LINK_ADR:
@@ -559,7 +559,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 						break
 					}
 					cmds = cmds[dupCount:]
-					err = handleLinkADRAns(ctx, stored, pld, uint(dupCount), ns.Component.FrequencyPlans)
+					err = handleLinkADRAns(ctx, stored, pld, uint(dupCount), ns.FrequencyPlans)
 				case ttnpb.CID_DUTY_CYCLE:
 					err = handleDutyCycleAns(ctx, stored)
 				case ttnpb.CID_RX_PARAM_SETUP:
@@ -641,7 +641,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
 			}
 
-			if err := adaptDataRate(ns.Component.FrequencyPlans, stored); err != nil {
+			if err := adaptDataRate(ns.FrequencyPlans, stored); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -724,7 +724,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		devAddr = ns.newDevAddr(ctx, dev)
 	}
 
-	if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
+	if err := resetMACState(ns.FrequencyPlans, dev); err != nil {
 		logger.WithError(err).Error("Failed to reset device's MAC state")
 		return err
 	}

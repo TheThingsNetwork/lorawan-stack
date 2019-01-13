@@ -301,13 +301,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 				payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.Component.FrequencyPlans,
+					ns.FrequencyPlans,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -372,7 +372,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 
-					fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 					drIdx := ttnpb.DATA_RATE_1
@@ -382,7 +382,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -726,13 +726,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 				payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.Component.FrequencyPlans,
+					ns.FrequencyPlans,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -797,13 +797,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						t.Fatal("Invalid context")
 					}
-					fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 					payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -1140,11 +1140,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.Component.FrequencyPlans,
+					ns.FrequencyPlans,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1211,13 +1211,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						t.Fatal("Invalid context")
 					}
-					fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 					rx1Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -1225,7 +1225,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1719,11 +1719,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if !a.So(ok, should.BeTrue) {
 					t.Fatal("Invalid context")
 				}
-				fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.Component.FrequencyPlans,
+					ns.FrequencyPlans,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1793,13 +1793,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						t.Fatal("Invalid context")
 					}
-					fp := test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
 					rx1Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -1807,7 +1807,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -2526,23 +2526,23 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 			)).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-			ns.Component.AddContextFiller(tc.ContextFunc)
-			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return context.WithValue(ctx, nsKey{}, ns)
 			})
-			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithCounter(ctx, popCallKey{})
 			})
-			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithCounter(ctx, setByIDCallKey{})
 			})
-			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithCounter(ctx, scheduleDownlinkCallKey{})
 			})
-			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithCounter(ctx, getPeerCallKey{})
 			})
-			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 				_ = cancel
 				return ctx

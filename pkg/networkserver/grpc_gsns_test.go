@@ -1201,7 +1201,7 @@ func handleUplinkTest() func(t *testing.T) {
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					if pb.MACState == nil {
-						err := ResetMACState(ns.Component.FrequencyPlans, pb)
+						err := ResetMACState(ns.FrequencyPlans, pb)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
@@ -1680,7 +1680,7 @@ func handleJoinTest() func(t *testing.T) {
 					NetID:              ns.NetID,
 					SelectedMACVersion: tc.Device.LoRaWANVersion,
 					RxDelay:            tc.Device.MACState.DesiredParameters.Rx1Delay,
-					CFList:             frequencyplans.CFList(*test.Must(ns.Component.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan), pb.LoRaWANPHYVersion),
+					CFList:             frequencyplans.CFList(*test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan), pb.LoRaWANPHYVersion),
 					DownlinkSettings: ttnpb.DLSettings{
 						Rx1DROffset: tc.Device.MACState.DesiredParameters.Rx1DataRateOffset,
 						Rx2DR:       tc.Device.MACState.DesiredParameters.Rx2DataRateIndex,
@@ -1749,7 +1749,7 @@ func handleJoinTest() func(t *testing.T) {
 							t.FailNow()
 						}
 
-						err = ResetMACState(ns.Component.FrequencyPlans, pb)
+						err = ResetMACState(ns.FrequencyPlans, pb)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}

@@ -359,7 +359,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
 		)
 
-		p := ns.Component.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, path.GatewayIdentifiers)
+		p := ns.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, path.GatewayIdentifiers)
 		if p == nil {
 			logger.Debug("Could not get Gateway Server")
 			continue
@@ -561,7 +561,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						b, appDown, err := generateDownlink(ctx, dev,
 							band.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
-							ns.Component.FrequencyPlans,
+							ns.FrequencyPlans,
 						)
 						if err != nil {
 							return nil, nil, err
@@ -608,7 +608,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						b, appDown, err := generateDownlink(ctx, dev,
 							band.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
-							ns.Component.FrequencyPlans,
+							ns.FrequencyPlans,
 						)
 						if err != nil {
 							return nil, nil, err
@@ -685,7 +685,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					b, appDown, err := generateDownlink(ctx, dev,
 						band.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						maxUpLength,
-						ns.Component.FrequencyPlans,
+						ns.FrequencyPlans,
 					)
 					if err != nil {
 						return nil, nil, err
