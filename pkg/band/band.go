@@ -214,7 +214,7 @@ func GetByID(id string) (Band, error) {
 	if band, ok := All[id]; ok {
 		return band, nil
 	}
-	return Band{}, errBandNotFound.WithAttributes("band_id", id)
+	return Band{}, errBandNotFound.WithAttributes("id", id)
 }
 
 type swapParameters struct {
@@ -247,7 +247,7 @@ func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
 		}
 	}
 
-	return b, errUnknownLoRaWANRegionalParameters
+	return b, errUnknownPHYVersion.WithAttributes("version", wantedVersion)
 }
 
 // Versions supported for this band.
