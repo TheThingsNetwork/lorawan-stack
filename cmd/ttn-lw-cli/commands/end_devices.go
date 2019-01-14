@@ -269,7 +269,7 @@ var (
 				return err
 			}
 
-			device.SetFields(isRes, isPaths...)
+			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
 
 			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths)
 			if err != nil {
