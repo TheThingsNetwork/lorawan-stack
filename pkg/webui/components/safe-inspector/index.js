@@ -127,56 +127,63 @@ export class SafeInspector extends Component {
 
     const containerStyle = classnames(style.container, {
       [style.containerSmall]: small,
+      [style.containerHidden]: hidden,
+    })
+
+    const dataStyle = classnames(style.data, {
+      [style.dataHidden]: hidden,
     })
 
     return (
       <div className={containerStyle}>
-        <div ref={this.displayElem} onClick={this.handleDataClick} className={style.data}>{display}</div>
-        {!hidden && !byteStyle && isBytes && (
-          <React.Fragment>
-            <span>{ msb ? 'msb' : 'lsb' }</span>
-            <button
-              title={m.byteSignificance}
-              className={style.buttonSwap}
-              onClick={this.handleSwapToggle}
-            >
-              <Icon small icon="swap_horiz" />
-            </button>
-          </React.Fragment>
-        )}
-        {!hidden && isBytes && (
-          <button
-            title={m.cStyle}
-            className={style.buttonTransform}
-            onClick={this.handleTransformToggle}
-          >
-            <Icon small icon="code" />
-          </button>
-        )}
-        <button
-          title={m.copyClipboard}
-          className={classnames(style.buttonCopy, 'copy')}
-          onClick={this.handleCopyClick}
-          data-clipboard-text={formattedData}
-        >
-          <Icon onClick={this.handleCopyClick} small icon="file_copy" />
-          {copied && (
-            <Message
-              content={m.copied}
-              onAnimationEnd={this.handleCopyAnimationEnd}
-              className={style.copyConfirm}
-            />
+        <div ref={this.displayElem} onClick={this.handleDataClick} className={dataStyle}>{display}</div>
+        <div className={style.buttons}>
+          {!hidden && !byteStyle && isBytes && (
+            <React.Fragment>
+              <span>{ msb ? 'msb' : 'lsb' }</span>
+              <button
+                title={m.byteSignificance}
+                className={style.buttonSwap}
+                onClick={this.handleSwapToggle}
+              >
+                <Icon className={style.buttonIcon} small icon="swap_horiz" />
+              </button>
+            </React.Fragment>
           )}
-        </button>
-        { hideable && (
+          {!hidden && isBytes && (
+            <button
+              title={m.cStyle}
+              className={style.buttonTransform}
+              onClick={this.handleTransformToggle}
+            >
+              <Icon className={style.buttonIcon} small icon="code" />
+            </button>
+          )}
           <button
-            title={m.toggleVisibility}
-            className={style.buttonVisibility}
-            onClick={this.handleVisibiltyToggle}
+            title={m.copyClipboard}
+            className={classnames(style.buttonCopy, 'copy')}
+            onClick={this.handleCopyClick}
+            data-clipboard-text={formattedData}
           >
-            <Icon small icon={hidden ? 'visibility' : 'visibility_off'} />
+            <Icon className={style.buttonIcon} onClick={this.handleCopyClick} small icon="file_copy" />
+            {copied && (
+              <Message
+                content={m.copied}
+                onAnimationEnd={this.handleCopyAnimationEnd}
+                className={style.copyConfirm}
+              />
+            )}
           </button>
-        )}
+          { hideable && (
+            <button
+              title={m.toggleVisibility}
+              className={style.buttonVisibility}
+              onClick={this.handleVisibiltyToggle}
+            >
+              <Icon className={style.buttonIcon} small icon={hidden ? 'visibility' : 'visibility_off'} />
+            </button>
+          )}
+        </div>
       </div>
     )
   }

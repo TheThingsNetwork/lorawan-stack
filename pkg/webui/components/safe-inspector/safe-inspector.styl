@@ -37,29 +37,29 @@ $height-small = 1.8rem
   flex: none
   display: flex
 
-  & > span
+  button
+    reset-button()
+    transition-color()
+    height: 100%
+    color: $c-icon-fill
+    flex: none
+    padding: 0 .65rem
+
+    &:not(.button-swap)
+      border-input('left')
+
+    &:hover
+      color: black
+
+    &:active
+      background-color: $c-backdrop
+
+  & > span // byte-order
+    nudge('up', 2px)
     font-size: $fs.s
     line-height: $height
     color: $tc-subtle-gray
     padding-left: $cs.xs
-
-.button-swap, .button-transform, .button-copy, .button-visibility
-  reset-button()
-  &:not(.button-swap)
-    border-input('left')
-  transition-color()
-  color: $c-icon-fill
-  flex: none
-  padding: 0 .65rem
-
-  span // icon
-    display: flex
-
-  &:hover
-    color: black
-
-  &:active
-    background-color: $c-backdrop
 
 .button-transform
   border-input('right', 3px)
@@ -67,24 +67,42 @@ $height-small = 1.8rem
   & + button
     border: 0
 
+.button-icon
+  display: flex
+
 .button-copy
   position: relative
 
 .data
+  box-sizing: border-box
   font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
   display: flex
+  background-color: white
   align-items: center
-  flex-grow: 1
+  height: 100%
   padding: 0 $cs.xs
   overflow: hidden
   text-overflow: ellipsis
   white-space: nowrap
+  border-radius: $br.s
 
   span
     margin-right: .3rem
 
+  &:hover
+    z-index: $zi.slight
+    animation: overlay
+    animation-delay: 500ms
+    animation-fill-mode: forwards
+
+.data-hidden
+  &:hover
+    animation: none
+
+
 .copy-confirm
   border-input()
+  z-index: $zi.slight
   border-radius: $br.s
   position: absolute
   background-color: white
@@ -123,5 +141,15 @@ $height-small = 1.8rem
     opacity: 0
     transform:  translate(0, -3px) scale(1)
 
+@keyframes overlay
+  0%
+    position: static
 
+  100%
+    border-input()
+    min-width: calc(100% + 2px)
+    position: absolute
+    left: -1px
+    top: -1px
+    height: calc(100% + 2px)
 
