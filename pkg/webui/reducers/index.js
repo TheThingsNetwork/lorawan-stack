@@ -14,6 +14,7 @@
 
 import { combineReducers } from 'redux'
 import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/application'
+import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications'
 import user from './user'
 import client from './client'
 import _console from './console' // conflicting name with window.console
@@ -22,6 +23,7 @@ import application from './application'
 import devices from './devices'
 import gateways from './gateways'
 import createNamedApiKeysReducer from './api-keys'
+import createNamedRightsReducer from './rights'
 
 export default combineReducers({
   user,
@@ -33,5 +35,8 @@ export default combineReducers({
   gateways,
   apiKeys: combineReducers({
     applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
+  }),
+  rights: combineReducers({
+    applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
   }),
 })
