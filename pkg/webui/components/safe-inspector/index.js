@@ -112,7 +112,7 @@ export class SafeInspector extends Component {
 
     const { data, isBytes, hideable, small } = this.props
 
-    let formattedData = data
+    let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
 
     if (isBytes) {
