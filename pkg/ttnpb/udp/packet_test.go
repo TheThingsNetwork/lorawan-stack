@@ -15,6 +15,7 @@
 package udp
 
 import (
+	"bytes"
 	"math"
 	"testing"
 
@@ -61,10 +62,7 @@ func TestFailedPackets(t *testing.T) {
 	err = p.UnmarshalBinary(b)
 	a.So(err, should.NotBeNil)
 
-	b = []byte{}
-	for i := 0; i < 12; i++ {
-		b = append(b, 0)
-	}
+	b = bytes.Repeat([]byte{0x0}, 9)
 	err = p.UnmarshalBinary(b)
 	a.So(err, should.NotBeNil)
 }

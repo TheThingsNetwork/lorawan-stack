@@ -277,10 +277,20 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
 			logger.Debug("Received Tx acknowledgement, JIT queue supported")
 		}
-		msg, err := encoding.ToGatewayUp(*packet.Data, md)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to unmarshal packet")
-			return err
+		var msg *ttnpb.GatewayUp
+		if packet.Data != nil {
+			var err error
+			msg, err = encoding.ToGatewayUp(*packet.Data, md)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to unmarshal packet")
+				return err
+			}
+		} else {
+			msg = &ttnpb.GatewayUp{
+				TxAcknowledgment: &ttnpb.TxAcknowledgment{
+					Result: ttnpb.TxAcknowledgment_SUCCESS,
+				},
+			}
 		}
 		if v, ok := state.correlations.Load(packet.Token); ok {
 			sent := v.(downlinkSent)

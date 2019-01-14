@@ -139,7 +139,7 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 		i += 8
 	}
 
-	if p.PacketType.HasData() {
+	if p.PacketType.HasData() && len(b)-i > 0 {
 		p.Data = new(Data)
 		err = json.Unmarshal(b[i:], p.Data)
 		if err != nil {
