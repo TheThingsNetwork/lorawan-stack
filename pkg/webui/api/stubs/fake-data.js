@@ -30,7 +30,7 @@ const applications = [ ...new Array(APPLICATIONS_COUNT).keys() ]
   }))
 
 const rights = {
-  application: [
+  applications: [
     'RIGHT_APPLICATION_INFO',
     'RIGHT_APPLICATION_SETTINGS_BASIC',
     'RIGHT_APPLICATION_SETTINGS_API_KEYS',
@@ -67,7 +67,7 @@ const applicationsApiKeys = applications.reduce(function (acc, curr, idx, apps) 
       application_id: curr.ids.application_id,
       name: faker.lorem.words(),
       key: faker.random.uuid(),
-      rights: getRights(rights.application, 1, 5),
+      rights: getRights(rights.applications, 1, 5),
     })
   }
 
