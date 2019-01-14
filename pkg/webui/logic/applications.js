@@ -42,6 +42,22 @@ const getApplicationsLogic = createLogic({
   },
 })
 
+const getApplicationsRightsLogic = createLogic({
+  type: applications.GET_APPS_RIGHTS_LIST,
+  async process ({ getState, action }, dispatch, done) {
+    try {
+      const rights = await api.v3.is.rights.applications()
+
+      dispatch(applications.getApplicationsRightsListSuccess(rights))
+    } catch (error) {
+      dispatch(applications.getApplicationsRightsListFailure(error))
+    }
+
+    done()
+  },
+})
+
 export default [
   getApplicationsLogic,
+  getApplicationsRightsLogic,
 ]
