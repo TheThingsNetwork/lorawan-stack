@@ -16,6 +16,7 @@ import React from 'react'
 import classnames from 'classnames'
 
 import SafeInspector from '../safe-inspector'
+import Message from '../../lib/components/message'
 
 import style from './data-sheet.styl'
 
@@ -26,13 +27,15 @@ const DataSheet = function ({ data }) {
         { data.map(function (group, index) {
           return (
             <React.Fragment key={`${group.header}_${index}`}>
-              <tr className={style.groupHeading}><th>{group.header}</th></tr>
+              <tr className={style.groupHeading}><th><Message content={group.header} /></th></tr>
               { group.items.map( function (item) {
+                const keyId = typeof item.key === 'object' ? item.key.id : item.key
                 const subItems = item.subItems ? item.subItems.map((subItem, subIndex) => (
-                  <DataSheetRow sub item={subItem} key={`${index}_${subIndex}`} />
+                  <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
                 )) : null
+
                 return (
-                  <React.Fragment key={`${item.key}_${index}`}>
+                  <React.Fragment key={`${keyId}_${index}`}>
                     <DataSheetRow item={item} />
                     {subItems}
                   </React.Fragment>
@@ -60,7 +63,7 @@ const DataSheetRow = function ({ item, sub }) {
 
   return (
     <tr className={rowStyle}>
-      <th>{item.key}</th>
+      <th><Message content={item.key} /></th>
       <td>{isSafeInspector ? (
         <SafeInspector
           hideable={false || item.sensitive}
