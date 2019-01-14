@@ -23,9 +23,11 @@ $height-small = 1.8rem
   justify-content: space-between
   position: relative
   box-sizing: border-box
+  line-height: @height - .1rem
 
   &-small
     height: $height-small
+    line-height: @height - .1rem
     .buttons button
       padding: 0 .4rem
     .buttons > span
@@ -36,6 +38,7 @@ $height-small = 1.8rem
 .buttons
   flex: none
   display: flex
+  min-width: 0
 
   button
     reset-button()
@@ -76,7 +79,7 @@ $height-small = 1.8rem
 .data
   box-sizing: border-box
   font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
-  display: flex
+  display: inline
   background-color: white
   align-items: center
   height: 100%
@@ -96,6 +99,7 @@ $height-small = 1.8rem
     animation-fill-mode: forwards
 
 .data-hidden
+  text-overflow: clip
   &:hover
     animation: none
 
