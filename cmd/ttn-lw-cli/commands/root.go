@@ -131,6 +131,7 @@ var (
 )
 
 func init() {
+	Root.SetGlobalNormalizationFunc(util.NormalizeFlags)
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
 	Root.AddCommand(version.Print(name))
 }

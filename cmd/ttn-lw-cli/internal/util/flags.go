@@ -25,11 +25,21 @@ import (
 	"github.com/spf13/pflag"
 )
 
+var (
+	toDash       = strings.NewReplacer("_", "-")
+	toUnderscore = strings.NewReplacer("-", "_")
+)
+
+func NormalizeFlags(f *pflag.FlagSet, name string) pflag.NormalizedName {
+	return pflag.NormalizedName(toDash.Replace(name))
+}
+
 func SelectFieldMask(cmdFlags *pflag.FlagSet, fieldMaskFlags ...*pflag.FlagSet) (paths []string) {
 	cmdFlags.Visit(func(flag *pflag.Flag) {
+		flagName := toUnderscore.Replace(flag.Name)
 		for _, fieldMaskFlags := range fieldMaskFlags {
-			if b, err := fieldMaskFlags.GetBool(flag.Name); err == nil && b {
-				paths = append(paths, flag.Name)
+			if b, err := fieldMaskFlags.GetBool(flagName); err == nil && b {
+				paths = append(paths, flagName)
 				return
 			}
 		}
@@ -39,9 +49,10 @@ func SelectFieldMask(cmdFlags *pflag.FlagSet, fieldMaskFlags ...*pflag.FlagSet) 
 
 func UpdateFieldMask(cmdFlags *pflag.FlagSet, fieldMaskFlags ...*pflag.FlagSet) (paths []string) {
 	cmdFlags.Visit(func(flag *pflag.Flag) {
+		flagName := toUnderscore.Replace(flag.Name)
 		for _, fieldMaskFlags := range fieldMaskFlags {
-			if fieldMaskFlags.Lookup(flag.Name) != nil {
-				paths = append(paths, flag.Name)
+			if fieldMaskFlags.Lookup(flagName) != nil {
+				paths = append(paths, flagName)
 				return
 			}
 		}
@@ -221,37 +232,38 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
 		if !flag.Changed {
 			return
 		}
+		flagName := toUnderscore.Replace(flag.Name)
 		var v interface{}
 		switch flag.Value.Type() {
 		case "bool":
-			v, _ = flags.GetBool(flag.Name)
+			v, _ = flags.GetBool(flagName)
 		case "string":
-			v, _ = flags.GetString(flag.Name)
+			v, _ = flags.GetString(flagName)
 		case "int32":
-			v, _ = flags.GetInt32(flag.Name)
+			v, _ = flags.GetInt32(flagName)
 		case "int64":
-			v, _ = flags.GetInt64(flag.Name)
+			v, _ = flags.GetInt64(flagName)
 		case "uint32":
-			v, _ = flags.GetUint32(flag.Name)
+			v, _ = flags.GetUint32(flagName)
 		case "uint64":
-			v, _ = flags.GetUint64(flag.Name)
+			v, _ = flags.GetUint64(flagName)
 		case "float32":
-			v, _ = flags.GetFloat32(flag.Name)
+			v, _ = flags.GetFloat32(flagName)
 		case "float64":
-			v, _ = flags.GetFloat64(flag.Name)
+			v, _ = flags.GetFloat64(flagName)
 		case "stringSlice":
-			v, _ = flags.GetStringSlice(flag.Name)
+			v, _ = flags.GetStringSlice(flagName)
 		case "intSlice":
-			v, _ = flags.GetIntSlice(flag.Name)
+			v, _ = flags.GetIntSlice(flagName)
 		case "uintSlice":
-			v, _ = flags.GetUintSlice(flag.Name)
+			v, _ = flags.GetUintSlice(flagName)
 		case "duration":
-			v, _ = flags.GetDuration(flag.Name)
+			v, _ = flags.GetDuration(flagName)
 		}
 		if v == nil {
-			panic(fmt.Sprintf("can't set %s to %s (%v)", flag.Name, flag.Value, flag.Value.Type()))
+			panic(fmt.Sprintf("can't set %s to %s (%v)", flagName, flag.Value, flag.Value.Type()))
 		}
-		setField(rv, trimPrefix(strings.Split(flag.Name, "."), prefix...), reflect.ValueOf(v))
+		setField(rv, trimPrefix(strings.Split(flagName, "."), prefix...), reflect.ValueOf(v))
 	})
 }
 
