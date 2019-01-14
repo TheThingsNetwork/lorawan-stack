@@ -822,9 +822,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 			"lorawan_phy_version",
 			"lorawan_version",
 			"mac_state",
+			"pending_session",
 			"queued_application_downlinks",
 			"recent_uplinks",
-			"session",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			paths := make([]string, 0, 5)
@@ -834,12 +834,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 				keys.NwkSEncKey = keys.FNwkSIntKey
 				keys.SNwkSIntKey = keys.FNwkSIntKey
 			}
-			dev.Session = &ttnpb.Session{
+			dev.PendingSession = &ttnpb.Session{
 				DevAddr:     devAddr,
 				SessionKeys: keys,
 				StartedAt:   time.Now().UTC(),
 			}
-			paths = append(paths, "session")
+			paths = append(paths, "pending_session")
 
 			dev.EndDeviceIdentifiers.DevAddr = &devAddr
 			paths = append(paths, "ids.dev_addr")
@@ -902,8 +902,8 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 			AppSKey:              resp.SessionKeys.AppSKey,
 			InvalidatedDownlinks: invalidatedQueue,
-			SessionKeyID:         dev.Session.SessionKeyID,
-			SessionStartedAt:     dev.Session.StartedAt,
+			SessionKeyID:         dev.PendingSession.SessionKeyID,
+			SessionStartedAt:     dev.PendingSession.StartedAt,
 		}},
 	})
 	if err != nil {
