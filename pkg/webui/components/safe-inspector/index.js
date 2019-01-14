@@ -66,6 +66,7 @@ export class SafeInspector extends Component {
     }
 
     this.displayElem = React.createRef()
+    this.copyElem = React.createRef()
   }
 
   handleVisibiltyToggle () {
@@ -98,7 +99,7 @@ export class SafeInspector extends Component {
   }
 
   componentDidMount () {
-    new clipboard('.copy')
+    new clipboard(this.copyElem.current)
   }
 
   render () {
@@ -162,9 +163,10 @@ export class SafeInspector extends Component {
           )}
           <button
             title={m.copyClipboard}
-            className={classnames(style.buttonCopy, 'copy')}
+            className={style.buttonCopy}
             onClick={this.handleCopyClick}
             data-clipboard-text={formattedData}
+            ref={this.copyElem}
           >
             <Icon className={style.buttonIcon} onClick={this.handleCopyClick} small icon="file_copy" />
             {copied && (
