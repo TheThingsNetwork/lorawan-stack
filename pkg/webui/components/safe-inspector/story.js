@@ -29,6 +29,19 @@ storiesOf('Safe Inspector', module)
       data="ab01f46d2f"
     />
   ))
+  .add('Multiple', () => (
+    <React.Fragment>
+      <SafeInspector data="ab01f46d2f" /><br />
+      <SafeInspector data="ff0000" /><br />
+      <SafeInspector data="f8a683c1d9b2" />
+    </React.Fragment>
+  ))
+  .add('Small', () => (
+    <SafeInspector
+      small
+      data="ab01f46d2f"
+    />
+  ))
   .add('Non Byte', () => (
     <SafeInspector
       data="somerandomhash.du9d8321-9dk2-edf2398efh8"
