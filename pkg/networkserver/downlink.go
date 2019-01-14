@@ -390,6 +390,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			},
 		}
 
+		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Scheduling downlink...")
 		_, err := ttnpb.NewNsGsClient(a.peer.Conn()).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
@@ -525,9 +526,14 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 						down, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, logger.WithFields(log.Fields(
-								"downlink_type", "join-accept",
 								"attempt_rx1", true,
 								"attempt_rx2", true,
+								"downlink_class", req.Class,
+								"downlink_type", "join-accept",
+								"rx1_delay", req.Rx1Delay,
+								"rx1_frequency", req.Rx1Frequency,
+								"rx2_data_rate", req.Rx2DataRateIndex,
+								"rx2_frequency", req.Rx2Frequency,
 							))),
 							req,
 							dev.EndDeviceIdentifiers,
@@ -572,9 +578,14 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 						down, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, logger.WithFields(log.Fields(
-								"downlink_type", "data",
 								"attempt_rx1", true,
 								"attempt_rx2", true,
+								"downlink_class", req.Class,
+								"downlink_type", "data",
+								"rx1_delay", req.Rx1Delay,
+								"rx1_frequency", req.Rx1Frequency,
+								"rx2_data_rate", req.Rx2DataRateIndex,
+								"rx2_frequency", req.Rx2Frequency,
 							))),
 							req,
 							dev.EndDeviceIdentifiers,
@@ -642,9 +653,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if len(paths) > 0 {
 							down, err := ns.scheduleDownlinkByPaths(
 								log.NewContext(ctx, logger.WithFields(log.Fields(
-									"downlink_type", "data",
 									"attempt_rx1", true,
 									"attempt_rx2", false,
+									"downlink_class", req.Class,
+									"downlink_type", "data",
+									"rx1_delay", req.Rx1Delay,
+									"rx1_frequency", req.Rx1Frequency,
 								))),
 								req,
 								dev.EndDeviceIdentifiers,

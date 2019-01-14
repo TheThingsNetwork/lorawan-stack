@@ -187,7 +187,10 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.Uplink
 func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessage) (*ttnpb.EndDevice, *ttnpb.Session, error) {
 	pld := up.Payload.GetMACPayload()
 
-	logger := log.FromContext(ctx).WithField("dev_addr", pld.DevAddr)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"dev_addr", pld.DevAddr,
+		"uplink_f_cnt", up.Payload.GetMACPayload().FCnt,
+	))
 
 	type device struct {
 		*ttnpb.EndDevice
@@ -238,10 +241,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 outer:
 	for _, dev := range devs {
-		logger := logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
-
 		fCnt := pld.FCnt
-
 		switch {
 		case !dev.Uses32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
 		case fCnt > dev.matchedSession.LastFCntUp&0xffff:
@@ -250,12 +250,19 @@ outer:
 			fCnt |= (dev.matchedSession.LastFCntUp + 0x10000) &^ 0xffff
 		}
 
+		logger = logger.WithFields(log.Fields(
+			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
+			"device_f_cnt", dev.matchedSession.LastFCntUp,
+			"full_f_cnt", fCnt,
+		))
+
 		gap := uint32(math.MaxUint32)
 		if fCnt == 0 && dev.matchedSession.LastFCntUp == 0 &&
 			(len(dev.RecentUplinks) == 0 || dev.PendingSession != nil) {
 			gap = 0
 		} else if !dev.ResetsFCnt {
 			if fCnt <= dev.matchedSession.LastFCntUp {
+				logger.Debug("FCnt too low, skipping...")
 				continue outer
 			}
 
@@ -264,10 +271,11 @@ outer:
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
 				_, band, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to get device's versioned band")
+					logger.WithError(err).Warn("Failed to get device's versioned band, skipping...")
 					continue
 				}
 				if gap > uint32(band.MaxFCntGap) {
+					logger.Debug("FCnt gap too high, skipping...")
 					continue outer
 				}
 			}
@@ -298,8 +306,12 @@ outer:
 	}
 	b := up.RawPayload[:len(up.RawPayload)-4]
 
+	logger.WithField("device_count", len(matching)).Debug("Performing MIC checks on devices with matching frame counters...")
 	for _, dev := range matching {
-		logger := logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+		logger := logger.WithFields(log.Fields(
+			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
+			"mac_version", dev.MACState.LoRaWANVersion,
+		))
 
 		if pld.Ack {
 			if len(dev.RecentDownlinks) == 0 {
@@ -370,6 +382,7 @@ outer:
 			continue
 		}
 		if !bytes.Equal(up.Payload.MIC, computedMIC[:]) {
+			logger.Debug("MIC mismatch")
 			continue
 		}
 
@@ -426,12 +439,15 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 		}
 	}()
 
+	log.FromContext(ctx).Debug("Matching device...")
 	dev, ses, err := ns.matchDevice(ctx, up)
 	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to match device")
 		return errDeviceNotFound.WithCause(err)
 	}
 
 	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+	logger.Debug("Matched device")
 
 	pld := up.Payload.GetMACPayload()
 	if pld == nil {
@@ -765,20 +781,24 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		logger.WithError(err).Error("Failed to load device from registry")
 		return err
 	}
+	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+	ctx = log.NewContext(ctx, logger)
 
 	devAddr := ns.newDevAddr(ctx, dev)
 	for dev.Session != nil && devAddr.Equal(dev.Session.DevAddr) {
 		devAddr = ns.newDevAddr(ctx, dev)
 	}
+	logger = logger.WithField("dev_addr", devAddr)
+	ctx = log.NewContext(ctx, logger)
 
 	if err := resetMACState(dev, ns.FrequencyPlans); err != nil {
 		logger.WithError(err).Error("Failed to reset device's MAC state")
 		return err
 	}
 
-	fp, err := ns.FrequencyPlans.GetByID(dev.FrequencyPlanID)
+	fp, band, err := getDeviceBandVersion(ns.FrequencyPlans, dev)
 	if err != nil {
-		return errUnknownFrequencyPlan.WithCause(err)
+		return err
 	}
 
 	req := &ttnpb.JoinRequest{
@@ -959,29 +979,36 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		)
 	}
 
+	logger.Debug("Deduplicating uplink...")
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
 	devIDs, err := lorawan.GetUplinkMessageIdentifiers(up)
 	if err != nil {
 		return nil, errDecodePayload.WithCause(err)
 	}
 	if ok {
+		logger.Debug("Dropping duplicate")
 		registerReceiveUplinkDuplicate(ctx, devIDs, up)
 		return ttnpb.Empty, nil
 	}
 	registerReceiveUplink(ctx, devIDs, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
+		logger.Debug("Waiting for collection window to be closed...")
 		<-ns.collectionDone(ctx, up)
 		stopDedup()
+		logger.Debug("Collection window closed, stopped deduplication")
 	}(up)
 
 	up = deepcopy.Copy(up).(*ttnpb.UplinkMessage)
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+		logger.Debug("Handling data uplink...")
 		return ttnpb.Empty, ns.handleUplink(ctx, devIDs, up, acc)
 	case ttnpb.MType_JOIN_REQUEST:
+		logger.Debug("Handling join-request...")
 		return ttnpb.Empty, ns.handleJoin(ctx, devIDs, up, acc)
 	case ttnpb.MType_REJOIN_REQUEST:
+		logger.Debug("Handling rejoin-request...")
 		return ttnpb.Empty, ns.handleRejoin(ctx, devIDs, up, acc)
 	default:
 		logger.Error("Unmatched MType")
