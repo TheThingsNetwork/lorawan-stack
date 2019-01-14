@@ -18,6 +18,8 @@ import classnames from 'classnames'
 import SafeInspector from '../safe-inspector'
 import Message from '../../lib/components/message'
 
+import PropTypes from '../../lib/prop-types'
+
 import style from './data-sheet.styl'
 
 const DataSheet = function ({ data }) {
@@ -50,9 +52,27 @@ const DataSheet = function ({ data }) {
   )
 }
 
-DataSheet.propTypes = {}
-
-export default DataSheet
+DataSheet.propTypes = {
+  /** A list of entries for the sheet */
+  data: PropTypes.arrayOf(PropTypes.shape({
+    /** The title of the item group */
+    header: PropTypes.message.isRequired,
+    /** A list of items for the group */
+    items: PropTypes.arrayOf(PropTypes.shape({
+      /** The key of the item */
+      key: PropTypes.message.isRequired,
+      /** The value of the item */
+      value: PropTypes.message.isRequired,
+      /** The type of the item, 'code', 'byte' or 'text' (default) */
+      type: PropTypes.string,
+      /** Whether this 'code' or 'byte' item should be hidden by default */
+      sensitive: PropTypes.bool,
+      /** Optional subitems of this item (same shape as item, but no deeper
+      * hierarchies) */
+      subItems: PropTypes.arrayOf(PropTypes.object),
+    })),
+  })),
+}
 
 const DataSheetRow = function ({ item, sub }) {
   const isSafeInspector = item.type === 'byte' || item.type === 'code'
@@ -76,3 +96,5 @@ const DataSheetRow = function ({ item, sub }) {
     </tr>
   )
 }
+
+export default DataSheet
