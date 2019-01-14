@@ -46,7 +46,16 @@ class DeviceOverview extends React.Component {
       ids,
       description,
       version_ids,
+      root_keys,
+      session,
     } = this.props.device
+
+    const {
+      f_nwk_s_int_key,
+      s_nwk_s_int_key,
+      nwk_s_enc_key,
+      app_s_key,
+    } = session.keys
 
     const sheetData = [
       {
@@ -61,9 +70,28 @@ class DeviceOverview extends React.Component {
       {
         header: 'Activation Info',
         items: [
-          { key: 'Device EUI', value: ids.dev_eui, type: 'byte', sensitive: true },
+          { key: 'Device EUI', value: ids.dev_eui, type: 'byte', sensitive: false },
           { key: 'Join EUI', value: ids.join_eui, type: 'byte', sensitive: false },
-          { key: 'Device Address', value: ids.dev_addr, type: 'code', sensitive: false },
+          {
+            key: 'Root Key ID',
+            value: root_keys.root_key_id,
+            type: 'code',
+            sensitive: false,
+            subItems: [
+              { key: 'Application Key', value: root_keys.app_key.key, type: 'code', sensitive: true },
+              { key: 'Network Key', value: root_keys.nwk_key.key, type: 'code', sensitive: true },
+            ],
+          },
+        ],
+      },
+      {
+        header: 'Session Info',
+        items: [
+          { key: 'Device Address', value: ids.dev_addr, type: 'byte', sensitive: false },
+          { key: 'Forwarding Network Session Integrity Key', value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
+          { key: 'Serving Network Session Integrity Key', value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
+          { key: 'Network Session Encryption Key', value: nwk_s_enc_key.key, type: 'code', sensitive: true },
+          { key: 'Application Session Key', value: app_s_key.key, type: 'code', sensitive: true },
         ],
       },
     ]
