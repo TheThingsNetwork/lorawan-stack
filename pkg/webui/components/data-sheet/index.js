@@ -20,30 +20,22 @@ import SafeInspector from '../safe-inspector'
 import style from './data-sheet.styl'
 
 const DataSheet = function ({ data }) {
-
   return (
     <table className={style.table}>
       <tbody>
         { data.map(function (group, index) {
           return (
             <React.Fragment key={`${group.header}_${index}`}>
-              <tr className={style.groupHeading}><th>{group.header}</th><td /></tr>
+              <tr className={style.groupHeading}><th>{group.header}</th></tr>
               { group.items.map( function (item) {
-                const isSafeInspector = item.type === 'byte' || item.type === 'code'
+                const subItems = item.subItems ? item.subItems.map((subItem, subIndex) => (
+                  <DataSheetRow sub item={subItem} key={`${index}_${subIndex}`} />
+                )) : null
                 return (
-                  <tr className={classnames({ [style.taller]: item.safe })} key={`${item.key}_${index}`}>
-                    <th>{item.key}</th>
-                    <td>{isSafeInspector ? (
-                      <SafeInspector
-                        hideable={false || item.sensitive}
-
-                        isBytes={item.type === 'byte'}
-                        small
-                        data={item.value}
-                      />
-                    )
-                      : item.value}</td>
-                  </tr>
+                  <React.Fragment key={`${item.key}_${index}`}>
+                    <DataSheetRow item={item} />
+                    {subItems}
+                  </React.Fragment>
                 )
               }
               )}
@@ -58,3 +50,26 @@ const DataSheet = function ({ data }) {
 DataSheet.propTypes = {}
 
 export default DataSheet
+
+const DataSheetRow = function ({ item, sub }) {
+  const isSafeInspector = item.type === 'byte' || item.type === 'code'
+  const rowStyle = classnames({
+    [style.taller]: isSafeInspector,
+    [style.sub]: sub,
+  })
+
+  return (
+    <tr className={rowStyle}>
+      <th>{item.key}</th>
+      <td>{isSafeInspector ? (
+        <SafeInspector
+          hideable={false || item.sensitive}
+          isBytes={item.type === 'byte'}
+          small
+          data={item.value}
+        />
+      )
+        : item.value}</td>
+    </tr>
+  )
+}
