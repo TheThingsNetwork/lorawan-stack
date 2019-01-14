@@ -63,9 +63,12 @@ export class SafeInspector extends Component {
       byteStyle: true,
       copied: false,
       msb: true,
+      truncated: false,
     }
 
+    this.containerElem = React.createRef()
     this.displayElem = React.createRef()
+    this.buttonsElem = React.createRef()
     this.copyElem = React.createRef()
   }
 
@@ -100,6 +103,32 @@ export class SafeInspector extends Component {
 
   componentDidMount () {
     new clipboard(this.copyElem.current)
+    window.addEventListener('resize', this.handleWindowResize)
+    this.checkTruncateState()
+  }
+
+  componentWillUmount () {
+    window.removeEventListener('resize', this.handleWindowResize)
+  }
+
+  handleWindowResize () {
+    this.checkTruncateState()
+  }
+
+  checkTruncateState () {
+    if (!this.containerElem.current) {
+      return
+    }
+
+    const containerWidth = this.containerElem.current.offsetWidth
+    const buttonsWidth = this.buttonsElem.current.offsetWidth
+    const displayWidth = this.displayElem.current.offsetWidth
+    const netContainerWidth = containerWidth - buttonsWidth - 14
+    if (netContainerWidth < displayWidth && !this.state.truncated) {
+      this.setState({ truncated: true })
+    } else if (netContainerWidth > displayWidth && this.state.truncated) {
+      this.setState({ truncated: false })
+    }
   }
 
   render () {
@@ -134,12 +163,13 @@ export class SafeInspector extends Component {
 
     const dataStyle = classnames(style.data, {
       [style.dataHidden]: hidden,
+      [style.dataTruncated]: this.state.truncated,
     })
 
     return (
-      <div className={containerStyle}>
+      <div ref={this.containerElem} className={containerStyle}>
         <div ref={this.displayElem} onClick={this.handleDataClick} className={dataStyle}>{display}</div>
-        <div className={style.buttons}>
+        <div ref= {this.buttonsElem} className={style.buttons}>
           {!hidden && !byteStyle && isBytes && (
             <React.Fragment>
               <span>{ msb ? 'msb' : 'lsb' }</span>

@@ -89,20 +89,23 @@ $height-small = 1.8rem
   white-space: nowrap
   border-radius: $br.s
 
+  &:hover
+    background-color: white // Needs to be here for Safari to work
+
   span
     margin-right: .3rem
 
-  &:hover
-    z-index: $zi.slight
-    animation: overlay
-    animation-delay: 500ms
-    animation-fill-mode: forwards
+.data-truncated:not(.data-hidden):hover
+  border-input()
+  z-index: $zi.slight
+  min-width: calc(100% + 2px)
+  position: absolute
+  left: -1px
+  top: -1px
+  height: calc(100% + 2px)
 
 .data-hidden
   text-overflow: clip
-  &:hover
-    animation: none
-
 
 .copy-confirm
   border-input()
@@ -116,13 +119,12 @@ $height-small = 1.8rem
   font-size: $fs.s
   padding: $cs.xxs
   display: hidden
-  animation: animationFrames ease 2s
+  animation: animation-frames ease 2s
   animation-iteration-count: 1
   transform-origin: 50% 50%
   animation-fill-mode: forwards
 
-
-@keyframes animationFrames
+@keyframes animation-frames
   0%
     opacity: 0
     transform:  translate(0px, -25px) scale(.5)
@@ -144,16 +146,4 @@ $height-small = 1.8rem
   100%
     opacity: 0
     transform:  translate(0, -3px) scale(1)
-
-@keyframes overlay
-  0%
-    position: static
-
-  100%
-    border-input()
-    min-width: calc(100% + 2px)
-    position: absolute
-    left: -1px
-    top: -1px
-    height: calc(100% + 2px)
 
