@@ -213,8 +213,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex: ttnpb.DATA_RATE_0,
-								ChannelIndex:  3,
+								DataRateIndex:      ttnpb.DATA_RATE_0,
+								DeviceChannelIndex: 3,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -266,6 +266,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"lorawan_phy_version",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -303,7 +304,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 				payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
@@ -374,7 +375,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 					drIdx := ttnpb.DATA_RATE_1
 					if rx1DRIdx < drIdx {
 						drIdx = rx1DRIdx
@@ -638,8 +639,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex: ttnpb.DATA_RATE_0,
-								ChannelIndex:  3,
+								DataRateIndex:      ttnpb.DATA_RATE_0,
+								DeviceChannelIndex: 3,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -691,6 +692,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"lorawan_phy_version",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -728,7 +730,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 				payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
@@ -799,7 +801,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 					payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
@@ -1052,8 +1054,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex: ttnpb.DATA_RATE_0,
-								ChannelIndex:  3,
+								DataRateIndex:      ttnpb.DATA_RATE_0,
+								DeviceChannelIndex: 3,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -1105,6 +1107,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"lorawan_phy_version",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -1213,7 +1216,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 					rx1Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
@@ -1607,8 +1610,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex: ttnpb.DATA_RATE_0,
-								ChannelIndex:  3,
+								DataRateIndex:      ttnpb.DATA_RATE_0,
+								DeviceChannelIndex: 3,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -1684,6 +1687,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"lorawan_phy_version",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -1795,7 +1799,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 					rx1Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
@@ -2212,8 +2216,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex: ttnpb.DATA_RATE_0,
-								ChannelIndex:  3,
+								DataRateIndex:      ttnpb.DATA_RATE_0,
+								DeviceChannelIndex: 3,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -2265,6 +2269,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"lorawan_phy_version",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -2294,7 +2299,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID2")
 
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 
 				expected := CopyEndDevice(pb)
 				expected.MACState.PendingApplicationDownlink = nil
@@ -2345,7 +2350,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					defer test.MustIncrementContextCounter(ctx, getPeerCallKey{}, 1)
 
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint32))].DownlinkFrequency
+					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 
 					switch uid := unique.ID(ctx, ids); uid {
 					case unique.ID(ctx, gateways[0]):

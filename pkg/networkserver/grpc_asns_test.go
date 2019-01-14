@@ -46,7 +46,7 @@ func TestLinkApplication(t *testing.T) {
 
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{
-			ServiceBase: config.ServiceBase{Cluster: config.Cluster{Keys: Keys}},
+			ServiceBase: config.ServiceBase{Cluster: config.Cluster{Keys: []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}}},
 		}),
 		&Config{
 			Devices:             devReg,

@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 	"fmt"
+	"math"
 	"sort"
 	"time"
 
@@ -497,7 +498,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 
-					rx1ChIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
+					if up.Settings.DeviceChannelIndex > math.MaxUint8 {
+						return nil, nil, errInvalidChannelIndex
+					}
+					rx1ChIdx, err := band.Rx1Channel(uint8(up.Settings.DeviceChannelIndex))
 					if err != nil {
 						return nil, nil, err
 					}
@@ -507,14 +511,16 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return nil, nil, errCorruptedMACState
 					}
 
-					req := &ttnpb.TxRequest{
-						Class:        ttnpb.CLASS_A,
-						Rx1Delay:     dev.MACState.CurrentParameters.Rx1Delay,
-						Rx1Frequency: dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency,
-					}
-					req.Rx1DataRateIndex, err = band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
+					rx1DRIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
 					if err != nil {
 						return nil, nil, err
+					}
+
+					req := &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
+						Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
+						Rx1Frequency:     dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency,
+						Rx1DataRateIndex: rx1DRIdx,
 					}
 
 					switch {

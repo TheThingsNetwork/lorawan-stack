@@ -17,8 +17,6 @@ package networkserver_test
 import (
 	"bytes"
 	"context"
-	"fmt"
-	"math"
 	"math/rand"
 	"sync"
 	"testing"
@@ -27,6 +25,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -41,14 +40,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 var (
 	DuplicateCount = 6
 	DeviceCount    = 100
-
-	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
 
 	Downlinks = [...]*ttnpb.ApplicationDownlink{
 		{FCnt: 0},
@@ -66,15 +62,6 @@ var (
 
 func init() {
 	SetAppQueueUpdateTimeout(0)
-}
-
-func contextWithKey() context.Context {
-	ctx := test.Context()
-	md := metadata.Pairs("authorization", fmt.Sprintf("Basic %s", Keys[0]))
-	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	return metadata.NewIncomingContext(ctx, md)
 }
 
 type UplinkHandler interface {
@@ -169,66 +156,7 @@ func handleUplinkTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
 
-		t.Run("Empty DevAddr", func(t *testing.T) {
-			a := assertions.New(t)
-
-			redisClient, flush := test.NewRedis(t, "networkserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
-				&Config{
-					Devices:             devReg,
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
-				})).(*NetworkServer)
-			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-			test.Must(nil, ns.Start())
-			defer ns.Close()
-
-			pb := &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
-					JoinEUI:                &JoinEUI,
-					DevEUI:                 &DevEUI,
-				},
-				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
-					SessionKeys: ttnpb.SessionKeys{
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: FNwkSIntKey[:],
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
-						},
-					},
-				},
-				FrequencyPlanID: test.EUFrequencyPlanID,
-			}
-
-			ret, err := CreateDevice(authorizedCtx, devReg, pb)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-
-			pb.CreatedAt = ret.CreatedAt
-			pb.UpdatedAt = ret.UpdatedAt
-			a.So(ret, should.Resemble, pb)
-
-			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
-			msg.Payload.GetMACPayload().DevAddr = types.DevAddr{}
-			_, err = ns.HandleUplink(authorizedCtx, msg)
-			a.So(err, should.NotBeNil)
-		})
-
-		t.Run("FCnt too high", func(t *testing.T) {
+		t.Run("No frequency match", func(t *testing.T) {
 			a := assertions.New(t)
 
 			redisClient, flush := test.NewRedis(t, "networkserver_test")
@@ -283,12 +211,16 @@ func handleUplinkTest() func(t *testing.T) {
 
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
-			msg.Payload.GetMACPayload().FCnt = math.MaxUint16 + 1
+			msg.Settings.Frequency = 42
 			_, err = ns.HandleUplink(authorizedCtx, msg)
-			a.So(err, should.NotBeNil)
+			if a.So(err, should.BeError) {
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("Error: %s", err)
+				}
+			}
 		})
 
-		t.Run("ChannelIndex too high", func(t *testing.T) {
+		t.Run("No data rate match", func(t *testing.T) {
 			a := assertions.New(t)
 
 			redisClient, flush := test.NewRedis(t, "networkserver_test")
@@ -343,69 +275,20 @@ func handleUplinkTest() func(t *testing.T) {
 
 			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 			msg.Payload.GetMACPayload().DevAddr = DevAddr
-			msg.Settings.ChannelIndex = math.MaxUint8 + 1
-			_, err = ns.HandleUplink(authorizedCtx, msg)
-			a.So(err, should.NotBeNil)
-		})
-
-		t.Run("DataRateIndex too high", func(t *testing.T) {
-			a := assertions.New(t)
-
-			redisClient, flush := test.NewRedis(t, "networkserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
-				&Config{
-					Devices:             devReg,
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
-				})).(*NetworkServer)
-			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-			test.Must(nil, ns.Start())
-			defer ns.Close()
-
-			pb := &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
-					JoinEUI:                &JoinEUI,
-					DevEUI:                 &DevEUI,
-				},
-				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
-					SessionKeys: ttnpb.SessionKeys{
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: FNwkSIntKey[:],
-						},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
-						},
+			msg.Settings.DataRate = ttnpb.DataRate{
+				Modulation: &ttnpb.DataRate_LoRa{
+					LoRa: &ttnpb.LoRaDataRate{
+						Bandwidth:       42,
+						SpreadingFactor: 42,
 					},
 				},
-				FrequencyPlanID: test.EUFrequencyPlanID,
 			}
-
-			ret, err := CreateDevice(authorizedCtx, devReg, pb)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-
-			pb.CreatedAt = ret.CreatedAt
-			pb.UpdatedAt = ret.UpdatedAt
-			a.So(ret, should.Resemble, pb)
-
-			msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
-			msg.Payload.GetMACPayload().DevAddr = DevAddr
-			msg.Settings.DataRateIndex = math.MaxUint8 + 1
 			_, err = ns.HandleUplink(authorizedCtx, msg)
-			a.So(err, should.NotBeNil)
+			if a.So(err, should.BeError) {
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("Error: %s", err)
+				}
+			}
 		})
 
 		for _, tc := range []struct {
@@ -423,8 +306,18 @@ func handleUplinkTest() func(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -466,8 +359,8 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -489,8 +382,18 @@ func handleUplinkTest() func(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -532,8 +435,8 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -556,8 +459,18 @@ func handleUplinkTest() func(t *testing.T) {
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -603,8 +516,8 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -627,8 +540,18 @@ func handleUplinkTest() func(t *testing.T) {
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -675,8 +598,8 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -698,8 +621,18 @@ func handleUplinkTest() func(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -743,17 +676,24 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
-						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeUplinkMIC(
+						SNwkSIntKey,
+						FNwkSIntKey,
+						0,
+						3,
+						2,
+						DevAddr,
+						0x42,
+						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
+					).([4]byte)
 					msg.Payload.MIC = mic[:]
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
@@ -769,8 +709,18 @@ func handleUplinkTest() func(t *testing.T) {
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -825,17 +775,24 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
-						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeUplinkMIC(
+						SNwkSIntKey,
+						FNwkSIntKey,
+						0x24,
+						3,
+						2,
+						DevAddr,
+						0x42,
+						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
+					).([4]byte)
 					msg.Payload.MIC = mic[:]
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
@@ -850,8 +807,18 @@ func handleUplinkTest() func(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -896,17 +863,24 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 					msg.Payload.GetMACPayload().FHDR.Ack = false
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
-						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeUplinkMIC(
+						SNwkSIntKey,
+						FNwkSIntKey,
+						0,
+						3,
+						2,
+						DevAddr,
+						0x42,
+						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
+					).([4]byte)
 					msg.Payload.MIC = mic[:]
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
@@ -922,8 +896,18 @@ func handleUplinkTest() func(t *testing.T) {
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 						CurrentParameters: ttnpb.MACParameters{
 							Channels: []*ttnpb.MACParameters_Channel{
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
-								ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
+								{
+									UplinkFrequency:   40,
+									DownlinkFrequency: 400,
+									MinDataRateIndex:  1,
+									MaxDataRateIndex:  4,
+								},
+								{
+									UplinkFrequency:   868300000,
+									DownlinkFrequency: 42,
+									MinDataRateIndex:  0,
+									MaxDataRateIndex:  5,
+								},
 								{
 									UplinkFrequency:   42,
 									DownlinkFrequency: 420,
@@ -978,17 +962,24 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 					msg.Payload.GetMACPayload().FHDR.Ack = true
 					msg.Payload.GetMACPayload().FHDR.ADR = false
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 42
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
 					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
-						uint8(msg.Settings.DataRateIndex), uint8(msg.Settings.ChannelIndex),
-						DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
+					mic := test.Must(crypto.ComputeUplinkMIC(
+						SNwkSIntKey,
+						FNwkSIntKey,
+						0x24,
+						3,
+						2,
+						DevAddr,
+						0x42,
+						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
+					).([4]byte)
 					msg.Payload.MIC = mic[:]
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
@@ -1201,7 +1192,7 @@ func handleUplinkTest() func(t *testing.T) {
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					if pb.MACState == nil {
-						err := ResetMACState(ns.FrequencyPlans, pb)
+						err := ResetMACState(pb, ns.FrequencyPlans)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
@@ -1211,6 +1202,8 @@ func handleUplinkTest() func(t *testing.T) {
 
 					msg := CopyUplinkMessage(tc.UplinkMessage)
 					msg.RxMetadata = md
+					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_3
+					msg.Settings.DeviceChannelIndex = 2
 
 					pb.RecentUplinks = append(pb.RecentUplinks, msg)
 					if len(pb.RecentUplinks) > RecentUplinkCount {
@@ -1447,13 +1440,11 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					Session:         nil,
-					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 868500000
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1479,8 +1470,8 @@ func handleJoinTest() func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 868500000
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1506,8 +1497,8 @@ func handleJoinTest() func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 868500000
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1533,8 +1524,8 @@ func handleJoinTest() func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 868500000
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1560,8 +1551,8 @@ func handleJoinTest() func(t *testing.T) {
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
-					msg.Settings.ChannelIndex = 2
-					msg.Settings.DataRateIndex = 3
+					msg.Settings.Frequency = 868500000
+					msg.Settings.DataRate = band.All[band.EU_863_870].DataRates[3].Rate
 
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
@@ -1614,6 +1605,10 @@ func handleJoinTest() func(t *testing.T) {
 				asSendCh := make(chan *ttnpb.ApplicationUp)
 
 				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
+				if tc.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+					keys.NwkSEncKey = keys.FNwkSIntKey
+					keys.SNwkSIntKey = keys.FNwkSIntKey
+				}
 
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
@@ -1674,17 +1669,23 @@ func handleJoinTest() func(t *testing.T) {
 				pb.UpdatedAt = ret.UpdatedAt
 				a.So(ret, should.Resemble, pb)
 
+				err = ResetMACState(ret, ns.FrequencyPlans)
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Failed to reset MAC state: %s", err)
+				}
+				pb = ret
+
 				expectedRequest := &ttnpb.JoinRequest{
-					RawPayload:         tc.UplinkMessage.RawPayload,
-					Payload:            tc.UplinkMessage.Payload,
+					RawPayload:         append(tc.UplinkMessage.RawPayload[:0:0], tc.UplinkMessage.RawPayload...),
+					Payload:            CopyUplinkMessage(tc.UplinkMessage).Payload,
 					NetID:              ns.NetID,
-					SelectedMACVersion: tc.Device.LoRaWANVersion,
-					RxDelay:            tc.Device.MACState.DesiredParameters.Rx1Delay,
+					SelectedMACVersion: pb.LoRaWANVersion,
+					RxDelay:            pb.MACState.DesiredParameters.Rx1Delay,
 					CFList:             frequencyplans.CFList(*test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan), pb.LoRaWANPHYVersion),
 					DownlinkSettings: ttnpb.DLSettings{
-						Rx1DROffset: tc.Device.MACState.DesiredParameters.Rx1DataRateOffset,
-						Rx2DR:       tc.Device.MACState.DesiredParameters.Rx2DataRateIndex,
-						OptNeg:      true,
+						Rx1DROffset: pb.MACState.DesiredParameters.Rx1DataRateOffset,
+						Rx2DR:       pb.MACState.DesiredParameters.Rx2DataRateIndex,
+						OptNeg:      pb.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 					},
 				}
 
@@ -1734,41 +1735,28 @@ func handleJoinTest() func(t *testing.T) {
 
 						ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 						if !a.So(err, should.BeNil) ||
-							!a.So(ret, should.NotBeNil) {
+							!a.So(ret, should.NotBeNil) ||
+							!a.So(ret.PendingSession, should.NotBeNil) {
 							t.FailNow()
 						}
-						if a.So(ret.Session, should.NotBeNil) {
-							a.So(ret.Session.StartedAt, should.HappenBetween, start, time.Now())
-							a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ret.Session.DevAddr)
-							if tc.Device.Session != nil {
-								a.So(ret.Session.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
-							}
+
+						a.So(ret.PendingSession.StartedAt, should.HappenBetween, start, time.Now())
+						a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ret.PendingSession.DevAddr)
+						if tc.Device.Session != nil {
+							a.So(ret.PendingSession.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
 						}
 
 						if !a.So(ret.RecentUplinks, should.NotBeEmpty) {
 							t.FailNow()
 						}
 
-						err = ResetMACState(ns.FrequencyPlans, pb)
-						if !a.So(err, should.BeNil) {
-							t.FailNow()
-						}
-
 						pb.MACState.RxWindowsAvailable = true
 						pb.MACState.QueuedJoinAccept = resp.RawPayload
-						pb.MACState.CurrentParameters.Rx1Delay = tc.Device.MACState.DesiredParameters.Rx1Delay
-						pb.MACState.CurrentParameters.Rx1DataRateOffset = tc.Device.MACState.DesiredParameters.Rx1DataRateOffset
-						pb.MACState.CurrentParameters.Rx2DataRateIndex = tc.Device.MACState.DesiredParameters.Rx2DataRateIndex
-
-						pb.MACState.DesiredParameters.Rx1Delay = pb.MACState.CurrentParameters.Rx1Delay
-						pb.MACState.DesiredParameters.Rx1DataRateOffset = pb.MACState.CurrentParameters.Rx1DataRateOffset
-						pb.MACState.DesiredParameters.Rx2DataRateIndex = pb.MACState.CurrentParameters.Rx2DataRateIndex
-
 						pb.EndDeviceIdentifiers.DevAddr = ret.EndDeviceIdentifiers.DevAddr
-						pb.Session = &ttnpb.Session{
+						pb.PendingSession = &ttnpb.Session{
 							DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
 							SessionKeys: *keys,
-							StartedAt:   ret.Session.StartedAt,
+							StartedAt:   ret.PendingSession.StartedAt,
 						}
 						pb.CreatedAt = ret.CreatedAt
 						pb.UpdatedAt = ret.UpdatedAt
@@ -1776,6 +1764,8 @@ func handleJoinTest() func(t *testing.T) {
 
 						msg := CopyUplinkMessage(tc.UplinkMessage)
 						msg.RxMetadata = md
+						msg.Settings.DeviceChannelIndex = 2
+						msg.Settings.DataRateIndex = ttnpb.DATA_RATE_3
 
 						pb.RecentUplinks = append(pb.RecentUplinks, msg)
 						if len(pb.RecentUplinks) > RecentUplinkCount {
@@ -1805,9 +1795,9 @@ func handleJoinTest() func(t *testing.T) {
 						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:              resp.SessionKeys.AppSKey,
-							SessionKeyID:         test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+							SessionKeyID:         pb.PendingSession.SessionKeys.SessionKeyID,
 							InvalidatedDownlinks: tc.Device.QueuedApplicationDownlinks,
-							SessionStartedAt:     pb.Session.StartedAt,
+							SessionStartedAt:     pb.PendingSession.StartedAt,
 						}},
 					})
 
@@ -1850,7 +1840,7 @@ func handleJoinTest() func(t *testing.T) {
 
 					select {
 					case req := <-handleJoinCh:
-						a.So(req.req.DevAddr, should.NotResemble, pb.Session.DevAddr)
+						a.So(req.req.DevAddr, should.NotResemble, pb.PendingSession.DevAddr)
 
 						expectedRequest.DevAddr = req.req.DevAddr
 						a.So(req.req, should.Resemble, expectedRequest)
@@ -1872,6 +1862,11 @@ func handleJoinTest() func(t *testing.T) {
 					_ = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 					close(deduplicationDoneCh)
 
+					pb, err = devReg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+					if !a.So(err, should.BeNil) {
+						t.Fatalf("Failed to get device from registry: %s", err)
+					}
+
 					select {
 					case up := <-asSendCh:
 						a.So(up.CorrelationIDs, should.NotBeEmpty)
@@ -1887,7 +1882,7 @@ func handleJoinTest() func(t *testing.T) {
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:          resp.SessionKeys.AppSKey,
-								SessionKeyID:     test.Must(devReg.GetByID(ctx, tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers, tc.Device.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)).(*ttnpb.EndDevice).Session.SessionKeys.SessionKeyID,
+								SessionKeyID:     pb.PendingSession.SessionKeys.SessionKeyID,
 								SessionStartedAt: up.GetJoinAccept().SessionStartedAt,
 							}},
 						})

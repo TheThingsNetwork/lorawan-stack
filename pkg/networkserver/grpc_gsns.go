@@ -182,14 +182,42 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.Uplink
 	}, false
 }
 
+func searchDataRate(dr ttnpb.DataRate, dev *ttnpb.EndDevice, fps *frequencyplans.Store) (ttnpb.DataRateIndex, error) {
+	_, band, err := getDeviceBandVersion(dev, fps)
+	if err != nil {
+		return 0, err
+	}
+	for i, bDR := range band.DataRates {
+		if bDR.Rate.Equal(dr) {
+			return ttnpb.DataRateIndex(i), nil
+		}
+	}
+	return 0, errDataRateNotFound.WithAttributes("data_rate", dr)
+}
+
+func searchUplinkChannel(freq uint64, dev *ttnpb.EndDevice) (uint8, error) {
+	for i, ch := range dev.MACState.CurrentParameters.Channels {
+		if ch.UplinkFrequency == freq {
+			return uint8(i), nil
+		}
+	}
+	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
+}
+
 // matchDevice tries to match the uplink message with a device and returns the matched device and session.
 // The LastFCntUp in the matched session is updated according to the FCnt in up.
 func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessage) (*ttnpb.EndDevice, *ttnpb.Session, error) {
+	if len(up.RawPayload) < 4 {
+		return nil, nil, errRawPayloadTooShort
+	}
+	b := up.RawPayload[:len(up.RawPayload)-4]
+
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_addr", pld.DevAddr,
 		"uplink_f_cnt", up.Payload.GetMACPayload().FCnt,
+		"payload_length", len(b),
 	))
 
 	type device struct {
@@ -235,6 +263,10 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		}); err != nil {
 		logger.WithError(err).Warn("Failed to find devices in registry by DevAddr")
 		return nil, nil, err
+	}
+	if len(devs) == 0 {
+		logger.Warn("No device matched DevAddr")
+		return nil, nil, errDeviceNotFound
 	}
 
 	matching := make([]device, 0, len(devs))
@@ -301,11 +333,6 @@ outer:
 		return matching[i].gap < matching[j].gap
 	})
 
-	if len(up.RawPayload) < 4 {
-		return nil, nil, errRawPayloadTooShort
-	}
-	b := up.RawPayload[:len(up.RawPayload)-4]
-
 	logger.WithField("device_count", len(matching)).Debug("Performing MIC checks on devices with matching frame counters...")
 	for _, dev := range matching {
 		logger := logger.WithFields(log.Fields(
@@ -317,6 +344,7 @@ outer:
 			if len(dev.RecentDownlinks) == 0 {
 				// Uplink acknowledges a downlink, but no downlink was sent to the device,
 				// hence it must be the wrong device.
+				logger.Debug("Uplink contains ACK, but no downlink was sent to device, skipping...")
 				continue
 			}
 		}
@@ -360,9 +388,15 @@ outer:
 				confFCnt = dev.matchedSession.LastConfFCntDown
 			}
 
-			txSettings := up.Settings
-			if err := setFrequencyPlanIndices(&txSettings, ns.FrequencyPlans, dev.EndDevice); err != nil {
-				logger.WithError(err).Warn("Failed to find data rate and channel index in device's frequency plan")
+			drIdx, err := searchDataRate(up.Settings.DataRate, dev.EndDevice, ns.FrequencyPlans)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to determine data rate index of uplink")
+				continue
+			}
+
+			chIdx, err := searchUplinkChannel(up.Settings.Frequency, dev.EndDevice)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to determine channel index of uplink")
 				continue
 			}
 
@@ -370,8 +404,8 @@ outer:
 				sNwkSIntKey,
 				fNwkSIntKey,
 				confFCnt,
-				uint8(txSettings.DataRateIndex),
-				uint8(txSettings.ChannelIndex),
+				uint8(drIdx),
+				chIdx,
 				pld.DevAddr,
 				dev.fCnt,
 				b,
@@ -389,44 +423,11 @@ outer:
 		if dev.fCnt == math.MaxUint32 {
 			return nil, nil, errFCntTooHigh
 		}
+
 		dev.matchedSession.LastFCntUp = dev.fCnt
 		return dev.EndDevice, dev.matchedSession, nil
 	}
 	return nil, nil, errDeviceNotFound
-}
-
-// setFrequencyPlanIndices sets the DataRateIndex and ChannelIndex of the given TxSettings based on the given device's
-// frequency plan.
-func setFrequencyPlanIndices(settings *ttnpb.TxSettings, fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
-	fp, band, err := getDeviceBandVersion(fps, dev)
-	if err != nil {
-		return errUnknownBand.WithCause(err)
-	}
-	switch settings.Modulation {
-	case ttnpb.Modulation_LORA:
-		for chIdx, ch := range fp.UplinkChannels {
-			if ch.Frequency != settings.Frequency {
-				continue
-			}
-			for drIdx := ch.MinDataRate; drIdx <= ch.MaxDataRate; drIdx++ {
-				dr := band.DataRates[drIdx].Rate
-				// TODO: Get values (https://github.com/TheThingsIndustries/lorawan-stack/issues/1384)
-				sf, _ := dr.SpreadingFactor()
-				bw, _ := dr.Bandwidth()
-				if sf == uint8(settings.SpreadingFactor) && bw == settings.Bandwidth {
-					settings.DataRateIndex = ttnpb.DataRateIndex(drIdx)
-					settings.ChannelIndex = uint32(chIdx)
-					return nil
-				}
-			}
-		}
-	case ttnpb.Modulation_FSK:
-		if fp.FSKChannel != nil && fp.FSKChannel.Frequency == settings.Frequency {
-			settings.DataRateIndex = ttnpb.DataRateIndex(fp.FSKChannel.DataRate)
-			settings.ChannelIndex = 0
-		}
-	}
-	return errInvalidDataRate
 }
 
 // MACHandler defines the behavior of a MAC command on a device.
@@ -575,10 +576,18 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				paths = append(paths, "pending_session")
 			}
 
-			if err := setFrequencyPlanIndices(&up.Settings, ns.FrequencyPlans, stored); err != nil {
-				logger.WithError(err).Warn("Failed to find data rate and channel index in device's frequency plan")
+			upChIdx, err := searchUplinkChannel(up.Settings.Frequency, dev)
+			if err != nil {
 				return nil, nil, err
 			}
+			up.Settings.DeviceChannelIndex = uint32(upChIdx)
+
+			upDRIdx, err := searchDataRate(up.Settings.DataRate, dev, ns.Component.FrequencyPlans)
+			if err != nil {
+				return nil, nil, err
+			}
+			up.Settings.DataRateIndex = upDRIdx
+
 			stored.RecentUplinks = append(stored.RecentUplinks, up)
 			if len(stored.RecentUplinks) > recentUplinkCount {
 				stored.RecentUplinks = stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount+1:]
@@ -796,7 +805,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		return err
 	}
 
-	fp, band, err := getDeviceBandVersion(ns.FrequencyPlans, dev)
+	fp, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 	if err != nil {
 		return err
 	}
@@ -890,10 +899,18 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 			dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
 			paths = append(paths, "mac_state")
 
-			if err := setFrequencyPlanIndices(&up.Settings, ns.FrequencyPlans, dev); err != nil {
-				logger.WithError(err).Warn("Failed to find data rate and channel index in device's frequency plan")
+			upChIdx, err := searchUplinkChannel(up.Settings.Frequency, dev)
+			if err != nil {
 				return nil, nil, err
 			}
+			up.Settings.DeviceChannelIndex = uint32(upChIdx)
+
+			upDRIdx, err := searchDataRate(up.Settings.DataRate, dev, ns.Component.FrequencyPlans)
+			if err != nil {
+				return nil, nil, err
+			}
+			up.Settings.DataRateIndex = upDRIdx
+
 			dev.RecentUplinks = append(dev.RecentUplinks, up)
 			if len(dev.RecentUplinks) > recentUplinkCount {
 				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
