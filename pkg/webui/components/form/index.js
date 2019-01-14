@@ -24,6 +24,7 @@ const InnerForm = function ({
   setFieldValue,
   setFieldTouched,
   handleSubmit,
+  handleReset,
   isSubmitting,
   isValid,
   errors,
@@ -35,8 +36,8 @@ const InnerForm = function ({
   submitEnabledWhenInvalid,
   validateOnBlur,
   validateOnChange,
+  dirty,
 }) {
-
   const decoratedChildren = recursiveMap(children,
     function (Child) {
       if (Child.type === Field) {
@@ -52,11 +53,19 @@ const InnerForm = function ({
           validateOnChange,
           ...Child.props,
         })
-      } else if (Child.type === Button && Child.props.type === 'submit') {
-        return React.cloneElement(Child, {
-          disabled: isSubmitting || (!submitEnabledWhenInvalid && !isValid),
-          ...Child.props,
-        })
+      } else if (Child.type === Button) {
+        if (Child.props.type === 'submit') {
+          return React.cloneElement(Child, {
+            ...Child.props,
+            disabled: isSubmitting || (!submitEnabledWhenInvalid && !isValid),
+          })
+        } else if (Child.props.type === 'reset') {
+          return React.cloneElement(Child, {
+            ...Child.props,
+            disabled: !isSubmitting && !dirty,
+            onClick: handleReset,
+          })
+        }
       }
 
       return Child
