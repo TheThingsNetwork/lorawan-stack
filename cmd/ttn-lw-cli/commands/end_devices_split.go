@@ -19,6 +19,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -493,4 +494,52 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 	}
 
 	return &res, nil
+}
+
+func deleteEndDevice(devID *ttnpb.EndDeviceIdentifiers) error {
+	as, err := api.Dial(ctx, config.ApplicationServerAddress)
+	if err != nil {
+		return err
+	}
+	_, err = ttnpb.NewAsEndDeviceRegistryClient(as).Delete(ctx, devID)
+	if errors.IsNotFound(err) {
+		logger.WithError(err).Error("Could not delete end device from Application Server")
+	} else if err != nil {
+		return err
+	}
+
+	ns, err := api.Dial(ctx, config.NetworkServerAddress)
+	if err != nil {
+		return err
+	}
+	_, err = ttnpb.NewNsEndDeviceRegistryClient(ns).Delete(ctx, devID)
+	if errors.IsNotFound(err) {
+		logger.WithError(err).Error("Could not delete end device from Network Server")
+	} else if err != nil {
+		return err
+	}
+
+	if devID.JoinEUI != nil && devID.DevEUI != nil {
+		js, err := api.Dial(ctx, config.JoinServerAddress)
+		if err != nil {
+			return err
+		}
+		_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
+		if errors.IsNotFound(err) {
+			logger.WithError(err).Error("Could not delete end device from Join Server")
+		} else if err != nil {
+			return err
+		}
+	}
+
+	is, err := api.Dial(ctx, config.IdentityServerAddress)
+	if err != nil {
+		return err
+	}
+	_, err = ttnpb.NewEndDeviceRegistryClient(is).Delete(ctx, devID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

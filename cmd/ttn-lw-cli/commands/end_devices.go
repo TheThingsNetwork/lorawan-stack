@@ -273,7 +273,8 @@ var (
 
 			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths)
 			if err != nil {
-				return err
+				logger.WithError(err).Error("Could not create end device, rolling back...")
+				return deleteEndDevice(&device.EndDeviceIdentifiers)
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
@@ -399,47 +400,7 @@ var (
 
 			compareServerAddresses(existingDevice, config)
 
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
-			if err != nil {
-				return err
-			}
-			_, err = ttnpb.NewAsEndDeviceRegistryClient(as).Delete(ctx, devID)
-			if errors.IsNotFound(err) {
-				logger.WithError(err).Error("Could not delete end device from Application Server")
-			} else if err != nil {
-				return err
-			}
-
-			ns, err := api.Dial(ctx, config.NetworkServerAddress)
-			if err != nil {
-				return err
-			}
-			_, err = ttnpb.NewNsEndDeviceRegistryClient(ns).Delete(ctx, devID)
-			if errors.IsNotFound(err) {
-				logger.WithError(err).Error("Could not delete end device from Network Server")
-			} else if err != nil {
-				return err
-			}
-
-			if devID.JoinEUI != nil && devID.DevEUI != nil {
-				js, err := api.Dial(ctx, config.JoinServerAddress)
-				if err != nil {
-					return err
-				}
-				_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
-				if errors.IsNotFound(err) {
-					logger.WithError(err).Error("Could not delete end device from Join Server")
-				} else if err != nil {
-					return err
-				}
-			}
-
-			_, err = ttnpb.NewEndDeviceRegistryClient(is).Delete(ctx, devID)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return deleteEndDevice(devID)
 		},
 	}
 )
