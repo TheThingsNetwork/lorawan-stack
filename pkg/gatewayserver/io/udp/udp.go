@@ -234,7 +234,6 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 	switch packet.PacketType {
 	case encoding.PullData:
 		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
-		logger.WithField("remote_addr", packet.GatewayAddr.String()).Debug("Storing downlink path")
 		state.lastDownlinkPath.Store(downlinkPath{
 			addr:    *packet.GatewayAddr,
 			version: packet.ProtocolVersion,
