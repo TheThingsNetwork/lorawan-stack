@@ -93,8 +93,10 @@ export default {
     },
   },
   rights: {
-    application () {
-      return fakeData.rights.application
+    applications () {
+      return new Promise(resolve => setTimeout(() => resolve(
+        fakeData.rights.applications
+      ), 500))
     },
   },
 }
