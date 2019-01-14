@@ -69,7 +69,10 @@ export class SafeInspector extends Component {
   }
 
   handleVisibiltyToggle () {
-    this.setState(prev => ({ hidden: !prev.hidden }))
+    this.setState(prev => ({
+      byteStyle: !prev.hidden ? true : prev.byteStyle,
+      hidden: !prev.hidden,
+    }))
   }
 
   handleTransformToggle () {
@@ -117,11 +120,9 @@ export class SafeInspector extends Component {
         const orderedChunks = msb ? chunks : chunks.reverse()
         formattedData = display = `{ ${orderedChunks.map(chunk => ` 0x${chunk.join('')}`)} }`
       } else {
-        display = chunks.map((chunk, index) => (<span key={`${data}_chunk_${index}`}>{chunk}</span>))
+        display = chunks.map((chunk, index) => (<span key={`${data}_chunk_${index}`}>{hidden ? '••' : chunk}</span>))
       }
-    }
-
-    if (hidden) {
+    } else if (hidden) {
       display = '•'.repeat(formattedData.length)
     }
 
