@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import { Col, Row, Container } from 'react-grid-system'
 
 import Tabs from '../../../components/tabs'
 import Icon from '../../../components/icon'
+import DataSheet from '../../../components/data-sheet'
 
 import style from './device-overview.styl'
 
@@ -44,7 +45,28 @@ class DeviceOverview extends React.Component {
     const {
       ids,
       description,
+      version_ids,
     } = this.props.device
+
+    const sheetData = [
+      {
+        header: 'Hardware',
+        items: [
+          { key: 'Brand', value: version_ids.brand_id },
+          { key: 'Model', value: version_ids.model_id },
+          { key: 'Hardware Version', value: version_ids.hardware_version },
+          { key: 'Firmware Version', value: version_ids.firmware_version },
+        ],
+      },
+      {
+        header: 'Activation Info',
+        items: [
+          { key: 'Device EUI', value: ids.dev_eui, type: 'byte', sensitive: true },
+          { key: 'Join EUI', value: ids.join_eui, type: 'byte', sensitive: false },
+          { key: 'Device Address', value: ids.dev_addr, type: 'code', sensitive: false },
+        ],
+      },
+    ]
 
     return (
       <div className={style.overviewInfo}>
@@ -57,6 +79,9 @@ class DeviceOverview extends React.Component {
             <span className={style.frameCountUp}><Icon icon="arrow_upward" className={style.frameCountIcon} />89.139</span>
             <span><Icon icon="arrow_downward" className={style.frameCountIcon} />0</span>
           </div>
+        </div>
+        <div>
+          <DataSheet data={sheetData} />
         </div>
       </div>
     )
@@ -82,7 +107,7 @@ class DeviceOverview extends React.Component {
               className={style.tabs}
             />
           </Col>
-          <Col sm={12} lg={6}>
+          <Col md={12} lg={6}>
             {this.deviceInfo}
           </Col>
         </Row>
