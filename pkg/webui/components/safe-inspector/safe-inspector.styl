@@ -13,13 +13,29 @@
 // limitations under the License.
 
 $height = 2.3rem
+$height-small = 1.8rem
 
 .container
   border-input()
   horizontalize()
   border-radius: $br.s
   height: $height
-  justify-content: flex-end
+  justify-content: space-between
+  position: relative
+  box-sizing: border-box
+
+  &-small
+    height: $height-small
+    .buttons button
+      padding: 0 .4rem
+    .buttons > span
+      line-height: $height-small
+    .data
+      font-size: $fs.s
+
+.buttons
+  flex: none
+  display: flex
 
   & > span
     font-size: $fs.s

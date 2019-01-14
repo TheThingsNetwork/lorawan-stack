@@ -106,7 +106,7 @@ export class SafeInspector extends Component {
       copied,
     } = this.state
 
-    const { data, isBytes, hideable } = this.props
+    const { data, isBytes, hideable, small } = this.props
 
     let formattedData = data
     let display = formattedData
@@ -125,8 +125,12 @@ export class SafeInspector extends Component {
       display = '•'.repeat(formattedData.length)
     }
 
+    const containerStyle = classnames(style.container, {
+      [style.containerSmall]: small,
+    })
+
     return (
-      <div className={style.container}>
+      <div className={containerStyle}>
         <div ref={this.displayElem} onClick={this.handleDataClick} className={style.data}>{display}</div>
         {!hidden && !byteStyle && isBytes && (
           <React.Fragment>
@@ -179,6 +183,7 @@ export class SafeInspector extends Component {
 }
 
 SafeInspector.defaultProps = {
+  small: false,
   isBytes: true,
   initiallyVisible: false,
   hideable: true,
@@ -193,6 +198,8 @@ SafeInspector.propTypes = {
   initiallyVisible: PropTypes.bool,
   /** Whether the data can be hidden (like passwords) */
   hideable: PropTypes.bool,
+  /** Whether a smaller style should be rendered (useful for display in tables) */
+  small: PropTypes.bool,
 }
 
 export default SafeInspector
