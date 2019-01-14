@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 .id
   h2()
   nudge('up', 3px)
-  line-height: 0.8
+  line-height: .8
   height: 1rem
   white-space: no-break
   margin: 0
@@ -26,7 +26,7 @@
   margin-top: 0
 
 .title
-  margin: $ls.xxs 0 $ls.xxs
+  margin: $ls.xxs 0
   height: 2rem
   display: flex
   align-items: flex-end
@@ -93,3 +93,7 @@
 
 .locationPlaceholder
   margin-top: $ls.m
+
+  &-general
+    margin-bottom: 2rem
+
