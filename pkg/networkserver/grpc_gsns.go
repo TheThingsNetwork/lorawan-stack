@@ -211,18 +211,22 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			"uses_32_bit_f_cnt",
 		},
 		func(dev *ttnpb.EndDevice) bool {
-			if dev.MACState == nil || (dev.Session == nil && dev.PendingSession == nil) {
+			if dev.MACState == nil {
 				return true
 			}
 
-			ses := dev.Session
-			if ses == nil {
-				ses = dev.PendingSession
+			if dev.Session != nil && dev.Session.DevAddr == pld.DevAddr {
+				devs = append(devs, device{
+					EndDevice:      dev,
+					matchedSession: dev.Session,
+				})
 			}
-			devs = append(devs, device{
-				EndDevice:      dev,
-				matchedSession: ses,
-			})
+			if dev.PendingSession != nil && dev.PendingSession.DevAddr == pld.DevAddr {
+				devs = append(devs, device{
+					EndDevice:      dev,
+					matchedSession: dev.PendingSession,
+				})
+			}
 			return true
 
 		}); err != nil {
@@ -239,7 +243,7 @@ outer:
 		fCnt := pld.FCnt
 
 		switch {
-		case !dev.Uses32BitFCnt, fCnt > dev.matchedSession.LastFCntUp:
+		case !dev.Uses32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
 		case fCnt > dev.matchedSession.LastFCntUp&0xffff:
 			fCnt |= dev.matchedSession.LastFCntUp &^ 0xffff
 		case dev.matchedSession.LastFCntUp < 0xffff0000:
@@ -247,7 +251,8 @@ outer:
 		}
 
 		gap := uint32(math.MaxUint32)
-		if fCnt == 0 && dev.matchedSession.LastFCntUp == 0 && len(dev.RecentUplinks) == 0 {
+		if fCnt == 0 && dev.matchedSession.LastFCntUp == 0 &&
+			(len(dev.RecentUplinks) == 0 || dev.PendingSession != nil) {
 			gap = 0
 		} else if !dev.ResetsFCnt {
 			if fCnt <= dev.matchedSession.LastFCntUp {
@@ -797,11 +802,13 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		return err
 	}
 
+	logger.Debug("Sending join-request to Join Server...")
 	resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Join Server failed to handle join-request")
 		return err
 	}
+	logger.Debug("Join-accept received from Join Server")
 	registerForwardUplink(ctx, dev, up)
 
 	select {
@@ -835,7 +842,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 				keys.SNwkSIntKey = keys.FNwkSIntKey
 			}
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr:     devAddr,
+				DevAddr:     req.DevAddr,
 				SessionKeys: keys,
 				StartedAt:   time.Now().UTC(),
 			}
