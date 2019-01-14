@@ -76,6 +76,7 @@ import { getApplication } from '../../../actions/application'
         title: sharedMessages.access,
         path: `${matchedUrl}/access`,
         icon: 'access',
+        exact: false,
       },
       {
         title: sharedMessages.generalSettings,
