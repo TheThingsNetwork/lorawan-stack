@@ -34,23 +34,28 @@ const headers = [
   {
     name: 'gateway_id',
     displayName: m.gtwId,
+    width: 45,
   },
   {
     name: 'eui',
     displayName: 'EUI',
+    width: 25,
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
+    width: 10,
   },
   {
     name: 'antennasCount',
     displayName: sharedMessages.antennas,
     centered: true,
+    width: 5,
   },
   {
     name: 'frequency_plan',
     displayName: m.freqPlan,
+    width: 15,
   },
 ]
 
