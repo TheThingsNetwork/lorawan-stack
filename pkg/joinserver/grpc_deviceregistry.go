@@ -57,7 +57,7 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	return dev, nil
 }
 
-// Set implements ttnpb.AsEndDeviceRegistryServer.
+// Set implements ttnpb.JsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if req.Device.JoinEUI == nil || req.Device.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
@@ -82,7 +82,7 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	})
 }
 
-// Delete implements ttnpb.AsEndDeviceRegistryServer.
+// Delete implements ttnpb.JsEndDeviceRegistryServer.
 func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
