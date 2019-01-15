@@ -27,7 +27,6 @@ import (
 var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI: "postgresql://root@localhost:26257/ttn_lorawan_dev?sslmode=disable",
 	OAuth: oauth.Config{
-		Mount: "/oauth",
 		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName:      "The Things Network Stack for LoRaWAN",
