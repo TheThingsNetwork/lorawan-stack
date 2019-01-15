@@ -23,6 +23,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (
@@ -226,7 +227,10 @@ func trimPrefix(path []string, prefix ...string) []string {
 	return path[nextElement:]
 }
 
-func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
+var flagValueError = errors.DefineInvalidArgument("flag_value", "invalid flag value")
+
+func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) error {
+	var flagValueErrorAttributes []interface{}
 	rv := reflect.Indirect(reflect.ValueOf(dst))
 	flags.VisitAll(func(flag *pflag.Flag) {
 		if !flag.Changed {
@@ -261,13 +265,23 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) {
 			v, _ = flags.GetDuration(flagName)
 		}
 		if v == nil {
-			panic(fmt.Sprintf("can't set %s to %s (%v)", flagName, flag.Value, flag.Value.Type()))
+			flagValueErrorAttributes = append(flagValueErrorAttributes,
+				flag.Name, fmt.Errorf("can't set field to %s (%v)", flag.Value, flag.Value.Type()),
+			)
 		}
-		setField(rv, trimPrefix(strings.Split(flagName, "."), prefix...), reflect.ValueOf(v))
+		if err := setField(rv, trimPrefix(strings.Split(flagName, "."), prefix...), reflect.ValueOf(v)); err != nil {
+			flagValueErrorAttributes = append(flagValueErrorAttributes,
+				flag.Name, err.Error(),
+			)
+		}
 	})
+	if len(flagValueErrorAttributes) > 0 {
+		return flagValueError.WithAttributes(flagValueErrorAttributes...)
+	}
+	return nil
 }
 
-func setField(rv reflect.Value, path []string, v reflect.Value) {
+func setField(rv reflect.Value, path []string, v reflect.Value) error {
 	rt := rv.Type()
 	vt := v.Type()
 	props := proto.GetProperties(rt)
@@ -287,7 +301,11 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 					field.Set(v)
 				case ft.Kind() == reflect.Int32 && vt.Kind() == reflect.String:
 					if valueMap := enumValues(ft); valueMap != nil {
-						field.SetInt(int64(valueMap[v.String()]))
+						if enumValue, ok := valueMap[v.String()]; ok {
+							field.SetInt(int64(enumValue))
+						} else {
+							return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+						}
 					}
 				case ft.PkgPath() == "time" && ft.Name() == "Time" && vt.Kind() == reflect.String:
 					var t time.Time
@@ -295,32 +313,32 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 					if v.String() != "" {
 						t, err = time.Parse(time.RFC3339Nano, v.String())
 						if err != nil {
-							panic(err)
+							return err
 						}
 					}
 					field.Set(reflect.ValueOf(t))
 				case ft.PkgPath() == "time" && ft.Name() == "Duration" && vt.Kind() == reflect.String:
 					d, err := time.ParseDuration(v.String())
 					if err != nil {
-						panic(err)
+						return err
 					}
 					field.Set(reflect.ValueOf(d))
 				case ft.Kind() == reflect.Slice && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
 					s := strings.TrimPrefix(v.String(), "0x")
 					buf, err := hex.DecodeString(s)
 					if err != nil {
-						panic(err)
+						return err
 					}
 					field.Set(reflect.ValueOf(buf))
 				case ft.Kind() == reflect.Array && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
 					s := strings.TrimPrefix(v.String(), "0x")
 					buf, err := hex.DecodeString(s)
 					if err != nil {
-						panic(err)
+						return err
 					}
 					if len(buf) > 0 {
 						if len(buf) != ft.Len() {
-							panic(fmt.Errorf(`bytes of "%s" do not fit in [%d]byte`, v.String(), ft.Len()))
+							return fmt.Errorf(`bytes of "%s" do not fit in [%d]byte`, v.String(), ft.Len())
 						}
 						for i := 0; i < ft.Len(); i++ {
 							field.Index(i).Set(reflect.ValueOf(buf[i]))
@@ -336,14 +354,15 @@ func setField(rv reflect.Value, path []string, v reflect.Value) {
 						}
 						field.Set(slice)
 					} else {
-						panic(fmt.Sprintf("%v is not convertible to %v\n", ft, vt))
+						return fmt.Errorf("%v is not convertible to %v", ft, vt)
 					}
 				default:
-					panic(fmt.Sprintf("%v is not assignable to %v\n", ft, vt))
+					return fmt.Errorf("%v is not assignable to %v", ft, vt)
 				}
-				return
+				return nil
 			}
 			setField(field, path[1:], v)
 		}
 	}
+	return fmt.Errorf("unknown field")
 }

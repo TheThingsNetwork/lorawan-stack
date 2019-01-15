@@ -1277,6 +1277,15 @@
       "file": "users.go"
     }
   },
+  "error:cmd/ttn-lw-cli/internal/util:flag_value": {
+    "translations": {
+      "en": "invalid flag value"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/internal/util",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-identity-server/commands:missing_flag": {
     "translations": {
       "en": "missing CLI flag `{flag}`"
