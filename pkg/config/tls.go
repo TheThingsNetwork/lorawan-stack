@@ -31,7 +31,7 @@ import (
 // TLS represents TLS configuration.
 type TLS struct {
 	RootCA      string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
-	Certificate string `name:"certificate" description:"Location of TLS client certificate"`
+	Certificate string `name:"certificate" description:"Location of TLS certificate"`
 	Key         string `name:"key" description:"Location of TLS private key"`
 }
 
