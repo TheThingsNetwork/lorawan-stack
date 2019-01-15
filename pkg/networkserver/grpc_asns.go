@@ -19,6 +19,7 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -37,7 +38,7 @@ func (s applicationUpStream) Close() error {
 
 // LinkApplication is called by the Application Server to subscribe to application events.
 func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) (err error) {
-	if err := rights.RequireApplication(stream.Context(), *id, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+	if err := cluster.Authorized(stream.Context()); err != nil {
 		return err
 	}
 
