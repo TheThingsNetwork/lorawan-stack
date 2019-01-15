@@ -276,7 +276,7 @@ func NewPopulatedMessageDownlink(r randyLorawan, sNwkSIntKey types.AES128Key, co
 	if err != nil {
 		panic(fmt.Sprintf("failed to compute payload for MIC computation: %s", err))
 	}
-	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, pld.MACPayload.DevAddr, pld.MACPayload.FCnt, b)
+	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, pld.MACPayload.DevAddr, 0, pld.MACPayload.FCnt, b)
 	if err != nil {
 		panic(fmt.Sprintf("failed to compute MIC: %s", err))
 	}

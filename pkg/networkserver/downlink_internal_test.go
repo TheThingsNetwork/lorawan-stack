@@ -2601,7 +2601,7 @@ func TestGenerateDownlink(t *testing.T) {
 			panic(fmt.Errorf("unknown version %s", ver))
 		}
 
-		mic, err := crypto.ComputeDownlinkMIC(key, mac.DevAddr, confFCnt, b)
+		mic, err := crypto.ComputeDownlinkMIC(key, mac.DevAddr, confFCnt, mac.FCnt, b)
 		if err != nil {
 			t.Fatal("Failed to compute MIC")
 		}

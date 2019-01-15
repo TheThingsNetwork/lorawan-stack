@@ -257,37 +257,36 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	// NOTE: It is assumed, that b does not contain MIC.
 
 	var key types.AES128Key
+	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
+		return nil, nil, errUnknownSNwkSIntKey
+	}
+	if dev.Session.SNwkSIntKey.KEKLabel != "" {
+		// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+		panic("unsupported")
+	}
+	copy(key[:], dev.Session.SNwkSIntKey.Key[:])
+
+	var mic [4]byte
 	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-		if dev.Session.FNwkSIntKey == nil || len(dev.Session.FNwkSIntKey.Key) == 0 {
-			return nil, nil, errUnknownFNwkSIntKey
-		}
-
-		if dev.Session.NwkSEncKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-			panic("unsupported")
-		}
-		copy(key[:], dev.Session.NwkSEncKey.Key[:])
+		mic, err = crypto.ComputeLegacyDownlinkMIC(
+			key,
+			*dev.EndDeviceIdentifiers.DevAddr,
+			pld.FHDR.FCnt,
+			b,
+		)
 	} else {
-		if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
-			return nil, nil, errUnknownSNwkSIntKey
+		var confFCnt uint32
+		if pld.Ack {
+			confFCnt = up.GetPayload().GetMACPayload().GetFCnt()
 		}
-		if dev.Session.SNwkSIntKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
-			panic("unsupported")
-		}
-		copy(key[:], dev.Session.SNwkSIntKey.Key[:])
+		mic, err = crypto.ComputeDownlinkMIC(
+			key,
+			*dev.EndDeviceIdentifiers.DevAddr,
+			confFCnt,
+			pld.FHDR.FCnt,
+			b,
+		)
 	}
-
-	var confFCnt uint32
-	if pld.Ack {
-		confFCnt = up.GetPayload().GetMACPayload().GetFCnt()
-	}
-	mic, err := crypto.ComputeDownlinkMIC(
-		key,
-		*dev.EndDeviceIdentifiers.DevAddr,
-		confFCnt,
-		b,
-	)
 	if err != nil {
 		return nil, nil, errComputeMIC
 	}

@@ -83,10 +83,11 @@ func DecryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, paylo
 	return encrypt(key, 1, addr, fCnt, payload)
 }
 
-func computeMIC(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte) (mic [4]byte, err error) {
+func computeMIC(key types.AES128Key, dir uint8, confFCnt uint16, addr types.DevAddr, fCnt uint32, payload []byte) (mic [4]byte, err error) {
 	hash, _ := cmac.New(key[:])
 	var b0 [aes.BlockSize]byte
 	b0[0] = 0x49
+	binary.LittleEndian.PutUint16(b0[1:3], confFCnt)
 	b0[5] = dir
 	copy(b0[6:10], reverse(addr[:]))
 	binary.LittleEndian.PutUint32(b0[10:14], fCnt)
@@ -103,18 +104,18 @@ func computeMIC(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32,
 	return
 }
 
-// ComputeLegacyUplinkMIC computes the Uplink Message Integrity Code
+// ComputeLegacyUplinkMIC computes the Uplink Message Integrity Code.
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
 // - The NwkSKey is used
 func ComputeLegacyUplinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
-	return computeMIC(key, 0, addr, fCnt, payload)
+	return computeMIC(key, 0, 0, addr, fCnt, payload)
 }
 
-// ComputeUplinkMIC computes the Uplink Message Integrity Code
+// ComputeUplinkMIC computes the Uplink Message Integrity Code.
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
 // - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink.
 func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) (mic [4]byte, err error) {
-	m0, err := computeMIC(fNwkSIntKey, 0, addr, fCnt, payload)
+	m0, err := computeMIC(fNwkSIntKey, 0, 0, addr, fCnt, payload)
 	if err != nil {
 		return mic, err
 	}
@@ -141,9 +142,17 @@ func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32,
 	return
 }
 
-// ComputeDownlinkMIC computes the Downlink Message Integrity Code
+// ComputeLegacyDownlinkMIC computes the Downlink Message Integrity Code.
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
-// - The SNwkSIntKey/NwkSKey is used
-func ComputeDownlinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
-	return computeMIC(key, 1, addr, fCnt, payload)
+// - The NwkSKey is used
+func ComputeLegacyDownlinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
+	return computeMIC(key, 1, 0, addr, fCnt, payload)
+}
+
+// ComputeDownlinkMIC computes the Downlink Message Integrity Code.
+// - The payload contains MHDR | FHDR | FPort | FRMPayload
+// - If this downlink has the ACK bit set, confFCnt must be set to the FCnt of the last uplink
+// - The SNwkSIntKey is used
+func ComputeDownlinkMIC(key types.AES128Key, addr types.DevAddr, confFCnt uint32, fCnt uint32, payload []byte) ([4]byte, error) {
+	return computeMIC(key, 1, uint16(confFCnt), addr, fCnt, payload)
 }

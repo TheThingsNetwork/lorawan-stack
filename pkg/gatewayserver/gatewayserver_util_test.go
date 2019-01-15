@@ -283,7 +283,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 	if err != nil {
 		panic(err)
 	}
-	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, devAddr, pld.FCnt, buf)
+	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, devAddr, 0, pld.FCnt, buf)
 	if err != nil {
 		panic(err)
 	}

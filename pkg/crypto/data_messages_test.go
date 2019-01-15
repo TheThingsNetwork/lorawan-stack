@@ -55,14 +55,19 @@ func TestUplinkDownlinkMIC(t *testing.T) {
 		0x01, 0x02, 0x03, 0x04, // Data
 	}
 
-	var mic [4]byte
-
-	mic, _ = ComputeLegacyUplinkMIC(key, addr, 1, payloadWithoutMIC)
+	mic, err := ComputeLegacyUplinkMIC(key, addr, 1, payloadWithoutMIC)
+	a.So(err, should.BeNil)
 	a.So(mic, should.Equal, [4]byte{0x3B, 0x07, 0x31, 0x82})
 
-	mic, _ = ComputeUplinkMIC(key, key, 0, 0, 0, addr, 1, payloadWithoutMIC)
+	mic, err = ComputeUplinkMIC(key, key, 0, 0, 0, addr, 1, payloadWithoutMIC)
+	a.So(err, should.BeNil)
 	a.So(mic, should.Equal, [4]byte{0x3B, 0x07, 0x3B, 0x07})
 
-	mic, _ = ComputeDownlinkMIC(key, addr, 1, payloadWithoutMIC)
+	mic, err = ComputeLegacyDownlinkMIC(key, addr, 1, payloadWithoutMIC)
+	a.So(err, should.BeNil)
+	a.So(mic, should.Equal, [4]byte{0xA5, 0x60, 0x9F, 0xA9})
+
+	mic, err = ComputeDownlinkMIC(key, addr, 0, 1, payloadWithoutMIC)
+	a.So(err, should.BeNil)
 	a.So(mic, should.Equal, [4]byte{0xA5, 0x60, 0x9F, 0xA9})
 }
