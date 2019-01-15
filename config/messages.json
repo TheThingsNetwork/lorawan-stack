@@ -1124,6 +1124,159 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:antenna_index": {
+    "translations": {
+      "en": "index of antenna to update out of bounds"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:contact_info_exists": {
+    "translations": {
+      "en": "contact info already exists"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "contact_info.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:contact_info_not_found": {
+    "translations": {
+      "en": "matching contact info not found"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "contact_info.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:end_device_eui_update": {
+    "translations": {
+      "en": "end device EUIs can not be updated"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:inconsistent_end_device_eui": {
+    "translations": {
+      "en": "given end device EUIs do not match registered EUIs"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_api_key_id": {
+    "translations": {
+      "en": "no API key ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_application_id": {
+    "translations": {
+      "en": "no application ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "applications.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_client_id": {
+    "translations": {
+      "en": "no client ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "clients.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_collaborator": {
+    "translations": {
+      "en": "no collaborator set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_email": {
+    "translations": {
+      "en": "no email set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users_invitations.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_end_device_eui": {
+    "translations": {
+      "en": "no end device EUIs set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_end_device_id": {
+    "translations": {
+      "en": "no end device ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_gateway_id": {
+    "translations": {
+      "en": "no gateway ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_ids": {
+    "translations": {
+      "en": "no IDs set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_organization_id": {
+    "translations": {
+      "en": "no organization ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "organizations.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_token_id": {
+    "translations": {
+      "en": "no token ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users_oauth.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_user_id": {
+    "translations": {
+      "en": "no user ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users.go"
+    }
+  },
   "error:cmd/ttn-lw-identity-server/commands:missing_flag": {
     "translations": {
       "en": "missing CLI flag `{flag}`"

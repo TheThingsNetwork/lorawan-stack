@@ -21,6 +21,7 @@ import (
 	"os"
 
 	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-application-server/commands"
+	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/commands"
 	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-console/commands"
 	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-gateway-server/commands"
 	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-identity-server/commands"
