@@ -464,14 +464,14 @@ func (fp *FrequencyPlan) ToConcentratorConfig() (*ttnpb.ConcentratorConfig, erro
 type FrequencyPlanDescription struct {
 	// ID is the unique identifier of the frequency plan.
 	ID string `yaml:"id"`
+	// BaseID is the ID of the base frequency plan that this frequency plan extends (optional).
+	BaseID string `yaml:"base-id,omitempty"`
 	// Name is a human readable name of the frequency plan.
 	Name string `yaml:"name"`
 	// BaseFrequency is the base frequency of the frequency plan (i.e. 868, 915)
 	BaseFrequency uint16 `yaml:"base-frequency"`
 	// File is the file where the frequency plan is defined.
 	File string `yaml:"file"`
-	// BaseID is the frequency's base (optional).
-	BaseID string `yaml:"base,omitempty"`
 }
 
 var errFetchFailed = errors.Define("fetch", "fetching failed")

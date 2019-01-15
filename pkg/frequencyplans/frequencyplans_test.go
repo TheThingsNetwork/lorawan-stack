@@ -87,15 +87,15 @@ func TestStore(t *testing.T) {
   base-frequency: 915
   file: AS_923.yml
 - id: JP
+  base-id: AS_923
   description: Japan
   base-frequency: 915
   file: JP.yml
-  base: AS_923
 - id: KR
+  base-id: AS_923
   description: South Korea
   base-frequency: 915
   file: KR.yml
-  base: AS_923
 - id: EU_863_870
   description: European Union
   file: EU.yml
@@ -105,15 +105,15 @@ func TestStore(t *testing.T) {
   file: US_915.yml
   base-frequency: 915
 - id: SA
+  base-id: AFRICA
   description: South Africa
   file: AS_923.yml
   base-frequency: 868
-  base: AFRICA
 - id: CA
+  base-id: US_915
   description: Canada
   file: EU.yml
   base-frequency: 915
-  base: US_915
 `),
 		"AS_923.yml": []byte(`band-id: AS_923
 uplink-channels:
