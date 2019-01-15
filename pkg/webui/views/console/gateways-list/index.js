@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col } from 'react-grid-system'
+import { Container, Row, Col } from 'react-grid-system'
 
 import Message from '../../../lib/components/message'
 import GatewaysTable from '../../../containers/gateways-table'
@@ -25,14 +25,16 @@ const GATEWAYS_TABLE_SIZE = 5
 export default class GatewaysList extends React.Component {
   render () {
     return (
-      <Row>
-        <IntlHelmet>
-          <title><Message content={sharedMessages.gateways} /></title>
-        </IntlHelmet>
-        <Col sm={12}>
-          <GatewaysTable pageSize={GATEWAYS_TABLE_SIZE} />
-        </Col>
-      </Row>
+      <Container>
+        <Row>
+          <IntlHelmet>
+            <title><Message content={sharedMessages.gateways} /></title>
+          </IntlHelmet>
+          <Col sm={12}>
+            <GatewaysTable pageSize={GATEWAYS_TABLE_SIZE} />
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }

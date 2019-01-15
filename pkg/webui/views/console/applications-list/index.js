@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col } from 'react-grid-system'
+import { Row, Col, Container } from 'react-grid-system'
 
 import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
@@ -26,14 +26,16 @@ const APPLICATIONS_TABLE_SIZE = 5
 export default class List extends React.Component {
   render () {
     return (
-      <Row>
-        <IntlHelmet>
-          <title><Message content={sharedMessages.applications} /></title>
-        </IntlHelmet>
-        <Col sm={12}>
-          <ApplicationsTable pageSize={APPLICATIONS_TABLE_SIZE} />
-        </Col>
-      </Row>
+      <Container>
+        <Row>
+          <IntlHelmet>
+            <title><Message content={sharedMessages.applications} /></title>
+          </IntlHelmet>
+          <Col sm={12}>
+            <ApplicationsTable pageSize={APPLICATIONS_TABLE_SIZE} />
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }

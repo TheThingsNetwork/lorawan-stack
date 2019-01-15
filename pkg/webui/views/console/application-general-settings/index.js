@@ -14,7 +14,7 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { Col, Row } from 'react-grid-system'
+import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
@@ -76,7 +76,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     const { application } = this.props
 
     return (
-      <div>
+      <Container>
         <Row justify="center">
           <Col lg={8} md={12}>
             <Message
@@ -125,7 +125,7 @@ export default class ApplicationGeneralSettings extends React.Component {
             </Form>
           </Col>
         </Row>
-      </div>
+      </Container>
     )
   }
 }

@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Col, Row } from 'react-grid-system'
+import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
@@ -65,7 +65,7 @@ class ApplicationOverview extends React.Component {
 
   render () {
     return (
-      <React.Fragment>
+      <Container>
         <Row className={style.head}>
           <Col sm={12} lg={6}>
             {this.applicationInfo}
@@ -79,7 +79,7 @@ class ApplicationOverview extends React.Component {
             <DevicesTable pageSize={DEVICES_TABLE_SIZE} />
           </Col>
         </Row>
-      </React.Fragment>
+      </Container>
     )
   }
 }
