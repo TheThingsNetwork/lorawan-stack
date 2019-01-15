@@ -159,15 +159,6 @@ const devices = [ ...new Array(DEVICES_COUNT).keys() ]
     }
   })
 
-const generateGatewayEUI = function () {
-  let res = 'eui-'
-  for (let i = 0; i < 16; i++) {
-    res += faker.random.alphaNumeric()
-  }
-
-  return res
-}
-
 const gatewayAntennas = [ ...new Array(GATEWAYS_COUNT).keys() ]
   .map(_ => ({
     gain: Math.floor(Math.random() * 5),
@@ -181,7 +172,7 @@ const gateways = [ ...new Array(GATEWAYS_COUNT).keys() ]
   .map((_, idx) => ({
     ids: {
       gateway_id: faker.random.uuid(),
-      eui: generateGatewayEUI(),
+      eui: faker.random.alphaNumeric(16),
     },
     name: faker.lorem.word(),
     description: faker.lorem.words(),
