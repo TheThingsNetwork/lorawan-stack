@@ -169,6 +169,9 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	if err != nil {
 		return err
 	}
+	if req == nil {
+		return nil
+	}
 
 	dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
 	dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
