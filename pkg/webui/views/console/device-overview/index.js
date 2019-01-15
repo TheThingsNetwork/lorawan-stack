@@ -16,11 +16,31 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
+import { defineMessages } from 'react-intl'
+import bind from 'autobind-decorator'
+import IntlHelmet from '../../../lib/components/intl-helmet'
+
 import Tabs from '../../../components/tabs'
 import Icon from '../../../components/icon'
 import DataSheet from '../../../components/data-sheet'
+import Message from '../../../lib/components/message'
 
 import style from './device-overview.styl'
+
+const m = defineMessages({
+  hardware: 'Hardware',
+  brand: 'Brand',
+  model: 'Model',
+  hardwareVersion: 'Hardware version',
+  firmwareVersion: 'Firmware Version',
+  activationInfo: 'Activation Info',
+  rootKeyId: 'Root Key Id',
+  sessionInfo: 'Session Info',
+  fwdNtwkKey: 'FNwkSIntKey',
+  sNtwkSIKey: 'SNwkSIntKey',
+  ntwkSEncKey: 'NwkSEncKey',
+  appSKey: 'AppSKey',
+})
 
 const tabs = [
   { title: 'Overview', name: 'overview' },
@@ -35,6 +55,7 @@ const tabs = [
     device: device.device,
   }
 })
+@bind
 class DeviceOverview extends React.Component {
 
   handleTabChange () {
@@ -100,7 +121,7 @@ class DeviceOverview extends React.Component {
       <div className={style.overviewInfo}>
         <div className={style.overviewInfoGeneral}>
           <span className={style.devId}>{ids.device_id}</span>
-          <span className={style.devDesc}>{description}</span>
+          <span className={style.devDesc}>{description || <Message content={m.noDesc} />}</span>
           <div className={style.connectivity}>
             <span className={style.activityDot} />
             <span className={style.lastSeen}>Last seen 2 secs. ago</span>
@@ -116,15 +137,18 @@ class DeviceOverview extends React.Component {
   }
 
   render () {
-    const { device_id } = this.props.device
+    const { device } = this.props
+    const { device_id } = device.ids
     return (
       <Container>
+        <IntlHelmet>
+          <title>{device.name || device_id}</title>
+        </IntlHelmet>
         <Row className={style.head}>
           <Col lg={12}>
             <div className={style.title}>
-
               <h2 className={style.id}>
-                {device_id}
+                {device.name || device_id}
               </h2>
             </div>
             <Tabs
