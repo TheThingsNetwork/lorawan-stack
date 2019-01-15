@@ -566,7 +566,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if err != nil {
 							return nil, nil, err
 						}
-						ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
+						if appDown != nil {
+							ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
+						}
 
 						down, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, logger.WithFields(log.Fields(
@@ -613,7 +615,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if err != nil {
 							return nil, nil, err
 						}
-						ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
+						if appDown != nil {
+							ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
+						}
 
 						var paths []downlinkPath
 						if appDown.ClassBC != nil && appDown.ClassBC.AbsoluteTime == nil {
@@ -690,7 +694,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if err != nil {
 						return nil, nil, err
 					}
-					ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
+					if appDown != nil {
+						ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
+					}
 
 					var paths []downlinkPath
 					if appDown.ClassBC != nil {
