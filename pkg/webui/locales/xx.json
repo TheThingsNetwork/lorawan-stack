@@ -19,6 +19,7 @@
   "containers.devices-table.index.add": "Xxx Xxxxxx",
   "containers.gateways-table.index.add": "Xxx Xxxxxxx",
   "containers.gateways-table.index.gtwId": "Xxxxxxx XX",
+  "containers.gateways-table.index.gtwEUI": "Xxxxxxx XXX",
   "containers.gateways-table.index.freqPlan": "Xxxxxxxxx Xxxx",
   "lib.shared-messages.access": "Xxxxxx",
   "lib.shared-messages.add": "Xxx",

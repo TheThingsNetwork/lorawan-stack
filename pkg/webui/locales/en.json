@@ -19,6 +19,7 @@
   "containers.devices-table.index.add": "Add Device",
   "containers.gateways-table.index.add": "Add Gateway",
   "containers.gateways-table.index.gtwId": "Gateway ID",
+  "containers.gateways-table.index.gtwEUI": "Gateway EUI",
   "containers.gateways-table.index.freqPlan": "Frequency Plan",
   "lib.shared-messages.access": "Access",
   "lib.shared-messages.add": "Add",
