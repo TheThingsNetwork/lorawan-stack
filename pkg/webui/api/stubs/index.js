@@ -78,19 +78,6 @@ export default {
       )
     },
   },
-  device: {
-    get (id) {
-      const dev = fakeData.devices.find(d => d.ids.device_id === id)
-
-      return new Promise((resolve, reject) => setTimeout(function () {
-        if (dev) {
-          resolve(dev)
-        } else {
-          reject(new Error())
-        }
-      }, 750))
-    },
-  },
   gateways: {
     list (params) {
       return genericSearch('gateways', params)
