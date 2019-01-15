@@ -21,9 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
-	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
@@ -39,12 +37,11 @@ const (
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode         string                 `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
-	Devices          DeviceRegistry         `name:"-"`
-	Links            LinkRegistry           `name:"-"`
-	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
-	MQTT             MQTTConfig             `name:"mqtt" description:"MQTT configuration"`
-	Webhooks         WebhooksConfig         `name:"webhooks" description:"Webhooks configuration"`
+	LinkMode string         `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
+	Devices  DeviceRegistry `name:"-"`
+	Links    LinkRegistry   `name:"-"`
+	MQTT     MQTTConfig     `name:"mqtt" description:"MQTT configuration"`
+	Webhooks WebhooksConfig `name:"webhooks" description:"Webhooks configuration"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
@@ -58,33 +55,6 @@ func (c Config) GetLinkMode() (LinkMode, error) {
 		return LinkExplicit, nil
 	default:
 		return LinkMode(0), errLinkMode.WithAttributes("value", c.LinkMode)
-	}
-}
-
-// DeviceRepositoryConfig defines the source of the device repository.
-type DeviceRepositoryConfig struct {
-	Static    map[string][]byte `name:"-"`
-	Directory string            `name:"directory" description:"Retrieve the device repository from the filesystem"`
-	URL       string            `name:"url" description:"Retrieve the device repository from a web server"`
-}
-
-// Client instantiates a new devicerepository.Client with a fetcher based on the configuration.
-// The order of precedence is Static, Directory and URL.
-// If neither Static, Directory nor a URL is set, this method returns nil.
-func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
-	var fetcher fetch.Interface
-	switch {
-	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
-	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
-	case c.URL != "":
-		fetcher = fetch.FromHTTP(c.URL, true)
-	default:
-		return nil
-	}
-	return &devicerepository.Client{
-		Fetcher: fetcher,
 	}
 }
 

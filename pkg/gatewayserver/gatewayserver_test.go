@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
@@ -74,7 +75,7 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 	})
-	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	config := &gatewayserver.Config{
 		RequireRegisteredGateways: false,
 		MQTT: gatewayserver.MQTTConfig{

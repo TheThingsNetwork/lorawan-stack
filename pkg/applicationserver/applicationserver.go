@@ -78,7 +78,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
 		formatter: payloadFormatter{
-			repository: conf.DeviceRepository.Client(),
+			repository: c.GetBaseConfig(c.Context()).DeviceRepository.Client(),
 			upFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder{
 				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),

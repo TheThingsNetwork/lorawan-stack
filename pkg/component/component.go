@@ -48,7 +48,9 @@ type Component struct {
 	cancelCtx          context.CancelFunc
 	terminationSignals chan os.Signal
 
-	config *Config
+	config        *Config
+	getBaseConfig func(ctx context.Context) config.ServiceBase
+
 	logger log.Stack
 	sentry *raven.Client
 
@@ -75,15 +77,29 @@ type Component struct {
 	tasks []task
 }
 
+// Option allows extending the component when it is instantiated with New.
 type Option func(*Component)
 
+// WithClusterNew returns an option that overrides the component's function for
+// setting up the cluster.
+// This allows extending the cluster configuration with custom logic based on
+// information in the context.
 func WithClusterNew(f func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (cluster.Cluster, error)) Option {
 	return func(c *Component) {
 		c.clusterNew = f
 	}
 }
 
-// New returns a new component
+// WithBaseConfigGetter returns an option that overrides the component's function
+// for getting the base config.
+// This allows overriding the configuration with information in the context.
+func WithBaseConfigGetter(f func(ctx context.Context) config.ServiceBase) Option {
+	return func(c *Component) {
+		c.getBaseConfig = f
+	}
+}
+
+// New returns a new component.
 func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 	var err error
 
@@ -139,7 +155,7 @@ func MustNew(logger log.Stack, config *Config, opts ...Option) *Component {
 	return c
 }
 
-// Logger returns the logger of the component
+// Logger returns the logger of the component.
 func (c *Component) Logger() log.Stack {
 	return c.logger
 }
@@ -149,12 +165,20 @@ func (c *Component) LogDebug() bool {
 	return c.config.Log.Level == log.DebugLevel
 }
 
-// Context returns the context of the component
+// Context returns the context of the component.
 func (c *Component) Context() context.Context {
 	return c.ctx
 }
 
-// FillContext fills the context
+// GetBaseConfig gets the base config of the component.
+func (c *Component) GetBaseConfig(ctx context.Context) config.ServiceBase {
+	if c.getBaseConfig != nil {
+		return c.getBaseConfig(ctx)
+	}
+	return c.config.ServiceBase
+}
+
+// FillContext fills the context.
 func (c *Component) FillContext(ctx context.Context) context.Context {
 	for _, filler := range c.fillers {
 		ctx = filler(ctx)
@@ -162,12 +186,12 @@ func (c *Component) FillContext(ctx context.Context) context.Context {
 	return ctx
 }
 
-// AddContextFiller adds the specified filler
+// AddContextFiller adds the specified filler.
 func (c *Component) AddContextFiller(f fillcontext.Filler) {
 	c.fillers = append(c.fillers, f)
 }
 
-// Start starts the component
+// Start starts the component.
 func (c *Component) Start() (err error) {
 	if c.grpc != nil {
 		c.logger.Debug("Initializing gRPC server...")
@@ -254,7 +278,7 @@ func (c *Component) Run() error {
 	}
 }
 
-// Close closes the server
+// Close closes the server.
 func (c *Component) Close() {
 	c.cancelCtx()
 

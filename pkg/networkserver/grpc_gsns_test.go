@@ -185,7 +185,7 @@ func handleUplinkTest() func(t *testing.T) {
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
-			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
@@ -244,7 +244,7 @@ func handleUplinkTest() func(t *testing.T) {
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
-			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
@@ -304,7 +304,7 @@ func handleUplinkTest() func(t *testing.T) {
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
-			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
@@ -364,7 +364,7 @@ func handleUplinkTest() func(t *testing.T) {
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
-			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
@@ -1109,7 +1109,7 @@ func handleUplinkTest() func(t *testing.T) {
 						return true, <-req.errch
 					}),
 				)).(*NetworkServer)
-				ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+				ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 				test.Must(nil, ns.Start())
 				defer ns.Close()
 
@@ -1406,7 +1406,7 @@ func handleJoinTest() func(t *testing.T) {
 				DownlinkTasks:       &MockDownlinkTaskQueue{},
 			},
 		)).(*NetworkServer)
-		ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+		ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 		test.Must(nil, ns.Start())
 		defer ns.Close()
 
@@ -1660,7 +1660,7 @@ func handleJoinTest() func(t *testing.T) {
 						return true, nil
 					}),
 				)).(*NetworkServer)
-				ns.Component.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+				ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 				test.Must(nil, ns.Start())
 				defer ns.Close()

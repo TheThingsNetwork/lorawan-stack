@@ -2231,6 +2231,15 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/frequencyplans:not_configured": {
+    "translations": {
+      "en": "frequency plans not configured"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
   "error:pkg/frequencyplans:not_found": {
     "translations": {
       "en": "frequency plan `{id}` not found"

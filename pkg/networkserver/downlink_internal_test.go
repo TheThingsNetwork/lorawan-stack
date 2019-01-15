@@ -2525,7 +2525,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 			)).(*NetworkServer)
-			ns.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			ns.Component.AddContextFiller(tc.ContextFunc)
 			ns.Component.AddContextFiller(func(ctx context.Context) context.Context {
 				return context.WithValue(ctx, nsKey{}, ns)

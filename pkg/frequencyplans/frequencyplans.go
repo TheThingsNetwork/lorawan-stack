@@ -570,11 +570,12 @@ func (s *Store) descriptions() (frequencyPlanList, error) {
 }
 
 var (
-	errRead     = errors.Define("read", "could not read frequency plan `{id}`")
-	errReadBase = errors.Define("read_base", "could not read the base `{base_id}` of frequency plan `{id}`")
-	errReadList = errors.Define("read_list", "could not read the list of frequency plans")
-	errNotFound = errors.DefineNotFound("not_found", "frequency plan `{id}` not found")
-	errInvalid  = errors.DefineCorruption("invalid", "invalid frequency plan")
+	errNotConfigured = errors.Define("not_configured", "frequency plans not configured")
+	errRead          = errors.Define("read", "could not read frequency plan `{id}`")
+	errReadBase      = errors.Define("read_base", "could not read the base `{base_id}` of frequency plan `{id}`")
+	errReadList      = errors.Define("read_list", "could not read the list of frequency plans")
+	errNotFound      = errors.DefineNotFound("not_found", "frequency plan `{id}` not found")
+	errInvalid       = errors.DefineCorruption("invalid", "invalid frequency plan")
 )
 
 func (s *Store) getByID(id string) (*FrequencyPlan, error) {
@@ -616,6 +617,10 @@ func (s *Store) getByID(id string) (*FrequencyPlan, error) {
 
 // GetByID retrieves the frequency plan that has the given ID.
 func (s *Store) GetByID(id string) (*FrequencyPlan, error) {
+	if s == nil {
+		return nil, errNotConfigured
+	}
+
 	if id == "" {
 		return nil, errNotFound.WithAttributes("id", id)
 	}
@@ -636,6 +641,10 @@ func (s *Store) GetByID(id string) (*FrequencyPlan, error) {
 
 // GetAllIDs returns the list of IDs of the available frequency plans.
 func (s *Store) GetAllIDs() ([]string, error) {
+	if s == nil {
+		return nil, errNotConfigured
+	}
+
 	descriptions, err := s.descriptions()
 	if err != nil {
 		return nil, errReadList.WithCause(err)

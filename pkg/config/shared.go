@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -167,38 +168,71 @@ type Blob struct {
 	GCP      BlobConfigGCP   `name:"gcp"`
 }
 
-// FrequencyPlans contains the source of the frequency plans.
-type FrequencyPlans struct {
-	Directory string `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
-	URL       string `name:"url" description:"Retrieve the frequency plans from a web server"`
+// FrequencyPlansConfig contains the source of the frequency plans.
+type FrequencyPlansConfig struct {
+	Static    map[string][]byte `name:"-"`
+	Directory string            `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
+	URL       string            `name:"url" description:"Retrieve the frequency plans from a web server"`
 }
 
-// Store returns a frequency plan store from the given configuration.
-// THe order of precedence is Directory and URL.
-// If neither Directory nor URL is set, the returned store is empty.
-func (f FrequencyPlans) Store() *frequencyplans.Store {
+// Store returns a frequencyplan.Store fwith a fetcher based on the configuration.
+// The order of precedence is Static, Directory and URL.
+// If neither Static, Directory nor a URL is set, this method returns nil.
+func (c FrequencyPlansConfig) Store() *frequencyplans.Store {
+	var fetcher fetch.Interface
 	switch {
-	case f.Directory != "":
-		return frequencyplans.NewStore(fetch.FromFilesystem(f.Directory))
-	case f.URL != "":
-		return frequencyplans.NewStore(fetch.FromHTTP(f.URL, true))
+	case c.Static != nil:
+		fetcher = fetch.NewMemFetcher(c.Static)
+	case c.Directory != "":
+		fetcher = fetch.FromFilesystem(c.Directory)
+	case c.URL != "":
+		fetcher = fetch.FromHTTP(c.URL, true)
 	default:
-		return frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{}))
+		return nil
+	}
+	return frequencyplans.NewStore(fetcher)
+}
+
+// DeviceRepositoryConfig defines the source of the device repository.
+type DeviceRepositoryConfig struct {
+	Static    map[string][]byte `name:"-"`
+	Directory string            `name:"directory" description:"Retrieve the device repository from the filesystem"`
+	URL       string            `name:"url" description:"Retrieve the device repository from a web server"`
+}
+
+// Client instantiates a new devicerepository.Client with a fetcher based on the configuration.
+// The order of precedence is Static, Directory and URL.
+// If neither Static, Directory nor a URL is set, this method returns nil.
+func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
+	var fetcher fetch.Interface
+	switch {
+	case c.Static != nil:
+		fetcher = fetch.NewMemFetcher(c.Static)
+	case c.Directory != "":
+		fetcher = fetch.FromFilesystem(c.Directory)
+	case c.URL != "":
+		fetcher = fetch.FromHTTP(c.URL, true)
+	default:
+		return nil
+	}
+	return &devicerepository.Client{
+		Fetcher: fetcher,
 	}
 }
 
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
-	Base           `name:",squash"`
-	Cluster        Cluster        `name:"cluster"`
-	Redis          Redis          `name:"redis"`
-	Events         Events         `name:"events"`
-	GRPC           GRPC           `name:"grpc"`
-	HTTP           HTTP           `name:"http"`
-	TLS            TLS            `name:"tls"`
-	Sentry         Sentry         `name:"sentry"`
-	Blob           Blob           `name:"blob"`
-	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
-	Rights         Rights         `name:"rights"`
-	KeyVault       KeyVault       `name:"key-vault"`
+	Base             `name:",squash"`
+	Cluster          Cluster                `name:"cluster"`
+	Redis            Redis                  `name:"redis"`
+	Events           Events                 `name:"events"`
+	GRPC             GRPC                   `name:"grpc"`
+	HTTP             HTTP                   `name:"http"`
+	TLS              TLS                    `name:"tls"`
+	Sentry           Sentry                 `name:"sentry"`
+	Blob             Blob                   `name:"blob"`
+	FrequencyPlans   FrequencyPlansConfig   `name:"frequency-plans" description:"Source of the frequency plans"`
+	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
+	Rights           Rights                 `name:"rights"`
+	KeyVault         KeyVault               `name:"key-vault"`
 }
