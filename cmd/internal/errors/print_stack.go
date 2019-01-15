@@ -12,19 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-cli is the binary for the Command-line interface of The Things Network Stack for LoRaWAN.
-package main
+package errors
 
 import (
+	"fmt"
+	"io"
 	"os"
 
-	"go.thethings.network/lorawan-stack/cmd/internal/errors"
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/commands"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-func main() {
-	if err := commands.Root.Execute(); err != nil {
-		errors.PrintStack(os.Stderr, err)
-		os.Exit(-1)
+// PrintStack prints the error stack to w.
+func PrintStack(w io.Writer, err error) {
+	for i, err := range errors.Stack(err) {
+		if i == 0 {
+			fmt.Fprintln(w, err)
+		} else {
+			fmt.Fprintf(w, "--- %s", err)
+		}
+		for k, v := range errors.Attributes(err) {
+			fmt.Fprintf(os.Stderr, "    %s=%v\n", k, v)
+		}
+		if ttnErr, ok := errors.From(err); ok {
+			if correlationID := ttnErr.CorrelationID(); correlationID != "" {
+				fmt.Fprintf(os.Stderr, "    correlation_id=%s\n", ttnErr.CorrelationID())
+			}
+		}
 	}
 }

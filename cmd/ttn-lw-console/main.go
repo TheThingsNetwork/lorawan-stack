@@ -15,19 +15,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"strings"
 
+	"go.thethings.network/lorawan-stack/cmd/internal/errors"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-console/commands"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 func main() {
 	if err := commands.Root.Execute(); err != nil {
-		for i, err := range errors.Stack(err) {
-			fmt.Println(strings.Repeat("  ", i), err)
-		}
+		errors.PrintStack(os.Stderr, err)
 		os.Exit(-1)
 	}
 }
