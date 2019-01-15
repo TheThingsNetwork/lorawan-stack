@@ -56,7 +56,7 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 				return
 			}
 			md := rpcmetadata.FromIncomingContext(ctx)
-			if md.AuthType != "Key" || md.AuthValue != registeredGatewayKey {
+			if md.AuthType != "Bearer" || md.AuthValue != registeredGatewayKey {
 				return
 			}
 			set = ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK)
@@ -69,7 +69,7 @@ func contextWithKey(ctx context.Context, ids ttnpb.GatewayIdentifiers, key strin
 	return func() context.Context {
 		md := metadata.New(map[string]string{
 			"id":            ids.GatewayID,
-			"authorization": fmt.Sprintf("Key %v", key),
+			"authorization": fmt.Sprintf("Bearer %v", key),
 		})
 		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 			md = metadata.Join(ctxMd, md)

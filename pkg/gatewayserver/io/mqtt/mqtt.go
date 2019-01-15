@@ -194,7 +194,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 
 	md := metadata.New(map[string]string{
 		"id":            ids.GatewayID,
-		"authorization": fmt.Sprintf("Key %s", info.Password),
+		"authorization": fmt.Sprintf("Bearer %s", info.Password),
 	})
 	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 		md = metadata.Join(ctxMd, md)

@@ -131,7 +131,7 @@ func TestGatewayServer(t *testing.T) {
 				defer conn.Close()
 				md := rpcmetadata.MD{
 					ID:            ids.GatewayID,
-					AuthType:      "Key",
+					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				}
@@ -460,7 +460,7 @@ func TestGatewayServer(t *testing.T) {
 			defer statsConn.Close()
 			statsCtx := metadata.AppendToOutgoingContext(test.Context(),
 				"id", ids.GatewayID,
-				"authorization", fmt.Sprintf("Key %v", registeredGatewayKey),
+				"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
 			)
 			statsClient := ttnpb.NewGsClient(statsConn)
 

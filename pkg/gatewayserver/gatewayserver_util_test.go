@@ -102,7 +102,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 		},
 	}
 	if key != "" {
-		is.gatewayAuths[uid] = []string{fmt.Sprintf("Key %v", key)}
+		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
 	}
 }
 

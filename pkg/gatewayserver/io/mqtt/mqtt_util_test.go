@@ -32,7 +32,7 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 				return
 			}
 			md := rpcmetadata.FromIncomingContext(ctx)
-			if md.AuthType != "Key" || md.AuthValue != registeredGatewayKey {
+			if md.AuthType != "Bearer" || md.AuthValue != registeredGatewayKey {
 				return
 			}
 			set = ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK)
