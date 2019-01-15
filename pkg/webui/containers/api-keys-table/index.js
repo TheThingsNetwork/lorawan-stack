@@ -41,10 +41,12 @@ const headers = [
   {
     name: 'id',
     displayName: m.keyId,
+    width: 35,
   },
   {
     name: 'rights',
     displayName: m.grantedRights,
+    width: 45,
     render (rights) {
       const tags = rights.map(r => (
         <Tag
@@ -65,6 +67,7 @@ const headers = [
   {
     name: 'name',
     displayName: sharedMessages.name,
+    width: 20,
   },
 ]
 
