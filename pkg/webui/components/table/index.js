@@ -15,6 +15,7 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import PropTypes from '../../lib/prop-types'
+import getByPath from '../../lib/get-by-path'
 
 import Overlay from '../overlay'
 import Pagination from '../pagination'
@@ -92,28 +93,33 @@ class Tabular extends React.Component {
     )
 
     const rows = data.length > 0 ? (
-      data.map((row, rowKey) => (
-        <Table.Row
-          key={rowKey}
-          id={rowKey}
-          onClick={onRowClick}
-        >
-          {
-            headers.map((header, index) => (
-              <Table.DataCell
-                key={index}
-                centered={header.centered}
-                small={small}
-              >
-                {headers[index].render
-                  ? headers[index].render(row[headers[index].name])
-                  : row[headers[index].name]
-                }
-              </Table.DataCell>
-            ))
-          }
-        </Table.Row>
-      ))
+      data.map( function (row, rowKey) {
+        return (
+          <Table.Row
+            key={rowKey}
+            id={rowKey}
+            onClick={onRowClick}
+          >
+            {
+              headers.map(function (header, index) {
+                const value = getByPath(row, headers[index].name)
+                return (
+                  <Table.DataCell
+                    key={index}
+                    centered={header.centered}
+                    small={small}
+                  >
+                    {headers[index].render
+                      ? headers[index].render(value)
+                      : value
+                    }
+                  </Table.DataCell>
+                )
+              })
+            }
+          </Table.Row>
+        )
+      })
     ) : (
       <Table.Empty
         colSpan={headers.length}
