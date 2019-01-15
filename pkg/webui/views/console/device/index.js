@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
+import { Helmet } from 'react-helmet'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
@@ -26,8 +27,9 @@ import DeviceOverview from '../device-overview'
 
 import { getDevice } from '../../../actions/device'
 
-@connect(function ({ device }, props) {
+@connect(function ({ device, application }, props) {
   return {
+    appName: application.application.name,
     devId: props.match.params.devId,
     fetching: device.fetching,
     error: device.error,
@@ -52,7 +54,7 @@ export default class Device extends React.Component {
   }
 
   render () {
-    const { fetching, error, match } = this.props
+    const { fetching, error, match, appName } = this.props
 
     if (fetching) {
       return (
@@ -68,9 +70,15 @@ export default class Device extends React.Component {
     }
 
     return (
-      <Switch>
-        <Route exact path={`${match.path}`} component={DeviceOverview} />
-      </Switch>
+      <React.Fragment>
+        <Helmet
+          titleTemplate={`%s - ${appName} - The Things Network Console`}
+          defaultTitle="Devices - The Things Network Console"
+        />
+        <Switch>
+          <Route exact path={`${match.path}`} component={DeviceOverview} />
+        </Switch>
+      </React.Fragment>
     )
   }
 }
