@@ -64,7 +64,7 @@ const applicationsApiKeys = applications.reduce(function (acc, curr, idx, apps) 
   for (let i = 0; i < keysCount; i++) {
     acc.push({
       id: faker.random.uuid(),
-      application_id: curr.application_id,
+      application_id: curr.ids.application_id,
       name: faker.lorem.words(),
       key: faker.random.uuid(),
       rights: getRights(rights.application, 1, 5),
