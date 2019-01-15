@@ -185,7 +185,7 @@ func TestApplicationServer(t *testing.T) {
 				}
 				defer conn.Close()
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
-					AuthType:      "Key",
+					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				})
@@ -323,7 +323,7 @@ func TestApplicationServer(t *testing.T) {
 				}
 				defer conn.Close()
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
-					AuthType:      "Key",
+					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				})
@@ -385,7 +385,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						req.Header.Set("Content-Type", "application/json")
-						req.Header.Set("Authorization", fmt.Sprintf("Key %s", key))
+						req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", key))
 						res, err := http.DefaultClient.Do(req)
 						if err == nil && (res.StatusCode < 200 || res.StatusCode > 299) {
 							err = errors.FromHTTPStatusCode(res.StatusCode)

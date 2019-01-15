@@ -369,7 +369,7 @@ func TestWebhooks(t *testing.T) {
 						t.FailNow()
 					}
 					req.Header.Set("Content-Type", "application/json")
-					req.Header.Set("Authorization", fmt.Sprintf("Key %s", tc.Key))
+					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
 					res, err := http.DefaultClient.Do(req)
 					if !a.So(err, should.BeNil) {
 						t.FailNow()

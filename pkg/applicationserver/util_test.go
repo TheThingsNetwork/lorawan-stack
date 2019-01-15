@@ -260,7 +260,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key
 		ApplicationIdentifiers: ids,
 	}
 	if key != "" {
-		is.applicationAuths[uid] = []string{fmt.Sprintf("Key %v", key)}
+		is.applicationAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
 	}
 }
 

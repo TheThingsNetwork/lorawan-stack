@@ -75,7 +75,7 @@ func TestDeviceRegistry(t *testing.T) {
 	}
 	defer conn.Close()
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
-		AuthType:      "Key",
+		AuthType:      "Bearer",
 		AuthValue:     registeredApplicationKey,
 		AllowInsecure: true,
 	})
