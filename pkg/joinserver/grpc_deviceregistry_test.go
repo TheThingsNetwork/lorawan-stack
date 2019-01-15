@@ -1014,3 +1014,306 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		})
 	}
 }
+
+func TestDeviceRegistryProvision(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.ContextWithT(test.Context(), t)
+	store := map[string]*ttnpb.EndDevice{
+		"0101010101010101:0101010101010101": {
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: registeredApplicationID,
+				DeviceID:               "dev-1",
+				JoinEUI:                eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+				DevEUI:                 eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+			},
+		},
+		"0202020202020202:0202020202020202": {
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: registeredApplicationID,
+				DeviceID:               "dev-2",
+				JoinEUI:                eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
+				DevEUI:                 eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
+			},
+		},
+	}
+	reg := &MockDeviceRegistry{
+		SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			key := fmt.Sprintf("%v:%v", joinEUI, devEUI)
+			dev := store[key]
+			var err error
+			dev, _, err = cb(dev)
+			if err != nil {
+				return nil, err
+			}
+			store[key] = dev
+			return dev, nil
+		},
+	}
+	srv := &JsDeviceServer{
+		Registry: reg,
+	}
+
+	// Permission denied.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): nil,
+			},
+		})
+		_, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1},
+		})
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	}
+
+	// Invalid identifiers.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				),
+			},
+		})
+		// Invalid application ID.
+		_, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: "wrong-id",
+					},
+					DeviceID: "dev-1",
+					JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+					DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+				},
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1},
+		})
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		// No DevEUI.
+		_, err = srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				{
+					ApplicationIdentifiers: registeredApplicationID,
+					DeviceID:               "dev-1",
+					JoinEUI:                eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+				},
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1},
+		})
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		// No JoinEUI.
+		_, err = srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				{
+					ApplicationIdentifiers: registeredApplicationID,
+					DeviceID:               "dev-1",
+					DevEUI:                 eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+				},
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1},
+		})
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	}
+
+	// Unknown provisioner.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				),
+			},
+		})
+		// Invalid application ID.
+		_, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
+			},
+			Provisioner: "unknown",
+			Data:        []byte{0x1},
+		})
+		a.So(errors.IsNotFound(err), should.BeTrue)
+	}
+
+	// Invalid number of entries.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				),
+			},
+		})
+		// Invalid application ID.
+		_, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1, 0x2},
+		})
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	}
+
+	// Provision one device.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				),
+			},
+		})
+		// Invalid application ID.
+		devs, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1},
+		})
+		a.So(err, should.BeNil)
+		if !a.So(devs.EndDevices, should.HaveLength, 1) {
+			t.FailNow()
+		}
+		a.So(devs.EndDevices[0].Provisioner, should.Equal, "mock")
+		a.So(devs.EndDevices[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"serial_number": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: 1,
+					},
+				},
+			},
+		})
+	}
+
+	// Provision one device and one not found.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				),
+			},
+		})
+		// Invalid application ID.
+		devs, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
+				{
+					ApplicationIdentifiers: registeredApplicationID,
+					DeviceID:               "dev-3",
+					JoinEUI:                eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
+					DevEUI:                 eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
+				},
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1, 0x3},
+		})
+		a.So(err, should.BeNil) // There should be a warning in the metadata about dev-3 not found.
+		if !a.So(devs.EndDevices, should.HaveLength, 1) {
+			t.FailNow()
+		}
+		a.So(devs.EndDevices[0].Provisioner, should.Equal, "mock")
+		a.So(devs.EndDevices[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"serial_number": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: 1,
+					},
+				},
+			},
+		})
+	}
+
+	// Provision two devices.
+	{
+		ctx := rights.NewContext(ctx, rights.Rights{
+			ApplicationRights: map[string]*ttnpb.Rights{
+				unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				),
+			},
+		})
+		// Invalid application ID.
+		devs, err := srv.Provision(ctx, &ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+				store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
+				store["0202020202020202:0202020202020202"].EndDeviceIdentifiers,
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1, 0x2},
+		})
+		a.So(err, should.BeNil)
+		if !a.So(devs.EndDevices, should.HaveLength, 2) {
+			t.FailNow()
+		}
+		a.So(devs.EndDevices[0].Provisioner, should.Equal, "mock")
+		a.So(devs.EndDevices[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"serial_number": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: 1,
+					},
+				},
+			},
+		})
+		a.So(devs.EndDevices[1].Provisioner, should.Equal, "mock")
+		a.So(devs.EndDevices[1].ProvisioningData, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"serial_number": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: 2,
+					},
+				},
+			},
+		})
+	}
+}
+
+type byteToSerialNumber struct {
+}
+
+func (p *byteToSerialNumber) Decode(data []byte) ([]*pbtypes.Struct, error) {
+	var res []*pbtypes.Struct
+	for _, b := range data {
+		res = append(res, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"serial_number": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: float64(b),
+					},
+				},
+			},
+		})
+	}
+	return res, nil
+}
+
+func init() {
+	provisioning.Register("mock", &byteToSerialNumber{})
+}

@@ -3383,6 +3383,42 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:provision_entry_count": {
+    "translations": {
+      "en": "expected `{expected}` but have `{actual}` entries to provision"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:provisioner_deocde": {
+    "translations": {
+      "en": "failed to decode provisioning data"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:provisioner_not_found": {
+    "translations": {
+      "en": "provisioner `{id}` not found"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:provisioning": {
+    "translations": {
+      "en": "provisioning failed"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:registry_operation": {
     "translations": {
       "en": "registry operation failed"
