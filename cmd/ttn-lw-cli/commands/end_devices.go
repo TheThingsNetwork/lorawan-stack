@@ -247,7 +247,9 @@ var (
 				)
 			}
 
-			util.SetFields(&device, setEndDeviceFlags)
+			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
+				return err
+			}
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			device.EndDeviceIdentifiers = *devID
 
@@ -297,7 +299,9 @@ var (
 				return nil
 			}
 			var device ttnpb.EndDevice
-			util.SetFields(&device, setEndDeviceFlags)
+			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
+				return err
+			}
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			device.EndDeviceIdentifiers = *devID
 

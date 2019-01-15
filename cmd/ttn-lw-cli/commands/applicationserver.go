@@ -82,7 +82,9 @@ var (
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationLinkFlags)
 
 			var link ttnpb.ApplicationLink
-			util.SetFields(&link, setApplicationLinkFlags)
+			if err := util.SetFields(&link, setApplicationLinkFlags); err != nil {
+				return err
+			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
 			if err != nil {
@@ -180,7 +182,9 @@ var (
 			}
 
 			var downlink ttnpb.ApplicationDownlink
-			util.SetFields(&downlink, setApplicationDownlinkFlags)
+			if err = util.SetFields(&downlink, setApplicationDownlinkFlags); err != nil {
+				return err
+			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
 			if err != nil {
@@ -207,7 +211,9 @@ var (
 			}
 
 			var downlink ttnpb.ApplicationDownlink
-			util.SetFields(&downlink, setApplicationDownlinkFlags)
+			if err = util.SetFields(&downlink, setApplicationDownlinkFlags); err != nil {
+				return err
+			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
 			if err != nil {

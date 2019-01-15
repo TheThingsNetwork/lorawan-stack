@@ -156,7 +156,9 @@ var (
 				return errNoCollaborator
 			}
 			var client ttnpb.Client
-			util.SetFields(&client, setClientFlags)
+			if err := util.SetFields(&client, setClientFlags); err != nil {
+				return err
+			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
 			client.ClientIdentifiers = *cliID
 
@@ -194,7 +196,9 @@ var (
 				return nil
 			}
 			var client ttnpb.Client
-			util.SetFields(&client, setClientFlags)
+			if err := util.SetFields(&client, setClientFlags); err != nil {
+				return err
+			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
 			client.ClientIdentifiers = *cliID
 

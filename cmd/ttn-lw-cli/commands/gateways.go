@@ -187,12 +187,16 @@ var (
 				return errNoCollaborator
 			}
 			var gateway ttnpb.Gateway
-			util.SetFields(&gateway, setGatewayFlags)
+			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
+				return err
+			}
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			gateway.GatewayIdentifiers = *gtwID
 
 			var antenna ttnpb.GatewayAntenna
-			util.SetFields(&antenna, setGatewayAntennaFlags, "antenna")
+			if err = util.SetFields(&antenna, setGatewayAntennaFlags, "antenna"); err != nil {
+				return err
+			}
 			gateway.Antennas = []ttnpb.GatewayAntenna{antenna}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -227,7 +231,9 @@ var (
 				return nil
 			}
 			var gateway ttnpb.Gateway
-			util.SetFields(&gateway, setGatewayFlags)
+			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
+				return err
+			}
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			gateway.GatewayIdentifiers = *gtwID
 
@@ -256,7 +262,9 @@ var (
 				if antennaRemove {
 					gateway.Antennas = append(res.Antennas[:antennaIndex], res.Antennas[antennaIndex+1:]...)
 				} else { // create or update
-					util.SetFields(&res.Antennas[antennaIndex], setGatewayAntennaFlags, "antenna")
+					if err = util.SetFields(&res.Antennas[antennaIndex], setGatewayAntennaFlags, "antenna"); err != nil {
+						return err
+					}
 					gateway.Antennas = res.Antennas
 				}
 				paths = append(paths, "antennas")

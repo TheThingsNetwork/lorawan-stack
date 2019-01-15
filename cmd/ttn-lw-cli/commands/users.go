@@ -130,7 +130,9 @@ var (
 				return errNoUserID
 			}
 			var user ttnpb.User
-			util.SetFields(&user, setUserFlags)
+			if err := util.SetFields(&user, setUserFlags); err != nil {
+				return err
+			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
 			user.UserIdentifiers = *usrID
 
@@ -163,7 +165,9 @@ var (
 				return nil
 			}
 			var user ttnpb.User
-			util.SetFields(&user, setUserFlags)
+			if err := util.SetFields(&user, setUserFlags); err != nil {
+				return err
+			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
 			user.UserIdentifiers = *usrID
 

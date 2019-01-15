@@ -124,7 +124,9 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command) (*ttnpb.E
 				return err
 			}
 			var contactInfo ttnpb.ContactInfo
-			util.SetFields(&contactInfo, contactInfoFlags)
+			if err = util.SetFields(&contactInfo, contactInfoFlags); err != nil {
+				return err
+			}
 			updatedInfo, err := updateContactInfo(id, func(existing []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
 				for _, existing := range existing {
 					if existing.ContactMethod == contactInfo.ContactMethod && existing.ContactType == contactInfo.ContactType && existing.Value == contactInfo.Value {
@@ -147,7 +149,9 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command) (*ttnpb.E
 				return err
 			}
 			var contactInfo ttnpb.ContactInfo
-			util.SetFields(&contactInfo, contactInfoFlags)
+			if err = util.SetFields(&contactInfo, contactInfoFlags); err != nil {
+				return err
+			}
 			updatedInfo, err := updateContactInfo(id, func(existing []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
 				var updatedInfo []*ttnpb.ContactInfo
 				var found bool

@@ -156,7 +156,9 @@ var (
 				return errNoCollaborator
 			}
 			var organization ttnpb.Organization
-			util.SetFields(&organization, setOrganizationFlags)
+			if err := util.SetFields(&organization, setOrganizationFlags); err != nil {
+				return err
+			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
 			organization.OrganizationIdentifiers = *orgID
 
@@ -190,7 +192,9 @@ var (
 				return nil
 			}
 			var organization ttnpb.Organization
-			util.SetFields(&organization, setOrganizationFlags)
+			if err := util.SetFields(&organization, setOrganizationFlags); err != nil {
+				return err
+			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
 			organization.OrganizationIdentifiers = *orgID
 

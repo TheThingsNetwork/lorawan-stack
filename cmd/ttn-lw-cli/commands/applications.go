@@ -156,7 +156,9 @@ var (
 				return errNoCollaborator
 			}
 			var application ttnpb.Application
-			util.SetFields(&application, setApplicationFlags)
+			if err := util.SetFields(&application, setApplicationFlags); err != nil {
+				return err
+			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
 			application.ApplicationIdentifiers = *appID
 
@@ -190,7 +192,9 @@ var (
 				return nil
 			}
 			var application ttnpb.Application
-			util.SetFields(&application, setApplicationFlags)
+			if err := util.SetFields(&application, setApplicationFlags); err != nil {
+				return err
+			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
 			application.ApplicationIdentifiers = *appID
 
