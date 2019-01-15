@@ -68,7 +68,10 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string) (*ttnpb.EndDeviceIden
 		applicationID = args[0]
 		deviceID = args[1]
 	}
-	if applicationID == "" || deviceID == "" {
+	if applicationID == "" {
+		return nil, errNoApplicationID
+	}
+	if deviceID == "" {
 		return nil, errNoEndDeviceID
 	}
 	ids := &ttnpb.EndDeviceIdentifiers{
