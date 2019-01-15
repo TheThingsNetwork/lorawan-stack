@@ -23,6 +23,10 @@ import (
 // DefaultApplicationServerConfig is the default configuration for the Application Server.
 var DefaultApplicationServerConfig = applicationserver.Config{
 	LinkMode: "all",
+	MQTT: applicationserver.MQTTConfig{
+		Listen:    ":1883",
+		ListenTLS: ":8883",
+	},
 	Webhooks: applicationserver.WebhooksConfig{
 		Target:    "direct",
 		Timeout:   5 * time.Second,
