@@ -32,7 +32,7 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
 		var cmds []*ttnpb.MACCommand
 		for i, ch := range dev.MACState.DesiredParameters.Channels {
-			if i <= len(dev.MACState.CurrentParameters.Channels) &&
+			if i < len(dev.MACState.CurrentParameters.Channels) &&
 				ch.UplinkFrequency == dev.MACState.CurrentParameters.Channels[i].UplinkFrequency &&
 				ch.MinDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex &&
 				ch.MaxDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
