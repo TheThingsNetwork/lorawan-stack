@@ -1366,6 +1366,8 @@ var EndDeviceFieldPathsNested = []string{
 	"pending_session.last_n_f_cnt_down",
 	"pending_session.started_at",
 	"power_state",
+	"provisioner",
+	"provisioning_data",
 	"queued_application_downlinks",
 	"recent_adr_uplinks",
 	"recent_downlinks",
@@ -1445,6 +1447,8 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"network_server_address",
 	"pending_session",
 	"power_state",
+	"provisioner",
+	"provisioning_data",
 	"queued_application_downlinks",
 	"recent_adr_uplinks",
 	"recent_downlinks",
@@ -2003,6 +2007,25 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 					dst.Formatters = nil
 				}
 			}
+		case "provisioner":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioner' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Provisioner = src.Provisioner
+			} else {
+				var zero string
+				dst.Provisioner = zero
+			}
+		case "provisioning_data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioning_data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProvisioningData = src.ProvisioningData
+			} else {
+				dst.ProvisioningData = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -2186,6 +2209,8 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_session.last_n_f_cnt_down",
 	"end_device.pending_session.started_at",
 	"end_device.power_state",
+	"end_device.provisioner",
+	"end_device.provisioning_data",
 	"end_device.queued_application_downlinks",
 	"end_device.recent_adr_uplinks",
 	"end_device.recent_downlinks",
@@ -2415,6 +2440,8 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_session.last_n_f_cnt_down",
 	"end_device.pending_session.started_at",
 	"end_device.power_state",
+	"end_device.provisioner",
+	"end_device.provisioning_data",
 	"end_device.queued_application_downlinks",
 	"end_device.recent_adr_uplinks",
 	"end_device.recent_downlinks",
@@ -2797,6 +2824,8 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.pending_session.last_n_f_cnt_down",
 	"device.pending_session.started_at",
 	"device.power_state",
+	"device.provisioner",
+	"device.provisioning_data",
 	"device.queued_application_downlinks",
 	"device.recent_adr_uplinks",
 	"device.recent_downlinks",

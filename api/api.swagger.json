@@ -1921,6 +1921,38 @@
         ]
       }
     },
+    "/js/applications/{application_id.application_id}/provision-devices": {
+      "put": {
+        "operationId": "Provision",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDevices"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ProvisionEndDevicesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "JsEndDeviceRegistry"
+        ]
+      }
+    },
     "/js/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
         "operationId": "Delete",
@@ -5918,6 +5950,12 @@
         "payload": {
           "type": "string",
           "format": "byte"
+        },
+        "provisioner": {
+          "type": "string"
+        },
+        "provisioning_data": {
+          "$ref": "#/definitions/protobufStruct"
         }
       }
     },
@@ -6285,6 +6323,14 @@
         "formatters": {
           "$ref": "#/definitions/v3MessagePayloadFormatters",
           "description": "The payload formatters for this end device. Stored in Application Server.\nCopied on creation from template identified by version_ids."
+        },
+        "provisioner": {
+          "type": "string",
+          "description": "ID of the provisioner. Stored in Join Server."
+        },
+        "provisioning_data": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Vendor-specific provisioning data. Stored in Join Server."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -7604,6 +7650,30 @@
       ],
       "default": "POWER_UNKNOWN",
       "description": "Power state of the device."
+    },
+    "v3ProvisionEndDevicesRequest": {
+      "type": "object",
+      "properties": {
+        "application_id": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "provisioner": {
+          "type": "string",
+          "description": "Provisioner service as configured in the Join Server."
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "Vendor-specific provisioning data."
+        },
+        "end_device_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3EndDeviceIdentifiers"
+          },
+          "description": "List of device identifiers that will be provisioned.\nThe devices must refer to application_id.\nThe number of entries in data must match the number of given identifiers."
+        }
+      }
     },
     "v3RejoinCountExponent": {
       "type": "string",

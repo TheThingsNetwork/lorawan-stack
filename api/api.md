@@ -251,6 +251,7 @@
     - [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest)
     - [JoinAcceptMICRequest](#ttn.lorawan.v3.JoinAcceptMICRequest)
     - [NwkSKeysResponse](#ttn.lorawan.v3.NwkSKeysResponse)
+    - [ProvisionEndDevicesRequest](#ttn.lorawan.v3.ProvisionEndDevicesRequest)
     - [SessionKeyRequest](#ttn.lorawan.v3.SessionKeyRequest)
   
   
@@ -1521,6 +1522,8 @@ SDKs are responsible for combining (if desired) the three.
 | recent_downlinks | [DownlinkMessage](#ttn.lorawan.v3.DownlinkMessage) | repeated | Recent downlink messages sorted by time. Stored in Network Server. The number of messages stored may depend on configuration. |
 | queued_application_downlinks | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) | repeated | Queued Application downlink messages. Stored in Application Server, which sets them on the Network Server. |
 | formatters | [MessagePayloadFormatters](#ttn.lorawan.v3.MessagePayloadFormatters) |  | The payload formatters for this end device. Stored in Application Server. Copied on creation from template identified by version_ids. |
+| provisioner | [string](#string) |  | ID of the provisioner. Stored in Join Server. |
+| provisioning_data | [google.protobuf.Struct](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
 
 
 
@@ -2950,6 +2953,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | lorawan_version | [MACVersion](#ttn.lorawan.v3.MACVersion) |  |  |
 | payload | [bytes](#bytes) |  |  |
+| provisioner | [string](#string) |  |  |
+| provisioning_data | [google.protobuf.Struct](#google.protobuf.Struct) |  |  |
 
 
 
@@ -2984,6 +2989,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | join_nonce | [bytes](#bytes) |  |  |
 | dev_nonce | [bytes](#bytes) |  |  |
 | net_id | [bytes](#bytes) |  |  |
+| provisioner | [string](#string) |  |  |
+| provisioning_data | [google.protobuf.Struct](#google.protobuf.Struct) |  |  |
 
 
 
@@ -3018,6 +3025,24 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | f_nwk_s_int_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode). |
 | s_nwk_s_int_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Serving Network Session Integrity Key. |
 | nwk_s_enc_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Network Session Encryption Key. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest"/>
+
+### ProvisionEndDevicesRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| application_id | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| provisioner | [string](#string) |  | Provisioner service as configured in the Join Server. |
+| data | [bytes](#bytes) |  | Vendor-specific provisioning data. |
+| end_device_ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | repeated | List of device identifiers that will be provisioned. The devices must refer to application_id. The number of entries in data must match the number of given identifiers. |
 
 
 
@@ -3075,6 +3100,7 @@ The JsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----------- | ------------ | ------------- | ------------|
 | Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 | Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
+| Provision | [ProvisionEndDevicesRequest](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | [EndDevices](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | Provision provisions vendor-specific data. The given devices must already exist before provisioning. |
 | Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
 

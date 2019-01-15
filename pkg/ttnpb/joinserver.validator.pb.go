@@ -3,12 +3,14 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/empty"
+import _ "github.com/golang/protobuf/ptypes/struct"
 import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
@@ -41,9 +43,23 @@ func (this *AppSKeyResponse) Validate() error {
 	}
 	return nil
 }
+
+var _regex_CryptoServicePayloadRequest_Provisioner = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`)
+
 func (this *CryptoServicePayloadRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIdentifiers", err)
+	}
+	if !_regex_CryptoServicePayloadRequest_Provisioner.MatchString(this.Provisioner) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Provisioner", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"`, this.Provisioner))
+	}
+	if !(len(this.Provisioner) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Provisioner", fmt.Errorf(`value '%v' must length be less than '37'`, this.Provisioner))
+	}
+	if this.ProvisioningData != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ProvisioningData); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ProvisioningData", err)
+		}
 	}
 	return nil
 }
@@ -56,9 +72,34 @@ func (this *JoinAcceptMICRequest) Validate() error {
 	}
 	return nil
 }
+
+var _regex_DeriveSessionKeysRequest_Provisioner = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`)
+
 func (this *DeriveSessionKeysRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIdentifiers", err)
+	}
+	if !_regex_DeriveSessionKeysRequest_Provisioner.MatchString(this.Provisioner) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Provisioner", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"`, this.Provisioner))
+	}
+	if !(len(this.Provisioner) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Provisioner", fmt.Errorf(`value '%v' must length be less than '37'`, this.Provisioner))
+	}
+	if this.ProvisioningData != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ProvisioningData); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ProvisioningData", err)
+		}
+	}
+	return nil
+}
+func (this *ProvisionEndDevicesRequest) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ApplicationIdentifiers)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationIdentifiers", err)
+	}
+	for _, item := range this.EndDeviceIDs {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(item)); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIDs", err)
+		}
 	}
 	return nil
 }

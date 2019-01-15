@@ -181,12 +181,16 @@ var CryptoServicePayloadRequestFieldPathsNested = []string{
 	"ids.join_eui",
 	"lorawan_version",
 	"payload",
+	"provisioner",
+	"provisioning_data",
 }
 
 var CryptoServicePayloadRequestFieldPathsTopLevel = []string{
 	"ids",
 	"lorawan_version",
 	"payload",
+	"provisioner",
+	"provisioning_data",
 }
 
 func (dst *CryptoServicePayloadRequest) SetFields(src *CryptoServicePayloadRequest, paths ...string) error {
@@ -229,6 +233,25 @@ func (dst *CryptoServicePayloadRequest) SetFields(src *CryptoServicePayloadReque
 			} else {
 				var zero []byte
 				dst.Payload = zero
+			}
+		case "provisioner":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioner' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Provisioner = src.Provisioner
+			} else {
+				var zero string
+				dst.Provisioner = zero
+			}
+		case "provisioning_data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioning_data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProvisioningData = src.ProvisioningData
+			} else {
+				dst.ProvisioningData = nil
 			}
 
 		default:
@@ -280,6 +303,8 @@ var JoinAcceptMICRequestFieldPathsNested = []string{
 	"payload_request.ids.join_eui",
 	"payload_request.lorawan_version",
 	"payload_request.payload",
+	"payload_request.provisioner",
+	"payload_request.provisioning_data",
 }
 
 var JoinAcceptMICRequestFieldPathsTopLevel = []string{
@@ -349,6 +374,8 @@ var DeriveSessionKeysRequestFieldPathsNested = []string{
 	"join_nonce",
 	"lorawan_version",
 	"net_id",
+	"provisioner",
+	"provisioning_data",
 }
 
 var DeriveSessionKeysRequestFieldPathsTopLevel = []string{
@@ -357,6 +384,8 @@ var DeriveSessionKeysRequestFieldPathsTopLevel = []string{
 	"join_nonce",
 	"lorawan_version",
 	"net_id",
+	"provisioner",
+	"provisioning_data",
 }
 
 func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, paths ...string) error {
@@ -419,6 +448,98 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 			} else {
 				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
 				dst.NetID = zero
+			}
+		case "provisioner":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioner' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Provisioner = src.Provisioner
+			} else {
+				var zero string
+				dst.Provisioner = zero
+			}
+		case "provisioning_data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioning_data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProvisioningData = src.ProvisioningData
+			} else {
+				dst.ProvisioningData = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var ProvisionEndDevicesRequestFieldPathsNested = []string{
+	"application_id",
+	"application_id.application_id",
+	"data",
+	"end_device_ids",
+	"provisioner",
+}
+
+var ProvisionEndDevicesRequestFieldPathsTopLevel = []string{
+	"application_id",
+	"data",
+	"end_device_ids",
+	"provisioner",
+}
+
+func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "application_id":
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
+		case "provisioner":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioner' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Provisioner = src.Provisioner
+			} else {
+				var zero string
+				dst.Provisioner = zero
+			}
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				var zero []byte
+				dst.Data = zero
+			}
+		case "end_device_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'end_device_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EndDeviceIDs = src.EndDeviceIDs
+			} else {
+				dst.EndDeviceIDs = nil
 			}
 
 		default:

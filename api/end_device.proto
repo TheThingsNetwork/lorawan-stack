@@ -19,6 +19,7 @@ import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
@@ -392,6 +393,11 @@ message EndDevice {
   // The payload formatters for this end device. Stored in Application Server.
   // Copied on creation from template identified by version_ids.
   MessagePayloadFormatters formatters = 45;
+
+  // ID of the provisioner. Stored in Join Server.
+  string provisioner = 46 [(validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
+  // Vendor-specific provisioning data. Stored in Join Server.
+  google.protobuf.Struct provisioning_data = 47;
 }
 
 message EndDevices {
