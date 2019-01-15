@@ -30,13 +30,13 @@ export default class Landing extends React.PureComponent {
   render () {
     const { path } = this.props.match
     return (
-      <React.Fragment>
+      <div className={style.container}>
         <div className={style.breadcrumbsContainer}>
           <Container>
             <Breadcrumbs />
           </Container>
         </div>
-        <Container>
+        <div className={style.contentContainer}>
           <Switch>
             <WithAuth>
               <Route exact path={`${path}`} component={Overview} />
@@ -45,8 +45,8 @@ export default class Landing extends React.PureComponent {
               <Route path={`${path}/organizations`} component={Organizations} />
             </WithAuth>
           </Switch>
-        </Container>
-      </React.Fragment>
+        </div>
+      </div>
       // TODO:  render not found
     )
   }
