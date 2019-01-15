@@ -2,6 +2,7 @@
 
 exports[`DataCell should match snapshot 1`] = `
 <Cell
+  className="cellData"
   component="td"
 >
   Data entry

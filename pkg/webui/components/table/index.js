@@ -74,6 +74,7 @@ class Tabular extends React.Component {
               centered={header.centered}
               content={header.sortable ? undefined : header.displayName}
               name={header.name}
+              width={header.width}
             >
               {
                 header.sortable ? (
@@ -210,6 +211,7 @@ Tabular.propTypes = {
     render: PropTypes.func,
     centered: PropTypes.bool,
     sortable: PropTypes.bool,
+    width: PropTypes.number,
   })),
 }
 

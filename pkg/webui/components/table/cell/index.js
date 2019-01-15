@@ -26,6 +26,7 @@ const Cell = function ({
   centered = false,
   small = false,
   colSpan = 1,
+  width,
   children,
   ...rest
 }) {
@@ -34,9 +35,12 @@ const Cell = function ({
     [style.cellSmall]: small,
   })
 
+  const widthStyle = width ? { width: `${width}%` } : undefined
+
   return (
     <Component
       {...rest}
+      style={widthStyle}
       className={cellClassNames}
       colSpan={colSpan}
     >
@@ -46,6 +50,8 @@ const Cell = function ({
 }
 
 Cell.propTypes = {
+  /** The width of the cell in percentages */
+  width: PropTypes.number,
   /** The html name of the wrapping component */
   component: PropTypes.string.isRequired,
   /** The number of columns that the cell should occupy */
@@ -78,10 +84,12 @@ HeadCell.propTypes = {
 }
 
 const DataCell = ({
+  className,
   children,
   ...rest
 }) => (
   <Cell
+    className={classnames(className, style.cellData)}
     component="td"
     {...rest}
   >
