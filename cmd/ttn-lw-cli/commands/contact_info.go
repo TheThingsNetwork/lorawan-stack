@@ -138,7 +138,7 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command) (*ttnpb.E
 			if err != nil {
 				return err
 			}
-			return io.Write(os.Stdout, config.Format, updatedInfo)
+			return io.Write(os.Stdout, config.OutputFormat, updatedInfo)
 		},
 	}
 	remove := &cobra.Command{
@@ -170,7 +170,7 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command) (*ttnpb.E
 			if err != nil {
 				return err
 			}
-			return io.Write(os.Stdout, config.Format, updatedInfo)
+			return io.Write(os.Stdout, config.OutputFormat, updatedInfo)
 		},
 	}
 	add.Flags().AddFlagSet(contactInfoFlags)

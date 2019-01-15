@@ -84,7 +84,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Users)
+			return io.Write(os.Stdout, config.OutputFormat, res.Users)
 		},
 	}
 	usersGetCommand = &cobra.Command{
@@ -114,7 +114,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	usersCreateCommand = &cobra.Command{
@@ -147,7 +147,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	usersUpdateCommand = &cobra.Command{
@@ -184,7 +184,7 @@ var (
 			}
 
 			res.SetFields(&user, "ids")
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	usersUpdatePasswordCommand = &cobra.Command{
@@ -228,7 +228,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	usersDeleteCommand = &cobra.Command{

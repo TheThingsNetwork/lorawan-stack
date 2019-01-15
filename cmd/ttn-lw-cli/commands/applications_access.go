@@ -43,7 +43,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Rights)
+			return io.Write(os.Stdout, config.OutputFormat, res.Rights)
 		},
 	}
 	applicationCollaborators = &cobra.Command{
@@ -70,7 +70,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Collaborators)
+			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
 	}
 	applicationCollaboratorsSet = &cobra.Command{
@@ -132,7 +132,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.APIKeys)
+			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
 		},
 	}
 	applicationAPIKeysCreate = &cobra.Command{
@@ -170,7 +170,7 @@ var (
 			logger.Warn("The API key value will never be shown again")
 			logger.Warn("Make sure to copy it to a safe place")
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationAPIKeysUpdate = &cobra.Command{

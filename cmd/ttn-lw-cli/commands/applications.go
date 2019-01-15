@@ -85,7 +85,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Applications)
+			return io.Write(os.Stdout, config.OutputFormat, res.Applications)
 		},
 	}
 	applicationsSearchCommand = &cobra.Command{
@@ -109,7 +109,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Applications)
+			return io.Write(os.Stdout, config.OutputFormat, res.Applications)
 		},
 	}
 	applicationsGetCommand = &cobra.Command{
@@ -139,7 +139,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsCreateCommand = &cobra.Command{
@@ -174,7 +174,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsUpdateCommand = &cobra.Command{
@@ -211,7 +211,7 @@ var (
 			}
 
 			res.SetFields(&application, "ids")
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsDeleteCommand = &cobra.Command{

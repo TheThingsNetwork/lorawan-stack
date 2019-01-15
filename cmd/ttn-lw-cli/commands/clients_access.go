@@ -43,7 +43,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Rights)
+			return io.Write(os.Stdout, config.OutputFormat, res.Rights)
 		},
 	}
 	clientCollaborators = &cobra.Command{
@@ -70,7 +70,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Collaborators)
+			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
 	}
 	clientCollaboratorsSet = &cobra.Command{

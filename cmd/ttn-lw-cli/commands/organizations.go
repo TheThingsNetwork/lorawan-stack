@@ -85,7 +85,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Organizations)
+			return io.Write(os.Stdout, config.OutputFormat, res.Organizations)
 		},
 	}
 	organizationsSearchCommand = &cobra.Command{
@@ -109,7 +109,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Organizations)
+			return io.Write(os.Stdout, config.OutputFormat, res.Organizations)
 		},
 	}
 	organizationsGetCommand = &cobra.Command{
@@ -139,7 +139,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	organizationsCreateCommand = &cobra.Command{
@@ -174,7 +174,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	organizationsUpdateCommand = &cobra.Command{
@@ -211,7 +211,7 @@ var (
 			}
 
 			res.SetFields(&organization, "ids")
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	organizationsDeleteCommand = &cobra.Command{

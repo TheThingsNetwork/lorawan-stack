@@ -134,7 +134,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.EndDevices)
+			return io.Write(os.Stdout, config.OutputFormat, res.EndDevices)
 		},
 	}
 	endDevicesGetCommand = &cobra.Command{
@@ -185,7 +185,7 @@ var (
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
 
-			return io.Write(os.Stdout, config.Format, device)
+			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
 	}
 	endDevicesCreateCommand = &cobra.Command{
@@ -284,7 +284,7 @@ var (
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
 
-			return io.Write(os.Stdout, config.Format, &device)
+			return io.Write(os.Stdout, config.OutputFormat, &device)
 		},
 	}
 	endDevicesUpdateCommand = &cobra.Command{
@@ -361,7 +361,7 @@ var (
 			}
 
 			res.SetFields(&device, "ids")
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	endDevicesDeleteCommand = &cobra.Command{

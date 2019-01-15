@@ -75,7 +75,7 @@ var (
 				UserIdentifiers: *usrID,
 			})
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	oauthAuthorizationsDeleteCommand = &cobra.Command{
@@ -144,7 +144,7 @@ var (
 				ClientIDs: *cliID,
 			})
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	oauthTokensDeleteCommand = &cobra.Command{

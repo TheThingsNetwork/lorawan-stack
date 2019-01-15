@@ -98,7 +98,7 @@ var eventsCommand = &cobra.Command{
 		}()
 
 		for evt := range events {
-			io.Write(os.Stdout, config.Format, evt)
+			io.Write(os.Stdout, config.OutputFormat, evt)
 		}
 
 		return nil

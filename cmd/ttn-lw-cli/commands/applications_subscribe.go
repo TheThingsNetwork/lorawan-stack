@@ -55,7 +55,7 @@ var (
 						streamErr = err
 						return
 					}
-					if err = io.Write(os.Stdout, config.Format, up); err != nil {
+					if err = io.Write(os.Stdout, config.OutputFormat, up); err != nil {
 						streamErr = err
 						return
 					}

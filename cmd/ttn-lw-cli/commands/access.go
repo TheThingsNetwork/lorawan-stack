@@ -38,7 +38,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 )

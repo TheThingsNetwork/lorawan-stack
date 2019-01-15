@@ -87,7 +87,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsWebhookGetCommand = &cobra.Command{
@@ -119,7 +119,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsWebhookListCommand = &cobra.Command{
@@ -151,7 +151,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsWebhookSetCommand = &cobra.Command{
@@ -183,7 +183,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationsWebhookDeleteCommand = &cobra.Command{

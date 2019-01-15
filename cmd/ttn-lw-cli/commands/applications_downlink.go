@@ -132,7 +132,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Downlinks)
+			return io.Write(os.Stdout, config.OutputFormat, res.Downlinks)
 		},
 	}
 )

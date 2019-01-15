@@ -85,7 +85,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Clients)
+			return io.Write(os.Stdout, config.OutputFormat, res.Clients)
 		},
 	}
 	clientsSearchCommand = &cobra.Command{
@@ -109,7 +109,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Clients)
+			return io.Write(os.Stdout, config.OutputFormat, res.Clients)
 		},
 	}
 	clientsGetCommand = &cobra.Command{
@@ -139,7 +139,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	clientsCreateCommand = &cobra.Command{
@@ -178,7 +178,7 @@ var (
 			logger.Warn("The Client secret will never be shown again")
 			logger.Warn("Make sure to copy it to a safe place")
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	clientsUpdateCommand = &cobra.Command{
@@ -215,7 +215,7 @@ var (
 			}
 
 			res.SetFields(&client, "ids")
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	clientsDeleteCommand = &cobra.Command{

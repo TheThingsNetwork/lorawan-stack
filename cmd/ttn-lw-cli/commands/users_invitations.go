@@ -59,7 +59,7 @@ var (
 			if err != nil {
 				return err
 			}
-			return io.Write(os.Stdout, config.Format, res.Invitations)
+			return io.Write(os.Stdout, config.OutputFormat, res.Invitations)
 		},
 	}
 	userInvitationsCreate = &cobra.Command{

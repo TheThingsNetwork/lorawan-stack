@@ -104,7 +104,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Gateways)
+			return io.Write(os.Stdout, config.OutputFormat, res.Gateways)
 		},
 	}
 	gatewaysSearchCommand = &cobra.Command{
@@ -128,7 +128,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res.Gateways)
+			return io.Write(os.Stdout, config.OutputFormat, res.Gateways)
 		},
 	}
 	gatewaysGetCommand = &cobra.Command{
@@ -170,7 +170,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	gatewaysCreateCommand = &cobra.Command{
@@ -211,7 +211,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	errAntennaIndex       = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
@@ -279,7 +279,7 @@ var (
 			}
 
 			res.SetFields(&gateway, "ids")
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	gatewaysDeleteCommand = &cobra.Command{
@@ -321,7 +321,7 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.Format, res)
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
