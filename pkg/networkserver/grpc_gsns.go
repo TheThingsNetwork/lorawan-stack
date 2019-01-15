@@ -812,9 +812,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			paths := make([]string, 0, 5)
 
+			keys := resp.SessionKeys
+			if !req.DownlinkSettings.OptNeg {
+				keys.NwkSEncKey = keys.FNwkSIntKey
+				keys.SNwkSIntKey = keys.FNwkSIntKey
+			}
 			dev.Session = &ttnpb.Session{
 				DevAddr:     devAddr,
-				SessionKeys: resp.SessionKeys,
+				SessionKeys: keys,
 				StartedAt:   time.Now().UTC(),
 			}
 			paths = append(paths, "session")
