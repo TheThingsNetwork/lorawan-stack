@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row } from 'react-grid-system'
+import { Container, Col, Row } from 'react-grid-system'
 import * as Yup from 'yup'
 import { push } from 'connected-react-router'
 import { connect } from 'react-redux'

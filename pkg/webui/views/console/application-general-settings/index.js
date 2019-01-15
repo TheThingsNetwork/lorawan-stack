@@ -77,7 +77,7 @@ export default class ApplicationGeneralSettings extends React.Component {
 
     return (
       <Container>
-        <Row justify="center">
+        <Row>
           <Col lg={8} md={12}>
             <Message
               component="h2"
@@ -85,7 +85,7 @@ export default class ApplicationGeneralSettings extends React.Component {
             />
           </Col>
         </Row>
-        <Row justify="center">
+        <Row>
           <Col lg={8} md={12}>
             <Form
               horizontal
