@@ -277,17 +277,17 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 					"data_rate_index", rx.dataRateIndex,
 				)
 			}
-			var maxEirp float32
+			var maxEIRP float32
 			if c.fp.MaxEIRP != nil {
-				maxEirp = *c.fp.MaxEIRP
+				maxEIRP = *c.fp.MaxEIRP
 			} else {
-				maxEirp = band.DefaultMaxEIRP
+				maxEIRP = band.DefaultMaxEIRP
 			}
 			settings := ttnpb.TxSettings{
-				DataRateIndex: rx.dataRateIndex,
-				Frequency:     rx.frequency,
-				TxPower:       int32(maxEirp),
-				GatewayChannelIndex:  uint32(channelIndex),
+				DataRateIndex:       rx.dataRateIndex,
+				Frequency:           rx.frequency,
+				TxPower:             int32(maxEIRP),
+				GatewayChannelIndex: uint32(channelIndex),
 			}
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)
