@@ -100,6 +100,7 @@ export default class ApplicationAccessEdit extends React.Component {
       function (acc, right) {
         acc.rightsItems.push(
           <Field
+            className={style.rightLabel}
             key={right}
             name={right}
             type="checkbox"
