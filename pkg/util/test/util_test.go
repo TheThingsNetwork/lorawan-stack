@@ -121,18 +121,18 @@ func TestWaitTimeout(t *testing.T) {
 		OK      bool
 	}{
 		{
-			Timeout: 10 * time.Millisecond,
+			Timeout: Delay,
 			OK:      false,
 		},
 		{
-			Timeout: 30 * time.Millisecond,
+			Timeout: 10 * Delay,
 			OK:      true,
 		},
 	} {
 		t.Run(fmt.Sprintf("%v", tc.Timeout), func(t *testing.T) {
 			a := assertions.New(t)
 
-			ok := WaitTimeout(tc.Timeout, func() { time.Sleep(20 * time.Millisecond) })
+			ok := WaitTimeout(tc.Timeout, func() { time.Sleep(2 * Delay) })
 			a.So(ok, should.Equal, tc.OK)
 		})
 	}
