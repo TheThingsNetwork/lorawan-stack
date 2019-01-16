@@ -83,12 +83,12 @@ func composeSwaps(swaps ...versionSwap) versionSwap {
 	}
 }
 
-func channelIndexIdentity(idx uint32) (uint32, error) {
+func channelIndexIdentity(idx uint8) (uint8, error) {
 	return idx, nil
 }
 
-func channelIndexModulo(n uint32) func(uint32) (uint32, error) {
-	return func(idx uint32) (uint32, error) {
+func channelIndexModulo(n uint8) func(uint8) (uint8, error) {
+	return func(idx uint8) (uint8, error) {
 		return idx % n, nil
 	}
 }
@@ -166,7 +166,7 @@ type Band struct {
 	DefaultMaxEIRP float32
 
 	// Rx1Channel computes the Rx1 channel index.
-	Rx1Channel func(uint32) (uint32, error)
+	Rx1Channel func(uint8) (uint8, error)
 	// Rx1DataRate computes the Rx1 data rate index.
 	Rx1DataRate func(ttnpb.DataRateIndex, uint32, bool) (ttnpb.DataRateIndex, error)
 
