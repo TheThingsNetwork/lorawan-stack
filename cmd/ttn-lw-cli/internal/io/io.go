@@ -15,8 +15,11 @@
 package io
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"reflect"
 	"strings"
 	"text/template"
@@ -86,4 +89,43 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 		}
 	}
 	return nil
+}
+
+// IsPipe returns whether the given reader is a pipe that can be read.
+func IsPipe(r io.Reader) bool {
+	if f, ok := r.(*os.File); ok {
+		if stat, err := f.Stat(); err == nil {
+			return (stat.Mode() & os.ModeCharDevice) == 0
+		}
+	}
+	return false
+}
+
+func fieldPaths(m map[string]interface{}, prefix string) (paths []string) {
+	for path, sub := range m {
+		if m, ok := sub.(map[string]interface{}); ok {
+			paths = append(paths, fieldPaths(m, prefix+path+".")...)
+		} else {
+			paths = append(paths, prefix+path)
+		}
+	}
+	return paths
+}
+
+// Read JSON data from the given reader into data.
+func Read(r io.Reader, data interface{}) (paths []string, err error) {
+	var obj json.RawMessage
+	if err = json.NewDecoder(r).Decode(&obj); err != nil {
+		return nil, err
+	}
+	var m map[string]interface{}
+	if err = json.Unmarshal(obj, &m); err != nil {
+		return nil, err
+	}
+	paths = fieldPaths(m, "")
+	b := bytes.NewBuffer(obj)
+	if err = jsonpb.TTN().NewDecoder(b).Decode(data); err != nil {
+		return nil, err
+	}
+	return paths, nil
 }
