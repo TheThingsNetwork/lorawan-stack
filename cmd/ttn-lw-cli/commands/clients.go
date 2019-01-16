@@ -148,19 +148,27 @@ var (
 		Short:   "Create a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
-			if cliID == nil {
-				return errNoClientID
-			}
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
 				return errNoCollaborator
 			}
 			var client ttnpb.Client
+			if io.IsPipe(os.Stdin) {
+				_, err := io.Read(os.Stdin, &client)
+				if err != nil {
+					return err
+				}
+			}
 			if err := util.SetFields(&client, setClientFlags); err != nil {
 				return err
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
-			client.ClientIdentifiers = *cliID
+			if cliID != nil && cliID.ClientID == "" {
+				client.ClientID = cliID.ClientID
+			}
+			if client.ClientID == "" {
+				return errNoClientID
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {

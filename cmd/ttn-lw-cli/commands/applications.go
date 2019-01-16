@@ -148,19 +148,27 @@ var (
 		Short:   "Create an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
-			if appID == nil {
-				return errNoApplicationID
-			}
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
 				return errNoCollaborator
 			}
 			var application ttnpb.Application
+			if io.IsPipe(os.Stdin) {
+				_, err := io.Read(os.Stdin, &application)
+				if err != nil {
+					return err
+				}
+			}
 			if err := util.SetFields(&application, setApplicationFlags); err != nil {
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			application.ApplicationIdentifiers = *appID
+			if appID != nil && appID.ApplicationID == "" {
+				application.ApplicationID = appID.ApplicationID
+			}
+			if application.ApplicationID == "" {
+				return errNoApplicationID
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {

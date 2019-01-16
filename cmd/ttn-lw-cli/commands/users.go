@@ -126,15 +126,23 @@ var (
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
-			}
 			var user ttnpb.User
+			if io.IsPipe(os.Stdin) {
+				_, err := io.Read(os.Stdin, &user)
+				if err != nil {
+					return err
+				}
+			}
 			if err := util.SetFields(&user, setUserFlags); err != nil {
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			user.UserIdentifiers = *usrID
+			if usrID != nil && usrID.UserID == "" {
+				user.UserID = usrID.UserID
+			}
+			if user.UserID == "" {
+				return errNoUserID
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {

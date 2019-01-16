@@ -58,9 +58,6 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 		gatewayID = args[0]
 		gatewayEUIHex = args[1]
 	}
-	if gatewayID == "" && gatewayEUIHex == "" {
-		return nil, errNoGatewayID
-	}
 	if gatewayID == "" && requireID {
 		return nil, errNoGatewayID
 	}
@@ -178,7 +175,7 @@ var (
 		Aliases: []string{"add", "register"},
 		Short:   "Create a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			gtwID, err := getGatewayID(cmd.Flags(), args, false)
 			if err != nil {
 				return err
 			}
@@ -187,11 +184,28 @@ var (
 				return errNoCollaborator
 			}
 			var gateway ttnpb.Gateway
+			if io.IsPipe(os.Stdin) {
+				_, err := io.Read(os.Stdin, &gateway)
+				if err != nil {
+					return err
+				}
+			}
 			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
 				return err
 			}
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
-			gateway.GatewayIdentifiers = *gtwID
+			if gtwID != nil {
+				if gtwID.GatewayID != "" {
+					gateway.GatewayID = gtwID.GatewayID
+				}
+				if gtwID.EUI != nil {
+					gateway.EUI = gtwID.EUI
+				}
+			}
+
+			if gateway.GatewayID == "" {
+				return errNoGatewayID
+			}
 
 			var antenna ttnpb.GatewayAntenna
 			if err = util.SetFields(&antenna, setGatewayAntennaFlags, "antenna"); err != nil {

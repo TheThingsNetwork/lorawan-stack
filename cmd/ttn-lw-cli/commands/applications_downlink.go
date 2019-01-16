@@ -37,7 +37,7 @@ var (
 		Use:   "push",
 		Short: "Push to the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}
@@ -66,7 +66,7 @@ var (
 		Use:   "replace",
 		Short: "Replace the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}
@@ -95,7 +95,7 @@ var (
 		Use:   "clear",
 		Short: "Clear the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}
@@ -118,7 +118,7 @@ var (
 		Use:   "list",
 		Short: "List the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}

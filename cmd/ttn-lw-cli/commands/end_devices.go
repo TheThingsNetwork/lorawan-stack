@@ -53,7 +53,7 @@ var (
 	errEndDeviceEUIUpdate       = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 )
 
-func getEndDeviceID(flagSet *pflag.FlagSet, args []string) (*ttnpb.EndDeviceIdentifiers, error) {
+func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.EndDeviceIdentifiers, error) {
 	applicationID, _ := flagSet.GetString("application-id")
 	deviceID, _ := flagSet.GetString("device-id")
 	switch len(args) {
@@ -68,10 +68,10 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string) (*ttnpb.EndDeviceIden
 		applicationID = args[0]
 		deviceID = args[1]
 	}
-	if applicationID == "" {
+	if applicationID == "" && requireID {
 		return nil, errNoApplicationID
 	}
-	if deviceID == "" {
+	if deviceID == "" && requireID {
 		return nil, errNoEndDeviceID
 	}
 	ids := &ttnpb.EndDeviceIdentifiers{
@@ -142,7 +142,7 @@ var (
 		Aliases: []string{"info"},
 		Short:   "Get an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}
@@ -193,13 +193,20 @@ var (
 		Aliases: []string{"add", "register"},
 		Short:   "Create an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, false)
 			if err != nil {
 				return err
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
 
 			var device ttnpb.EndDevice
+			if io.IsPipe(os.Stdin) {
+				jsonPaths, err := io.Read(os.Stdin, &device)
+				if err != nil {
+					return err
+				}
+				paths = append(paths, jsonPaths...)
+			}
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
 			if setDefaults {
@@ -254,7 +261,27 @@ var (
 				return err
 			}
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
-			device.EndDeviceIdentifiers = *devID
+			if devID != nil {
+				if devID.DeviceID != "" {
+					device.DeviceID = devID.DeviceID
+				}
+				if devID.ApplicationID != "" {
+					device.ApplicationID = devID.ApplicationID
+				}
+				if devID.JoinEUI != nil {
+					device.JoinEUI = devID.JoinEUI
+				}
+				if devID.DevEUI != nil {
+					device.DevEUI = devID.DevEUI
+				}
+			}
+
+			if device.ApplicationID == "" {
+				return errNoApplicationID
+			}
+			if device.DeviceID == "" {
+				return errNoEndDeviceID
+			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(paths...)
 
@@ -292,7 +319,7 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}
@@ -368,7 +395,7 @@ var (
 		Use:   "delete",
 		Short: "Delete an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args)
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}

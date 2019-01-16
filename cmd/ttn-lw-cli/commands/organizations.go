@@ -148,19 +148,27 @@ var (
 		Short:   "Create an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
-			if orgID == nil {
-				return errNoOrganizationID
-			}
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
 				return errNoCollaborator
 			}
 			var organization ttnpb.Organization
+			if io.IsPipe(os.Stdin) {
+				_, err := io.Read(os.Stdin, &organization)
+				if err != nil {
+					return err
+				}
+			}
 			if err := util.SetFields(&organization, setOrganizationFlags); err != nil {
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			organization.OrganizationIdentifiers = *orgID
+			if orgID != nil && orgID.OrganizationID == "" {
+				organization.OrganizationID = orgID.OrganizationID
+			}
+			if organization.OrganizationID == "" {
+				return errNoOrganizationID
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
