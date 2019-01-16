@@ -54,8 +54,8 @@ var (
 	appQueueUpdateTimeout = 200 * time.Millisecond
 )
 
-func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
-	fp, band, err := getDeviceBandVersion(fps, dev)
+func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
+	fp, band, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}
@@ -257,7 +257,7 @@ outer:
 			gap = fCnt - dev.matchedSession.LastFCntUp
 
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
-				_, band, err := getDeviceBandVersion(ns.FrequencyPlans, dev.EndDevice)
+				_, band, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to get device's versioned band")
 					continue
@@ -566,7 +566,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 
 			if stored.MACState != nil {
 				stored.MACState.PendingApplicationDownlink = nil
-			} else if err := resetMACState(ns.FrequencyPlans, stored); err != nil {
+			} else if err := resetMACState(stored, ns.FrequencyPlans); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -683,7 +683,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
 			}
 
-			if err := adaptDataRate(ns.FrequencyPlans, stored); err != nil {
+			if err := adaptDataRate(stored, ns.FrequencyPlans); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -766,7 +766,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 		devAddr = ns.newDevAddr(ctx, dev)
 	}
 
-	if err := resetMACState(ns.FrequencyPlans, dev); err != nil {
+	if err := resetMACState(dev, ns.FrequencyPlans); err != nil {
 		logger.WithError(err).Error("Failed to reset device's MAC state")
 		return err
 	}
@@ -844,7 +844,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 			dev.EndDeviceIdentifiers.DevAddr = &devAddr
 			paths = append(paths, "ids.dev_addr")
 
-			if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
+			if err := resetMACState(dev, ns.Component.FrequencyPlans); err != nil {
 				resetErr = true
 				return nil, nil, err
 			}

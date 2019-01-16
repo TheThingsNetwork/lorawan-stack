@@ -72,7 +72,7 @@ const maxNbTrans = 3
 // optimalADRUplinkCount is the amount of uplinks required to ensure optimal results from the ADR algorithm.
 const optimalADRUplinkCount = 20
 
-func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
+func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 	ups := dev.RecentADRUplinks
 	if len(ups) == 0 {
 		return nil
@@ -87,7 +87,7 @@ func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		}
 	}
 
-	_, band, err := getDeviceBandVersion(fps, dev)
+	_, band, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}

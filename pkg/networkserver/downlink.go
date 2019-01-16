@@ -469,7 +469,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 
-				fp, band, err := getDeviceBandVersion(ns.FrequencyPlans, dev)
+				fp, band, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 				if err != nil {
 					return nil, nil, errUnknownBand.WithCause(err)
 				}

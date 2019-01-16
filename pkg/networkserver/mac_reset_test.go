@@ -76,7 +76,7 @@ func TestHandleResetInd(t *testing.T) {
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
-				if err := ResetMACState(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev); err != nil {
+				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher)); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 

@@ -41,7 +41,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		return maxDownLen, maxUpLen, true, nil
 	}
 
-	_, band, err := getDeviceBandVersion(fps, dev)
+	_, band, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
@@ -105,7 +105,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
 	}
 
-	_, band, err := getDeviceBandVersion(fps, dev)
+	_, band, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}

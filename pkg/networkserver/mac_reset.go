@@ -38,7 +38,7 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return nil
 	}
 
-	if err := resetMACState(fps, dev); err != nil {
+	if err := resetMACState(dev, fps); err != nil {
 		return err
 	}
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1

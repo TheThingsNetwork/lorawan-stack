@@ -20,7 +20,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func getDeviceBandVersion(fps *frequencyplans.Store, dev *ttnpb.EndDevice) (*frequencyplans.FrequencyPlan, band.Band, error) {
+func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, band.Band, error) {
 	fp, err := fps.GetByID(dev.FrequencyPlanID)
 	if err != nil {
 		return nil, band.Band{}, err

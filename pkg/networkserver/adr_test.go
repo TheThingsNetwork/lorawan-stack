@@ -154,7 +154,7 @@ func TestAdaptDataRate(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			err := adaptDataRate(frequencyplans.NewStore(test.FrequencyPlansFetcher), dev)
+			err := adaptDataRate(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher))
 			if err != nil && !a.So(err, should.Equal, tc.Error) ||
 				err == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
