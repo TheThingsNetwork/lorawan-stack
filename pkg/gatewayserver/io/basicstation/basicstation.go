@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,12 +22,17 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstation/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
+)
+
+var (
+	errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway eui")
 )
 
 type srv struct {
@@ -72,7 +77,19 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	var req messages.DiscoverQuery
 	if err := json.Unmarshal(data, &req); err != nil {
 		logger.WithError(err).Debug("Failed to parse discover query message")
+		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Invalid request")); err != nil {
+			logger.WithError(err).Warn("Failed to write error response message")
+			return err
+		}
 		return err
+	}
+
+	if req.EUI.IsZero() {
+		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Invalid request")); err != nil {
+			logger.WithError(err).Warn("Failed to write error response message")
+			return err
+		}
+		return errEmptyGatewayEUI
 	}
 
 	ids := ttnpb.GatewayIdentifiers{
@@ -81,7 +98,10 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx, ids, err := s.server.FillGatewayContext(s.ctx, ids)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to fill gateway context")
-		// TODO: Report error back to gateway.
+		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Router not registered")); err != nil {
+			logger.WithError(err).Warn("Failed to write error response message")
+			return err
+		}
 		return err
 	}
 	uid := unique.ID(ctx, ids)
@@ -101,7 +121,10 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	data, err = json.Marshal(res)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to marshal response message")
-		// TODO: Report error back to gateway.
+		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Internal error")); err != nil {
+			logger.WithError(err).Warn("Failed to write error response message")
+			return err
+		}
 		return err
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
@@ -199,4 +222,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
 	}
+}
+
+// getErrorResponseFromString add  the string into the "Error" field of the response message and returns the marshaled byte slice.
+func getErrorResponseFromString(msg string) []byte {
+	data, _ := json.Marshal(messages.DiscoverResponse{
+		Error: msg,
+	})
+	return data
 }
