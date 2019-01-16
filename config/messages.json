@@ -1277,6 +1277,15 @@
       "file": "users.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_webhook_id": {
+    "translations": {
+      "en": "no webhook ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "applications_webhook.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/internal/util:flag_value": {
     "translations": {
       "en": "invalid flag value"
