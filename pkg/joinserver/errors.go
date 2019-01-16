@@ -48,7 +48,7 @@ var (
 	errNoSNwkSIntKey             = errors.DefineCorruption("no_s_nwk_s_int_key", "no SNwkSIntKey specified")
 	errPayloadLengthMismatch     = errors.DefineInvalidArgument("payload_length", "expected length of payload to be equal to 23 got {length}")
 	errProvisionerNotFound       = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
-	errProvisionerDecode         = errors.Define("provisioner_deocde", "failed to decode provisioning data")
+	errProvisionerDecode         = errors.Define("provisioner_decode", "failed to decode provisioning data")
 	errProvisionEntryCount       = errors.DefineInvalidArgument("provision_entry_count", "expected `{expected}` but have `{actual}` entries to provision")
 	errProvisioning              = errors.DefineAborted("provisioning", "provisioning failed")
 	errRegistryOperation         = errors.DefineInternal("registry_operation", "registry operation failed")

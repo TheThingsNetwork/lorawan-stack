@@ -3392,7 +3392,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:provisioner_deocde": {
+  "error:pkg/joinserver:provisioner_decode": {
     "translations": {
       "en": "failed to decode provisioning data"
     },

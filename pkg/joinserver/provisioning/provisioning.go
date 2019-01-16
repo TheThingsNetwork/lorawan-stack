@@ -15,12 +15,17 @@
 // Package provisioning provides a registry and implementations of vendor-specific device provisioners.
 package provisioning
 
-import pbtypes "github.com/gogo/protobuf/types"
+import (
+	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
+)
 
 // Provisioner is a device provisioner based on vendor-specific data.
 type Provisioner interface {
 	// Decode decodes vendor-specific provisioning data in a struct for each entry.
 	Decode(data []byte) ([]*pbtypes.Struct, error)
+	// DeviceID generates a device ID
+	DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) string
 }
 
 var registry = map[string]Provisioner{}

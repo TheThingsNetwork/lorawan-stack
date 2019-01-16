@@ -16,15 +16,14 @@ package joinserver
 
 import (
 	"context"
-	"fmt"
+	"encoding/binary"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 type jsEndDeviceRegistryServer struct {
@@ -86,66 +85,83 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	})
 }
 
-func (s jsEndDeviceRegistryServer) Provision(ctx context.Context, req *ttnpb.ProvisionEndDevicesRequest) (*ttnpb.EndDevices, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
-		return nil, err
+func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesRequest, stream ttnpb.JsEndDeviceRegistry_ProvisionServer) error {
+	if err := rights.RequireApplication(stream.Context(), req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		return err
 	}
-	for _, dev := range req.EndDeviceIDs {
-		if dev.ApplicationIdentifiers != req.ApplicationIdentifiers {
-			return nil, errInvalidIdentifiers
-		}
-		if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
-			return nil, errNoJoinEUI
-		}
-		if dev.DevEUI == nil || dev.DevEUI.IsZero() {
-			return nil, errNoDevEUI
-		}
-	}
+
 	provisioner := provisioning.Get(req.Provisioner)
 	if provisioner == nil {
-		return nil, errProvisionerNotFound.WithAttributes("id", req.Provisioner)
+		return errProvisionerNotFound.WithAttributes("id", req.Provisioner)
 	}
+
+	var next func(*pbtypes.Struct) (*ttnpb.EndDevice, error)
+	switch devices := req.EndDevices.(type) {
+	case *ttnpb.ProvisionEndDevicesRequest_List:
+		i := 0
+		next = func(*pbtypes.Struct) (*ttnpb.EndDevice, error) {
+			if i == len(devices.List.EndDeviceIDs) {
+				return nil, errProvisionEntryCount.WithAttributes(
+					"expected", len(devices.List.EndDeviceIDs),
+					"actual", i+1,
+				)
+			}
+			ids := devices.List.EndDeviceIDs[i]
+			i++
+			if ids.ApplicationIdentifiers != req.ApplicationIdentifiers {
+				return nil, errInvalidIdentifiers
+			}
+			if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
+				return nil, errNoJoinEUI
+			}
+			if ids.DevEUI == nil || ids.DevEUI.IsZero() {
+				return nil, errNoDevEUI
+			}
+			return &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+			}, nil
+		}
+	case *ttnpb.ProvisionEndDevicesRequest_Range:
+		if devices.Range.JoinEUI.IsZero() {
+			return errNoJoinEUI
+		}
+		if devices.Range.FromDevEUI.IsZero() {
+			return errNoDevEUI
+		}
+		devEUIInt := binary.BigEndian.Uint64(devices.Range.FromDevEUI[:])
+		next = func(entry *pbtypes.Struct) (*ttnpb.EndDevice, error) {
+			var devEUI types.EUI64
+			binary.BigEndian.PutUint64(devEUI[:], devEUIInt)
+			devEUIInt++
+			return &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: req.ApplicationIdentifiers,
+					DeviceID:               provisioner.DeviceID(devices.Range.JoinEUI, devEUI, entry),
+					JoinEUI:                &devices.Range.JoinEUI,
+					DevEUI:                 &devEUI,
+				},
+			}, nil
+		}
+	default:
+		return errInvalidIdentifiers
+	}
+
 	entries, err := provisioner.Decode(req.Data)
 	if err != nil {
-		return nil, errProvisionerDecode.WithCause(err)
+		return errProvisionerDecode.WithCause(err)
 	}
-	if len(entries) != len(req.EndDeviceIDs) {
-		return nil, errProvisionEntryCount.WithAttributes(
-			"expected", len(req.EndDeviceIDs),
-			"actual", len(entries),
-		)
-	}
-	res := &ttnpb.EndDevices{
-		EndDevices: make([]*ttnpb.EndDevice, 0, len(entries)),
-	}
-	for i, entry := range entries {
-		ids := req.EndDeviceIDs[i]
-		dev, err := s.Registry.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI,
-			[]string{
-				"provisioner",
-				"provisioning_data",
-			},
-			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				if dev == nil {
-					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
-				}
-				var paths []string
-				dev.Provisioner = req.Provisioner
-				dev.ProvisioningData = entry
-				paths = append(paths, "provisioner", "provisioning_data")
-				return dev, paths, nil
-			},
-		)
+	for _, entry := range entries {
+		dev, err := next(entry)
 		if err != nil {
-			warning.Add(ctx, fmt.Sprintf("%d: %s", i+1, err.Error()))
-		} else {
-			res.EndDevices = append(res.EndDevices, dev)
+			return err
+		}
+		dev.Provisioner = req.Provisioner
+		dev.ProvisioningData = entry
+		if err := stream.Send(dev); err != nil {
+			return err
 		}
 	}
-	if len(res.EndDevices) == 0 {
-		return nil, errProvisioning
-	}
-	return res, nil
+	return nil
 }
 
 // Delete implements ttnpb.JsEndDeviceRegistryServer.
