@@ -64,17 +64,22 @@ func TestWatcher(t *testing.T) {
 
 	time.Sleep(test.Delay)
 
-	file.WriteString("Hello, World!")
+	n, err := file.WriteString("Hello, World!")
+	a.So(err, should.BeNil)
+	a.So(n, should.Equal, 13)
 
 	time.Sleep(test.Delay)
 
-	file.Chmod(0640)
+	err = file.Chmod(0641)
+	a.So(err, should.BeNil)
 
-	file.Close()
+	err = file.Close()
+	a.So(err, should.BeNil)
 
 	time.Sleep(test.Delay)
 
-	os.Remove(filename)
+	err = os.Remove(filename)
+	a.So(err, should.BeNil)
 
 	time.Sleep(test.Delay)
 
