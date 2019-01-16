@@ -114,6 +114,7 @@ const Field = function (props) {
   }
 
   const {
+    className,
     type = 'text',
     name = '',
     title,
@@ -165,7 +166,7 @@ const Field = function (props) {
 
   const hasMessages = _touched && (_error || warning)
 
-  const classname = classnames(style.field, style[type], ...from(style, {
+  const classname = classnames(className, style.field, style[type], ...from(style, {
     error: _error,
     warning: warning && !_error,
     horizontal,
