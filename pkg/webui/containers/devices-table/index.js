@@ -42,7 +42,7 @@ const headers = [
 
 @connect(function ({ application, devices }, props) {
   return {
-    appId: application.application.application_id,
+    appId: application.application.ids.application_id,
     totalCount: devices.totalCount,
   }
 })

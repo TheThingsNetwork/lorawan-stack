@@ -82,7 +82,7 @@ const devices = [ ...new Array(DEVICES_COUNT).keys() ]
       ids: {
         device_id: faker.lorem.slug(),
         application_ids: {
-          application_id: app.application_id,
+          application_id: app.ids.application_id,
         },
         dev_eui: faker.random.alphaNumeric(16),
         join_eui: faker.random.alphaNumeric(16),

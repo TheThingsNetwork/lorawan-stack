@@ -74,7 +74,7 @@ export default {
       return genericSearch(
         'devices',
         params,
-        d => d.ids.application_id === appId && d.ids.device_id.includes(query),
+        d => d.ids.application_ids.application_id === appId && d.ids.device_id.includes(query),
       )
     },
   },
