@@ -71,6 +71,27 @@ func TestUnmarshalEUI(t *testing.T) {
 			OK:    true,
 		},
 		{
+			Input: `"aa:bb:cc:01:02:03:42:ff"`,
+			EUI64: types.EUI64{0xaa, 0xbb, 0xcc, 0x01, 0x02, 0x03, 0x42, 0xff},
+			OK:    true,
+		},
+		{
+			Input: `"aa:bb:cc:01:02:03"`,
+			OK:    false,
+		},
+		{
+			Input: `aa:bb:cc:01:02:03:42:ff:f2`,
+			OK:    false,
+		},
+		{
+			Input: `aa:bb:cc:01:02:03:42:xx`,
+			OK:    false,
+		},
+		{
+			Input: `aa:bb:cc:01:02:03:42-01`,
+			OK:    false,
+		},
+		{
 			Input: `"aa-bb-cc-01-02-03"`,
 			OK:    false, // Too short.
 		},

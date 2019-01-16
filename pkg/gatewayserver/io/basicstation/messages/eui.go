@@ -53,15 +53,26 @@ func (eui EUI) MarshalJSON() ([]byte, error) {
 }
 
 var (
-	hexPattern = regexp.MustCompile(`^"([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})"$`)
-	id6Pattern = regexp.MustCompile(`^"(?:([a-z]+)-)?(?:([a-f0-9]{0,4}):)?([a-f0-9]{0,4}):([a-f0-9]{0,4}):([a-f0-9]{0,4})"$`)
+	hexPatternWithDashes = regexp.MustCompile(`^"([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})"$`)
+	hexPatternWithColons = regexp.MustCompile(`^"([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2})"$`)
+	id6Pattern           = regexp.MustCompile(`^"(?:([a-z]+)-)?(?:([a-f0-9]{0,4}):)?([a-f0-9]{0,4}):([a-f0-9]{0,4}):([a-f0-9]{0,4})"$`)
 )
 
 var errFormat = errors.DefineInvalidArgument("format", "invalid format")
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (eui *EUI) UnmarshalJSON(data []byte) error {
-	if bytes := hexPattern.FindStringSubmatch(string(data)); bytes != nil {
+	if bytes := hexPatternWithDashes.FindStringSubmatch(string(data)); bytes != nil {
+		for i, b := range bytes[1:] {
+			v, err := strconv.ParseUint(b, 16, 8)
+			if err != nil {
+				return errFormat.WithCause(err)
+			}
+			eui.EUI64[i] = uint8(v)
+		}
+		return nil
+	}
+	if bytes := hexPatternWithColons.FindStringSubmatch(string(data)); bytes != nil {
 		for i, b := range bytes[1:] {
 			v, err := strconv.ParseUint(b, 16, 8)
 			if err != nil {
