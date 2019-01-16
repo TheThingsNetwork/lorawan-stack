@@ -127,8 +127,8 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			var user ttnpb.User
-			if io.IsPipe(os.Stdin) {
-				_, err := io.Read(os.Stdin, &user)
+			if inputDecoder != nil {
+				_, err := inputDecoder.Decode(&user)
 				if err != nil {
 					return err
 				}

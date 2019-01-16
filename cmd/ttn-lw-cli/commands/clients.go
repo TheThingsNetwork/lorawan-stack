@@ -153,8 +153,8 @@ var (
 				return errNoCollaborator
 			}
 			var client ttnpb.Client
-			if io.IsPipe(os.Stdin) {
-				_, err := io.Read(os.Stdin, &client)
+			if inputDecoder != nil {
+				_, err := inputDecoder.Decode(&client)
 				if err != nil {
 					return err
 				}

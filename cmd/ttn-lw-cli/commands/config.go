@@ -28,6 +28,7 @@ var (
 // Config for the ttn-lw-cli binary.
 type Config struct {
 	conf.Base                `name:",squash"`
+	InputFormat              string `name:"input-format" description:"Input format"`
 	OutputFormat             string `name:"output-format" description:"Output format"`
 	OAuthServerAddress       string `name:"oauth-server-address" description:"OAuth Server Address"`
 	IdentityServerAddress    string `name:"identity-server-address" description:"Identity Server Address"`
@@ -46,6 +47,7 @@ var DefaultConfig = Config{
 			Level: log.InfoLevel,
 		},
 	},
+	InputFormat:              "json",
 	OutputFormat:             "json",
 	OAuthServerAddress:       clusterHTTPAddress,
 	IdentityServerAddress:    clusterGRPCAddress,

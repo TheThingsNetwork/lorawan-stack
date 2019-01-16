@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared/version"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -38,6 +39,8 @@ var (
 	oauth2Config *oauth2.Config
 	ctx          = context.Background()
 	cache        util.Cache
+
+	inputDecoder io.Decoder
 
 	// Root command is the entrypoint of the program
 	Root = &cobra.Command{
@@ -55,6 +58,16 @@ var (
 			// unmarshal config
 			if err = mgr.Unmarshal(config); err != nil {
 				return err
+			}
+
+			// create input decoder on Stdin
+			if io.IsPipe(os.Stdin) {
+				switch config.InputFormat {
+				case "json":
+					inputDecoder = io.NewJSONDecoder(os.Stdin)
+				default:
+					return fmt.Errorf("unknown input format: %s", config.InputFormat)
+				}
 			}
 
 			// get cache

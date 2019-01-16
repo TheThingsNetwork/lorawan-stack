@@ -101,21 +101,24 @@ func IsPipe(r io.Reader) bool {
 	return false
 }
 
-func fieldPaths(m map[string]interface{}, prefix string) (paths []string) {
-	for path, sub := range m {
-		if m, ok := sub.(map[string]interface{}); ok {
-			paths = append(paths, fieldPaths(m, prefix+path+".")...)
-		} else {
-			paths = append(paths, prefix+path)
-		}
-	}
-	return paths
+// Decoder is the interface for the functionality that reads and decodes entities
+// from an io.Reader, typically os.Stdin.
+type Decoder interface {
+	Decode(data interface{}) (paths []string, err error)
 }
 
-// Read JSON data from the given reader into data.
-func Read(r io.Reader, data interface{}) (paths []string, err error) {
+type jsonDecoder struct {
+	dec *json.Decoder
+}
+
+// NewJSONDecoder returns a new Decoder on top of r, and that uses the TTN JSON format.
+func NewJSONDecoder(r io.Reader) Decoder {
+	return &jsonDecoder{dec: json.NewDecoder(r)}
+}
+
+func (r *jsonDecoder) Decode(data interface{}) (paths []string, err error) {
 	var obj json.RawMessage
-	if err = json.NewDecoder(r).Decode(&obj); err != nil {
+	if err = r.dec.Decode(&obj); err != nil {
 		return nil, err
 	}
 	var m map[string]interface{}
@@ -128,4 +131,15 @@ func Read(r io.Reader, data interface{}) (paths []string, err error) {
 		return nil, err
 	}
 	return paths, nil
+}
+
+func fieldPaths(m map[string]interface{}, prefix string) (paths []string) {
+	for path, sub := range m {
+		if m, ok := sub.(map[string]interface{}); ok {
+			paths = append(paths, fieldPaths(m, prefix+path+".")...)
+		} else {
+			paths = append(paths, prefix+path)
+		}
+	}
+	return paths
 }

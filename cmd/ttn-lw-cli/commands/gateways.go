@@ -184,8 +184,8 @@ var (
 				return errNoCollaborator
 			}
 			var gateway ttnpb.Gateway
-			if io.IsPipe(os.Stdin) {
-				_, err := io.Read(os.Stdin, &gateway)
+			if inputDecoder != nil {
+				_, err := inputDecoder.Decode(&gateway)
 				if err != nil {
 					return err
 				}

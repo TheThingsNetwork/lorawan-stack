@@ -153,8 +153,8 @@ var (
 				return errNoCollaborator
 			}
 			var organization ttnpb.Organization
-			if io.IsPipe(os.Stdin) {
-				_, err := io.Read(os.Stdin, &organization)
+			if inputDecoder != nil {
+				_, err := inputDecoder.Decode(&organization)
 				if err != nil {
 					return err
 				}

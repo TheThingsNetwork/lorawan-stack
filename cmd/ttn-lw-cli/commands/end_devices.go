@@ -200,8 +200,8 @@ var (
 			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
 
 			var device ttnpb.EndDevice
-			if io.IsPipe(os.Stdin) {
-				jsonPaths, err := io.Read(os.Stdin, &device)
+			if inputDecoder != nil {
+				jsonPaths, err := inputDecoder.Decode(&device)
 				if err != nil {
 					return err
 				}
