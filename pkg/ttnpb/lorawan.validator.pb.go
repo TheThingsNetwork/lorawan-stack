@@ -133,8 +133,8 @@ func (this *TxSettings) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.DataRate)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("DataRate", err)
 	}
-	if !(this.ChannelIndex < 256) {
-		return github_com_mwitkow_go_proto_validators.FieldError("ChannelIndex", fmt.Errorf(`value '%v' must be less than '256'`, this.ChannelIndex))
+	if !(this.GatewayChannelIndex < 256) {
+		return github_com_mwitkow_go_proto_validators.FieldError("GatewayChannelIndex", fmt.Errorf(`value '%v' must be less than '256'`, this.GatewayChannelIndex))
 	}
 	if this.Time != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Time); err != nil {

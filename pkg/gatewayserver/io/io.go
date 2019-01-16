@@ -287,7 +287,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				DataRateIndex: rx.dataRateIndex,
 				Frequency:     rx.frequency,
 				TxPower:       int32(maxEirp),
-				ChannelIndex:  uint32(channelIndex),
+				GatewayChannelIndex:  uint32(channelIndex),
 			}
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)

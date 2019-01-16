@@ -4009,7 +4009,7 @@ On downlink, this is a scheduled transmission.
 | frequency | [uint64](#uint64) |  | Frequency (Hz). |
 | tx_power | [int32](#int32) |  | Transmission power (dBm). Only on downlink. |
 | invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
-| channel_index | [uint32](#uint32) |  | Index of the channel that received the message. |
+| gateway_channel_index | [uint32](#uint32) |  | Index of the gateway channel that received the message. Set by Gateway Server. |
 | enable_crc | [bool](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |

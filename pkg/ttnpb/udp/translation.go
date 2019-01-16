@@ -152,8 +152,8 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 	up := ttnpb.UplinkMessage{}
 	rx := *data.RxPacket[rxIndex]
 	up.Settings = ttnpb.TxSettings{
-		Frequency:    uint64(rx.Freq * 1000000),
-		ChannelIndex: uint32(rx.Chan),
+		Frequency:           uint64(rx.Freq * 1000000),
+		GatewayChannelIndex: uint32(rx.Chan),
 	}
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
@@ -266,7 +266,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		}
 		rxs = append(rxs, &RxPacket{
 			Freq: float64(msg.Settings.Frequency) / 1000000,
-			Chan: uint8(msg.Settings.ChannelIndex),
+			Chan: uint8(msg.Settings.GatewayChannelIndex),
 			Modu: modulation,
 			DatR: DataRate{msg.Settings.DataRate},
 			CodR: codr,

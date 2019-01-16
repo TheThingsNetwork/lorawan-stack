@@ -1018,7 +1018,6 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 }
 
 var TxSettingsFieldPathsNested = []string{
-	"channel_index",
 	"coding_rate",
 	"data_rate",
 	"data_rate.modulation.fsk",
@@ -1029,6 +1028,7 @@ var TxSettingsFieldPathsNested = []string{
 	"data_rate_index",
 	"enable_crc",
 	"frequency",
+	"gateway_channel_index",
 	"invert_polarization",
 	"modulation",
 	"time",
@@ -1037,12 +1037,12 @@ var TxSettingsFieldPathsNested = []string{
 }
 
 var TxSettingsFieldPathsTopLevel = []string{
-	"channel_index",
 	"coding_rate",
 	"data_rate",
 	"data_rate_index",
 	"enable_crc",
 	"frequency",
+	"gateway_channel_index",
 	"invert_polarization",
 	"modulation",
 	"time",
@@ -1121,15 +1121,15 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				var zero bool
 				dst.InvertPolarization = zero
 			}
-		case "channel_index":
+		case "gateway_channel_index":
 			if len(subs) > 0 {
-				return fmt.Errorf("'channel_index' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'gateway_channel_index' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ChannelIndex = src.ChannelIndex
+				dst.GatewayChannelIndex = src.GatewayChannelIndex
 			} else {
 				var zero uint32
-				dst.ChannelIndex = zero
+				dst.GatewayChannelIndex = zero
 			}
 		case "enable_crc":
 			if len(subs) > 0 {
