@@ -1,0 +1,156 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.wrapper
+  border-input()
+  border-radius: $br.s
+  transition: border-color .2s
+  position: relative
+  overflow: hidden
+  z-index: 0
+
+  :global .ace-github
+    &.ace_editor
+      z-index: 0
+
+    .ace_scroller.ace_scroll-left
+      box-shadow: none
+
+    .ace_print-margin
+      display: none
+
+    .ace_cursor
+      color: $tc-subtle-gray
+
+    .ace_marker-layer .ace_active-line
+    .ace_gutter-active-line
+      background-color: $c-backdrop
+      transition: background .2s
+
+    .ace_marker-layer .ace_selection
+      background: $c-bg-selection
+
+    .ace_multiselect .ace_selection.ace_start
+      box-shadow: 0 0 3px 0 white
+
+    .ace_marker-layer .ace_step
+      background: $c-bg-step
+
+    .ace_marker-layer .ace_bracket
+      margin: -1px 0 0 -1px
+      border: 1px solid $c-divider-dark
+
+    .ace_marker-layer .ace_selected-word
+      border: 1px solid $c-divider-dark
+
+    .ace_keyword,
+    .ace_meta,
+    .ace_storage,
+    .ace_storage.ace_type,
+    .ace_support.ace_type
+      code-entry($c-keyword)
+
+    .ace_keyword.ace_operator
+      code-entry($c-operator)
+
+    .ace_constant.ace_character,
+    .ace_constant.ace_language,
+    .ace_keyword.ace_other.ace_unit,
+    .ace_support.ace_constant
+      code-entry($c-constant, 'normal', 'italic')
+
+    .ace_constant.ace_other
+      code-entry($c-constant-other)
+
+    .ace_invalid
+      code-entry($c-default-overlay)
+      background-color: $c-bg-invalid
+
+    .ace_invalid.ace_deprecated
+      code-entry($c-default-overlay)
+      background-color: $c-bg-deprecated
+
+    .ace_marker-layer .ace_active-line
+    .ace_gutter-active-line
+      background: none
+      transition: background .2s
+
+    .ace_fold
+      background-color: $c-bg-fold
+
+    .ace_entity.ace_name.ace_function,
+    .ace_support.ace_function,
+    .ace_support.ace_class
+      code-entry($c-name)
+
+    .ace_support.ace_type
+      code-entry($c-type)
+
+    .ace_heading,
+    .ace_markup.ace_heading,
+    .ace_string,
+    .ace_constant.ace_boolean
+      code-entry($c-type-other)
+
+    .ace_entity.ace_name.ace_tag,
+    .ace_entity.ace_other.ace_attribute-name,
+    .ace_meta.ace_tag,
+    .ace_variable,
+      code-entry($c-variable)
+
+    .ace_string.ace_regexp
+      code-entry($c-regexp)
+
+    .ace_comment
+      code-entry($c-comment, 'normal', 'italic')
+
+    .ace_punctuation,
+      code-entry($c-punctuation)
+
+    .ace_paren
+      code-entry($c-parenthesis)
+
+    .ace_indent-guide
+      border-input('right')
+      background: none
+      padding: 1px 0
+      margin-top: -1px
+
+    .ace_tooltip
+      font-size: $fs.s
+      background: lighter($c-warning, 5)
+      border: 1px $c-warning solid
+      color: darker($c-warning, 15)
+      padding: $cs.xs $cs.s
+      border-radius: $br.m
+      box-shadow: none
+      margin: 0
+
+  &.focus
+    :global .ace-github
+      .ace_marker-layer .ace_active-line
+        background-color: lighter($c-active-blue, 9)
+
+      .ace_gutter-active-line
+        background-color: darker($c-backdrop, 3)
+
+  &.read-only
+    :global .ace-github
+      .ace_marker-layer .ace_active-line,
+      .ace_gutter-active-line,
+      .ace_cursor
+        display: none
+
+      .ace_bracket
+        border: 0
