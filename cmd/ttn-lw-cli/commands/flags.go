@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"io/ioutil"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -182,4 +183,17 @@ func getCombinedIdentifiers(flagSet *pflag.FlagSet) *ttnpb.CombinedIdentifiers {
 		ids.EntityIdentifiers = append(ids.EntityIdentifiers, ttnpb.UserIdentifiers{UserID: userID}.EntityIdentifiers())
 	}
 	return ids
+}
+
+func dataFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("local-file", "", "local file name")
+	return flagSet
+}
+
+func getData(flagSet *pflag.FlagSet) ([]byte, error) {
+	if filename, _ := flagSet.GetString("local-file"); filename != "" {
+		return ioutil.ReadFile(filename)
+	}
+	return nil, nil
 }
