@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ package basicstation_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -37,6 +39,9 @@ var (
 	registeredGatewayUID = "test-gateway"
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	registeredGatewayKey = "test-key"
+
+	discoveryEndPoint      = "ws://localhost:8100/api/v3/gs/io/basicstation/discover"
+	connectionRootEndPoint = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/"
 
 	timeout = 10 * test.Delay
 )
@@ -66,53 +71,164 @@ func TestDiscover(t *testing.T) {
 	}
 	defer c.Close()
 
-	url := "ws://localhost:8100/api/v3/gs/io/basicstation/discover"
-	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
-	if !a.So(err, should.BeNil) {
-		t.Fatalf("Connection failed: %v", err)
-	}
-	defer conn.Close()
-
-	eui := messages.EUI{
-		Prefix: "router",
-		EUI64:  types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
-	}
-
-	query := messages.DiscoverQuery{
-		EUI: eui,
-	}
-	req, err := json.Marshal(query)
-	if err != nil {
-		panic(err)
-	}
-	if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
-		t.Fatalf("Failed to write message: %v", err)
-	}
-
-	resCh := make(chan []byte)
-	go func() {
-		_, data, err := conn.ReadMessage()
-		if err != nil {
-			t.Fatalf("Failed to read message: %v", err)
-		}
-		resCh <- data
-	}()
-	select {
-	case res := <-resCh:
-		var response messages.DiscoverResponse
-		if err := json.Unmarshal(res, &response); err != nil {
-			t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
-		}
-		a.So(response, should.Resemble, messages.DiscoverResponse{
-			EUI: eui,
-			Muxs: messages.EUI{
-				Prefix: "muxs",
-			},
-			URI: "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/eui-0101010101010101",
+	// Test Endpoints
+	for i, tc := range []struct {
+		URL                string
+		ExpectedError      error
+		ExpectedStatusCode int
+	}{
+		{
+			"ws://localhost:8100/router-info", // This would ideally be proxied to "ws://server-address:port/api/v3/gs/io/basicstation/discover" but is invalid for unit tests.
+			websocket.ErrBadHandshake,
+			http.StatusNotFound,
+		},
+		{
+			discoveryEndPoint + "/router-58a0:cbff:fe80:f8",
+			websocket.ErrBadHandshake,
+			http.StatusNotFound,
+		},
+		{
+			discoveryEndPoint + "/eui-0101010101010101",
+			websocket.ErrBadHandshake,
+			http.StatusNotFound,
+		},
+	} {
+		t.Run(fmt.Sprintf("InvalidDiscoveryEndPoint/%d", i), func(t *testing.T) {
+			_, res, err := websocket.DefaultDialer.Dial(tc.URL, nil)
+			if res.StatusCode != tc.ExpectedStatusCode {
+				t.Fatalf("Unexpected response received: %v", res.Status)
+			}
+			if !a.So(err, should.Equal, tc.ExpectedError) {
+				t.Fatalf("Connection failed: %v", err)
+			}
 		})
-	case <-time.After(timeout):
-		t.Fatalf("Read message timeout")
 	}
+
+	// Test Queries
+	for i, tc := range []struct {
+		Query interface{}
+	}{
+		{
+			messages.DiscoverQuery{},
+		},
+		{
+			struct{}{},
+		},
+		{
+			struct {
+				EUI string `json:"route"`
+			}{EUI: `"01-02-03-04-05-06-07-08"`},
+		},
+		{
+			struct {
+				EUI string `json:"router"`
+			}{EUI: `"01-02-03-04-05-06-07-08-09"`},
+		},
+		{
+			struct {
+				EUI string `json:"router"`
+			}{EUI: `"01:02:03:04:05:06:07:08:09"`},
+		},
+		{
+			struct {
+				EUI string `json:"router"`
+			}{EUI: `"01:02:03:04:05:06:07-08"`},
+		},
+	} {
+		t.Run(fmt.Sprintf("InvalidQuery/%d", i), func(t *testing.T) {
+			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Connection failed: %v", err)
+			}
+			defer conn.Close()
+
+			req, err := json.Marshal(tc.Query)
+			if err != nil {
+				panic(err)
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
+				t.Fatalf("Failed to write message: %v", err)
+			}
+
+			resCh := make(chan []byte)
+			go func() {
+				_, data, err := conn.ReadMessage()
+				if err != nil {
+					t.Fatalf("Failed to read message: %v", err)
+				}
+				resCh <- data
+			}()
+			select {
+			case res := <-resCh:
+				var response messages.DiscoverResponse
+				if err := json.Unmarshal(res, &response); err != nil {
+					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+				}
+				a.So(response, should.Resemble, messages.DiscoverResponse{
+					Error: "Invalid request",
+				})
+			case <-time.After(timeout):
+				t.Fatalf("Read message timeout")
+			}
+		})
+	}
+
+	for i, tc := range []struct {
+		EndPointEUI string
+		EUI         types.EUI64
+		Query       interface{}
+	}{
+		{
+			"1111111111111111",
+			types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
+			messages.DiscoverQuery{EUI: messages.EUI{Prefix: "router", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}}},
+		},
+	} {
+		t.Run(fmt.Sprintf("ValidQuery/%d", i), func(t *testing.T) {
+			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Connection failed: %v", err)
+			}
+			defer conn.Close()
+
+			req, err := json.Marshal(tc.Query)
+			if err != nil {
+				panic(err)
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
+				t.Fatalf("Failed to write message: %v", err)
+			}
+
+			resCh := make(chan []byte)
+			go func() {
+				_, data, err := conn.ReadMessage()
+				if err != nil {
+					t.Fatalf("Failed to read message: %v", err)
+				}
+				resCh <- data
+			}()
+			select {
+			case res := <-resCh:
+				var response messages.DiscoverResponse
+				if err := json.Unmarshal(res, &response); err != nil {
+					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+				}
+				a.So(response, should.Resemble, messages.DiscoverResponse{
+					EUI: messages.EUI{Prefix: "router", EUI64: tc.EUI},
+					Muxs: messages.EUI{
+						Prefix: "muxs",
+					},
+					URI: connectionRootEndPoint + "eui-" + tc.EndPointEUI,
+				})
+			case <-time.After(timeout):
+				t.Fatalf("Read message timeout")
+			}
+		})
+	}
+}
+
+func TestConfiguration(t *testing.T) {
+	// HardcodedURL
 }
 
 func TestTraffic(t *testing.T) {
