@@ -55,7 +55,7 @@ func (d *mem) getNwkKey(version ttnpb.MACVersion) (types.AES128Key, error) {
 	}
 }
 
-func (d *mem) JoinRequestMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) (res [4]byte, err error) {
+func (d *mem) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) (res [4]byte, err error) {
 	key, err := d.getNwkKey(version)
 	if err != nil {
 		return
@@ -68,11 +68,11 @@ var (
 	errNoJoinEUI = errors.DefineCorruption("no_join_eui", "no JoinEUI specified")
 )
 
-func (d *mem) JoinAcceptMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error) {
-	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
+func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error) {
+	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
 		return [4]byte{}, errNoJoinEUI
 	}
-	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
+	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
 		return [4]byte{}, errNoDevEUI
 	}
 	key, err := d.getNwkKey(version)
@@ -81,8 +81,8 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 	}
 	switch version {
 	case ttnpb.MAC_V1_1:
-		jsIntKey := crypto.DeriveJSIntKey(key, *ids.DevEUI)
-		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *ids.JoinEUI, dn, payload)
+		jsIntKey := crypto.DeriveJSIntKey(key, *dev.DevEUI)
+		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *dev.JoinEUI, dn, payload)
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 		return crypto.ComputeLegacyJoinAcceptMIC(key, payload)
 	default:
@@ -90,7 +90,7 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 	}
 }
 
-func (d *mem) EncryptJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
+func (d *mem) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
 	key, err := d.getNwkKey(version)
 	if err != nil {
 		return nil, err
@@ -98,28 +98,28 @@ func (d *mem) EncryptJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 	return crypto.EncryptJoinAccept(key, payload)
 }
 
-func (d *mem) EncryptRejoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
+func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
 	if version != ttnpb.MAC_V1_1 {
 		panic("This statement is unreachable. Please version check.")
 	}
-	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
+	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
 	}
-	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
+	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
 	if d.nwkKey == nil {
 		return nil, errNoNwkKey
 	}
-	jsEncKey := crypto.DeriveJSEncKey(*d.nwkKey, *ids.DevEUI)
+	jsEncKey := crypto.DeriveJSEncKey(*d.nwkKey, *dev.DevEUI)
 	return crypto.EncryptJoinAccept(jsEncKey, payload)
 }
 
-func (d *mem) DeriveNwkSKeys(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
-	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
+func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
+	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
 		return NwkSKeys{}, errNoJoinEUI
 	}
-	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
+	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
 		return NwkSKeys{}, errNoDevEUI
 	}
 	switch version {
@@ -128,9 +128,9 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			return NwkSKeys{}, errNoNwkKey
 		}
 		return NwkSKeys{
-			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, *ids.JoinEUI, dn),
-			SNwkSIntKey: crypto.DeriveSNwkSIntKey(*d.nwkKey, jn, *ids.JoinEUI, dn),
-			NwkSEncKey:  crypto.DeriveNwkSEncKey(*d.nwkKey, jn, *ids.JoinEUI, dn),
+			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, *dev.JoinEUI, dn),
+			SNwkSIntKey: crypto.DeriveSNwkSIntKey(*d.nwkKey, jn, *dev.JoinEUI, dn),
+			NwkSEncKey:  crypto.DeriveNwkSEncKey(*d.nwkKey, jn, *dev.JoinEUI, dn),
 		}, nil
 
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
@@ -148,11 +148,11 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 
 var errNoAppKey = errors.DefineCorruption("no_app_key", "no AppKey specified")
 
-func (d *mem) DeriveAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
-	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
+func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
+	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
 		return types.AES128Key{}, errNoJoinEUI
 	}
-	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
+	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
 		return types.AES128Key{}, errNoDevEUI
 	}
 	if d.appKey == nil {
@@ -161,7 +161,7 @@ func (d *mem) DeriveAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 
 	switch version {
 	case ttnpb.MAC_V1_1:
-		return crypto.DeriveAppSKey(*d.appKey, jn, *ids.JoinEUI, dn), nil
+		return crypto.DeriveAppSKey(*d.appKey, jn, *dev.JoinEUI, dn), nil
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 		return crypto.DeriveLegacyAppSKey(*d.appKey, jn, nid, dn), nil
 	default:

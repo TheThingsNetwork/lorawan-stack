@@ -30,16 +30,16 @@ type NwkSKeys struct {
 
 // Network performs network layer cryptographic operations.
 type Network interface {
-	JoinRequestMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([4]byte, error)
-	JoinAcceptMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error)
-	EncryptJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([]byte, error)
-	EncryptRejoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([]byte, error)
-	DeriveNwkSKeys(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error)
+	JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([4]byte, error)
+	JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error)
+	EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
+	EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
+	DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error)
 }
 
 // Application performs application layer cryptographic operations.
 type Application interface {
-	DeriveAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error)
+	DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error)
 }
 
 // NetworkApplication is an interface that combines Network and Application.

@@ -134,6 +134,8 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"resets_join_nonces",
 			"root_keys",
 			"used_dev_nonces",
+			"provisioner",
+			"provisioning_data",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			paths := make([]string, 0, 3)
@@ -236,26 +238,30 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errNoAppKey
 			}
 
-			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, rawPayload[:19])
+			cryptoDev := &ttnpb.EndDevice{}
+			if err := cryptoDev.SetFields(dev, "ids", "provisioner", "provisioning_data"); err != nil {
+				return nil, nil, err
+			}
+			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoDev, req.SelectedMACVersion, rawPayload[:19])
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
 			if !bytes.Equal(reqMIC[:], rawPayload[19:]) {
 				return nil, nil, errMICMismatch
 			}
-			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, 0xff, pld.DevNonce, b)
+			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMACVersion, 0xff, pld.DevNonce, b)
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
-			enc, err := networkCryptoService.EncryptJoinAccept(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, append(b[1:], resMIC[:]...))
+			enc, err := networkCryptoService.EncryptJoinAccept(ctx, cryptoDev, req.SelectedMACVersion, append(b[1:], resMIC[:]...))
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, dev.EndDeviceIdentifiers, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}

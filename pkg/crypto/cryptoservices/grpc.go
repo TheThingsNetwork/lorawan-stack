@@ -37,11 +37,13 @@ func NewNetworkRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault) Network 
 	}
 }
 
-func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) (mic [4]byte, err error) {
+func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) (mic [4]byte, err error) {
 	res, err := s.Client.JoinRequestMIC(ctx, &ttnpb.CryptoServicePayloadRequest{
-		EndDeviceIdentifiers: ids,
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		Payload:              payload,
+		Provisioner:          dev.Provisioner,
+		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
 		return
@@ -50,12 +52,14 @@ func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, ids ttnpb.EndDevi
 	return
 }
 
-func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
+func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
 	res, err := s.Client.JoinAcceptMIC(ctx, &ttnpb.JoinAcceptMICRequest{
 		CryptoServicePayloadRequest: ttnpb.CryptoServicePayloadRequest{
-			EndDeviceIdentifiers: ids,
+			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			LoRaWANVersion:       version,
 			Payload:              payload,
+			Provisioner:          dev.Provisioner,
+			ProvisioningData:     dev.ProvisioningData,
 		},
 		JoinRequestType: uint32(joinReqType),
 		DevNonce:        dn,
@@ -67,11 +71,13 @@ func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, ids ttnpb.EndDevic
 	return
 }
 
-func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
+func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
 	res, err := s.Client.EncryptJoinAccept(ctx, &ttnpb.CryptoServicePayloadRequest{
-		EndDeviceIdentifiers: ids,
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		Payload:              payload,
+		Provisioner:          dev.Provisioner,
+		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
 		return nil, err
@@ -79,11 +85,13 @@ func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, ids ttnpb.EndD
 	return res.Payload, nil
 }
 
-func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
+func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
 	res, err := s.Client.EncryptRejoinAccept(ctx, &ttnpb.CryptoServicePayloadRequest{
-		EndDeviceIdentifiers: ids,
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		Payload:              payload,
+		Provisioner:          dev.Provisioner,
+		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
 		return nil, err
@@ -91,13 +99,15 @@ func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, ids ttnpb.En
 	return res.Payload, nil
 }
 
-func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
+func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
 	keys, err := s.Client.DeriveNwkSKeys(ctx, &ttnpb.DeriveSessionKeysRequest{
-		EndDeviceIdentifiers: ids,
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		JoinNonce:            jn,
 		DevNonce:             dn,
 		NetID:                nid,
+		Provisioner:          dev.Provisioner,
+		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
 		return NwkSKeys{}, err
@@ -131,13 +141,15 @@ func NewApplicationRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault) Appl
 	}
 }
 
-func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
+func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
 	res, err := s.Client.DeriveAppSKey(ctx, &ttnpb.DeriveSessionKeysRequest{
-		EndDeviceIdentifiers: ids,
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		JoinNonce:            jn,
 		DevNonce:             dn,
 		NetID:                nid,
+		Provisioner:          dev.Provisioner,
+		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
 		return types.AES128Key{}, err

@@ -95,7 +95,10 @@ func TestCryptoServices(t *testing.T) {
 				} {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
-						res, err := svc.JoinRequestMIC(ctx, ids, tc.Version, tc.Payload)
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: ids,
+						}
+						res, err := svc.JoinRequestMIC(ctx, dev, tc.Version, tc.Payload)
 						a.So(err, should.BeNil)
 						a.So(res, should.Resemble, tc.Result)
 					})
@@ -156,7 +159,10 @@ func TestCryptoServices(t *testing.T) {
 				} {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
-						res, err := svc.JoinAcceptMIC(ctx, ids, tc.Version, tc.JoinReqType, tc.DevNonce, tc.Payload)
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: ids,
+						}
+						res, err := svc.JoinAcceptMIC(ctx, dev, tc.Version, tc.JoinReqType, tc.DevNonce, tc.Payload)
 						a.So(err, should.BeNil)
 						a.So(res, should.Resemble, tc.Result)
 					})
@@ -192,7 +198,10 @@ func TestCryptoServices(t *testing.T) {
 				} {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
-						res, err := svc.EncryptJoinAccept(ctx, ids, tc.Version, tc.Payload)
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: ids,
+						}
+						res, err := svc.EncryptJoinAccept(ctx, dev, tc.Version, tc.Payload)
 						a.So(err, should.BeNil)
 						a.So(res, should.Resemble, tc.Result)
 					})
@@ -213,7 +222,10 @@ func TestCryptoServices(t *testing.T) {
 				} {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
-						res, err := svc.EncryptRejoinAccept(ctx, ids, tc.Version, tc.Payload)
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: ids,
+						}
+						res, err := svc.EncryptRejoinAccept(ctx, dev, tc.Version, tc.Payload)
 						a.So(err, should.BeNil)
 						a.So(res, should.Resemble, tc.Result)
 					})
@@ -262,7 +274,10 @@ func TestCryptoServices(t *testing.T) {
 				} {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
-						keys, err := svc.DeriveNwkSKeys(ctx, ids, tc.Version, tc.JoinNonce, tc.DevNonce, tc.NetID)
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: ids,
+						}
+						keys, err := svc.DeriveNwkSKeys(ctx, dev, tc.Version, tc.JoinNonce, tc.DevNonce, tc.NetID)
 						a.So(err, should.BeNil)
 						a.So(keys.FNwkSIntKey, should.Resemble, tc.FNwkSIntKey)
 						a.So(keys.SNwkSIntKey, should.Resemble, tc.SNwkSIntKey)
@@ -316,7 +331,10 @@ func TestCryptoServices(t *testing.T) {
 				} {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
-						appSKey, err := svc.DeriveAppSKey(ctx, ids, tc.Version, tc.JoinNonce, tc.DevNonce, tc.NetID)
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: ids,
+						}
+						appSKey, err := svc.DeriveAppSKey(ctx, dev, tc.Version, tc.JoinNonce, tc.DevNonce, tc.NetID)
 						a.So(err, should.BeNil)
 						a.So(appSKey, should.Resemble, tc.AppSKey)
 					})
@@ -332,7 +350,10 @@ type mockNetworkRPCServer struct {
 }
 
 func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
-	mic, err := s.Network.JoinRequestMIC(ctx, req.EndDeviceIdentifiers, req.LoRaWANVersion, req.Payload)
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	mic, err := s.Network.JoinRequestMIC(ctx, dev, req.LoRaWANVersion, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +363,10 @@ func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.Cr
 }
 
 func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.JoinAcceptMICRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
-	mic, err := s.Network.JoinAcceptMIC(ctx, req.EndDeviceIdentifiers, req.LoRaWANVersion, byte(req.JoinRequestType), req.DevNonce, req.Payload)
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.LoRaWANVersion, byte(req.JoinRequestType), req.DevNonce, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -352,7 +376,10 @@ func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.Joi
 }
 
 func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
-	data, err := s.Network.EncryptJoinAccept(ctx, req.EndDeviceIdentifiers, req.LoRaWANVersion, req.Payload)
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	data, err := s.Network.EncryptJoinAccept(ctx, dev, req.LoRaWANVersion, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +389,10 @@ func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb
 }
 
 func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
-	data, err := s.Network.EncryptRejoinAccept(ctx, req.EndDeviceIdentifiers, req.LoRaWANVersion, req.Payload)
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	data, err := s.Network.EncryptRejoinAccept(ctx, dev, req.LoRaWANVersion, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +402,10 @@ func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttn
 }
 
 func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.NwkSKeysResponse, error) {
-	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, req.EndDeviceIdentifiers, req.LoRaWANVersion, req.JoinNonce, req.DevNonce, req.NetID)
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LoRaWANVersion, req.JoinNonce, req.DevNonce, req.NetID)
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +431,10 @@ type mockApplicationRPCServer struct {
 }
 
 func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.AppSKeyResponse, error) {
-	appSKey, err := s.Application.DeriveAppSKey(ctx, req.EndDeviceIdentifiers, req.LoRaWANVersion, req.JoinNonce, req.DevNonce, req.NetID)
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LoRaWANVersion, req.JoinNonce, req.DevNonce, req.NetID)
 	if err != nil {
 		return nil, err
 	}
