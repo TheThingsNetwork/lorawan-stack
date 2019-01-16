@@ -15,10 +15,11 @@
 package commands
 
 import (
+	stdio "io"
 	"os"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -28,7 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	ttntypes "go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var (
@@ -79,14 +80,14 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		DeviceID:               deviceID,
 	}
 	if joinEUIHex, _ := flagSet.GetString("join-eui"); joinEUIHex != "" {
-		var joinEUI ttntypes.EUI64
+		var joinEUI types.EUI64
 		if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
 			return nil, err
 		}
 		ids.JoinEUI = &joinEUI
 	}
 	if devEUIHex, _ := flagSet.GetString("dev-eui"); devEUIHex != "" {
-		var devEUI ttntypes.EUI64
+		var devEUI types.EUI64
 		if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
 			return nil, err
 		}
@@ -128,7 +129,7 @@ var (
 			}
 			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
 				ApplicationIdentifiers: *appID,
-				FieldMask:              types.FieldMask{Paths: paths},
+				FieldMask:              pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -170,7 +171,7 @@ var (
 			}
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            types.FieldMask{Paths: isPaths},
+				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -354,7 +355,7 @@ var (
 			}
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            types.FieldMask{Paths: isPaths},
+				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -392,6 +393,88 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	endDevicesProvisionCommand = &cobra.Command{
+		Use:   "provision",
+		Short: "Provision end devices using vendor-specific data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), args)
+			if appID == nil {
+				return errNoApplicationID
+			}
+
+			provisioner, _ := cmd.Flags().GetString("provisioner")
+			data, err := getData(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			req := &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: *appID,
+				Provisioner:            provisioner,
+				Data:                   data,
+			}
+
+			if inputDecoder != nil {
+				list := &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{}
+				for {
+					var ids ttnpb.EndDeviceIdentifiers
+					_, err := inputDecoder.Decode(&ids)
+					if err == stdio.EOF {
+						break
+					}
+					if err != nil {
+						return err
+					}
+					ids.ApplicationIdentifiers = *appID
+					list.EndDeviceIDs = append(list.EndDeviceIDs, ids)
+				}
+				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_List{
+					List: list,
+				}
+			} else {
+				var joinEUI types.EUI64
+				joinEUIHex, _ := cmd.Flags().GetString("join-eui")
+				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
+					return err
+				}
+				var fromDevEUI types.EUI64
+				fromDevEUIHex, _ := cmd.Flags().GetString("from-dev-eui")
+				if err := fromDevEUI.UnmarshalText([]byte(fromDevEUIHex)); err != nil {
+					return err
+				}
+				if joinEUI.IsZero() || fromDevEUI.IsZero() {
+					return errNoEndDeviceEUI
+				}
+				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
+					Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
+						JoinEUI:    joinEUI,
+						FromDevEUI: fromDevEUI,
+					},
+				}
+			}
+
+			js, err := api.Dial(ctx, config.JoinServerAddress)
+			if err != nil {
+				return err
+			}
+			stream, err := ttnpb.NewJsEndDeviceRegistryClient(js).Provision(ctx, req)
+			if err != nil {
+				return err
+			}
+			for {
+				dev, err := stream.Recv()
+				if err == stdio.EOF {
+					return nil
+				}
+				if err != nil {
+					return err
+				}
+				if err := io.Write(os.Stdout, config.OutputFormat, dev); err != nil {
+					return err
+				}
+			}
+		},
+	}
 	endDevicesDeleteCommand = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete an end device",
@@ -407,7 +490,7 @@ var (
 			}
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask: types.FieldMask{Paths: []string{
+				FieldMask: pbtypes.FieldMask{Paths: []string{
 					"network_server_address",
 					"application_server_address",
 					"join_server_address",
@@ -481,6 +564,12 @@ func init() {
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
+	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
+	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags())
+	endDevicesProvisionCommand.Flags().String("provisioner", "", "provisioner service")
+	endDevicesProvisionCommand.Flags().String("join-eui", "", "(hex)")
+	endDevicesProvisionCommand.Flags().String("from-dev-eui", "", "starting DevEUI to provision (hex)")
+	endDevicesCommand.AddCommand(endDevicesProvisionCommand)
 	endDevicesDeleteCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesCommand.AddCommand(endDevicesDeleteCommand)
 
