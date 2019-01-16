@@ -107,6 +107,7 @@
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
     "react": "^16.4.1",
+    "react-ace": "^6.3.2",
     "react-display-name": "^0.2.3",
     "react-dom": "^16.4.1",
     "react-grid-system": "^4.3.1",
