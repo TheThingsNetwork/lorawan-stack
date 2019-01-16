@@ -8152,7 +8152,12 @@
         "gateway_channel_index": {
           "type": "integer",
           "format": "int64",
-          "description": "Index of the gateway channel that received the message. Set by Gateway Server."
+          "description": "Index of the gateway channel that received the message.\nSet by Gateway Server."
+        },
+        "device_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the device channel that received the message.\nSet by Network Server."
         },
         "enable_crc": {
           "type": "boolean",

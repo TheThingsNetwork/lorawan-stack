@@ -1026,6 +1026,7 @@ var TxSettingsFieldPathsNested = []string{
 	"data_rate.modulation.lora.bandwidth",
 	"data_rate.modulation.lora.spreading_factor",
 	"data_rate_index",
+	"device_channel_index",
 	"enable_crc",
 	"frequency",
 	"gateway_channel_index",
@@ -1040,6 +1041,7 @@ var TxSettingsFieldPathsTopLevel = []string{
 	"coding_rate",
 	"data_rate",
 	"data_rate_index",
+	"device_channel_index",
 	"enable_crc",
 	"frequency",
 	"gateway_channel_index",
@@ -1130,6 +1132,16 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 			} else {
 				var zero uint32
 				dst.GatewayChannelIndex = zero
+			}
+		case "device_channel_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceChannelIndex = src.DeviceChannelIndex
+			} else {
+				var zero uint32
+				dst.DeviceChannelIndex = zero
 			}
 		case "enable_crc":
 			if len(subs) > 0 {

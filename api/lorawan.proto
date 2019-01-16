@@ -253,16 +253,20 @@ message TxSettings {
   int32 tx_power = 5;
   // Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.
   bool invert_polarization = 6;
-  // Index of the gateway channel that received the message. Set by Gateway Server.
+  // Index of the gateway channel that received the message.
+  // Set by Gateway Server.
   uint32 gateway_channel_index = 7 [(validator.field) = {int_lt: 256}];
+  // Index of the device channel that received the message.
+  // Set by Network Server.
+  uint32 device_channel_index = 8 [(validator.field) = {int_lt: 256}];
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
-  bool enable_crc = 8 [(gogoproto.customname) = "EnableCRC"];
+  bool enable_crc = 9 [(gogoproto.customname) = "EnableCRC"];
   // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).
   // On downlink, set timestamp to 0 and time to null to use immediate scheduling.
-  uint32 timestamp = 9;
+  uint32 timestamp = 10;
   // Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.
   // For downlink, this requires the gateway to have GPS time synchronization.
-  google.protobuf.Timestamp time = 10 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 11 [(gogoproto.stdtime) = true];
 }
 
 message GatewayAntennaIdentifiers {

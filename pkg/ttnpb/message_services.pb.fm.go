@@ -33,6 +33,7 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.settings.data_rate.modulation.lora.bandwidth",
 	"message.settings.data_rate.modulation.lora.spreading_factor",
 	"message.settings.data_rate_index",
+	"message.settings.device_channel_index",
 	"message.settings.enable_crc",
 	"message.settings.frequency",
 	"message.settings.gateway_channel_index",
