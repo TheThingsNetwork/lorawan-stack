@@ -361,7 +361,7 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 				}
 				return nil
 			}
-			setField(field, path[1:], v)
+			return setField(field, path[1:], v)
 		}
 	}
 	return fmt.Errorf("unknown field")
