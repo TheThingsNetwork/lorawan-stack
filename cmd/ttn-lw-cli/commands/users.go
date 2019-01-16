@@ -124,7 +124,7 @@ var (
 		PreRun: func(cmd *cobra.Command, args []string) {
 			api.SetAuth("", "") // Unset auth on this call
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			usrID := getUserID(cmd.Flags(), args)
 			var user ttnpb.User
 			if inputDecoder != nil {
@@ -156,7 +156,7 @@ var (
 			}
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
-		},
+		}),
 	}
 	usersUpdateCommand = &cobra.Command{
 		Use:     "update",

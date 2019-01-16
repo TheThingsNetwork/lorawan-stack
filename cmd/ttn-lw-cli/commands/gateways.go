@@ -174,7 +174,7 @@ var (
 		Use:     "create",
 		Aliases: []string{"add", "register"},
 		Short:   "Create a gateway",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			gtwID, err := getGatewayID(cmd.Flags(), args, false)
 			if err != nil {
 				return err
@@ -226,7 +226,7 @@ var (
 			}
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
-		},
+		}),
 	}
 	errAntennaIndex       = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
 	gatewaysUpdateCommand = &cobra.Command{

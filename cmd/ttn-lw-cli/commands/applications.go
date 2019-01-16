@@ -146,7 +146,7 @@ var (
 		Use:     "create",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an application",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			appID := getApplicationID(cmd.Flags(), args)
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -183,7 +183,7 @@ var (
 			}
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
-		},
+		}),
 	}
 	applicationsUpdateCommand = &cobra.Command{
 		Use:     "update",

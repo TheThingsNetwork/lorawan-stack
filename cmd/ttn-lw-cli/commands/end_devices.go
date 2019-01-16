@@ -192,7 +192,7 @@ var (
 		Use:     "create",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an end device",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			devID, err := getEndDeviceID(cmd.Flags(), args, false)
 			if err != nil {
 				return err
@@ -312,7 +312,7 @@ var (
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
 
 			return io.Write(os.Stdout, config.OutputFormat, &device)
-		},
+		}),
 	}
 	endDevicesUpdateCommand = &cobra.Command{
 		Use:     "update",

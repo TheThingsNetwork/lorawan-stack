@@ -146,7 +146,7 @@ var (
 		Use:     "create",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an organization",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -183,7 +183,7 @@ var (
 			}
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
-		},
+		}),
 	}
 	organizationsUpdateCommand = &cobra.Command{
 		Use:     "update",

@@ -146,7 +146,7 @@ var (
 		Use:     "create",
 		Aliases: []string{"add", "register"},
 		Short:   "Create a client",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			cliID := getClientID(cmd.Flags(), args)
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -187,7 +187,7 @@ var (
 			logger.Warn("Make sure to copy it to a safe place")
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
-		},
+		}),
 	}
 	clientsUpdateCommand = &cobra.Command{
 		Use:     "update",
