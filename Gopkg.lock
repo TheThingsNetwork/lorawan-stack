@@ -459,15 +459,15 @@
   revision = "57d518f124b0cf46ea2021f25a01396b3522e6fb"
 
 [[projects]]
-  digest = "1:7d4958827c8f2d9d31e24d9a3a52194eb179f77d854692e57954c516ecf76748"
+  digest = "1:d269638dbd514822446c3c818b6389c880058af79ec54d97731818b34fe66921"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
     "dialects/postgres",
   ]
   pruneopts = ""
-  revision = "472c70caa40267cb89fd8facb07fe6454b578626"
-  version = "v1.9.2"
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
 
 [[projects]]
   branch = "master"
