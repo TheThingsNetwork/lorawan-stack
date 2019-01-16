@@ -156,7 +156,7 @@ func request_JsEndDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func request_JsEndDeviceRegistry_Provision_0(ctx context.Context, marshaler runtime.Marshaler, client JsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_JsEndDeviceRegistry_Provision_0(ctx context.Context, marshaler runtime.Marshaler, client JsEndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (JsEndDeviceRegistry_ProvisionClient, runtime.ServerMetadata, error) {
 	var protoReq ProvisionEndDevicesRequest
 	var metadata runtime.ServerMetadata
 
@@ -175,19 +175,27 @@ func request_JsEndDeviceRegistry_Provision_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["application_id.application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "application_id.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	msg, err := client.Provision(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
+	stream, err := client.Provision(ctx, &protoReq)
+	if err != nil {
+		return nil, metadata, err
+	}
+	header, err := stream.Header()
+	if err != nil {
+		return nil, metadata, err
+	}
+	metadata.HeaderMD = header
+	return stream, metadata, nil
 
 }
 
@@ -351,7 +359,7 @@ func RegisterJsEndDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.
 			return
 		}
 
-		forward_JsEndDeviceRegistry_Provision_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_JsEndDeviceRegistry_Provision_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -385,7 +393,7 @@ var (
 
 	pattern_JsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
 
-	pattern_JsEndDeviceRegistry_Provision_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "application_id.application_id", "provision-devices"}, ""))
+	pattern_JsEndDeviceRegistry_Provision_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "application_ids.application_id", "provision-devices"}, ""))
 
 	pattern_JsEndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )
@@ -397,7 +405,7 @@ var (
 
 	forward_JsEndDeviceRegistry_Set_1 = runtime.ForwardResponseMessage
 
-	forward_JsEndDeviceRegistry_Provision_0 = runtime.ForwardResponseMessage
+	forward_JsEndDeviceRegistry_Provision_0 = runtime.ForwardResponseStream
 
 	forward_JsEndDeviceRegistry_Delete_0 = runtime.ForwardResponseMessage
 )

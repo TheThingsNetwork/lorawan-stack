@@ -96,10 +96,30 @@ func (this *ProvisionEndDevicesRequest) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ApplicationIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationIdentifiers", err)
 	}
+	if oneOfNester, ok := this.GetEndDevices().(*ProvisionEndDevicesRequest_List); ok {
+		if oneOfNester.List != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.List); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("List", err)
+			}
+		}
+	}
+	if oneOfNester, ok := this.GetEndDevices().(*ProvisionEndDevicesRequest_Range); ok {
+		if oneOfNester.Range != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.Range); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("Range", err)
+			}
+		}
+	}
+	return nil
+}
+func (this *ProvisionEndDevicesRequest_IdentifiersList) Validate() error {
 	for _, item := range this.EndDeviceIDs {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(item)); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceIDs", err)
 		}
 	}
+	return nil
+}
+func (this *ProvisionEndDevicesRequest_IdentifiersRange) Validate() error {
 	return nil
 }

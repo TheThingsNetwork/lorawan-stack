@@ -477,24 +477,29 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 }
 
 var ProvisionEndDevicesRequestFieldPathsNested = []string{
-	"application_id",
-	"application_id.application_id",
+	"application_ids",
+	"application_ids.application_id",
 	"data",
-	"end_device_ids",
+	"end_devices",
+	"end_devices.list",
+	"end_devices.list.end_device_ids",
+	"end_devices.range",
+	"end_devices.range.from_dev_eui",
+	"end_devices.range.join_eui",
 	"provisioner",
 }
 
 var ProvisionEndDevicesRequestFieldPathsTopLevel = []string{
-	"application_id",
+	"application_ids",
 	"data",
-	"end_device_ids",
+	"end_devices",
 	"provisioner",
 }
 
 func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "application_id":
+		case "application_ids":
 			if len(subs) > 0 {
 				newDst := &dst.ApplicationIdentifiers
 				var newSrc *ApplicationIdentifiers
@@ -532,6 +537,94 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 				var zero []byte
 				dst.Data = zero
 			}
+
+		case "end_devices":
+			if len(subs) == 0 && src == nil {
+				dst.EndDevices = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.EndDevices = src.EndDevices
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "list":
+					if _, ok := dst.EndDevices.(*ProvisionEndDevicesRequest_List); !ok {
+						dst.EndDevices = &ProvisionEndDevicesRequest_List{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.EndDevices.(*ProvisionEndDevicesRequest_List).List
+						if newDst == nil {
+							newDst = &ProvisionEndDevicesRequest_IdentifiersList{}
+							dst.EndDevices.(*ProvisionEndDevicesRequest_List).List = newDst
+						}
+						var newSrc *ProvisionEndDevicesRequest_IdentifiersList
+						if src != nil {
+							newSrc = src.GetList()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.EndDevices.(*ProvisionEndDevicesRequest_List).List = src.GetList()
+						} else {
+							dst.EndDevices.(*ProvisionEndDevicesRequest_List).List = nil
+						}
+					}
+				case "range":
+					if _, ok := dst.EndDevices.(*ProvisionEndDevicesRequest_Range); !ok {
+						dst.EndDevices = &ProvisionEndDevicesRequest_Range{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.EndDevices.(*ProvisionEndDevicesRequest_Range).Range
+						if newDst == nil {
+							newDst = &ProvisionEndDevicesRequest_IdentifiersRange{}
+							dst.EndDevices.(*ProvisionEndDevicesRequest_Range).Range = newDst
+						}
+						var newSrc *ProvisionEndDevicesRequest_IdentifiersRange
+						if src != nil {
+							newSrc = src.GetRange()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.EndDevices.(*ProvisionEndDevicesRequest_Range).Range = src.GetRange()
+						} else {
+							dst.EndDevices.(*ProvisionEndDevicesRequest_Range).Range = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var ProvisionEndDevicesRequest_IdentifiersListFieldPathsNested = []string{
+	"end_device_ids",
+}
+
+var ProvisionEndDevicesRequest_IdentifiersListFieldPathsTopLevel = []string{
+	"end_device_ids",
+}
+
+func (dst *ProvisionEndDevicesRequest_IdentifiersList) SetFields(src *ProvisionEndDevicesRequest_IdentifiersList, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {
 				return fmt.Errorf("'end_device_ids' has no subfields, but %s were specified", subs)
@@ -540,6 +633,47 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 				dst.EndDeviceIDs = src.EndDeviceIDs
 			} else {
 				dst.EndDeviceIDs = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var ProvisionEndDevicesRequest_IdentifiersRangeFieldPathsNested = []string{
+	"from_dev_eui",
+	"join_eui",
+}
+
+var ProvisionEndDevicesRequest_IdentifiersRangeFieldPathsTopLevel = []string{
+	"from_dev_eui",
+	"join_eui",
+}
+
+func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *ProvisionEndDevicesRequest_IdentifiersRange, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.JoinEUI = zero
+			}
+		case "from_dev_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'from_dev_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FromDevEUI = src.FromDevEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.FromDevEUI = zero
 			}
 
 		default:
