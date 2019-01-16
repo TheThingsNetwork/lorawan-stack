@@ -399,3 +399,53 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 }
+
+// Test the attack described on https://github.com/TheThingsIndustries/lorawan-stack/issues/1469.
+func TestDeviceRegistryGetUnrightfulAccess(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.ContextWithT(test.Context(), t)
+	reg := &MockDeviceRegistry{
+		GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+			if joinEUI == *registeredDevice.JoinEUI && devEUI == *registeredDevice.DevEUI {
+				var res ttnpb.EndDevice
+				if err := res.SetFields(registeredDevice, paths...); err != nil {
+					return nil, err
+				}
+				return &res, nil
+			}
+			return nil, errors.DefineNotFound("not_found", "not found")
+		},
+	}
+	srv := &JsDeviceServer{
+		Registry: reg,
+	}
+
+	other := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: "foo-application-other",
+			},
+			DeviceID: "foo-device-other",
+			JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			DevEUI:   eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+		},
+	}
+
+	ctx = rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, other.ApplicationIdentifiers): ttnpb.RightsFrom(
+				ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+			),
+		},
+	})
+
+	dev, err := srv.Get(ctx, &ttnpb.GetEndDeviceRequest{
+		EndDeviceIdentifiers: other.EndDeviceIdentifiers,
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{"root_keys"},
+		},
+	})
+	a.So(err, should.NotBeNil)
+	a.So(dev.RootKeys, should.BeNil)
+}
