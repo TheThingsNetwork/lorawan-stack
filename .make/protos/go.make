@@ -26,7 +26,7 @@ go.protos: $(wildcard api/*.proto)
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh api
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' -or -name '*pb.gw.go' | grep -v 'vendor'`
 	goimports -w $(PWD)/pkg/ttnpb
-	unconvert -apply ./pkg/ttnpb/... ./pkg/util/rpctest/...
+	unconvert -apply ./pkg/ttnpb
 	gofmt -w -s $(PWD)/pkg/ttnpb
 
 go.protos.clean:
