@@ -42,6 +42,7 @@ var (
 
 	discoveryEndPoint      = "ws://localhost:8100/api/v3/gs/io/basicstation/discover"
 	connectionRootEndPoint = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/"
+	testTrafficEndPoint    = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/eui-010101010101"
 
 	timeout = 10 * test.Delay
 )
@@ -227,8 +228,77 @@ func TestDiscover(t *testing.T) {
 	}
 }
 
-func TestConfiguration(t *testing.T) {
-	// HardcodedURL
+func TestVersion(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	ctx = newContextWithRightsFetcher(ctx)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			HTTP: config.HTTP{
+				Listen: ":8100",
+			},
+		},
+	})
+	gs := mock.NewServer()
+	srv := New(ctx, gs)
+	c.RegisterWeb(srv)
+	if err := c.Start(); err != nil {
+		panic(err)
+	}
+	defer c.Close()
+
+	for i, tc := range []struct {
+		Query interface{}
+	}{
+		{
+			messages.Version{
+				Station:  "test-station",
+				Firmware: "1.0.0",
+				Package:  "test-package",
+				Model:    "test-model",
+				Protocol: 2,
+				Features: []string{"prod", "gps"},
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("InvalidMessage/%d", i), func(t *testing.T) {
+			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Connection failed: %v", err)
+			}
+			defer conn.Close()
+
+			req, err := json.Marshal(tc.Query)
+			if err != nil {
+				panic(err)
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
+				t.Fatalf("Failed to write message: %v", err)
+			}
+
+			resCh := make(chan []byte)
+			go func() {
+				_, data, err := conn.ReadMessage()
+				if err != nil {
+					t.Fatalf("Failed to read message: %v", err)
+				}
+				resCh <- data
+			}()
+			select {
+			case res := <-resCh:
+				var response messages.DiscoverResponse
+				if err := json.Unmarshal(res, &response); err != nil {
+					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+				}
+				a.So(response, should.Resemble, messages.RouterConfig{})
+			case <-time.After(timeout):
+				t.Fatalf("Read message timeout")
+			}
+		})
+	}
+
+	//TODO: test hardcoded URL, connect without discover.
 }
 
 func TestTraffic(t *testing.T) {
