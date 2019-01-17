@@ -114,6 +114,7 @@ func TestOAuthFlow(t *testing.T) {
 	}
 
 	for _, tt := range []struct {
+		Name         string
 		StoreSetup   func(*mockStore)
 		StoreCheck   func(*testing.T, *mockStore)
 		Method       string
@@ -130,22 +131,18 @@ func TestOAuthFlow(t *testing.T) {
 		},
 		{
 			Method:       "GET",
-			Path:         "/oauth",
-			ExpectedCode: http.StatusOK,
-			ExpectedBody: "The Things Network OAuth",
-		},
-		{
-			Method:       "GET",
 			Path:         "/oauth/login",
 			ExpectedCode: http.StatusOK,
 			ExpectedBody: "The Things Network OAuth",
 		},
 		{
+			Name:         "GET me without auth",
 			Method:       "GET",
 			Path:         "/oauth/api/me",
 			ExpectedCode: http.StatusUnauthorized,
 		},
 		{
+			Name:         "logout without auth",
 			Method:       "POST",
 			Path:         "/oauth/api/auth/logout",
 			ExpectedCode: http.StatusUnauthorized,
@@ -167,6 +164,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "login error",
 			StoreSetup: func(s *mockStore) {
 				s.err.getUser = mockErrUnauthenticated
 			},
@@ -183,6 +181,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "login wrong password",
 			StoreSetup: func(s *mockStore) {
 				s.res.user = mockUser
 			},
@@ -192,6 +191,7 @@ func TestOAuthFlow(t *testing.T) {
 			ExpectedCode: http.StatusUnauthorized,
 		},
 		{
+			Name: "login",
 			StoreSetup: func(s *mockStore) {
 				s.res.user = mockUser
 				s.res.session = mockSession
@@ -202,6 +202,7 @@ func TestOAuthFlow(t *testing.T) {
 			ExpectedCode: http.StatusOK,
 		},
 		{
+			Name: "GET me with auth",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
 				s.res.user = mockUser
@@ -218,6 +219,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "authorization page",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
 				s.res.user = mockUser
@@ -236,6 +238,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "authorize client",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
 				s.res.user = mockUser
@@ -261,6 +264,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "logout",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
 				s.res.user = mockUser
@@ -276,7 +280,11 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(fmt.Sprintf("%s %s", tt.Method, tt.Path), func(t *testing.T) {
+		name := tt.Name
+		if name == "" {
+			name = fmt.Sprintf("%s %s", tt.Method, tt.Path)
+		}
+		t.Run(name, func(t *testing.T) {
 			store.reset()
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
@@ -388,6 +396,7 @@ func TestTokenExchange(t *testing.T) {
 	}
 
 	for _, tt := range []struct {
+		Name         string
 		StoreSetup   func(*mockStore)
 		StoreCheck   func(*testing.T, *mockStore)
 		Method       string
@@ -397,6 +406,7 @@ func TestTokenExchange(t *testing.T) {
 		ExpectedBody string
 	}{
 		{
+			Name: "Exchange Authorization Code",
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
@@ -434,6 +444,7 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 		{
+			Name: "Exchange Refresh Token",
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
 				s.res.accessToken = &ttnpb.OAuthAccessToken{
@@ -470,7 +481,11 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(fmt.Sprintf("%s %s", tt.Method, tt.Path), func(t *testing.T) {
+		name := tt.Name
+		if name == "" {
+			name = fmt.Sprintf("%s %s", tt.Method, tt.Path)
+		}
+		t.Run(name, func(t *testing.T) {
 			store.reset()
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
