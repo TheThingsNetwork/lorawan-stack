@@ -17,6 +17,7 @@ package oauth
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -137,8 +138,45 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+type tokenRequest struct {
+	GrantType    string `json:"grant_type" form:"grant_type"`
+	Code         string `json:"code" form:"code"`
+	RedirectURI  string `json:"redirect_uri" form:"redirect_uri"`
+	ClientID     string `json:"client_id" form:"client_id"`
+	ClientSecret string `json:"client_secret" form:"client_secret"`
+}
+
+func (r tokenRequest) Values() (values url.Values) {
+	values = make(url.Values)
+	if r.GrantType != "" {
+		values.Set("grant_type", r.GrantType)
+	}
+	if r.Code != "" {
+		values.Set("code", r.Code)
+	}
+	if r.RedirectURI != "" {
+		values.Set("redirect_uri", r.RedirectURI)
+	}
+	if r.ClientID != "" {
+		values.Set("client_id", r.ClientID)
+	}
+	if r.ClientSecret != "" {
+		values.Set("client_secret", r.ClientSecret)
+	}
+	return
+}
+
 func (s *server) Token(c echo.Context) error {
 	req := c.Request()
+
+	// Convert request through tokenRequest so that we can accept both forms and JSON.
+	var tokenRequest tokenRequest
+	if err := c.Bind(&tokenRequest); err != nil {
+		return err
+	}
+	req.Form = tokenRequest.Values()
+	req.PostForm = req.Form
+
 	oauth2 := s.oauth2(req.Context())
 	resp := oauth2.NewResponse()
 	defer resp.Close()
@@ -146,6 +184,7 @@ func (s *server) Token(c echo.Context) error {
 	if ar == nil {
 		return s.output(c, resp)
 	}
+
 	client := ttnpb.Client(ar.Client.(osinClient))
 	userIDs := ar.UserData.(userData).UserIdentifiers
 	ar.GenerateRefresh = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)

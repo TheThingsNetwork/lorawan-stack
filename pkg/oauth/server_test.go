@@ -414,12 +414,12 @@ func TestTokenExchange(t *testing.T) {
 			},
 			Method: "POST",
 			Path:   "/oauth/token",
-			Body: url.Values{
-				"grant_type":    {"authorization_code"},
-				"code":          {"the code"},
-				"redirect_uri":  {"http://uri/callback"},
-				"client_id":     {"client"},
-				"client_secret": {"secret"},
+			Body: map[string]string{
+				"grant_type":    "authorization_code",
+				"code":          "the code",
+				"redirect_uri":  "http://uri/callback",
+				"client_id":     "client",
+				"client_secret": "secret",
 			},
 			ExpectedCode: http.StatusOK,
 			StoreCheck: func(t *testing.T, s *mockStore) {
