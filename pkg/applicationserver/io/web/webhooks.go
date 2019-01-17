@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/version"
@@ -185,25 +186,11 @@ func (w *webhooks) handleError() echo.MiddlewareFunc {
 				return err
 			}
 			log.FromContext(w.ctx).WithError(err).Debug("HTTP request failed")
-			status := http.StatusInternalServerError
-			if echoErr, ok := err.(*echo.HTTPError); ok {
-				status = echoErr.Code
-				if ttnErr, ok := errors.From(echoErr.Internal); ok {
-					if status == http.StatusInternalServerError {
-						status = errors.ToHTTPStatusCode(ttnErr)
-					}
-					err = ttnErr
-				}
-			} else if ttnErr, ok := errors.From(err); ok {
-				status = errors.ToHTTPStatusCode(ttnErr)
-				err = ttnErr
-			} else {
-				err = errHTTP.WithCause(err).WithAttributes("message", err.Error())
-			}
+			statusCode, err := web_errors.ProcessError(err)
 			if strings.Contains(c.Request().Header.Get(echo.HeaderAccept), "application/json") {
-				return c.JSON(status, err)
+				return c.JSON(statusCode, err)
 			}
-			return c.String(status, err.Error())
+			return c.String(statusCode, err.Error())
 		}
 	}
 }

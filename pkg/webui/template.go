@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Data contains data to render templates.
@@ -168,41 +167,11 @@ func (t *AppTemplate) Handler(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, buf.Bytes())
 }
 
-// RenderErrors renders errors into the WebUI if they occur.
-func RenderErrors(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		err := next(c)
-		if err == nil || c.Response().Committed {
-			return err
-		}
-		c.Set("app_config", map[string]interface{}{
-			"error": true,
-		})
-
-		status := http.StatusInternalServerError
-		if echoErr, ok := err.(*echo.HTTPError); ok {
-			status = echoErr.Code
-			if ttnErr, ok := errors.From(echoErr.Internal); ok {
-				if status == http.StatusInternalServerError {
-					status = errors.ToHTTPStatusCode(ttnErr)
-				}
-				err = ttnErr
-			}
-		} else if ttnErr, ok := errors.From(err); ok {
-			status = errors.ToHTTPStatusCode(ttnErr)
-			err = ttnErr
-		}
-
-		if strings.Contains(c.Request().Header.Get("accept"), "application/json") {
-			return c.JSON(status, err)
-		}
-
-		buf := new(bytes.Buffer)
-		if err := Template.Render(buf, "", map[string]interface{}{
-			"error": err,
-		}, c); err != nil {
-			return err
-		}
-		return c.HTMLBlob(status, buf.Bytes())
+// RenderError implements web.ErrorRenderer.
+func (t *AppTemplate) RenderError(c echo.Context, statusCode int, err error) error {
+	buf := new(bytes.Buffer)
+	if err := Template.Render(buf, "", map[string]interface{}{"error": err}, c); err != nil {
+		return err
 	}
+	return c.HTMLBlob(statusCode, buf.Bytes())
 }

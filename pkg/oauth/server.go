@@ -22,6 +22,7 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -147,19 +148,25 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
-	group := server.Group(s.config.Mount, webui.RenderErrors, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set("template_data", s.config.UI.TemplateData)
-			frontendConfig := s.config.UI.FrontendConfig
-			frontendConfig.Language = s.config.UI.TemplateData.Language
-			c.Set("app_config", struct {
-				FrontendConfig
-			}{
-				FrontendConfig: frontendConfig,
-			})
-			return next(c)
-		}
-	})
+	group := server.Group(
+		s.config.Mount,
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				c.Set("template_data", s.config.UI.TemplateData)
+				frontendConfig := s.config.UI.FrontendConfig
+				frontendConfig.Language = s.config.UI.TemplateData.Language
+				c.Set("app_config", struct {
+					FrontendConfig
+				}{
+					FrontendConfig: frontendConfig,
+				})
+				return next(c)
+			}
+		},
+		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
+			"text/html": webui.Template,
+		}),
+	)
 
 	api := group.Group("/api", middleware.CSRF())
 	api.POST("/auth/login", s.Login)

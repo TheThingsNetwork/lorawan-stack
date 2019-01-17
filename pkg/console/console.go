@@ -23,6 +23,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -129,19 +130,25 @@ func path(u string) (string, error) {
 
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.
 func (console *Console) RegisterRoutes(server *web.Server) {
-	group := server.Group(console.config.Mount, webui.RenderErrors, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set("template_data", console.config.UI.TemplateData)
-			frontendConfig := console.config.UI.FrontendConfig
-			frontendConfig.Language = console.config.UI.TemplateData.Language
-			c.Set("app_config", struct {
-				FrontendConfig
-			}{
-				FrontendConfig: frontendConfig,
-			})
-			return next(c)
-		}
-	})
+	group := server.Group(
+		console.config.Mount,
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				c.Set("template_data", console.config.UI.TemplateData)
+				frontendConfig := console.config.UI.FrontendConfig
+				frontendConfig.Language = console.config.UI.TemplateData.Language
+				c.Set("app_config", struct {
+					FrontendConfig
+				}{
+					FrontendConfig: frontendConfig,
+				})
+				return next(c)
+			}
+		},
+		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
+			"text/html": webui.Template,
+		}),
+	)
 
 	api := group.Group("/api", middleware.CSRF())
 	api.GET("/auth/token", console.Token)
