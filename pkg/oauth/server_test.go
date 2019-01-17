@@ -44,9 +44,26 @@ type loginFormData struct {
 	Password string `json:"password"`
 }
 
+var (
+	mockSession = &ttnpb.UserSession{
+		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+		SessionID:       "session_id",
+		CreatedAt:       time.Now().Truncate(time.Second),
+	}
+	mockUser = &ttnpb.User{
+		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+	}
+	mockClient = &ttnpb.Client{
+		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "client"},
+		State:             ttnpb.STATE_APPROVED,
+		Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
+		RedirectURIs:      []string{"http://callback"},
+		Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+	}
+)
+
 func TestOAuthFlow(t *testing.T) {
 	ctx := test.Context()
-	now := time.Now().Truncate(time.Second)
 	store := &mockStore{}
 	password, err := auth.Hash("pass")
 	if err != nil {
@@ -155,7 +172,6 @@ func TestOAuthFlow(t *testing.T) {
 		{
 			StoreSetup: func(s *mockStore) {
 				s.res.user = &ttnpb.User{Password: string(password)}
-				s.res.session = &ttnpb.UserSession{UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"}, SessionID: "session_id"}
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
@@ -165,11 +181,7 @@ func TestOAuthFlow(t *testing.T) {
 		{
 			StoreSetup: func(s *mockStore) {
 				s.res.user = &ttnpb.User{Password: string(password)}
-				s.res.session = &ttnpb.UserSession{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-					SessionID:       "session_id",
-					CreatedAt:       now,
-				}
+				s.res.session = mockSession
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
@@ -178,14 +190,8 @@ func TestOAuthFlow(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.session = &ttnpb.UserSession{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-					SessionID:       "session_id",
-					CreatedAt:       now,
-				}
-				s.res.user = &ttnpb.User{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-				}
+				s.res.session = mockSession
+				s.res.user = mockUser
 			},
 			Method:       "GET",
 			Path:         "/oauth/api/me",
@@ -200,21 +206,9 @@ func TestOAuthFlow(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.session = &ttnpb.UserSession{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-					SessionID:       "session_id",
-					CreatedAt:       now,
-				}
-				s.res.user = &ttnpb.User{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-				}
-				s.res.client = &ttnpb.Client{
-					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "client"},
-					State:             ttnpb.STATE_APPROVED,
-					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
-					RedirectURIs:      []string{"http://callback"},
-					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
-				}
+				s.res.session = mockSession
+				s.res.user = mockUser
+				s.res.client = mockClient
 				s.err.getAuthorization = mockErrNotFound
 			},
 			Method:       "GET",
@@ -230,14 +224,8 @@ func TestOAuthFlow(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.session = &ttnpb.UserSession{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-					SessionID:       "session_id",
-					CreatedAt:       now,
-				}
-				s.res.user = &ttnpb.User{
-					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
-				}
+				s.res.session = mockSession
+				s.res.user = mockUser
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/logout",
