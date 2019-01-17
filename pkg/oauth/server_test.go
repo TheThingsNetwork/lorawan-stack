@@ -18,11 +18,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"testing"
 	"time"
 
@@ -44,6 +45,11 @@ type loginFormData struct {
 	Password string `json:"password"`
 }
 
+type authorizeFormData struct {
+	encoding  string
+	Authorize bool `json:"authorize"`
+}
+
 var (
 	mockSession = &ttnpb.UserSession{
 		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
@@ -57,7 +63,7 @@ var (
 		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "client"},
 		State:             ttnpb.STATE_APPROVED,
 		Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-		RedirectURIs:      []string{"http://callback"},
+		RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
 		Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 	}
 )
@@ -212,7 +218,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.err.getAuthorization = mockErrNotFound
 			},
 			Method:       "GET",
-			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://callback&response_type=code&state=foo",
+			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode: http.StatusOK,
 			ExpectedBody: `"client":{"ids":{"client_id":"client"}`,
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -220,6 +226,31 @@ func TestOAuthFlow(t *testing.T) {
 				a.So(s.req.clientIDs.GetClientID(), should.Equal, "client")
 				a.So(s.calls, should.Contain, "GetClient")
 				a.So(s.calls, should.Contain, "GetAuthorization")
+			},
+		},
+		{
+			StoreSetup: func(s *mockStore) {
+				s.res.session = mockSession
+				s.res.user = mockUser
+				s.res.client = mockClient
+				s.err.getAuthorization = mockErrNotFound
+			},
+			Method:       "POST",
+			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Body:         authorizeFormData{encoding: "form", Authorize: true},
+			ExpectedCode: http.StatusFound,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "Authorize")
+				a.So(s.req.authorization.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.authorization.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.calls, should.Contain, "CreateAuthorizationCode")
+				a.So(s.req.authorizationCode.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.authorizationCode.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.req.authorizationCode.Rights, should.Resemble, mockClient.Rights)
+				a.So(s.req.authorizationCode.Code, should.NotBeEmpty)
+				a.So(s.req.authorizationCode.RedirectURI, should.Equal, "http://uri/callback")
+				a.So(s.req.authorizationCode.State, should.Equal, "foo")
 			},
 		},
 		{
@@ -244,7 +275,21 @@ func TestOAuthFlow(t *testing.T) {
 				tt.StoreSetup(store)
 			}
 
-			var body io.Reader
+			req := httptest.NewRequest(tt.Method, tt.Path, nil)
+			req.URL.Scheme, req.URL.Host = "http", req.Host
+
+			var csrfToken string
+
+			var body *bytes.Buffer
+
+			for _, c := range jar.Cookies(req.URL) {
+				req.AddCookie(c)
+				if c.Name == "_csrf" {
+					csrfToken = c.Value
+					req.Header.Set("X-CSRF-Token", c.Value)
+				}
+			}
+
 			var contentType string
 			switch b := tt.Body.(type) {
 			case loginFormData:
@@ -260,21 +305,32 @@ func TestOAuthFlow(t *testing.T) {
 					}.Encode()))
 					contentType = "application/x-www-form-urlencoded"
 				}
-			case io.Reader:
-				body = b
+			case authorizeFormData:
+				if b.encoding == "json" {
+					json, _ := json.Marshal(b)
+					body = bytes.NewBuffer(json)
+					contentType = "application/json"
+				}
+				if b.encoding == "form" {
+					values := url.Values{
+						"authorize": []string{strconv.FormatBool(b.Authorize)},
+					}
+					if csrfToken != "" {
+						values.Set("csrf", csrfToken)
+					}
+					body = bytes.NewBuffer([]byte(values.Encode()))
+					contentType = "application/x-www-form-urlencoded"
+				}
 			}
 
-			req := httptest.NewRequest(tt.Method, tt.Path, body)
-			req.URL.Scheme, req.URL.Host = "http", req.Host
 			if contentType != "" {
 				req.Header.Set("Content-Type", contentType)
 			}
-			for _, c := range jar.Cookies(req.URL) {
-				req.AddCookie(c)
-				if c.Name == "_csrf" {
-					req.Header.Set("X-CSRF-Token", c.Value)
-				}
+			if body != nil {
+				req.Body = ioutil.NopCloser(body)
+				req.ContentLength = int64(body.Len())
 			}
+
 			res := httptest.NewRecorder()
 
 			c.ServeHTTP(res, req)
