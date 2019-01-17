@@ -86,6 +86,7 @@ enum PHYVersion {
 
 enum DataRateIndex {
   option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_stringer) = false;
 
   DATA_RATE_0 = 0;
   DATA_RATE_1 = 1;

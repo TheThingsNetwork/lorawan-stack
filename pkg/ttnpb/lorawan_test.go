@@ -17,6 +17,7 @@ package ttnpb_test
 import (
 	"testing"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -76,4 +77,37 @@ func TestMACVersionCompare(t *testing.T) {
 			a.So(tc.B.Compare(tc.A), should.Equal, -tc.Expected)
 		}
 	}
+}
+
+func TestDataRateIndex(t *testing.T) {
+	a := assertions.New(t)
+	a.So(DATA_RATE_4.String(), should.Equal, "4")
+
+	b, err := DATA_RATE_4.MarshalText()
+	a.So(err, should.BeNil)
+	a.So(b, should.Resemble, []byte("4"))
+
+	b, err = DATA_RATE_4.MarshalJSON()
+	a.So(err, should.BeNil)
+	a.So(b, should.Resemble, []byte("4"))
+
+	b, err = DATA_RATE_4.MarshalJSONPB(&jsonpb.Marshaler{})
+	a.So(err, should.BeNil)
+	a.So(b, should.Resemble, []byte("4"))
+
+	b, err = DATA_RATE_4.MarshalJSONPB(&jsonpb.Marshaler{EnumsAsInts: true})
+	a.So(err, should.BeNil)
+	a.So(b, should.Resemble, []byte("4"))
+
+	var idx DataRateIndex
+	err = idx.UnmarshalText([]byte("4"))
+	a.So(idx, should.Equal, DATA_RATE_4)
+
+	idx = DATA_RATE_15
+	err = idx.UnmarshalJSON([]byte("4"))
+	a.So(idx, should.Equal, DATA_RATE_4)
+
+	idx = DATA_RATE_15
+	err = idx.UnmarshalJSONPB(nil, []byte("4"))
+	a.So(idx, should.Equal, DATA_RATE_4)
 }

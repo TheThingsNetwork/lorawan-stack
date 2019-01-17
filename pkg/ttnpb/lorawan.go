@@ -215,3 +215,49 @@ func (v *PHYVersion) UnmarshalJSON(b []byte) error {
 func (v *PHYVersion) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
 	return v.UnmarshalJSON(b)
 }
+
+// String implements fmt.Stringer.
+func (v DataRateIndex) String() string {
+	return strconv.Itoa(int(v))
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v DataRateIndex) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v DataRateIndex) MarshalJSON() ([]byte, error) {
+	return v.MarshalText()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v DataRateIndex) MarshalJSONPB(_ *jsonpb.Marshaler) ([]byte, error) {
+	return v.MarshalJSON()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *DataRateIndex) UnmarshalText(b []byte) error {
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("DataRateIndex")(string(b)).WithCause(err)
+	}
+	if i > int(DATA_RATE_15) {
+		return errFieldHasMax.WithAttributes(
+			"lorawan_field", "DataRateIndex",
+			"max", DATA_RATE_15,
+		)
+	}
+	*v = DataRateIndex(i)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *DataRateIndex) UnmarshalJSON(b []byte) error {
+	return v.UnmarshalText(b)
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *DataRateIndex) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
