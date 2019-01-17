@@ -179,6 +179,8 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			}
 			return err
 		}
+		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))
+		up.CorrelationIDs = append(up.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 		registerReceiveUp(ctx, up, l.connName)
 		if err := as.handleUp(ctx, up, l); err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")

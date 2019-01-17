@@ -216,6 +216,9 @@ var errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{devi
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
+	for _, item := range items {
+		item.CorrelationIDs = append(item.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+	}
 	logger := log.FromContext(ctx)
 	link, err := as.getLink(ctx, ids.ApplicationIdentifiers)
 	if err != nil {
