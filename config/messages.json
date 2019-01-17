@@ -1747,7 +1747,7 @@
   },
   "error:pkg/band:band_not_found": {
     "translations": {
-      "en": "band `{band_id}` not found"
+      "en": "band `{id}` not found"
     },
     "description": {
       "package": "pkg/band",
@@ -1799,9 +1799,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/band:unknown_lorawan_version": {
+  "error:pkg/band:unknown_phy_version": {
     "translations": {
-      "en": "unknown LoRaWAN version"
+      "en": "unknown LoRaWAN PHY version `{version}`"
     },
     "description": {
       "package": "pkg/band",
@@ -2044,7 +2044,7 @@
   },
   "error:pkg/encoding/lorawan:encoded_field_length_bound": {
     "translations": {
-      "en": "`{lorawan_field}` encoded length should between `{min}` and `{max}`"
+      "en": "`{lorawan_field}` encoded length `{value}` should between `{min}` and `{max}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -2053,7 +2053,7 @@
   },
   "error:pkg/encoding/lorawan:encoded_field_length_multiple_choices": {
     "translations": {
-      "en": "`{lorawan_field}` encoded length should be equal to `{expected_1}` or `{expected_2}`"
+      "en": "`{lorawan_field}` encoded length `{value}` should be equal to `{expected_1}` or `{expected_2}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -2089,7 +2089,7 @@
   },
   "error:pkg/encoding/lorawan:field_length_equal": {
     "translations": {
-      "en": "`{lorawan_field}` length should be equal to `{expected}`"
+      "en": "`{lorawan_field}` length `{value}` should be equal to `{expected}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -2098,7 +2098,7 @@
   },
   "error:pkg/encoding/lorawan:field_length_with_max": {
     "translations": {
-      "en": "`{lorawan_field}` length should be lower or equal to `{expected}`"
+      "en": "`{lorawan_field}` length `{value}` should be lower or equal to `{max}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -2107,7 +2107,7 @@
   },
   "error:pkg/encoding/lorawan:field_length_with_min": {
     "translations": {
-      "en": "`{lorawan_field}` length should be higher or equal to `{expected}`"
+      "en": "`{lorawan_field}` length `{value}` should be higher or equal to `{min}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -2116,7 +2116,7 @@
   },
   "error:pkg/encoding/lorawan:field_length_with_multiple_choices": {
     "translations": {
-      "en": "`{lorawan_field}` length should be equal to `{expected_1}` or `{expected_2}`"
+      "en": "`{lorawan_field}` length `{value}` should be equal to `{expected_1}` or `{expected_2}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -2125,7 +2125,7 @@
   },
   "error:pkg/encoding/lorawan:field_with_max": {
     "translations": {
-      "en": "`{lorawan_field}` should be lower or equal to `{max}`"
+      "en": "`{lorawan_field}` value `{value}` should be lower or equal to `{max}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -3428,6 +3428,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver:channel_index": {
+    "translations": {
+      "en": "invalid channel index"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:cid_out_of_range": {
     "translations": {
       "en": "CID must be in range from {min} to {max}"
@@ -3467,6 +3476,15 @@
   "error:pkg/networkserver:data_rate": {
     "translations": {
       "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:data_rate_not_found": {
+    "translations": {
+      "en": "data rate not found"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -3764,6 +3782,15 @@
   "error:pkg/networkserver:unsupported_lorawan_version": {
     "translations": {
       "en": "unsupported LoRaWAN version: {version}"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:uplink_channel_not_found": {
+    "translations": {
+      "en": "uplink channel not found"
     },
     "description": {
       "package": "pkg/networkserver",
