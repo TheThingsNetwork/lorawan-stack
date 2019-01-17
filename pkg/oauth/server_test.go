@@ -398,8 +398,6 @@ func TestTokenExchange(t *testing.T) {
 	}{
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.session = mockSession
-				s.res.user = mockUser
 				s.res.client = mockClient
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
 					UserIDs:     mockUser.UserIdentifiers,
