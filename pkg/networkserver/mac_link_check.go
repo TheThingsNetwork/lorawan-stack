@@ -30,11 +30,13 @@ var (
 func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
 	events.Publish(evtReceiveLinkCheckRequest(ctx, dev.EndDeviceIdentifiers, nil))
 
-	floor, ok := demodulationFloor[msg.Settings.SpreadingFactor][msg.Settings.Bandwidth]
-	if !ok {
-		return errInvalidDataRate
+	var floor float32
+	if dr, ok := msg.Settings.DataRate.Modulation.(*ttnpb.DataRate_LoRa); ok {
+		floor, ok = demodulationFloor[dr.LoRa.SpreadingFactor][dr.LoRa.Bandwidth]
+		if !ok {
+			return errInvalidDataRate
+		}
 	}
-
 	gtws := make(map[string]struct{}, len(msg.RxMetadata))
 
 	maxSNR := msg.RxMetadata[0].SNR

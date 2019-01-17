@@ -14,6 +14,8 @@
 
 package udp
 
+import "encoding/json"
+
 // Data contains a LoRaWAN packet
 type Data struct {
 	RxPacket    []*RxPacket  `json:"rxpk,omitempty"`
@@ -32,7 +34,7 @@ type RxPacket struct {
 	RFCh uint8        `json:"rfch"`           // Concentrator "RF chain" used for Rx (unsigned integer)
 	Stat int8         `json:"stat"`           // CRC status: 1 = OK, -1 = fail, 0 = no CRC
 	Modu string       `json:"modu"`           // Modulation identifier "LORA" or "FSK"
-	DatR DataRate     `json:"datr"`           // LoRa datarate identifier (eg. SF12BW500) or FSK datarate (unsigned, in bits per second)
+	DatR DataRate     `json:"datr"`           // LoRa datarate or FSK datarate
 	CodR string       `json:"codr"`           // LoRa ECC coding rate identifier
 	RSSI int16        `json:"rssi"`           // RSSI in dBm (signed integer, 1 dB precision)
 	LSNR float64      `json:"lsnr"`           // Lora SNR ratio in dB (signed float, 0.1 dB precision)
@@ -67,7 +69,7 @@ type TxPacket struct {
 	RFCh uint8        `json:"rfch"`           // Concentrator "RF chain" used for Tx (unsigned integer)
 	Powe uint8        `json:"powe"`           // Tx output power in dBm (unsigned integer, dBm precision)
 	Modu string       `json:"modu"`           // Modulation identifier "LORA" or "FSK"
-	DatR DataRate     `json:"datr"`           // LoRa datarate identifier (eg. SF12BW500) || FSK datarate (unsigned, in bits per second)
+	DatR DataRate     `json:"datr"`           // LoRa datarate or FSK datarate
 	CodR string       `json:"codr,omitempty"` // LoRa ECC coding rate identifier
 	FDev uint16       `json:"fdev,omitempty"` // FSK frequency deviation (unsigned integer, in Hz)
 	IPol bool         `json:"ipol"`           // Lora modulation polarization inversion
@@ -75,6 +77,20 @@ type TxPacket struct {
 	Size uint16       `json:"size"`           // RF packet payload size in bytes (unsigned integer)
 	NCRC bool         `json:"ncrc,omitempty"` // If true, disable the CRC of the physical layer (optional)
 	Data string       `json:"data"`           // Base64 encoded RF packet payload, padding optional
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (p *TxPacket) UnmarshalJSON(data []byte) error {
+	type Alias TxPacket
+	aux := struct {
+		*Alias
+	}{
+		Alias: (*Alias)(p),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Stat contains a status message

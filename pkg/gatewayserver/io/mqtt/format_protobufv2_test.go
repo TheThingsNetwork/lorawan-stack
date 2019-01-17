@@ -36,14 +36,19 @@ func TestProtobufV2Downlink(t *testing.T) {
 		Payload:    &ttnpb.Message{},
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				DataRateIndex:   0,
-				Bandwidth:       125000,
-				SpreadingFactor: 12,
-				CodingRate:      "4/5",
-				Frequency:       863000000,
-				TxPower:         15,
-				Timestamp:       12000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						},
+					},
+				},
+				CodingRate:    "4/5",
+				DataRateIndex: 0,
+				Frequency:     863000000,
+				TxPower:       15,
+				Timestamp:     12000,
 			},
 		},
 	}
@@ -91,10 +96,16 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 	}
 	validV3Settings := ttnpb.TxSettings{
-		Bandwidth:       125000,
-		CodingRate:      "4/5",
-		DataRateIndex:   5,
-		SpreadingFactor: 7,
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_LoRa{
+				LoRa: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+				},
+			},
+		},
+		CodingRate:    "4/5",
+		DataRateIndex: 5,
 	}
 	validV2Metadata := legacyttnpb.GatewayRxMetadata{
 		GatewayID: "gateway-id",

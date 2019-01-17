@@ -100,14 +100,20 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 	out := &TxSettings{}
 	switch r.Intn(2) {
 	case 0:
-		out.Modulation = Modulation_FSK
+		out.DataRate.Modulation = &DataRate_FSK{
+			FSK: &FSKDataRate{
+				BitRate: 50000,
+			},
+		}
 	case 1:
-		out.Modulation = Modulation_LORA
+		out.DataRate.Modulation = &DataRate_LoRa{
+			LoRa: &LoRaDataRate{
+				Bandwidth:       []uint32{125000, 250000, 500000}[r.Intn(3)],
+				SpreadingFactor: uint32(r.Intn(6) + 7),
+			},
+		}
+		out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)
 	}
-	out.Bandwidth = []uint32{125000, 250000, 500000}[r.Intn(3)]
-	out.SpreadingFactor = uint32(r.Intn(6) + 7)
-	out.BitRate = r.Uint32()
-	out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)
 	out.Frequency = uint64(r.Uint32())
 	out.TxPower = r.Int31()
 	if r.Intn(2) == 0 {

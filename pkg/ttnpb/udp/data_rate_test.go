@@ -18,8 +18,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -27,8 +27,8 @@ func TestDataRate(t *testing.T) {
 	a := assertions.New(t)
 
 	table := map[string]udp.DataRate{
-		`"SF7BW125"`: {DataRate: types.DataRate{LoRa: "SF7BW125"}},
-		`50000`:      {DataRate: types.DataRate{FSK: 50000}},
+		`"SF7BW125"`: {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}},
+		`50000`:      {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{BitRate: 50000}}}},
 	}
 
 	for s, dr := range table {
@@ -45,4 +45,45 @@ func TestDataRate(t *testing.T) {
 	var dr udp.DataRate
 	err := dr.UnmarshalJSON([]byte{})
 	a.So(err, should.NotBeNil)
+}
+
+func TestValidLoRaDataRateParsing(t *testing.T) {
+	a := assertions.New(t)
+
+	table := map[string]udp.DataRate{
+		"SF6BW125": {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}},
+		"SF9BW500": {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}},
+	}
+	for dr, expected := range table {
+		actual, err := udp.ParseLoRaDataRate(dr)
+		a.So(err, should.BeNil)
+		a.So(actual, should.Resemble, expected)
+	}
+}
+
+func TestInvalidLoRaDataRateParsing(t *testing.T) {
+	a := assertions.New(t)
+
+	table := []string{
+		"6BW125",
+		"SF9B500",
+	}
+	for _, dr := range table {
+		_, err := udp.ParseLoRaDataRate(dr)
+		a.So(err, should.NotBeNil)
+	}
+}
+
+func TestStringer(t *testing.T) {
+	a := assertions.New(t)
+
+	table := map[udp.DataRate]string{
+		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}}: "SF6BW125",
+		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}}: "SF9BW500",
+		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{BitRate: 50000}}}}:                           "50000",
+	}
+
+	for dr, expected := range table {
+		a.So(dr.String(), should.Equal, expected)
+	}
 }

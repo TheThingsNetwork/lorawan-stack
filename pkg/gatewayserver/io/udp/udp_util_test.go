@@ -17,7 +17,6 @@ package udp_test
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"net"
 	"sync"
 	"testing"
@@ -53,23 +52,21 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 	}
 	for i, t := range timestamps {
 		up := ttnpb.NewPopulatedUplinkMessage(test.Randy, true)
-		var modulation string
-		var dataRate types.DataRate
-		switch up.Settings.Modulation {
-		case ttnpb.Modulation_LORA:
+		var modulation, codr string
+		switch up.Settings.DataRate.Modulation.(type) {
+		case *ttnpb.DataRate_LoRa:
 			modulation = "LORA"
-			dataRate.LoRa = fmt.Sprintf("SF%dBW%d", up.Settings.SpreadingFactor, up.Settings.Bandwidth/1000)
-		case ttnpb.Modulation_FSK:
+			codr = up.Settings.CodingRate
+		case *ttnpb.DataRate_FSK:
 			modulation = "FSK"
-			dataRate.FSK = up.Settings.BitRate
 		}
 		abs := encoding.CompactTime(time.Unix(0, 0).Add(t))
 		packet.Data.RxPacket[i] = &encoding.RxPacket{
 			Freq: float64(up.Settings.Frequency) / 1000000,
 			Chan: uint8(up.Settings.ChannelIndex),
 			Modu: modulation,
-			DatR: encoding.DataRate{DataRate: dataRate},
-			CodR: up.Settings.CodingRate,
+			CodR: codr,
+			DatR: encoding.DataRate{up.Settings.DataRate},
 			Size: uint16(len(up.RawPayload)),
 			Data: base64.StdEncoding.EncodeToString(up.RawPayload),
 			Tmst: uint32(t / time.Microsecond),

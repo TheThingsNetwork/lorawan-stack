@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -91,7 +92,14 @@ func TestUplinkPacket(t *testing.T) {
 	a.So(uplink.RFCh, should.Equal, 0)
 	a.So(uplink.Stat, should.Equal, 1)
 	a.So(uplink.Modu, should.Equal, "LORA")
-	a.So(uplink.DatR.LoRa, should.Equal, "SF7BW125")
+	a.So(uplink.DatR, should.Resemble, DataRate{DataRate: ttnpb.DataRate{
+		Modulation: &ttnpb.DataRate_LoRa{
+			LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       125000,
+			},
+		},
+	}})
 	a.So(uplink.CodR, should.Equal, "4/5")
 	a.So(uplink.LSNR, should.AlmostEqual, -12.0)
 	a.So(uplink.RSSI, should.Equal, -112)
@@ -127,7 +135,14 @@ func TestDownlinkPacket(t *testing.T) {
 	a.So(tx.RFCh, should.Equal, 0)
 	a.So(tx.Powe, should.Equal, 14)
 	a.So(tx.Modu, should.Equal, "LORA")
-	a.So(tx.DatR.LoRa, should.Equal, "SF11BW125")
+	a.So(tx.DatR, should.Resemble, DataRate{DataRate: ttnpb.DataRate{
+		Modulation: &ttnpb.DataRate_LoRa{
+			LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 11,
+				Bandwidth:       125000,
+			},
+		},
+	}})
 	a.So(tx.CodR, should.Equal, "4/6")
 	a.So(tx.IPol, should.Equal, false)
 }

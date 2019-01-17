@@ -24,21 +24,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 )
 
 // eirpDelta is the integer-rounded delta between EIRP and ERP.
 const eirpDelta = 2
 
 var (
-	modulationToV3 = map[legacyttnpb.Modulation]ttnpb.Modulation{
-		legacyttnpb.Modulation_LORA: ttnpb.Modulation_LORA,
-		legacyttnpb.Modulation_FSK:  ttnpb.Modulation_FSK,
-	}
-	modulationToV2 = map[ttnpb.Modulation]legacyttnpb.Modulation{
-		ttnpb.Modulation_LORA: legacyttnpb.Modulation_LORA,
-		ttnpb.Modulation_FSK:  legacyttnpb.Modulation_FSK,
-	}
 	sourceToV3 = map[legacyttnpb.LocationMetadata_LocationSource]ttnpb.LocationSource{
 		legacyttnpb.LocationMetadata_GPS:            ttnpb.SOURCE_GPS,
 		legacyttnpb.LocationMetadata_CONFIG:         ttnpb.SOURCE_REGISTRY,
@@ -78,14 +70,22 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	if settings == nil {
 		return nil, errNotScheduled
 	}
-	var fcnt uint32
+	lorawan := &legacyttnpb.LoRaWANTxConfiguration{}
 	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
-		fcnt = pld.MACPayload.FHDR.FCnt
+		lorawan.FCnt = pld.MACPayload.FHDR.FCnt
 	}
-	modulation, ok := modulationToV2[settings.Modulation]
-	if !ok {
-		return nil, errModulation.WithAttributes("modulation", modulation.String())
+	switch dr := settings.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_LoRa:
+		lorawan.Modulation = legacyttnpb.Modulation_LORA
+		lorawan.CodingRate = settings.CodingRate
+		lorawan.DataRate = fmt.Sprintf("SF%dBW%d", dr.LoRa.SpreadingFactor, dr.LoRa.Bandwidth/1000)
+	case *ttnpb.DataRate_FSK:
+		lorawan.Modulation = legacyttnpb.Modulation_FSK
+		lorawan.BitRate = dr.FSK.BitRate
+	default:
+		return nil, errModulation
 	}
+
 	v2downlink := &legacyttnpb.DownlinkMessage{
 		Payload: down.RawPayload,
 		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
@@ -96,13 +96,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 			Timestamp:             settings.Timestamp,
 		},
 		ProtocolConfiguration: legacyttnpb.ProtocolTxConfiguration{
-			LoRaWAN: &legacyttnpb.LoRaWANTxConfiguration{
-				BitRate:    settings.BitRate,
-				CodingRate: settings.CodingRate,
-				DataRate:   fmt.Sprintf("SF%dBW%d", settings.SpreadingFactor, settings.Bandwidth/1000),
-				FCnt:       fcnt,
-				Modulation: modulation,
-			},
+			LoRaWAN: lorawan,
 		},
 	}
 	return v2downlink.Marshal()
@@ -123,16 +117,10 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	uplink := &ttnpb.UplinkMessage{
 		RawPayload: v2uplink.Payload,
 	}
-	modulation, ok := modulationToV3[lorawanMetadata.Modulation]
-	if !ok {
-		return nil, errModulation.WithAttributes("modulation", modulation.String())
-	}
-	settings := ttnpb.TxSettings{
-		CodingRate: lorawanMetadata.CodingRate,
-		Frequency:  gwMetadata.Frequency,
-		Modulation: modulation,
-	}
 
+	settings := ttnpb.TxSettings{
+		Frequency: gwMetadata.Frequency,
+	}
 	switch lorawanMetadata.Modulation {
 	case legacyttnpb.Modulation_LORA:
 		bandID, ok := frequencyPlanToBand[lorawanMetadata.FrequencyPlan]
@@ -145,11 +133,12 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 		}
 		var drIndex ttnpb.DataRateIndex
 		var found bool
-		dr := types.DataRate{
-			LoRa: lorawanMetadata.DataRate,
+		loraDr, err := udp.ParseLoRaDataRate(lorawanMetadata.DataRate)
+		if err != nil {
+			return nil, err
 		}
 		for bandDRIndex, bandDR := range band.DataRates {
-			if bandDR.Rate == dr {
+			if bandDR.Rate.Equal(loraDr.DataRate) {
 				found = true
 				drIndex = ttnpb.DataRateIndex(bandDRIndex)
 				break
@@ -158,18 +147,17 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 		if !found {
 			return nil, errDataRate.WithAttributes("data_rate", lorawanMetadata.DataRate)
 		}
+		settings.DataRate = loraDr.DataRate
+		settings.CodingRate = lorawanMetadata.CodingRate
 		settings.DataRateIndex = drIndex
-		settings.Bandwidth, err = dr.Bandwidth()
-		if err != nil {
-			return nil, err
-		}
-		sf, err := dr.SpreadingFactor()
-		if err != nil {
-			return nil, err
-		}
-		settings.SpreadingFactor = uint32(sf)
 	case legacyttnpb.Modulation_FSK:
-		settings.BitRate = lorawanMetadata.BitRate
+		settings.DataRate = ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_FSK{
+				FSK: &ttnpb.FSKDataRate{
+					BitRate: lorawanMetadata.BitRate,
+				},
+			},
+		}
 	default:
 		return nil, errModulation.WithAttributes("modulation", lorawanMetadata.Modulation)
 	}

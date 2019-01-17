@@ -43,8 +43,14 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
-					SpreadingFactor: 13,
-					Bandwidth:       250,
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{
+							LoRa: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 13,
+								Bandwidth:       250000,
+							},
+						},
+					},
 				},
 			},
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
@@ -72,8 +78,14 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
-					SpreadingFactor: 12,
-					Bandwidth:       250,
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{
+							LoRa: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 12,
+								Bandwidth:       250000,
+							},
+						},
+					},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
@@ -122,8 +134,14 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
-					SpreadingFactor: 12,
-					Bandwidth:       250,
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{
+							LoRa: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 12,
+								Bandwidth:       250000,
+							},
+						},
+					},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
@@ -172,8 +190,14 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
-					SpreadingFactor: 12,
-					Bandwidth:       250,
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{
+							LoRa: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 12,
+								Bandwidth:       250000,
+							},
+						},
+					},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{

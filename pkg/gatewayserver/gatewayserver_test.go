@@ -518,11 +518,16 @@ func TestGatewayServer(t *testing.T) {
 							UplinkMessages: []*ttnpb.UplinkMessage{
 								{
 									Settings: ttnpb.TxSettings{
-										Modulation:      ttnpb.Modulation_LORA,
-										SpreadingFactor: 7,
-										Bandwidth:       250000,
-										CodingRate:      "4/5",
-										Frequency:       867900000,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 7,
+													Bandwidth:       250000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  867900000,
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
@@ -544,9 +549,14 @@ func TestGatewayServer(t *testing.T) {
 							UplinkMessages: []*ttnpb.UplinkMessage{
 								{
 									Settings: ttnpb.TxSettings{
-										Modulation: ttnpb.Modulation_FSK,
-										BitRate:    50000,
-										Frequency:  867900000,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_FSK{
+												FSK: &ttnpb.FSKDataRate{
+													BitRate: 50000,
+												},
+											},
+										},
+										Frequency: 867900000,
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
@@ -568,11 +578,16 @@ func TestGatewayServer(t *testing.T) {
 							UplinkMessages: []*ttnpb.UplinkMessage{
 								{
 									Settings: ttnpb.TxSettings{
-										Modulation:      ttnpb.Modulation_LORA,
-										SpreadingFactor: 9,
-										Bandwidth:       125000,
-										CodingRate:      "4/5",
-										Frequency:       868500000,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 9,
+													Bandwidth:       125000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  868500000,
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
@@ -586,11 +601,16 @@ func TestGatewayServer(t *testing.T) {
 								},
 								{
 									Settings: ttnpb.TxSettings{
-										Modulation:      ttnpb.Modulation_LORA,
-										SpreadingFactor: 7,
-										Bandwidth:       125000,
-										CodingRate:      "4/5",
-										Frequency:       868100000,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 7,
+													Bandwidth:       125000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  868100000,
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
@@ -604,11 +624,16 @@ func TestGatewayServer(t *testing.T) {
 								},
 								{
 									Settings: ttnpb.TxSettings{
-										Modulation:      ttnpb.Modulation_LORA,
-										SpreadingFactor: 12,
-										Bandwidth:       125000,
-										CodingRate:      "4/5",
-										Frequency:       867700000,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 12,
+													Bandwidth:       125000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  867700000,
 									},
 									RxMetadata: []*ttnpb.RxMetadata{
 										{
@@ -717,13 +742,18 @@ func TestGatewayServer(t *testing.T) {
 							RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 							Settings: &ttnpb.DownlinkMessage_Scheduled{
 								Scheduled: &ttnpb.TxSettings{
-									Modulation:      ttnpb.Modulation_LORA,
-									SpreadingFactor: 12,
-									Bandwidth:       125000,
-									CodingRate:      "4/5",
-									Frequency:       869525000,
-									TxPower:         10,
-									Timestamp:       100,
+									DataRate: ttnpb.DataRate{
+										Modulation: &ttnpb.DataRate_LoRa{
+											LoRa: &ttnpb.LoRaDataRate{
+												SpreadingFactor: 12,
+												Bandwidth:       125000,
+											},
+										},
+									},
+									CodingRate: "4/5",
+									Frequency:  869525000,
+									TxPower:    10,
+									Timestamp:  100,
 								},
 							},
 						},

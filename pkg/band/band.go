@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // PayloadSizer abstracts the acceptable payload size depending on contextual parameters.
@@ -49,7 +48,7 @@ func (p dwellTimePayloadSizer) PayloadSize(dwellTime bool) uint16 {
 
 // DataRate indicates the properties of a band's data rate.
 type DataRate struct {
-	Rate           types.DataRate
+	Rate           ttnpb.DataRate
 	DefaultMaxSize PayloadSizer
 }
 

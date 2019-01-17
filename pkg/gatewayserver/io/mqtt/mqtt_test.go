@@ -271,11 +271,16 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
-							Modulation:      ttnpb.Modulation_LORA,
-							Bandwidth:       125000,
-							SpreadingFactor: 7,
-							CodingRate:      "4/5",
-							Frequency:       869525000,
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{
+									LoRa: &ttnpb.LoRaDataRate{
+										Bandwidth:       125000,
+										SpreadingFactor: 7,
+									},
+								},
+							},
+							CodingRate: "4/5",
+							Frequency:  869525000,
 						},
 					},
 				},

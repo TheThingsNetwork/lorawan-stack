@@ -27,11 +27,11 @@ import (
 // Compute computes the time-on-air for the given payload size and the TxSettings.
 // This function takes into account PHYPayload.
 func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
-	switch settings.Modulation {
-	case ttnpb.Modulation_LORA:
-		return computeLoRa(payloadSize, settings.Bandwidth, uint8(settings.SpreadingFactor), settings.CodingRate)
-	case ttnpb.Modulation_FSK:
-		return computeFSK(payloadSize, settings.BitRate), nil
+	switch dr := settings.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_LoRa:
+		return computeLoRa(payloadSize, dr.LoRa.Bandwidth, uint8(dr.LoRa.SpreadingFactor), settings.CodingRate)
+	case *ttnpb.DataRate_FSK:
+		return computeFSK(payloadSize, dr.FSK.BitRate), nil
 	default:
 		panic("invalid modulation")
 	}

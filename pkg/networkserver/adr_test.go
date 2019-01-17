@@ -129,9 +129,15 @@ func TestAdaptDataRate(t *testing.T) {
 					{FCnt: 30, MaxSNR: -9, GtwDiversity: 3},
 					{FCnt: 31, MaxSNR: -7, GtwDiversity: 2,
 						TxSettings: ttnpb.TxSettings{
-							SpreadingFactor: 12,
-							Bandwidth:       125,
-							DataRateIndex:   0,
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{
+									LoRa: &ttnpb.LoRaDataRate{
+										SpreadingFactor: 12,
+										Bandwidth:       125000,
+									},
+								},
+							},
+							DataRateIndex: 0,
 						},
 					},
 				}),

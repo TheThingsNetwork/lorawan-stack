@@ -57,12 +57,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 7,
-				CodingRate:      "4/5",
-				Timestamp:       100,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  100,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -72,12 +77,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 51,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 12,
-				CodingRate:      "4/5",
-				Time:            timePtr(time.Unix(0, int64(100*time.Millisecond))),
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Time:       timePtr(time.Unix(0, int64(100*time.Millisecond))),
 			},
 			ExpectedToa: 2465792 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -87,12 +97,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 51,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 12,
-				CodingRate:      "4/5",
-				Timestamp:       20000000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  20000000,
 			},
 			ExpectedToa: 2465792 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -102,12 +117,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 7,
-				CodingRate:      "4/5",
-				Timestamp:       20000000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  20000000,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -115,12 +135,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 7,
-				CodingRate:      "4/5",
-				Timestamp:       20000000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  20000000,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -130,12 +155,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 7,
-				CodingRate:      "4/5",
-				Timestamp:       20000000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  20000000,
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -145,12 +175,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 7,
-				CodingRate:      "4/5",
-				Timestamp:       20000000 + 41216 + 1000000, // time-on-air + time-off-air.
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  20000000 + 41216 + 1000000, // time-on-air + time-off-air.
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -160,12 +195,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       869525000,
-				Bandwidth:       125000,
-				SpreadingFactor: 7,
-				CodingRate:      "4/5",
-				Timestamp:       20000000 + 41216 + 1000000 + 30000, // time-on-air + time-off-air + queue delay
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  20000000 + 41216 + 1000000 + 30000, // time-on-air + time-off-air + queue delay
 			},
 			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -173,12 +213,17 @@ func TestScheduleAt(t *testing.T) {
 		{
 			PayloadSize: 20,
 			Settings: ttnpb.TxSettings{
-				Modulation:      ttnpb.Modulation_LORA,
-				Frequency:       868100000,
-				Bandwidth:       125000,
-				SpreadingFactor: 12,
-				CodingRate:      "4/5",
-				Timestamp:       30000000, // In next duty-cycle window; discard previous.
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  868100000,
+				Timestamp:  30000000, // In next duty-cycle window; discard previous.
 			},
 			ExpectedToa: 1318912 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -227,12 +272,17 @@ func TestScheduleAnytime(t *testing.T) {
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
-			Modulation:      ttnpb.Modulation_LORA,
-			Frequency:       frequency,
-			Bandwidth:       125000,
-			SpreadingFactor: sf,
-			CodingRate:      "4/5",
-			Timestamp:       t,
+			DataRate: ttnpb.DataRate{
+				Modulation: &ttnpb.DataRate_LoRa{
+					LoRa: &ttnpb.LoRaDataRate{
+						Bandwidth:       125000,
+						SpreadingFactor: sf,
+					},
+				},
+			},
+			CodingRate: "4/5",
+			Frequency:  frequency,
+			Timestamp:  t,
 		}
 	}
 
@@ -302,13 +352,18 @@ func TestScheduleAnytimeShort(t *testing.T) {
 
 	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
-			Modulation:      ttnpb.Modulation_LORA,
-			Frequency:       frequency,
-			Bandwidth:       125000,
-			SpreadingFactor: sf,
-			CodingRate:      "4/5",
-			Time:            time,
-			Timestamp:       timestamp,
+			DataRate: ttnpb.DataRate{
+				Modulation: &ttnpb.DataRate_LoRa{
+					LoRa: &ttnpb.LoRaDataRate{
+						Bandwidth:       125000,
+						SpreadingFactor: sf,
+					},
+				},
+			},
+			CodingRate: "4/5",
+			Frequency:  frequency,
+			Time:       time,
+			Timestamp:  timestamp,
 		}
 	}
 

@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 const bufferSize = 10
@@ -249,7 +248,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				continue
 			}
 			dataRate := band.DataRates[rx.dataRateIndex].Rate
-			if dataRate == types.EmptyDataRate {
+			if dataRate == (ttnpb.DataRate{}) {
 				return errDataRate.WithAttributes("index", rx.dataRateIndex)
 			}
 			// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
@@ -293,23 +292,10 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)
 			}
-			if dataRate.LoRa != "" {
-				settings.Modulation = ttnpb.Modulation_LORA
-				bw, err := dataRate.Bandwidth()
-				if err != nil {
-					return err
-				}
-				settings.Bandwidth = bw
-				sf, err := dataRate.SpreadingFactor()
-				if err != nil {
-					return err
-				}
-				settings.SpreadingFactor = uint32(sf)
+			settings.DataRate = dataRate
+			if dr := dataRate.GetLoRa(); dr != nil {
 				settings.CodingRate = "4/5"
 				settings.InvertPolarization = true
-			} else {
-				settings.Modulation = ttnpb.Modulation_FSK
-				settings.BitRate = dataRate.FSK
 			}
 			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
 			switch request.Class {

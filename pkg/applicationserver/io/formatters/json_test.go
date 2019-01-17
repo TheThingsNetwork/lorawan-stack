@@ -59,7 +59,7 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"ESIzRA==","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{}}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"ESIzRA==","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{"data_rate":{}}}}`,
 		},
 		{
 			Message: &ttnpb.ApplicationUp{

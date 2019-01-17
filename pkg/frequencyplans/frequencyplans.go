@@ -175,14 +175,12 @@ func (lsc *LoRaStandardChannel) ToConcentratorConfig(band band.Band) *ttnpb.Conc
 	if lsc == nil {
 		return nil
 	}
-	// TODO: Get values (https://github.com/TheThingsIndustries/lorawan-stack/issues/1384)
-	sf, _ := band.DataRates[lsc.DataRate].Rate.SpreadingFactor()
-	bw, _ := band.DataRates[lsc.DataRate].Rate.Bandwidth()
+	dr := band.DataRates[lsc.DataRate].Rate.GetLoRa()
 	return &ttnpb.ConcentratorConfig_LoRaStandardChannel{
 		Frequency:       lsc.Frequency,
 		Radio:           uint32(lsc.Radio),
-		SpreadingFactor: uint32(sf),
-		Bandwidth:       bw,
+		SpreadingFactor: dr.SpreadingFactor,
+		Bandwidth:       dr.Bandwidth,
 	}
 }
 

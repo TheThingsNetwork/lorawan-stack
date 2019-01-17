@@ -21,18 +21,17 @@ import (
 
 	assertions "github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func buildLoRaDownlinkFromParameters(payloadSize int, dataRate types.DataRate, codingRate string) (downlink ttnpb.DownlinkMessage, err error) {
+func buildLoRaDownlinkFromParameters(payloadSize int, dataRate ttnpb.DataRate, codingRate string) (downlink ttnpb.DownlinkMessage, err error) {
 	payload := []byte{}
 	for i := 0; i < payloadSize; i++ {
 		payload = append(payload, 0)
 	}
 	scheduled := &ttnpb.TxSettings{
+		DataRate:   dataRate,
 		CodingRate: codingRate,
-		Modulation: ttnpb.Modulation_LORA,
 	}
 	downlink = ttnpb.DownlinkMessage{
 		RawPayload: payload,
@@ -40,39 +39,15 @@ func buildLoRaDownlinkFromParameters(payloadSize int, dataRate types.DataRate, c
 			Scheduled: scheduled,
 		},
 	}
-	bw, err := dataRate.Bandwidth()
-	if err != nil {
-		return
-	}
-	sf, err := dataRate.SpreadingFactor()
-	if err != nil {
-		return
-	}
-	scheduled.Bandwidth = bw
-	scheduled.SpreadingFactor = uint32(sf)
-	return downlink, nil
-}
 
-func TestInvalidModulation(t *testing.T) {
-	a := assertions.New(t)
-	scheduled := ttnpb.TxSettings{
-		Modulation: 1234,
-	}
-	a.So(func() {
-		Compute(12, scheduled)
-	}, should.Panic)
+	return downlink, nil
 }
 
 func TestInvalidLoRa(t *testing.T) {
 	a := assertions.New(t)
 
 	{
-		_, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SFUT"}, "4/5")
-		a.So(err, should.NotBeNil)
-	}
-
-	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF10BW125"}, "1/9")
+		downlink, err := buildLoRaDownlinkFromParameters(10, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}, "1/9")
 		scheduled := *downlink.GetScheduled()
 		a.So(err, should.BeNil)
 		_, err = Compute(len(downlink.RawPayload), scheduled)
@@ -80,19 +55,23 @@ func TestInvalidLoRa(t *testing.T) {
 	}
 
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF7BW125"}, "1/9")
+		downlink, err := buildLoRaDownlinkFromParameters(10, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "1/9")
 		scheduled := *downlink.GetScheduled()
 		a.So(err, should.BeNil)
-		scheduled.SpreadingFactor = 0
+		if dr, err := scheduled.DataRate.Modulation.(*ttnpb.DataRate_LoRa); err {
+			dr.LoRa.SpreadingFactor = 0
+		}
 		_, err = Compute(len(downlink.RawPayload), scheduled)
 		a.So(err, should.NotBeNil)
 	}
 
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF7BW125"}, "4/5")
+		downlink, err := buildLoRaDownlinkFromParameters(10, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
 		scheduled := *downlink.GetScheduled()
 		a.So(err, should.BeNil)
-		scheduled.Bandwidth = 0
+		if dr, err := scheduled.DataRate.Modulation.(*ttnpb.DataRate_LoRa); err {
+			dr.LoRa.Bandwidth = 0
+		}
 		_, err = Compute(len(downlink.RawPayload), scheduled)
 		a.So(err, should.NotBeNil)
 	}
@@ -100,13 +79,13 @@ func TestInvalidLoRa(t *testing.T) {
 
 func TestDifferentLoRaSFs(t *testing.T) {
 	a := assertions.New(t)
-	sfTests := map[types.DataRate]uint{
-		{LoRa: "SF7BW125"}:  41216,
-		{LoRa: "SF8BW125"}:  72192,
-		{LoRa: "SF9BW125"}:  144384,
-		{LoRa: "SF10BW125"}: 288768,
-		{LoRa: "SF11BW125"}: 577536,
-		{LoRa: "SF12BW125"}: 991232,
+	sfTests := map[ttnpb.DataRate]uint{
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}:  41216,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 8, Bandwidth: 125000}}}:  72192,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 125000}}}:  144384,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}: 288768,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 11, Bandwidth: 125000}}}: 577536,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 125000}}}: 991232,
 	}
 	for dr, us := range sfTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, dr, "4/5")
@@ -120,10 +99,10 @@ func TestDifferentLoRaSFs(t *testing.T) {
 
 func TestDifferentLoRaBWs(t *testing.T) {
 	a := assertions.New(t)
-	bwTests := map[types.DataRate]uint{
-		{LoRa: "SF7BW125"}: 41216,
-		{LoRa: "SF7BW250"}: 20608,
-		{LoRa: "SF7BW500"}: 10304,
+	bwTests := map[ttnpb.DataRate]uint{
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}: 41216,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 250000}}}: 20608,
+		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 500000}}}: 10304,
 	}
 	for dr, us := range bwTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, dr, "4/5")
@@ -144,7 +123,7 @@ func TestDifferentLoRaCRs(t *testing.T) {
 		"4/8": 53504,
 	}
 	for cr, us := range crTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF7BW125"}, cr)
+		dl, err := buildLoRaDownlinkFromParameters(10, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, cr)
 		scheduled := *dl.GetScheduled()
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), scheduled)
@@ -165,7 +144,7 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 		19: 51456,
 	}
 	for size, us := range plTests {
-		dl, err := buildLoRaDownlinkFromParameters(size, types.DataRate{LoRa: "SF7BW125"}, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(size, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
 		scheduled := *dl.GetScheduled()
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), scheduled)
@@ -178,8 +157,13 @@ func TestFSK(t *testing.T) {
 	a := assertions.New(t)
 	payloadSize := 200
 	scheduled := ttnpb.TxSettings{
-		Modulation: ttnpb.Modulation_FSK,
-		BitRate:    50000,
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_FSK{
+				FSK: &ttnpb.FSKDataRate{
+					BitRate: 50000,
+				},
+			},
+		},
 	}
 	toa, err := Compute(payloadSize, scheduled)
 	a.So(err, should.BeNil)

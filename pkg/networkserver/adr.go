@@ -25,39 +25,39 @@ import (
 
 var demodulationFloor = map[uint32]map[uint32]float32{
 	6: {
-		125: -5,
-		250: -2,
-		500: 1,
+		125000: -5,
+		250000: -2,
+		500000: 1,
 	},
 	7: {
-		125: -7.5,
-		250: -4.5,
-		500: -1.5,
+		125000: -7.5,
+		250000: -4.5,
+		500000: -1.5,
 	},
 	8: {
-		125: -10,
-		250: -7,
-		500: -4,
+		125000: -10,
+		250000: -7,
+		500000: -4,
 	},
 	9: {
-		125: -12.5,
-		250: -9.5,
-		500: -6.5,
+		125000: -12.5,
+		250000: -9.5,
+		500000: -6.5,
 	},
 	10: {
-		125: -15,
-		250: -12,
-		500: -9,
+		125000: -15,
+		250000: -12,
+		500000: -9,
 	},
 	11: {
-		125: -17.5,
-		250: -14.5,
-		500: -11.5,
+		125000: -17.5,
+		250000: -14.5,
+		500000: -11.5,
 	},
 	12: {
-		125: -20,
-		250: -17,
-		500: -24,
+		125000: -20,
+		250000: -17,
+		500000: -24,
 	},
 }
 
@@ -108,10 +108,13 @@ func adaptDataRate(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	dev.MACState.DesiredParameters.ADRTxPowerIndex = dev.MACState.CurrentParameters.ADRTxPowerIndex
 
 	// NOTE: We currently assume that the uplink's SF and BW correspond to CurrentParameters.ADRDataRateIndex.
-
-	df, ok := demodulationFloor[up.Settings.SpreadingFactor][up.Settings.Bandwidth]
-	if !ok {
-		return errInvalidDataRate
+	var df float32
+	if dr := up.Settings.DataRate.GetLoRa(); dr != nil {
+		var ok bool
+		df, ok = demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
+		if !ok {
+			return errInvalidDataRate
+		}
 	}
 
 	// The link margin indicates how much stronger the signal (SNR) is than the

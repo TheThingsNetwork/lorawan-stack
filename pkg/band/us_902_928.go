@@ -16,7 +16,6 @@ package band
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var us_902_928 Band
@@ -70,18 +69,51 @@ func init() {
 		},
 
 		DataRates: [16]DataRate{
-			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: constPayloadSizer(19)},
-			{Rate: types.DataRate{LoRa: "SF9BW125"}, DefaultMaxSize: constPayloadSizer(61)},
-			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: constPayloadSizer(133)},
-			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: constPayloadSizer(250)},
-			{Rate: types.DataRate{LoRa: "SF8BW500"}, DefaultMaxSize: constPayloadSizer(250)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 10,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(19)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 9,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(61)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 8,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(133)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(250)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 8,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(250)},
 			{}, {}, {}, // RFU
-			{Rate: types.DataRate{LoRa: "SF12BW500"}, DefaultMaxSize: constPayloadSizer(41)},
-			{Rate: types.DataRate{LoRa: "SF11BW500"}, DefaultMaxSize: constPayloadSizer(117)},
-			{Rate: types.DataRate{LoRa: "SF10BW500"}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: types.DataRate{LoRa: "SF9BW500"}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: types.DataRate{LoRa: "SF8BW500"}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: types.DataRate{LoRa: "SF7BW500"}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 12,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(41)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 11,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(117)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 10,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 9,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 8,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       500000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 		MaxADRDataRateIndex: 3,

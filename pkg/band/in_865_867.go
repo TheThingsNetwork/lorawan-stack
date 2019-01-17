@@ -16,7 +16,6 @@ package band
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var in_865_867 Band
@@ -50,14 +49,34 @@ func init() {
 		},
 
 		DataRates: [16]DataRate{
-			{Rate: types.DataRate{LoRa: "SF12BW125"}, DefaultMaxSize: constPayloadSizer(59)},
-			{Rate: types.DataRate{LoRa: "SF11BW125"}, DefaultMaxSize: constPayloadSizer(59)},
-			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: constPayloadSizer(59)},
-			{Rate: types.DataRate{LoRa: "SF9BW125"}, DefaultMaxSize: constPayloadSizer(123)},
-			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 12,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(59)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 11,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(59)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 10,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(59)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 9,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(123)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 8,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       125000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
 			{}, // RFU
-			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: constPayloadSizer(230)},
+			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{
+				BitRate: 50000,
+			}}}, DefaultMaxSize: constPayloadSizer(230)},
 			{}, {}, {}, {}, {}, {}, {}, // RFU
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},

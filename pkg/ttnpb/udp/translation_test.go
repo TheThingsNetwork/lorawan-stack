@@ -95,7 +95,7 @@ func TestToGatewayUp(t *testing.T) {
 					Freq: 868.0,
 					Chan: 2,
 					Modu: "LORA",
-					DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+					DatR: udp.DataRate{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
 					CodR: "4/7",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
@@ -110,11 +110,12 @@ func TestToGatewayUp(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	msg := upstream.UplinkMessages[0]
+	dr := msg.Settings.DataRate.GetLoRa()
+	a.So(dr, should.NotBeNil)
+	a.So(dr.SpreadingFactor, should.Equal, 10)
+	a.So(dr.Bandwidth, should.Equal, 125000)
 	a.So(msg.Settings.CodingRate, should.Equal, "4/7")
-	a.So(msg.Settings.SpreadingFactor, should.Equal, 10)
-	a.So(msg.Settings.Bandwidth, should.Equal, 125000)
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
-	a.So(msg.Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
 }
@@ -140,7 +141,7 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 						Freq: 868.0,
 						Chan: 2,
 						Modu: "LORA",
-						DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+						DatR: udp.DataRate{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
 						CodR: "4/7",
 						Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 						Size: 19,
@@ -195,11 +196,12 @@ func TestToGatewayUpRaw(t *testing.T) {
 
 	a.So(len(upstream.UplinkMessages), should.Equal, 1)
 	msg := upstream.UplinkMessages[0]
+	dr := msg.Settings.DataRate.GetLoRa()
+	a.So(dr, should.NotBeNil)
+	a.So(dr.SpreadingFactor, should.Equal, 7)
+	a.So(dr.Bandwidth, should.Equal, 125000)
 	a.So(msg.Settings.CodingRate, should.Equal, "4/5")
-	a.So(msg.Settings.SpreadingFactor, should.Equal, 7)
-	a.So(msg.Settings.Bandwidth, should.Equal, 125000)
 	a.So(msg.Settings.Frequency, should.Equal, 868100000)
-	a.So(msg.Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
 	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
 }
@@ -262,11 +264,16 @@ func TestFromDownlinkMessage(t *testing.T) {
 	msg := &ttnpb.DownlinkMessage{
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				Frequency:          925700000,
-				Modulation:         ttnpb.Modulation_LORA,
+				Frequency: 925700000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							SpreadingFactor: 10,
+							Bandwidth:       500000,
+						},
+					},
+				},
 				TxPower:            20,
-				SpreadingFactor:    10,
-				Bandwidth:          500000,
 				InvertPolarization: true,
 				Timestamp:          1886440700,
 			},
@@ -275,7 +282,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	}
 	tx, err := udp.FromDownlinkMessage(msg)
 	a.So(err, should.BeNil)
-	a.So(tx.DatR.LoRa, should.Equal, "SF10BW500")
+	a.So(tx.DatR, should.Resemble, udp.DataRate{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{Bandwidth: 500000, SpreadingFactor: 10}}}})
 	a.So(tx.Tmst, should.Equal, 1886440700)
 	a.So(tx.NCRC, should.Equal, true)
 	a.So(tx.Data, should.Equal, "ffOO")
@@ -286,11 +293,16 @@ func TestDownlinkRoundtrip(t *testing.T) {
 	expected := &ttnpb.DownlinkMessage{
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				Frequency:          925700000,
-				Modulation:         ttnpb.Modulation_LORA,
+				Frequency: 925700000,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							SpreadingFactor: 10,
+							Bandwidth:       500000,
+						},
+					},
+				},
 				TxPower:            20,
-				SpreadingFactor:    10,
-				Bandwidth:          500000,
 				InvertPolarization: true,
 				Timestamp:          188700000,
 			},
@@ -311,9 +323,7 @@ func TestFromDownlinkMessageDummy(t *testing.T) {
 
 	msg := ttnpb.DownlinkMessage{
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
-			Scheduled: &ttnpb.TxSettings{
-				Modulation: 3939,
-			},
+			Scheduled: &ttnpb.TxSettings{},
 		},
 	}
 	_, err := udp.FromDownlinkMessage(&msg)
