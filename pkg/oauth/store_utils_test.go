@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package oauth
+package oauth_test
 
 import (
 	"context"
@@ -24,49 +24,82 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+type mockStoreContents struct {
+	calls []string
+	req   struct {
+		ctx       context.Context
+		fieldMask *types.FieldMask
+		session   *ttnpb.UserSession
+		sessionID string
+		userIDs   *ttnpb.UserIdentifiers
+		clientIDs *ttnpb.ClientIdentifiers
+	}
+	res struct {
+		session       *ttnpb.UserSession
+		user          *ttnpb.User
+		client        *ttnpb.Client
+		authorization *ttnpb.OAuthClientAuthorization
+	}
+	err struct {
+		getUser          error
+		createSession    error
+		getSession       error
+		deleteSession    error
+		getClient        error
+		getAuthorization error
+	}
+}
+
 type mockStore struct {
 	store.UserStore
 	store.UserSessionStore
 	store.ClientStore
 	store.OAuthStore
 
-	lastCall string
-	req      struct {
-		ctx       context.Context
-		fieldMask *types.FieldMask
-		session   *ttnpb.UserSession
-		sessionID string
-		userIDs   *ttnpb.UserIdentifiers
-	}
-	res struct {
-		err     error
-		session *ttnpb.UserSession
-		user    *ttnpb.User
-	}
+	mockStoreContents
 }
 
-var mockErrUnauthenticated = grpc.Errorf(codes.Unauthenticated, "Unauthenticated")
+func (s *mockStore) reset() {
+	s.mockStoreContents = mockStoreContents{}
+}
+
+var (
+	mockErrUnauthenticated = grpc.Errorf(codes.Unauthenticated, "Unauthenticated")
+	mockErrNotFound        = grpc.Errorf(codes.NotFound, "NotFound")
+)
 
 func (s *mockStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
 	s.req.ctx, s.req.userIDs, s.req.fieldMask = ctx, id, fieldMask
-	s.lastCall = "GetUser"
-	return s.res.user, s.res.err
+	s.calls = append(s.calls, "GetUser")
+	return s.res.user, s.err.getUser
 }
 
 func (s *mockStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	s.req.ctx, s.req.session = ctx, sess
-	s.lastCall = "CreateSession"
-	return s.res.session, s.res.err
+	s.calls = append(s.calls, "CreateSession")
+	return s.res.session, s.err.createSession
 }
 
 func (s *mockStore) GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error) {
 	s.req.ctx, s.req.userIDs, s.req.sessionID = ctx, userIDs, sessionID
-	s.lastCall = "GetSession"
-	return s.res.session, s.res.err
+	s.calls = append(s.calls, "GetSession")
+	return s.res.session, s.err.getSession
 }
 
 func (s *mockStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error {
 	s.req.ctx, s.req.userIDs, s.req.sessionID = ctx, userIDs, sessionID
-	s.lastCall = "DeleteSession"
-	return s.res.err
+	s.calls = append(s.calls, "DeleteSession")
+	return s.err.deleteSession
+}
+
+func (s *mockStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
+	s.req.ctx, s.req.clientIDs, s.req.fieldMask = ctx, id, fieldMask
+	s.calls = append(s.calls, "GetClient")
+	return s.res.client, s.err.getClient
+}
+
+func (s *mockStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error) {
+	s.req.ctx, s.req.userIDs, s.req.clientIDs = ctx, userIDs, clientIDs
+	s.calls = append(s.calls, "GetAuthorization")
+	return s.res.authorization, s.err.getAuthorization
 }

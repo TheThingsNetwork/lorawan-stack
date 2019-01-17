@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package oauth
+package oauth_test
 
 import (
 	"bytes"
@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/oauth"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/webui"
@@ -43,7 +44,7 @@ type loginFormData struct {
 	Password string `json:"password"`
 }
 
-func TestServerLoginLogout(t *testing.T) {
+func TestOAuthFlow(t *testing.T) {
 	ctx := test.Context()
 	now := time.Now().Truncate(time.Second)
 	store := &mockStore{}
@@ -68,9 +69,9 @@ func TestServerLoginLogout(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	s := NewServer(ctx, store, Config{
+	s := oauth.NewServer(ctx, store, oauth.Config{
 		Mount: "/oauth",
-		UI: UIConfig{
+		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName: "The Things Network",
 				Title:    "OAuth",
@@ -121,7 +122,7 @@ func TestServerLoginLogout(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.err = mockErrUnauthenticated
+				s.err.getUser = mockErrUnauthenticated
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
@@ -129,7 +130,7 @@ func TestServerLoginLogout(t *testing.T) {
 			ExpectedCode: http.StatusUnauthorized,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
-				a.So(s.lastCall, should.Equal, "GetUser")
+				a.So(s.calls, should.Contain, "GetUser")
 				if a.So(s.req.userIDs, should.NotBeNil) {
 					a.So(s.req.userIDs.UserID, should.Equal, "user")
 				}
@@ -137,7 +138,7 @@ func TestServerLoginLogout(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.err = mockErrUnauthenticated
+				s.err.getUser = mockErrUnauthenticated
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
@@ -145,7 +146,7 @@ func TestServerLoginLogout(t *testing.T) {
 			ExpectedCode: http.StatusUnauthorized,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
-				a.So(s.lastCall, should.Equal, "GetUser")
+				a.So(s.calls, should.Contain, "GetUser")
 				if a.So(s.req.userIDs, should.NotBeNil) {
 					a.So(s.req.userIDs.UserID, should.Equal, "user")
 				}
@@ -153,7 +154,6 @@ func TestServerLoginLogout(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.err = nil
 				s.res.user = &ttnpb.User{Password: string(password)}
 				s.res.session = &ttnpb.UserSession{UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"}, SessionID: "session_id"}
 			},
@@ -164,7 +164,6 @@ func TestServerLoginLogout(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.err = nil
 				s.res.user = &ttnpb.User{Password: string(password)}
 				s.res.session = &ttnpb.UserSession{
 					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
@@ -194,24 +193,65 @@ func TestServerLoginLogout(t *testing.T) {
 			ExpectedBody: `"user_id":"user"`,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
-				a.So(s.lastCall, should.Equal, "GetUser")
+				a.So(s.calls, should.Contain, "GetUser")
 				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
 				a.So(s.req.sessionID, should.Equal, "session_id") // actually the before-last call.
 			},
 		},
 		{
+			StoreSetup: func(s *mockStore) {
+				s.res.session = &ttnpb.UserSession{
+					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+					SessionID:       "session_id",
+					CreatedAt:       now,
+				}
+				s.res.user = &ttnpb.User{
+					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+				}
+				s.res.client = &ttnpb.Client{
+					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "client"},
+					State:             ttnpb.STATE_APPROVED,
+					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
+					RedirectURIs:      []string{"http://callback"},
+					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+				}
+				s.err.getAuthorization = mockErrNotFound
+			},
+			Method:       "GET",
+			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://callback&response_type=code&state=foo",
+			ExpectedCode: http.StatusOK,
+			ExpectedBody: `"client":{"ids":{"client_id":"client"}`,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.req.clientIDs.GetClientID(), should.Equal, "client")
+				a.So(s.calls, should.Contain, "GetClient")
+				a.So(s.calls, should.Contain, "GetAuthorization")
+			},
+		},
+		{
+			StoreSetup: func(s *mockStore) {
+				s.res.session = &ttnpb.UserSession{
+					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+					SessionID:       "session_id",
+					CreatedAt:       now,
+				}
+				s.res.user = &ttnpb.User{
+					UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+				}
+			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/logout",
 			ExpectedCode: http.StatusOK,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
-				a.So(s.lastCall, should.Equal, "DeleteSession")
+				a.So(s.calls, should.Contain, "DeleteSession")
 				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
 				a.So(s.req.sessionID, should.Equal, "session_id")
 			},
 		},
 	} {
 		t.Run(fmt.Sprintf("%s %s", tt.Method, tt.Path), func(t *testing.T) {
+			store.reset()
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
 			}
