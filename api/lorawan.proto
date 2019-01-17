@@ -200,11 +200,6 @@ message CFList {
   repeated bool ch_masks = 3;
 }
 
-enum Modulation {
-  LORA = 0;
-  FSK = 1;
-}
-
 enum Class {
   option (gogoproto.goproto_enum_prefix) = false;
   CLASS_A = 0;
@@ -222,39 +217,52 @@ enum TxSchedulePriority {
   HIGHEST = 6;
 }
 
+message LoRaDataRate {
+  // Bandwidth (Hz).
+  uint32 bandwidth = 1;
+  uint32 spreading_factor = 2;
+}
+
+message FSKDataRate {
+  // Bit rate (bps).
+  uint32 bit_rate = 1;
+}
+
+message DataRate {
+  oneof modulation {
+    LoRaDataRate lora = 1 [(gogoproto.customname) = "LoRa"];
+    FSKDataRate fsk = 2 [(gogoproto.customname) = "FSK"];
+  };
+}
+
 // TxSettings contains the settings for a transmission.
 // This message is used on both uplink and downlink.
 // On downlink, this is a scheduled transmission.
 message TxSettings {
   option (gogoproto.populate) = false;
 
-  Modulation modulation = 1;
+  // Data rate.
+  DataRate data_rate = 1 [(gogoproto.nullable) = false];
   // LoRaWAN data rate index.
   DataRateIndex data_rate_index = 2;
-  // LoRa bandwidth (Hz).
-  uint32 bandwidth = 3;
-  // LoRa spreading factor.
-  uint32 spreading_factor = 4;
-  // FSK bit rate (bps).
-  uint32 bit_rate = 5;
   // LoRa coding rate.
-  string coding_rate = 6;
+  string coding_rate = 3;
   // Frequency (Hz).
-  uint64 frequency = 7;
+  uint64 frequency = 4;
   // Transmission power (dBm). Only on downlink.
-  int32 tx_power = 8;
+  int32 tx_power = 5;
   // Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.
-  bool invert_polarization = 9;
+  bool invert_polarization = 6;
   // Index of the channel that received the message.
-  uint32 channel_index = 10 [(validator.field) = {int_lt: 256}];
+  uint32 channel_index = 7 [(validator.field) = {int_lt: 256}];
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
-  bool enable_crc = 11 [(gogoproto.customname) = "EnableCRC"];
+  bool enable_crc = 8 [(gogoproto.customname) = "EnableCRC"];
   // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).
   // On downlink, set timestamp to 0 and time to null to use immediate scheduling.
-  uint32 timestamp = 12;
+  uint32 timestamp = 9;
   // Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.
   // For downlink, this requires the gateway to have GPS time synchronization.
-  google.protobuf.Timestamp time = 13 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 10 [(gogoproto.stdtime) = true];
 }
 
 message GatewayAntennaIdentifiers {

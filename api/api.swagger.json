@@ -5922,6 +5922,17 @@
         }
       }
     },
+    "v3DataRate": {
+      "type": "object",
+      "properties": {
+        "lora": {
+          "$ref": "#/definitions/v3LoRaDataRate"
+        },
+        "fsk": {
+          "$ref": "#/definitions/v3FSKDataRate"
+        }
+      }
+    },
     "v3DataRateIndex": {
       "type": "string",
       "enum": [
@@ -6437,6 +6448,16 @@
         }
       }
     },
+    "v3FSKDataRate": {
+      "type": "object",
+      "properties": {
+        "bit_rate": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Bit rate (bps)."
+        }
+      }
+    },
     "v3Gateway": {
       "type": "object",
       "properties": {
@@ -6840,6 +6861,20 @@
         "kek_label": {
           "type": "string",
           "description": "The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key."
+        }
+      }
+    },
+    "v3LoRaDataRate": {
+      "type": "object",
+      "properties": {
+        "bandwidth": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Bandwidth (Hz)."
+        },
+        "spreading_factor": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -7311,14 +7346,6 @@
         "MINOR_RFU_15"
       ],
       "default": "MINOR_RFU_0"
-    },
-    "v3Modulation": {
-      "type": "string",
-      "enum": [
-        "LORA",
-        "FSK"
-      ],
-      "default": "LORA"
     },
     "v3NwkSKeysResponse": {
       "type": "object",
@@ -8095,27 +8122,13 @@
     "v3TxSettings": {
       "type": "object",
       "properties": {
-        "modulation": {
-          "$ref": "#/definitions/v3Modulation"
+        "data_rate": {
+          "$ref": "#/definitions/v3DataRate",
+          "description": "Data rate."
         },
         "data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex",
           "description": "LoRaWAN data rate index."
-        },
-        "bandwidth": {
-          "type": "integer",
-          "format": "int64",
-          "description": "LoRa bandwidth (Hz)."
-        },
-        "spreading_factor": {
-          "type": "integer",
-          "format": "int64",
-          "description": "LoRa spreading factor."
-        },
-        "bit_rate": {
-          "type": "integer",
-          "format": "int64",
-          "description": "FSK bit rate (bps)."
         },
         "coding_rate": {
           "type": "string",

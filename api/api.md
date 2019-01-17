@@ -274,12 +274,15 @@
 - [lorawan-stack/api/lorawan.proto](#lorawan-stack/api/lorawan.proto)
     - [CFList](#ttn.lorawan.v3.CFList)
     - [DLSettings](#ttn.lorawan.v3.DLSettings)
+    - [DataRate](#ttn.lorawan.v3.DataRate)
     - [DownlinkPath](#ttn.lorawan.v3.DownlinkPath)
     - [FCtrl](#ttn.lorawan.v3.FCtrl)
     - [FHDR](#ttn.lorawan.v3.FHDR)
+    - [FSKDataRate](#ttn.lorawan.v3.FSKDataRate)
     - [GatewayAntennaIdentifiers](#ttn.lorawan.v3.GatewayAntennaIdentifiers)
     - [JoinAcceptPayload](#ttn.lorawan.v3.JoinAcceptPayload)
     - [JoinRequestPayload](#ttn.lorawan.v3.JoinRequestPayload)
+    - [LoRaDataRate](#ttn.lorawan.v3.LoRaDataRate)
     - [MACCommand](#ttn.lorawan.v3.MACCommand)
     - [MACCommand.ADRParamSetupReq](#ttn.lorawan.v3.MACCommand.ADRParamSetupReq)
     - [MACCommand.BeaconFreqAns](#ttn.lorawan.v3.MACCommand.BeaconFreqAns)
@@ -331,7 +334,6 @@
     - [MType](#ttn.lorawan.v3.MType)
     - [Major](#ttn.lorawan.v3.Major)
     - [Minor](#ttn.lorawan.v3.Minor)
-    - [Modulation](#ttn.lorawan.v3.Modulation)
     - [PHYVersion](#ttn.lorawan.v3.PHYVersion)
     - [PingSlotPeriod](#ttn.lorawan.v3.PingSlotPeriod)
     - [RejoinCountExponent](#ttn.lorawan.v3.RejoinCountExponent)
@@ -3213,6 +3215,22 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
+<a name="ttn.lorawan.v3.DataRate"/>
+
+### DataRate
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| lora | [LoRaDataRate](#ttn.lorawan.v3.LoRaDataRate) |  |  |
+| fsk | [FSKDataRate](#ttn.lorawan.v3.FSKDataRate) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.DownlinkPath"/>
 
 ### DownlinkPath
@@ -3260,6 +3278,21 @@ Only the components for which the keys were meant, will have the key-encryption-
 | f_ctrl | [FCtrl](#ttn.lorawan.v3.FCtrl) |  |  |
 | f_cnt | [uint32](#uint32) |  |  |
 | f_opts | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.FSKDataRate"/>
+
+### FSKDataRate
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bit_rate | [uint32](#uint32) |  | Bit rate (bps). |
 
 
 
@@ -3314,6 +3347,22 @@ Only the components for which the keys were meant, will have the key-encryption-
 | join_eui | [bytes](#bytes) |  |  |
 | dev_eui | [bytes](#bytes) |  |  |
 | dev_nonce | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.LoRaDataRate"/>
+
+### LoRaDataRate
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bandwidth | [uint32](#uint32) |  | Bandwidth (Hz). |
+| spreading_factor | [uint32](#uint32) |  |  |
 
 
 
@@ -3954,11 +4003,8 @@ On downlink, this is a scheduled transmission.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| modulation | [Modulation](#ttn.lorawan.v3.Modulation) |  |  |
+| data_rate | [DataRate](#ttn.lorawan.v3.DataRate) |  | Data rate. |
 | data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index. |
-| bandwidth | [uint32](#uint32) |  | LoRa bandwidth (Hz). |
-| spreading_factor | [uint32](#uint32) |  | LoRa spreading factor. |
-| bit_rate | [uint32](#uint32) |  | FSK bit rate (bps). |
 | coding_rate | [string](#string) |  | LoRa coding rate. |
 | frequency | [uint64](#uint64) |  | Frequency (Hz). |
 | tx_power | [int32](#int32) |  | Transmission power (dBm). Only on downlink. |
@@ -4244,18 +4290,6 @@ On downlink, this is a scheduled transmission.
 | MINOR_RFU_13 | 13 |  |
 | MINOR_RFU_14 | 14 |  |
 | MINOR_RFU_15 | 15 |  |
-
-
-
-<a name="ttn.lorawan.v3.Modulation"/>
-
-### Modulation
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| LORA | 0 |  |
-| FSK | 1 |  |
 
 
 
