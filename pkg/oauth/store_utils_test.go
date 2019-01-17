@@ -35,12 +35,15 @@ type mockStoreContents struct {
 		clientIDs         *ttnpb.ClientIdentifiers
 		authorization     *ttnpb.OAuthClientAuthorization
 		authorizationCode *ttnpb.OAuthAuthorizationCode
+		code              string
+		token             *ttnpb.OAuthAccessToken
+		previousID        string
 	}
 	res struct {
-		session       *ttnpb.UserSession
-		user          *ttnpb.User
-		client        *ttnpb.Client
-		authorization *ttnpb.OAuthClientAuthorization
+		session           *ttnpb.UserSession
+		user              *ttnpb.User
+		client            *ttnpb.Client
+		authorization     *ttnpb.OAuthClientAuthorization
 	}
 	err struct {
 		getUser                 error
@@ -51,6 +54,9 @@ type mockStoreContents struct {
 		getAuthorization        error
 		authorize               error
 		createAuthorizationCode error
+		getAuthorizationCode    error
+		deleteAuthorizationCode error
+		createAccessToken       error
 	}
 }
 
@@ -118,4 +124,22 @@ func (s *mockStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAu
 	s.req.ctx, s.req.authorizationCode = ctx, code
 	s.calls = append(s.calls, "CreateAuthorizationCode")
 	return s.err.createAuthorizationCode
+}
+
+func (s *mockStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
+	s.req.ctx, s.req.code = ctx, code
+	s.calls = append(s.calls, "GetAuthorizationCode")
+	return s.res.authorizationCode, s.err.getAuthorizationCode
+}
+
+func (s *mockStore) DeleteAuthorizationCode(ctx context.Context, code string) error {
+	s.req.ctx, s.req.code = ctx, code
+	s.calls = append(s.calls, "DeleteAuthorizationCode")
+	return s.err.deleteAuthorizationCode
+}
+
+func (s *mockStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error {
+	s.req.ctx, s.req.token, s.req.previousID = ctx, token, previousID
+	s.calls = append(s.calls, "CreateAccessToken")
+	return s.err.createAccessToken
 }

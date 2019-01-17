@@ -68,13 +68,23 @@ var (
 	}
 )
 
-func TestOAuthFlow(t *testing.T) {
-	ctx := test.Context()
-	store := &mockStore{}
+func init() {
 	password, err := auth.Hash("pass")
 	if err != nil {
 		panic(err)
 	}
+	mockUser.Password = string(password)
+
+	secret, err := auth.Hash("secret")
+	if err != nil {
+		panic(err)
+	}
+	mockClient.Secret = string(secret)
+}
+
+func TestOAuthFlow(t *testing.T) {
+	ctx := test.Context()
+	store := &mockStore{}
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
 		panic(err)
@@ -89,9 +99,6 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	})
-	if err != nil {
-		panic(err)
-	}
 	s := oauth.NewServer(ctx, store, oauth.Config{
 		Mount: "/oauth",
 		UI: oauth.UIConfig{
@@ -177,7 +184,7 @@ func TestOAuthFlow(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.user = &ttnpb.User{Password: string(password)}
+				s.res.user = mockUser
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
@@ -186,7 +193,7 @@ func TestOAuthFlow(t *testing.T) {
 		},
 		{
 			StoreSetup: func(s *mockStore) {
-				s.res.user = &ttnpb.User{Password: string(password)}
+				s.res.user = mockUser
 				s.res.session = mockSession
 			},
 			Method:       "POST",
@@ -351,5 +358,127 @@ func TestOAuthFlow(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestTokenExchange(t *testing.T) {
+	ctx := test.Context()
+	store := &mockStore{}
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			HTTP: config.HTTP{
+				Cookie: config.Cookie{
+					HashKey:  []byte("12345678123456781234567812345678"),
+					BlockKey: []byte("12345678123456781234567812345678"),
+				},
+			},
+		},
+	})
+	s := oauth.NewServer(ctx, store, oauth.Config{
+		Mount: "/oauth",
+		UI: oauth.UIConfig{
+			TemplateData: webui.TemplateData{
+				SiteName: "The Things Network",
+				Title:    "OAuth",
+			},
+		},
+	})
+	c.RegisterWeb(s)
+	if err := c.Start(); err != nil {
+		panic(err)
+	}
+
+	for _, tt := range []struct {
+		StoreSetup   func(*mockStore)
+		StoreCheck   func(*testing.T, *mockStore)
+		Method       string
+		Path         string
+		Body         interface{}
+		ExpectedCode int
+		ExpectedBody string
+	}{
+		{
+			StoreSetup: func(s *mockStore) {
+				s.res.session = mockSession
+				s.res.user = mockUser
+				s.res.client = mockClient
+				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
+					UserIDs:     mockUser.UserIdentifiers,
+					ClientIDs:   mockClient.ClientIdentifiers,
+					Rights:      mockClient.Rights,
+					Code:        "the code",
+					RedirectURI: "http://uri/callback",
+					State:       "foo",
+					CreatedAt:   time.Now().Truncate(time.Second),
+					ExpiresAt:   time.Now().Truncate(time.Second).Add(time.Hour),
+				}
+			},
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: url.Values{
+				"grant_type":    {"authorization_code"},
+				"code":          {"the code"},
+				"redirect_uri":  {"http://uri/callback"},
+				"client_id":     {"client"},
+				"client_secret": {"secret"},
+			},
+			ExpectedCode: http.StatusOK,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "GetAuthorizationCode")
+				a.So(s.calls, should.Contain, "DeleteAuthorizationCode")
+				a.So(s.req.code, should.Equal, "the code")
+				a.So(s.calls, should.Contain, "CreateAccessToken")
+				a.So(s.req.token.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.token.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
+				a.So(s.req.token.AccessToken, should.NotBeEmpty)
+				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("%s %s", tt.Method, tt.Path), func(t *testing.T) {
+			store.reset()
+			if tt.StoreSetup != nil {
+				tt.StoreSetup(store)
+			}
+
+			var body *bytes.Buffer
+			var contentType string
+
+			if tt.Body != nil {
+				switch ttBody := tt.Body.(type) {
+				case url.Values:
+					body = bytes.NewBufferString(ttBody.Encode())
+					contentType = "application/x-www-form-urlencoded"
+				default:
+					json, _ := json.Marshal(tt.Body)
+					body = bytes.NewBuffer(json)
+					contentType = "application/json"
+				}
+			}
+
+			req := httptest.NewRequest(tt.Method, tt.Path, body)
+			req.URL.Scheme, req.URL.Host = "http", req.Host
+
+			if contentType != "" {
+				req.Header.Set("Content-Type", contentType)
+			}
+
+			res := httptest.NewRecorder()
+
+			c.ServeHTTP(res, req)
+
+			a := assertions.New(t)
+			a.So(res.Code, should.Equal, tt.ExpectedCode)
+			if tt.ExpectedBody != "" {
+				if a.So(res.Body, should.NotBeNil) {
+					a.So(res.Body.String(), should.ContainSubstring, tt.ExpectedBody)
+				}
+			}
+
+			if tt.StoreCheck != nil {
+				tt.StoreCheck(t, store)
+			}
+		})
+	}
 }
