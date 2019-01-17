@@ -48,6 +48,7 @@ type TemplateData struct {
 	JSFiles       []string `name:"js-file" description:"The names of the JS files"`
 }
 
+// MountPath derives the mount path from the canonical URL of the config.
 func (t TemplateData) MountPath() string {
 	if url, err := url.Parse(t.CanonicalURL); err == nil {
 		if url.Path == "" {
@@ -98,10 +99,10 @@ const appHTML = `{{- $assetsBaseURL := .AssetsBaseURL -}}
 </html>
 `
 
-// Template for rendering the Web UI.
+// Template for rendering the web UI.
 // The context is expected to contain TemplateData as "template_data".
 // The "app_config" will be rendered into the environment.
-var Template echo.Renderer
+var Template *AppTemplate
 
 func init() {
 	appHTML := appHTML
@@ -109,13 +110,17 @@ func init() {
 	for i, line := range appHTMLLines {
 		appHTMLLines[i] = strings.TrimSpace(line)
 	}
-	Template = &appTemplate{
-		template: template.Must(template.New("app").Parse(strings.Join(appHTMLLines, ""))),
-	}
+	Template = NewAppTemplate(template.Must(template.New("app").Parse(strings.Join(appHTMLLines, ""))))
 }
 
-type appTemplate struct {
+// AppTemplate wraps the application template for the web UI.
+type AppTemplate struct {
 	template *template.Template
+}
+
+// NewAppTemplate instantiates a new application template for the web UI.
+func NewAppTemplate(t *template.Template) *AppTemplate {
+	return &AppTemplate{template: t}
 }
 
 var hashedFiles = map[string]string{}
@@ -124,18 +129,27 @@ func registerHashedFile(original, hashed string) {
 	hashedFiles[original] = hashed
 }
 
-func (t *appTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
+// Render is the echo.Renderer that renders the web UI.
+func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
 	templateData := c.Get("template_data").(TemplateData)
+	cssFiles := make([]string, len(templateData.CSSFiles))
 	for i, cssFile := range templateData.CSSFiles {
 		if hashedFile, ok := hashedFiles[cssFile]; ok {
-			templateData.CSSFiles[i] = hashedFile
+			cssFiles[i] = hashedFile
+		} else {
+			cssFiles[i] = cssFile
 		}
 	}
+	templateData.CSSFiles = cssFiles
+	jsFiles := make([]string, len(templateData.JSFiles))
 	for i, jsFile := range templateData.JSFiles {
 		if hashedFile, ok := hashedFiles[jsFile]; ok {
-			templateData.JSFiles[i] = hashedFile
+			jsFiles[i] = hashedFile
+		} else {
+			jsFiles[i] = jsFile
 		}
 	}
+	templateData.JSFiles = jsFiles
 	return t.template.Execute(w, Data{
 		TemplateData: templateData,
 		AppConfig:    c.Get("app_config"),
@@ -143,10 +157,10 @@ func (t *appTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo
 	})
 }
 
-// Render the WebUI.
+// Handler is the echo.HandlerFunc that renders the web UI.
 // The context is expected to contain TemplateData as "template_data".
 // The "app_config" and "page_data" will be rendered into the environment.
-func Render(c echo.Context) error {
+func (t *AppTemplate) Handler(c echo.Context) error {
 	buf := new(bytes.Buffer)
 	if err := Template.Render(buf, "", c.Get("page_data"), c); err != nil {
 		return err
