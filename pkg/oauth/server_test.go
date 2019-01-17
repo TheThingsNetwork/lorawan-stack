@@ -114,14 +114,15 @@ func TestOAuthFlow(t *testing.T) {
 	}
 
 	for _, tt := range []struct {
-		Name         string
-		StoreSetup   func(*mockStore)
-		StoreCheck   func(*testing.T, *mockStore)
-		Method       string
-		Path         string
-		Body         interface{}
-		ExpectedCode int
-		ExpectedBody string
+		Name             string
+		StoreSetup       func(*mockStore)
+		StoreCheck       func(*testing.T, *mockStore)
+		Method           string
+		Path             string
+		Body             interface{}
+		ExpectedCode     int
+		ExpectedRedirect string
+		ExpectedBody     string
 	}{
 		{
 			Method:       "GET",
@@ -245,10 +246,11 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.client = mockClient
 				s.err.getAuthorization = mockErrNotFound
 			},
-			Method:       "POST",
-			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
-			Body:         authorizeFormData{encoding: "form", Authorize: true},
-			ExpectedCode: http.StatusFound,
+			Method:           "POST",
+			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Body:             authorizeFormData{encoding: "form", Authorize: true},
+			ExpectedCode:     http.StatusFound,
+			ExpectedRedirect: "http://uri/callback?code=",
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "Authorize")
@@ -352,6 +354,7 @@ func TestOAuthFlow(t *testing.T) {
 
 			a := assertions.New(t)
 			a.So(res.Code, should.Equal, tt.ExpectedCode)
+			a.So(res.Header().Get("location"), should.ContainSubstring, tt.ExpectedRedirect)
 			if tt.ExpectedBody != "" {
 				if a.So(res.Body, should.NotBeNil) {
 					a.So(res.Body.String(), should.ContainSubstring, tt.ExpectedBody)
