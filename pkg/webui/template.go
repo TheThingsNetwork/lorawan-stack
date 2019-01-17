@@ -69,7 +69,7 @@ const appHTML = `{{- $assetsBaseURL := .AssetsBaseURL -}}
     <meta http-equiv="X-UA-Compatible" content="IE=edge" >
     {{with .Description}}<meta name="description" content="{{.}}">{{end}}
 
-    <meta property="og:url" content="{{.}}">
+    <meta property="og:url" content="{{.CanonicalURL}}">
     <meta property="og:site_name" content="{{.SiteName}}{{with .Title}} {{.}}{{end}}">
     {{with .SubTitle}}<meta property="og:title" content="{{.}}">{{end}}
     {{with .Description}}<meta property="og:description" content="{{.}}">{{end}}
