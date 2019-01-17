@@ -16,6 +16,26 @@ package messages
 
 import "encoding/json"
 
+// Definition of message types
+const (
+	// Upstream types for messages from the Gateway
+	TypeUpstreamVersion              = "version"
+	TypeUpstreamJoinRequest          = "jreq"
+	TypeUpstreamJoinUplinkDataFrame  = "updf"
+	TypeUpstreamProprietaryDataFrame = "propdf"
+	TypeUpstreamTxConfirmation       = "dntxed"
+	TypeUpstreamTimeSync             = "timesync"
+	TypeUpstreamRemoteShell          = "rmtsh"
+
+	// Downstream types for messages from the Network
+	TypeDownstreamRouterConfig              = "router_config"
+	TypeDownstreamDownlinkMessage           = "dnmsg"
+	TypeDownstreamDownlinkMulticastSchedule = "dnsched"
+	TypeDownstreamTimeSync                  = "timesync"
+	TypeDownstreamRemoteCommand             = "runcmd"
+	TypeDownstreamRemoteShell               = "rmtsh"
+)
+
 // DiscoverQuery contains the unique identifier of the gateway.
 // This message is sent by the gateway.
 type DiscoverQuery struct {
@@ -30,12 +50,6 @@ type DiscoverResponse struct {
 	URI   string `json:"uri,omitempty"`
 	Error string `json:"error,omitempty"`
 }
-
-const (
-	TypeVersion      = "version"
-	TypeRouterConfig = "router_config"
-	TypeJoinRequest  = "jreq"
-)
 
 // Type returns the message type of the given data.
 func Type(data []byte) (string, error) {
@@ -66,7 +80,7 @@ func (v Version) MarshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  TypeVersion,
+		Type:  TypeUpstreamVersion,
 		Alias: Alias(v),
 	})
 }
@@ -100,9 +114,9 @@ type SX1301Config struct {
 		} */
 }
 
-// RouterInfo contains router information.
+// RouterConfig contains the router configuration.
 // This message is sent by the Gateway Server.
-type RouterInfo struct {
+type RouterConfig struct {
 	NetID          []int        `json:"NetID"`
 	JoinEUI        [][]int      `json:"JoinEui"`
 	Region         string       `json:"region"`

@@ -38,5 +38,5 @@ func TestType(t *testing.T) {
 
 	mt, err := messages.Type(data)
 	a.So(err, should.BeNil)
-	a.So(mt, should.Equal, messages.TypeVersion)
+	a.So(mt, should.Equal, messages.TypeUpstreamVersion)
 }
