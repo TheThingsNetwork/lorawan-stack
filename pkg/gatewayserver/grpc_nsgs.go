@@ -81,6 +81,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 			continue
 		}
 		ctx = events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
+		down.CorrelationIDs = append(down.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 		registerSendDownlink(ctx, conn.Gateway(), down)
 		return &types.Empty{}, nil
 	}

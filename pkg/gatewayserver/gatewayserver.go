@@ -232,7 +232,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 
 	uid := unique.ID(ctx, ids)
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_conn:%s", events.NewCorrelationID()))
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
 	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
 	if er == nil {
@@ -323,6 +323,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			return
 		case msg := <-conn.Up():
 			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
+			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 			registerReceiveUplink(ctx, conn.Gateway(), msg)
 			drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 				logger.WithError(err).Debug("Dropping message")
@@ -348,6 +349,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			registerReceiveStatus(ctx, conn.Gateway(), status)
 		case ack := <-conn.TxAck():
 			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("tx_ack:%s", events.NewCorrelationID()))
+			ack.CorrelationIDs = append(ack.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 			if ack.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, conn.Gateway())
 			} else {
