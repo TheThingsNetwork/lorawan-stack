@@ -38,12 +38,15 @@ type mockStoreContents struct {
 		code              string
 		token             *ttnpb.OAuthAccessToken
 		previousID        string
+		tokenID           string
 	}
 	res struct {
 		session           *ttnpb.UserSession
 		user              *ttnpb.User
 		client            *ttnpb.Client
 		authorization     *ttnpb.OAuthClientAuthorization
+		authorizationCode *ttnpb.OAuthAuthorizationCode
+		accessToken       *ttnpb.OAuthAccessToken
 	}
 	err struct {
 		getUser                 error
@@ -57,6 +60,8 @@ type mockStoreContents struct {
 		getAuthorizationCode    error
 		deleteAuthorizationCode error
 		createAccessToken       error
+		getAccessToken          error
+		deleteAccessToken       error
 	}
 }
 
@@ -142,4 +147,19 @@ func (s *mockStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAcc
 	s.req.ctx, s.req.token, s.req.previousID = ctx, token, previousID
 	s.calls = append(s.calls, "CreateAccessToken")
 	return s.err.createAccessToken
+}
+
+func (s *mockStore) GetAccessToken(ctx context.Context, tokenID string) (*ttnpb.OAuthAccessToken, error) {
+	s.req.ctx, s.req.tokenID = ctx, tokenID
+	s.calls = append(s.calls, "GetAccessToken")
+	return s.res.accessToken, s.err.getAccessToken
+}
+
+func (s *mockStore) DeleteAccessToken(ctx context.Context, tokenID string) error {
+	s.req.ctx = ctx
+	if tokenID != "" {
+		s.req.tokenID = tokenID
+	}
+	s.calls = append(s.calls, "DeleteAccessToken")
+	return s.err.deleteAccessToken
 }

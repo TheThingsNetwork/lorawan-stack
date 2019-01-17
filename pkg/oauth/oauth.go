@@ -141,6 +141,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 type tokenRequest struct {
 	GrantType    string `json:"grant_type" form:"grant_type"`
 	Code         string `json:"code" form:"code"`
+	RefreshToken string `json:"refresh_token" form:"refresh_token"`
 	RedirectURI  string `json:"redirect_uri" form:"redirect_uri"`
 	ClientID     string `json:"client_id" form:"client_id"`
 	ClientSecret string `json:"client_secret" form:"client_secret"`
@@ -153,6 +154,9 @@ func (r tokenRequest) Values() (values url.Values) {
 	}
 	if r.Code != "" {
 		values.Set("code", r.Code)
+	}
+	if r.RefreshToken != "" {
+		values.Set("refresh_token", r.RefreshToken)
 	}
 	if r.RedirectURI != "" {
 		values.Set("redirect_uri", r.RedirectURI)

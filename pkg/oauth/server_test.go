@@ -433,6 +433,42 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
 			},
 		},
+		{
+			StoreSetup: func(s *mockStore) {
+				s.res.client = mockClient
+				s.res.accessToken = &ttnpb.OAuthAccessToken{
+					UserIDs:      mockUser.UserIdentifiers,
+					ClientIDs:    mockClient.ClientIdentifiers,
+					ID:           "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
+					RefreshToken: "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
+					Rights:       mockClient.Rights,
+					CreatedAt:    time.Now().Truncate(time.Second),
+					ExpiresAt:    time.Now().Truncate(time.Second).Add(time.Hour),
+				}
+			},
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type":    "refresh_token",
+				"refresh_token": "OJSWM.IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A.GCPIASDUP7UZJ6YL5OP2ESZB7CKRFV4JJQYTMDOSDIOE7O75IAMQ",
+				"client_id":     "client",
+				"client_secret": "secret",
+			},
+			ExpectedCode: http.StatusOK,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "GetAccessToken")
+				a.So(s.calls, should.Contain, "DeleteAccessToken")
+				a.So(s.req.tokenID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
+				a.So(s.calls, should.Contain, "CreateAccessToken")
+				a.So(s.req.token.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.token.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
+				a.So(s.req.token.AccessToken, should.NotBeEmpty)
+				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
+				a.So(s.req.previousID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
+			},
+		},
 	} {
 		t.Run(fmt.Sprintf("%s %s", tt.Method, tt.Path), func(t *testing.T) {
 			store.reset()
