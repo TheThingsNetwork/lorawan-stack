@@ -99,7 +99,7 @@ func TestServerLoginLogout(t *testing.T) {
 		},
 		{
 			Method:       "GET",
-			Path:         "/oauth/",
+			Path:         "/oauth",
 			ExpectedCode: http.StatusOK,
 			ExpectedBody: "The Things Network OAuth",
 		},

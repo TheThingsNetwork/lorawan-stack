@@ -25,57 +25,46 @@ import (
 func Log(logger log.Interface) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			start := time.Now()
-			err := next(c)
-			stop := time.Now()
-
 			req := c.Request()
-
-			version := req.Header.Get("X-Version")
-			if version == "" {
-				version = "unknown"
-				if v := req.URL.Query().Get("version"); v != "" {
-					version = v
-				}
-			}
-
-			status := c.Response().Status
-
-			if err != nil {
-				if err, ok := err.(*echo.HTTPError); ok {
-					status = err.Code
-				}
-			}
-
-			w := logger.WithFields(log.Fields(
-				"duration", stop.Sub(start),
+			logger := logger.WithFields(log.Fields(
 				"method", req.Method,
 				"url", req.URL.String(),
 				"remote_addr", req.RemoteAddr,
 				"request_id", c.Response().Header().Get("X-Request-ID"),
-				"response_size", c.Response().Size,
-				"status", status,
-				"version", version,
+			))
+			if fwd := req.Header.Get("X-Forwarded-For"); fwd != "" {
+				logger = logger.WithField("forwarded_for", fwd)
+			}
+
+			start := time.Now()
+			err := next(c)
+			stop := time.Now()
+
+			logger = logger.WithFields(log.Fields(
+				"duration", stop.Sub(start),
+				"request_id", c.Response().Header().Get("X-Request-ID"),
 			))
 
-			if loc := c.Response().Header().Get("Location"); status >= 300 && status < 400 && loc != "" {
-				w = w.WithField("location", loc)
-			}
-
-			if fwd := req.Header.Get("X-Forwarded-For"); fwd != "" {
-				w = w.WithField("forwarded_for", fwd)
-			}
-
 			if err != nil {
-				w = w.WithError(err)
+				logger.WithError(err).Error("Request errored")
+				return err
 			}
 
-			if status < 500 {
-				w.Info("Request handled")
-			} else {
-				w.Error("Request error")
+			res := c.Response()
+			logger = logger.WithFields(log.Fields(
+				"response_size", res.Size,
+				"status", res.Status,
+			))
+			if loc := res.Header().Get("Location"); res.Status >= 300 && res.Status < 400 && loc != "" {
+				logger = logger.WithField("location", loc)
 			}
 
+			if res.Status >= 500 {
+				logger.Error("Request error")
+				return err
+			}
+
+			logger.Info("Request handled")
 			return err
 		}
 	}

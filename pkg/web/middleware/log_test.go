@@ -34,10 +34,14 @@ func redirectHandler(c echo.Context) error {
 	return c.Redirect(http.StatusMovedPermanently, "/other")
 }
 
-func forwardHandler(c echo.Context) error {
-	c.Request().Header.Set("X-Forwarded-For", "/other")
-	return c.String(http.StatusOK, "200")
+func forwardMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Request().Header.Set("X-Forwarded-For", "/other")
+		return next(c)
+	}
 }
+
+func noopHandler(c echo.Context) error { return nil }
 
 func invalidHandler(c echo.Context) error {
 	return errors.New("This handler throws an error")
@@ -83,32 +87,11 @@ func TestLogging(t *testing.T) {
 		a.So(fields["url"], should.Equal, "/")
 		a.So(fields["response_size"], should.Equal, 3)
 		a.So(fields["status"], should.Equal, 200)
-		a.So(fields["version"], should.Equal, "unknown")
 		a.So(fields, should.ContainKey, "duration")
 		a.So(fields, should.ContainKey, "remote_addr")
 		a.So(fields, should.ContainKey, "request_id")
 		a.So(fields, should.ContainKey, "response_size")
 		a.So(fields, should.NotContainKey, "redirect")
-	}
-
-	// Reset messages
-	messages = nil
-
-	// Test Logging middleware with version query
-	{
-		handler := Log(logger)(handler)
-
-		req := httptest.NewRequest("GET", "/?version=1234", nil)
-		rec := httptest.NewRecorder()
-
-		c := e.NewContext(req, rec)
-		err := handler(c)
-
-		a.So(err, should.BeNil)
-
-		fields := messages[0].Fields().Fields()
-		a.So(len(messages), should.Equal, 1)
-		a.So(fields["version"], should.Equal, "1234")
 	}
 
 	// Reset messages
@@ -160,7 +143,7 @@ func TestLogging(t *testing.T) {
 
 	// Test Logging middleware on forward
 	{
-		handler := Log(logger)(forwardHandler)
+		handler := forwardMiddleware(Log(logger)(noopHandler))
 		req := httptest.NewRequest("GET", "/", nil)
 		rec := httptest.NewRecorder()
 

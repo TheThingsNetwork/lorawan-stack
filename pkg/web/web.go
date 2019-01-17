@@ -127,7 +127,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Group creates a sub group.
 func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
 	t := strings.TrimSuffix(prefix, "/")
-	return s.server.Group(t, middleware...)
+	return s.rootGroup.Group.Group(t, middleware...)
 }
 
 // RootGroup creates a new Echo router group with prefix and optional group-level middleware on the root Server.
