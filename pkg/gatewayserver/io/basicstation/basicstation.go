@@ -195,12 +195,13 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			return err
 		}
 		switch typ {
-		case messages.TypeVersion:
+		case messages.TypeUpstreamVersion:
 			var version messages.Version
 			if err := json.Unmarshal(data, &version); err != nil {
 				logger.WithError(err).Debug("Failed to unmarshal version message")
 				return err
 			}
+			// TODO : Do we need to emit an event here?
 			logger = logger.WithFields(log.Fields(
 				"station", version.Station,
 				"firmware", version.Firmware,
@@ -214,11 +215,15 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			// TODO: Send frequency plan, see messages.RouterConfig.
 			_ = fp
 
-		// TODO: Add case for uplink messages.
-		case messages.TypeJoinRequest:
-			// TODO
+		case messages.TypeUpstreamJoinRequest:
+		case messages.TypeUpstreamJoinUplinkDataFrame:
+		case messages.TypeUpstreamTxConfirmation:
+		case messages.TypeUpstreamProprietaryDataFrame:
+		case messages.TypeUpstreamRemoteShell:
+		case messages.TypeUpstreamTimeSync:
 
 		default:
+			// Unknown message types are ignored by the server
 			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
 	}
