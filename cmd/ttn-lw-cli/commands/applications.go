@@ -163,7 +163,7 @@ var (
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			if appID != nil && appID.ApplicationID == "" {
+			if appID != nil && appID.ApplicationID != "" {
 				application.ApplicationID = appID.ApplicationID
 			}
 			if application.ApplicationID == "" {

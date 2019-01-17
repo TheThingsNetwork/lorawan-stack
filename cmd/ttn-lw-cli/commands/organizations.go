@@ -163,7 +163,7 @@ var (
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			if orgID != nil && orgID.OrganizationID == "" {
+			if orgID != nil && orgID.OrganizationID != "" {
 				organization.OrganizationID = orgID.OrganizationID
 			}
 			if organization.OrganizationID == "" {

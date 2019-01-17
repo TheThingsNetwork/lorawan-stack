@@ -163,7 +163,7 @@ var (
 				return err
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
-			if cliID != nil && cliID.ClientID == "" {
+			if cliID != nil && cliID.ClientID != "" {
 				client.ClientID = cliID.ClientID
 			}
 			if client.ClientID == "" {

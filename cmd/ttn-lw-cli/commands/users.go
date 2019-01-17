@@ -137,7 +137,7 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			if usrID != nil && usrID.UserID == "" {
+			if usrID != nil && usrID.UserID != "" {
 				user.UserID = usrID.UserID
 			}
 			if user.UserID == "" {
