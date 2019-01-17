@@ -36,7 +36,7 @@ func (cli osinClient) GetId() string {
 }
 
 func (cli osinClient) GetSecret() string {
-	panic("ClientSecretMatches should be used instead")
+	panic("GetSecret should never be called by osin")
 }
 
 func (cli osinClient) ClientSecretMatches(secret string) bool {
@@ -233,22 +233,7 @@ func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
 }
 
 func (s *storage) LoadAccess(token string) (*osin.AccessData, error) {
-	tokenType, id, tokenKey, err := auth.SplitToken(token)
-	if err != nil {
-		return nil, err
-	}
-	if tokenType != auth.AccessToken {
-		return nil, errNoAccessToken
-	}
-	data, err := s.loadAccess(id)
-	if err != nil {
-		return nil, err
-	}
-	valid, err := auth.Password(data.AccessToken).Validate(tokenKey)
-	if !valid || err != nil {
-		return nil, errInvalidToken
-	}
-	return data, nil
+	panic("LoadAccess should never be called by osin")
 }
 
 func (s *storage) RemoveAccess(token string) error {
