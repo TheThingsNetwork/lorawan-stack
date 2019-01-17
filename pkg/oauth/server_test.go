@@ -239,6 +239,42 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "client not approved",
+			StoreSetup: func(s *mockStore) {
+				s.res.session = mockSession
+				s.res.user = mockUser
+				s.res.client = &ttnpb.Client{
+					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "client"},
+					State:             ttnpb.STATE_REJECTED,
+					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
+					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+				}
+			},
+			Method:           "GET",
+			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			ExpectedCode:     http.StatusFound,
+			ExpectedRedirect: "http://uri/callback?error=",
+		},
+		{
+			Name: "client without grant",
+			StoreSetup: func(s *mockStore) {
+				s.res.session = mockSession
+				s.res.user = mockUser
+				s.res.client = &ttnpb.Client{
+					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "client"},
+					State:             ttnpb.STATE_APPROVED,
+					Grants:            []ttnpb.GrantType{},
+					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+				}
+			},
+			Method:           "GET",
+			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			ExpectedCode:     http.StatusFound,
+			ExpectedRedirect: "http://uri/callback?error=",
+		},
+		{
 			Name: "authorize client",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
