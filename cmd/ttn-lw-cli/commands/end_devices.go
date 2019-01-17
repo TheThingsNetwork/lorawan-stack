@@ -224,7 +224,7 @@ var (
 				}
 				paths = append(paths,
 					"network_server_address", "application_server_address", "join_server_address",
-					"default_class", "uses_32_bit_fcnt", "mac_settings",
+					"default_class", "uses_32_bit_f_cnt", "mac_settings",
 				)
 			}
 			if otaa, _ := cmd.Flags().GetBool("otaa"); otaa {
