@@ -72,10 +72,10 @@ func (b Blacklists) Contains(id string) bool {
 // be in the context.
 func Check(ctx context.Context, id string) error {
 	if builtin.Contains(id) {
-		return errBlacklistedID
+		return errBlacklistedID.WithAttributes("id", id)
 	}
 	if FromContext(ctx).Contains(id) {
-		return errBlacklistedID
+		return errBlacklistedID.WithAttributes("id", id)
 	}
 	return nil
 }
