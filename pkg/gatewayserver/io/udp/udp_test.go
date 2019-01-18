@@ -40,15 +40,15 @@ var (
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	registeredGatewayKey = "test-key"
 
+	timeout = (1 << 4) * test.Delay
+
 	testConfig = Config{
 		PacketHandlers:      2,
 		PacketBuffer:        10,
-		DownlinkPathExpires: 50 * test.Delay,
-		ConnectionExpires:   125 * test.Delay,
+		DownlinkPathExpires: 5 * timeout,
+		ConnectionExpires:   12 * timeout,
 		ScheduleLateTime:    0,
 	}
-
-	timeout = 10 * test.Delay
 )
 
 func TestConnection(t *testing.T) {
