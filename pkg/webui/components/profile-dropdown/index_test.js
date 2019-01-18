@@ -14,10 +14,7 @@
 
 import getProfileDropdownDriver from './index_driver'
 
-const user = {
-  name: 'kschiffer',
-}
-
+const userId = 'kschiffer'
 const dropdownItems = [
   {
     title: 'Profile Settings',
@@ -40,7 +37,7 @@ describe('Profile Dropdown', function () {
 
   describe('is in initial state', function () {
     beforeEach(function () {
-      driver.when.created({ user, dropdownItems })
+      driver.when.created({ userId, dropdownItems })
     })
     it('should match snapshot', function () {
       expect(driver.component).toMatchSnapshot()

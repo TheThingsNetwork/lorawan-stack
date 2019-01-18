@@ -12,7 +12,7 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
     className="profilePicture"
   />
   <span
-    className="username"
+    className="id"
   >
     kschiffer
   </span>
@@ -50,7 +50,7 @@ exports[`Profile Dropdown is in initial state should match snapshot 1`] = `
     className="profilePicture"
   />
   <span
-    className="username"
+    className="id"
   >
     kschiffer
   </span>
