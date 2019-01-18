@@ -48,51 +48,44 @@ quality: go.quality js.quality styl.quality snap.quality
 clean: go.clean js.clean
 
 # stack binary
-ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
-ttn-lw-stack: js.build
-ttn-lw-stack: $(RELEASE_DIR)/ttn-lw-stack-$(GOOS)-$(GOARCH)
+ttn-lw-stack: $(MAGE) js.build
+	@GO_BINARIES=stack $(MAGE) go:build
 
 # identity-server binary
-ttn-lw-identity-server: MAIN=./cmd/ttn-lw-identity-server/main.go
-ttn-lw-identity-server: $(RELEASE_DIR)/ttn-lw-identity-server-$(GOOS)-$(GOARCH)
+ttn-lw-identity-server: $(MAGE) js.build
+	@GO_BINARIES=identity-server $(MAGE) go:build
 
 # gateway-server binary
-ttn-lw-gateway-server: MAIN=./cmd/ttn-lw-gateway-server/main.go
-ttn-lw-gateway-server: $(RELEASE_DIR)/ttn-lw-gateway-server-$(GOOS)-$(GOARCH)
+ttn-lw-gateway-server: $(MAGE)
+	@GO_BINARIES=gateway-server $(MAGE) go:build
 
 # network-server binary
-ttn-lw-network-server: MAIN=./cmd/ttn-lw-network-server/main.go
-ttn-lw-network-server: $(RELEASE_DIR)/ttn-lw-network-server-$(GOOS)-$(GOARCH)
+ttn-lw-network-server: $(MAGE)
+	@GO_BINARIES=network-server $(MAGE) go:build
 
 # application-server binary
-ttn-lw-application-server: MAIN=./cmd/ttn-lw-application-server/main.go
-ttn-lw-application-server: $(RELEASE_DIR)/ttn-lw-application-server-$(GOOS)-$(GOARCH)
+ttn-lw-application-server: $(MAGE)
+	@GO_BINARIES=application-server $(MAGE) go:build
 
 # join-server binary
-ttn-lw-join-server: MAIN=./cmd/ttn-lw-join-server/main.go
-ttn-lw-join-server: $(RELEASE_DIR)/ttn-lw-join-server-$(GOOS)-$(GOARCH)
+ttn-lw-join-server: $(MAGE)
+	@GO_BINARIES=join-server $(MAGE) go:build
 
 # console binary
-ttn-lw-console: MAIN=./cmd/ttn-lw-console/main.go
-ttn-lw-console: js.build
-ttn-lw-console: $(RELEASE_DIR)/ttn-lw-console-$(GOOS)-$(GOARCH)
+ttn-lw-console: $(MAGE) js.build
+	@GO_BINARIES=console $(MAGE) go:build
 
 # cli binary
-ttn-lw-cli: MAIN=./cmd/ttn-lw-cli/main.go
-ttn-lw-cli: $(RELEASE_DIR)/ttn-lw-cli-$(GOOS)-$(GOARCH)
+ttn-lw-cli: $(MAGE)
+	@GO_BINARIES=cli $(MAGE) go:build
 
 # All binaries
-build-all: ttn-lw-stack ttn-lw-identity-server ttn-lw-gateway-server ttn-lw-network-server ttn-lw-application-server ttn-lw-join-server ttn-lw-console ttn-lw-cli
+build-all: $(MAGE) js.build
+	@GO_BINARIES="" $(MAGE) go:build
 
 # All supported platforms
 build-all-platforms:
-	GOOS=linux GOARCH=amd64 make build-all
-	GOOS=linux GOARCH=386 make build-all
-	GOOS=linux GOARCH=arm make build-all
-	GOOS=linux GOARCH=arm64 make build-all
-	GOOS=darwin GOARCH=amd64 make build-all
-	GOOS=windows GOARCH=amd64 make build-all
-	GOOS=windows GOARCH=386 make build-all
+	@GO_BINARIES="" $(MAGE) go:buildCrossPlatform
 
 DOCKER_IMAGE ?= thethingsnetwork/lorawan-stack
 

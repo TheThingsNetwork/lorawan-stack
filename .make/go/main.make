@@ -29,9 +29,6 @@ GO_METALINTER = gometalinter
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
 
 # go flags
-GO_ENV = CGO_ENABLED=0
-GO_STRINGVARS ?= -X go.thethings.network/lorawan-stack/pkg/version.GitCommit=$(GIT_COMMIT) -X go.thethings.network/lorawan-stack/pkg/version.BuildDate=$(BUILD_DATE) -X go.thethings.network/lorawan-stack/pkg/version.TTN=$(GIT_TAG) -X go.thethings.network/lorawan-stack/pkg/version.GitBranch=$(GIT_BRANCH)
-LD_FLAGS = -ldflags "-w $(GO_STRINGVARS)"
 ifdef ($(GO_TAGS))
 	GO_FLAGS += "-tags $(GO_TAGS)"
 endif
@@ -114,7 +111,6 @@ go.init: go.min-version
 
 INIT_RULES += go.init
 
-include .make/go/build.make
 include .make/go/test.make
 include .make/go/quality.make
 
