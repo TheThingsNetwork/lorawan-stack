@@ -2,6 +2,7 @@ language: go
 go:
 - "1.11.x"
 conditions: v1
+if: type = pull_request OR branch =~ master$
 matrix:
   include:
     - env: RUNTYPE=js
