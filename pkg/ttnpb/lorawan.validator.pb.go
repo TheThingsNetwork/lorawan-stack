@@ -106,7 +106,33 @@ func (this *DLSettings) Validate() error {
 func (this *CFList) Validate() error {
 	return nil
 }
+func (this *LoRaDataRate) Validate() error {
+	return nil
+}
+func (this *FSKDataRate) Validate() error {
+	return nil
+}
+func (this *DataRate) Validate() error {
+	if oneOfNester, ok := this.GetModulation().(*DataRate_LoRa); ok {
+		if oneOfNester.LoRa != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.LoRa); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("LoRa", err)
+			}
+		}
+	}
+	if oneOfNester, ok := this.GetModulation().(*DataRate_FSK); ok {
+		if oneOfNester.FSK != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.FSK); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("FSK", err)
+			}
+		}
+	}
+	return nil
+}
 func (this *TxSettings) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.DataRate)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("DataRate", err)
+	}
 	if !(this.ChannelIndex < 256) {
 		return github_com_mwitkow_go_proto_validators.FieldError("ChannelIndex", fmt.Errorf(`value '%v' must be less than '256'`, this.ChannelIndex))
 	}

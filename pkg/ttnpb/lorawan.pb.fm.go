@@ -854,61 +854,19 @@ func (dst *CFList) SetFields(src *CFList, paths ...string) error {
 	return nil
 }
 
-var TxSettingsFieldPathsNested = []string{
+var LoRaDataRateFieldPathsNested = []string{
 	"bandwidth",
-	"bit_rate",
-	"channel_index",
-	"coding_rate",
-	"data_rate_index",
-	"enable_crc",
-	"frequency",
-	"invert_polarization",
-	"modulation",
 	"spreading_factor",
-	"time",
-	"timestamp",
-	"tx_power",
 }
 
-var TxSettingsFieldPathsTopLevel = []string{
+var LoRaDataRateFieldPathsTopLevel = []string{
 	"bandwidth",
-	"bit_rate",
-	"channel_index",
-	"coding_rate",
-	"data_rate_index",
-	"enable_crc",
-	"frequency",
-	"invert_polarization",
-	"modulation",
 	"spreading_factor",
-	"time",
-	"timestamp",
-	"tx_power",
 }
 
-func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
+func (dst *LoRaDataRate) SetFields(src *LoRaDataRate, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "modulation":
-			if len(subs) > 0 {
-				return fmt.Errorf("'modulation' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Modulation = src.Modulation
-			} else {
-				var zero Modulation
-				dst.Modulation = zero
-			}
-		case "data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DataRateIndex = src.DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
-			}
 		case "bandwidth":
 			if len(subs) > 0 {
 				return fmt.Errorf("'bandwidth' has no subfields, but %s were specified", subs)
@@ -929,6 +887,25 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				var zero uint32
 				dst.SpreadingFactor = zero
 			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var FSKDataRateFieldPathsNested = []string{
+	"bit_rate",
+}
+
+var FSKDataRateFieldPathsTopLevel = []string{
+	"bit_rate",
+}
+
+func (dst *FSKDataRate) SetFields(src *FSKDataRate, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
 		case "bit_rate":
 			if len(subs) > 0 {
 				return fmt.Errorf("'bit_rate' has no subfields, but %s were specified", subs)
@@ -938,6 +915,171 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 			} else {
 				var zero uint32
 				dst.BitRate = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var DataRateFieldPathsNested = []string{
+	"modulation",
+	"modulation.fsk",
+	"modulation.fsk.bit_rate",
+	"modulation.lora",
+	"modulation.lora.bandwidth",
+	"modulation.lora.spreading_factor",
+}
+
+var DataRateFieldPathsTopLevel = []string{
+	"modulation",
+}
+
+func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+
+		case "modulation":
+			if len(subs) == 0 && src == nil {
+				dst.Modulation = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Modulation = src.Modulation
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "lora":
+					if _, ok := dst.Modulation.(*DataRate_LoRa); !ok {
+						dst.Modulation = &DataRate_LoRa{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Modulation.(*DataRate_LoRa).LoRa
+						if newDst == nil {
+							newDst = &LoRaDataRate{}
+							dst.Modulation.(*DataRate_LoRa).LoRa = newDst
+						}
+						var newSrc *LoRaDataRate
+						if src != nil {
+							newSrc = src.GetLoRa()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Modulation.(*DataRate_LoRa).LoRa = src.GetLoRa()
+						} else {
+							dst.Modulation.(*DataRate_LoRa).LoRa = nil
+						}
+					}
+				case "fsk":
+					if _, ok := dst.Modulation.(*DataRate_FSK); !ok {
+						dst.Modulation = &DataRate_FSK{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Modulation.(*DataRate_FSK).FSK
+						if newDst == nil {
+							newDst = &FSKDataRate{}
+							dst.Modulation.(*DataRate_FSK).FSK = newDst
+						}
+						var newSrc *FSKDataRate
+						if src != nil {
+							newSrc = src.GetFSK()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Modulation.(*DataRate_FSK).FSK = src.GetFSK()
+						} else {
+							dst.Modulation.(*DataRate_FSK).FSK = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var TxSettingsFieldPathsNested = []string{
+	"channel_index",
+	"coding_rate",
+	"data_rate",
+	"data_rate.modulation.fsk",
+	"data_rate.modulation.fsk.bit_rate",
+	"data_rate.modulation.lora",
+	"data_rate.modulation.lora.bandwidth",
+	"data_rate.modulation.lora.spreading_factor",
+	"data_rate_index",
+	"enable_crc",
+	"frequency",
+	"invert_polarization",
+	"modulation",
+	"time",
+	"timestamp",
+	"tx_power",
+}
+
+var TxSettingsFieldPathsTopLevel = []string{
+	"channel_index",
+	"coding_rate",
+	"data_rate",
+	"data_rate_index",
+	"enable_crc",
+	"frequency",
+	"invert_polarization",
+	"modulation",
+	"time",
+	"timestamp",
+	"tx_power",
+}
+
+func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "data_rate":
+			if len(subs) > 0 {
+				newDst := &dst.DataRate
+				var newSrc *DataRate
+				if src != nil {
+					newSrc = &src.DataRate
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate = src.DataRate
+				} else {
+					var zero DataRate
+					dst.DataRate = zero
+				}
+			}
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.DataRateIndex = zero
 			}
 		case "coding_rate":
 			if len(subs) > 0 {

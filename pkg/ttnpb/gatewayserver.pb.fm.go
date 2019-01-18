@@ -154,25 +154,29 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.settings.request.rx2_data_rate_index",
 	"downlink_message.settings.request.rx2_frequency",
 	"downlink_message.settings.scheduled",
-	"downlink_message.settings.scheduled.bandwidth",
-	"downlink_message.settings.scheduled.bit_rate",
 	"downlink_message.settings.scheduled.channel_index",
 	"downlink_message.settings.scheduled.coding_rate",
+	"downlink_message.settings.scheduled.data_rate",
+	"downlink_message.settings.scheduled.data_rate.modulation.fsk",
+	"downlink_message.settings.scheduled.data_rate.modulation.fsk.bit_rate",
+	"downlink_message.settings.scheduled.data_rate.modulation.lora",
+	"downlink_message.settings.scheduled.data_rate.modulation.lora.bandwidth",
+	"downlink_message.settings.scheduled.data_rate.modulation.lora.spreading_factor",
 	"downlink_message.settings.scheduled.data_rate_index",
 	"downlink_message.settings.scheduled.enable_crc",
 	"downlink_message.settings.scheduled.frequency",
 	"downlink_message.settings.scheduled.invert_polarization",
-	"downlink_message.settings.scheduled.modulation",
-	"downlink_message.settings.scheduled.spreading_factor",
 	"downlink_message.settings.scheduled.time",
 	"downlink_message.settings.scheduled.timestamp",
 	"downlink_message.settings.scheduled.tx_power",
+	"modulation",
 	"settings",
 }
 
 var GatewayDownFieldPathsTopLevel = []string{
 	"Payload",
 	"downlink_message",
+	"modulation",
 	"settings",
 }
 
