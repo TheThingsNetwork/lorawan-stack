@@ -41,7 +41,7 @@ func init() {
 func findAccount(ctx context.Context, db *gorm.DB, id *ttnpb.OrganizationOrUserIdentifiers) (*Account, error) {
 	entityID := id.EntityIdentifiers()
 	var account Account
-	err := db.Scopes(withContext(ctx)).Where(&Account{
+	err := db.Scopes(withContext(ctx)).Where(Account{
 		UID: entityID.IDString(),
 	}).Find(&account).Error
 	if err != nil {

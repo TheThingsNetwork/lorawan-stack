@@ -37,7 +37,7 @@ func init() {
 }
 
 func findAccountMemberships(db *gorm.DB, account *Account, entityType string) ([]*Membership, error) {
-	query := db.Where(&Account{AccountID: account.ID})
+	query := db.Where(Membership{AccountID: account.ID})
 	if entityType != "" {
 		query = query.Where("entity_type = ?", entityType)
 	}

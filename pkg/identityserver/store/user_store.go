@@ -93,7 +93,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	query := s.db.Scopes(withContext(ctx), withUserID(idStrings...))
 	query = selectUserFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&User{}))
+		countTotal(ctx, query.Model(User{}))
 		query = query.Limit(limit).Offset(offset)
 	}
 	var userModels []User
@@ -153,7 +153,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 		}
 	}
 	if oldProfilePictureID != nil && userModel.ProfilePictureID != oldProfilePictureID {
-		if err = s.db.Where(&Model{ID: *oldProfilePictureID}).Delete(&Picture{}).Error; err != nil {
+		if err = s.db.Where(Picture{Model: Model{ID: *oldProfilePictureID}}).Delete(&Picture{}).Error; err != nil {
 			return nil, err
 		}
 	}

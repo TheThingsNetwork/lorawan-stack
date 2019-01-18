@@ -89,7 +89,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(idStrings...))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&Organization{}))
+		countTotal(ctx, query.Model(Organization{}))
 		query = query.Limit(limit).Offset(offset)
 	}
 	var orgModels []Organization

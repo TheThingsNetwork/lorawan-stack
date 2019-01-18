@@ -83,7 +83,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	query := s.db.Scopes(withContext(ctx), withClientID(idStrings...))
 	query = selectClientFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&Client{}))
+		countTotal(ctx, query.Model(Client{}))
 		query = query.Limit(limit).Offset(offset)
 	}
 	var cliModels []Client

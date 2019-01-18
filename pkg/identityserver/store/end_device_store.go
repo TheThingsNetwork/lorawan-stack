@@ -82,7 +82,7 @@ func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice)
 func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error) {
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&EndDevice{}))
+		countTotal(ctx, query.Model(EndDevice{}))
 		query = query.Limit(limit).Offset(offset)
 	}
 	var devModels []EndDevice

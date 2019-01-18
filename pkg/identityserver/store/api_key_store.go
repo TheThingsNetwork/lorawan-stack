@@ -68,7 +68,7 @@ var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not lin
 
 func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
 	var keyModel APIKey
-	if err := s.db.Scopes(withContext(ctx)).Where(&APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
+	if err := s.db.Scopes(withContext(ctx)).Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, nil, errAPIKeyNotFound
 		}

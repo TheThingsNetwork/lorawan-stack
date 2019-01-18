@@ -19,7 +19,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/google/go-cloud/blob"
+	"gocloud.dev/blob"
 )
 
 type bucketFetcher struct {

@@ -32,7 +32,6 @@ ci.go.lint.simple:
 	@$(MAKE) go.dev-deps go.deps
 	@$(MAKE) go.misspell
 	@$(MAKE) go.fmt
-	@$(MAKE) go.depfmt
 	@$(MAKE) headers.check
 	@$(MAKE) git.diff
 

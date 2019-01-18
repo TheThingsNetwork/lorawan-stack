@@ -40,7 +40,7 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 		return nil, err
 	}
 	var authModel ClientAuthorization
-	err = s.db.Where(&ClientAuthorization{
+	err = s.db.Where(ClientAuthorization{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	}).First(&authModel).Error
@@ -65,7 +65,7 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 		return nil, err
 	}
 	var authModel ClientAuthorization
-	err = s.db.Where(&ClientAuthorization{
+	err = s.db.Where(ClientAuthorization{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	}).First(&authModel).Error
@@ -99,7 +99,7 @@ func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.Use
 	if err != nil {
 		return err
 	}
-	err = s.db.Where(&ClientAuthorization{
+	err = s.db.Where(ClientAuthorization{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	}).Delete(&ClientAuthorization{}).Error
@@ -140,7 +140,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 		return nil, errAuthorizationCodeNotFound
 	}
 	var codeModel AuthorizationCode
-	err := s.db.Scopes(withContext(ctx)).Where(&AuthorizationCode{
+	err := s.db.Scopes(withContext(ctx)).Where(AuthorizationCode{
 		Code: code,
 	}).Preload("Client").Preload("User.Account").First(&codeModel).Error
 	if err != nil {
@@ -155,7 +155,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	if code == "" {
 		return errAuthorizationCodeNotFound
 	}
-	err := s.db.Scopes(withContext(ctx)).Where(&AuthorizationCode{
+	err := s.db.Scopes(withContext(ctx)).Where(AuthorizationCode{
 		Code: code,
 	}).Delete(&AuthorizationCode{}).Error
 	if err != nil {
@@ -202,7 +202,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		return nil, errAccessTokenNotFound
 	}
 	var tokenModel AccessToken
-	err := s.db.Scopes(withContext(ctx)).Where(&AccessToken{
+	err := s.db.Scopes(withContext(ctx)).Where(AccessToken{
 		TokenID: id,
 	}).Preload("Client").Preload("User.Account").First(&tokenModel).Error
 	if err != nil {
@@ -217,7 +217,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	if id == "" {
 		return errAccessTokenNotFound
 	}
-	err := s.db.Scopes(withContext(ctx)).Where(&AccessToken{
+	err := s.db.Scopes(withContext(ctx)).Where(AccessToken{
 		TokenID: id,
 	}).Delete(&AccessToken{}).Error
 	if err != nil {

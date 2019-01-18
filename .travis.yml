@@ -1,6 +1,6 @@
 language: go
 go:
-- "1.11"
+- "1.11.x"
 conditions: v1
 matrix:
   include:
@@ -22,7 +22,6 @@ cache:
   - $HOME/.cache/go-build
   - $GOPATH/bin
   - $GOPATH/pkg
-  - $GOPATH/src/github.com/golang # dep
   - $GOPATH/src/github.com/alecthomas # gometalinter
   - $GOPATH/src/github.com/mattn # goveralls
 before_install:

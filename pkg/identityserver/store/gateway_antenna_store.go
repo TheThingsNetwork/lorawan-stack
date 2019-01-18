@@ -19,7 +19,7 @@ import (
 )
 
 func replaceGatewayAntennas(db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) (err error) {
-	db = db.Where(&GatewayAntenna{GatewayID: gatewayUUID})
+	db = db.Where(GatewayAntenna{GatewayID: gatewayUUID})
 	if len(new) < len(old) {
 		if err = db.Where("\"index\" >= ?", len(new)).Delete(&GatewayAntenna{}).Error; err != nil {
 			return err

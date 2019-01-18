@@ -84,7 +84,7 @@ $RECYCLE.BIN/
 
 *.coverprofile
 /dist
-/vendor/*/
+/vendor
 /release
 /.cache
 node_modules/

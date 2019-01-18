@@ -36,10 +36,7 @@ go.unconvert:
 go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) | $(to_packages)
 go.lint-travis: go.lint
 
-go.depfmt:
-	@go run $(MAKE_DIR)/go/depfmt.go
-
 # run all quality on all files
-go.quality: go.fmt go.misspell go.unconvert go.lint go.depfmt
+go.quality: go.fmt go.misspell go.unconvert go.lint
 
 # vim: ft=make

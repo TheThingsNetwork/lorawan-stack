@@ -78,9 +78,6 @@ to_packages = sed 's:/[^/]*$$::' | sort | uniq
 # make packages local (prefix with ./)
 to_local = sed 's:^:\./:' | sed 's:^\./.*\.go$$:.:'
 
-# the govendor file
-GO_VENDOR_FILE ?= Gopkg.toml
-
 # all go files
 GO_FILES = $(ALL_FILES) | $(only_go)
 
@@ -96,10 +93,9 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 # get tools required for development
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
-	@$(log) "Getting dep" && curl -sL https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && $(GO) get -u github.com/mattn/goveralls; fi
-	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
-	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
+	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && GO111MODULE=off go get -u github.com/mattn/goveralls; fi
+	@$(log) "Getting gometalinter" && GO111MODULE=off go get -u github.com/alecthomas/gometalinter
+	@$(log) "Getting gometalinter linters" && GO111MODULE=off $(GO_METALINTER) -i
 
 # testing minimum version
 go.min-version:
@@ -114,7 +110,7 @@ DEP_FLAGS ?= -v
 # install dependencies
 go.deps:
 	@$(log) "Installing go dependencies"
-	@dep ensure $(DEP_FLAGS)
+	@GO111MODULE=on go mod vendor
 
 # clean build files
 go.clean:

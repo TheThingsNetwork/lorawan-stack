@@ -38,7 +38,7 @@ func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID *ttnpb.E
 		return nil, err
 	}
 	var models []ContactInfo
-	err = s.db.Where(&ContactInfo{
+	err = s.db.Where(ContactInfo{
 		EntityType: entityTypeForID(entityID),
 		EntityID:   entity.PrimaryKey(),
 	}).Find(&models).Error
@@ -60,7 +60,7 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.E
 	entityType, entityUUID := entityTypeForID(entityID), entity.PrimaryKey()
 
 	var existing []ContactInfo
-	err = s.db.Where(&ContactInfo{
+	err = s.db.Where(ContactInfo{
 		EntityType: entityType,
 		EntityID:   entityUUID,
 	}).Find(&existing).Error
@@ -203,7 +203,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		return errValidationTokenExpired
 	}
 
-	err = s.db.Model(&ContactInfo{}).Scopes(withContext(ctx)).Where(ContactInfo{
+	err = s.db.Model(ContactInfo{}).Scopes(withContext(ctx)).Where(ContactInfo{
 		EntityID:      model.EntityID,
 		EntityType:    model.EntityType,
 		ContactMethod: model.ContactMethod,
@@ -216,8 +216,8 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 	}
 
 	if model.EntityType == "user" && model.ContactMethod == int(ttnpb.CONTACT_METHOD_EMAIL) {
-		err = s.db.Model(&User{}).Scopes(withContext(ctx)).Where(Model{
-			ID: model.EntityID,
+		err = s.db.Model(User{}).Scopes(withContext(ctx)).Where(User{
+			Model: Model{ID: model.EntityID},
 		}).Where(User{
 			PrimaryEmailAddress: model.Value,
 		}).Update(User{

@@ -54,9 +54,9 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(&UserSession{UserID: user.PrimaryKey()})
+	query := s.db.Where(UserSession{UserID: user.PrimaryKey()})
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&UserSession{}))
+		countTotal(ctx, query.Model(UserSession{}))
 		query = query.Limit(limit).Offset(offset)
 	}
 	var sessionModels []UserSession
@@ -80,7 +80,7 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(&UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
+	query := s.db.Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -99,7 +99,7 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(&UserSession{Model: Model{ID: sess.SessionID}, UserID: user.PrimaryKey()})
+	query := s.db.Where(UserSession{Model: Model{ID: sess.SessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -121,6 +121,6 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 	if err != nil {
 		return err
 	}
-	query := s.db.Where(&UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
+	query := s.db.Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
 	return query.Delete(&UserSession{}).Error
 }

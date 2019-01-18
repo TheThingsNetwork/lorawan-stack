@@ -67,7 +67,7 @@ var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invit
 
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
 	var invitationModel Invitation
-	if err := s.db.Scopes(withContext(ctx)).Where(&Invitation{Token: token}).First(&invitationModel).Error; err != nil {
+	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errInvitationNotFound
 		}
@@ -80,7 +80,7 @@ var errInvitationAlreadyAccepted = errors.DefineAlreadyExists("invitation_alread
 
 func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers) error {
 	var invitationModel Invitation
-	if err := s.db.Scopes(withContext(ctx)).Where(&Invitation{Token: token}).First(&invitationModel).Error; err != nil {
+	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound
 		}
@@ -106,7 +106,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {
 	var invitationModel Invitation
-	if err := s.db.Scopes(withContext(ctx)).Where(&Invitation{Email: email}).First(&invitationModel).Error; err != nil {
+	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Email: email}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound
 		}

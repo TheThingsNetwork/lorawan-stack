@@ -23,13 +23,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/google/go-cloud/blob"
-	"github.com/google/go-cloud/blob/fileblob"
-	"github.com/google/go-cloud/blob/gcsblob"
-	"github.com/google/go-cloud/blob/s3blob"
-	"github.com/google/go-cloud/gcp"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"gocloud.dev/blob"
+	"gocloud.dev/blob/fileblob"
+	"gocloud.dev/blob/gcsblob"
+	"gocloud.dev/blob/s3blob"
+	"gocloud.dev/gcp"
 	"golang.org/x/oauth2/google"
 )
 
@@ -96,7 +96,7 @@ func (c Config) getAWS(ctx context.Context, bucket string) (*blob.Bucket, error)
 	if err != nil {
 		return nil, err
 	}
-	return s3blob.OpenBucket(ctx, bucket, s, nil)
+	return s3blob.OpenBucket(ctx, s, bucket, nil)
 }
 
 func (c Config) getGCP(ctx context.Context, bucket string) (*blob.Bucket, error) {
@@ -120,7 +120,7 @@ func (c Config) getGCP(ctx context.Context, bucket string) (*blob.Bucket, error)
 	if err != nil {
 		return nil, err
 	}
-	return gcsblob.OpenBucket(ctx, bucket, cli, nil)
+	return gcsblob.OpenBucket(ctx, cli, bucket, nil)
 }
 
 // WriterOptions returns WriterOptions with the given content type and metadata
