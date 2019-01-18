@@ -66,7 +66,9 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 			Chan: uint8(up.Settings.ChannelIndex),
 			Modu: modulation,
 			CodR: codr,
-			DatR: encoding.DataRate{up.Settings.DataRate},
+			DatR: encoding.DataRate{
+				DataRate: up.Settings.DataRate,
+			},
 			Size: uint16(len(up.RawPayload)),
 			Data: base64.StdEncoding.EncodeToString(up.RawPayload),
 			Tmst: uint32(t / time.Microsecond),
