@@ -3167,6 +3167,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:end_device_request": {
+    "translations": {
+      "en": "GetEndDeviceRequest is invalid"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:forward_join_request": {
     "translations": {
       "en": "failed to forward JoinRequest"
