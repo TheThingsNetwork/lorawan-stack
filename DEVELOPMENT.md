@@ -133,8 +133,6 @@ make protos.clean protos
 ├── DEVELOPMENT.md      guide for setting up your development environment
 ├── docker-compose.yml  deployment file (including databases) for Docker Compose
 ├── Dockerfile          formula for building Docker images
-├── Gopkg.lock          dependency lock file managed by golang/dep
-├── Gopkg.toml          dependency file managed by golang/dep
 ├── LICENSE             the license that explains what you're allowed to do with this code
 ├── Makefile            dev/test/build tooling
 ├── README.md           general information about this project
