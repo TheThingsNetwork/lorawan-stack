@@ -36,13 +36,13 @@ import (
 )
 
 var (
-	registeredGatewayUID = "test-gateway"
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayUID = "0101010101010101"
+	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "eui-0101010101010101"}
+	registeredGateway    = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "KR_920_923"}
 	registeredGatewayKey = "test-key"
 
 	discoveryEndPoint      = "ws://localhost:8100/api/v3/gs/io/basicstation/discover"
 	connectionRootEndPoint = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/"
-	testTrafficEndPoint    = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/eui-010101010101"
 
 	timeout = 10 * test.Delay
 )
@@ -247,6 +247,9 @@ func TestVersion(t *testing.T) {
 		panic(err)
 	}
 	defer c.Close()
+	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
+
+	testTrafficEndPoint := "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/eui-0101010101010101"
 
 	for i, tc := range []struct {
 		Query interface{}
@@ -262,18 +265,25 @@ func TestVersion(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(fmt.Sprintf("InvalidMessage/%d", i), func(t *testing.T) {
-			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+		t.Run(fmt.Sprintf("VersionMessage/%d", i), func(t *testing.T) {
+			conn, _, err := websocket.DefaultDialer.Dial(testTrafficEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
 			}
 			defer conn.Close()
-
-			req, err := json.Marshal(tc.Query)
+			req, err := json.Marshal(messages.DiscoverQuery{EUI: messages.EUI{Prefix: "router", EUI64: types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}}})
 			if err != nil {
 				panic(err)
 			}
 			if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
+				t.Fatalf("Failed to write message: %v", err)
+			}
+
+			reqVersion, err := json.Marshal(tc.Query)
+			if err != nil {
+				panic(err)
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, reqVersion); err != nil {
 				t.Fatalf("Failed to write message: %v", err)
 			}
 
@@ -287,7 +297,7 @@ func TestVersion(t *testing.T) {
 			}()
 			select {
 			case res := <-resCh:
-				var response messages.DiscoverResponse
+				var response messages.RouterConfig
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}

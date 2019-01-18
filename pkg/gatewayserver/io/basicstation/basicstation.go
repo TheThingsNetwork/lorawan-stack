@@ -201,7 +201,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Debug("Failed to unmarshal version message")
 				return err
 			}
-			// TODO : Do we need to emit an event here?
 			logger = logger.WithFields(log.Fields(
 				"station", version.Station,
 				"firmware", version.Firmware,
@@ -212,8 +211,20 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to get frequency plan")
 				return err
 			}
-			// TODO: Send frequency plan, see messages.RouterConfig.
-			_ = fp
+			cfg, err := messages.GetRouterConfig(*fp, version.IsProduction())
+			if err != nil {
+				logger.WithError(err).Warn("Failed to generate router configuration")
+				return err
+			}
+			data, err = json.Marshal(cfg)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to marshal response message")
+				return err
+			}
+			if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
+				logger.WithError(err).Warn("Failed to send router configuration")
+				return err
+			}
 
 		case messages.TypeUpstreamJoinRequest:
 		case messages.TypeUpstreamJoinUplinkDataFrame:
