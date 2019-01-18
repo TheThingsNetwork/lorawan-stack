@@ -27,11 +27,9 @@ export default class ProfileDropdown extends React.PureComponent {
 
   static propTypes = {
     /**
-    * The User object returned from the API
+    * The id of the current user
     */
-    user: PropTypes.PropTypes.shape({
-      name: PropTypes.string.isRequired,
-    }).isRequired,
+    userId: PropTypes.string.isRequired,
     /**
     * A list of items for the dropdown
     * @param {(string|Object)} title - The title to be displayed
@@ -82,7 +80,7 @@ export default class ProfileDropdown extends React.PureComponent {
   }
 
   render () {
-    const { user, dropdownItems, ...rest } = this.props
+    const { userId, dropdownItems, ...rest } = this.props
 
     return (
       <div
@@ -95,7 +93,7 @@ export default class ProfileDropdown extends React.PureComponent {
         {...rest}
       >
         <div className={styles.profilePicture} />
-        <span className={styles.username}>{user.name}</span>
+        <span className={styles.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
         { this.state.expanded && <Dropdown items={dropdownItems} />}
       </div>

@@ -86,7 +86,7 @@ const Header = function ({
             </div>
             <div className={styles.right}>
               <Input icon="search" onEnter={handleSearchRequest} />
-              <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} user={user} />
+              <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} userId={user.ids.user_id} />
             </div>
           </React.Fragment>
         )
