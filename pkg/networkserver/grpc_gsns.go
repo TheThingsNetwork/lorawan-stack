@@ -484,7 +484,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 		outer:
 			for len(cmds) > 0 {
-				cmd, cmds := cmds[0], cmds[1:]
+				var cmd *ttnpb.MACCommand
+				cmd, cmds = cmds[0], cmds[1:]
 				switch cmd.CID {
 				case ttnpb.CID_RESET:
 					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans)
