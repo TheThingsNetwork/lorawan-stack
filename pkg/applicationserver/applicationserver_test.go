@@ -498,6 +498,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyID: []byte{0x11},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
