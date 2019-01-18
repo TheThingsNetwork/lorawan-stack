@@ -1,0 +1,21 @@
+* @johanstokking
+
+.make @htdvisser @rvolosatovs
+api @johanstokking @htdvisser @rvolosatovs
+cmd @johanstokking @htdvisser @rvolosatovs
+doc @TheThingsIndustries/stack
+config @bafonis @kschiffer
+
+pkg @TheThingsIndustries/stack
+pkg/auth @johanstokking @htdvisser
+pkg/crypto @johanstokking @htdvisser
+pkg/webui @bafonis @kschiffer
+
+pkg/applicationserver @johanstokking
+pkg/console @bafonis @kschiffer
+pkg/gatewayserver @johanstokking
+pkg/networkserver @rvolosatovs
+pkg/identityserver @htdvisser
+pkg/joinserver @johanstokking @rvolosatovs
+
+sdk/js @bafonis @kschiffer
