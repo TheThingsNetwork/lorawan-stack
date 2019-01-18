@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include .mage/mage.make
+
 HEADER_EXTRA_FILES = Makefile
 
 PRE_COMMIT = headers.check-staged js.lint-staged styl.lint-staged snap.lint-staged
@@ -22,7 +24,6 @@ SUPPORT_LOCALES = en
 include .make/log.make
 include .make/general.make
 include .make/git.make
-include .make/versions.make
 include .make/headers.make
 include .make/go/main.make
 include .make/protos/main.make

@@ -9,6 +9,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.0
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/RangelReale/osin v1.0.1
+	github.com/TheThingsIndustries/magepkg v0.0.0-20190121105130-84da34311dab
 	github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/aws/aws-sdk-go v1.16.21
@@ -49,6 +50,7 @@ require (
 	github.com/labstack/echo v3.3.5+incompatible
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.0.0
+	github.com/magefile/mage v1.8.0
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.4
 	github.com/mattn/go-runewidth v0.0.4 // indirect
