@@ -24,11 +24,24 @@ import * as accessToken from '../lib/access-token'
 const consoleLogic = createLogic({
   type: _console.INITIALIZE,
   async process ({ getState, action }, dispatch, done) {
+    dispatch(user.getUserMe())
+
     try {
       try {
-        const result = window.APP_CONFIG.console
-          ? await api.v3.is.users.me()
-          : await api.oauth.me()
+        const isConsole = window.APP_ROOT = '/console'
+
+        let result
+        if (isConsole) {
+          // there is no way to retrieve the current user directly
+          // within the console app, so first get the authentication info
+          // and only afterwards fetch the user
+          const info = await api.v3.is.authInfo()
+          const userId = info.data.oauth_access_token.user_ids.user_id
+          result = await api.v3.is.users.get(userId)
+        } else {
+          result = await api.oauth.me()
+        }
+
         dispatch(user.getUserMeSuccess(result.data))
       } catch (error) {
         dispatch(user.getUserMeFailure())
@@ -37,7 +50,6 @@ const consoleLogic = createLogic({
       dispatch(_console.initializeSuccess())
       console.log('Initialization successful!')
     } catch (error) {
-      console.log(error)
       dispatch(_console.initializeFailure())
     }
     done()

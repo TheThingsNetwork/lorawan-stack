@@ -31,13 +31,20 @@ export default {
         },
       },
       users: {
-        async me () {
-          return axios.get('/api/v3/is/users/me', {
+        async get (userId) {
+          return axios.get(`/api/v3/users/${userId}`, {
             headers: {
               Authorization: `Bearer ${(await token()).access_token}`,
             },
           })
         },
+      },
+      async authInfo () {
+        return axios.get('/api/v3/auth_info', {
+          headers: {
+            Authorization: `Bearer ${(await token()).access_token}`,
+          },
+        })
       },
       applications: {
         list: stubs.applications.list,

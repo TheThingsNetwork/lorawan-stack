@@ -20,24 +20,12 @@ import * as accessToken from '../lib/access-token'
 
 export default [
   createLogic({
-    type: user.GET_USER_ME,
-    async process ({ getState, action }, dispatch, done) {
-      try {
-        const result = window.APP_CONFIG.console
-          ? await api.v3.is.users.me()
-          : await api.oauth.me()
-        dispatch(user.getUserMeSuccess(result.data))
-      } catch (error) {
-        dispatch(user.getUserMeFailure())
-      }
-      done()
-    },
-  }),
-  createLogic({
     type: user.LOGOUT,
     async process ({ getState, action }, dispatch, done) {
       try {
-        if (window.APP_CONFIG.console) {
+        const isConsole = window.APP_ROOT === '/console'
+
+        if (isConsole) {
           await api.console.auth.logout()
         } else {
           await api.oauth.logout()
