@@ -552,8 +552,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDevic
 				}
 				if err != nil {
 					logger.WithField("cid", cmd.CID).WithError(err).Warn("Failed to process MAC command")
-					handleErr = true
-					return nil, nil, err
 				}
 			}
 			if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
