@@ -77,7 +77,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
 	go.opencensus.io v0.18.0
-	go.thethings.network/lorawan-stack-legacy v0.0.0-20181114101953-85f7614eadb9
+	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
 	gocloud.dev v0.9.0
 	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
 	golang.org/x/image v0.0.0-20190118043309-183bebdce1b2 // indirect
