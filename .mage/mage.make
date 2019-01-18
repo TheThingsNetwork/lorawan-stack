@@ -16,8 +16,8 @@ MAGE := .mage/run
 
 $(MAGE): magefile.go $(wildcard .mage/*.go)
 	@command -v go > /dev/null || ($(error) Did you forget to install Go?)
-	@command -v mage > /dev/null || go get github.com/magefile/mage
-	mage -compile $(MAGE)
+	@command -v mage > /dev/null || (GO111MODULE=off GOOS="" GOARCH="" go get github.com/magefile/mage)
+	GO111MODULE=on mage -compile $(MAGE)
 
 .PHONY: mage
 
