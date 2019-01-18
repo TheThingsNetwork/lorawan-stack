@@ -17,7 +17,6 @@ package ttnmage
 import (
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 	"strings"
 
 	"github.com/TheThingsIndustries/magepkg/git"
@@ -68,7 +67,7 @@ func (Version) Files() error {
 	version := strings.TrimPrefix(tag, "v")
 	for _, packageJSONFile := range []string{"package.json", "sdk/js/package.json"} {
 		err = sh.Run(
-			filepath.Join("node_modules", ".bin", "json"),
+			nodeBin("json"),
 			"-f", packageJSONFile,
 			"-I",
 			"-e", fmt.Sprintf(`this.version="%s"`, version),

@@ -73,26 +73,24 @@ no_pb = grep -v '_pb\.js$$'
 
 # Rules
 
-# install dev dependencies
+$(YARN): js.dev-deps
 
-$(YARN):
-	@$(log) "fetching js tools"
-	$(NPM) install yarn@$(YARN_VERSION) --no-package-lock --no-save
+js.dev-deps: $(MAGE)
+	@$(log) "Installing js dev dependencies"
+	@$(MAGE) js:devDeps
 
-js.dev-deps: $(YARN)
+# install dependencies
+js.deps: $(YARN)
+	@$(log) "Installing js dependencies"
+	@$(MAGE) js:deps
 
 # init initializes js
-js.init:
-	@$(log) "initializing js"
+js.init: $(MAGE)
+	@$(log) "Initializing js"
 	@make js.dev-deps
 	@make js.deps
 
 INIT_RULES += js.init
-
-# install dependencies
-js.deps: $(YARN)
-	@$(log) "fetching js dependencies"
-	@$(YARN) install $(YARN_FLAGS)
 
 # clean build files and cache
 js.clean-public:

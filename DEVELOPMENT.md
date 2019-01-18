@@ -14,11 +14,7 @@ On Ubuntu (or Ubuntu [using the Windows Subsystem for Linux](https://www.microso
 
 ```sh
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-
-sudo apt-get update
-sudo apt-get install -y build-essential nodejs yarn
+sudo apt-get install -y build-essential nodejs
 
 curl -sSL https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
 sudo ln -s /usr/local/go/bin/* /usr/local/bin
