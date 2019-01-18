@@ -544,6 +544,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyID: []byte{0x22},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
@@ -603,6 +604,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyID: []byte{0x33},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
@@ -671,6 +673,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 					},
@@ -700,6 +703,7 @@ func TestApplicationServer(t *testing.T) {
 										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 					},
@@ -729,6 +733,7 @@ func TestApplicationServer(t *testing.T) {
 										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 					},
@@ -768,6 +773,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 					},
@@ -797,6 +803,7 @@ func TestApplicationServer(t *testing.T) {
 										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 					},
@@ -834,6 +841,7 @@ func TestApplicationServer(t *testing.T) {
 										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
@@ -881,6 +889,7 @@ func TestApplicationServer(t *testing.T) {
 										PendingSession: true,
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
@@ -960,6 +969,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
@@ -1122,6 +1132,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
+								CorrelationIDs: up.CorrelationIDs,
 							})
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {

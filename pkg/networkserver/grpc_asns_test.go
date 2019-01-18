@@ -16,6 +16,7 @@ package networkserver_test
 
 import (
 	"context"
+	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"sync"
 	"testing"
 	"time"
@@ -66,6 +67,7 @@ func TestLinkApplication(t *testing.T) {
 			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
 		},
 	})
+	authorizedCtx = cluster.NewContext(authorizedCtx, nil)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
@@ -124,6 +126,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
 		},
 	})
+	authorizedCtx = cluster.NewContext(authorizedCtx, errors.New("Cluster auth disabled"))
 
 	for _, tc := range []struct {
 		Name           string
@@ -324,6 +327,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
 		},
 	})
+	authorizedCtx = cluster.NewContext(authorizedCtx, errors.New("Cluster auth disabled"))
 
 	for _, tc := range []struct {
 		Name           string
@@ -524,6 +528,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
 		},
 	})
+	authorizedCtx = cluster.NewContext(authorizedCtx, errors.New("Cluster auth disabled"))
 
 	for _, tc := range []struct {
 		Name           string
