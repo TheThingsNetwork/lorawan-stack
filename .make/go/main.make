@@ -27,12 +27,6 @@ GO_MISSPELL= misspell
 GO_UNCONVERT= unconvert
 GO_METALINTER = gometalinter
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
-GO_MINIMUM_VERSION = 1.11
-GO_VERSION := $(shell go version | cut -d' ' -f3 | cut -c 3-6)
-
-# Get the minor Go version
-get_go_major = cut -d'.' -f1
-get_go_minor = cut -d'.' -f2
 
 # go flags
 GO_ENV = CGO_ENABLED=0
@@ -97,13 +91,8 @@ go.dev-deps:
 	@$(log) "Getting gometalinter" && GO111MODULE=off go get -u github.com/alecthomas/gometalinter
 	@$(log) "Getting gometalinter linters" && GO111MODULE=off $(GO_METALINTER) -i
 
-# testing minimum version
-go.min-version:
-	@if [[ `echo $(GO_VERSION) | $(get_go_major)` -lt `echo $(GO_MINIMUM_VERSION) | $(get_go_major)` ]] || \
-	 [[ `echo $(GO_VERSION) | $(get_go_major)` -eq `echo $(GO_MINIMUM_VERSION) | $(get_go_major)` && `echo $(GO_VERSION) | $(get_go_minor)` -lt `echo $(GO_MINIMUM_VERSION) | $(get_go_minor)` ]]; then \
-		$(err) "Go is not up to date. Go $(GO_MINIMUM_VERSION) at least is required."; \
-		exit 1; \
-	fi
+go.min-version: $(MAGE)
+	@$(MAGE) go:checkVersion
 
 DEP_FLAGS ?= -v
 
