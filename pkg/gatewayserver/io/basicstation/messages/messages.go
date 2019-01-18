@@ -14,7 +14,19 @@
 
 package messages
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+)
+
+var errFrequencyPlan = errors.Define("frequency_plan", "frequency plan")
 
 // Definition of message types
 const (
@@ -34,7 +46,16 @@ const (
 	TypeDownstreamTimeSync                  = "timesync"
 	TypeDownstreamRemoteCommand             = "runcmd"
 	TypeDownstreamRemoteShell               = "rmtsh"
+
+	configHardwareSpecPrefix            = "sx1301"
+	configHardwareSpecNoOfConcentrators = "1"
 )
+
+// DataRates encodes the available datarates of the channel plan for the Station in the format below
+// [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
+// [1] -> BW (Bandwidth; 125/250/500 for LoRa, ignored for FSK)
+// [2] -> DNONLY (Downlink Only; 1 = true, 0 = false)
+type DataRates [16][3]int
 
 // DiscoverQuery contains the unique identifier of the gateway.
 // This message is sent by the gateway.
@@ -85,34 +106,23 @@ func (v Version) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// SX1301Config contains the concentrator configuration.
-type SX1301Config struct {
-	/*
-		{
-			"radio_0": { .. } // same structure as radio_1
-			"radio_1": {
-				"enable": BOOL,
-				"freq"  : INT
-			},
-			"chan_FSK": {
-				"enable": BOOL
-			},
-			"chan_Lora_std": {
-				"enable": BOOL,
-				"radio": 0|1,
-				"if": INT,
-				"bandwidth": INT,
-				"spread_factor": INT
-			},
-			"chan_multiSF_0": { .. }  // _0 .. _7 all have the same structure
-			..
-			"chan_multiSF_7": {
-				"enable": BOOL,
-				"radio": 0|1,
-				"if": INT
-			}
-		} */
+// IsProduction checks the features field for "prod" and returns true if found.
+// This is then used to set debug options in the router config
+func (v Version) IsProduction() bool {
+	if len(v.Features) == 0 {
+		return false
+	}
+	for _, feature := range v.Features {
+		if feature == "prod" {
+			return true
+		}
+	}
+	return false
 }
+
+// SX1301Config contains the concentrator configuration.
+// TODO: Hamonize this with sx1301_conf from https://github.com/TheThingsIndustries/lorawan-stack/issues/408
+type SX1301Config struct{}
 
 // RouterConfig contains the router configuration.
 // This message is sent by the Gateway Server.
@@ -122,9 +132,95 @@ type RouterConfig struct {
 	Region         string       `json:"region"`
 	HardwareSpec   string       `json:"hwspec"`
 	FrequencyRange []int        `json:"freq_range"`
-	DataRates      [][]int      `json:"DRs"`
+	DataRates      DataRates    `json:"DRs"`
 	SX1301Config   SX1301Config `json:"sx1301_conf"`
-	NoCCA          bool         `json:"nocca"`
-	NoDutyCycle    bool         `json:"nodc"`
-	NoDwellTime    bool         `json:"nodwell"`
+
+	// These are debug options to be unset in production gateways
+	NoCCA       bool `json:"nocca"`
+	NoDutyCycle bool `json:"nodc"`
+	NoDwellTime bool `json:"nodwell"`
+}
+
+// GetRouterConfig returns the routerconfig message to be sent to the gateway
+// TODO: Adapt to https://github.com/TheThingsIndustries/lorawan-stack/pull/1402
+func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig, error) {
+	if err := fp.Validate(); err != nil {
+		return RouterConfig{}, errFrequencyPlan
+	}
+
+	cfg := RouterConfig{}
+
+	// TODO: Set maximumally permissive values
+	cfg.JoinEUI = nil
+	cfg.NetID = nil
+
+	s := strings.Split(fp.BandID, "_")
+	if len(s) < 2 {
+		return RouterConfig{}, errFrequencyPlan
+	}
+	cfg.Region = fmt.Sprintf("%s%s", s[0], s[1])
+	if len(fp.Radios) == 0 {
+		return RouterConfig{}, errFrequencyPlan
+	}
+	// TODO: Handle FP with multiple radios if necessary
+	cfg.FrequencyRange = []int{int(fp.Radios[0].TxConfiguration.MinFrequency), int(fp.Radios[0].TxConfiguration.MaxFrequency)}
+
+	// TODO: Figure out how to evaluate configHardwareSpecNoOfConcentrators
+	cfg.HardwareSpec = fmt.Sprintf("%s/%s", configHardwareSpecPrefix, configHardwareSpecNoOfConcentrators)
+
+	drs, err := getDataRatesFromBandID(fp.BandID)
+	if err != nil {
+		return RouterConfig{}, errFrequencyPlan
+	}
+	cfg.DataRates = drs
+
+	if isProd {
+		cfg.NoCCA = false
+		cfg.NoDutyCycle = false
+		cfg.NoDwellTime = false
+	} else {
+		cfg.NoCCA = true
+		cfg.NoDutyCycle = true
+		cfg.NoDwellTime = true
+	}
+
+	// TODO: Get sx1301 config https://github.com/TheThingsIndustries/lorawan-stack/issues/408
+	cfg.SX1301Config = SX1301Config{}
+	return cfg, nil
+}
+
+var dataRatePattern = regexp.MustCompile("[0-9]+")
+
+// getDataRatesFromBandID parses the available datarates from the Frequency Plam into the LNS Format.
+func getDataRatesFromBandID(id string) (DataRates, error) {
+	band, err := band.GetByID(id)
+	if err != nil {
+		return DataRates{}, err
+	}
+
+	drs := DataRates{}
+	// Set the default values
+	for _, dr := range drs {
+		dr[0] = -1
+		dr[1] = 0
+		dr[2] = 0
+	}
+
+	var i = 0
+	for _, dr := range band.DataRates {
+		if dr.Rate.LoRa != "" {
+			// Ex: SF12BW125 -> dr[0] = 12, dr[1] = 125, dr[2] = 0
+			s := dataRatePattern.FindAllString(dr.Rate.LoRa, -1)
+			if len(s) != 2 {
+				continue
+			}
+			drs[i][0], _ = strconv.Atoi(s[0])
+			drs[i][1], _ = strconv.Atoi(s[1])
+			i++
+		} else if dr.Rate.FSK != 0 {
+			drs[i][0] = 0 // must be set to 0 for FSK, the BW field is ignored.
+			i++
+		}
+	}
+	return drs, nil
 }
