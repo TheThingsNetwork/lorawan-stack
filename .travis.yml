@@ -3,6 +3,9 @@ go:
 - "1.11.x"
 conditions: v1
 if: type = pull_request OR branch =~ master$
+env:
+  global:
+  - YARN_CACHE_FOLDER=$HOME/.cache/yarn
 matrix:
   include:
     - env: RUNTYPE=js
@@ -18,7 +21,6 @@ services:
 - docker
 cache:
   directories:
-  - /usr/local/share/.cache/yarn
   - $HOME/.cache/go-build
   - $HOME/.cache/yarn
   - $GOPATH/pkg/mod
