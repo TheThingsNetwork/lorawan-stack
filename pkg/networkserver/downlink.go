@@ -137,19 +137,20 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
+outer:
 	for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
 		switch dev.RecentUplinks[i].Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
 			up = dev.RecentUplinks[i]
 			needsDownlink = up.Payload.GetMACPayload().FCtrl.ADRAckReq
-			break
+			break outer
 		case ttnpb.MType_CONFIRMED_UP:
 			up = dev.RecentUplinks[i]
 			needsDownlink = true
-			break
+			break outer
 		case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 			up = dev.RecentUplinks[i]
-			break
+			break outer
 		default:
 			logger.WithField("m_type", up.Payload.MHDR.MType).Warn("Unknown MType stored in RecentUplinks")
 		}
