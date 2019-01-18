@@ -13,17 +13,14 @@ brew install go node yarn
 On Ubuntu (or Ubuntu [using the Windows Subsystem for Linux](https://www.microsoft.com/nl-NL/store/p/ubuntu/9nblggh4msv6?rtc=1)):
 
 ```sh
-curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 
-curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
-echo "deb https://deb.nodesource.com/node_8.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-echo "deb-src https://deb.nodesource.com/node_8.x xenial main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
-
 sudo apt-get update
-sudo apt-get install build-essential nodejs yarn
+sudo apt-get install -y build-essential nodejs yarn
 
-curl -sSL https://dl.google.com/go/go1.11.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
+curl -sSL https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
 sudo ln -s /usr/local/go/bin/* /usr/local/bin
 ```
 
@@ -87,7 +84,6 @@ As most of the tasks will be managed by `make` we will first initialize the tool
 
 ```sh
 make init
-make deps
 ```
 
 For convenience, you can initialize the development database with some defaults:

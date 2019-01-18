@@ -17,13 +17,10 @@ services:
 - docker
 cache:
   directories:
-  - ${TRAVIS_BUILD_DIR}/node_modules
-  - ${TRAVIS_BUILD_DIR}/.cache
+  - /usr/local/share/.cache/yarn
   - $HOME/.cache/go-build
-  - $GOPATH/bin
-  - $GOPATH/pkg
-  - $GOPATH/src/github.com/alecthomas # gometalinter
-  - $GOPATH/src/github.com/mattn # goveralls
+  - $HOME/.cache/yarn
+  - $GOPATH/pkg/mod
 before_install:
 - sudo rm /usr/local/bin/docker-compose
 - curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose

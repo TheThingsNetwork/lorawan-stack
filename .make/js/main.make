@@ -81,19 +81,11 @@ $(YARN):
 
 js.dev-deps: $(YARN)
 
-js_init_script = \
-	var fs = require('fs'); \
-	try { var pkg = require('./package.json') } catch(err) { pkg = {} }; \
-	pkg.babel = pkg.babel || { presets: [ 'ttn' ] }; \
-	pkg.eslintConfig = pkg.eslintConfig || { extends: 'ttn' }; \
-	pkg.jest = pkg.jest || { preset: 'jest-preset-ttn' }; \
-	fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-
-# initialize repository
+# init initializes js
 js.init:
 	@$(log) "initializing js"
-	@echo "$(js_init_script)" | node
-
+	@make js.dev-deps
+	@make js.deps
 
 INIT_RULES += js.init
 
