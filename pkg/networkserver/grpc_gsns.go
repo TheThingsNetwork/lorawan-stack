@@ -317,9 +317,16 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger.Debug("Matching device...")
 	dev, ses, err := ns.matchDevice(ctx, up)
 	if err != nil {
+		registerDropDataUplink(ctx, nil, up, err)
 		log.FromContext(ctx).WithError(err).Warn("Failed to match device")
 		return errDeviceNotFound.WithCause(err)
 	}
+
+	defer func() {
+		if err != nil {
+			registerDropDataUplink(ctx, &dev.EndDeviceIdentifiers, up, err)
+		}
+	}()
 
 	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 	ctx = log.NewContext(ctx, logger)
@@ -394,7 +401,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 
 	up.RxMetadata = acc.Accumulated()
-	registerMergeMetadata(ctx, dev, up)
+	registerMergeMetadata(ctx, &dev.EndDeviceIdentifiers, up)
 
 	var handleErr bool
 	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
@@ -614,7 +621,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	} else if !ok {
 		logger.Warn("Application Server not found, not forwarding uplink")
 	} else {
-		registerForwardUplink(ctx, dev, up)
+		registerForwardDataUplink(ctx, &dev.EndDeviceIdentifiers, up)
 		scheduleAt = scheduleAt.Add(appQueueUpdateTimeout)
 	}
 	return ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, scheduleAt)
@@ -651,9 +658,17 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		},
 	)
 	if err != nil {
+		registerDropJoinRequest(ctx, nil, up, err)
 		logger.WithError(err).Error("Failed to load device from registry")
 		return err
 	}
+
+	defer func() {
+		if err != nil {
+			registerDropJoinRequest(ctx, &dev.EndDeviceIdentifiers, up, err)
+		}
+	}()
+
 	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 	ctx = log.NewContext(ctx, logger)
 
@@ -702,7 +717,8 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		return err
 	}
 	logger.Debug("Join-accept received from Join Server")
-	registerForwardUplink(ctx, dev, up)
+
+	registerForwardJoinRequest(ctx, &dev.EndDeviceIdentifiers, up)
 
 	select {
 	case <-ctx.Done():
@@ -711,7 +727,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}
 
 	up.RxMetadata = acc.Accumulated()
-	registerMergeMetadata(ctx, dev, up)
+	registerMergeMetadata(ctx, &dev.EndDeviceIdentifiers, up)
 
 	var invalidatedQueue []*ttnpb.ApplicationDownlink
 	var resetErr bool
@@ -823,6 +839,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropRejoinRequest(ctx, nil, up, err)
+		}
+	}()
 	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
@@ -858,9 +879,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger.Debug("Deduplicating uplink...")
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
 	if ok {
-		logger.Debug("Dropping duplicate")
+		logger.Debug("Dropped duplicate uplink")
+		registerReceiveUplinkDuplicate(ctx, up)
 		return ttnpb.Empty, nil
 	}
+	registerReceiveUplink(ctx, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
 		logger.Debug("Waiting for collection window to be closed...")

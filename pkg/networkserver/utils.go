@@ -70,15 +70,14 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 	dev.MACState = &ttnpb.MACState{
 		LoRaWANVersion: dev.LoRaWANVersion,
 		CurrentParameters: ttnpb.MACParameters{
-			ADRAckDelay:       uint32(band.ADRAckDelay),
-			ADRAckLimit:       uint32(band.ADRAckLimit),
-			ADRNbTrans:        1,
-			MaxDutyCycle:      ttnpb.DUTY_CYCLE_1,
-			MaxEIRP:           band.DefaultMaxEIRP,
-			Rx1Delay:          ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
-			Rx1DataRateOffset: 0,
-			Rx2DataRateIndex:  band.DefaultRx2Parameters.DataRateIndex,
-			Rx2Frequency:      band.DefaultRx2Parameters.Frequency,
+			ADRAckDelay:      uint32(band.ADRAckDelay),
+			ADRAckLimit:      uint32(band.ADRAckLimit),
+			ADRNbTrans:       1,
+			MaxDutyCycle:     ttnpb.DUTY_CYCLE_1,
+			MaxEIRP:          band.DefaultMaxEIRP,
+			Rx1Delay:         ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
+			Rx2DataRateIndex: band.DefaultRx2Parameters.DataRateIndex,
+			Rx2Frequency:     band.DefaultRx2Parameters.Frequency,
 		},
 	}
 

@@ -63,18 +63,19 @@ var (
 	evtBeginApplicationLink = events.Define("ns.application.begin_link", "begin application link")
 	evtEndApplicationLink   = events.Define("ns.application.end_link", "end application link")
 
-	evtReceiveUp          = events.Define("ns.up.receive", "receive uplink message")
-	evtReceiveUpDuplicate = events.Define("ns.up.receive_duplicate", "receive duplicate uplink message")
-	evtMergeMetadata      = events.Define("ns.up.merge_metadata", "merge uplink message metadata")
+	evtReceiveUplink          = events.Define("ns.up.receive", "receive uplink message")
+	evtReceiveUplinkDuplicate = events.Define("ns.up.receive_duplicate", "receive duplicate uplink message")
 
-	evtDropData    = events.Define("ns.up.data.drop", "drop data message")
-	evtForwardData = events.Define("ns.up.data.forward", "forward data message")
+	evtMergeMetadata = events.Define("ns.up.merge_metadata", "merge uplink message metadata")
 
-	evtDropJoin    = events.Define("ns.up.join.drop", "drop join-request")
-	evtForwardJoin = events.Define("ns.up.join.forward", "forward join-request")
+	evtDropDataUplink    = events.Define("ns.up.data.drop", "drop data message")
+	evtForwardDataUplink = events.Define("ns.up.data.forward", "forward data message")
 
-	evtDropRejoin    = events.Define("ns.up.rejoin.drop", "drop rejoin-request")
-	evtForwardRejoin = events.Define("ns.up.rejoin.forward", "forward rejoin-request")
+	evtDropJoinRequest    = events.Define("ns.up.join.drop", "drop join-request")
+	evtForwardJoinRequest = events.Define("ns.up.join.forward", "forward join-request")
+
+	evtDropRejoinRequest    = events.Define("ns.up.rejoin.drop", "drop rejoin-request")
+	evtForwardRejoinRequest = events.Define("ns.up.rejoin.forward", "forward rejoin-request")
 
 	evtEnqueueProprietaryMACAnswer  = defineEnqueueMACAnswerEvent("proprietary", "proprietary MAC command")
 	evtEnqueueProprietaryMACRequest = defineEnqueueMACRequestEvent("proprietary", "proprietary MAC command")
@@ -110,7 +111,7 @@ var nsMetrics = &messageMetrics{
 			Name:      "uplink_forwarded_total",
 			Help:      "Total number of forwarded uplinks",
 		},
-		[]string{messageType, "application_id"},
+		[]string{messageType},
 	),
 	uplinkDropped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -159,62 +160,84 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkGateways.Collect(ch)
 }
 
-func mType(msg *ttnpb.UplinkMessage) string { return strings.ToLower(msg.Payload.MType.String()) }
-
-func registerReceiveUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUp(ctx, nil, nil))
-	nsMetrics.uplinkReceived.WithLabelValues(ctx, mType(msg)).Inc()
-	nsMetrics.uplinkUniqueReceived.WithLabelValues(ctx, mType(msg)).Inc()
+func uplinkMTypeLabel(msg *ttnpb.UplinkMessage) string {
+	return strings.ToLower(msg.Payload.MType.String())
 }
 
-func registerReceiveUplinkDuplicate(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUpDuplicate(ctx, nil, nil))
-	nsMetrics.uplinkReceived.WithLabelValues(ctx, mType(msg)).Inc()
+func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
+	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
+	nsMetrics.uplinkUniqueReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) {
-	switch msg.Payload.MType {
-	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		events.Publish(evtForwardData(ctx, dev.EndDeviceIdentifiers, nil))
-	case ttnpb.MType_JOIN_REQUEST:
-		events.Publish(evtForwardJoin(ctx, dev.EndDeviceIdentifiers, nil))
-	case ttnpb.MType_REJOIN_REQUEST:
-		events.Publish(evtForwardRejoin(ctx, dev.EndDeviceIdentifiers, nil))
-	}
-	appID := unknown
-	if dev != nil {
-		appID = dev.ApplicationID
-	}
-	nsMetrics.uplinkForwarded.WithLabelValues(ctx, mType(msg), appID).Inc()
+func registerReceiveUplinkDuplicate(ctx context.Context, msg *ttnpb.UplinkMessage) {
+	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
-	if payload := msg.GetPayload(); payload != nil {
-		switch payload.MType {
-		case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-			events.Publish(evtDropData(ctx, nil, err))
-		case ttnpb.MType_JOIN_REQUEST:
-			events.Publish(evtDropJoin(ctx, nil, err))
-		case ttnpb.MType_REJOIN_REQUEST:
-			events.Publish(evtDropRejoin(ctx, nil, err))
-		}
+func registerMergeMetadata(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtMergeMetadata(ctx, devIDs, len(msg.RxMetadata)))
 	}
+
+	gtws := make(map[string]struct{}, len(msg.RxMetadata))
+	for _, md := range msg.RxMetadata {
+		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
+	}
+	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(len(gtws)))
+}
+
+func registerForwardDataUplink(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtForwardDataUplink(ctx, devIDs, nil))
+	}
+	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
+}
+
+func registerForwardJoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtForwardJoinRequest(ctx, devIDs, nil))
+	}
+	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
+}
+
+func registerForwardRejoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtForwardRejoinRequest(ctx, devIDs, nil))
+	}
+	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
+}
+
+func registerDropDataUplink(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtDropDataUplink(ctx, devIDs, err))
+	}
+
 	if ttnErr, ok := errors.From(err); ok {
-		nsMetrics.uplinkDropped.WithLabelValues(ctx, mType(msg), ttnErr.String()).Inc()
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.String()).Inc()
 	} else {
-		nsMetrics.uplinkDropped.WithLabelValues(ctx, mType(msg), unknown).Inc()
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), unknown).Inc()
 	}
 }
 
-func registerMergeMetadata(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
-	numGateways := len(msg.RxMetadata)
-	if numGateways > 1 {
-		uniqueGateways := make(map[string]struct{}, len(msg.RxMetadata))
-		for _, meta := range msg.RxMetadata {
-			uniqueGateways[unique.ID(ctx, meta.GatewayIdentifiers)] = struct{}{}
-		}
-		numGateways = len(uniqueGateways)
+func registerDropJoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtDropJoinRequest(ctx, devIDs, err))
 	}
-	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(numGateways))
+
+	if ttnErr, ok := errors.From(err); ok {
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.String()).Inc()
+	} else {
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), unknown).Inc()
+	}
+}
+
+func registerDropRejoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
+	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
+		events.Publish(evtDropRejoinRequest(ctx, devIDs, err))
+	}
+
+	if ttnErr, ok := errors.From(err); ok {
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.String()).Inc()
+	} else {
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), unknown).Inc()
+	}
 }
