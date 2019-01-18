@@ -88,7 +88,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_addr", pld.DevAddr,
-		"uplink_f_cnt", up.Payload.GetMACPayload().FCnt,
+		"uplink_f_cnt", pld.FCnt,
 		"payload_length", len(b),
 	))
 
@@ -156,8 +156,9 @@ outer:
 
 		logger = logger.WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			"device_f_cnt", dev.matchedSession.LastFCntUp,
-			"full_f_cnt", fCnt,
+			"full_f_cnt_up", fCnt,
+			"last_f_cnt_up", dev.matchedSession.LastFCntUp,
+			"uplink_f_cnt_up", pld.FCnt,
 		))
 
 		gap := uint32(math.MaxUint32)
@@ -305,27 +306,25 @@ outer:
 // MACHandler defines the behavior of a MAC command on a device.
 type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, up *ttnpb.UplinkMessage) error
 
-func (ns *NetworkServer) handleUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
-	defer func() {
-		if err != nil {
-			registerDropUplink(ctx, devIDs, up, err)
-		}
-	}()
+func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+	pld := up.Payload.GetMACPayload()
 
-	log.FromContext(ctx).Debug("Matching device...")
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"dev_addr", pld.DevAddr,
+	))
+	ctx = log.NewContext(ctx, logger)
+
+	logger.Debug("Matching device...")
 	dev, ses, err := ns.matchDevice(ctx, up)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to match device")
 		return errDeviceNotFound.WithCause(err)
 	}
 
-	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
-	logger.Debug("Matched device")
+	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+	ctx = log.NewContext(ctx, logger)
 
-	pld := up.Payload.GetMACPayload()
-	if pld == nil {
-		return errNoPayload
-	}
+	logger.Debug("Matched device")
 
 	if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
 		asUp := &ttnpb.ApplicationUp{
@@ -633,19 +632,14 @@ func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.Dev
 	return devAddr
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
-	defer func() {
-		if err != nil {
-			registerDropUplink(ctx, devIDs, up, err)
-		}
-	}()
-
+func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	pld := up.Payload.GetJoinRequestPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", pld.DevEUI,
 		"join_eui", pld.JoinEUI,
 	))
+	ctx = log.NewContext(ctx, logger)
 
 	dev, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
 		[]string{
@@ -828,12 +822,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, devIDs ttnpb.EndDeviceI
 	return nil
 }
 
-func (ns *NetworkServer) handleRejoin(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
-	defer func() {
-		if err != nil {
-			registerDropUplink(ctx, devIDs, up, err)
-		}
-	}()
+func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
@@ -854,30 +843,24 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	logger := log.FromContext(ctx)
 
-	if up.Payload.Payload == nil {
-		if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
-			return nil, errDecodePayload.WithCause(err)
-		}
-	}
-
 	if up.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
 			"major", up.Payload.Major,
 		)
 	}
 
+	if up.Payload.Payload == nil {
+		if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
+			return nil, errDecodePayload.WithCause(err)
+		}
+	}
+
 	logger.Debug("Deduplicating uplink...")
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
-	devIDs, err := lorawan.GetUplinkMessageIdentifiers(up)
-	if err != nil {
-		return nil, errDecodePayload.WithCause(err)
-	}
 	if ok {
 		logger.Debug("Dropping duplicate")
-		registerReceiveUplinkDuplicate(ctx, devIDs, up)
 		return ttnpb.Empty, nil
 	}
-	registerReceiveUplink(ctx, devIDs, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
 		logger.Debug("Waiting for collection window to be closed...")
@@ -890,13 +873,13 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		logger.Debug("Handling data uplink...")
-		return ttnpb.Empty, ns.handleUplink(ctx, devIDs, up, acc)
+		return ttnpb.Empty, ns.handleUplink(ctx, up, acc)
 	case ttnpb.MType_JOIN_REQUEST:
 		logger.Debug("Handling join-request...")
-		return ttnpb.Empty, ns.handleJoin(ctx, devIDs, up, acc)
+		return ttnpb.Empty, ns.handleJoin(ctx, up, acc)
 	case ttnpb.MType_REJOIN_REQUEST:
 		logger.Debug("Handling rejoin-request...")
-		return ttnpb.Empty, ns.handleRejoin(ctx, devIDs, up, acc)
+		return ttnpb.Empty, ns.handleRejoin(ctx, up, acc)
 	default:
 		logger.Error("Unmatched MType")
 		return ttnpb.Empty, nil

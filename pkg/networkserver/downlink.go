@@ -61,6 +61,8 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
 func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) ([]byte, *ttnpb.ApplicationDownlink, error) {
+	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+
 	if dev.MACState == nil {
 		return nil, nil, errUnknownMACState
 	}
@@ -75,10 +77,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	}
 	maxDownLen, maxUpLen = maxDownLen-5, maxUpLen-5
 
-	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
-
 	spec := lorawan.DefaultMACCommands
-
 	cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
 	for _, cmd := range dev.MACState.QueuedResponses {
 		desc := spec[cmd.CID]
@@ -134,9 +133,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 			return nil, nil, errEncodeMAC.WithCause(err)
 		}
 	}
-	if len(cmdBuf) > 0 {
-		logger.WithField("buf", cmdBuf).Debug("Generated MAC command buffer")
-	}
+	logger = logger.WithField("mac_count", len(cmds))
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
@@ -172,6 +169,10 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 			FCnt: dev.Session.LastNFCntDown + 1,
 		},
 	}
+	logger = logger.WithFields(log.Fields(
+		"ack", pld.FHDR.FCtrl.Ack,
+		"f_cnt", pld.FHDR.FCnt,
+	))
 
 	var appDown *ttnpb.ApplicationDownlink
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
@@ -180,6 +181,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
 
 		if len(down.FRMPayload) > int(maxDownLen) {
+			logger.Warn("Application downlink present, but the payload is too long, skipping...")
 			// TODO: Inform AS that payload is too long(https://github.com/TheThingsIndustries/lorawan-stack/issues/377)
 			if !needsDownlink && len(cmdBuf) == 0 {
 				return nil, nil, errNoDownlink
@@ -197,6 +199,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 			}
 		}
 	}
+	logger = logger.WithField("f_port", pld.FPort)
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
@@ -229,6 +232,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	}
 
 	pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
+	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 
 	switch {
 	case dev.MACState.DeviceClass != ttnpb.CLASS_C,
@@ -290,7 +294,10 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	if err != nil {
 		return nil, nil, errComputeMIC
 	}
-	return append(b, mic[:]...), appDown, nil
+	b = append(b, mic[:]...)
+
+	logger.WithField("payload_length", len(b)).Debug("Generated downlink")
+	return b, appDown, nil
 }
 
 type downlinkPath struct {
