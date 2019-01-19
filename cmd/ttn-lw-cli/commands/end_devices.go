@@ -432,18 +432,16 @@ var (
 					List: list,
 				}
 			} else {
-				var joinEUI types.EUI64
-				joinEUIHex, _ := cmd.Flags().GetString("join-eui")
-				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-					return err
+				var joinEUI *types.EUI64
+				if joinEUIHex, _ := cmd.Flags().GetString("join-eui"); joinEUIHex != "" {
+					if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
+						return err
+					}
 				}
 				var fromDevEUI types.EUI64
 				fromDevEUIHex, _ := cmd.Flags().GetString("from-dev-eui")
 				if err := fromDevEUI.UnmarshalText([]byte(fromDevEUIHex)); err != nil {
 					return err
-				}
-				if joinEUI.IsZero() || fromDevEUI.IsZero() {
-					return errNoEndDeviceEUI
 				}
 				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
 					Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
