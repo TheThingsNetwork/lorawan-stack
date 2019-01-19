@@ -115,6 +115,7 @@ require (
 	gopkg.in/jarcoal/httpmock.v1 v1.0.0-20181117152235-275e9df93516
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
+	gopkg.in/square/go-jose.v2 v2.2.2
 	gopkg.in/yaml.v2 v2.2.2
 	honnef.co/go/tools v0.0.0-20190109154334-5bcec433c8ea // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
