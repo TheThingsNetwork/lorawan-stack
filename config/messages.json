@@ -3086,6 +3086,24 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/joinserver/provisioning:entry": {
+    "translations": {
+      "en": "invalid entry"
+    },
+    "description": {
+      "package": "pkg/joinserver/provisioning",
+      "file": "provisioning.go"
+    }
+  },
+  "error:pkg/joinserver/provisioning:microchip_public_key": {
+    "translations": {
+      "en": "unknown Microchip public key ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/joinserver/provisioning",
+      "file": "microchip.go"
+    }
+  },
   "error:pkg/joinserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
