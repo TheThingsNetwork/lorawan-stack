@@ -32,7 +32,7 @@ message KeyEnvelope {
 // These are stored on the Join Server.
 message RootKeys {
   // Join Server issued identifier for the root keys.
-  string root_key_id = 1 [(gogoproto.customname) = "RootKeyID", (validator.field) = {string_not_empty: true}];
+  string root_key_id = 1 [(gogoproto.customname) = "RootKeyID"];
   // The (encrypted) Application Key.
   KeyEnvelope app_key = 2;
   // The (encrypted) Network Key.
