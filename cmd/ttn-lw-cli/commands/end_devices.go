@@ -227,26 +227,6 @@ var (
 					"default_class", "uses_32_bit_f_cnt", "mac_settings",
 				)
 			}
-			if otaa, _ := cmd.Flags().GetBool("otaa"); otaa {
-				device.SupportsJoin = true
-				paths = append(paths, "supports_join")
-				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
-					if device.Provisioner != "" {
-						return errEndDeviceKeysWithProvisioner
-					}
-					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
-					device.RootKeys = &ttnpb.RootKeys{
-						RootKeyID: "ttn-lw-cli-generated",
-						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
-						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
-					}
-					paths = append(paths,
-						"root_keys.root_key_id",
-						"root_keys.app_key",
-						"root_keys.nwk_key",
-					)
-				}
-			}
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
 				device.SupportsJoin = false
 				paths = append(paths, "supports_join")
@@ -271,6 +251,25 @@ var (
 						"session.keys.nwk_s_enc_key",
 						"session.keys.app_s_key",
 						"dev_addr",
+					)
+				}
+			} else {
+				device.SupportsJoin = true
+				paths = append(paths, "supports_join")
+				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
+					if device.Provisioner != "" {
+						return errEndDeviceKeysWithProvisioner
+					}
+					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					device.RootKeys = &ttnpb.RootKeys{
+						RootKeyID: "ttn-lw-cli-generated",
+						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+					}
+					paths = append(paths,
+						"root_keys.root_key_id",
+						"root_keys.app_key",
+						"root_keys.nwk_key",
 					)
 				}
 			}
@@ -585,7 +584,6 @@ func init() {
 	endDevicesCreateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesCreateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesCreateCommand.Flags().Bool("defaults", true, "configure end device with defaults")
-	endDevicesCreateCommand.Flags().Bool("otaa", true, "configure end device as OTAA")
 	endDevicesCreateCommand.Flags().Bool("with-root-keys", false, "generate OTAA root keys")
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
 	endDevicesCreateCommand.Flags().Bool("with-session-keys", false, "generate ABP session keys")
