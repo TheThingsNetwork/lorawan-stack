@@ -1419,6 +1419,47 @@ func TestDeviceRegistryProvision(t *testing.T) {
 		a.So(devs[2].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
 		a.So(devs[2].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2}))
 	}
+
+	// From data: provision three new devices with custom JoinEUI.
+	{
+		var devs []*ttnpb.EndDevice
+		stream := &mockJsEndDeviceRegistryProvisionServer{
+			MockServerStream: &test.MockServerStream{
+				MockStream: &test.MockStream{
+					ContextFunc: func() context.Context {
+						return authorizedCtx
+					},
+				},
+			},
+			SendFunc: func(dev *ttnpb.EndDevice) error {
+				devs = append(devs, dev)
+				return nil
+			},
+		}
+		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
+			ApplicationIdentifiers: registeredApplicationID,
+			EndDevices: &ttnpb.ProvisionEndDevicesRequest_FromData{
+				FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
+					JoinEUI: eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+				},
+			},
+			Provisioner: "mock",
+			Data:        []byte{0x1, 0x2, 0x3},
+		}, stream)
+		a.So(err, should.BeNil)
+		if !a.So(devs, should.HaveLength, 3) {
+			t.FailNow()
+		}
+		a.So(devs[0].DeviceID, should.Equal, "sn-1")
+		a.So(devs[0].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
+		a.So(devs[0].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}))
+		a.So(devs[1].DeviceID, should.Equal, "sn-2")
+		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
+		a.So(devs[1].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2}))
+		a.So(devs[2].DeviceID, should.Equal, "sn-3")
+		a.So(devs[2].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
+		a.So(devs[2].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3}))
+	}
 }
 
 type byteToSerialNumber struct {

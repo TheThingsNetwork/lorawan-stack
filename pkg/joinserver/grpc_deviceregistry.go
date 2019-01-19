@@ -111,23 +111,11 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 			if ids.ApplicationIdentifiers != req.ApplicationIdentifiers {
 				return nil, errInvalidIdentifiers
 			}
-			if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
-				return nil, errNoJoinEUI
-			}
-			if ids.DevEUI == nil || ids.DevEUI.IsZero() {
-				return nil, errNoDevEUI
-			}
 			return &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 			}, nil
 		}
 	case *ttnpb.ProvisionEndDevicesRequest_Range:
-		if devices.Range.JoinEUI != nil && devices.Range.JoinEUI.IsZero() {
-			return errNoJoinEUI
-		}
-		if devices.Range.FromDevEUI.IsZero() {
-			return errNoDevEUI
-		}
 		devEUIInt := binary.BigEndian.Uint64(devices.Range.FromDevEUI[:])
 		next = func(entry *pbtypes.Struct) (*ttnpb.EndDevice, error) {
 			var devEUI types.EUI64
@@ -141,9 +129,34 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 				if joinEUI, err = provisioner.DefaultJoinEUI(entry); err != nil {
 					return nil, err
 				}
-				if joinEUI.IsZero() {
-					return nil, errNoJoinEUI
+			}
+			deviceID, err := provisioner.DeviceID(joinEUI, devEUI, entry)
+			if err != nil {
+				return nil, err
+			}
+			return &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: req.ApplicationIdentifiers,
+					DeviceID:               deviceID,
+					JoinEUI:                &joinEUI,
+					DevEUI:                 &devEUI,
+				},
+			}, nil
+		}
+	case *ttnpb.ProvisionEndDevicesRequest_FromData:
+		next = func(entry *pbtypes.Struct) (*ttnpb.EndDevice, error) {
+			var joinEUI types.EUI64
+			if devices.FromData.JoinEUI != nil {
+				joinEUI = *devices.FromData.JoinEUI
+			} else {
+				var err error
+				if joinEUI, err = provisioner.DefaultJoinEUI(entry); err != nil {
+					return nil, err
 				}
+			}
+			devEUI, err := provisioner.DefaultDevEUI(entry)
+			if err != nil {
+				return nil, err
 			}
 			deviceID, err := provisioner.DeviceID(joinEUI, devEUI, entry)
 			if err != nil {
@@ -170,6 +183,15 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 		dev, err := next(entry)
 		if err != nil {
 			return err
+		}
+		if err := dev.EndDeviceIdentifiers.ValidateContext(stream.Context()); err != nil {
+			return err
+		}
+		if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
+			return errNoJoinEUI
+		}
+		if dev.DevEUI == nil || dev.DevEUI.IsZero() {
+			return errNoDevEUI
 		}
 		dev.Provisioner = req.Provisioner
 		dev.ProvisioningData = entry
