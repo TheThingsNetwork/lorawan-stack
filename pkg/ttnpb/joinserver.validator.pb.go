@@ -110,6 +110,13 @@ func (this *ProvisionEndDevicesRequest) Validate() error {
 			}
 		}
 	}
+	if oneOfNester, ok := this.GetEndDevices().(*ProvisionEndDevicesRequest_FromData); ok {
+		if oneOfNester.FromData != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(oneOfNester.FromData); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("FromData", err)
+			}
+		}
+	}
 	return nil
 }
 func (this *ProvisionEndDevicesRequest_IdentifiersList) Validate() error {
@@ -121,5 +128,8 @@ func (this *ProvisionEndDevicesRequest_IdentifiersList) Validate() error {
 	return nil
 }
 func (this *ProvisionEndDevicesRequest_IdentifiersRange) Validate() error {
+	return nil
+}
+func (this *ProvisionEndDevicesRequest_IdentifiersFromData) Validate() error {
 	return nil
 }

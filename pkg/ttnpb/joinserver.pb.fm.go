@@ -481,6 +481,8 @@ var ProvisionEndDevicesRequestFieldPathsNested = []string{
 	"application_ids.application_id",
 	"data",
 	"end_devices",
+	"end_devices.from_data",
+	"end_devices.from_data.join_eui",
 	"end_devices.list",
 	"end_devices.list.end_device_ids",
 	"end_devices.range",
@@ -601,6 +603,30 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 							dst.EndDevices.(*ProvisionEndDevicesRequest_Range).Range = nil
 						}
 					}
+				case "from_data":
+					if _, ok := dst.EndDevices.(*ProvisionEndDevicesRequest_FromData); !ok {
+						dst.EndDevices = &ProvisionEndDevicesRequest_FromData{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.EndDevices.(*ProvisionEndDevicesRequest_FromData).FromData
+						if newDst == nil {
+							newDst = &ProvisionEndDevicesRequest_IdentifiersFromData{}
+							dst.EndDevices.(*ProvisionEndDevicesRequest_FromData).FromData = newDst
+						}
+						var newSrc *ProvisionEndDevicesRequest_IdentifiersFromData
+						if src != nil {
+							newSrc = src.GetFromData()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.EndDevices.(*ProvisionEndDevicesRequest_FromData).FromData = src.GetFromData()
+						} else {
+							dst.EndDevices.(*ProvisionEndDevicesRequest_FromData).FromData = nil
+						}
+					}
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
@@ -673,6 +699,34 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *Provision
 			} else {
 				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
 				dst.FromDevEUI = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var ProvisionEndDevicesRequest_IdentifiersFromDataFieldPathsNested = []string{
+	"join_eui",
+}
+
+var ProvisionEndDevicesRequest_IdentifiersFromDataFieldPathsTopLevel = []string{
+	"join_eui",
+}
+
+func (dst *ProvisionEndDevicesRequest_IdentifiersFromData) SetFields(src *ProvisionEndDevicesRequest_IdentifiersFromData, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				dst.JoinEUI = nil
 			}
 
 		default:
