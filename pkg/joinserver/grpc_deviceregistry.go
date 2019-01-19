@@ -122,6 +122,9 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 			}, nil
 		}
 	case *ttnpb.ProvisionEndDevicesRequest_Range:
+		if devices.Range.JoinEUI != nil && devices.Range.JoinEUI.IsZero() {
+			return errNoJoinEUI
+		}
 		if devices.Range.FromDevEUI.IsZero() {
 			return errNoDevEUI
 		}
@@ -137,6 +140,9 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 				var err error
 				if joinEUI, err = provisioner.DefaultJoinEUI(entry); err != nil {
 					return nil, err
+				}
+				if joinEUI.IsZero() {
+					return nil, errNoJoinEUI
 				}
 			}
 			deviceID, err := provisioner.DeviceID(joinEUI, devEUI, entry)
