@@ -17,6 +17,7 @@ package provisioning
 
 import (
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -24,11 +25,19 @@ import (
 type Provisioner interface {
 	// Decode decodes vendor-specific provisioning data in a struct for each entry.
 	Decode(data []byte) ([]*pbtypes.Struct, error)
+	// DefaultJoinEUI returns the default JoinEUI for the given entry.
+	DefaultJoinEUI(entry *pbtypes.Struct) (types.EUI64, error)
+	// DefaultDevEUI returns the default DevEUI for the given entry.
+	DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, error)
 	// DeviceID generates a device ID
-	DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) string
+	DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error)
 }
 
-var registry = map[string]Provisioner{}
+var (
+	registry = map[string]Provisioner{}
+
+	errEntry = errors.DefineInvalidArgument("entry", "invalid entry")
+)
 
 // Get returns the provisioner by ID.
 func Get(id string) Provisioner {
