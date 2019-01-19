@@ -1085,7 +1085,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:    types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
+					JoinEUI:    eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
@@ -1113,7 +1113,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:    types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
+					JoinEUI:    eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
@@ -1137,24 +1137,12 @@ func TestDeviceRegistryProvision(t *testing.T) {
 				return nil
 			},
 		}
-		// No JoinEUI.
+		// No FromDevEUI.
 		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-				},
-			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
-		}, stream)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-		// No FromDevEUI.
-		err = srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
-				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+					JoinEUI: eui64Ptr(types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
 				},
 			},
 			Provisioner: "mock",
@@ -1391,7 +1379,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 		})
 	}
 
-	// Range: provision three new devices.
+	// Range: provision three new devices with default JoinEUI.
 	{
 		var devs []*ttnpb.EndDevice
 		stream := &mockJsEndDeviceRegistryProvisionServer{
@@ -1411,7 +1399,6 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:    types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2},
 					FromDevEUI: types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
@@ -1423,13 +1410,13 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			t.FailNow()
 		}
 		a.So(devs[0].DeviceID, should.Equal, "sn-1")
-		a.So(devs[0].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}))
+		a.So(devs[0].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
 		a.So(devs[0].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
 		a.So(devs[1].DeviceID, should.Equal, "sn-2")
-		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}))
+		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
 		a.So(devs[1].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}))
 		a.So(devs[2].DeviceID, should.Equal, "sn-3")
-		a.So(devs[2].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}))
+		a.So(devs[2].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
 		a.So(devs[2].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2}))
 	}
 }
@@ -1447,8 +1434,8 @@ func (p *byteToSerialNumber) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, 
 	return devEUI, nil
 }
 
-func (p *byteToSerialNumber) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) string {
-	return fmt.Sprintf("sn-%d", int(entry.Fields["serial_number"].GetNumberValue()))
+func (p *byteToSerialNumber) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
+	return fmt.Sprintf("sn-%d", int(entry.Fields["serial_number"].GetNumberValue())), nil
 }
 
 func (p *byteToSerialNumber) Decode(data []byte) ([]*pbtypes.Struct, error) {
