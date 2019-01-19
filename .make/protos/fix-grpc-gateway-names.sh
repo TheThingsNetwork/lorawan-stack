@@ -7,6 +7,7 @@ function usage {
 }
 [[ ${1} = "" ]] && usage
 protoDir="${1}"
+basePackage="go.thethings.network/lorawan-stack"
 
 # TODO figure out a way to traverse only files imported by protos using grpc-gateway (google.api.http option)
 protos=(${protoDir}/*.proto)
@@ -23,8 +24,8 @@ for f in ${protos[@]}; do
     path=${f%".proto"}".pb.gw.go"
     if grep -q 'option go_package' "${f}"; then
       goPackage=`grep 'option go_package' "${f}" | perl \
-        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"([[:alnum:]_.\-/]+)".*!\1!'`
-      path=${GOPATH:-"${HOME}/go"}"/src/""${goPackage}"/`basename "${path}"`
+        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"'${basePackage}'/([[:alnum:]_.\-/]+)".*!\1!'`
+      path=${goPackage}/`basename "${path}"`
     fi
     genPaths+=(${path})
   fi
