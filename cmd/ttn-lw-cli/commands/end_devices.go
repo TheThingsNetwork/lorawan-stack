@@ -214,8 +214,6 @@ var (
 				device.NetworkServerAddress = config.NetworkServerAddress
 				device.ApplicationServerAddress = config.ApplicationServerAddress
 				device.JoinServerAddress = config.JoinServerAddress
-				device.LoRaWANVersion = ttnpb.MAC_V1_1
-				device.LoRaWANPHYVersion = ttnpb.PHY_V1_1_REV_B
 				device.DefaultClass = ttnpb.CLASS_A
 				device.Uses32BitFCnt = true
 				device.MACSettings = &ttnpb.MACSettings{
@@ -224,22 +222,25 @@ var (
 				}
 				paths = append(paths,
 					"network_server_address", "application_server_address", "join_server_address",
-					"lorawan_version", "lorawan_phy_version",
 					"default_class", "uses_32_bit_fcnt", "mac_settings",
 				)
 			}
 			if otaa, _ := cmd.Flags().GetBool("otaa"); otaa {
+				device.SupportsJoin = true
 				// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
 				device.RootKeys = &ttnpb.RootKeys{
-					AppKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
-					NwkKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
+					RootKeyID: "ttn-lw-cli-generated",
+					AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+					NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
 				}
 				paths = append(paths,
+					"supports_join",
 					"root_keys.app_key",
 					"root_keys.nwk_key",
 				)
 			}
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
+				device.SupportsJoin = false
 				device.Session = &ttnpb.Session{
 					// TODO: Generate DevAddr (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
 					SessionKeys: ttnpb.SessionKeys{
@@ -252,10 +253,12 @@ var (
 				device.DevAddr = &device.Session.DevAddr
 				// TODO: Set device.NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
 				paths = append(paths,
+					"supports_join",
 					"session.keys.f_nwk_s_int_key",
 					"session.keys.s_nwk_s_int_key",
 					"session.keys.nwk_s_enc_key",
 					"session.keys.app_s_key",
+					"dev_addr",
 				)
 			}
 
