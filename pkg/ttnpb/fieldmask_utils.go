@@ -58,3 +58,23 @@ func HasAnyField(requested []string, search ...string) bool {
 	}
 	return false
 }
+
+// FlattenPaths flattens the paths by the given paths to flatten.
+// When paths contains `a.b.c` and flatten contains `a.b`, the result will be `a.b`.
+func FlattenPaths(paths, flatten []string) []string {
+	res := make([]string, 0, len(paths))
+	flattened := make(map[string]bool)
+	for _, path := range paths {
+		for _, flatten := range flatten {
+			if flatten == path || strings.HasPrefix(path, flatten+".") {
+				if !flattened[flatten] {
+					res = append(res, flatten)
+					flattened[flatten] = true
+				}
+			} else {
+				res = append(res, path)
+			}
+		}
+	}
+	return res
+}

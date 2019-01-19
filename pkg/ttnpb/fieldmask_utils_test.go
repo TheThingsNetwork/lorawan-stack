@@ -81,3 +81,15 @@ func TestHasAnyField(t *testing.T) {
 	a.So(ttnpb.HasAnyField(requested, "d"), should.BeTrue)
 	a.So(ttnpb.HasAnyField(requested, "d.e", "b"), should.BeTrue)
 }
+
+func TestFlattenPaths(t *testing.T) {
+	a := assertions.New(t)
+	paths := []string{
+		"a",
+		"a.b",
+		"a.b.c",
+		"a.b.c.d",
+		"e.f",
+	}
+	a.So(ttnpb.FlattenPaths(paths, []string{"a.b"}), should.Resemble, []string{"a", "a.b", "e.f"})
+}
