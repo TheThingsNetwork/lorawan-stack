@@ -114,7 +114,7 @@ message ProvisionEndDevicesRequest {
     repeated EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceIDs"];
   }
   message IdentifiersRange {
-    bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
     // DevEUI to start issuing from.
     bytes from_dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "FromDevEUI"];
   }

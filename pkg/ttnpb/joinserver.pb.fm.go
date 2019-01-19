@@ -662,8 +662,7 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *Provision
 			if src != nil {
 				dst.JoinEUI = src.JoinEUI
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
-				dst.JoinEUI = zero
+				dst.JoinEUI = nil
 			}
 		case "from_dev_eui":
 			if len(subs) > 0 {
