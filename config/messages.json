@@ -1160,6 +1160,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:end_device_keys_provisioner": {
+    "translations": {
+      "en": "end device ABP or OTAA keys cannot be set when there is a provisioner"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:inconsistent_end_device_eui": {
     "translations": {
       "en": "given end device EUIs do not match registered EUIs"

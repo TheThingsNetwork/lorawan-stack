@@ -48,10 +48,11 @@ func endDeviceIDFlags() *pflag.FlagSet {
 }
 
 var (
-	errNoEndDeviceID            = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
-	errNoEndDeviceEUI           = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
-	errInconsistentEndDeviceEUI = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
-	errEndDeviceEUIUpdate       = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
+	errNoEndDeviceID                = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
+	errNoEndDeviceEUI               = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
+	errInconsistentEndDeviceEUI     = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
+	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
+	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
 )
 
 func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.EndDeviceIdentifiers, error) {
@@ -227,39 +228,50 @@ var (
 			}
 			if otaa, _ := cmd.Flags().GetBool("otaa"); otaa {
 				device.SupportsJoin = true
-				// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
-				device.RootKeys = &ttnpb.RootKeys{
-					RootKeyID: "ttn-lw-cli-generated",
-					AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
-					NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+				paths = append(paths, "supports_join")
+				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
+					if device.Provisioner != "" {
+						return errEndDeviceKeysWithProvisioner
+					}
+					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					device.RootKeys = &ttnpb.RootKeys{
+						RootKeyID: "ttn-lw-cli-generated",
+						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+					}
+					paths = append(paths,
+						"root_keys.root_key_id",
+						"root_keys.app_key",
+						"root_keys.nwk_key",
+					)
 				}
-				paths = append(paths,
-					"supports_join",
-					"root_keys.app_key",
-					"root_keys.nwk_key",
-				)
 			}
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
 				device.SupportsJoin = false
-				device.Session = &ttnpb.Session{
+				paths = append(paths, "supports_join")
+				if withKeys, _ := cmd.Flags().GetBool("with-session-keys"); withKeys {
+					if device.Provisioner != "" {
+						return errEndDeviceKeysWithProvisioner
+					}
 					// TODO: Generate DevAddr (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
-					SessionKeys: ttnpb.SessionKeys{
-						FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
-						SNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
-						NwkSEncKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
-						AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey(16)},
-					},
+					device.Session = &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							SNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							NwkSEncKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey(16)},
+						},
+					}
+					device.DevAddr = &device.Session.DevAddr
+					// TODO: Set device.NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					paths = append(paths,
+						"session.keys.f_nwk_s_int_key",
+						"session.keys.s_nwk_s_int_key",
+						"session.keys.nwk_s_enc_key",
+						"session.keys.app_s_key",
+						"dev_addr",
+					)
 				}
-				device.DevAddr = &device.Session.DevAddr
-				// TODO: Set device.NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
-				paths = append(paths,
-					"supports_join",
-					"session.keys.f_nwk_s_int_key",
-					"session.keys.s_nwk_s_int_key",
-					"session.keys.nwk_s_enc_key",
-					"session.keys.app_s_key",
-					"dev_addr",
-				)
 			}
 
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
@@ -573,7 +585,9 @@ func init() {
 	endDevicesCreateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesCreateCommand.Flags().Bool("defaults", true, "configure end device with defaults")
 	endDevicesCreateCommand.Flags().Bool("otaa", true, "configure end device as OTAA")
+	endDevicesCreateCommand.Flags().Bool("with-root-keys", false, "generate OTAA root keys")
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
+	endDevicesCreateCommand.Flags().Bool("with-session-keys", false, "generate ABP session keys")
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
