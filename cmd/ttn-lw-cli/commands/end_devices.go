@@ -36,6 +36,7 @@ var (
 	selectEndDeviceListFlags = &pflag.FlagSet{}
 	selectEndDeviceFlags     = &pflag.FlagSet{}
 	setEndDeviceFlags        = &pflag.FlagSet{}
+	endDeviceFlattenPaths    = []string{"provisioning_data"}
 )
 
 func endDeviceIDFlags() *pflag.FlagSet {
@@ -203,11 +204,11 @@ var (
 
 			var device ttnpb.EndDevice
 			if inputDecoder != nil {
-				jsonPaths, err := inputDecoder.Decode(&device)
+				decodedPaths, err := inputDecoder.Decode(&device)
 				if err != nil {
 					return err
 				}
-				paths = append(paths, jsonPaths...)
+				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
 			}
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
