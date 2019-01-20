@@ -181,7 +181,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 	}()
 
 	// TODO: Start downlink processing in goroutine, see gRPC frontend.
-	_ = conn
 
 	for {
 		_, data, err := ws.ReadMessage()
@@ -192,6 +191,11 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		typ, err := messages.Type(data)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to parse message type")
+			return err
+		}
+		fp, err := s.server.GetFrequencyPlan(ctx, ids)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to get frequency plan")
 			return err
 		}
 		switch typ {
@@ -206,11 +210,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				"firmware", version.Firmware,
 				"model", version.Model,
 			))
-			fp, err := s.server.GetFrequencyPlan(ctx, ids)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to get frequency plan")
-				return err
-			}
 			cfg, err := messages.GetRouterConfig(*fp, version.IsProduction())
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate router configuration")
@@ -227,6 +226,23 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			}
 
 		case messages.TypeUpstreamJoinRequest:
+			var jreq messages.JoinRequest
+			if err := json.Unmarshal(data, &jreq); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal join request message")
+				return err
+			}
+			logger = logger.WithFields(log.Fields(
+				"upstream_type", messages.TypeUpstreamJoinRequest,
+			))
+			up, err := jreq.ToUplinkMessage(ids, fp.BandID)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to parse join request message")
+				return err
+			}
+			if err := conn.HandleUp(&up); err != nil {
+				logger.WithError(err).Warn("Failed to handle uplink message")
+			}
+
 		case messages.TypeUpstreamJoinUplinkDataFrame:
 		case messages.TypeUpstreamTxConfirmation:
 		case messages.TypeUpstreamProprietaryDataFrame:
