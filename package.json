@@ -62,7 +62,7 @@
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
     "webpack-plugin-hash-output": "^3.1.0",
-    "webpack-shell-plugin": "^0.5.0",
+    "webpack-shell-plugin": "0.4.5",
     "yargs": "^12.0.1",
     "yarn": "1.12.3"
   },
