@@ -20,6 +20,9 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -27,7 +30,10 @@ import (
 )
 
 type jsEndDeviceRegistryServer struct {
-	Registry DeviceRegistry
+	Registry                 DeviceRegistry
+	KeyVault                 crypto.KeyVault
+	NetworkCryptoService     cryptoservices.Network
+	ApplicationCryptoService cryptoservices.Application
 }
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
@@ -41,13 +47,15 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
+	paths := req.FieldMask.Paths
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
 		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
+		paths = append(paths, "provisioner", "provisioning_data")
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	dev, err := s.Registry.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
+	dev, err := s.Registry.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, paths)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound
 	}
@@ -56,6 +64,45 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	}
 	if !dev.ApplicationIdentifiers.Equal(req.ApplicationIdentifiers) {
 		return nil, errDeviceNotFound
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
+		if dev.RootKeys == nil {
+			dev.RootKeys = &ttnpb.RootKeys{}
+		}
+		networkCryptoService := s.NetworkCryptoService
+		if dev.RootKeys.NwkKey != nil {
+			nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, s.KeyVault)
+			if err != nil {
+				return nil, err
+			}
+			networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
+		}
+		if networkCryptoService != nil {
+			if nwkKey, err := networkCryptoService.NwkKey(ctx, dev); err == nil {
+				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+					Key: nwkKey[:],
+				}
+			} else {
+				return nil, err
+			}
+		}
+		applicationCryptoService := s.ApplicationCryptoService
+		if dev.RootKeys.AppKey != nil {
+			appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, s.KeyVault)
+			if err != nil {
+				return nil, err
+			}
+			applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
+		}
+		if applicationCryptoService != nil {
+			if appKey, err := applicationCryptoService.AppKey(ctx, dev); err == nil {
+				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
+					Key: appKey[:],
+				}
+			} else {
+				return nil, err
+			}
+		}
 	}
 	return dev, nil
 }
