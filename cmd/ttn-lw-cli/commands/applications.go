@@ -59,7 +59,7 @@ func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationI
 var (
 	applicationsCommand = &cobra.Command{
 		Use:     "applications",
-		Aliases: []string{"application", "app", "a"},
+		Aliases: []string{"application", "apps", "app", "a"},
 		Short:   "Application commands",
 	}
 	applicationsListCommand = &cobra.Command{
