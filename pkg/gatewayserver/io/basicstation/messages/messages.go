@@ -17,16 +17,16 @@ package messages
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
-	"strconv"
 	"strings"
+	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var errFrequencyPlan = errors.Define("frequency_plan", "frequency plan")
+var errFrequencyPlan = errors.Define("frequency_plan", "invalid frequency plan")
+var errJoinRequestMessage = errors.Define("join_request_message", "invalid join request message received")
 
 // Definition of message types
 const (
@@ -139,6 +139,9 @@ type RouterConfig struct {
 	NoCCA       bool `json:"nocca"`
 	NoDutyCycle bool `json:"nodc"`
 	NoDwellTime bool `json:"nodwell"`
+
+	// TODO: Roundtrip time monitoring
+	MuxTime float64 `json:"MuxTime"`
 }
 
 // GetRouterConfig returns the routerconfig message to be sent to the gateway
@@ -189,38 +192,78 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig
 	return cfg, nil
 }
 
-var dataRatePattern = regexp.MustCompile("[0-9]+")
+// upInfo provides additional metadata on each upstream message.
+type upInfo struct {
+	RxTime  int64   `json:"rxtime"`
+	RCtx    int64   `json:"rtcx"`
+	XTime   int64   `json:"xtime"`
+	GPSTime int64   `json:"gpstime"`
+	RSSI    float32 `json:"rssi"`
+	SNR     float32 `json:"snr"`
+}
 
-// getDataRatesFromBandID parses the available datarates from the Frequency Plam into the LNS Format.
-func getDataRatesFromBandID(id string) (DataRates, error) {
-	band, err := band.GetByID(id)
+// RadioMetaData is a the metadata that is received as part of all upstream messages (except Tx Confirmation).
+type RadioMetaData struct {
+	DataRate  int    `json:"DR"`
+	Frequency uint64 `json:"Freq"`
+	UpInfo    upInfo `json:"upinfo"`
+}
+
+// JoinRequest is the LoRaWAN Join Request message
+type JoinRequest struct {
+	MHdr          uint    `json:"MHdr"`
+	JoinEUI       EUI     `json:"JoinEui"`
+	DevEUI        EUI     `json:"DevEui"`
+	DevNonce      uint    `json:"DevNonce"`
+	MIC           int32   `json:"MIC"`
+	RefTime       float64 `json:"RefTime"`
+	RadioMetaData RadioMetaData
+}
+
+// ToUplinkMessage extracts fields from the basic station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
+func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string) (ttnpb.UplinkMessage, error) {
+	up := ttnpb.UplinkMessage{}
+	up.ReceivedAt = time.Now()
+
+	parsedMHDR, err := getMHDRFromInt(req.MHdr)
 	if err != nil {
-		return DataRates{}, err
+		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
 	}
 
-	drs := DataRates{}
-	// Set the default values
-	for _, dr := range drs {
-		dr[0] = -1
-		dr[1] = 0
-		dr[2] = 0
+	micBytes, err := getInt32IntegerAsByteSlice(req.MIC)
+	if err != nil {
+		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
+	}
+	up.Payload = &ttnpb.Message{
+		MHDR: parsedMHDR,
+		MIC:  micBytes,
+		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
+			JoinEUI:  req.JoinEUI.EUI64,
+			DevEUI:   req.DevEUI.EUI64,
+			DevNonce: getUint16IntegerAsByteSlice(uint16(req.DevNonce)),
+		}},
 	}
 
-	var i = 0
-	for _, dr := range band.DataRates {
-		if dr.Rate.LoRa != "" {
-			// Ex: SF12BW125 -> dr[0] = 12, dr[1] = 125, dr[2] = 0
-			s := dataRatePattern.FindAllString(dr.Rate.LoRa, -1)
-			if len(s) != 2 {
-				continue
-			}
-			drs[i][0], _ = strconv.Atoi(s[0])
-			drs[i][1], _ = strconv.Atoi(s[1])
-			i++
-		} else if dr.Rate.FSK != 0 {
-			drs[i][0] = 0 // must be set to 0 for FSK, the BW field is ignored.
-			i++
-		}
+	rxTime := time.Unix(req.RadioMetaData.UpInfo.RxTime, 0)
+	rxMetadata := &ttnpb.RxMetadata{
+		GatewayIdentifiers: ids,
+		Time:               &rxTime,
+		Timestamp:          (uint32)(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF),
+		RSSI:               req.RadioMetaData.UpInfo.RSSI,
+		SNR:                req.RadioMetaData.UpInfo.SNR,
 	}
-	return drs, nil
+	up.RxMetadata = append(up.RxMetadata, rxMetadata)
+
+	loraDR, err := getDataRateFromDataRateIndex(bandID, req.RadioMetaData.DataRate)
+	if err != nil {
+		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
+	}
+	up.Settings = ttnpb.TxSettings{
+		// TODO: Is this to be hardcoded or left out?
+		CodingRate:    "4/5",
+		Frequency:     req.RadioMetaData.Frequency,
+		DataRateIndex: (ttnpb.DataRateIndex)(req.RadioMetaData.DataRate),
+		DataRate:      loraDR,
+	}
+	return up, nil
 }
