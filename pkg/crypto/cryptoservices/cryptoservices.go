@@ -35,11 +35,13 @@ type Network interface {
 	EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
 	EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
 	DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error)
+	NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error)
 }
 
 // Application performs application layer cryptographic operations.
 type Application interface {
 	DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error)
+	AppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error)
 }
 
 // NetworkApplication is an interface that combines Network and Application.

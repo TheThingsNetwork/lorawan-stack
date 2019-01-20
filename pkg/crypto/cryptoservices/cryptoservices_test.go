@@ -285,6 +285,13 @@ func TestCryptoServices(t *testing.T) {
 					})
 				}
 			})
+
+			t.Run("NwkKey", func(t *testing.T) {
+				a := assertions.New(t)
+				key, err := svc.NwkKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
+				a.So(err, should.BeNil)
+				a.So(key, should.Resemble, types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1})
+			})
 		})
 	}
 
@@ -339,6 +346,13 @@ func TestCryptoServices(t *testing.T) {
 						a.So(appSKey, should.Resemble, tc.AppSKey)
 					})
 				}
+			})
+
+			t.Run("AppKey", func(t *testing.T) {
+				a := assertions.New(t)
+				key, err := svc.AppKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
+				a.So(err, should.BeNil)
+				a.So(key, should.Resemble, types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2})
 			})
 		})
 	}
@@ -425,6 +439,21 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 	return res, nil
 }
 
+func (s *mockNetworkRPCServer) NwkKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	nwkKey, err := s.Network.NwkKey(ctx, dev)
+	if err != nil {
+		return nil, err
+	}
+	env, err := cryptoutil.WrapAES128Key(nwkKey, "", s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	return &env, nil
+}
+
 type mockApplicationRPCServer struct {
 	Application Application
 	crypto.KeyVault
@@ -444,4 +473,19 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	return res, nil
+}
+
+func (s *mockApplicationRPCServer) AppKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
+	dev := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+	}
+	appKey, err := s.Application.AppKey(ctx, dev)
+	if err != nil {
+		return nil, err
+	}
+	env, err := cryptoutil.WrapAES128Key(appKey, "", s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	return &env, nil
 }

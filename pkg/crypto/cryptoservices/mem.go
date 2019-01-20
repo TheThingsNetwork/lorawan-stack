@@ -146,6 +146,13 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	}
 }
 
+func (d *mem) NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+	if d.nwkKey == nil {
+		return types.AES128Key{}, errNoNwkKey
+	}
+	return *d.nwkKey, nil
+}
+
 var errNoAppKey = errors.DefineCorruption("no_app_key", "no AppKey specified")
 
 func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
@@ -167,4 +174,11 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 	default:
 		panic("This statement is unreachable. Fix version check.")
 	}
+}
+
+func (d *mem) AppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+	if d.appKey == nil {
+		return types.AES128Key{}, errNoAppKey
+	}
+	return *d.appKey, nil
 }
