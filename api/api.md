@@ -249,6 +249,7 @@
     - [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest)
     - [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadResponse)
     - [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest)
+    - [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest)
     - [JoinAcceptMICRequest](#ttn.lorawan.v3.JoinAcceptMICRequest)
     - [NwkSKeysResponse](#ttn.lorawan.v3.NwkSKeysResponse)
     - [ProvisionEndDevicesRequest](#ttn.lorawan.v3.ProvisionEndDevicesRequest)
@@ -3000,6 +3001,23 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
+<a name="ttn.lorawan.v3.GetRootKeysRequest"/>
+
+### GetRootKeysRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| provisioner | [string](#string) |  |  |
+| provisioning_data | [google.protobuf.Struct](#google.protobuf.Struct) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.JoinAcceptMICRequest"/>
 
 ### JoinAcceptMICRequest
@@ -3130,6 +3148,7 @@ Service for application layer cryptographic operations.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | DeriveAppSKey | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [AppSKeyResponse](#ttn.lorawan.v3.DeriveSessionKeysRequest) |  |
+| AppKey | [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest) | [KeyEnvelope](#ttn.lorawan.v3.GetRootKeysRequest) | Get the AppKey. This rpc is often not implemented as root keys are not exposed. |
 
 
 <a name="ttn.lorawan.v3.AsJs"/>
@@ -3167,6 +3186,7 @@ Service for network layer cryptographic operations.
 | EncryptJoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
 | EncryptRejoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
 | DeriveNwkSKeys | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [NwkSKeysResponse](#ttn.lorawan.v3.DeriveSessionKeysRequest) |  |
+| NwkKey | [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest) | [KeyEnvelope](#ttn.lorawan.v3.GetRootKeysRequest) | Get the NwkKey. This rpc is often not implemented as root keys are not exposed. |
 
 
 <a name="ttn.lorawan.v3.NsJs"/>

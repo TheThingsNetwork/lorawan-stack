@@ -89,6 +89,12 @@ message DeriveSessionKeysRequest {
   google.protobuf.Struct provisioning_data = 7;
 }
 
+message GetRootKeysRequest {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  string provisioner = 2 [(validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
+  google.protobuf.Struct provisioning_data = 3;
+}
+
 // Service for network layer cryptographic operations.
 service NetworkCryptoService {
   rpc JoinRequestMIC(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
@@ -96,11 +102,15 @@ service NetworkCryptoService {
   rpc EncryptJoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
   rpc EncryptRejoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
   rpc DeriveNwkSKeys(DeriveSessionKeysRequest) returns (NwkSKeysResponse);
+  // Get the NwkKey. This rpc is often not implemented as root keys are not exposed.
+  rpc NwkKey(GetRootKeysRequest) returns (KeyEnvelope);
 }
 
 // Service for application layer cryptographic operations.
 service ApplicationCryptoService {
   rpc DeriveAppSKey(DeriveSessionKeysRequest) returns (AppSKeyResponse);
+  // Get the AppKey. This rpc is often not implemented as root keys are not exposed.
+  rpc AppKey(GetRootKeysRequest) returns (KeyEnvelope);
 }
 
 message ProvisionEndDevicesRequest {

@@ -476,6 +476,72 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 	return nil
 }
 
+var GetRootKeysRequestFieldPathsNested = []string{
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_addr",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"provisioner",
+	"provisioning_data",
+}
+
+var GetRootKeysRequestFieldPathsTopLevel = []string{
+	"ids",
+	"provisioner",
+	"provisioning_data",
+}
+
+func (dst *GetRootKeysRequest) SetFields(src *GetRootKeysRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "provisioner":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioner' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Provisioner = src.Provisioner
+			} else {
+				var zero string
+				dst.Provisioner = zero
+			}
+		case "provisioning_data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'provisioning_data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProvisioningData = src.ProvisioningData
+			} else {
+				dst.ProvisioningData = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 var ProvisionEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
