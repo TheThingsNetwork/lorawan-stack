@@ -1346,6 +1346,7 @@ PeerInfo
 | NETWORK_SERVER | 4 |  |
 | APPLICATION_SERVER | 5 |  |
 | JOIN_SERVER | 6 |  |
+| CRYPTO_SERVER | 7 |  |
 
 
  
