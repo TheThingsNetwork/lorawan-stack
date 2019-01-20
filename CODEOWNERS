@@ -4,7 +4,7 @@
 api @johanstokking @htdvisser @rvolosatovs
 cmd @johanstokking @htdvisser @rvolosatovs
 doc @TheThingsIndustries/stack
-config @bafonis @kschiffer
+config @TheThingsIndustries/stack
 
 pkg @TheThingsIndustries/stack
 pkg/auth @johanstokking @htdvisser
