@@ -3,12 +3,13 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/duration"
+import _ "github.com/mwitkow/go-proto-validators"
 
 import time "time"
 
@@ -19,6 +20,9 @@ var _ = math.Inf
 var _ = time.Kitchen
 
 func (this *JoinRequest) Validate() error {
+	if !(len(this.RawPayload) == 23) {
+		return github_com_mwitkow_go_proto_validators.FieldError("RawPayload", fmt.Errorf(`value '%v' must length be not equal '23'`, this.RawPayload))
+	}
 	if this.Payload != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Payload); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("Payload", err)
@@ -35,6 +39,12 @@ func (this *JoinRequest) Validate() error {
 	return nil
 }
 func (this *JoinResponse) Validate() error {
+	if !(len(this.RawPayload) > 16) {
+		return github_com_mwitkow_go_proto_validators.FieldError("RawPayload", fmt.Errorf(`value '%v' must length be greater than '16'`, this.RawPayload))
+	}
+	if !(len(this.RawPayload) < 34) {
+		return github_com_mwitkow_go_proto_validators.FieldError("RawPayload", fmt.Errorf(`value '%v' must length be less than '34'`, this.RawPayload))
+	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.SessionKeys)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("SessionKeys", err)
 	}
