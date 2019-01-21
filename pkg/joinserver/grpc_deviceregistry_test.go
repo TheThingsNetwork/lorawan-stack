@@ -1086,8 +1086,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:    eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+					JoinEUI:     eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+					StartDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
 			ProvisionerID:    "mock",
@@ -1114,8 +1114,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:    eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+					JoinEUI:     eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+					StartDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
 			ProvisionerID:    "unknown",
@@ -1138,7 +1138,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 				return nil
 			},
 		}
-		// No FromDevEUI.
+		// No StartDevEUI.
 		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
@@ -1401,7 +1401,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
 				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					FromDevEUI: types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+					StartDevEUI: types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
 			ProvisionerID:    "mock",

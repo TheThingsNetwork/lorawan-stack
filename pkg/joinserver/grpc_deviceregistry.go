@@ -166,7 +166,7 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 			}, nil
 		}
 	case *ttnpb.ProvisionEndDevicesRequest_Range:
-		devEUIInt := binary.BigEndian.Uint64(devices.Range.FromDevEUI[:])
+		devEUIInt := binary.BigEndian.Uint64(devices.Range.StartDevEUI[:])
 		next = func(entry *pbtypes.Struct) (*ttnpb.EndDevice, error) {
 			var devEUI types.EUI64
 			binary.BigEndian.PutUint64(devEUI[:], devEUIInt)
