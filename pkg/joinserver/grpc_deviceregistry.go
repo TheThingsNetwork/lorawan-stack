@@ -52,7 +52,7 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
-		paths = append(paths, "provisioner", "provisioning_data")
+		paths = append(paths, "provisioner_id", "provisioning_data")
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
 	dev, err := s.Registry.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, paths)
@@ -137,9 +137,9 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 		return err
 	}
 
-	provisioner := provisioning.Get(req.Provisioner)
+	provisioner := provisioning.Get(req.ProvisionerID)
 	if provisioner == nil {
-		return errProvisionerNotFound.WithAttributes("id", req.Provisioner)
+		return errProvisionerNotFound.WithAttributes("id", req.ProvisionerID)
 	}
 
 	var next func(*pbtypes.Struct) (*ttnpb.EndDevice, error)
@@ -222,7 +222,7 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 		return errInvalidIdentifiers
 	}
 
-	entries, err := provisioner.Decode(req.Data)
+	entries, err := provisioner.Decode(req.ProvisioningData)
 	if err != nil {
 		return errProvisionerDecode.WithCause(err)
 	}
@@ -240,7 +240,7 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 		if dev.DevEUI == nil || dev.DevEUI.IsZero() {
 			return errNoDevEUI
 		}
-		dev.Provisioner = req.Provisioner
+		dev.ProvisionerID = req.ProvisionerID
 		dev.ProvisioningData = entry
 		if err := stream.Send(dev); err != nil {
 			return err

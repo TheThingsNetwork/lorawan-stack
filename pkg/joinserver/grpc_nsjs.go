@@ -134,7 +134,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"resets_join_nonces",
 			"root_keys",
 			"used_dev_nonces",
-			"provisioner",
+			"provisioner_id",
 			"provisioning_data",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -239,7 +239,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			}
 
 			cryptoDev := &ttnpb.EndDevice{}
-			if err := cryptoDev.SetFields(dev, "ids", "provisioner", "provisioning_data"); err != nil {
+			if err := cryptoDev.SetFields(dev, "ids", "provisioner_id", "provisioning_data"); err != nil {
 				return nil, nil, err
 			}
 			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoDev, req.SelectedMACVersion, rawPayload[:19])

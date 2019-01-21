@@ -1090,8 +1090,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	}
@@ -1118,8 +1118,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					FromDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
-			Provisioner: "unknown",
-			Data:        []byte{0x1},
+			ProvisionerID:    "unknown",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
@@ -1146,8 +1146,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					JoinEUI: eui64Ptr(types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	}
@@ -1185,8 +1185,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
@@ -1205,8 +1205,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
@@ -1225,8 +1225,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	}
@@ -1267,8 +1267,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1, 0x2, 0x3},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1, 0x2, 0x3},
 		}, stream)
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		a.So(devs, should.HaveLength, 2)
@@ -1299,14 +1299,14 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1},
 		}, stream)
 		a.So(err, should.BeNil)
 		if !a.So(devs, should.HaveLength, 1) {
 			t.FailNow()
 		}
-		a.So(devs[0].Provisioner, should.Equal, "mock")
+		a.So(devs[0].ProvisionerID, should.Equal, "mock")
 		a.So(devs[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
 			Fields: map[string]*pbtypes.Value{
 				"serial_number": {
@@ -1349,15 +1349,15 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1, 0x3},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1, 0x3},
 		}, stream)
 		a.So(err, should.BeNil)
 		if !a.So(devs, should.HaveLength, 2) {
 			t.FailNow()
 		}
 		a.So(devs[0].DeviceID, should.Equal, "dev-1")
-		a.So(devs[0].Provisioner, should.Equal, "mock")
+		a.So(devs[0].ProvisionerID, should.Equal, "mock")
 		a.So(devs[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
 			Fields: map[string]*pbtypes.Value{
 				"serial_number": {
@@ -1368,7 +1368,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			},
 		})
 		a.So(devs[1].DeviceID, should.Equal, "dev-3")
-		a.So(devs[1].Provisioner, should.Equal, "mock")
+		a.So(devs[1].ProvisionerID, should.Equal, "mock")
 		a.So(devs[1].ProvisioningData, should.Resemble, &pbtypes.Struct{
 			Fields: map[string]*pbtypes.Value{
 				"serial_number": {
@@ -1403,8 +1403,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					FromDevEUI: types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1, 0x2, 0x3},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1, 0x2, 0x3},
 		}, stream)
 		a.So(err, should.BeNil)
 		if !a.So(devs, should.HaveLength, 3) {
@@ -1444,8 +1444,8 @@ func TestDeviceRegistryProvision(t *testing.T) {
 					JoinEUI: eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
 				},
 			},
-			Provisioner: "mock",
-			Data:        []byte{0x1, 0x2, 0x3},
+			ProvisionerID:    "mock",
+			ProvisioningData: []byte{0x1, 0x2, 0x3},
 		}, stream)
 		a.So(err, should.BeNil)
 		if !a.So(devs, should.HaveLength, 3) {
