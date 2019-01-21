@@ -445,15 +445,15 @@ var (
 						return err
 					}
 				}
-				if fromDevEUIHex, _ := cmd.Flags().GetString("from-dev-eui"); fromDevEUIHex != "" {
-					var fromDevEUI types.EUI64
-					if err := fromDevEUI.UnmarshalText([]byte(fromDevEUIHex)); err != nil {
+				if startDevEUIHex, _ := cmd.Flags().GetString("start-dev-eui"); startDevEUIHex != "" {
+					var startDevEUI types.EUI64
+					if err := startDevEUI.UnmarshalText([]byte(startDevEUIHex)); err != nil {
 						return err
 					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
 						Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-							JoinEUI:    joinEUI,
-							FromDevEUI: fromDevEUI,
+							JoinEUI:     joinEUI,
+							StartDevEUI: startDevEUI,
 						},
 					}
 				} else {
@@ -580,7 +580,7 @@ func init() {
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags())
 	endDevicesProvisionCommand.Flags().String("provisioner-id", "", "provisioner service")
 	endDevicesProvisionCommand.Flags().String("join-eui", "", "(hex)")
-	endDevicesProvisionCommand.Flags().String("from-dev-eui", "", "starting DevEUI to provision (hex)")
+	endDevicesProvisionCommand.Flags().String("start-dev-eui", "", "starting DevEUI to provision (hex)")
 	endDevicesCommand.AddCommand(endDevicesProvisionCommand)
 	endDevicesDeleteCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesCommand.AddCommand(endDevicesDeleteCommand)
