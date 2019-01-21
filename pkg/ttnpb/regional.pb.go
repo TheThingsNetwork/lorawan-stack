@@ -749,13 +749,13 @@ func (m *ConcentratorConfig_LBTConfiguration) MarshalTo(dAtA []byte) (int, error
 	if m.RSSITarget != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSITarget))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSITarget)))
 		i += 4
 	}
 	if m.RSSIOffset != 0 {
 		dAtA[i] = 0x15
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
 		i += 4
 	}
 	dAtA[i] = 0x1a
@@ -843,11 +843,11 @@ func NewPopulatedConcentratorConfig_FSKChannel(r randyRegional, easy bool) *Conc
 
 func NewPopulatedConcentratorConfig_LBTConfiguration(r randyRegional, easy bool) *ConcentratorConfig_LBTConfiguration {
 	this := &ConcentratorConfig_LBTConfiguration{}
-	this.RSSITarget = r.Float32()
+	this.RSSITarget = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSITarget *= -1
 	}
-	this.RSSIOffset = r.Float32()
+	this.RSSIOffset = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSIOffset *= -1
 	}
@@ -1726,7 +1726,7 @@ func (m *ConcentratorConfig_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSITarget = math.Float32frombits(v)
+			m.RSSITarget = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSIOffset", wireType)
@@ -1737,7 +1737,7 @@ func (m *ConcentratorConfig_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSIOffset = math.Float32frombits(v)
+			m.RSSIOffset = float32(math.Float32frombits(v))
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ScanTime", wireType)

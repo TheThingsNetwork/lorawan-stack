@@ -530,25 +530,25 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	if m.RSSI != 0 {
 		dAtA[i] = 0x45
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSI)))
 		i += 4
 	}
 	if m.ChannelRSSI != 0 {
 		dAtA[i] = 0x4d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.ChannelRSSI))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.ChannelRSSI)))
 		i += 4
 	}
 	if m.RSSIStandardDeviation != 0 {
 		dAtA[i] = 0x55
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIStandardDeviation))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIStandardDeviation)))
 		i += 4
 	}
 	if m.SNR != 0 {
 		dAtA[i] = 0x5d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.SNR)))
 		i += 4
 	}
 	if m.FrequencyOffset != 0 {
@@ -610,13 +610,13 @@ func (m *Location) MarshalTo(dAtA []byte) (int, error) {
 	if m.Latitude != 0 {
 		dAtA[i] = 0x9
 		i++
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(m.Latitude))
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Latitude)))
 		i += 8
 	}
 	if m.Longitude != 0 {
 		dAtA[i] = 0x11
 		i++
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(m.Longitude))
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Longitude)))
 		i += 8
 	}
 	if m.Altitude != 0 {
@@ -662,19 +662,19 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 		this.EncryptedFineTimestamp[i] = byte(r.Intn(256))
 	}
 	this.EncryptedFineTimestampKeyID = randStringMetadata(r)
-	this.RSSI = r.Float32()
+	this.RSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSI *= -1
 	}
-	this.ChannelRSSI = r.Float32()
+	this.ChannelRSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.ChannelRSSI *= -1
 	}
-	this.RSSIStandardDeviation = r.Float32()
+	this.RSSIStandardDeviation = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSIStandardDeviation *= -1
 	}
-	this.SNR = r.Float32()
+	this.SNR = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.SNR *= -1
 	}
@@ -701,11 +701,11 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 
 func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 	this := &Location{}
-	this.Latitude = r.Float64()
+	this.Latitude = float64(r.Float64())
 	if r.Intn(2) == 0 {
 		this.Latitude *= -1
 	}
-	this.Longitude = r.Float64()
+	this.Longitude = float64(r.Float64())
 	if r.Intn(2) == 0 {
 		this.Longitude *= -1
 	}
@@ -1160,7 +1160,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSI = math.Float32frombits(v)
+			m.RSSI = float32(math.Float32frombits(v))
 		case 9:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ChannelRSSI", wireType)
@@ -1171,7 +1171,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.ChannelRSSI = math.Float32frombits(v)
+			m.ChannelRSSI = float32(math.Float32frombits(v))
 		case 10:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSIStandardDeviation", wireType)
@@ -1182,7 +1182,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSIStandardDeviation = math.Float32frombits(v)
+			m.RSSIStandardDeviation = float32(math.Float32frombits(v))
 		case 11:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SNR", wireType)
@@ -1193,7 +1193,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.SNR = math.Float32frombits(v)
+			m.SNR = float32(math.Float32frombits(v))
 		case 12:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyOffset", wireType)
@@ -1389,7 +1389,7 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:])
 			iNdEx += 8
-			m.Latitude = math.Float64frombits(v)
+			m.Latitude = float64(math.Float64frombits(v))
 		case 2:
 			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Longitude", wireType)
@@ -1400,7 +1400,7 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:])
 			iNdEx += 8
-			m.Longitude = math.Float64frombits(v)
+			m.Longitude = float64(math.Float64frombits(v))
 		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Altitude", wireType)

@@ -2761,7 +2761,7 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 	if m.MaxEIRP != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.MaxEIRP))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.MaxEIRP)))
 		i += 4
 	}
 	if m.UplinkDwellTime {
@@ -3767,7 +3767,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		dAtA[i] = 0x2
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.BatteryPercentage))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.BatteryPercentage)))
 		i += 4
 	}
 	if m.DownlinkMargin != 0 {
@@ -5448,7 +5448,7 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.MaxEIRP = math.Float32frombits(v)
+			m.MaxEIRP = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UplinkDwellTime", wireType)
@@ -8634,7 +8634,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.BatteryPercentage = math.Float32frombits(v)
+			m.BatteryPercentage = float32(math.Float32frombits(v))
 		case 39:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkMargin", wireType)

@@ -2276,7 +2276,7 @@ func (m *GatewayRadio) MarshalTo(dAtA []byte) (int, error) {
 	if m.RSSIOffset != 0 {
 		dAtA[i] = 0x25
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
 		i += 4
 	}
 	if m.TxConfiguration != nil {
@@ -2910,7 +2910,7 @@ func (m *GatewayAntenna) MarshalTo(dAtA []byte) (int, error) {
 	if m.Gain != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Gain))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.Gain)))
 		i += 4
 	}
 	dAtA[i] = 0x12
@@ -3029,7 +3029,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], k)
 			dAtA[i] = 0x15
 			i++
-			encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(v))
+			encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(v)))
 			i += 4
 		}
 	}
@@ -3182,7 +3182,7 @@ func NewPopulatedGatewayRadio(r randyGateway, easy bool) *GatewayRadio {
 	this.Enable = bool(r.Intn(2) == 0)
 	this.ChipType = randStringGateway(r)
 	this.Frequency = uint64(r.Uint32())
-	this.RSSIOffset = r.Float32()
+	this.RSSIOffset = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSIOffset *= -1
 	}
@@ -3362,7 +3362,7 @@ func NewPopulatedSetGatewayCollaboratorRequest(r randyGateway, easy bool) *SetGa
 
 func NewPopulatedGatewayAntenna(r randyGateway, easy bool) *GatewayAntenna {
 	this := &GatewayAntenna{}
-	this.Gain = r.Float32()
+	this.Gain = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.Gain *= -1
 	}
@@ -3410,7 +3410,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 		this.Metrics = make(map[string]float32)
 		for i := 0; i < v32; i++ {
 			v33 := randStringGateway(r)
-			this.Metrics[v33] = r.Float32()
+			this.Metrics[v33] = float32(r.Float32())
 			if r.Intn(2) == 0 {
 				this.Metrics[v33] *= -1
 			}
@@ -4870,7 +4870,7 @@ func (m *GatewayRadio) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSIOffset = math.Float32frombits(v)
+			m.RSSIOffset = float32(math.Float32frombits(v))
 		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TxConfiguration", wireType)
@@ -6910,7 +6910,7 @@ func (m *GatewayAntenna) Unmarshal(dAtA []byte) error {
 			}
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.Gain = math.Float32frombits(v)
+			m.Gain = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
