@@ -395,7 +395,7 @@ message EndDevice {
   MessagePayloadFormatters formatters = 45;
 
   // ID of the provisioner. Stored in Join Server.
-  string provisioner = 46 [(validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
+  string provisioner_id = 46 [(gogoproto.customname) = "ProvisionerID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
   // Vendor-specific provisioning data. Stored in Join Server.
   google.protobuf.Struct provisioning_data = 47;
 }

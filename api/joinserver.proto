@@ -65,7 +65,7 @@ message CryptoServicePayloadRequest {
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
   MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
   bytes payload = 3;
-  string provisioner = 4 [(validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
+  string provisioner_id = 4 [(gogoproto.customname) = "ProvisionerID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
   google.protobuf.Struct provisioning_data = 5;
 }
 
@@ -85,13 +85,13 @@ message DeriveSessionKeysRequest {
   bytes join_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.JoinNonce"];
   bytes dev_nonce = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevNonce"];
   bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
-  string provisioner = 6 [(validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
+  string provisioner_id = 6 [(gogoproto.customname) = "ProvisionerID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
   google.protobuf.Struct provisioning_data = 7;
 }
 
 message GetRootKeysRequest {
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
-  string provisioner = 2 [(validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
+  string provisioner_id = 2 [(gogoproto.customname) = "ProvisionerID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", length_lt: 37}];
   google.protobuf.Struct provisioning_data = 3;
 }
 
@@ -115,13 +115,14 @@ service ApplicationCryptoService {
 
 message ProvisionEndDevicesRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
-  // Provisioner service as configured in the Join Server.
-  string provisioner = 2;
+  // ID of the provisioner service as configured in the Join Server.
+  string provisioner_id = 2 [(gogoproto.customname) = "ProvisionerID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", length_lt: 37}];
   // Vendor-specific provisioning data.
-  bytes data = 3;
+  bytes provisioning_data = 3;
 
   message IdentifiersList {
-    repeated EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceIDs"];
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    repeated EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceIDs"];
   }
   message IdentifiersRange {
     bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
@@ -133,8 +134,8 @@ message ProvisionEndDevicesRequest {
   }
   oneof end_devices {
     // List of device identifiers that will be provisioned.
-    // The device identifiers must contain application_ids, device_id, join_eui and dev_eui.
-    // The application_ids must equal the provision request's application_ids.
+    // The device identifiers must contain device_id and dev_eui.
+    // If set, the application_ids must equal the provision request's application_ids.
     // The number of entries in data must match the number of given identifiers.
     IdentifiersList list = 4;
     // Provision devices in a range.

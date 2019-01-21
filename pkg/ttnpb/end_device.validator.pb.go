@@ -131,7 +131,7 @@ func (this *MACState) Validate() error {
 	return nil
 }
 
-var _regex_EndDevice_Provisioner = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`)
+var _regex_EndDevice_ProvisionerID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`)
 
 func (this *EndDevice) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceIdentifiers)); err != nil {
@@ -218,11 +218,11 @@ func (this *EndDevice) Validate() error {
 			return github_com_mwitkow_go_proto_validators.FieldError("Formatters", err)
 		}
 	}
-	if !_regex_EndDevice_Provisioner.MatchString(this.Provisioner) {
-		return github_com_mwitkow_go_proto_validators.FieldError("Provisioner", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"`, this.Provisioner))
+	if !_regex_EndDevice_ProvisionerID.MatchString(this.ProvisionerID) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ProvisionerID", fmt.Errorf(`value '%v' must be a string conforming to regex "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"`, this.ProvisionerID))
 	}
-	if !(len(this.Provisioner) < 37) {
-		return github_com_mwitkow_go_proto_validators.FieldError("Provisioner", fmt.Errorf(`value '%v' must length be less than '37'`, this.Provisioner))
+	if !(len(this.ProvisionerID) < 37) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ProvisionerID", fmt.Errorf(`value '%v' must length be less than '37'`, this.ProvisionerID))
 	}
 	if this.ProvisioningData != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ProvisioningData); err != nil {

@@ -1366,7 +1366,7 @@ var EndDeviceFieldPathsNested = []string{
 	"pending_session.last_n_f_cnt_down",
 	"pending_session.started_at",
 	"power_state",
-	"provisioner",
+	"provisioner_id",
 	"provisioning_data",
 	"queued_application_downlinks",
 	"recent_adr_uplinks",
@@ -1447,7 +1447,7 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"network_server_address",
 	"pending_session",
 	"power_state",
-	"provisioner",
+	"provisioner_id",
 	"provisioning_data",
 	"queued_application_downlinks",
 	"recent_adr_uplinks",
@@ -2007,15 +2007,15 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 					dst.Formatters = nil
 				}
 			}
-		case "provisioner":
+		case "provisioner_id":
 			if len(subs) > 0 {
-				return fmt.Errorf("'provisioner' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'provisioner_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Provisioner = src.Provisioner
+				dst.ProvisionerID = src.ProvisionerID
 			} else {
 				var zero string
-				dst.Provisioner = zero
+				dst.ProvisionerID = zero
 			}
 		case "provisioning_data":
 			if len(subs) > 0 {
@@ -2209,7 +2209,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_session.last_n_f_cnt_down",
 	"end_device.pending_session.started_at",
 	"end_device.power_state",
-	"end_device.provisioner",
+	"end_device.provisioner_id",
 	"end_device.provisioning_data",
 	"end_device.queued_application_downlinks",
 	"end_device.recent_adr_uplinks",
@@ -2440,7 +2440,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_session.last_n_f_cnt_down",
 	"end_device.pending_session.started_at",
 	"end_device.power_state",
-	"end_device.provisioner",
+	"end_device.provisioner_id",
 	"end_device.provisioning_data",
 	"end_device.queued_application_downlinks",
 	"end_device.recent_adr_uplinks",
@@ -2824,7 +2824,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.pending_session.last_n_f_cnt_down",
 	"device.pending_session.started_at",
 	"device.power_state",
-	"device.provisioner",
+	"device.provisioner_id",
 	"device.provisioning_data",
 	"device.queued_application_downlinks",
 	"device.recent_adr_uplinks",

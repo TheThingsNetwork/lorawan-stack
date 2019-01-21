@@ -1982,7 +1982,7 @@
           "200": {
             "description": "A successful response.(streaming responses)",
             "schema": {
-              "$ref": "#/definitions/v3EndDevice"
+              "$ref": "#/x-stream-definitions/v3EndDevice"
             }
           }
         },
@@ -4840,6 +4840,10 @@
     "ProvisionEndDevicesRequestIdentifiersList": {
       "type": "object",
       "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
+        },
         "end_device_ids": {
           "type": "array",
           "items": {
@@ -5985,7 +5989,7 @@
           "type": "string",
           "format": "byte"
         },
-        "provisioner": {
+        "provisioner_id": {
           "type": "string"
         },
         "provisioning_data": {
@@ -6358,7 +6362,7 @@
           "$ref": "#/definitions/v3MessagePayloadFormatters",
           "description": "The payload formatters for this end device. Stored in Application Server.\nCopied on creation from template identified by version_ids."
         },
-        "provisioner": {
+        "provisioner_id": {
           "type": "string",
           "description": "ID of the provisioner. Stored in Join Server."
         },
@@ -7691,18 +7695,18 @@
         "application_ids": {
           "$ref": "#/definitions/v3ApplicationIdentifiers"
         },
-        "provisioner": {
+        "provisioner_id": {
           "type": "string",
-          "description": "Provisioner service as configured in the Join Server."
+          "description": "ID of the provisioner service as configured in the Join Server."
         },
-        "data": {
+        "provisioning_data": {
           "type": "string",
           "format": "byte",
           "description": "Vendor-specific provisioning data."
         },
         "list": {
           "$ref": "#/definitions/ProvisionEndDevicesRequestIdentifiersList",
-          "description": "List of device identifiers that will be provisioned.\nThe device identifiers must contain application_ids, device_id, join_eui and dev_eui.\nThe application_ids must equal the provision request's application_ids.\nThe number of entries in data must match the number of given identifiers."
+          "description": "List of device identifiers that will be provisioned.\nThe device identifiers must contain device_id and dev_eui.\nIf set, the application_ids must equal the provision request's application_ids.\nThe number of entries in data must match the number of given identifiers."
         },
         "range": {
           "$ref": "#/definitions/ProvisionEndDevicesRequestIdentifiersRange",
@@ -8622,6 +8626,18 @@
         }
       },
       "title": "Stream result of v3ApplicationUp"
+    },
+    "v3EndDevice": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v3EndDevice"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v3EndDevice"
     },
     "v3Event": {
       "type": "object",
