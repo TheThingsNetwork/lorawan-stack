@@ -27,8 +27,8 @@ const getDevicesListLogic = createLogic({
 
     try {
       const data = filters.query
-        ? await api.v3.is.devices.search(appId, filters)
-        : await api.v3.is.devices.list(appId, filters)
+        ? await api.v3.is.application.devices.search(appId, filters)
+        : await api.v3.is.application.devices.list(appId, filters)
 
       dispatch(devices.getDevicesListSuccess(data.devices, data.totalCount))
     } catch (error) {

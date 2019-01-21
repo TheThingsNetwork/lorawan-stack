@@ -58,13 +58,11 @@ export default {
         apiKeys: {
           list: stubs.application.apiKeys.list,
         },
-      },
-      devices: {
-        list: stubs.devices.list,
-        search: stubs.devices.search,
-      },
-      device: {
-        get: stubs.device.get,
+        devices: {
+          list: stubs.devices.list,
+          search: stubs.devices.search,
+          get: stubs.device.get,
+        },
       },
       gateways: {
         list: stubs.gateways.list,

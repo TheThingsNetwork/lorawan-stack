@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import * as device from '../actions/device'
 const getDeviceLogic = createLogic({
   type: [ device.GET_DEV ],
   async process ({ getState, action }, dispatch, done) {
-    const { id } = action
+    const { device_id, application_id } = action
     try {
-      const dev = await api.v3.is.device.get(id)
+      const dev = await api.v3.is.application.devices.get(application_id, device_id)
       dispatch(device.getDeviceSuccess(dev))
     } catch (e) {
       dispatch(device.getDeviceFailure(e))

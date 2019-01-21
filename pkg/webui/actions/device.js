@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@ export const GET_DEV = 'GET_DEVICE'
 export const GET_DEV_SUCCESS = 'GET_DEVICE_SUCCESS'
 export const GET_DEV_FAILURE = 'GET_DEVICE_FAILURE'
 
-export const getDevice = id => (
-  { type: GET_DEV, id }
+export const getDevice = (device_id, application_id) => (
+  { type: GET_DEV, device_id, application_id }
 )
 
 export const getDeviceSuccess = device => (
