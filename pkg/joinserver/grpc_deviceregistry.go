@@ -158,6 +158,9 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 			if ids.ApplicationIdentifiers != req.ApplicationIdentifiers {
 				return nil, errInvalidIdentifiers
 			}
+			if ids.JoinEUI == nil {
+				ids.JoinEUI = devices.List.JoinEUI
+			}
 			return &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
 			}, nil

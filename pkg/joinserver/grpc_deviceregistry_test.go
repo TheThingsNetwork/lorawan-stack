@@ -1338,12 +1338,12 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			ApplicationIdentifiers: registeredApplicationID,
 			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
 				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+					JoinEUI: eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
 					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
 						store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
 						{
 							ApplicationIdentifiers: registeredApplicationID,
 							DeviceID:               "dev-3",
-							JoinEUI:                eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
 							DevEUI:                 eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
 						},
 					},
@@ -1368,6 +1368,7 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			},
 		})
 		a.So(devs[1].DeviceID, should.Equal, "dev-3")
+		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}))
 		a.So(devs[1].ProvisionerID, should.Equal, "mock")
 		a.So(devs[1].ProvisioningData, should.Resemble, &pbtypes.Struct{
 			Fields: map[string]*pbtypes.Value{
