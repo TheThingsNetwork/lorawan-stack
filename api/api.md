@@ -121,6 +121,7 @@
     - [MACParameters.Channel](#ttn.lorawan.v3.MACParameters.Channel)
     - [MACSettings](#ttn.lorawan.v3.MACSettings)
     - [MACState](#ttn.lorawan.v3.MACState)
+    - [MACState.JoinAccept](#ttn.lorawan.v3.MACState.JoinAccept)
     - [Session](#ttn.lorawan.v3.Session)
     - [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest)
     - [UpdateEndDeviceRequest](#ttn.lorawan.v3.UpdateEndDeviceRequest)
@@ -1511,7 +1512,7 @@ SDKs are responsible for combining (if desired) the three.
 | net_id | [bytes](#bytes) |  | Home NetID. Stored in Join Server. |
 | mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Settings for how the Network Server handles MAC for this device. Stored in Network Server. |
 | mac_state | [MACState](#ttn.lorawan.v3.MACState) |  | MAC state of the device. Stored in Network Server. |
-| session | [Session](#ttn.lorawan.v3.Session) |  | Current session. Stored in Network Server and Application Server. |
+| session | [Session](#ttn.lorawan.v3.Session) |  | Current session of the device. Stored in Network Server and Application Server. |
 | pending_session | [Session](#ttn.lorawan.v3.Session) |  | Pending session. Stored in Network Server and Application Server until RekeyInd is received. |
 | last_dev_nonce | [uint32](#uint32) |  | Last DevNonce used. This field is only used for devices using LoRaWAN version 1.1 and later. Stored in Join Server. |
 | used_dev_nonces | [uint32](#uint32) | repeated | Used DevNonces sorted in ascending order. This field is only used for devices using LoRaWAN versions preceding 1.1. Stored in Join Server. |
@@ -1793,8 +1794,25 @@ This is used internally by the Network Server and is read only.
 | pending_application_downlink | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  | A confirmed application downlink, for which an acknowledgment is expected to arrive. |
 | queued_responses | [MACCommand](#ttn.lorawan.v3.MACCommand) | repeated | Queued MAC responses. Regenerated on each uplink. |
 | pending_requests | [MACCommand](#ttn.lorawan.v3.MACCommand) | repeated | Pending MAC requests(i.e. sent requests, for which no response has been received yet). Regenerated on each downlink. |
-| queued_join_accept | [bytes](#bytes) |  | Queued join-accept payload. Set each time (re-)join request is received and removed each time a downlink is scheduled. |
+| queued_join_accept | [MACState.JoinAccept](#ttn.lorawan.v3.MACState.JoinAccept) |  | Queued join-accept. Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled. |
+| pending_join_request | [JoinRequest](#ttn.lorawan.v3.JoinRequest) |  | Pending join request. Set each time a join accept is scheduled and removed each time an uplink is received from the device. |
 | rx_windows_available | [bool](#bool) |  | Whether or not Rx windows are expected to be open. Set to true every time an uplink is received. Set to false every time a successful downlink scheduling attempt is made. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACState.JoinAccept"/>
+
+### MACState.JoinAccept
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payload | [bytes](#bytes) |  | Payload of the join-accept received from Join Server. |
+| request | [JoinRequest](#ttn.lorawan.v3.JoinRequest) |  | JoinRequest sent to Join Server. |
 
 
 
@@ -3292,7 +3310,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ---- | ----- | ----------- |
 | type | [CFListType](#ttn.lorawan.v3.CFListType) |  |  |
 | freq | [uint32](#uint32) | repeated | Frequencies to be broadcasted, in hecto-Hz. These values are broadcasted as 24 bits unsigned integers. This field should not contain default values. |
-| ch_masks | [bool](#bool) | repeated | ChMasks controlling the channels to be used. If this value is used, there should be 80 values. |
+| ch_masks | [bool](#bool) | repeated | ChMasks controlling the channels to be used. Length of this field must be equal to the amount of uplink channels defined by the selected frequency plan. |
 
 
 

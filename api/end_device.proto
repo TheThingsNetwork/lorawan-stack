@@ -22,6 +22,7 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/join.proto";
 import "lorawan-stack/api/keys.proto";
 import "lorawan-stack/api/lorawan.proto";
 import "lorawan-stack/api/messages.proto";
@@ -222,15 +223,23 @@ message MACState {
   // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
   // Regenerated on each downlink.
   repeated MACCommand pending_requests = 10;
-  // Queued join-accept payload.
-  // Set each time (re-)join request is received and removed each time a downlink is scheduled.
-  bytes queued_join_accept = 11;
+
+  message JoinAccept {
+    // Payload of the join-accept received from Join Server.
+    bytes payload = 1 [(validator.field) = { length_gt: 11, length_lt: 29 }];
+    // JoinRequest sent to Join Server.
+    JoinRequest request = 2 [(gogoproto.nullable) = false];
+  }
+  // Queued join-accept.
+  // Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled.
+  JoinAccept queued_join_accept = 11;
+  // Pending join request.
+  // Set each time a join accept is scheduled and removed each time an uplink is received from the device.
+  JoinRequest pending_join_request = 12;
   // Whether or not Rx windows are expected to be open.
   // Set to true every time an uplink is received.
   // Set to false every time a successful downlink scheduling attempt is made.
-  bool rx_windows_available = 12;
-
-  // TODO: Add info about failed MAC requests
+  bool rx_windows_available = 13;
 }
 
 // Power state of the device.
@@ -337,7 +346,7 @@ message EndDevice {
   MACSettings mac_settings = 28 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.
   MACState mac_state = 29 [(gogoproto.customname) = "MACState"];
-  // Current session. Stored in Network Server and Application Server.
+  // Current session of the device. Stored in Network Server and Application Server.
   Session session = 30;
   // Pending session. Stored in Network Server and Application Server until RekeyInd is received.
   Session pending_session = 31;

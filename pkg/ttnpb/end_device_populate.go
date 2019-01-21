@@ -88,9 +88,6 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		copy(out.EndDeviceIdentifiers.DevAddr[:], out.Session.DevAddr[:])
 	}
 
-	if r.Intn(10) != 0 {
-		out.PendingSession = NewPopulatedSession(r, easy)
-	}
 	out.BatteryPercentage = r.Float32()
 	out.FrequencyPlanID = "EU_863_870"
 	out.MACSettings = NewPopulatedMACSettings(r, easy)

@@ -4814,6 +4814,20 @@
         }
       }
     },
+    "MACStateJoinAccept": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "format": "byte",
+          "description": "Payload of the join-accept received from Join Server."
+        },
+        "request": {
+          "$ref": "#/definitions/v3JoinRequest",
+          "description": "JoinRequest sent to Join Server."
+        }
+      }
+    },
     "PictureEmbedded": {
       "type": "object",
       "properties": {
@@ -5574,7 +5588,7 @@
             "type": "boolean",
             "format": "boolean"
           },
-          "description": "ChMasks controlling the channels to be used.\nIf this value is used, there should be 80 values."
+          "description": "ChMasks controlling the channels to be used.\nLength of this field must be equal to the amount of uplink channels\ndefined by the selected frequency plan."
         }
       }
     },
@@ -6277,7 +6291,7 @@
         },
         "session": {
           "$ref": "#/definitions/v3Session",
-          "description": "Current session. Stored in Network Server and Application Server."
+          "description": "Current session of the device. Stored in Network Server and Application Server."
         },
         "pending_session": {
           "$ref": "#/definitions/v3Session",
@@ -6925,6 +6939,45 @@
         }
       }
     },
+    "v3JoinRequest": {
+      "type": "object",
+      "properties": {
+        "raw_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "payload": {
+          "$ref": "#/definitions/lorawanv3Message"
+        },
+        "dev_addr": {
+          "type": "string",
+          "format": "byte"
+        },
+        "selected_mac_version": {
+          "$ref": "#/definitions/v3MACVersion"
+        },
+        "net_id": {
+          "type": "string",
+          "format": "byte"
+        },
+        "downlink_settings": {
+          "$ref": "#/definitions/v3DLSettings"
+        },
+        "rx_delay": {
+          "$ref": "#/definitions/v3RxDelay"
+        },
+        "cf_list": {
+          "$ref": "#/definitions/v3CFList",
+          "description": "Optional CFList."
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v3JoinRequestPayload": {
       "type": "object",
       "properties": {
@@ -7362,9 +7415,12 @@
           "description": "Pending MAC requests(i.e. sent requests, for which no response has been received yet).\nRegenerated on each downlink."
         },
         "queued_join_accept": {
-          "type": "string",
-          "format": "byte",
-          "description": "Queued join-accept payload.\nSet each time (re-)join request is received and removed each time a downlink is scheduled."
+          "$ref": "#/definitions/MACStateJoinAccept",
+          "description": "Queued join-accept.\nSet each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled."
+        },
+        "pending_join_request": {
+          "$ref": "#/definitions/v3JoinRequest",
+          "description": "Pending join request.\nSet each time a join accept is scheduled and removed each time an uplink is received from the device."
         },
         "rx_windows_available": {
           "type": "boolean",

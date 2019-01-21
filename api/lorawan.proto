@@ -196,7 +196,8 @@ message CFList {
   // This field should not contain default values.
   repeated uint32 freq = 2;
   // ChMasks controlling the channels to be used.
-  // If this value is used, there should be 80 values.
+  // Length of this field must be equal to the amount of uplink channels
+  // defined by the selected frequency plan.
   repeated bool ch_masks = 3;
 }
 

@@ -128,6 +128,28 @@ func (this *MACState) Validate() error {
 			}
 		}
 	}
+	if this.QueuedJoinAccept != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.QueuedJoinAccept); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("QueuedJoinAccept", err)
+		}
+	}
+	if this.PendingJoinRequest != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.PendingJoinRequest); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("PendingJoinRequest", err)
+		}
+	}
+	return nil
+}
+func (this *MACState_JoinAccept) Validate() error {
+	if !(len(this.Payload) > 11) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Payload", fmt.Errorf(`value '%v' must length be greater than '11'`, this.Payload))
+	}
+	if !(len(this.Payload) < 29) {
+		return github_com_mwitkow_go_proto_validators.FieldError("Payload", fmt.Errorf(`value '%v' must length be less than '29'`, this.Payload))
+	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Request)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("Request", err)
+	}
 	return nil
 }
 
