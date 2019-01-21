@@ -41,8 +41,10 @@ class Http {
     // access tokens.
     if (typeof token === 'function') {
       this.axios.interceptors.request.use(async function (config) {
-        const tkn = await token()
+        const tkn = (await token()).access_token
         config.headers.Authorization = `Bearer ${tkn}`
+
+        return config
       },
       err => Promise.reject(err))
     }
