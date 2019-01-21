@@ -53,8 +53,7 @@ class Http {
   async handleRequest (method, endpoint, rawPayload) {
     const payload = rawPayload ? Marshaler.payload(rawPayload) : {}
     try {
-      const res = await this.axios[method](endpoint, payload)
-      return res.data
+      return await this.axios[method](endpoint, payload)
     } catch (err) {
       if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data
