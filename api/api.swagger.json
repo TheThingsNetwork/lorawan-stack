@@ -4859,7 +4859,7 @@
           "type": "string",
           "format": "byte"
         },
-        "from_dev_eui": {
+        "start_dev_eui": {
           "type": "string",
           "format": "byte",
           "description": "DevEUI to start issuing from."

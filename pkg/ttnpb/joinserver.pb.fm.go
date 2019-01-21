@@ -552,8 +552,8 @@ var ProvisionEndDevicesRequestFieldPathsNested = []string{
 	"end_devices.list.end_device_ids",
 	"end_devices.list.join_eui",
 	"end_devices.range",
-	"end_devices.range.from_dev_eui",
 	"end_devices.range.join_eui",
+	"end_devices.range.start_dev_eui",
 	"provisioner_id",
 	"provisioning_data",
 }
@@ -747,13 +747,13 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersList) SetFields(src *ProvisionE
 }
 
 var ProvisionEndDevicesRequest_IdentifiersRangeFieldPathsNested = []string{
-	"from_dev_eui",
 	"join_eui",
+	"start_dev_eui",
 }
 
 var ProvisionEndDevicesRequest_IdentifiersRangeFieldPathsTopLevel = []string{
-	"from_dev_eui",
 	"join_eui",
+	"start_dev_eui",
 }
 
 func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *ProvisionEndDevicesRequest_IdentifiersRange, paths ...string) error {
@@ -768,15 +768,15 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *Provision
 			} else {
 				dst.JoinEUI = nil
 			}
-		case "from_dev_eui":
+		case "start_dev_eui":
 			if len(subs) > 0 {
-				return fmt.Errorf("'from_dev_eui' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'start_dev_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FromDevEUI = src.FromDevEUI
+				dst.StartDevEUI = src.StartDevEUI
 			} else {
 				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
-				dst.FromDevEUI = zero
+				dst.StartDevEUI = zero
 			}
 
 		default:

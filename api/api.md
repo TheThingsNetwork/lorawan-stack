@@ -3112,7 +3112,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | join_eui | [bytes](#bytes) |  |  |
-| from_dev_eui | [bytes](#bytes) |  | DevEUI to start issuing from. |
+| start_dev_eui | [bytes](#bytes) |  | DevEUI to start issuing from. |
 
 
 
