@@ -16,7 +16,7 @@ import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import clipboard from 'clipboard'
-import { defineMessages } from 'react-intl'
+import { defineMessages, injectIntl } from 'react-intl'
 
 import Icon from '../icon'
 import Message from '../../lib/components/message'
@@ -53,6 +53,7 @@ const m = defineMessages({
   byteSignificance: 'Swap byte significance',
 })
 
+@injectIntl
 @bind
 export class SafeInspector extends Component {
   constructor (props) {
@@ -79,8 +80,9 @@ export class SafeInspector extends Component {
     }))
   }
 
-  handleTransformToggle () {
-    this.setState(prev => ({ byteStyle: !prev.byteStyle }))
+  async handleTransformToggle () {
+    await this.setState(prev => ({ byteStyle: !prev.byteStyle }))
+    this.checkTruncateState()
   }
 
   handleSwapToggle () {
@@ -139,7 +141,7 @@ export class SafeInspector extends Component {
       copied,
     } = this.state
 
-    const { data, isBytes, hideable, small } = this.props
+    const { data, isBytes, hideable, small, intl } = this.props
 
     let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
@@ -174,7 +176,7 @@ export class SafeInspector extends Component {
             <React.Fragment>
               <span>{ msb ? 'msb' : 'lsb' }</span>
               <button
-                title={m.byteSignificance}
+                title={intl.formatMessage(m.byteSignificance)}
                 className={style.buttonSwap}
                 onClick={this.handleSwapToggle}
               >
@@ -184,7 +186,7 @@ export class SafeInspector extends Component {
           )}
           {!hidden && isBytes && (
             <button
-              title={m.cStyle}
+              title={intl.formatMessage(m.cStyle)}
               className={style.buttonTransform}
               onClick={this.handleTransformToggle}
             >
@@ -192,7 +194,7 @@ export class SafeInspector extends Component {
             </button>
           )}
           <button
-            title={m.copyClipboard}
+            title={intl.formatMessage(m.copyClipboard)}
             className={style.buttonCopy}
             onClick={this.handleCopyClick}
             data-clipboard-text={formattedData}
@@ -209,7 +211,7 @@ export class SafeInspector extends Component {
           </button>
           { hideable && (
             <button
-              title={m.toggleVisibility}
+              title={intl.formatMessage(m.toggleVisibility)}
               className={style.buttonVisibility}
               onClick={this.handleVisibiltyToggle}
             >
