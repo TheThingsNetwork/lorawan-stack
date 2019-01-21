@@ -30,7 +30,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	return ns.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
+	return ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, req.FieldMask.Paths)
 }
 
 func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
