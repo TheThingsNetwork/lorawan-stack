@@ -93,7 +93,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 	}
 
 	dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
-	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, int(math.Max(float64(len(band.UplinkChannels)), float64(len(fp.UplinkChannels)))))
+	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels)+len(fp.UplinkChannels))
 
 	for i, upCh := range band.UplinkChannels {
 		ch := &ttnpb.MACParameters_Channel{
@@ -103,9 +103,6 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 			EnableUplink:     true,
 		}
 		dev.MACState.CurrentParameters.Channels[i] = ch
-
-		chCopy := *ch
-		dev.MACState.DesiredParameters.Channels[i] = &chCopy
 	}
 
 	for i, downCh := range band.DownlinkChannels {
@@ -113,29 +110,44 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 		dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
 
-	for i, upCh := range fp.UplinkChannels {
-		ch := dev.MACState.DesiredParameters.Channels[i]
-		if ch == nil {
-			dev.MACState.DesiredParameters.Channels[i] = &ttnpb.MACParameters_Channel{
-				MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
-				MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
-				UplinkFrequency:  upCh.Frequency,
-				EnableUplink:     true,
-			}
-			continue
-		}
-
-		if ch.MinDataRateIndex > ttnpb.DataRateIndex(upCh.MinDataRate) || ttnpb.DataRateIndex(upCh.MaxDataRate) > ch.MaxDataRateIndex {
-			panic("data rate limits exceed band limitations")
-		}
-		ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
-		ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
-		ch.UplinkFrequency = upCh.Frequency
+	for _, ch := range dev.MACState.CurrentParameters.Channels {
+		chCopy := *ch
+		chCopy.EnableUplink = false
+		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &chCopy)
 	}
 
-	for i, downCh := range fp.DownlinkChannels {
-		// NOTE: len(fp.DownlinkChannels) <= len(fp.UplinkChannels) => i < len(dev.MACState.DesiredParameters.Channels)
-		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+outerUp:
+	for _, upCh := range fp.UplinkChannels {
+		for _, ch := range dev.MACState.DesiredParameters.Channels {
+			if ch.UplinkFrequency == upCh.Frequency {
+				ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
+				ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
+				ch.EnableUplink = true
+				continue outerUp
+			}
+		}
+
+		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
+			MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
+			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
+			UplinkFrequency:  upCh.Frequency,
+			EnableUplink:     true,
+		})
+	}
+
+outerDown:
+	for _, downCh := range fp.DownlinkChannels {
+		for _, ch := range dev.MACState.DesiredParameters.Channels {
+			switch ch.DownlinkFrequency {
+			case 0:
+				ch.DownlinkFrequency = downCh.Frequency
+				continue outerDown
+
+			case downCh.Frequency:
+				continue outerDown
+			}
+		}
+		panic("uplink/downlink channel length is inconsistent")
 	}
 
 	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
