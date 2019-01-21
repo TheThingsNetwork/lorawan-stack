@@ -402,7 +402,7 @@ var (
 				return errNoApplicationID
 			}
 
-			provisioner, _ := cmd.Flags().GetString("provisioner")
+			provisionerID, _ := cmd.Flags().GetString("provisioner-id")
 			data, err := getData(cmd.Flags())
 			if err != nil {
 				return err
@@ -410,8 +410,8 @@ var (
 
 			req := &ttnpb.ProvisionEndDevicesRequest{
 				ApplicationIdentifiers: *appID,
-				Provisioner:            provisioner,
-				Data:                   data,
+				ProvisionerID:          provisionerID,
+				ProvisioningData:       data,
 			}
 
 			if inputDecoder != nil {
@@ -426,6 +426,13 @@ var (
 						return err
 					}
 					ids.ApplicationIdentifiers = *appID
+					if joinEUIHex, _ := cmd.Flags().GetString("join-eui"); joinEUIHex != "" {
+						var joinEUI types.EUI64
+						if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
+							return err
+						}
+						list.JoinEUI = &joinEUI
+					}
 					list.EndDeviceIDs = append(list.EndDeviceIDs, ids)
 				}
 				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_List{
@@ -571,7 +578,7 @@ func init() {
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags())
-	endDevicesProvisionCommand.Flags().String("provisioner", "", "provisioner service")
+	endDevicesProvisionCommand.Flags().String("provisioner-id", "", "provisioner service")
 	endDevicesProvisionCommand.Flags().String("join-eui", "", "(hex)")
 	endDevicesProvisionCommand.Flags().String("from-dev-eui", "", "starting DevEUI to provision (hex)")
 	endDevicesCommand.AddCommand(endDevicesProvisionCommand)

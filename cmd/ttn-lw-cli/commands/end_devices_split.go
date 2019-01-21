@@ -232,7 +232,7 @@ func getEndDevicePathFromJS(pathParts ...string) bool {
 		"last_join_nonce",
 		"last_rj_count_0",
 		"last_rj_count_1",
-		"provisioner",
+		"provisioner_id",
 		"provisioning_data":
 		return true
 	}
@@ -254,7 +254,7 @@ func setEndDevicePathToJS(pathParts ...string) bool {
 		"last_join_nonce",
 		"last_rj_count_0",
 		"last_rj_count_1",
-		"provisioner",
+		"provisioner_id",
 		"provisioning_data":
 		return true
 	}
