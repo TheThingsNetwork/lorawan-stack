@@ -1,6 +1,6 @@
 * @johanstokking
 
-.make @htdvisser @rvolosatovs
+.make,.mage @htdvisser @rvolosatovs
 api @johanstokking @htdvisser @rvolosatovs
 cmd @johanstokking @htdvisser @rvolosatovs
 doc @TheThingsIndustries/stack
