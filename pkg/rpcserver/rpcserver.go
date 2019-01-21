@@ -188,7 +188,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 			if md.Page == 0 {
 				md.Page = 1
 			}
-			md.Limit, _ = strconv.ParseUint(q.Get("per_page"), 10, 64)
+			md.Limit, _ = strconv.ParseUint(q.Get("limit"), 10, 64)
 
 			return md.ToMetadata()
 		}),
