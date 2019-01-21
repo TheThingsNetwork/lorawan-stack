@@ -306,7 +306,7 @@ func splitEndDeviceGetPaths(paths ...string) (is, ns, as, js []string) {
 	return
 }
 
-func splitEndDeviceSetPaths(paths ...string) (is, ns, as, js []string) {
+func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js []string) {
 	var unassigned []string
 	for _, path := range paths {
 		switch path {
@@ -333,7 +333,7 @@ func splitEndDeviceSetPaths(paths ...string) (is, ns, as, js []string) {
 			as = append(as, path)
 			assigned = true
 		}
-		if setEndDevicePathToJS(parts...) {
+		if supportsJoin && setEndDevicePathToJS(parts...) {
 			js = append(js, path)
 			assigned = true
 		}

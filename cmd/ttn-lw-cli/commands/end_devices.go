@@ -302,11 +302,13 @@ var (
 				if devID.ApplicationID != "" {
 					device.ApplicationID = devID.ApplicationID
 				}
-				if devID.JoinEUI != nil {
-					device.JoinEUI = devID.JoinEUI
-				}
-				if devID.DevEUI != nil {
-					device.DevEUI = devID.DevEUI
+				if device.SupportsJoin {
+					if devID.JoinEUI != nil {
+						device.JoinEUI = devID.JoinEUI
+					}
+					if devID.DevEUI != nil {
+						device.DevEUI = devID.DevEUI
+					}
 				}
 			}
 
@@ -317,7 +319,7 @@ var (
 				return errNoEndDeviceID
 			}
 
-			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(paths...)
+			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			// Require EUIs for devices that need to be added to the Join Server.
 			if len(jsPaths) > 0 && (device.JoinEUI == nil || device.DevEUI == nil) {
@@ -369,7 +371,7 @@ var (
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			device.EndDeviceIdentifiers = *devID
 
-			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(paths...)
+			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			if len(nsPaths) > 0 {
 				isPaths = append(isPaths, "network_server_address")
