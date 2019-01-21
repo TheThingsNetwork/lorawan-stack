@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -258,7 +259,7 @@ func TestGetUplinkMessage(t *testing.T) {
 				RadioMetaData: RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
-					UpInfo: upInfo{
+					UpInfo: UpInfo{
 						RxTime: 1548059982,
 						XTime:  12666373963464220,
 						RSSI:   89,
@@ -303,9 +304,15 @@ func TestGetUplinkMessage(t *testing.T) {
 			if !(a.So(err, should.Resemble, tc.ExpectedError)) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
-			msg.ReceivedAt = time.Time{} //time.Now() cannot/need not be tested
+			msg.ReceivedAt = time.Time{}
+			var payload ttnpb.Message
+			a.So(lorawan.UnmarshalMessage(msg.RawPayload, &payload), should.BeNil)
+			if !a.So(&payload, should.Resemble, msg.Payload) {
+				t.Fatalf("Invalid RawPayload: %v", msg.RawPayload)
+			}
+			msg.RawPayload = nil
 			if !(a.So(msg, should.Resemble, tc.ExpectedUplinkMessage)) {
-				t.Fatalf("Invalid UplinkMessage: %v", msg)
+				t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 			}
 		})
 	}
