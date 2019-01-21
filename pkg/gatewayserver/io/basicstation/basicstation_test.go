@@ -38,7 +38,7 @@ import (
 var (
 	registeredGatewayUID = "0101010101010101"
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "eui-0101010101010101"}
-	registeredGateway    = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "KR_920_923"}
+	registeredGateway    = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "EU_863_870"}
 	registeredGatewayKey = "test-key"
 
 	discoveryEndPoint      = "ws://localhost:8100/api/v3/gs/io/basicstation/discover"
@@ -252,9 +252,12 @@ func TestVersion(t *testing.T) {
 	testTrafficEndPoint := "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/eui-0101010101010101"
 
 	for i, tc := range []struct {
-		Query interface{}
+		Name                 string
+		VersionQuery         interface{}
+		ExpectedRouterConfig interface{}
 	}{
 		{
+			"VersionProd",
 			messages.Version{
 				Station:  "test-station",
 				Firmware: "1.0.0",
@@ -262,6 +265,50 @@ func TestVersion(t *testing.T) {
 				Model:    "test-model",
 				Protocol: 2,
 				Features: []string{"prod", "gps"},
+			},
+			messages.RouterConfig{
+				Region:         "EU863",
+				HardwareSpec:   "sx1301/1",
+				FrequencyRange: []int{863000000, 870000000},
+				DataRates: [16][3]int{
+					[3]int{12, 125, 0},
+					[3]int{11, 125, 0},
+					[3]int{10, 125, 0},
+					[3]int{9, 125, 0},
+					[3]int{8, 125, 0},
+					[3]int{7, 125, 0},
+					[3]int{7, 250, 0},
+					[3]int{0, 0, 0},
+				},
+			},
+		},
+		{
+			"VersionDebug",
+			messages.Version{
+				Station:  "test-station",
+				Firmware: "1.0.0",
+				Package:  "test-package",
+				Model:    "test-model",
+				Protocol: 2,
+				Features: []string{"rmtsh", "gps"},
+			},
+			messages.RouterConfig{
+				Region:         "EU863",
+				HardwareSpec:   "sx1301/1",
+				FrequencyRange: []int{863000000, 870000000},
+				DataRates: [16][3]int{
+					[3]int{12, 125, 0},
+					[3]int{11, 125, 0},
+					[3]int{10, 125, 0},
+					[3]int{9, 125, 0},
+					[3]int{8, 125, 0},
+					[3]int{7, 125, 0},
+					[3]int{7, 250, 0},
+					[3]int{0, 0, 0},
+				},
+				NoCCA:       true,
+				NoDwellTime: true,
+				NoDutyCycle: true,
 			},
 		},
 	} {
@@ -279,7 +326,7 @@ func TestVersion(t *testing.T) {
 				t.Fatalf("Failed to write message: %v", err)
 			}
 
-			reqVersion, err := json.Marshal(tc.Query)
+			reqVersion, err := json.Marshal(tc.VersionQuery)
 			if err != nil {
 				panic(err)
 			}
@@ -301,7 +348,7 @@ func TestVersion(t *testing.T) {
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
-				a.So(response, should.Resemble, messages.RouterConfig{})
+				a.So(response, should.Resemble, tc.ExpectedRouterConfig)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
