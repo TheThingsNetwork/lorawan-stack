@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -192,8 +193,8 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig
 	return cfg, nil
 }
 
-// upInfo provides additional metadata on each upstream message.
-type upInfo struct {
+// UpInfo provides additional metadata on each upstream message.
+type UpInfo struct {
 	RxTime  int64   `json:"rxtime"`
 	RCtx    int64   `json:"rtcx"`
 	XTime   int64   `json:"xtime"`
@@ -206,7 +207,7 @@ type upInfo struct {
 type RadioMetaData struct {
 	DataRate  int    `json:"DR"`
 	Frequency uint64 `json:"Freq"`
-	UpInfo    upInfo `json:"upinfo"`
+	UpInfo    UpInfo `json:"upinfo"`
 }
 
 // JoinRequest is the LoRaWAN Join Request message
@@ -218,6 +219,19 @@ type JoinRequest struct {
 	MIC           int32   `json:"MIC"`
 	RefTime       float64 `json:"RefTime"`
 	RadioMetaData RadioMetaData
+}
+
+// MarshalJSON implements json.Marshaler.
+// TODO: Make MarshalJSON() messages generic.
+func (req JoinRequest) MarshalJSON() ([]byte, error) {
+	type Alias JoinRequest
+	return json.Marshal(struct {
+		Type string `json:"msgtype"`
+		Alias
+	}{
+		Type:  TypeUpstreamJoinRequest,
+		Alias: Alias(req),
+	})
 }
 
 // ToUplinkMessage extracts fields from the basic station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
@@ -242,6 +256,11 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 			DevEUI:   req.DevEUI.EUI64,
 			DevNonce: getUint16IntegerAsByteSlice(uint16(req.DevNonce)),
 		}},
+	}
+
+	up.RawPayload, err = lorawan.MarshalMessage(*up.Payload)
+	if err != nil {
+		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
 	}
 
 	rxTime := time.Unix(req.RadioMetaData.UpInfo.RxTime, 0)

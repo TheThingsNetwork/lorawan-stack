@@ -77,7 +77,8 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	var req messages.DiscoverQuery
 	if err := json.Unmarshal(data, &req); err != nil {
 		logger.WithError(err).Debug("Failed to parse discover query message")
-		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Invalid request")); err != nil {
+		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Invalid request"})
+		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
 			logger.WithError(err).Warn("Failed to write error response message")
 			return err
 		}
@@ -85,7 +86,8 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	}
 
 	if req.EUI.IsZero() {
-		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Invalid request")); err != nil {
+		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Invalid request"})
+		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
 			logger.WithError(err).Warn("Failed to write error response message")
 			return err
 		}
@@ -98,7 +100,8 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx, ids, err := s.server.FillGatewayContext(s.ctx, ids)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to fill gateway context")
-		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Router not registered")); err != nil {
+		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Router not provisioned"})
+		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
 			logger.WithError(err).Warn("Failed to write error response message")
 			return err
 		}
@@ -121,7 +124,8 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	data, err = json.Marshal(res)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to marshal response message")
-		if err := ws.WriteMessage(websocket.TextMessage, getErrorResponseFromString("Internal error")); err != nil {
+		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Internal error"})
+		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
 			logger.WithError(err).Warn("Failed to write error response message")
 			return err
 		}
@@ -254,12 +258,4 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
 	}
-}
-
-// getErrorResponseFromString add  the string into the "Error" field of the response message and returns the marshaled byte slice.
-func getErrorResponseFromString(msg string) []byte {
-	data, _ := json.Marshal(messages.DiscoverResponse{
-		Error: msg,
-	})
-	return data
 }
