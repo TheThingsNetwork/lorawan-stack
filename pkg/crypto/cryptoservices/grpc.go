@@ -42,7 +42,7 @@ func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDev
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		Payload:              payload,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevi
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			LoRaWANVersion:       version,
 			Payload:              payload,
-			Provisioner:          dev.Provisioner,
+			ProvisionerID:        dev.ProvisionerID,
 			ProvisioningData:     dev.ProvisioningData,
 		},
 		JoinRequestType: uint32(joinReqType),
@@ -76,7 +76,7 @@ func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, dev *ttnpb.End
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		Payload:              payload,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
@@ -90,7 +90,7 @@ func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.E
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		LoRaWANVersion:       version,
 		Payload:              payload,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
@@ -106,7 +106,7 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 		JoinNonce:            jn,
 		DevNonce:             dn,
 		NetID:                nid,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
@@ -131,7 +131,7 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 func (s *networkRPCClient) NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
 	key, err := s.Client.NwkKey(ctx, &ttnpb.GetRootKeysRequest{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
@@ -160,7 +160,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 		JoinNonce:            jn,
 		DevNonce:             dn,
 		NetID:                nid,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
@@ -172,7 +172,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 func (s *applicationRPCClient) AppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
 	key, err := s.Client.AppKey(ctx, &ttnpb.GetRootKeysRequest{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		Provisioner:          dev.Provisioner,
+		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	})
 	if err != nil {
