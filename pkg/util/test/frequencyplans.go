@@ -101,6 +101,19 @@ lora-standard-channel:
 fsk-channel:
   frequency: 868800000
   data-rate: 7
+radios:
+- enable: true
+  chip-type: SX1257
+  frequency: 867500000
+  rssi-offset: -166
+  tx:
+    min-frequency: 863000000
+    max-frequency: 870000000
+- enable: true
+  chip-type: SX1257
+  frequency: 868500000
+  rssi-offset: -166
+clock-source: 1
 `
 
 	// KRFrequencyPlanID is a Korean frequency plan for testing.
@@ -150,6 +163,19 @@ downlink-channels:
 - frequency: 923300000
   min-data-rate: 0
   max-data-rate: 5
+radios:
+- enable: true
+  chip-type: SX1257
+  frequency: 922400000
+  rssi-offset: -166
+  tx:
+    min-frequency: 920900000
+    max-frequency: 923300000
+- enable: true
+  chip-type: SX1257
+  frequency: 923000000
+  rssi-offset: -166
+clock-source: 1
 lbt:
   rssi-target: -80
   scan-time: 128`
