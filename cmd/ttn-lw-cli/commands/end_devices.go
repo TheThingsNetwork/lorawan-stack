@@ -104,6 +104,17 @@ func generateKey(length int) []byte {
 	return key
 }
 
+func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
+	nwkAddr := make([]byte, types.NwkAddrLength(netID))
+	random.Read(nwkAddr)
+	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(netID)%8)
+	devAddr, err := types.NewDevAddr(netID, nwkAddr)
+	if err != nil {
+		return types.DevAddr{}, err
+	}
+	return devAddr, nil
+}
+
 var (
 	endDevicesCommand = &cobra.Command{
 		Use:     "end-devices",
@@ -230,34 +241,40 @@ var (
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
 				device.SupportsJoin = false
 				paths = append(paths, "supports_join")
-				if withKeys, _ := cmd.Flags().GetBool("with-session-keys"); withKeys {
-					if device.Provisioner != "" {
+				if withSession, _ := cmd.Flags().GetBool("with-session"); withSession {
+					if device.ProvisionerID != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
-					// TODO: Generate DevAddr (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					// TODO: Generate DevAddr in cluster NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					devAddr, err := generateDevAddr(types.NetID{})
+					if err != nil {
+						return err
+					}
 					device.Session = &ttnpb.Session{
+						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							SNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							NwkSEncKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							SessionKeyID: generateKey(16),
+							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							SNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							NwkSEncKey:   &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey(16)},
 						},
 					}
-					device.DevAddr = &device.Session.DevAddr
-					// TODO: Set device.NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					device.DevAddr = &devAddr
 					paths = append(paths,
+						"session.keys.session_key_id",
 						"session.keys.f_nwk_s_int_key",
 						"session.keys.s_nwk_s_int_key",
 						"session.keys.nwk_s_enc_key",
 						"session.keys.app_s_key",
-						"dev_addr",
+						"session.dev_addr",
 					)
 				}
 			} else {
 				device.SupportsJoin = true
 				paths = append(paths, "supports_join")
 				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
-					if device.Provisioner != "" {
+					if device.ProvisionerID != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
 					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
@@ -586,7 +603,7 @@ func init() {
 	endDevicesCreateCommand.Flags().Bool("defaults", true, "configure end device with defaults")
 	endDevicesCreateCommand.Flags().Bool("with-root-keys", false, "generate OTAA root keys")
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
-	endDevicesCreateCommand.Flags().Bool("with-session-keys", false, "generate ABP session keys")
+	endDevicesCreateCommand.Flags().Bool("with-session", false, "generate ABP session DevAddr and keys")
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
