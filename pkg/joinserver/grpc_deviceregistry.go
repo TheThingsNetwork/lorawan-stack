@@ -20,7 +20,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -30,14 +29,11 @@ import (
 )
 
 type jsEndDeviceRegistryServer struct {
-	Registry                 DeviceRegistry
-	KeyVault                 crypto.KeyVault
-	NetworkCryptoService     cryptoservices.Network
-	ApplicationCryptoService cryptoservices.Application
+	JS *JoinServer
 }
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
-func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if req.JoinEUI == nil || req.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
 	}
@@ -55,7 +51,7 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		paths = append(paths, "provisioner_id", "provisioning_data")
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	dev, err := s.Registry.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, paths)
+	dev, err := srv.JS.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, paths)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound
 	}
@@ -69,38 +65,50 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		if dev.RootKeys == nil {
 			dev.RootKeys = &ttnpb.RootKeys{}
 		}
-		networkCryptoService := s.NetworkCryptoService
-		if dev.RootKeys.NwkKey != nil {
-			nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, s.KeyVault)
-			if err != nil {
-				return nil, err
-			}
-			networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-		}
-		if networkCryptoService != nil {
-			if nwkKey, err := networkCryptoService.NwkKey(ctx, dev); err == nil {
-				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
-					Key: nwkKey[:],
+
+		cs := srv.JS.GetPeer(ctx, ttnpb.PeerInfo_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
+			var networkCryptoService cryptoservices.Network
+			if dev.RootKeys.NwkKey != nil {
+				nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, srv.JS.KeyVault)
+				if err != nil {
+					return nil, err
 				}
-			} else {
-				return nil, err
+				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
+			} else if cs != nil {
+				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
-		}
-		applicationCryptoService := s.ApplicationCryptoService
-		if dev.RootKeys.AppKey != nil {
-			appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, s.KeyVault)
-			if err != nil {
-				return nil, err
-			}
-			applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-		}
-		if applicationCryptoService != nil {
-			if appKey, err := applicationCryptoService.AppKey(ctx, dev); err == nil {
-				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
-					Key: appKey[:],
+			if networkCryptoService != nil {
+				if nwkKey, err := networkCryptoService.NwkKey(ctx, dev); err == nil {
+					dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+						Key: nwkKey[:],
+					}
+				} else {
+					return nil, err
 				}
-			} else {
-				return nil, err
+			}
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.app_key") {
+			var applicationCryptoService cryptoservices.Application
+			if dev.RootKeys.AppKey != nil {
+				appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, srv.JS.KeyVault)
+				if err != nil {
+					return nil, err
+				}
+				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
+			} else if cs != nil {
+				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
+			}
+			if applicationCryptoService != nil {
+				if appKey, err := applicationCryptoService.AppKey(ctx, dev); err == nil {
+					dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
+						Key: appKey[:],
+					}
+				} else {
+					return nil, err
+				}
 			}
 		}
 	}
@@ -108,7 +116,7 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 }
 
 // Set implements ttnpb.JsEndDeviceRegistryServer.
-func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if req.Device.JoinEUI == nil || req.Device.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
 	}
@@ -124,7 +132,7 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		}
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	return s.Registry.SetByEUI(ctx, *req.Device.JoinEUI, *req.Device.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	return srv.JS.devices.SetByEUI(ctx, *req.Device.JoinEUI, *req.Device.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil && !dev.ApplicationIdentifiers.Equal(req.Device.ApplicationIdentifiers) {
 			return nil, nil, errInvalidIdentifiers
 		}
@@ -132,7 +140,7 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	})
 }
 
-func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesRequest, stream ttnpb.JsEndDeviceRegistry_ProvisionServer) error {
+func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesRequest, stream ttnpb.JsEndDeviceRegistry_ProvisionServer) error {
 	if err := rights.RequireApplication(stream.Context(), req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return err
 	}
@@ -253,7 +261,7 @@ func (s jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReque
 }
 
 // Delete implements ttnpb.JsEndDeviceRegistryServer.
-func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
 	}
@@ -263,7 +271,7 @@ func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	_, err := s.Registry.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, err := srv.JS.devices.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil || !dev.ApplicationIdentifiers.Equal(ids.ApplicationIdentifiers) {
 			return nil, nil, errDeviceNotFound
 		}

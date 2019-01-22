@@ -24,6 +24,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -1060,8 +1061,12 @@ func TestDeviceRegistryProvision(t *testing.T) {
 			),
 		},
 	})
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	js := test.Must(New(c, &Config{
+		Devices: reg,
+	})).(*JoinServer)
 	srv := &JsDeviceServer{
-		Registry: reg,
+		JS: js,
 	}
 
 	// Permission denied.

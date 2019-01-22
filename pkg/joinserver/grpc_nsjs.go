@@ -210,8 +210,9 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errGenerateSessionKeyID
 			}
 
-			networkCryptoService := srv.JS.networkCryptoService
-			applicationCryptoService := srv.JS.applicationCryptoService
+			cs := srv.JS.GetPeer(ctx, ttnpb.PeerInfo_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+
+			var networkCryptoService cryptoservices.Network
 			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
 				// LoRaWAN 1.1 and higher use a NwkKey.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, srv.JS.KeyVault)
@@ -219,7 +220,11 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					return nil, nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
+			} else if cs != nil {
+				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
+
+			var applicationCryptoService cryptoservices.Application
 			if dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
 				appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, srv.JS.KeyVault)
 				if err != nil {
@@ -230,6 +235,8 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					// LoRaWAN 1.0.x use the AppKey for network security operations.
 					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
 				}
+			} else if cs != nil {
+				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if networkCryptoService == nil {
 				return nil, nil, errNoNwkKey

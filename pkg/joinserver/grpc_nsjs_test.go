@@ -66,15 +66,19 @@ func TestHandleJoin(t *testing.T) {
 	devReg := &redis.DeviceRegistry{Redis: redisClient}
 	keyReg := &redis.KeyRegistry{Redis: redisClient}
 
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
 	js := NsJsServer{
 		JS: test.Must(New(
-			component.MustNew(test.GetLogger(t), &component.Config{}),
+			c,
 			&Config{
 				Devices:         devReg,
 				Keys:            keyReg,
 				JoinEUIPrefixes: joinEUIPrefixes,
 			},
 		)).(*JoinServer),
+	}
+	if err := c.Start(); err != nil {
+		panic(err)
 	}
 
 	// Invalid payload.
@@ -1045,15 +1049,19 @@ func TestHandleJoin(t *testing.T) {
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
 			keyReg := &redis.KeyRegistry{Redis: redisClient}
 
+			c := component.MustNew(test.GetLogger(t), &component.Config{})
 			js := NsJsServer{
 				JS: test.Must(New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
+					c,
 					&Config{
 						Devices:         devReg,
 						Keys:            keyReg,
 						JoinEUIPrefixes: joinEUIPrefixes,
 					},
 				)).(*JoinServer),
+			}
+			if err := c.Start(); err != nil {
+				panic(err)
 			}
 
 			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
@@ -1284,14 +1292,18 @@ func TestGetNwkSKeys(t *testing.T) {
 				ctx = tc.Context(ctx)
 			}
 
+			c := component.MustNew(test.GetLogger(t), &component.Config{})
 			js := NsJsServer{
 				JS: test.Must(New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
+					c,
 					&Config{
 						Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
 						Devices: &MockDeviceRegistry{},
 					},
 				)).(*JoinServer),
+			}
+			if err := c.Start(); err != nil {
+				panic(err)
 			}
 			res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 

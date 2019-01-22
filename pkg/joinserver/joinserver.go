@@ -25,13 +25,18 @@ import (
 	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
 )
+
+// Config represents the JoinServer configuration.
+type Config struct {
+	Devices         DeviceRegistry      `name:"-"`
+	Keys            KeyRegistry         `name:"-"`
+	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
+}
 
 // JoinServer implements the Join Server component.
 //
@@ -47,9 +52,6 @@ type JoinServer struct {
 	entropyMu *sync.Mutex
 	entropy   io.Reader
 
-	networkCryptoService     cryptoservices.Network
-	applicationCryptoService cryptoservices.Application
-
 	grpc struct {
 		nsJs      nsJsServer
 		asJs      asJsServer
@@ -59,10 +61,6 @@ type JoinServer struct {
 
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
-	if conf.Keys == nil || conf.Devices == nil {
-		panic(errors.New("One of registries is <nil>"))
-	}
-
 	js := &JoinServer{
 		Component: c,
 
@@ -75,24 +73,9 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
-	js.grpc.jsDevices = jsEndDeviceRegistryServer{Registry: js.devices}
+	js.grpc.jsDevices = jsEndDeviceRegistryServer{JS: js}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
-
-	if conf.NetworkCryptoService.Enabled {
-		var err error
-		js.networkCryptoService, err = conf.DialNetworkCryptoService(js.Context(), c.KeyVault)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if conf.ApplicationCryptoService.Enabled {
-		var err error
-		js.applicationCryptoService, err = conf.DialApplicationCryptoService(js.Context(), c.KeyVault)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsIndustries/lorawan-stack/issues/244).
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
