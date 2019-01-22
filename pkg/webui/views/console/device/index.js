@@ -16,16 +16,28 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 import { Helmet } from 'react-helmet'
+import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Spinner from '../../../components/spinner'
+import Tabs from '../../../components/tabs'
 
 import DeviceOverview from '../device-overview'
 
 import { getDevice } from '../../../actions/device'
+
+import style from './device.styl'
+
+const tabs = [
+  { title: 'Overview', name: 'overview' },
+  { title: 'Data', name: 'data' },
+  { title: 'Location', name: 'location' },
+  { title: 'Payload Formatter', name: 'develop' },
+  { title: 'General Settings', name: 'general-settings' },
+]
 
 @connect(function ({ device, application }, props) {
   return {
@@ -53,8 +65,12 @@ export default class Device extends React.Component {
     dispatch(getDevice(devId))
   }
 
+  handleTabChange () {
+
+  }
+
   render () {
-    const { fetching, error, match, appName } = this.props
+    const { fetching, error, match, appName, devId } = this.props
 
     if (fetching) {
       return (
@@ -75,6 +91,24 @@ export default class Device extends React.Component {
           titleTemplate={`%s - ${appName} - The Things Network Console`}
           defaultTitle="Devices - The Things Network Console"
         />
+        <Container>
+          <Row>
+            <Col lg={12}>
+              <div className={style.title}>
+                <h2 className={style.id}>
+                  {devId}
+                </h2>
+              </div>
+              <Tabs
+                narrow
+                active="overview"
+                tabs={tabs}
+                onTabChange={this.handleTabChange}
+                className={style.tabs}
+              />
+            </Col>
+          </Row>
+        </Container>
         <Switch>
           <Route exact path={`${match.path}`} component={DeviceOverview} />
         </Switch>

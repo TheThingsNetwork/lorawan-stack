@@ -20,7 +20,6 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
-import Tabs from '../../../components/tabs'
 import Icon from '../../../components/icon'
 import DataSheet from '../../../components/data-sheet'
 import Message from '../../../lib/components/message'
@@ -42,14 +41,6 @@ const m = defineMessages({
   appSKey: 'AppSKey',
 })
 
-const tabs = [
-  { title: 'Overview', name: 'overview' },
-  { title: 'Data', name: 'data' },
-  { title: 'Location', name: 'location' },
-  { title: 'Payload Formatter', name: 'develop' },
-  { title: 'General Settings', name: 'general-settings' },
-]
-
 @connect(function ({ device }, props) {
   return {
     device: device.device,
@@ -57,10 +48,6 @@ const tabs = [
 })
 @bind
 class DeviceOverview extends React.Component {
-
-  handleTabChange () {
-
-  }
 
   get deviceInfo () {
     const {
@@ -145,20 +132,6 @@ class DeviceOverview extends React.Component {
           <title>{device.name || device_id}</title>
         </IntlHelmet>
         <Row className={style.head}>
-          <Col lg={12}>
-            <div className={style.title}>
-              <h2 className={style.id}>
-                {device.name || device_id}
-              </h2>
-            </div>
-            <Tabs
-              narrow
-              active="overview"
-              tabs={tabs}
-              onTabChange={this.handleTabChange}
-              className={style.tabs}
-            />
-          </Col>
           <Col md={12} lg={6}>
             {this.deviceInfo}
           </Col>
