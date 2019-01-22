@@ -61,13 +61,21 @@ class Marshaler {
       return { [entity]: [], totalCount: 0 }
     }
 
-    const transforedList = transform ? list.map(transform) : list
+    const transformedList = transform ? list.map(transform) : list
 
-    return { [entity]: transforedList, totalCount }
+    return { [entity]: transformedList, totalCount }
+  }
+
+  static payloadSingleResponse ({ data }, transform) {
+    return transform ? transform(data) : data
   }
 
   static unwrapApplications (result, transform) {
     return this.payloadListResponse('applications', result, transform)
+  }
+
+  static unwrapApplication (result, transform) {
+    return this.payloadSingleResponse(result, transform)
   }
 
   static fieldMaskFromPatch (patch) {
