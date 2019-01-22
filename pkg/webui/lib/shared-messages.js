@@ -53,7 +53,7 @@ export default defineMessages({
   overview: 'Overview',
   password: 'Password',
   payloadFormatter: 'Payload Formatter',
-  payload_formats: 'Payload Formats',
+  payloadFormats: 'Payload Formats',
   privacyPolicy: 'Privacy Policy',
   profileSettings: 'Profile Settings',
   rights: 'Rights',

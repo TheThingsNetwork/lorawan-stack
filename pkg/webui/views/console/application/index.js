@@ -61,7 +61,7 @@ import { getApplication } from '../../../actions/application'
         icon: 'data',
       },
       {
-        title: sharedMessages.payload_formats,
+        title: sharedMessages.payloadFormats,
         path: `${matchedUrl}/payload-formats`,
         icon: 'payload_formats',
       },
