@@ -16,9 +16,11 @@ package networkserver
 
 import (
 	"context"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -35,16 +37,31 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	return ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	var addDownlinkTask bool
+	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		paths := req.FieldMask.Paths
-		if !req.Device.SupportsJoin && dev == nil {
+		if dev == nil && !req.Device.SupportsJoin {
 			if err := resetMACState(&req.Device, ns.FrequencyPlans); err != nil {
 				return nil, nil, err
 			}
+			if req.Device.MACState.DeviceClass != ttnpb.CLASS_A {
+				addDownlinkTask = len(req.Device.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters)
+			}
 			paths = append(paths, "mac_state")
+		} else if ttnpb.HasAnyField(paths, "mac_state.device_class") && dev.MACState.DeviceClass == ttnpb.CLASS_A && req.Device.MACState.DeviceClass != ttnpb.CLASS_A {
+			addDownlinkTask = true
 		}
 		return &req.Device, paths, nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	if addDownlinkTask {
+		if err = ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, time.Now()); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to add downlink task for device after set")
+		}
+	}
+	return dev, nil
 }
 
 // Delete implements NsEndDeviceRegistryServer.

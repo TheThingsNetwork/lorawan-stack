@@ -419,7 +419,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"resets_f_cnt",
 			"session",
 			"supports_join",
-			"supports_class_c",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
@@ -565,9 +564,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 				stored.Session = ses
 				stored.PendingSession = nil
-				if stored.SupportsClassC && stored.MACState.DeviceClass == ttnpb.CLASS_A {
-					stored.MACState.DeviceClass = ttnpb.CLASS_C
-				}
 			} else if stored.PendingSession != nil {
 				handleErr = true
 				return nil, nil, errNoRekey
