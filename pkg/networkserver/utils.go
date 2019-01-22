@@ -68,7 +68,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 	}
 
 	dev.MACState = &ttnpb.MACState{
-		DeviceClass:    ttnpb.CLASS_A,
+		DeviceClass:    dev.DefaultClass,
 		LoRaWANVersion: dev.LoRaWANVersion,
 		CurrentParameters: ttnpb.MACParameters{
 			ADRAckDelay:      uint32(band.ADRAckDelay),
