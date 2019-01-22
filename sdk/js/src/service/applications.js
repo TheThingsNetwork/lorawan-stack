@@ -32,7 +32,7 @@ class Applications {
   // Retrieval
 
   async getAll (params) {
-    const result = await this._api.ApplicationRegistry.List()
+    const result = await this._api.ApplicationRegistry.List({ query: params })
     return Marshaler.unwrapApplications(
       result,
       app => new Application(this, app, false)

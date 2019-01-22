@@ -15,6 +15,7 @@
 /* eslint-disable no-invalid-this */
 
 import traverse from 'traverse'
+import queryString from 'query-string'
 
 /** Class used to marshal data shapes. Currently a stub. */
 class Marshaler {
@@ -31,6 +32,10 @@ class Marshaler {
     }
 
     return query
+  }
+
+  static query (params) {
+    return queryString.stringify(params)
   }
 
   static payload (payload, wrap) {

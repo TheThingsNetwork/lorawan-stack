@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import apiDefinition from '../../generated/api-definition.json'
+import Marshaler from '../util/marshaler'
 import Http from './http'
 
 /**
@@ -42,7 +43,11 @@ class Api {
         const rpc = service[rpcName]
 
         this[serviceName][rpcName] = function (params = {}, body) {
-          const paramSignature = Object.keys(params).sort().join()
+
+          const routeParams = params.route || {}
+          const queryParams = params.query || {}
+
+          const paramSignature = Object.keys(routeParams).sort().join()
 
           const endpoint = rpc.http.find(function (prospect) {
             return prospect.parameters.sort().join() === paramSignature
@@ -55,8 +60,11 @@ class Api {
           let route = endpoint.pattern
 
           for (const parameter of endpoint.parameters) {
-            route = route.replace(`{${parameter}}`, params[parameter])
+            route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
+
+          const searchQuery = Marshaler.query(queryParams)
+          route = searchQuery ? `${route}?${searchQuery}` : route
 
           return connector[endpoint.method](route, body)
         }
