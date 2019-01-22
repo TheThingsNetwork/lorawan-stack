@@ -20,7 +20,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../lib/prop-types'
 
 import 'brace/mode/javascript'
-import 'brace/theme/github'
+import './ttn-theme'
 
 import style from './code-editor.styl'
 
@@ -96,7 +96,7 @@ class CodeEditor extends React.Component {
       <div className={editorCls}>
         <ReactAce
           // rendered options
-          theme="github"
+          theme="ttn"
           minLines={minLines}
           maxLines={maxLines}
 
