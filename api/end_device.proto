@@ -153,23 +153,25 @@ message EndDeviceVersion {
   bool supports_class_b = 6;
   // Whether the device supports class C.
   bool supports_class_c = 7;
+  // Default device class.
+  Class default_class = 8;
   // Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd).
-  MACParameters default_mac_parameters = 8 [(gogoproto.customname) = "DefaultMACParameters"];
+  MACParameters default_mac_parameters = 9 [(gogoproto.customname) = "DefaultMACParameters"];
   // Minimum frequency the device is capable of using (Hz).
-  uint64 min_frequency = 9;
+  uint64 min_frequency = 10;
   // Maximum frequency the device is capable of using (Hz).
-  uint64 max_frequency = 10;
+  uint64 max_frequency = 11;
   // Whether the device resets the frame counters (not LoRaWAN compliant).
-  bool resets_f_cnt = 11;
+  bool resets_f_cnt = 12;
   // Whether the device uses 32-bit frame counters.
-  bool uses_32_bit_f_cnt = 12 [(gogoproto.customname) = "Uses32BitFCnt"];
+  bool uses_32_bit_f_cnt = 13 [(gogoproto.customname) = "Uses32BitFCnt"];
   // The device supports join (it's OTAA).
-  bool supports_join = 13;
+  bool supports_join = 14;
   // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
-  bool resets_join_nonces = 14;
+  bool resets_join_nonces = 15;
 
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 15 [(gogoproto.nullable) = false];
+  MessagePayloadFormatters default_formatters = 16 [(gogoproto.nullable) = false];
 }
 
 message MACSettings {
@@ -291,102 +293,105 @@ message EndDevice {
   // Whether the device supports class C.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   bool supports_class_c = 14;
+  // Default device class. Stored in Network Server.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  Class default_class = 15;
   // LoRaWAN MAC version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 16 [(gogoproto.customname) = "LoRaWANVersion"];
   // LoRaWAN PHY version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 17 [(gogoproto.customname) = "LoRaWANPHYVersion"];
   // ID of the frequency plan used by this device.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 18 [(gogoproto.customname) = "FrequencyPlanID"];
   // Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACParameters default_mac_parameters = 18 [(gogoproto.customname) = "DefaultMACParameters"];
+  MACParameters default_mac_parameters = 19 [(gogoproto.customname) = "DefaultMACParameters"];
   // Minimum frequency the device is capable of using (Hz). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  uint64 min_frequency = 19;
+  uint64 min_frequency = 20;
   // Maximum frequency the device is capable of using (Hz). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  uint64 max_frequency = 20;
+  uint64 max_frequency = 21;
   // Whether the device resets the frame counters (not LoRaWAN compliant). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool resets_f_cnt = 21;
+  bool resets_f_cnt = 22;
   // Whether the device uses 32-bit frame counters. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool uses_32_bit_f_cnt = 22 [(gogoproto.customname) = "Uses32BitFCnt"];
+  bool uses_32_bit_f_cnt = 23 [(gogoproto.customname) = "Uses32BitFCnt"];
   // The device supports join (it's OTAA).
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool supports_join = 23;
+  bool supports_join = 24;
   // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  bool resets_join_nonces = 24;
+  bool resets_join_nonces = 25;
 
   // Device root keys. Stored in Join Server.
-  RootKeys root_keys = 25;
+  RootKeys root_keys = 26;
 
   // Home NetID. Stored in Join Server.
-  bytes net_id = 26 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID", (gogoproto.customname) = "NetID"];
+  bytes net_id = 27 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID", (gogoproto.customname) = "NetID"];
   // Settings for how the Network Server handles MAC for this device. Stored in Network Server.
-  MACSettings mac_settings = 27 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 28 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.
-  MACState mac_state = 28 [(gogoproto.customname) = "MACState"];
+  MACState mac_state = 29 [(gogoproto.customname) = "MACState"];
   // Current session. Stored in Network Server and Application Server.
-  Session session = 29;
+  Session session = 30;
   // Pending session. Stored in Network Server and Application Server until RekeyInd is received.
-  Session pending_session = 30;
+  Session pending_session = 31;
 
   // Last DevNonce used.
   // This field is only used for devices using LoRaWAN version 1.1 and later.
   // Stored in Join Server.
-  uint32 last_dev_nonce = 31;
+  uint32 last_dev_nonce = 32;
   // Used DevNonces sorted in ascending order.
   // This field is only used for devices using LoRaWAN versions preceding 1.1.
   // Stored in Join Server.
-  repeated uint32 used_dev_nonces = 32;
+  repeated uint32 used_dev_nonces = 33;
   // Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used.
   // Stored in Join Server.
-  uint32 last_join_nonce = 33;
+  uint32 last_join_nonce = 34;
   // Last Rejoin counter value used (type 0/2).
   // Stored in Join Server.
-  uint32 last_rj_count_0 = 34 [(gogoproto.customname) = "LastRJCount0"];
+  uint32 last_rj_count_0 = 35 [(gogoproto.customname) = "LastRJCount0"];
   // Last Rejoin counter value used (type 1).
   // Stored in Join Server.
-  uint32 last_rj_count_1 = 35 [(gogoproto.customname) = "LastRJCount1"];
+  uint32 last_rj_count_1 = 36 [(gogoproto.customname) = "LastRJCount1"];
 
   // Time when last DevStatus MAC command was received.
   // Stored in Network Server.
-  google.protobuf.Timestamp last_dev_status_received_at = 36 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_dev_status_received_at = 37 [(gogoproto.stdtime) = true];
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  PowerState power_state = 37;
+  PowerState power_state = 38;
   // Latest-known battery percentage of the device.
   // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
   // Stored in Network Server.
-  float battery_percentage = 38;
+  float battery_percentage = 39;
   // Demodulation signal-to-noise ratio (dB).
   // Received via the DevStatus MAC command at last_dev_status_received_at.
   // Stored in Network Server.
-  int32 downlink_margin = 39;
+  int32 downlink_margin = 40;
 
   // Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.
   // The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.
   // The number of messages stored is in the range [0,20];
-  repeated UplinkMessage recent_adr_uplinks = 40 [(gogoproto.customname) = "RecentADRUplinks"];
+  repeated UplinkMessage recent_adr_uplinks = 41 [(gogoproto.customname) = "RecentADRUplinks"];
   // Recent uplink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated UplinkMessage recent_uplinks = 41;
+  repeated UplinkMessage recent_uplinks = 42;
   // Recent downlink messages sorted by time. Stored in Network Server.
   // The number of messages stored may depend on configuration.
-  repeated DownlinkMessage recent_downlinks = 42;
+  repeated DownlinkMessage recent_downlinks = 43;
   // Queued Application downlink messages. Stored in Application Server,
   // which sets them on the Network Server.
-  repeated ApplicationDownlink queued_application_downlinks = 43;
+  repeated ApplicationDownlink queued_application_downlinks = 44;
 
   // The payload formatters for this end device. Stored in Application Server.
   // Copied on creation from template identified by version_ids.
-  MessagePayloadFormatters formatters = 44;
+  MessagePayloadFormatters formatters = 45;
 }
 
 message EndDevices {

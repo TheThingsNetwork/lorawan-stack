@@ -636,6 +636,7 @@ func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifie
 }
 
 var EndDeviceVersionFieldPathsNested = []string{
+	"default_class",
 	"default_formatters",
 	"default_formatters.down_formatter",
 	"default_formatters.down_formatter_parameter",
@@ -681,6 +682,7 @@ var EndDeviceVersionFieldPathsNested = []string{
 }
 
 var EndDeviceVersionFieldPathsTopLevel = []string{
+	"default_class",
 	"default_formatters",
 	"default_mac_parameters",
 	"frequency_plan_id",
@@ -777,6 +779,16 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			} else {
 				var zero bool
 				dst.SupportsClassC = zero
+			}
+		case "default_class":
+			if len(subs) > 0 {
+				return fmt.Errorf("'default_class' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DefaultClass = src.DefaultClass
+			} else {
+				var zero Class
+				dst.DefaultClass = zero
 			}
 		case "default_mac_parameters":
 			if len(subs) > 0 {
@@ -1213,6 +1225,7 @@ var EndDeviceFieldPathsNested = []string{
 	"attributes",
 	"battery_percentage",
 	"created_at",
+	"default_class",
 	"default_mac_parameters",
 	"default_mac_parameters.adr_ack_delay",
 	"default_mac_parameters.adr_ack_limit",
@@ -1407,6 +1420,7 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"attributes",
 	"battery_percentage",
 	"created_at",
+	"default_class",
 	"default_mac_parameters",
 	"description",
 	"downlink_margin",
@@ -1608,6 +1622,16 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				var zero bool
 				dst.SupportsClassC = zero
+			}
+		case "default_class":
+			if len(subs) > 0 {
+				return fmt.Errorf("'default_class' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DefaultClass = src.DefaultClass
+			} else {
+				var zero Class
+				dst.DefaultClass = zero
 			}
 		case "lorawan_version":
 			if len(subs) > 0 {
@@ -2021,6 +2045,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.created_at",
+	"end_device.default_class",
 	"end_device.default_mac_parameters",
 	"end_device.default_mac_parameters.adr_ack_delay",
 	"end_device.default_mac_parameters.adr_ack_limit",
@@ -2249,6 +2274,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.created_at",
+	"end_device.default_class",
 	"end_device.default_mac_parameters",
 	"end_device.default_mac_parameters.adr_ack_delay",
 	"end_device.default_mac_parameters.adr_ack_limit",
@@ -2630,6 +2656,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.attributes",
 	"device.battery_percentage",
 	"device.created_at",
+	"device.default_class",
 	"device.default_mac_parameters",
 	"device.default_mac_parameters.adr_ack_delay",
 	"device.default_mac_parameters.adr_ack_limit",

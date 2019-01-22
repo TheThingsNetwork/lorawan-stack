@@ -1490,6 +1490,7 @@ SDKs are responsible for combining (if desired) the three.
 | locations | [EndDevice.LocationsEntry](#ttn.lorawan.v3.EndDevice.LocationsEntry) | repeated | Location of the device. Stored in Entity Registry. |
 | supports_class_b | [bool](#bool) |  | Whether the device supports class B. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | supports_class_c | [bool](#bool) |  | Whether the device supports class C. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
+| default_class | [Class](#ttn.lorawan.v3.Class) |  | Default device class. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | lorawan_version | [MACVersion](#ttn.lorawan.v3.MACVersion) |  | LoRaWAN MAC version. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | lorawan_phy_version | [PHYVersion](#ttn.lorawan.v3.PHYVersion) |  | LoRaWAN PHY version. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | frequency_plan_id | [string](#string) |  | ID of the frequency plan used by this device. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
@@ -1608,6 +1609,7 @@ Template for creating end devices.
 | photos | [string](#string) | repeated | Photos contains file names of device photos. |
 | supports_class_b | [bool](#bool) |  | Whether the device supports class B. |
 | supports_class_c | [bool](#bool) |  | Whether the device supports class C. |
+| default_class | [Class](#ttn.lorawan.v3.Class) |  | Default device class. |
 | default_mac_parameters | [MACParameters](#ttn.lorawan.v3.MACParameters) |  | Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). |
 | min_frequency | [uint64](#uint64) |  | Minimum frequency the device is capable of using (Hz). |
 | max_frequency | [uint64](#uint64) |  | Maximum frequency the device is capable of using (Hz). |
