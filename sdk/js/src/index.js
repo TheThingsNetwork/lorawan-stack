@@ -21,12 +21,13 @@ class TtnLw {
     baseURL,
     connectionType,
     defaultUserId,
+    proxy,
     axiosConfig = {},
   }) {
     this.config = arguments.config
     this.api = new Api(connectionType, { baseURL, ...axiosConfig }, token)
 
-    this.Applications = new Applications(this.api, { defaultUserId })
+    this.Applications = new Applications(this.api, { defaultUserId, proxy })
     this.Application = Application.bind(null, this.Applications)
   }
 }
