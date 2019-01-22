@@ -215,6 +215,7 @@ var (
 				device.JoinServerAddress = config.JoinServerAddress
 				device.LoRaWANVersion = ttnpb.MAC_V1_1
 				device.LoRaWANPHYVersion = ttnpb.PHY_V1_1_REV_B
+				device.DefaultClass = ttnpb.CLASS_A
 				device.Uses32BitFCnt = true
 				device.MACSettings = &ttnpb.MACSettings{
 					UseADR:    true,
@@ -223,7 +224,7 @@ var (
 				paths = append(paths,
 					"network_server_address", "application_server_address", "join_server_address",
 					"lorawan_version", "lorawan_phy_version",
-					"uses_32_bit_fcnt", "mac_settings",
+					"default_class", "uses_32_bit_fcnt", "mac_settings",
 				)
 			}
 			if otaa, _ := cmd.Flags().GetBool("otaa"); otaa {
