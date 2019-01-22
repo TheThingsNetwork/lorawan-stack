@@ -36,6 +36,13 @@ class Applications {
       : undefined
 
     this.getAll = this.getAll.bind(this)
+    this.getById = this.getById.bind(this)
+    this.getByOrganization = this.getByOrganization.bind(this)
+    this.getByCollaborator = this.getByCollaborator.bind(this)
+    this.updateById = this.updateById.bind(this)
+    this.create = this.create.bind(this)
+    this.deleteById = this.deleteById.bind(this)
+    this.withId = this.withId.bind(this)
   }
 
   // Retrieval
