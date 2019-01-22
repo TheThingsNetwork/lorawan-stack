@@ -27,6 +27,10 @@ const (
   name: Korea 920-923 MHz
   base-frequency: 915
   file: KR_920_923.yml
+- id: US_902_928_FSB_2
+  name: US 902-928 MHz FSB2
+  base-frequency: 915
+  file: US_902_928_FSB_2.yml
 - id: EXAMPLE
   name: Example 866.1 MHz
   base-frequency: 868
@@ -150,6 +154,85 @@ lbt:
   rssi-target: -80
   scan-time: 128`
 
+	// USFrequencyPlanID is a American frequency plan for testing.
+	USFrequencyPlanID = "US_902_928_FSB_2"
+	usFrequencyPlan   = `band-id: US_902_928
+uplink-channels:
+- frequency: 903900000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 0
+- frequency: 904100000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 0
+- frequency: 904300000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 0
+- frequency: 904500000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 0
+- frequency: 904700000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 1
+- frequency: 904900000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 1
+- frequency: 905100000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 1
+- frequency: 905300000
+  min-data-rate: 0
+  max-data-rate: 3
+  radio: 1
+downlink-channels:
+- frequency: 923300000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 923900000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 924500000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 925100000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 925700000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 926300000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 926900000
+  min-data-rate: 8
+  max-data-rate: 13
+- frequency: 927500000
+  min-data-rate: 8
+  max-data-rate: 13
+lora-standard-channel:
+  frequency: 904600000
+  data-rate: 12
+  radio: 0
+radios:
+- enable: true
+  chip-type: SX1257
+  frequency: 904300000
+  rssi-offset: -166
+  tx:
+    min-frequency: 923000000
+    max-frequency: 928000000
+- enable: true
+  chip-type: SX1257
+  frequency: 905000000
+  rssi-offset: -166
+clock-source: 1`
+
 	// ExampleFrequencyPlanID is an example frequency plan.
 	ExampleFrequencyPlanID = "EXAMPLE"
 	exampleFrequencyPlan   = `band-id: EU_863_870
@@ -207,8 +290,9 @@ max-eirp: 27`
 
 // FrequencyPlansFetcher fetches frequency plans from memory.
 var FrequencyPlansFetcher = fetch.NewMemFetcher(map[string][]byte{
-	"frequency-plans.yml": []byte(frequencyPlansDescription),
-	"EU_863_870.yml":      []byte(euFrequencyPlan),
-	"KR_920_923.yml":      []byte(krFrequencyPlan),
-	"EXAMPLE.yml":         []byte(exampleFrequencyPlan),
+	"frequency-plans.yml":  []byte(frequencyPlansDescription),
+	"EU_863_870.yml":       []byte(euFrequencyPlan),
+	"KR_920_923.yml":       []byte(krFrequencyPlan),
+	"US_902_928_FSB_2.yml": []byte(usFrequencyPlan),
+	"EXAMPLE.yml":          []byte(exampleFrequencyPlan),
 })
