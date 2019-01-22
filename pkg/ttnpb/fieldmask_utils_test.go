@@ -77,6 +77,7 @@ func TestHasAnyField(t *testing.T) {
 	a.So(ttnpb.HasAnyField(requested, "x", "a"), should.BeTrue)
 	a.So(ttnpb.HasAnyField(requested, "x.y", "b"), should.BeFalse)
 	a.So(ttnpb.HasAnyField(requested, "x", "b.c"), should.BeTrue)
+	a.So(ttnpb.HasAnyField(requested, "x", "b.c.d"), should.BeTrue)
 	a.So(ttnpb.HasAnyField(requested, "d"), should.BeTrue)
 	a.So(ttnpb.HasAnyField(requested, "d.e", "b"), should.BeTrue)
 }
