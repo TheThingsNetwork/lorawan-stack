@@ -37,11 +37,11 @@ const m = defineMessages({
 })
 
 const tabs = [
-  { title: 'Overview', name: 'overview' },
-  { title: 'Data', name: 'data' },
-  { title: 'Location', name: 'location' },
-  { title: 'Payload Formatter', name: 'develop' },
-  { title: 'General Settings', name: 'general-settings' },
+  { title: sharedMessages.overview, name: 'overview' },
+  { title: sharedMessages.data, name: 'data' },
+  { title: sharedMessages.location, name: 'location' },
+  { title: sharedMessages.payloadFormats, name: 'develop' },
+  { title: sharedMessages.generalSettings, name: 'general-settings' },
 ]
 
 @connect(function ({ device, application }, props) {

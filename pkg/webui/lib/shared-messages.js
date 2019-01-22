@@ -60,7 +60,6 @@ export default defineMessages({
   organizations: 'Organizations',
   overview: 'Overview',
   password: 'Password',
-  payloadFormatter: 'Payload Formatter',
   payloadFormats: 'Payload Formats',
   privacyPolicy: 'Privacy Policy',
   profileSettings: 'Profile Settings',

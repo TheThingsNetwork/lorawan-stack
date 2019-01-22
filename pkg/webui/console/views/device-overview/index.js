@@ -15,15 +15,33 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
-
+import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
+import sharedMessages from '../../../lib/shared-messages'
+
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import Icon from '../../../components/icon'
+import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
 import Message from '../../../lib/components/message'
 
 import style from './device-overview.styl'
+
+const m = defineMessages({
+  hardware: 'Hardware',
+  brand: 'Brand',
+  model: 'Model',
+  hardwareVersion: 'Hardware version',
+  firmwareVersion: 'Firmware Version',
+  activationInfo: 'Activation Info',
+  rootKeyId: 'Root Key ID',
+  sessionInfo: 'Session Info',
+  fwdNtwkKey: 'FNwkSIntKey',
+  sNtwkSIKey: 'SNwkSIntKey',
+  ntwkSEncKey: 'NwkSEncKey',
+  appSKey: 'AppSKey',
+  latestData: 'Latest Data',
+})
 
 @connect(function ({ device }, props) {
   return {
@@ -51,39 +69,39 @@ class DeviceOverview extends React.Component {
 
     const sheetData = [
       {
-        header: 'Hardware',
+        header: m.hardware,
         items: [
-          { key: 'Brand', value: version_ids.brand_id },
-          { key: 'Model', value: version_ids.model_id },
-          { key: 'Hardware Version', value: version_ids.hardware_version },
-          { key: 'Firmware Version', value: version_ids.firmware_version },
+          { key: m.brand, value: version_ids.brand_id },
+          { key: m.model, value: version_ids.model_id },
+          { key: m.hardwareVersion, value: version_ids.hardware_version },
+          { key: m.firmwareVersion, value: version_ids.firmware_version },
         ],
       },
       {
-        header: 'Activation Info',
+        header: m.activationInfo,
         items: [
-          { key: 'Device EUI', value: ids.dev_eui, type: 'byte', sensitive: false },
-          { key: 'Join EUI', value: ids.join_eui, type: 'byte', sensitive: false },
+          { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
+          { key: sharedMessages.joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },
           {
-            key: 'Root Key ID',
+            key: m.rootKeyId,
             value: root_keys.root_key_id,
             type: 'code',
             sensitive: false,
             subItems: [
-              { key: 'Application Key', value: root_keys.app_key.key, type: 'code', sensitive: true },
-              { key: 'Network Key', value: root_keys.nwk_key.key, type: 'code', sensitive: true },
+              { key: sharedMessages.appKey, value: root_keys.app_key.key, type: 'code', sensitive: true },
+              { key: sharedMessages.networkKey, value: root_keys.nwk_key.key, type: 'code', sensitive: true },
             ],
           },
         ],
       },
       {
-        header: 'Session Info',
+        header: m.sessionInfo,
         items: [
-          { key: 'Device Address', value: ids.dev_addr, type: 'byte', sensitive: false },
-          { key: 'Forwarding Network Session Integrity Key', value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
-          { key: 'Serving Network Session Integrity Key', value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
-          { key: 'Network Session Encryption Key', value: nwk_s_enc_key.key, type: 'code', sensitive: true },
-          { key: 'Application Session Key', value: app_s_key.key, type: 'code', sensitive: true },
+          { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
+          { key: m.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
+          { key: m.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
+          { key: m.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
+          { key: m.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
         ],
       },
     ]
@@ -119,11 +137,11 @@ class DeviceOverview extends React.Component {
           </Col>
           <Col md={12} lg={6}>
             <div className={style.activityPlaceholder}>
-              <h4>Latest Data</h4>
+              <h4><Message content={m.latestData} /></h4>
               <div>Activity Panel Placeholder</div>
             </div>
             <div className={style.locationPlaceholder}>
-              <h4>Location</h4>
+              <h4><Message content={sharedMessages.location} /></h4>
               <div>Location Map Placeholder</div>
             </div>
           </Col>
