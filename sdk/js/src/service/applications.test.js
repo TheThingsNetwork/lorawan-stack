@@ -43,7 +43,10 @@ jest.mock('../api', function () {
     return {
       ApplicationRegistry: {
         Get: jest.fn().mockResolvedValue(mockApplicationData),
-        List: jest.fn().mockResolvedValue({ applications: [ mockApplicationData ]}),
+        List: jest.fn().mockResolvedValue({
+          data: { applications: [ mockApplicationData ]},
+          headers: { 'x-total-count': 1 },
+        }),
       },
     }
   })
@@ -77,10 +80,13 @@ describe('Applications', function () {
   test('instance returns an application list on getAll()', async function () {
     jest.resetModules()
 
-    const apps = await applications.getAll()
-    expect(apps).toBeDefined()
+    const result = await applications.getAll()
+    expect(result).toBeDefined()
+
+    const { applications: apps, totalCount } = result
     expect(apps.constructor.name).toBe('Array')
     expect(apps).toHaveLength(1)
     expect(apps[0].constructor.name).toBe('Application')
+    expect(totalCount).toBe(1)
   })
 })

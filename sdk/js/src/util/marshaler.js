@@ -43,8 +43,26 @@ class Marshaler {
     return res
   }
 
-  static unwrapApplications (raw) {
-    return raw.applications
+  static payloadListResponse (entity, { data = {}, headers = {}}, transform) {
+    const list = data[entity]
+
+    if (!list) {
+      return { [entity]: [], totalCount: 0 }
+    }
+
+    const totalCount = parseInt(headers['x-total-count'])
+
+    if (isNaN(totalCount)) {
+      return { [entity]: [], totalCount: 0 }
+    }
+
+    const transforedList = transform ? list.map(transform) : list
+
+    return { [entity]: transforedList, totalCount }
+  }
+
+  static unwrapApplications (result, transform) {
+    return this.payloadListResponse('applications', result, transform)
   }
 
   static fieldMaskFromPatch (patch) {

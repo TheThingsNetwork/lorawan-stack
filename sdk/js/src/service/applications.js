@@ -25,14 +25,18 @@ class Applications {
   constructor (api, { defaultUserId }) {
     this._defaultUserId = defaultUserId
     this._api = api
+
+    this.getAll = this.getAll.bind(this)
   }
 
   // Retrieval
 
-  async getAll () {
-    let applications = await this._api.ApplicationRegistry.List()
-    applications = Marshaler.unwrapApplications(applications)
-    return applications.map(data => new Application(this, data, false))
+  async getAll (params) {
+    const result = await this._api.ApplicationRegistry.List()
+    return Marshaler.unwrapApplications(
+      result,
+      app => new Application(this, app, false)
+    )
   }
 
   async getById (id) {
