@@ -27,13 +27,15 @@ import (
 type networkRPCClient struct {
 	Client ttnpb.NetworkCryptoServiceClient
 	crypto.KeyVault
+	callOpts []grpc.CallOption
 }
 
 // NewNetworkRPCClient returns a network service which uses a gRPC service on the given connection.
-func NewNetworkRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault) Network {
+func NewNetworkRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault, callOpts ...grpc.CallOption) Network {
 	return &networkRPCClient{
 		Client:   ttnpb.NewNetworkCryptoServiceClient(cc),
 		KeyVault: keyVault,
+		callOpts: callOpts,
 	}
 }
 
@@ -44,7 +46,7 @@ func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDev
 		Payload:              payload,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return
 	}
@@ -63,7 +65,7 @@ func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevi
 		},
 		JoinRequestType: uint32(joinReqType),
 		DevNonce:        dn,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return
 	}
@@ -78,7 +80,7 @@ func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, dev *ttnpb.End
 		Payload:              payload,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +94,7 @@ func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.E
 		Payload:              payload,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +110,7 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 		NetID:                nid,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
@@ -133,7 +135,7 @@ func (s *networkRPCClient) NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (ty
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return types.AES128Key{}, err
 	}
@@ -143,13 +145,15 @@ func (s *networkRPCClient) NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (ty
 type applicationRPCClient struct {
 	Client ttnpb.ApplicationCryptoServiceClient
 	crypto.KeyVault
+	callOpts []grpc.CallOption
 }
 
 // NewApplicationRPCClient returns an application service which uses a gRPC service on the given connection.
-func NewApplicationRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault) Application {
+func NewApplicationRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault, callOpts ...grpc.CallOption) Application {
 	return &applicationRPCClient{
 		Client:   ttnpb.NewApplicationCryptoServiceClient(cc),
 		KeyVault: keyVault,
+		callOpts: callOpts,
 	}
 }
 
@@ -162,7 +166,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 		NetID:                nid,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return types.AES128Key{}, err
 	}
@@ -174,7 +178,7 @@ func (s *applicationRPCClient) AppKey(ctx context.Context, dev *ttnpb.EndDevice)
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
-	})
+	}, s.callOpts...)
 	if err != nil {
 		return types.AES128Key{}, err
 	}
