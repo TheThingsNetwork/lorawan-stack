@@ -68,6 +68,11 @@ import Device from '../device'
         icon: 'link',
       },
       {
+        title: sharedMessages.payloadFormats,
+        path: `${matchedUrl}/payload-formats`,
+        icon: 'payload_formats',
+      },
+      {
         title: sharedMessages.integrations,
         path: `${matchedUrl}/integrations`,
         icon: 'integration',
