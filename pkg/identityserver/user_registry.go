@@ -42,11 +42,43 @@ var (
 )
 
 var (
-	errInvitationTokenRequired = errors.DefineUnauthenticated("invitation_token_required", "invitation token required")
-	errInvitationTokenExpired  = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
+	errInvitationTokenRequired   = errors.DefineUnauthenticated("invitation_token_required", "invitation token required")
+	errInvitationTokenExpired    = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
+	errPasswordStrengthLength    = errors.DefineInvalidArgument("password_strength_length", "need at least `{n}` characters")
+	errPasswordStrengthUppercase = errors.DefineInvalidArgument("password_strength_uppercase", "need at least `{n}` uppercase letter(s)")
+	errPasswordStrengthDigits    = errors.DefineInvalidArgument("password_strength_digits", "need at least `{n}` digit(s)")
+	errPasswordStrengthSpecial   = errors.DefineInvalidArgument("password_strength_special", "need at least `{n}` special character(s)")
 )
 
 const maxProfilePictureStoredDimensions = 1024
+
+func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password string) error {
+	requirements := is.configFromContext(ctx).UserRegistration.PasswordRequirements
+	if len(password) < requirements.MinLength {
+		return errPasswordStrengthLength.WithAttributes("n", requirements.MinLength)
+	}
+	var uppercase, digits, special int
+	for _, r := range password {
+		switch {
+		case r >= 'A' && r <= 'Z':
+			uppercase++
+		case r >= '0' && r <= '9':
+			digits++
+		case r == '!' || r == '%' || r == '@' || r == '#' || r == '$' || r == '&' || r == '*':
+			special++
+		}
+	}
+	if uppercase < requirements.MinUppercase {
+		return errPasswordStrengthUppercase.WithAttributes("n", requirements.MinUppercase)
+	}
+	if digits < requirements.MinDigits {
+		return errPasswordStrengthDigits.WithAttributes("n", requirements.MinDigits)
+	}
+	if special < requirements.MinSpecial {
+		return errPasswordStrengthSpecial.WithAttributes("n", requirements.MinSpecial)
+	}
+	return nil
+}
 
 func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err error) {
 	if usr.ProfilePicture == nil {
@@ -107,6 +139,9 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
+	if err := is.validatePasswordStrength(ctx, req.User.Password); err != nil {
+		return nil, err
+	}
 	hashedPassword, err := auth.Hash(req.User.Password)
 	if err != nil {
 		return nil, err
@@ -293,6 +328,9 @@ var (
 )
 
 func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
+	if err := is.validatePasswordStrength(ctx, req.New); err != nil {
+		return nil, err
+	}
 	hashedPassword, err := auth.Hash(req.New)
 	if err != nil {
 		return nil, err

@@ -58,6 +58,7 @@ func TestUsersPermissionNotRequired(t *testing.T) {
 		created, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
 				UserIdentifiers: userID,
+				Password:        "test password",
 			},
 		})
 
@@ -131,6 +132,61 @@ func TestUsersPermissionDenied(t *testing.T) {
 	})
 }
 
+func TestUsersWeakPassword(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewUserRegistryClient(cc)
+
+		weakPassword := "weak" // Does not meet minimum length requirement of 10 characters.
+
+		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
+			User: ttnpb.User{
+				UserIdentifiers: ttnpb.UserIdentifiers{UserID: "test-user-id"},
+				Password:        weakPassword,
+			},
+		})
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
+
+		oldPassword := user.Password
+		newPassword := weakPassword
+
+		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			Old:             oldPassword,
+			New:             newPassword,
+		}, creds)
+
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		pwUpdated, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			FieldMask:       types.FieldMask{Paths: []string{"password", "password_updated_at"}},
+		}, creds)
+
+		a.So(err, should.BeNil)
+
+		oldPasswordMatch, err := auth.Password(pwUpdated.Password).Validate(oldPassword)
+		if err != nil {
+			panic(err)
+		}
+		newPasswordMatch, _ := auth.Password(pwUpdated.Password).Validate(newPassword)
+		if err != nil {
+			panic(err)
+		}
+
+		a.So(pwUpdated, should.NotBeNil)
+		a.So(oldPasswordMatch, should.BeTrue)
+		a.So(newPasswordMatch, should.BeFalse)
+		a.So(pwUpdated.PasswordUpdatedAt, should.Equal, user.PasswordUpdatedAt)
+	})
+}
+
 func TestUsersCRUD(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
@@ -188,7 +244,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		passwordUpdateTime := time.Now()
 		oldPassword := user.Password
-		newPassword := "updated user password"
+		newPassword := "updated user password" // Meets minimum length requirement of 10 characters.
 
 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 			UserIdentifiers: user.UserIdentifiers,
@@ -218,7 +274,6 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(oldPasswordMatch, should.BeFalse)
 		a.So(newPasswordMatch, should.BeTrue)
 		a.So(pwUpdated.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
-		a.So(err, should.BeNil)
 
 		_, err = reg.Delete(ctx, &user.UserIdentifiers, creds)
 		a.So(err, should.BeNil)

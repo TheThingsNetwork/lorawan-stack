@@ -2969,6 +2969,42 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/identityserver:password_strength_digits": {
+    "translations": {
+      "en": "need at least `{n}` digit(s)"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:password_strength_length": {
+    "translations": {
+      "en": "need at least `{n}` characters"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:password_strength_special": {
+    "translations": {
+      "en": "need at least `{n}` special character(s)"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:password_strength_uppercase": {
+    "translations": {
+      "en": "need at least `{n}` uppercase letter(s)"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:search_admin_only": {
     "translations": {
       "en": "search is only available to admins"

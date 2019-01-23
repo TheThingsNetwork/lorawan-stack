@@ -46,6 +46,12 @@ type Config struct {
 		AdminApproval struct {
 			Required bool `name:"required" description:"Require admin approval for new users"`
 		} `name:"admin-approval"`
+		PasswordRequirements struct {
+			MinLength    int `name:"min-length" description:"Minimum password length"`
+			MinUppercase int `name:"min-uppercase" description:"Minimum number of uppercase letters"`
+			MinDigits    int `name:"min-digits" description:"Minimum number of digits"`
+			MinSpecial   int `name:"min-special" description:"Minimum number of special characters"`
+		} `name:"password-requirements"`
 	} `name:"user-registration"`
 	AuthCache struct {
 		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
