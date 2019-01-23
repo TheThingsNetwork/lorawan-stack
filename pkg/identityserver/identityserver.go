@@ -40,6 +40,9 @@ type Config struct {
 			Required bool          `name:"required" description:"Require invitations for new users"`
 			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`
 		} `name:"invitation"`
+		ContactInfoValidation struct {
+			Required bool `name:"required" description:"Require contact info validation for new users"`
+		} `name:"contact-info-validation"`
 		AdminApproval struct {
 			Required bool `name:"required" description:"Require admin approval for new users"`
 		} `name:"admin-approval"`

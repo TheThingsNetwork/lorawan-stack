@@ -185,7 +185,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights)
 		}
 
-		if user.PrimaryEmailAddressValidatedAt == nil {
+		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
 			// Go to profile page, edit basic settings (such as email), delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
 			warning.Add(ctx, "Restricted rights until email address validated")

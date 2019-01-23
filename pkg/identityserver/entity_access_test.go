@@ -31,6 +31,8 @@ func TestEntityAccess(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.UserRegistration.ContactInfoValidation.Required = true
+
 		cli := ttnpb.NewEntityAccessClient(cc)
 
 		t.Run("New User", func(t *testing.T) {
