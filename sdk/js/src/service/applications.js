@@ -39,6 +39,7 @@ class Applications {
     this.getById = this.getById.bind(this)
     this.getByOrganization = this.getByOrganization.bind(this)
     this.getByCollaborator = this.getByCollaborator.bind(this)
+    this.search = this.search.bind(this)
     this.updateById = this.updateById.bind(this)
     this.create = this.create.bind(this)
     this.deleteById = this.deleteById.bind(this)
@@ -76,6 +77,16 @@ class Applications {
     return this._api.ApplicationRegistry.List({
       route: { 'collaborator.user_ids.user_id': userId },
     })
+  }
+
+  async search (params) {
+    const result = await this._api.EntityRegistrySearch.SearchApplications({
+      query: params,
+    })
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
   }
 
   // Update
