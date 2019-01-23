@@ -15,6 +15,7 @@
 package identityserver
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -27,6 +28,34 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
+
+func TestValidatePasswordStrength(t *testing.T) {
+	a := assertions.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, _ *grpc.ClientConn) {
+		conf := *is.config
+		conf.UserRegistration.PasswordRequirements.MinLength = 8
+		conf.UserRegistration.PasswordRequirements.MinUppercase = 1
+		conf.UserRegistration.PasswordRequirements.MinDigits = 1
+		conf.UserRegistration.PasswordRequirements.MinSpecial = 1
+		ctx := context.WithValue(is.Context(), ctxKey, &conf)
+
+		for p, ok := range map[string]bool{
+			"aA0$":         false, // Fails length check.
+			"aaa123!@#":    false, // Fails uppercase check.
+			"aaaAAA!@#":    false, // Fails digits check.
+			"aaaAAA123":    false, // Fails special check.
+			"aaaAAA123!@#": true,
+		} {
+			err := is.validatePasswordStrength(ctx, p)
+			if ok {
+				a.So(err, should.BeNil)
+			} else {
+				a.So(err, should.NotBeNil)
+			}
+		}
+	})
+}
 
 func TestTemporaryValidPassword(t *testing.T) {
 	a := assertions.New(t)
