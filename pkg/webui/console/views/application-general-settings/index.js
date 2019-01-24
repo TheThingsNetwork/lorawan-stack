@@ -28,7 +28,7 @@ import Field from '../../../components/field'
 import Button from '../../../components/button'
 import ModalButton from '../../../components/button/modal-button'
 
-import { deleteApplication, updateApplication } from '../../store/actions/applications'
+import { deleteApplication, updateApplication } from '../../store/actions/application'
 
 import style from './application-general-settings.styl'
 

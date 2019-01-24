@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { createLogic } from 'redux-logic'
-import { replace } from 'connected-react-router'
 
 import api from '../../api'
 import * as applications from '../actions/applications'
@@ -44,74 +43,6 @@ const getApplicationsLogic = createLogic({
   },
 })
 
-const deleteApplicationLogic = createLogic({
-  type: applications.DELETE_APP,
-  async process ({ getState, action }, dispatch, done) {
-    const id = action.id
-
-    try {
-      await api.application.delete(id)
-      dispatch(applications.deleteApplicationSuccess())
-      dispatch(replace('/console/applications'))
-    } catch (error) {
-      dispatch(applications.deleteApplicationFailure(error))
-    }
-
-    done()
-  },
-})
-
-const updateApplicationLogic = createLogic({
-  type: applications.UPDATE_APP,
-  async process ({ getState, action }, dispatch, done) {
-    const data = action.data
-    const application = getState().application.application
-
-    const changed = Object.keys(data).reduce(function (patch, field) {
-      const oldValue = application[field]
-      const newValue = data[field]
-
-      if (oldValue !== newValue) {
-        patch[field] = newValue
-      }
-
-      return patch
-    }, {})
-
-    try {
-      await api.application.update(application.ids.application_id, changed)
-      dispatch(applications.updateApplicationSuccess())
-    } catch (error) {
-      dispatch(applications.updateApplicationFailure(error))
-    }
-
-    done()
-  },
-})
-
-const createApplicationLogic = createLogic({
-  type: applications.CREATE_APP,
-  async process ({ getState, action }, dispatch, done) {
-    const application = action.data
-    const userId = getState().user.user.ids.user_id
-
-    try {
-      const result = await api.application.create(userId,
-        {
-          ids: { application_id: application.application_id },
-          name: application.name,
-          description: application.description,
-        })
-      dispatch(applications.createApplicationSuccess(result))
-      dispatch(replace('/console/applications'))
-    } catch (error) {
-      dispatch(applications.createApplicationFailure(error))
-    }
-
-    done()
-  },
-})
-
 const getApplicationsRightsLogic = createLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
   async process ({ getState, action }, dispatch, done) {
@@ -129,8 +60,5 @@ const getApplicationsRightsLogic = createLogic({
 
 export default [
   getApplicationsLogic,
-  deleteApplicationLogic,
-  createApplicationLogic,
-  updateApplicationLogic,
   getApplicationsRightsLogic,
 ]

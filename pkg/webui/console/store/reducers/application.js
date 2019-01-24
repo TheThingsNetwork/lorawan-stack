@@ -17,14 +17,9 @@ import {
   GET_APP_SUCCESS,
   GET_APP_FAILURE,
 } from '../actions/application'
-import {
-  CREATE_APP_FAILURE,
-  DELETE_APP_FAILURE,
-  UPDATE_APP_FAILURE,
-} from '../actions/applications'
 
 const defaultState = {
-  fetching: true,
+  fetching: false,
   error: undefined,
   application: undefined,
 }
@@ -45,9 +40,6 @@ const application = function (state = defaultState, action) {
       application: action.application,
     }
   case GET_APP_FAILURE:
-  case CREATE_APP_FAILURE:
-  case DELETE_APP_FAILURE:
-  case UPDATE_APP_FAILURE:
     return {
       ...state,
       fetching: false,

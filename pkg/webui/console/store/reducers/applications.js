@@ -17,8 +17,6 @@ import {
   SEARCH_APPS_LIST,
   GET_APPS_LIST_SUCCESS,
   GET_APPS_LIST_FAILURE,
-  CHANGE_APPS_PAGE,
-  CHANGE_APPS_TAB,
 } from '../actions/applications'
 
 const defaultState = {
@@ -56,16 +54,6 @@ const applications = function (state = defaultState, action) {
       fetching: false,
       fetchingSearch: false,
       error: action.error,
-    }
-  case CHANGE_APPS_PAGE:
-    return {
-      ...state,
-      fetching: true,
-    }
-  case CHANGE_APPS_TAB:
-    return {
-      ...state,
-      fetching: true,
     }
   default:
     return state

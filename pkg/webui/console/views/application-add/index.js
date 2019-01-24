@@ -28,7 +28,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 
-import { createApplication } from '../../store/actions/applications'
+import { createApplication } from '../../store/actions/application'
 
 
 import style from './application-add.styl'
