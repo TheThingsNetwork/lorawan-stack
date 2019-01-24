@@ -278,13 +278,13 @@ func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) e
 
 var ListClientsRequestFieldPathsNested = []string{
 	"collaborator",
+	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
 	"field_mask",
-	"ids",
 	"limit",
 	"order",
 	"page",
@@ -293,7 +293,6 @@ var ListClientsRequestFieldPathsNested = []string{
 var ListClientsRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"field_mask",
-	"ids",
 	"limit",
 	"order",
 	"page",
@@ -389,18 +388,17 @@ var CreateClientRequestFieldPathsNested = []string{
 	"client.state",
 	"client.updated_at",
 	"collaborator",
+	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
-	"ids",
 }
 
 var CreateClientRequestFieldPathsTopLevel = []string{
 	"client",
 	"collaborator",
-	"ids",
 }
 
 func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...string) error {
@@ -519,19 +517,18 @@ var SetClientCollaboratorRequestFieldPathsNested = []string{
 	"client_ids.client_id",
 	"collaborator",
 	"collaborator.ids",
+	"collaborator.ids.ids",
 	"collaborator.ids.ids.organization_ids",
 	"collaborator.ids.ids.organization_ids.organization_id",
 	"collaborator.ids.ids.user_ids",
 	"collaborator.ids.ids.user_ids.email",
 	"collaborator.ids.ids.user_ids.user_id",
 	"collaborator.rights",
-	"ids",
 }
 
 var SetClientCollaboratorRequestFieldPathsTopLevel = []string{
 	"client_ids",
 	"collaborator",
-	"ids",
 }
 
 func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) error {

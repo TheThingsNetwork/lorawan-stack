@@ -1020,6 +1020,7 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 var TxSettingsFieldPathsNested = []string{
 	"coding_rate",
 	"data_rate",
+	"data_rate.modulation",
 	"data_rate.modulation.fsk",
 	"data_rate.modulation.fsk.bit_rate",
 	"data_rate.modulation.lora",
@@ -1031,7 +1032,6 @@ var TxSettingsFieldPathsNested = []string{
 	"frequency",
 	"gateway_channel_index",
 	"invert_polarization",
-	"modulation",
 	"time",
 	"timestamp",
 	"tx_power",
@@ -1046,7 +1046,6 @@ var TxSettingsFieldPathsTopLevel = []string{
 	"frequency",
 	"gateway_channel_index",
 	"invert_polarization",
-	"modulation",
 	"time",
 	"timestamp",
 	"tx_power",

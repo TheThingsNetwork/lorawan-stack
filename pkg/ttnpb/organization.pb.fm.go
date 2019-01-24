@@ -197,13 +197,13 @@ func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths 
 
 var ListOrganizationsRequestFieldPathsNested = []string{
 	"collaborator",
+	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
 	"field_mask",
-	"ids",
 	"limit",
 	"order",
 	"page",
@@ -212,7 +212,6 @@ var ListOrganizationsRequestFieldPathsNested = []string{
 var ListOrganizationsRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"field_mask",
-	"ids",
 	"limit",
 	"order",
 	"page",
@@ -292,12 +291,12 @@ func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, pa
 
 var CreateOrganizationRequestFieldPathsNested = []string{
 	"collaborator",
+	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
-	"ids",
 	"organization",
 	"organization.attributes",
 	"organization.contact_info",
@@ -311,7 +310,6 @@ var CreateOrganizationRequestFieldPathsNested = []string{
 
 var CreateOrganizationRequestFieldPathsTopLevel = []string{
 	"collaborator",
-	"ids",
 	"organization",
 }
 
@@ -545,20 +543,19 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 var SetOrganizationCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",
 	"collaborator.ids",
+	"collaborator.ids.ids",
 	"collaborator.ids.ids.organization_ids",
 	"collaborator.ids.ids.organization_ids.organization_id",
 	"collaborator.ids.ids.user_ids",
 	"collaborator.ids.ids.user_ids.email",
 	"collaborator.ids.ids.user_ids.user_id",
 	"collaborator.rights",
-	"ids",
 	"organization_ids",
 	"organization_ids.organization_id",
 }
 
 var SetOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
 	"collaborator",
-	"ids",
 	"organization_ids",
 }
 

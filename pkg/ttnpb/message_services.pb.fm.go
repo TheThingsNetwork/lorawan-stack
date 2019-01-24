@@ -27,6 +27,7 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.settings",
 	"message.settings.coding_rate",
 	"message.settings.data_rate",
+	"message.settings.data_rate.modulation",
 	"message.settings.data_rate.modulation.fsk",
 	"message.settings.data_rate.modulation.fsk.bit_rate",
 	"message.settings.data_rate.modulation.lora",
@@ -41,7 +42,6 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.settings.time",
 	"message.settings.timestamp",
 	"message.settings.tx_power",
-	"modulation",
 	"parameter",
 }
 
@@ -49,7 +49,6 @@ var ProcessUplinkMessageRequestFieldPathsTopLevel = []string{
 	"end_device_version_ids",
 	"ids",
 	"message",
-	"modulation",
 	"parameter",
 }
 

@@ -88,7 +88,6 @@ func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
 }
 
 var GatewayDownFieldPathsNested = []string{
-	"Payload",
 	"downlink_message",
 	"downlink_message.correlation_ids",
 	"downlink_message.end_device_ids",
@@ -99,6 +98,7 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.end_device_ids.device_id",
 	"downlink_message.end_device_ids.join_eui",
 	"downlink_message.payload",
+	"downlink_message.payload.Payload",
 	"downlink_message.payload.Payload.join_accept_payload",
 	"downlink_message.payload.Payload.join_accept_payload.cf_list",
 	"downlink_message.payload.Payload.join_accept_payload.cf_list.ch_masks",
@@ -142,6 +142,7 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.payload.m_hdr.major",
 	"downlink_message.payload.mic",
 	"downlink_message.raw_payload",
+	"downlink_message.settings",
 	"downlink_message.settings.request",
 	"downlink_message.settings.request.absolute_time",
 	"downlink_message.settings.request.advanced",
@@ -156,6 +157,7 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.settings.scheduled",
 	"downlink_message.settings.scheduled.coding_rate",
 	"downlink_message.settings.scheduled.data_rate",
+	"downlink_message.settings.scheduled.data_rate.modulation",
 	"downlink_message.settings.scheduled.data_rate.modulation.fsk",
 	"downlink_message.settings.scheduled.data_rate.modulation.fsk.bit_rate",
 	"downlink_message.settings.scheduled.data_rate.modulation.lora",
@@ -170,15 +172,10 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.settings.scheduled.time",
 	"downlink_message.settings.scheduled.timestamp",
 	"downlink_message.settings.scheduled.tx_power",
-	"modulation",
-	"settings",
 }
 
 var GatewayDownFieldPathsTopLevel = []string{
-	"Payload",
 	"downlink_message",
-	"modulation",
-	"settings",
 }
 
 func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {

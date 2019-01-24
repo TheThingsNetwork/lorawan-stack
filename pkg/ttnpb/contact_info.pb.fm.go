@@ -84,6 +84,7 @@ var ContactInfoValidationFieldPathsNested = []string{
 	"contact_info",
 	"created_at",
 	"entity",
+	"entity.ids",
 	"entity.ids.application_ids",
 	"entity.ids.application_ids.application_id",
 	"entity.ids.client_ids",
@@ -105,7 +106,6 @@ var ContactInfoValidationFieldPathsNested = []string{
 	"entity.ids.user_ids.user_id",
 	"expires_at",
 	"id",
-	"ids",
 	"token",
 }
 
@@ -115,7 +115,6 @@ var ContactInfoValidationFieldPathsTopLevel = []string{
 	"entity",
 	"expires_at",
 	"id",
-	"ids",
 	"token",
 }
 

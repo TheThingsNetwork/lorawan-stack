@@ -10,7 +10,6 @@ import (
 )
 
 var JoinRequestFieldPathsNested = []string{
-	"Payload",
 	"cf_list",
 	"cf_list.ch_masks",
 	"cf_list.freq",
@@ -23,6 +22,7 @@ var JoinRequestFieldPathsNested = []string{
 	"downlink_settings.rx2_dr",
 	"net_id",
 	"payload",
+	"payload.Payload",
 	"payload.Payload.join_accept_payload",
 	"payload.Payload.join_accept_payload.cf_list",
 	"payload.Payload.join_accept_payload.cf_list.ch_masks",
@@ -71,7 +71,6 @@ var JoinRequestFieldPathsNested = []string{
 }
 
 var JoinRequestFieldPathsTopLevel = []string{
-	"Payload",
 	"cf_list",
 	"correlation_ids",
 	"dev_addr",

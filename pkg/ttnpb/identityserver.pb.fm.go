@@ -13,6 +13,7 @@ var AuthInfoResponseFieldPathsNested = []string{
 	"access_method.api_key.api_key.name",
 	"access_method.api_key.api_key.rights",
 	"access_method.api_key.entity_ids",
+	"access_method.api_key.entity_ids.ids",
 	"access_method.api_key.entity_ids.ids.application_ids",
 	"access_method.api_key.entity_ids.ids.application_ids.application_id",
 	"access_method.api_key.entity_ids.ids.client_ids",
@@ -44,14 +45,12 @@ var AuthInfoResponseFieldPathsNested = []string{
 	"access_method.oauth_access_token.user_ids",
 	"access_method.oauth_access_token.user_ids.email",
 	"access_method.oauth_access_token.user_ids.user_id",
-	"ids",
 	"universal_rights",
 	"universal_rights.rights",
 }
 
 var AuthInfoResponseFieldPathsTopLevel = []string{
 	"access_method",
-	"ids",
 	"universal_rights",
 }
 
@@ -163,6 +162,7 @@ var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 	"api_key.name",
 	"api_key.rights",
 	"entity_ids",
+	"entity_ids.ids",
 	"entity_ids.ids.application_ids",
 	"entity_ids.ids.application_ids.application_id",
 	"entity_ids.ids.client_ids",
@@ -182,13 +182,11 @@ var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 	"entity_ids.ids.user_ids",
 	"entity_ids.ids.user_ids.email",
 	"entity_ids.ids.user_ids.user_id",
-	"ids",
 }
 
 var AuthInfoResponse_APIKeyAccessFieldPathsTopLevel = []string{
 	"api_key",
 	"entity_ids",
-	"ids",
 }
 
 func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKeyAccess, paths ...string) error {

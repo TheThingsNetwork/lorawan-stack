@@ -8,10 +8,9 @@ import (
 )
 
 var UplinkMessageFieldPathsNested = []string{
-	"Payload",
 	"correlation_ids",
-	"modulation",
 	"payload",
+	"payload.Payload",
 	"payload.Payload.join_accept_payload",
 	"payload.Payload.join_accept_payload.cf_list",
 	"payload.Payload.join_accept_payload.cf_list.ch_masks",
@@ -60,6 +59,7 @@ var UplinkMessageFieldPathsNested = []string{
 	"settings",
 	"settings.coding_rate",
 	"settings.data_rate",
+	"settings.data_rate.modulation",
 	"settings.data_rate.modulation.fsk",
 	"settings.data_rate.modulation.fsk.bit_rate",
 	"settings.data_rate.modulation.lora",
@@ -77,9 +77,7 @@ var UplinkMessageFieldPathsNested = []string{
 }
 
 var UplinkMessageFieldPathsTopLevel = []string{
-	"Payload",
 	"correlation_ids",
-	"modulation",
 	"payload",
 	"raw_payload",
 	"received_at",
@@ -176,7 +174,6 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 }
 
 var DownlinkMessageFieldPathsNested = []string{
-	"Payload",
 	"correlation_ids",
 	"end_device_ids",
 	"end_device_ids.application_ids",
@@ -185,8 +182,8 @@ var DownlinkMessageFieldPathsNested = []string{
 	"end_device_ids.dev_eui",
 	"end_device_ids.device_id",
 	"end_device_ids.join_eui",
-	"modulation",
 	"payload",
+	"payload.Payload",
 	"payload.Payload.join_accept_payload",
 	"payload.Payload.join_accept_payload.cf_list",
 	"payload.Payload.join_accept_payload.cf_list.ch_masks",
@@ -245,6 +242,7 @@ var DownlinkMessageFieldPathsNested = []string{
 	"settings.scheduled",
 	"settings.scheduled.coding_rate",
 	"settings.scheduled.data_rate",
+	"settings.scheduled.data_rate.modulation",
 	"settings.scheduled.data_rate.modulation.fsk",
 	"settings.scheduled.data_rate.modulation.fsk.bit_rate",
 	"settings.scheduled.data_rate.modulation.lora",
@@ -262,10 +260,8 @@ var DownlinkMessageFieldPathsNested = []string{
 }
 
 var DownlinkMessageFieldPathsTopLevel = []string{
-	"Payload",
 	"correlation_ids",
 	"end_device_ids",
-	"modulation",
 	"payload",
 	"raw_payload",
 	"settings",
@@ -457,12 +453,12 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"f_cnt",
 	"f_port",
 	"frm_payload",
-	"modulation",
 	"rx_metadata",
 	"session_key_id",
 	"settings",
 	"settings.coding_rate",
 	"settings.data_rate",
+	"settings.data_rate.modulation",
 	"settings.data_rate.modulation.fsk",
 	"settings.data_rate.modulation.fsk.bit_rate",
 	"settings.data_rate.modulation.lora",
@@ -484,7 +480,6 @@ var ApplicationUplinkFieldPathsTopLevel = []string{
 	"f_cnt",
 	"f_port",
 	"frm_payload",
-	"modulation",
 	"rx_metadata",
 	"session_key_id",
 	"settings",
@@ -1062,7 +1057,6 @@ var ApplicationUpFieldPathsNested = []string{
 	"end_device_ids.dev_eui",
 	"end_device_ids.device_id",
 	"end_device_ids.join_eui",
-	"modulation",
 	"up",
 	"up.downlink_ack",
 	"up.downlink_ack.class_b_c",
@@ -1167,6 +1161,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.settings",
 	"up.uplink_message.settings.coding_rate",
 	"up.uplink_message.settings.data_rate",
+	"up.uplink_message.settings.data_rate.modulation",
 	"up.uplink_message.settings.data_rate.modulation.fsk",
 	"up.uplink_message.settings.data_rate.modulation.fsk.bit_rate",
 	"up.uplink_message.settings.data_rate.modulation.lora",
@@ -1186,7 +1181,6 @@ var ApplicationUpFieldPathsNested = []string{
 var ApplicationUpFieldPathsTopLevel = []string{
 	"correlation_ids",
 	"end_device_ids",
-	"modulation",
 	"up",
 }
 

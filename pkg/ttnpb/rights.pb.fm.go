@@ -126,7 +126,7 @@ func (dst *APIKeys) SetFields(src *APIKeys, paths ...string) error {
 
 var CollaboratorFieldPathsNested = []string{
 	"ids",
-	"ids",
+	"ids.ids",
 	"ids.ids.organization_ids",
 	"ids.ids.organization_ids.organization_id",
 	"ids.ids.user_ids",
@@ -136,7 +136,6 @@ var CollaboratorFieldPathsNested = []string{
 }
 
 var CollaboratorFieldPathsTopLevel = []string{
-	"ids",
 	"ids",
 	"rights",
 }

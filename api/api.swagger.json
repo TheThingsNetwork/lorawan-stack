@@ -1463,7 +1463,7 @@
           "200": {
             "description": "A successful response.(streaming responses)",
             "schema": {
-              "$ref": "#/definitions/v3Event"
+              "$ref": "#/x-stream-definitions/v3Event"
             }
           }
         },
@@ -4958,6 +4958,31 @@
         }
       },
       "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
     },
     "v3ADRAckDelayExponent": {
       "type": "string",
@@ -8470,6 +8495,56 @@
           }
         }
       }
+    }
+  },
+  "x-stream-definitions": {
+    "v3ApplicationUp": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v3ApplicationUp"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v3ApplicationUp"
+    },
+    "v3Event": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v3Event"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v3Event"
+    },
+    "v3Gateway": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v3Gateway"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v3Gateway"
+    },
+    "v3GatewayDown": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v3GatewayDown"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v3GatewayDown"
     }
   }
 }

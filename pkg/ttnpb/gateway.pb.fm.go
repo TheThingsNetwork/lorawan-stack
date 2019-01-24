@@ -773,13 +773,13 @@ func (dst *GetGatewayIdentifiersForEUIRequest) SetFields(src *GetGatewayIdentifi
 
 var ListGatewaysRequestFieldPathsNested = []string{
 	"collaborator",
+	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
 	"field_mask",
-	"ids",
 	"limit",
 	"order",
 	"page",
@@ -788,7 +788,6 @@ var ListGatewaysRequestFieldPathsNested = []string{
 var ListGatewaysRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"field_mask",
-	"ids",
 	"limit",
 	"order",
 	"page",
@@ -868,6 +867,7 @@ func (dst *ListGatewaysRequest) SetFields(src *ListGatewaysRequest, paths ...str
 
 var CreateGatewayRequestFieldPathsNested = []string{
 	"collaborator",
+	"collaborator.ids",
 	"collaborator.ids.organization_ids",
 	"collaborator.ids.organization_ids.organization_id",
 	"collaborator.ids.user_ids",
@@ -898,13 +898,11 @@ var CreateGatewayRequestFieldPathsNested = []string{
 	"gateway.version_ids.firmware_version",
 	"gateway.version_ids.hardware_version",
 	"gateway.version_ids.model_id",
-	"ids",
 }
 
 var CreateGatewayRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"gateway",
-	"ids",
 }
 
 func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...string) error {
@@ -1155,6 +1153,7 @@ func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest
 var SetGatewayCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",
 	"collaborator.ids",
+	"collaborator.ids.ids",
 	"collaborator.ids.ids.organization_ids",
 	"collaborator.ids.ids.organization_ids.organization_id",
 	"collaborator.ids.ids.user_ids",
@@ -1164,13 +1163,11 @@ var SetGatewayCollaboratorRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
-	"ids",
 }
 
 var SetGatewayCollaboratorRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"gateway_ids",
-	"ids",
 }
 
 func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorRequest, paths ...string) error {
