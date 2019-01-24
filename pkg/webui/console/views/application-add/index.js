@@ -15,7 +15,7 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import * as Yup from 'yup'
-import { push } from 'connected-react-router'
+import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
@@ -28,6 +28,9 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 
+import { createApplication } from '../../store/actions/applications'
+
+
 import style from './application-add.styl'
 
 const m = defineMessages({
@@ -39,13 +42,13 @@ const m = defineMessages({
 })
 
 const initialValues = {
-  app_id: '',
+  application_id: '',
   name: '',
   description: '',
 }
 
 const validationSchema = Yup.object().shape({
-  app_id: Yup.string()
+  application_id: Yup.string()
     .matches(/^[0-9a-z]+$/i, sharedMessages.validateAlphanum)
     .min(2, sharedMessages.validateTooShort)
     .max(25, sharedMessages.validateTooLong)
@@ -66,25 +69,33 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@connect()
+@connect(({ application }) => ({ error: application.error }))
 @bind
 export default class Add extends React.Component {
 
-  handleSubmit (e) {
-    // Add API call and redirect to applications page go here
+  handleSubmit (values, { setSubmitting }) {
+    const { dispatch } = this.props
+
+    dispatch(createApplication(values))
+    setSubmitting(false)
   }
 
   handleCancel () {
-    this.props.dispatch(push('/console/applications'))
+    const { dispatch } = this.props
+
+    dispatch(replace('/console/applications'))
   }
 
   render () {
+    const { error } = this.props
+
     return (
       <Container>
         <Row className={style.wrapper}>
           <Col sm={12}><h2>Add Application</h2></Col>
           <Col className={style.form} sm={12} md={8} lg={8} xl={8}>
             <Form
+              error={error}
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               validationSchema={validationSchema}
@@ -92,7 +103,7 @@ export default class Add extends React.Component {
             >
               <Field
                 title={sharedMessages.appId}
-                name="app_id"
+                name="application_id"
                 type="text"
                 placeholder={m.appIdPlaceholder}
                 autoFocus

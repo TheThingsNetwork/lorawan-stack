@@ -28,6 +28,8 @@ import Field from '../../../components/field'
 import Button from '../../../components/button'
 import ModalButton from '../../../components/button/modal-button'
 
+import { deleteApplication, updateApplication } from '../../store/actions/applications'
+
 import style from './application-general-settings.styl'
 
 const m = defineMessages({
@@ -49,6 +51,7 @@ const validationSchema = Yup.object().shape({
 @connect(function ({ application }) {
   return {
     application: application.application,
+    error: application.error,
   }
 })
 @withBreadcrumb('apps.single.general-settings', function (props) {
@@ -66,14 +69,21 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
 
-  handleSubmit (e) {
+  handleSubmit (values, { setSubmitting }) {
+    const { dispatch } = this.props
+
+    dispatch(updateApplication(values))
+    setSubmitting(false)
   }
 
   handleDelete () {
+    const { match, dispatch } = this.props
+
+    dispatch(deleteApplication(match.params.appId))
   }
 
   render () {
-    const { application } = this.props
+    const { application, error } = this.props
 
     return (
       <Container>
@@ -88,6 +98,7 @@ export default class ApplicationGeneralSettings extends React.Component {
         <Row>
           <Col lg={8} md={12}>
             <Form
+              error={error}
               horizontal
               onSubmit={this.handleSubmit}
               initialValues={{ name: application.name, description: application.description }}
