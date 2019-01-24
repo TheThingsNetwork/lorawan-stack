@@ -47,10 +47,25 @@ var (
 			defer db.Close()
 			store.SetLogger(db, logger)
 
+			var dbVersion string
+			err = db.Raw("SELECT version()").Row().Scan(&dbVersion)
+			if err != nil {
+				return err
+			}
+			logger.Infof("Detected database %s", dbVersion)
+
 			logger.Infof("Creating database \"%s\"...", dbName)
 			err = db.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbName)).Error
 			if err != nil {
 				return err
+			}
+
+			if !strings.Contains(dbVersion, "CockroachDB") {
+				logger.Infof("Enabling pgcrypto extension \"%s\"...", dbName)
+				err = db.Exec("CREATE EXTENSION IF NOT EXISTS pgcrypto").Error
+				if err != nil {
+					return err
+				}
 			}
 
 			logger.Infof("Creating tables in \"%s\"...", dbName)
