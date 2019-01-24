@@ -48,6 +48,7 @@ const inputAllowedProps = [
   'disabled',
   'readOnly',
   'loading',
+  'autoComplete',
 ]
 
 const checkboxAllowedProps = [
