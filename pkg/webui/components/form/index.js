@@ -29,6 +29,7 @@ const InnerForm = function ({
   isValid,
   errors,
   error,
+  info,
   values,
   touched,
   children,
@@ -74,6 +75,7 @@ const InnerForm = function ({
   return (
     <form onSubmit={handleSubmit}>
       {error && (<Notification small error={error} />)}
+      {info && (<Notification small info={info} />)}
       {decoratedChildren}
     </form>
   )
@@ -90,8 +92,8 @@ const formRender = ({ children, ...rest }) => function (props) {
   )
 }
 
-const Form = ({ children, error, horizontal, submitEnabledWhenInvalid, ...rest }) => (
-  <Formik {...rest} render={formRender({ children, error, horizontal, submitEnabledWhenInvalid })} />
+const Form = ({ children, error, info, horizontal, submitEnabledWhenInvalid, ...rest }) => (
+  <Formik {...rest} render={formRender({ children, error, info, horizontal, submitEnabledWhenInvalid })} />
 )
 
 function recursiveMap (children, fn) {
