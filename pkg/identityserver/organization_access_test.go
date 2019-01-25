@@ -185,7 +185,7 @@ func TestOrganizationAccessClusterAuth(t *testing.T) {
 		rights, err := reg.ListRights(ctx, &organizationID, is.WithClusterAuth())
 
 		a.So(rights, should.NotBeNil)
-		a.So(ttnpb.AllReadRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(ttnpb.AllClusterRights.Sub(rights).Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 	})
 }
