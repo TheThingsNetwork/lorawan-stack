@@ -77,9 +77,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 		)).(*JoinServer),
 	}
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
+	test.Must(nil, c.Start())
 
 	// Invalid payload.
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
@@ -1060,9 +1058,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				)).(*JoinServer),
 			}
-			if err := c.Start(); err != nil {
-				panic(err)
-			}
+			test.Must(nil, c.Start())
 
 			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
@@ -1302,9 +1298,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					},
 				)).(*JoinServer),
 			}
-			if err := c.Start(); err != nil {
-				panic(err)
-			}
+			test.Must(nil, c.Start())
 			res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 
 			if tc.ErrorAssertion != nil {
