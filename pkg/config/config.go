@@ -131,6 +131,7 @@ func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *M
 	m.viper.SetTypeByDefaultValue(true)
 	m.viper.SetConfigName(name)
 	m.viper.SetConfigType("yml")
+	m.viper.AllowEmptyEnv(true)
 	m.viper.SetEnvPrefix(envPrefix)
 	m.viper.AutomaticEnv()
 	m.viper.AddConfigPath(".")

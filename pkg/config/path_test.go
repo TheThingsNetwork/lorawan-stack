@@ -33,8 +33,8 @@ func TestConfigPathHome(t *testing.T) {
 	a := assertions.New(t)
 
 	os.Setenv("HOME", "/home/johndoe")
-	os.Setenv("XDG_CONFIG_HOME", "")
-	os.Setenv("TEST_CONFIG", "")
+	os.Unsetenv("XDG_CONFIG_HOME")
+	os.Unsetenv("TEST_CONFIG")
 
 	defaults := &configWithPath{}
 
@@ -58,7 +58,7 @@ func TestConfigPathXDGHome(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
-	os.Setenv("TEST_CONFIG", "")
+	os.Unsetenv("TEST_CONFIG")
 
 	defaults := &configWithPath{}
 
@@ -81,8 +81,8 @@ func TestConfigPathDefault(t *testing.T) {
 	a := assertions.New(t)
 
 	os.Setenv("HOME", "/home/johndoe")
-	os.Setenv("XDG_CONFIG_HOME", "")
-	os.Setenv("TEST_CONFIG", "")
+	os.Unsetenv("XDG_CONFIG_HOME")
+	os.Unsetenv("TEST_CONFIG")
 
 	defaults := &configWithPath{
 		ConfigPaths: []string{
@@ -135,7 +135,7 @@ func TestConfigPathCliFlag(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
-	os.Setenv("TEST_CONFIG", "")
+	os.Unsetenv("TEST_CONFIG")
 
 	defaults := &configWithPath{}
 
@@ -159,7 +159,7 @@ func TestConfigPathDefine(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
-	os.Setenv("TEST_CONFIG", "")
+	os.Unsetenv("TEST_CONFIG")
 
 	defaults := &configWithoutPath{}
 
@@ -177,8 +177,8 @@ func TestDataDirHome(t *testing.T) {
 	a := assertions.New(t)
 
 	os.Setenv("HOME", "/home/johndoe")
-	os.Setenv("XDG_DATA_HOME", "")
-	os.Setenv("TEST_DATA_DIR", "")
+	os.Unsetenv("XDG_DATA_HOME")
+	os.Unsetenv("TEST_DATA_DIR")
 
 	defaults := &configWithPath{}
 
@@ -198,7 +198,7 @@ func TestDataDirXDGHome(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_DATA_HOME", "/home/johndoe/.data")
-	os.Setenv("TEST_DATA_DIR", "")
+	os.Unsetenv("TEST_DATA_DIR")
 
 	defaults := &configWithPath{}
 
@@ -218,7 +218,7 @@ func TestDataDirDefault(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_DATA_HOME", "/home/johndoe/.data")
-	os.Setenv("TEST_DATA_DIR", "")
+	os.Unsetenv("TEST_DATA_DIR")
 
 	defaults := &configWithPath{
 		DataDir: "/var/run/test",
@@ -260,7 +260,7 @@ func TestDataDirCliFlag(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_DATA_HOME", "/home/johndoe/.data")
-	os.Setenv("TEST_DATA_DIR", "")
+	os.Unsetenv("TEST_DATA_DIR")
 
 	defaults := &configWithPath{}
 
@@ -280,7 +280,7 @@ func TestDataDirDefine(t *testing.T) {
 
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
-	os.Setenv("TEST_CONFIG", "")
+	os.Unsetenv("TEST_CONFIG")
 
 	defaults := &configWithoutPath{}
 
