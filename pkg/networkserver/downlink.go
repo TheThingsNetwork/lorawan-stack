@@ -645,7 +645,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 
 						var paths []downlinkPath
-						if appDown.ClassBC != nil && appDown.ClassBC.AbsoluteTime == nil {
+						if appDown != nil && appDown.ClassBC != nil && appDown.ClassBC.AbsoluteTime == nil {
 							paths = make([]downlinkPath, 0, len(appDown.ClassBC.Gateways))
 							for _, gtw := range appDown.ClassBC.Gateways {
 								if gtw == nil || gtw.IsZero() {
@@ -660,9 +660,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									},
 								})
 							}
-						} else if appDown.ClassBC == nil {
+						} else if appDown == nil || appDown.ClassBC == nil {
 							paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
 						}
+						// NOTE: We must skip Rx1 if appDown.ClassBC.AbsoluteTime is set
 
 						if len(paths) > 0 {
 							down, err := ns.scheduleDownlinkByPaths(
@@ -727,7 +728,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 
 					var paths []downlinkPath
-					if appDown.ClassBC != nil {
+					if appDown != nil && appDown.ClassBC != nil {
 						paths = make([]downlinkPath, 0, len(appDown.ClassBC.Gateways))
 						for _, gtw := range appDown.ClassBC.Gateways {
 							paths = append(paths, downlinkPath{
