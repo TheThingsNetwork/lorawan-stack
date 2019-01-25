@@ -16,18 +16,19 @@ package networkserver_test
 
 import (
 	"context"
-	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -79,11 +80,12 @@ func TestLinkApplication(t *testing.T) {
 
 	time.AfterFunc(test.Delay, func() {
 		defer wg.Done()
-		err := ns.LinkApplication(&ids, &MockAsNsLinkApplicationStream{
+		err := ns.LinkApplication(&MockAsNsLinkApplicationStream{
 			MockServerStream: &test.MockServerStream{
 				MockStream: &test.MockStream{
 					ContextFunc: func() context.Context {
-						ctx, cancel := context.WithCancel(authorizedCtx)
+						ctx := (rpcmetadata.MD{ID: ids.ApplicationID}).ToIncomingContext(authorizedCtx)
+						ctx, cancel := context.WithCancel(ctx)
 						time.AfterFunc(test.Delay, cancel)
 						return ctx
 					},
@@ -96,11 +98,11 @@ func TestLinkApplication(t *testing.T) {
 		}
 	})
 
-	err := ns.LinkApplication(&ids, &MockAsNsLinkApplicationStream{
+	err := ns.LinkApplication(&MockAsNsLinkApplicationStream{
 		MockServerStream: &test.MockServerStream{
 			MockStream: &test.MockStream{
 				ContextFunc: func() context.Context {
-					return authorizedCtx
+					return (rpcmetadata.MD{ID: ids.ApplicationID}).ToIncomingContext(authorizedCtx)
 				},
 			},
 		},

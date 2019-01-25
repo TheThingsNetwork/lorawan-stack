@@ -15,13 +15,17 @@
 package networkserver
 
 import (
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+var _ ttnpb.AsNs_LinkApplicationServer = &MockAsNsLinkApplicationStream{}
+
 type MockAsNsLinkApplicationStream struct {
 	*test.MockServerStream
 	SendFunc func(*ttnpb.ApplicationUp) error
+	RecvFunc func() (*pbtypes.Empty, error)
 }
 
 func (s *MockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
@@ -29,4 +33,11 @@ func (s *MockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
 		return nil
 	}
 	return s.SendFunc(msg)
+}
+
+func (s *MockAsNsLinkApplicationStream) Recv() (*pbtypes.Empty, error) {
+	if s.RecvFunc == nil {
+		return ttnpb.Empty, nil
+	}
+	return s.RecvFunc()
 }

@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
@@ -36,22 +37,29 @@ func (s applicationUpStream) Close() error {
 }
 
 // LinkApplication is called by the Application Server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) (err error) {
-	ctx := stream.Context()
+func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) error {
+	ctx := link.Context()
 
-	if err = rights.RequireApplication(ctx, *id, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+	ids := ttnpb.ApplicationIdentifiers{
+		ApplicationID: rpcmetadata.FromIncomingContext(ctx).ID,
+	}
+	var err error
+	if err = ids.ValidateContext(ctx); err != nil {
+		return err
+	}
+	if err = rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return err
 	}
 
 	ws := &applicationUpStream{
-		AsNs_LinkApplicationServer: stream,
+		AsNs_LinkApplicationServer: link,
 		closeCh:                    make(chan struct{}),
 	}
 
-	events.Publish(evtBeginApplicationLink(ctx, id, nil))
-	defer events.Publish(evtEndApplicationLink(ctx, id, err))
+	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
+	defer events.Publish(evtEndApplicationLink(ctx, ids, err))
 
-	uid := unique.ID(ctx, id)
+	uid := unique.ID(ctx, ids)
 
 	ns.applicationServersMu.Lock()
 	cl, ok := ns.applicationServers[uid]

@@ -248,12 +248,21 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	if ns.handleASUplink == nil {
 		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (ok bool, err error) {
 			ns.applicationServersMu.RLock()
+
 			as, ok := ns.applicationServers[unique.ID(ctx, ids)]
-			if ok {
-				err = as.Send(up)
+			if !ok {
+				ns.applicationServersMu.RUnlock()
+				return false, nil
 			}
-			ns.applicationServersMu.RUnlock()
-			return ok, err
+
+			defer ns.applicationServersMu.RUnlock()
+			if err = as.Send(up); err != nil {
+				return true, err
+			}
+			if err = as.RecvMsg(ttnpb.Empty); err != nil {
+				return true, err
+			}
+			return true, nil
 		}
 	}
 

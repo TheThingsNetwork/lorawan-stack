@@ -380,8 +380,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		}
 		asUp.CorrelationIDs = append(asUp.CorrelationIDs, up.CorrelationIDs...)
 
+		asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
+		defer cancel()
+
 		logger.Debug("Sending downlink (n)ack to Application Server...")
-		ok, err := ns.handleASUplink(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, asUp)
+		ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, asUp)
 		if err != nil {
 			return err
 		}
@@ -683,8 +686,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 	matched = stored
 
-	scheduleAt := time.Now().UTC()
-	ok, err := ns.handleASUplink(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
+	asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
+	defer cancel()
+
+	ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
@@ -702,9 +707,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		logger.Warn("Application Server not found, not forwarding uplink")
 	} else {
 		registerForwardDataUplink(ctx, &matched.EndDeviceIdentifiers, up)
-		scheduleAt = scheduleAt.Add(appQueueUpdateTimeout)
 	}
-	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, scheduleAt)
+	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, time.Now().UTC())
 }
 
 // newDevAddr generates a DevAddr for specified EndDevice.
