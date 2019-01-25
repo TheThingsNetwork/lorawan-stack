@@ -448,6 +448,12 @@ var (
 				ProvisioningData:       data,
 			}
 
+			var joinEUI types.EUI64
+			if joinEUIHex, _ := cmd.Flags().GetString("join-eui"); joinEUIHex != "" {
+				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
+					return err
+				}
+			}
 			if inputDecoder != nil {
 				list := &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{}
 				for {
@@ -460,11 +466,7 @@ var (
 						return err
 					}
 					ids.ApplicationIdentifiers = *appID
-					if joinEUIHex, _ := cmd.Flags().GetString("join-eui"); joinEUIHex != "" {
-						var joinEUI types.EUI64
-						if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-							return err
-						}
+					if !joinEUI.IsZero() {
 						list.JoinEUI = &joinEUI
 					}
 					list.EndDeviceIDs = append(list.EndDeviceIDs, ids)
@@ -473,28 +475,27 @@ var (
 					List: list,
 				}
 			} else {
-				var joinEUI *types.EUI64
-				if joinEUIHex, _ := cmd.Flags().GetString("join-eui"); joinEUIHex != "" {
-					if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-						return err
-					}
-				}
 				if startDevEUIHex, _ := cmd.Flags().GetString("start-dev-eui"); startDevEUIHex != "" {
 					var startDevEUI types.EUI64
 					if err := startDevEUI.UnmarshalText([]byte(startDevEUIHex)); err != nil {
 						return err
 					}
+					r := &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
+						StartDevEUI: startDevEUI,
+					}
+					if !joinEUI.IsZero() {
+						r.JoinEUI = &joinEUI
+					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
-						Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-							JoinEUI:     joinEUI,
-							StartDevEUI: startDevEUI,
-						},
+						Range: r,
 					}
 				} else {
+					fromData := &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{}
+					if !joinEUI.IsZero() {
+						fromData.JoinEUI = &joinEUI
+					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_FromData{
-						FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
-							JoinEUI: joinEUI,
-						},
+						FromData: fromData,
 					}
 				}
 			}
