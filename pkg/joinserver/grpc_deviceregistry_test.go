@@ -16,6 +16,8 @@ package joinserver_test
 
 import (
 	"context"
+	"encoding/binary"
+	"fmt"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -26,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -1069,452 +1072,584 @@ func TestDeviceRegistryDelete(t *testing.T) {
 }
 
 func TestDeviceRegistryProvision(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.ContextWithT(test.Context(), t)
-	store := map[string]*ttnpb.EndDevice{
-		"0101010101010101:0101010101010101": {
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				DeviceID:               "dev-1",
-				JoinEUI:                eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-				DevEUI:                 eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+	for _, tc := range []struct {
+		Name              string
+		ContextFunc       func(context.Context) context.Context
+		ProvisionRequest  *ttnpb.ProvisionEndDevicesRequest
+		ErrorAssertion    func(*testing.T, error) bool
+		SingleAssertion   func(*testing.T, *ttnpb.EndDevice) bool
+		MultipleAssertion func(*testing.T, []*ttnpb.EndDevice) bool
+	}{
+		{
+			Name: "Permission denied",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{},
+				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
 			},
 		},
-		"0202020202020202:0202020202020202": {
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				DeviceID:               "dev-2",
-				JoinEUI:                eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
-				DevEUI:                 eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
+		{
+			Name: "Unknown provisioner",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{},
+				},
+				ProvisionerID:    "unknown",
+				ProvisioningData: []byte{0x1},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
 			},
 		},
-	}
-	reg := &MockDeviceRegistry{
-		SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-			key := fmt.Sprintf("%v:%v", joinEUI, devEUI)
-			dev := store[key]
-			var err error
-			dev, _, err = cb(dev)
-			if err != nil {
-				return nil, err
-			}
-			store[key] = dev
-			return dev, nil
+		{
+			Name: "Range without StartDevEUI",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
+					Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
+						JoinEUI: eui64Ptr(types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+					},
+				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
 		},
-	}
-	authorizedCtx := rights.NewContext(ctx, rights.Rights{
-		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, registeredApplicationID): ttnpb.RightsFrom(
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-			),
-		},
-	})
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	js := test.Must(New(c, &Config{
-		Devices: reg,
-	})).(*JoinServer)
-	srv := &JsDeviceServer{
-		JS: js,
-	}
-
-	// Permission denied.
-	{
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return rights.NewContext(ctx, rights.Rights{
-							ApplicationRights: map[string]*ttnpb.Rights{
-								unique.ID(ctx, registeredApplicationID): nil,
+		{
+			Name: "List with wrong application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+						EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+							{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+									ApplicationID: "wrong-id",
+								},
+								DeviceID: "new-dev-1",
+								JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+								DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 							},
-						})
+						},
 					},
 				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1},
 			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				return nil
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
-				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:     eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-					StartDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+		},
+		{
+			Name: "List item without JoinEUI",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
 				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
-	}
-
-	// Unknown provisioner.
-	{
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+						EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+							{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+									ApplicationID: registeredApplicationID,
+								},
+								DeviceID: "new-dev-1",
+								JoinEUI:  eui64Ptr(types.EUI64{}),
+								DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+							},
+						},
 					},
 				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1},
 			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				return nil
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
-				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI:     eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-					StartDevEUI: types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+		},
+		{
+			Name: "List item without DevEUI",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
 				},
-			},
-			ProvisionerID:    "unknown",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(errors.IsNotFound(err), should.BeTrue)
-	}
-
-	// Range: invalid identifiers.
-	{
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+						EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+							{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+									ApplicationID: registeredApplicationID,
+								},
+								DeviceID: "new-dev-1",
+								JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+								DevEUI:   eui64Ptr(types.EUI64{}),
+							},
+						},
 					},
 				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1},
 			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				return nil
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
-		}
-		// No StartDevEUI.
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
-				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					JoinEUI: eui64Ptr(types.EUI64{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+		},
+		{
+			Name: "List one device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
 				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-	}
-
-	// List: invalid identifiers.
-	{
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+						EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+							{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+									ApplicationID: registeredApplicationID,
+								},
+								DeviceID: "new-dev-1",
+								JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+								DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+							},
+						},
 					},
 				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1},
 			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				t.Fatal("Did not expect any end device")
-				return nil
+			SingleAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-dev-1",
+						JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+						DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+					},
+					ProvisionerID: "mock",
+					ProvisioningData: &pbtypes.Struct{
+						Fields: map[string]*pbtypes.Value{
+							"serial_number": {
+								Kind: &pbtypes.Value_NumberValue{
+									NumberValue: 1,
+								},
+							},
+						},
+					},
+				})
 			},
-		}
-
-		// Invalid application ID.
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
-				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
-						{
+		},
+		{
+			Name: "List invalid number of entries",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
+					List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+						EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
+							{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+									ApplicationID: registeredApplicationID,
+								},
+								DeviceID: "new-dev-1",
+								JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+								DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+							},
+							{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+									ApplicationID: registeredApplicationID,
+								},
+								DeviceID: "new-dev-42",
+								JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+								DevEUI:   eui64Ptr(types.EUI64{0x2a, 0x2a, 0x2a, 0x2a, 0x2a, 0x2a, 0x2a, 0x2a}),
+							},
+						},
+					},
+				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1, 0x2a, 0xff},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+			MultipleAssertion: func(t *testing.T, devs []*ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				return a.So(devs, should.Resemble, []*ttnpb.EndDevice{
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-								ApplicationID: "wrong-id",
+								ApplicationID: registeredApplicationID,
 							},
-							DeviceID: "dev-1",
+							DeviceID: "new-dev-1",
 							JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 							DevEUI:   eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 1,
+									},
+								},
+							},
+						},
+					},
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "new-dev-42",
+							JoinEUI:  eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+							DevEUI:   eui64Ptr(types.EUI64{0x2a, 0x2a, 0x2a, 0x2a, 0x2a, 0x2a, 0x2a, 0x2a}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 42,
+									},
+								},
+							},
+						},
+					},
+				})
+			},
+		},
+		{
+			Name: "Range three devices",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
+					Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
+						JoinEUI:     eui64Ptr(types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42}),
+						StartDevEUI: types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 					},
 				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1, 0x2a, 0xff},
 			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-
-		// No JoinEUI.
-		err = srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
-				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
-						{
-							ApplicationIdentifiers: registeredApplicationID,
-							DeviceID:               "dev-1",
-							JoinEUI:                eui64Ptr(types.EUI64{}),
-							DevEUI:                 eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
+			MultipleAssertion: func(t *testing.T, devs []*ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				return a.So(devs, should.Resemble, []*ttnpb.EndDevice{
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "sn-1",
+							JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42}),
+							DevEUI:   eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 1,
+									},
+								},
+							},
+						},
+					},
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "sn-42",
+							JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42}),
+							DevEUI:   eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 42,
+									},
+								},
+							},
+						},
+					},
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "sn-255",
+							JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42}),
+							DevEUI:   eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 255,
+									},
+								},
+							},
+						},
+					},
+				})
+			},
+		},
+		{
+			Name: "From data with three devices",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						),
+					},
+				})
+			},
+			ProvisionRequest: &ttnpb.ProvisionEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				EndDevices: &ttnpb.ProvisionEndDevicesRequest_FromData{
+					FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
+						JoinEUI: eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+					},
+				},
+				ProvisionerID:    "mock",
+				ProvisioningData: []byte{0x1, 0x2a, 0xff},
+			},
+			MultipleAssertion: func(t *testing.T, devs []*ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				return a.So(devs, should.Resemble, []*ttnpb.EndDevice{
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "sn-1",
+							JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+							DevEUI:   eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 1,
+									},
+								},
+							},
+						},
+					},
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "sn-42",
+							JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+							DevEUI:   eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2a}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 42,
+									},
+								},
+							},
+						},
+					},
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+								ApplicationID: registeredApplicationID,
+							},
+							DeviceID: "sn-255",
+							JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
+							DevEUI:   eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xff}),
+						},
+						ProvisionerID: "mock",
+						ProvisioningData: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"serial_number": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: 255,
+									},
+								},
+							},
+						},
+					},
+				})
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			ctx := tc.ContextFunc(test.ContextWithT(test.Context(), t))
+			js := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{},
+			)).(*JoinServer)
+			js.KeyVault = keyVault
+			test.Must(nil, js.Start())
+			defer js.Close()
+			srv := &JsDeviceServer{
+				JS: js,
+			}
+			var devs []*ttnpb.EndDevice
+			stream := &mockJsEndDeviceRegistryProvisionServer{
+				MockServerStream: &test.MockServerStream{
+					MockStream: &test.MockStream{
+						ContextFunc: func() context.Context {
+							return tc.ContextFunc(ctx)
 						},
 					},
 				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-
-		// No DevEUI.
-		err = srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
-				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
-						{
-							ApplicationIdentifiers: registeredApplicationID,
-							DeviceID:               "dev-1",
-							JoinEUI:                eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-							DevEUI:                 eui64Ptr(types.EUI64{}),
-						},
-					},
+				SendFunc: func(dev *ttnpb.EndDevice) error {
+					devs = append(devs, dev)
+					return nil
 				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-	}
-
-	// List: invalid number of entries.
-	{
-		var devs []*ttnpb.EndDevice
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
-					},
-				},
-			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				devs = append(devs, dev)
-				return nil
-			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
-				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
-						{
-							ApplicationIdentifiers: registeredApplicationID,
-							DeviceID:               "dev-1",
-							JoinEUI:                eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-							DevEUI:                 eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-						},
-						{
-							ApplicationIdentifiers: registeredApplicationID,
-							DeviceID:               "dev-2",
-							JoinEUI:                eui64Ptr(types.EUI64{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
-							DevEUI:                 eui64Ptr(types.EUI64{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
-						},
-					},
-				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1, 0x2, 0x3},
-		}, stream)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-		a.So(devs, should.HaveLength, 2)
-	}
-
-	// List: provision one existing device.
-	{
-		var devs []*ttnpb.EndDevice
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
-					},
-				},
-			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				devs = append(devs, dev)
-				return nil
-			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
-				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
-						store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
-					},
-				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1},
-		}, stream)
-		a.So(err, should.BeNil)
-		if !a.So(devs, should.HaveLength, 1) {
-			t.FailNow()
-		}
-		a.So(devs[0].ProvisionerID, should.Equal, "mock")
-		a.So(devs[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
-				"serial_number": {
-					Kind: &pbtypes.Value_NumberValue{
-						NumberValue: 1,
-					},
-				},
-			},
+			}
+			err := srv.Provision(tc.ProvisionRequest, stream)
+			if tc.ErrorAssertion != nil {
+				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+			} else {
+				a.So(err, should.BeNil)
+			}
+			if tc.SingleAssertion != nil {
+				if !a.So(devs, should.HaveLength, 1) {
+					t.FailNow()
+				}
+				a.So(tc.SingleAssertion(t, devs[0]), should.BeTrue)
+				return
+			}
+			if tc.MultipleAssertion != nil {
+				a.So(tc.MultipleAssertion(t, devs), should.BeTrue)
+				return
+			}
+			a.So(devs, should.BeEmpty)
 		})
-	}
-
-	// List: provision one device existing and one new device.
-	{
-		var devs []*ttnpb.EndDevice
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
-					},
-				},
-			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				devs = append(devs, dev)
-				return nil
-			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_List{
-				List: &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					JoinEUI: eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
-					EndDeviceIDs: []ttnpb.EndDeviceIdentifiers{
-						store["0101010101010101:0101010101010101"].EndDeviceIdentifiers,
-						{
-							ApplicationIdentifiers: registeredApplicationID,
-							DeviceID:               "dev-3",
-							DevEUI:                 eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}),
-						},
-					},
-				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1, 0x3},
-		}, stream)
-		a.So(err, should.BeNil)
-		if !a.So(devs, should.HaveLength, 2) {
-			t.FailNow()
-		}
-		a.So(devs[0].DeviceID, should.Equal, "dev-1")
-		a.So(devs[0].ProvisionerID, should.Equal, "mock")
-		a.So(devs[0].ProvisioningData, should.Resemble, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
-				"serial_number": {
-					Kind: &pbtypes.Value_NumberValue{
-						NumberValue: 1,
-					},
-				},
-			},
-		})
-		a.So(devs[1].DeviceID, should.Equal, "dev-3")
-		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3}))
-		a.So(devs[1].ProvisionerID, should.Equal, "mock")
-		a.So(devs[1].ProvisioningData, should.Resemble, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
-				"serial_number": {
-					Kind: &pbtypes.Value_NumberValue{
-						NumberValue: 3,
-					},
-				},
-			},
-		})
-	}
-
-	// Range: provision three new devices with default JoinEUI.
-	{
-		var devs []*ttnpb.EndDevice
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
-					},
-				},
-			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				devs = append(devs, dev)
-				return nil
-			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_Range{
-				Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-					StartDevEUI: types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1, 0x2, 0x3},
-		}, stream)
-		a.So(err, should.BeNil)
-		if !a.So(devs, should.HaveLength, 3) {
-			t.FailNow()
-		}
-		a.So(devs[0].DeviceID, should.Equal, "sn-1")
-		a.So(devs[0].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[0].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[1].DeviceID, should.Equal, "sn-2")
-		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[1].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}))
-		a.So(devs[2].DeviceID, should.Equal, "sn-3")
-		a.So(devs[2].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[2].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2}))
-	}
-
-	// From data: provision three new devices with custom JoinEUI.
-	{
-		var devs []*ttnpb.EndDevice
-		stream := &mockJsEndDeviceRegistryProvisionServer{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						return authorizedCtx
-					},
-				},
-			},
-			SendFunc: func(dev *ttnpb.EndDevice) error {
-				devs = append(devs, dev)
-				return nil
-			},
-		}
-		err := srv.Provision(&ttnpb.ProvisionEndDevicesRequest{
-			ApplicationIdentifiers: registeredApplicationID,
-			EndDevices: &ttnpb.ProvisionEndDevicesRequest_FromData{
-				FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
-					JoinEUI: eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}),
-				},
-			},
-			ProvisionerID:    "mock",
-			ProvisioningData: []byte{0x1, 0x2, 0x3},
-		}, stream)
-		a.So(err, should.BeNil)
-		if !a.So(devs, should.HaveLength, 3) {
-			t.FailNow()
-		}
-		a.So(devs[0].DeviceID, should.Equal, "sn-1")
-		a.So(devs[0].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[0].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}))
-		a.So(devs[1].DeviceID, should.Equal, "sn-2")
-		a.So(devs[1].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[1].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2}))
-		a.So(devs[2].DeviceID, should.Equal, "sn-3")
-		a.So(devs[2].JoinEUI, should.Resemble, eui64Ptr(types.EUI64{0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}))
-		a.So(devs[2].DevEUI, should.Resemble, eui64Ptr(types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3}))
 	}
 }
 
