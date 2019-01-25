@@ -38,6 +38,16 @@ export default {
             },
           })
         },
+        async create (userData) {
+          return axios.post(`/api/v3/users`, userData)
+        },
+        async get (userId) {
+          return axios.get(`/api/v3/users/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${(await token()).access_token}`,
+            },
+          })
+        },
       },
       async authInfo () {
         return axios.get('/api/v3/auth_info', {
