@@ -25,6 +25,7 @@ import { EnvProvider } from '../../../lib/components/env'
 import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
+import CreateAccount from '../create-account'
 import createStore from '../../../store'
 import Init from '../../../lib/components/init'
 
@@ -53,6 +54,7 @@ export default class OAuthApp extends React.PureComponent {
                   <Route path="/oauth" exact component={Landing} />
                   <Route path="/oauth/login" component={Login} />
                   <Route path="/oauth/authorize" component={Authorize} />
+                  <Route path="/oauth/register" component={CreateAccount} />
                 </Switch>
               </ConnectedRouter>
             </WithLocale>

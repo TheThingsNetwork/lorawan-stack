@@ -29,12 +29,19 @@
   display: flex
   flex-direction: column
   align-items: center
+  padding: $cs.s
+
+  & > form
+    width: 100%
 
   & > h1
     margin-bottom: $ls.m
     line-height: 1
 
-  & > form
+  & > div
     width: 100%
     min-width: 16rem
     max-width: 30rem
+
+  .field
+    display: block

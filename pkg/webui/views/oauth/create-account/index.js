@@ -34,16 +34,24 @@ import style from './create-account.styl'
 const m = defineMessages({
   createTtnAccount: 'Create The Things Network Account',
   register: 'Register',
+  goToLogin: 'Go to login',
   confirmPassword: 'Confirm Password',
   validatePasswordMatch: 'Passwords should match',
+  validatePasswordDigit: 'Should contain at least one digit',
+  validatePasswordUppercase: 'Should contain at least one uppercase letter',
+  validatePasswordSpecial: 'Should contain at least one special character',
   registrationApproved: 'You have successfully registered and can login now',
   registrationPending: 'You have successfully sent the registration request. Please wait until an admin approves it.',
 })
 
+const digit = /(?=.*[\d])/
+const uppercase = /(?=.*[A-Z])/
+const special = /(?=.*[!@#$%^&*])/
+
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(4)
-    .max(50)
+    .min(2)
+    .max(36)
     .required(sharedMessages.validateRequired),
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
@@ -51,6 +59,9 @@ const validationSchema = Yup.object().shape({
     .required(sharedMessages.validateRequired),
   password: Yup.string()
     .min(8)
+    .matches(digit, m.validatePasswordDigit)
+    .matches(uppercase, m.validatePasswordUppercase)
+    .matches(special, m.validatePasswordSpecial)
     .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)
@@ -82,17 +93,21 @@ export default class CreateAccount extends React.PureComponent {
     this.state = {
       error: '',
       info: '',
+      registered: false,
     }
   }
 
   async handleSubmit (values, { setSubmitting, setErrors }) {
     try {
-      const result = await api.v3.is.users.create(values)
+      const { user_id, ...rest } = values
+      const result = await api.v3.is.users.create({
+        user: { ids: { user_id }, ...rest },
+      })
+
       this.setState({
         error: '',
         info: getSuccessMessage(result.data.state),
       })
-
     } catch (error) {
       this.setState({
         error: error.response.data,
@@ -113,7 +128,8 @@ export default class CreateAccount extends React.PureComponent {
   }
 
   render () {
-    const { error, info } = this.state
+    const { error, info, registered } = this.state
+    const cancelButtonText = registered ? m.goToLogin : sharedMessages.cancel
 
     return (
       <div className={style.fullHeightCenter}>
@@ -129,6 +145,7 @@ export default class CreateAccount extends React.PureComponent {
             validationSchema={validationSchema}
           >
             <Field
+              className={style.field}
               required
               title={sharedMessages.userId}
               name="user_id"
@@ -137,12 +154,14 @@ export default class CreateAccount extends React.PureComponent {
               autoFocus
             />
             <Field
+              className={style.field}
               title={sharedMessages.name}
               name="name"
               type="text"
               autoComplete="name"
             />
             <Field
+              className={style.field}
               required
               title={sharedMessages.email}
               type="text"
@@ -150,6 +169,7 @@ export default class CreateAccount extends React.PureComponent {
               autoComplete="email"
             />
             <Field
+              className={style.field}
               required
               title={sharedMessages.password}
               name="password"
@@ -157,6 +177,7 @@ export default class CreateAccount extends React.PureComponent {
               autoComplete="new-password"
             />
             <Field
+              className={style.field}
               required
               title={m.confirmPassword}
               name="password_confirm"
@@ -164,7 +185,7 @@ export default class CreateAccount extends React.PureComponent {
               autoComplete="new-password"
             />
             <Button type="submit" message={m.register} />
-            <Button naked secondary message={sharedMessages.cancel} onClick={this.handleCancel} />
+            <Button naked secondary message={cancelButtonText} onClick={this.handleCancel} />
           </Form>
         </div>
       </div>

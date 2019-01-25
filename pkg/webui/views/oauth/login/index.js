@@ -17,6 +17,8 @@ import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import Query from 'query-string'
 import { defineMessages } from 'react-intl'
+import { replace } from 'connected-react-router'
+import { connect } from 'react-redux'
 
 import api from '../../../api'
 import sharedMessages from '../../../lib/shared-messages'
@@ -35,8 +37,8 @@ const m = defineMessages({
   loginToContinue: 'Please login to continue',
   ttnAccount: 'The Things Network Account',
 })
-
 @withRouter
+@connect()
 @bind
 export default class OAuth extends React.PureComponent {
   constructor (props) {
@@ -58,6 +60,13 @@ export default class OAuth extends React.PureComponent {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  navigateToRegister () {
+    const { dispatch, location } = this.props
+    dispatch(replace('/oauth/register', {
+      back: `${location.pathname}${location.search}`,
+    }))
   }
 
   render () {
@@ -99,7 +108,7 @@ export default class OAuth extends React.PureComponent {
                 type="password"
               />
               <Button type="submit" message={sharedMessages.login} />
-              <Button naked message={m.createAccount} />
+              <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
             </Form>
           </div>
         </div>
