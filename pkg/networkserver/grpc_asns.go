@@ -19,7 +19,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -38,10 +37,10 @@ func (s applicationUpStream) Close() error {
 
 // LinkApplication is called by the Application Server to subscribe to application events.
 func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) (err error) {
-	if err := cluster.Authorized(stream.Context()); err != nil {
-		if err = rights.RequireApplication(stream.Context(), *id, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-			return err
-		}
+	ctx := stream.Context()
+
+	if err = rights.RequireApplication(ctx, *id, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return err
 	}
 
 	ws := &applicationUpStream{
@@ -49,11 +48,10 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 		closeCh:                    make(chan struct{}),
 	}
 
-	ctx := stream.Context()
-	uid := unique.ID(ctx, id)
-
 	events.Publish(evtBeginApplicationLink(ctx, id, nil))
 	defer events.Publish(evtEndApplicationLink(ctx, id, err))
+
+	uid := unique.ID(ctx, id)
 
 	ns.applicationServersMu.Lock()
 	cl, ok := ns.applicationServers[uid]
@@ -83,10 +81,8 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	if err := cluster.Authorized(ctx); err != nil {
-		if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-			return nil, err
-		}
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
 	}
 
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -108,10 +104,8 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	if err := cluster.Authorized(ctx); err != nil {
-		if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-			return nil, err
-		}
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
 	}
 
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{"queued_application_downlinks"}, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -133,10 +127,8 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 // DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	if err := cluster.Authorized(ctx); err != nil {
-		if err = rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-			return nil, err
-		}
+	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
 	}
 	dev, err := ns.devices.GetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, []string{"queued_application_downlinks"})
 	if err != nil {
