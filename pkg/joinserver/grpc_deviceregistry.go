@@ -62,16 +62,13 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		return nil, errDeviceNotFound
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
-		if dev.RootKeys == nil {
-			dev.RootKeys = &ttnpb.RootKeys{}
-		}
-
+		rootKeysEnc := dev.RootKeys
+		dev.RootKeys = &ttnpb.RootKeys{}
 		cs := srv.JS.GetPeer(ctx, ttnpb.PeerInfo_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
-
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
 			var networkCryptoService cryptoservices.Network
-			if dev.RootKeys.NwkKey != nil {
-				nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, srv.JS.KeyVault)
+			if rootKeysEnc.GetNwkKey() != nil {
+				nwkKey, err := cryptoutil.UnwrapAES128Key(*rootKeysEnc.NwkKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}
@@ -89,11 +86,10 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				}
 			}
 		}
-
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.app_key") {
 			var applicationCryptoService cryptoservices.Application
-			if dev.RootKeys.AppKey != nil {
-				appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, srv.JS.KeyVault)
+			if rootKeysEnc.GetAppKey() != nil {
+				appKey, err := cryptoutil.UnwrapAES128Key(*rootKeysEnc.AppKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}

@@ -16,8 +16,6 @@ package joinserver_test
 
 import (
 	"context"
-	"encoding/binary"
-	"fmt"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -39,13 +37,19 @@ type getByEUIFuncKey struct{}
 type setByEUIFuncKey struct{}
 
 var (
-	registeredJoinEUI = eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-	registeredDevEUI  = eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
-	registeredNwkKey  = []byte{0x1, 0x2}
-	registeredAppKey  = []byte{0x3, 0x4}
+	registeredJoinEUI   = eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+	registeredDevEUI    = eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+	registeredNwkKey    = []byte{0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x0}
+	registeredNwkKeyEnc = []byte{0xa3, 0x34, 0x38, 0x1c, 0xca, 0x1c, 0x12, 0x7a, 0x5b, 0xb1, 0xa8, 0x97, 0x39, 0xc7, 0x5, 0x34, 0x91, 0x26, 0x9b, 0x21, 0x4f, 0x27, 0x80, 0x19}
+	registeredAppKey    = []byte{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
+	registeredAppKeyEnc = []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5}
 
 	unregisteredJoinEUI = eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 	unregisteredDevEUI  = eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+
+	keyVault = cryptoutil.NewMemKeyVault(map[string][]byte{
+		"test": {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
+	})
 )
 
 const (
@@ -75,11 +79,11 @@ func TestDeviceRegistryGet(t *testing.T) {
 			RootKeyID: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				KEKLabel: registeredKEKLabel,
-				Key:      registeredNwkKey,
+				Key:      registeredNwkKeyEnc,
 			},
 			AppKey: &ttnpb.KeyEnvelope{
 				KEKLabel: registeredKEKLabel,
-				Key:      registeredAppKey,
+				Key:      registeredAppKeyEnc,
 			},
 		},
 	}
@@ -90,6 +94,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 		DeviceRequest    *ttnpb.GetEndDeviceRequest
 		ErrorAssertion   func(*testing.T, error) bool
 		ContextAssertion func(context.Context) bool
+		DeviceAssertion  func(*testing.T, *ttnpb.EndDevice) bool
 	}{
 		{
 			Name: "Permission denied",
@@ -365,7 +370,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Equal, *registeredJoinEUI)
 				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "root_keys"})
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "root_keys", "provisioner_id", "provisioning_data"})
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
@@ -378,6 +383,19 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 1)
 			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				expected := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
+				expected.RootKeys = &ttnpb.RootKeys{
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: registeredNwkKey,
+					},
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: registeredAppKey,
+					},
+				}
+				return a.So(dev, should.Resemble, expected)
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -386,8 +404,17 @@ func TestDeviceRegistryGet(t *testing.T) {
 			reg := &MockDeviceRegistry{
 				GetByEUIFunc: tc.GetByEUIFunc,
 			}
+			js := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices: reg,
+				},
+			)).(*JoinServer)
+			js.KeyVault = keyVault
+			test.Must(nil, js.Start())
+			defer js.Close()
 			srv := &JsDeviceServer{
-				Registry: reg,
+				JS: js,
 			}
 			dev, err := srv.Get(ctx, tc.DeviceRequest)
 			a.So(tc.ContextAssertion(ctx), should.BeTrue)
@@ -397,6 +424,10 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return
 			}
 			a.So(err, should.BeNil)
+			if tc.DeviceAssertion != nil {
+				a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+				return
+			}
 			a.So(dev, should.Resemble, registeredDevice)
 		})
 	}
@@ -754,8 +785,17 @@ func TestDeviceRegistrySet(t *testing.T) {
 			reg := &MockDeviceRegistry{
 				SetByEUIFunc: tc.SetByEUIFunc,
 			}
+			js := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices: reg,
+				},
+			)).(*JoinServer)
+			js.KeyVault = keyVault
+			test.Must(nil, js.Start())
+			defer js.Close()
 			srv := &JsDeviceServer{
-				Registry: reg,
+				JS: js,
 			}
 			dev, err := srv.Set(ctx, tc.DeviceRequest)
 			a.So(tc.ContextAssertion(ctx), should.BeTrue)
@@ -1003,8 +1043,17 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			reg := &MockDeviceRegistry{
 				SetByEUIFunc: tc.SetByEUIFunc,
 			}
+			js := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices: reg,
+				},
+			)).(*JoinServer)
+			js.KeyVault = keyVault
+			test.Must(nil, js.Start())
+			defer js.Close()
 			srv := &JsDeviceServer{
-				Registry: reg,
+				JS: js,
 			}
 			dev, err := srv.Delete(ctx, tc.Device)
 			a.So(tc.ContextAssertion(ctx), should.BeTrue)
