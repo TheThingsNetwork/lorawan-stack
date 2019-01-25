@@ -29,7 +29,7 @@ type Picture struct {
 
 	OriginalLocation string `gorm:"type:VARCHAR"`
 
-	Original []byte `gorm:"type:BLOB"`
+	Original []byte `gorm:"type:BYTEA"`
 	MIMEType string `gorm:"type:VARCHAR"`
 
 	ResizedAt *time.Time
