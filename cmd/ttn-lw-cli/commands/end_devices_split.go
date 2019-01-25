@@ -422,10 +422,10 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 	return &res, nil
 }
 
-func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []string) (*ttnpb.EndDevice, error) {
+func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []string, isCreate bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
 
-	if len(isPaths) > 0 {
+	if len(isPaths) > 0 || isCreate {
 		is, err := api.Dial(ctx, config.IdentityServerAddress)
 		if err != nil {
 			return nil, err
@@ -459,7 +459,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		res.SetFields(jsRes, jsPaths...)
 	}
 
-	if len(nsPaths) > 0 {
+	if len(nsPaths) > 0 || isCreate {
 		ns, err := api.Dial(ctx, config.NetworkServerAddress)
 		if err != nil {
 			return nil, err
@@ -476,7 +476,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		res.SetFields(nsRes, nsPaths...)
 	}
 
-	if len(asPaths) > 0 {
+	if len(asPaths) > 0 || isCreate {
 		as, err := api.Dial(ctx, config.ApplicationServerAddress)
 		if err != nil {
 			return nil, err

@@ -303,7 +303,7 @@ var (
 
 			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
 
-			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths)
+			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
 				return deleteEndDevice(&device.EndDeviceIdentifiers)
@@ -382,7 +382,7 @@ var (
 
 			compareServerAddresses(existingDevice, config)
 
-			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths)
+			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, false)
 			if err != nil {
 				return err
 			}
