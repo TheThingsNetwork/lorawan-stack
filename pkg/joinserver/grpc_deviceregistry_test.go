@@ -39,6 +39,9 @@ var (
 	registeredDevEUI  = eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 	registeredNwkKey  = []byte{0x1, 0x2}
 	registeredAppKey  = []byte{0x3, 0x4}
+
+	unregisteredJoinEUI = eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+	unregisteredDevEUI  = eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 )
 
 const (
@@ -46,7 +49,11 @@ const (
 	registeredDeviceID      = "foo-device"
 	registeredRootKeyID     = "testKey"
 	registeredKEKLabel      = "test"
+
+	unregisteredDeviceID = "bar-device"
 )
+
+var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
 
@@ -108,7 +115,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 0)
 			},
 		},
 		{
@@ -192,6 +199,88 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 		},
 		{
+			Name: "Not found",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, deepcopy.Copy(registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers).(ttnpb.ApplicationIdentifiers)): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Equal, *unregisteredJoinEUI)
+				a.So(devEUI, should.Equal, *unregisteredDevEUI)
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
+				return nil, errNotFound
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: registeredApplicationID,
+					},
+					DeviceID: unregisteredDeviceID,
+					JoinEUI:  unregisteredJoinEUI,
+					DevEUI:   unregisteredDevEUI,
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids"},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 1)
+			},
+		},
+		{
+			Name: "Invalid application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "other-app"}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Equal, *registeredJoinEUI)
+				a.So(devEUI, should.Equal, *registeredDevEUI)
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
+				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: "other-app",
+					},
+					DeviceID: "other-device",
+					JoinEUI:  registeredJoinEUI,
+					DevEUI:   registeredDevEUI,
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids"},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 1)
+			},
+		},
+		{
 			Name: "Get without key",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
@@ -252,7 +341,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 0)
 			},
 		},
 		{
@@ -338,6 +427,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 		DeviceRequest    *ttnpb.SetEndDeviceRequest
 		ErrorAssertion   func(*testing.T, error) bool
 		ContextAssertion func(context.Context) bool
+		DeviceAssertion  func(*testing.T, *ttnpb.EndDevice) bool
 	}{
 		{
 			Name: "Permission denied",
@@ -369,7 +459,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 0)
 			},
 		},
 		{
@@ -459,6 +549,103 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 		},
 		{
+			Name: "Create",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				Device: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-device",
+						JoinEUI:  unregisteredJoinEUI,
+						DevEUI:   unregisteredDevEUI,
+					},
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids"},
+				},
+			},
+			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
+				a.So(joinEUI, should.Equal, *unregisteredJoinEUI)
+				a.So(devEUI, should.Equal, *unregisteredDevEUI)
+				a.So(paths, should.Contain, "ids")
+				dev, _, err := cb(nil)
+				return dev, err
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-device",
+						JoinEUI:  unregisteredJoinEUI,
+						DevEUI:   unregisteredDevEUI,
+					},
+				})
+			},
+		},
+		{
+			Name: "Create, but registered in other application",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "other-app"}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				Device: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: "other-app",
+						},
+						DeviceID: "new-device",
+						JoinEUI:  registeredJoinEUI,
+						DevEUI:   registeredDevEUI,
+					},
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids"},
+				},
+			},
+			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
+				a.So(joinEUI, should.Equal, *registeredJoinEUI)
+				a.So(devEUI, should.Equal, *registeredDevEUI)
+				a.So(paths, should.Contain, "ids")
+				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				return dev, err
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+			},
+		},
+		{
 			Name: "Set without keys",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
@@ -521,7 +708,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 0)
 			},
 		},
 		{
@@ -574,6 +761,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return
 			}
 			a.So(err, should.BeNil)
+			if tc.DeviceAssertion != nil {
+				a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+				return
+			}
 			a.So(dev, should.Resemble, registeredDevice)
 		})
 	}
@@ -636,7 +827,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 0)
 			},
 		},
 		{
@@ -703,6 +894,79 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			},
 		},
 		{
+			Name: "Not found",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, deepcopy.Copy(registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers).(ttnpb.ApplicationIdentifiers)): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			Device: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				},
+				DeviceID: unregisteredDeviceID,
+				JoinEUI:  unregisteredJoinEUI,
+				DevEUI:   unregisteredDevEUI,
+			},
+			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
+				a.So(joinEUI, should.Equal, *unregisteredJoinEUI)
+				a.So(devEUI, should.Equal, *unregisteredDevEUI)
+				a.So(paths, should.BeNil)
+				return nil, errNotFound
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+			},
+		},
+		{
+			Name: "Invalid application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "other-app"}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			Device: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationID: "other-app",
+				},
+				DeviceID: "other-device",
+				JoinEUI:  registeredJoinEUI,
+				DevEUI:   registeredDevEUI,
+			},
+			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
+				a.So(joinEUI, should.Equal, *registeredJoinEUI)
+				a.So(devEUI, should.Equal, *registeredDevEUI)
+				a.So(paths, should.BeNil)
+				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				return dev, err
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, setByEUIFuncKey{}), should.Equal, 1)
+			},
+		},
+		{
 			Name: "Delete",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
@@ -747,104 +1011,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			}
 			a.So(err, should.BeNil)
 			a.So(dev, should.Resemble, ttnpb.Empty)
-		})
-	}
-}
-
-// Test the attack described on https://github.com/TheThingsIndustries/lorawan-stack/issues/1469.
-func TestDeviceRegistryGetUnrightfulAccess(t *testing.T) {
-	registeredDevice := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: registeredApplicationID,
-			},
-			DeviceID: registeredDeviceID,
-			JoinEUI:  registeredJoinEUI,
-			DevEUI:   registeredDevEUI,
-		},
-		RootKeys: &ttnpb.RootKeys{
-			RootKeyID: registeredRootKeyID,
-			NwkKey: &ttnpb.KeyEnvelope{
-				KEKLabel: registeredKEKLabel,
-				Key:      registeredNwkKey,
-			},
-			AppKey: &ttnpb.KeyEnvelope{
-				KEKLabel: registeredKEKLabel,
-				Key:      registeredAppKey,
-			},
-		},
-	}
-	for _, tc := range []struct {
-		Name             string
-		ContextFunc      func(context.Context, *ttnpb.EndDevice) context.Context
-		GetByEUIFunc     func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
-		DeviceRequest    *ttnpb.GetEndDeviceRequest
-		ErrorAssertion   func(*testing.T, error) bool
-		ContextAssertion func(context.Context) bool
-	}{
-		{
-			Name: "Root keys attack",
-			ContextFunc: func(ctx context.Context, other *ttnpb.EndDevice) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, other.ApplicationIdentifiers): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-						),
-					},
-				})
-			},
-			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.Contain, "ids")
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(err, should.NotBeNil)
-			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByEUIFuncKey{}), should.Equal, 1)
-			},
-		},
-	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			other := &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-						ApplicationID: "foo-application-other",
-					},
-					DeviceID: "foo-device-other",
-					JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-					DevEUI:   eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				},
-			}
-			ctx := test.ContextWithCounter(tc.ContextFunc(test.ContextWithT(test.Context(), t), other), getByEUIFuncKey{})
-			reg := &MockDeviceRegistry{
-				GetByEUIFunc: tc.GetByEUIFunc,
-			}
-			srv := &JsDeviceServer{
-				Registry: reg,
-			}
-			dev, err := srv.Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: other.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys"},
-				},
-			})
-			a.So(tc.ContextAssertion(ctx), should.BeTrue)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-				a.So(dev, should.BeNil)
-				return
-			}
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, registeredDevice)
 		})
 	}
 }

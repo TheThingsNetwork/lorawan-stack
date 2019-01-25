@@ -19,6 +19,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -34,21 +35,26 @@ func (s jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if req.DevEUI == nil || req.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
-	dev, err := s.Registry.GetByEUI(ctx, *req.JoinEUI, *req.DevEUI, req.FieldMask.Paths)
-	if err != nil {
-		return nil, err
-	}
-	if err := rights.RequireApplication(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
-		if err := rights.RequireApplication(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 	}
-
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	return dev, err
+	dev, err := s.Registry.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
+	if errors.IsNotFound(err) {
+		return nil, errDeviceNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !dev.ApplicationIdentifiers.Equal(req.ApplicationIdentifiers) {
+		return nil, errDeviceNotFound
+	}
+	return dev, nil
 }
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
@@ -59,18 +65,19 @@ func (s jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if req.Device.DevEUI == nil || req.Device.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
-
+	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
+		if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+			return nil, err
+		}
+	}
 	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
-	return s.Registry.SetByEUI(ctx, *req.Device.EndDeviceIdentifiers.JoinEUI, *req.Device.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if err := rights.RequireApplication(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
-			return nil, nil, err
+	return s.Registry.SetByEUI(ctx, *req.Device.JoinEUI, *req.Device.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if dev != nil && !dev.ApplicationIdentifiers.Equal(req.Device.ApplicationIdentifiers) {
+			return nil, nil, errInvalidIdentifiers
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
-			if err := rights.RequireApplication(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
-				return nil, nil, err
-			}
-		}
-
 		return &req.Device, req.FieldMask.Paths, nil
 	})
 }
@@ -83,10 +90,12 @@ func (s jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
-
+	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
 	_, err := s.Registry.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if err := rights.RequireApplication(ctx, dev.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
-			return nil, nil, err
+		if dev == nil || !dev.ApplicationIdentifiers.Equal(ids.ApplicationIdentifiers) {
+			return nil, nil, errDeviceNotFound
 		}
 		return nil, nil, nil
 	})

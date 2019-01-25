@@ -30,6 +30,7 @@ var (
 	errEndDeviceRequest          = errors.DefineInvalidArgument("end_device_request", "GetEndDeviceRequest is invalid")
 	errForwardJoinRequest        = errors.Define("forward_join_request", "failed to forward JoinRequest")
 	errGenerateSessionKeyID      = errors.Define("generate_session_key_id", "failed to generate session key ID")
+	errDeviceNotFound            = errors.DefineNotFound("device_not_found", "device not found")
 	errInvalidIdentifiers        = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errJoinNonceTooHigh          = errors.Define("join_nonce_too_high", "JoinNonce is too high")
 	errMICMismatch               = errors.DefineInvalidArgument("mic_mismatch", "MIC mismatch")

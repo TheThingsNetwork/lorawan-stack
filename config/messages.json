@@ -3158,6 +3158,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:device_not_found": {
+    "translations": {
+      "en": "device not found"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:duplicate_identifiers": {
     "translations": {
       "en": "a device identified by the identifiers already exists"
