@@ -146,7 +146,7 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	}
 }
 
-func (d *mem) NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+func (d *mem) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
 	if d.nwkKey == nil {
 		return types.AES128Key{}, errNoNwkKey
 	}
@@ -176,7 +176,7 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 	}
 }
 
-func (d *mem) AppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+func (d *mem) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
 	if d.appKey == nil {
 		return types.AES128Key{}, errNoAppKey
 	}

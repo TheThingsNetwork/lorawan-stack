@@ -288,7 +288,7 @@ func TestCryptoServices(t *testing.T) {
 
 			t.Run("NwkKey", func(t *testing.T) {
 				a := assertions.New(t)
-				key, err := svc.NwkKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
+				key, err := svc.GetNwkKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
 				a.So(err, should.BeNil)
 				a.So(key, should.Resemble, types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1})
 			})
@@ -350,7 +350,7 @@ func TestCryptoServices(t *testing.T) {
 
 			t.Run("AppKey", func(t *testing.T) {
 				a := assertions.New(t)
-				key, err := svc.AppKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
+				key, err := svc.GetAppKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
 				a.So(err, should.BeNil)
 				a.So(key, should.Resemble, types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2})
 			})
@@ -439,11 +439,11 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 	return res, nil
 }
 
-func (s *mockNetworkRPCServer) NwkKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
+func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	nwkKey, err := s.Network.NwkKey(ctx, dev)
+	nwkKey, err := s.Network.GetNwkKey(ctx, dev)
 	if err != nil {
 		return nil, err
 	}
@@ -475,11 +475,11 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 	return res, nil
 }
 
-func (s *mockApplicationRPCServer) AppKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
+func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	appKey, err := s.Application.AppKey(ctx, dev)
+	appKey, err := s.Application.GetAppKey(ctx, dev)
 	if err != nil {
 		return nil, err
 	}

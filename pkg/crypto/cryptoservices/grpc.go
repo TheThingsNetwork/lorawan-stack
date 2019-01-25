@@ -130,8 +130,8 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 	return res, nil
 }
 
-func (s *networkRPCClient) NwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
-	key, err := s.Client.NwkKey(ctx, &ttnpb.GetRootKeysRequest{
+func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+	key, err := s.Client.GetNwkKey(ctx, &ttnpb.GetRootKeysRequest{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
@@ -173,8 +173,8 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 	return cryptoutil.UnwrapAES128Key(res.AppSKey, s.KeyVault)
 }
 
-func (s *applicationRPCClient) AppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
-	key, err := s.Client.AppKey(ctx, &ttnpb.GetRootKeysRequest{
+func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+	key, err := s.Client.GetAppKey(ctx, &ttnpb.GetRootKeysRequest{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
