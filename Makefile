@@ -51,30 +51,6 @@ clean: go.clean js.clean
 ttn-lw-stack: $(MAGE) js.build
 	@GO_BINARIES=stack $(MAGE) go:build
 
-# identity-server binary
-ttn-lw-identity-server: $(MAGE) js.build
-	@GO_BINARIES=identity-server $(MAGE) go:build
-
-# gateway-server binary
-ttn-lw-gateway-server: $(MAGE)
-	@GO_BINARIES=gateway-server $(MAGE) go:build
-
-# network-server binary
-ttn-lw-network-server: $(MAGE)
-	@GO_BINARIES=network-server $(MAGE) go:build
-
-# application-server binary
-ttn-lw-application-server: $(MAGE)
-	@GO_BINARIES=application-server $(MAGE) go:build
-
-# join-server binary
-ttn-lw-join-server: $(MAGE)
-	@GO_BINARIES=join-server $(MAGE) go:build
-
-# console binary
-ttn-lw-console: $(MAGE) js.build
-	@GO_BINARIES=console $(MAGE) go:build
-
 # cli binary
 ttn-lw-cli: $(MAGE)
 	@GO_BINARIES=cli $(MAGE) go:build

@@ -1304,22 +1304,31 @@
       "file": "flags.go"
     }
   },
-  "error:cmd/ttn-lw-identity-server/commands:missing_flag": {
+  "error:cmd/ttn-lw-stack/commands:missing_flag": {
     "translations": {
       "en": "missing CLI flag `{flag}`"
     },
     "description": {
-      "package": "cmd/ttn-lw-identity-server/commands",
+      "package": "cmd/ttn-lw-stack/commands",
       "file": "root.go"
     }
   },
-  "error:cmd/ttn-lw-identity-server/commands:password_mismatch": {
+  "error:cmd/ttn-lw-stack/commands:password_mismatch": {
     "translations": {
       "en": "password did not match"
     },
     "description": {
-      "package": "cmd/ttn-lw-identity-server/commands",
-      "file": "create_admin_user.go"
+      "package": "cmd/ttn-lw-stack/commands",
+      "file": "is_db_create_admin_user.go"
+    }
+  },
+  "error:cmd/ttn-lw-stack/commands:unknown_component": {
+    "translations": {
+      "en": "unknown component `{component}`"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-stack/commands",
+      "file": "start.go"
     }
   },
   "error:pkg/applicationserver/io/grpc:connect": {

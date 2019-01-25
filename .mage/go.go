@@ -145,15 +145,7 @@ func goBuild(ctx context.Context, binary string, config goBuildConfig) error {
 
 var goBinaries = []string{
 	"stack",
-
-	"identity-server",
-	"gateway-server",
-	"network-server",
-	"application-server",
-	"join-server",
-
 	"cli",
-	"console",
 }
 
 func init() {

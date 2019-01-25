@@ -25,11 +25,11 @@ import (
 )
 
 var (
-	dbCommand = &cobra.Command{
-		Use:   "db",
+	isDBCommand = &cobra.Command{
+		Use:   "is-db",
 		Short: "Manage the Identity Server database",
 	}
-	dbInitCommand = &cobra.Command{
+	isDBInitCommand = &cobra.Command{
 		Use:   "init",
 		Short: "Initialize the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -78,7 +78,7 @@ var (
 			return nil
 		},
 	}
-	dbMigrateCommand = &cobra.Command{
+	isDBMigrateCommand = &cobra.Command{
 		Use:   "migrate",
 		Short: "Migrate the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -109,7 +109,7 @@ var (
 )
 
 func init() {
-	Root.AddCommand(dbCommand)
-	dbCommand.AddCommand(dbInitCommand)
-	dbCommand.AddCommand(dbMigrateCommand)
+	Root.AddCommand(isDBCommand)
+	isDBCommand.AddCommand(isDBInitCommand)
+	isDBCommand.AddCommand(isDBMigrateCommand)
 }

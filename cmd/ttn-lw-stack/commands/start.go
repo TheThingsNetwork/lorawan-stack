@@ -17,6 +17,7 @@ package commands
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
@@ -25,6 +26,7 @@ import (
 	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -34,11 +36,45 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/redis"
 )
 
+var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
+
 var (
 	startCommand = &cobra.Command{
-		Use:   "start",
+		Use:   "start [is|gs|ns|as|js|console|all]... [flags]",
 		Short: "Start the Network Stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var start struct {
+				IdentityServer    bool
+				GatewayServer     bool
+				NetworkServer     bool
+				ApplicationServer bool
+				JoinServer        bool
+				Console           bool
+			}
+			startAll := len(args) == 0
+			for _, arg := range args {
+				switch strings.ToLower(arg) {
+				case "is", "identityserver":
+					start.IdentityServer = true
+				case "gs", "gatewayserver":
+					start.GatewayServer = true
+				case "ns", "networkserver":
+					start.NetworkServer = true
+				case "as", "applicationserver":
+					start.ApplicationServer = true
+				case "js", "joinserver":
+					start.JoinServer = true
+				case "console":
+					start.Console = true
+				case "all":
+					startAll = true
+				default:
+					return errUnknownComponent.WithAttributes("component", arg)
+				}
+			}
+
+			logger.Info("Setting up core component")
+
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
 				return shared.ErrInitializeBaseComponent.WithCause(err)
@@ -49,83 +85,96 @@ var (
 				return err
 			}
 
-			config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"ns", "devices"},
-			})}
-			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"ns", "tasks"},
-			}), 100000, "ns", redis.Key(host, strconv.Itoa(os.Getpid())))
-			config.NS.DownlinkTasks = nsDownlinkTasks
-
-			config.AS.Links = &asredis.LinkRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"as", "links"},
-			})}
-			config.AS.Devices = &asredis.DeviceRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"as", "devices"},
-			})}
-			if config.AS.Webhooks.Target != "" {
-				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{Redis: redis.New(&redis.Config{
+			if start.IdentityServer || startAll {
+				logger.Info("Setting up Identity Server")
+				is, err := identityserver.New(c, &config.IS)
+				if err != nil {
+					return shared.ErrInitializeIdentityServer.WithCause(err)
+				}
+				is.SetRedisCache(redis.New(&redis.Config{
 					Redis:     config.Redis,
-					Namespace: []string{"as", "io", "webhooks"},
+					Namespace: []string{"is", "cache"},
+				}))
+			}
+
+			if start.GatewayServer || startAll {
+				logger.Info("Setting up Gateway Server")
+				gs, err := gatewayserver.New(c, &config.GS)
+				if err != nil {
+					return shared.ErrInitializeGatewayServer.WithCause(err)
+				}
+				_ = gs
+			}
+
+			if start.NetworkServer || startAll {
+				logger.Info("Setting up Network Server")
+				config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"ns", "devices"},
 				})}
+				nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"ns", "tasks"},
+				}), 100000, "ns", redis.Key(host, strconv.Itoa(os.Getpid())))
+				config.NS.DownlinkTasks = nsDownlinkTasks
+				ns, err := networkserver.New(c, &config.NS)
+				if err != nil {
+					return shared.ErrInitializeNetworkServer.WithCause(err)
+				}
+				ns.Component.RegisterTask("queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 			}
 
-			config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"js", "devices"},
-			})}
-
-			config.JS.Keys = &jsredis.KeyRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"js", "keys"},
-			})}
-
-			is, err := identityserver.New(c, &config.IS)
-			if err != nil {
-				return shared.ErrInitializeIdentityServer.WithCause(err)
+			if start.ApplicationServer || startAll {
+				logger.Info("Setting up Application Server")
+				config.AS.Links = &asredis.LinkRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"as", "links"},
+				})}
+				config.AS.Devices = &asredis.DeviceRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"as", "devices"},
+				})}
+				if config.AS.Webhooks.Target != "" {
+					config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{Redis: redis.New(&redis.Config{
+						Redis:     config.Redis,
+						Namespace: []string{"as", "io", "webhooks"},
+					})}
+				}
+				as, err := applicationserver.New(c, &config.AS)
+				if err != nil {
+					return shared.ErrInitializeApplicationServer.WithCause(err)
+				}
+				_ = as
 			}
-			_ = is
 
-			is.SetRedisCache(redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"is", "cache"},
-			}))
-
-			gs, err := gatewayserver.New(c, &config.GS)
-			if err != nil {
-				return shared.ErrInitializeGatewayServer.WithCause(err)
+			if start.JoinServer || startAll {
+				logger.Info("Setting up Join Server")
+				config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"js", "devices"},
+				})}
+				config.JS.Keys = &jsredis.KeyRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"js", "keys"},
+				})}
+				js, err := joinserver.New(c, &config.JS)
+				if err != nil {
+					return shared.ErrInitializeJoinServer.WithCause(err)
+				}
+				_ = js
 			}
-			_ = gs
 
-			ns, err := networkserver.New(c, &config.NS)
-			if err != nil {
-				return shared.ErrInitializeNetworkServer.WithCause(err)
+			if start.Console || startAll {
+				logger.Info("Setting up Console")
+				console, err := console.New(c, config.Console)
+				if err != nil {
+					return shared.ErrInitializeConsole.WithCause(err)
+				}
+				_ = console
 			}
-			ns.Component.RegisterTask("queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 
-			as, err := applicationserver.New(c, &config.AS)
-			if err != nil {
-				return shared.ErrInitializeApplicationServer.WithCause(err)
-			}
-			_ = as
+			logger.Info("Starting...")
 
-			js, err := joinserver.New(c, &config.JS)
-			if err != nil {
-				return shared.ErrInitializeJoinServer.WithCause(err)
-			}
-			_ = js
-
-			console, err := console.New(c, config.Console)
-			if err != nil {
-				return shared.ErrInitializeConsole.WithCause(err)
-			}
-			_ = console
-
-			logger.Info("Starting stack...")
 			return c.Run()
 		},
 	}

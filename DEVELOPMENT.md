@@ -102,7 +102,7 @@ You can build the stack with the following command:
 make clean build-all
 ```
 
-This will compile the front-end in `public`, and the binaries in `release`. There is a single binary (`ttn-lw-stack`) as well as specialized binaries. The single binary contains all components and can be started independent of other binaries, while the specialized binaries together form the entire stack. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
+This will compile the front-end in `public`, and the binaries in `release`. There is a single binary for the server, `ttn-lw-stack`, as well as a binary for the command-line interface `ttn-lw-cli`. The single binary contains all components start one or multiple components. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
 
 Note that the operating system and architecture is appended to the binary name, i.e. on macOS, you will find `release/ttn-lw-stack-darwin-amd64`.
 
@@ -138,7 +138,7 @@ make protos.clean protos
 │   ├── internal        contains internal files shared between the different binaries
 │   │   ...
 │   ├── ttn-lw-cli      the command-line-interface for the TTN stack for LoRaWAN
-│   └── ttn-lw-stack    bundles the binaries that form the TTN stack for LoRaWAN
+│   └── ttn-lw-stack    bundles the server binaries that form the TTN stack for LoRaWAN
 ├── config              configuration for our JavaScript SDK and frontend
 ├── doc                 detailed documentation on the workings of the TTN stack for LoRaWAN
 ├── pkg                 contains all libraries used in the TTN stack for LoRaWAN

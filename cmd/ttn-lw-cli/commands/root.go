@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package commands implements the commands for the ttn-lw-application-server binary.
+// Package commands implements the commands for the ttn-lw-cli binary.
 package commands
 
 import (

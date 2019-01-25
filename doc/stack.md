@@ -54,17 +54,19 @@ After having downloaded the Stack and having [prepared the dependencies](#depend
 
 ```bash
 # On a Linux amd64 environment:
-$ ./ttn-lw-linux-identity-server-amd64 init
-$ ./ttn-lw-linux-stack-amd64 start
+$ ./ttn-lw-stack-linux-amd64 is-db init
+$ ./ttn-lw-stack-linux-amd64 is-db create-admin-user --id admin --email admin@localhost
+$ ./ttn-lw-stack-linux-amd64 is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'http://localhost:11885/oauth/callback'
+$ ./ttn-lw-stack-linux-amd64 start
 ```
-
-The `init` command runs database migrations and creates an admin account, with `admin`/`admin` as default logins.
 
 #### Run with `docker-compose`
 
 You can also run it using Docker, or container orchestration solutions. An example [Docker Compose configuration](../docker-compose.yml) is available in the repository:
 
 ```bash
-$ docker-compose run --rm --entrypoint ttn-lw-identity-server stack init
+$ docker-compose run --rm stack is-db init
+$ docker-compose run --rm stack is-db create-admin-user [...]
+$ docker-compose run --rm stack is-db create-oauth-client [...]
 $ docker-compose up
 ```

@@ -111,5 +111,5 @@ func init() {
 	createAdminUserCommand.Flags().String("id", "admin", "User ID")
 	createAdminUserCommand.Flags().String("email", "", "Email address")
 	createAdminUserCommand.Flags().String("password", "", "Password")
-	Root.AddCommand(createAdminUserCommand)
+	isDBCommand.AddCommand(createAdminUserCommand)
 }

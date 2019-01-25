@@ -141,5 +141,5 @@ func init() {
 	createOAuthClient.Flags().StringSlice("redirect-uri", []string{}, "Redirect URIs of the OAuth client")
 	createOAuthClient.Flags().Bool("authorized", true, "Mark OAuth client as pre-authorized")
 	createOAuthClient.Flags().Bool("endorsed", true, "Mark OAuth client as endorsed ")
-	Root.AddCommand(createOAuthClient)
+	isDBCommand.AddCommand(createOAuthClient)
 }
