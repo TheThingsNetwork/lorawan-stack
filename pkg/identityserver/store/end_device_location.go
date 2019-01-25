@@ -20,8 +20,8 @@ import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 type EndDeviceLocation struct {
 	Model
 
-	EndDeviceID string `gorm:"type:UUID;unique_index:id;index;not null"`
-	Service     string `gorm:"unique_index:id"`
+	EndDeviceID string `gorm:"type:UUID;unique_index:end_device_location_id_index;index:end_device_device_index;not null"`
+	Service     string `gorm:"unique_index:end_device_location_id_index"`
 
 	Location
 

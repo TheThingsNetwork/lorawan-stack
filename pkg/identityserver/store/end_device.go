@@ -23,18 +23,18 @@ import (
 type EndDevice struct {
 	Model
 
-	ApplicationID string `gorm:"unique_index:id;type:VARCHAR(36);not null;index"`
+	ApplicationID string `gorm:"unique_index:end_device_id_index;type:VARCHAR(36);not null;index:end_device_application_index"`
 	Application   *Application
 
 	// BEGIN common fields
-	DeviceID    string      `gorm:"unique_index:id;type:VARCHAR(36);not null"`
+	DeviceID    string      `gorm:"unique_index:end_device_id_index;type:VARCHAR(36);not null"`
 	Name        string      `gorm:"type:VARCHAR"`
 	Description string      `gorm:"type:TEXT"`
 	Attributes  []Attribute `gorm:"polymorphic:Entity;polymorphic_value:device"`
 	// END common fields
 
-	JoinEUI *EUI64 `gorm:"unique_index:eui;index;type:VARCHAR(16);column:join_eui"`
-	DevEUI  *EUI64 `gorm:"unique_index:eui;index;type:VARCHAR(16);column:dev_eui"`
+	JoinEUI *EUI64 `gorm:"unique_index:end_device_eui_index;index:end_device_join_eui_index;type:VARCHAR(16);column:join_eui"`
+	DevEUI  *EUI64 `gorm:"unique_index:end_device_eui_index;index:end_device_dev_eui_index;type:VARCHAR(16);column:dev_eui"`
 
 	BrandID         string `gorm:"type:VARCHAR"`
 	ModelID         string `gorm:"type:VARCHAR"`

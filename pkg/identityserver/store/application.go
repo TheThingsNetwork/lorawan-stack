@@ -25,7 +25,7 @@ type Application struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ApplicationID string       `gorm:"unique_index:id;type:VARCHAR(36);not null"`
+	ApplicationID string       `gorm:"unique_index:application_id_index;type:VARCHAR(36);not null"`
 	Name          string       `gorm:"type:VARCHAR"`
 	Description   string       `gorm:"type:TEXT"`
 	Attributes    []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:application"`

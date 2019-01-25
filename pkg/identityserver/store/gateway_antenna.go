@@ -21,8 +21,8 @@ type GatewayAntenna struct {
 	Model
 
 	Gateway   *Gateway
-	GatewayID string `gorm:"type:UUID;unique_index:id;index;not null"`
-	Index     int    `gorm:"unique_index:id;not null"`
+	GatewayID string `gorm:"type:UUID;unique_index:gateway_antenna_id_index;index:gateway_antenna_gateway_index;not null"`
+	Index     int    `gorm:"unique_index:gateway_antenna_id_index;not null"`
 
 	Attributes []Attribute `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 

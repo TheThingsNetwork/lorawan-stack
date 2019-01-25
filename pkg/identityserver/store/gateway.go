@@ -26,10 +26,10 @@ type Gateway struct {
 	Model
 	SoftDelete
 
-	GatewayEUI *EUI64 `gorm:"unique_index:eui;type:VARCHAR(16);column:gateway_eui"`
+	GatewayEUI *EUI64 `gorm:"unique_index:gateway_eui_index;type:VARCHAR(16);column:gateway_eui"`
 
 	// BEGIN common fields
-	GatewayID   string       `gorm:"unique_index:id;type:VARCHAR(36);not null"`
+	GatewayID   string       `gorm:"unique_index:gateway_id_index;type:VARCHAR(36);not null"`
 	Name        string       `gorm:"type:VARCHAR"`
 	Description string       `gorm:"type:TEXT"`
 	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:gateway"`

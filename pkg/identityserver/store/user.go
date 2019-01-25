@@ -54,7 +54,7 @@ type User struct {
 	TemporaryPasswordExpiresAt *time.Time
 
 	ProfilePicture   *Picture
-	ProfilePictureID *string `gorm:"type:UUID;index"`
+	ProfilePictureID *string `gorm:"type:UUID;index:user_profile_picture_index"`
 }
 
 func init() {

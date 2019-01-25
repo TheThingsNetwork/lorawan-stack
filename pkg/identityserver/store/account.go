@@ -26,10 +26,10 @@ type Account struct {
 	Model
 	SoftDelete
 
-	UID string `gorm:"type:VARCHAR(36);unique_index:id"`
+	UID string `gorm:"type:VARCHAR(36);unique_index:account_uid_index"`
 
-	AccountID   string `gorm:"type:UUID;index:account;not null"`
-	AccountType string `gorm:"type:VARCHAR(32);index:account;not null"` // user or organization
+	AccountID   string `gorm:"type:UUID;index:account_id_index;not null"`
+	AccountType string `gorm:"type:VARCHAR(32);index:account_id_index;not null"` // user or organization
 
 	Memberships []*Membership
 }

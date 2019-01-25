@@ -32,8 +32,8 @@ type ContactInfo struct {
 
 	ValidatedAt *time.Time
 
-	EntityID   string `gorm:"type:UUID;index:entity;not null"`
-	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
+	EntityID   string `gorm:"type:UUID;index:contact_info_entity_index;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:contact_info_entity_index;not null"`
 }
 
 func init() {

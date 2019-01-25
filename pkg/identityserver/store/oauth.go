@@ -79,10 +79,10 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 type AccessToken struct {
 	ClientAuthorization
 
-	TokenID string `gorm:"type:VARCHAR;unique_index:id;not null"`
+	TokenID string `gorm:"type:VARCHAR;unique_index:access_token_id_index;not null"`
 
 	Previous   *AccessToken `gorm:"foreignkey:PreviousID;association_foreignkey:TokenID"`
-	PreviousID string       `gorm:"type:VARCHAR;index"`
+	PreviousID string       `gorm:"type:VARCHAR;index:access_token_previous_index"`
 
 	AccessToken  string `gorm:"type:VARCHAR;not null"`
 	RefreshToken string `gorm:"type:VARCHAR;not null"`

@@ -25,7 +25,7 @@ type UserSession struct {
 	Model
 
 	User   *User
-	UserID string `gorm:"type:UUID;index;not null"`
+	UserID string `gorm:"type:UUID;index:user_session_user_index;not null"`
 
 	ExpiresAt *time.Time
 }

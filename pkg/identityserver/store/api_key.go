@@ -20,14 +20,14 @@ import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 type APIKey struct {
 	Model
 
-	APIKeyID string `gorm:"type:VARCHAR;unique_index:id"`
+	APIKeyID string `gorm:"type:VARCHAR;unique_index:api_key_id_index"`
 
 	Key    string `gorm:"type:VARCHAR"`
 	Rights Rights `gorm:"type:INT ARRAY"`
 	Name   string `gorm:"type:VARCHAR"`
 
-	EntityID   string `gorm:"type:UUID;index:entity;not null"`
-	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
+	EntityID   string `gorm:"type:UUID;index:api_key_entity_index;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:api_key_entity_index;not null"`
 }
 
 func init() {

@@ -18,8 +18,8 @@ package store
 type Attribute struct {
 	ID string `gorm:"type:UUID;primary_key;default:gen_random_uuid()"`
 
-	EntityID   string `gorm:"type:UUID;index:entity;not null"`
-	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
+	EntityID   string `gorm:"type:UUID;index:attribute_entity_index;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:attribute_entity_index;not null"`
 
 	Key   string `gorm:"type:VARCHAR"`
 	Value string `gorm:"type:VARCHAR"`

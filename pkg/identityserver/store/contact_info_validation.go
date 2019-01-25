@@ -24,11 +24,11 @@ import (
 type ContactInfoValidation struct {
 	Model
 
-	Reference string `gorm:"type:VARCHAR;index:id"`
-	Token     string `gorm:"type:VARCHAR;index:id"`
+	Reference string `gorm:"type:VARCHAR;index:contact_info_validation_id_index"`
+	Token     string `gorm:"type:VARCHAR;index:contact_info_validation_id_index"`
 
-	EntityID   string `gorm:"type:UUID;index:entity;not null"`
-	EntityType string `gorm:"type:VARCHAR(32);index:entity;not null"`
+	EntityID   string `gorm:"type:UUID;index:contact_info_validation_entity_index;not null"`
+	EntityType string `gorm:"type:VARCHAR(32);index:contact_info_validation_entity_index;not null"`
 
 	ContactMethod int    `gorm:"not null"`
 	Value         string `gorm:"type:VARCHAR"`
