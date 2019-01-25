@@ -16,6 +16,7 @@ package commands
 
 import (
 	"os"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -103,7 +104,7 @@ var (
 			if len(paths) == 0 {
 				logger.Warn("No fields selected, will select everything")
 				selectApplicationWebhookFlags.VisitAll(func(flag *pflag.Flag) {
-					paths = append(paths, flag.Name)
+					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
 
@@ -135,7 +136,7 @@ var (
 			if len(paths) == 0 {
 				logger.Warn("No fields selected, will select everything")
 				selectApplicationWebhookFlags.VisitAll(func(flag *pflag.Flag) {
-					paths = append(paths, flag.Name)
+					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
 
