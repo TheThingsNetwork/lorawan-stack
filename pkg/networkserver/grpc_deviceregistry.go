@@ -41,6 +41,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		paths := req.FieldMask.Paths
 		if dev == nil && !req.Device.SupportsJoin {
+			if req.Device.Session == nil {
+				return nil, nil, errEmptySession
+			}
 			if err := resetMACState(&req.Device, ns.FrequencyPlans); err != nil {
 				return nil, nil, err
 			}
