@@ -57,6 +57,8 @@ func getUserID(flagSet *pflag.FlagSet, args []string) *ttnpb.UserIdentifiers {
 	return &ttnpb.UserIdentifiers{UserID: userID}
 }
 
+var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
+
 var (
 	usersCommand = &cobra.Command{
 		Use:     "users",
@@ -142,6 +144,21 @@ var (
 			}
 			if user.UserID == "" {
 				return errNoUserID
+			}
+
+			if user.Password == "" {
+				pw, err := gopass.GetPasswdPrompt("Please enter password:", true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
+				user.Password = string(pw)
+				pw, err = gopass.GetPasswdPrompt("Please confirm password:", true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
+				if string(pw) != user.Password {
+					return errPasswordMismatch
+				}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)

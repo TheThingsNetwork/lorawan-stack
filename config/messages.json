@@ -1286,6 +1286,15 @@
       "file": "applications_webhook.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:password_mismatch": {
+    "translations": {
+      "en": "password did not match"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/internal/util:flag_value": {
     "translations": {
       "en": "invalid flag value"
