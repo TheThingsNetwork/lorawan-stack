@@ -5086,7 +5086,7 @@ The AsNs service connects an Application Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| LinkApplication | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationUp](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
+| LinkApplication | [.google.protobuf.Empty](#google.protobuf.Empty) | [ApplicationUp](#google.protobuf.Empty) |  |
 | DownlinkQueueReplace | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkQueueRequest) |  |
 | DownlinkQueuePush | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkQueueRequest) |  |
 | DownlinkQueueList | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [ApplicationDownlinks](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |
