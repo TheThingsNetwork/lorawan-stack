@@ -17,7 +17,6 @@ package formatters_test
 import (
 	"strconv"
 	"testing"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -71,13 +70,12 @@ func TestJSONUpstream(t *testing.T) {
 				},
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
-						SessionKeyID:     []byte{0x11, 0x22, 0x33, 0x44},
-						PendingSession:   false,
-						SessionStartedAt: time.Date(2018, 11, 27, 15, 12, 0, 0, time.UTC),
+						SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						PendingSession: false,
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA==","session_started_at":"2018-11-27T15:12:00Z"}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA=="}}`,
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
