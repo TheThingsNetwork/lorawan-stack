@@ -4825,6 +4825,10 @@
         "request": {
           "$ref": "#/definitions/v3JoinRequest",
           "description": "JoinRequest sent to Join Server."
+        },
+        "keys": {
+          "$ref": "#/definitions/v3SessionKeys",
+          "description": "Network session keys associated with the join."
         }
       }
     },
@@ -5324,11 +5328,6 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a\nrejoin-request."
-        },
-        "session_started_at": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Server time when the session started."
         }
       }
     },

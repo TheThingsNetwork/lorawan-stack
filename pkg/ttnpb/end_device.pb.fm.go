@@ -1105,6 +1105,20 @@ var MACStateFieldPathsNested = []string{
 	"pending_requests",
 	"ping_slot_periodicity",
 	"queued_join_accept",
+	"queued_join_accept.keys",
+	"queued_join_accept.keys.app_s_key",
+	"queued_join_accept.keys.app_s_key.kek_label",
+	"queued_join_accept.keys.app_s_key.key",
+	"queued_join_accept.keys.f_nwk_s_int_key",
+	"queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+	"queued_join_accept.keys.f_nwk_s_int_key.key",
+	"queued_join_accept.keys.nwk_s_enc_key",
+	"queued_join_accept.keys.nwk_s_enc_key.kek_label",
+	"queued_join_accept.keys.nwk_s_enc_key.key",
+	"queued_join_accept.keys.s_nwk_s_int_key",
+	"queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+	"queued_join_accept.keys.s_nwk_s_int_key.key",
+	"queued_join_accept.keys.session_key_id",
 	"queued_join_accept.payload",
 	"queued_join_accept.request",
 	"queued_join_accept.request.cf_list",
@@ -1373,6 +1387,20 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 }
 
 var MACState_JoinAcceptFieldPathsNested = []string{
+	"keys",
+	"keys.app_s_key",
+	"keys.app_s_key.kek_label",
+	"keys.app_s_key.key",
+	"keys.f_nwk_s_int_key",
+	"keys.f_nwk_s_int_key.kek_label",
+	"keys.f_nwk_s_int_key.key",
+	"keys.nwk_s_enc_key",
+	"keys.nwk_s_enc_key.kek_label",
+	"keys.nwk_s_enc_key.key",
+	"keys.s_nwk_s_int_key",
+	"keys.s_nwk_s_int_key.kek_label",
+	"keys.s_nwk_s_int_key.key",
+	"keys.session_key_id",
 	"payload",
 	"request",
 	"request.cf_list",
@@ -1436,6 +1464,7 @@ var MACState_JoinAcceptFieldPathsNested = []string{
 }
 
 var MACState_JoinAcceptFieldPathsTopLevel = []string{
+	"keys",
 	"payload",
 	"request",
 }
@@ -1469,6 +1498,24 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				} else {
 					var zero JoinRequest
 					dst.Request = zero
+				}
+			}
+		case "keys":
+			if len(subs) > 0 {
+				newDst := &dst.Keys
+				var newSrc *SessionKeys
+				if src != nil {
+					newSrc = &src.Keys
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Keys = src.Keys
+				} else {
+					var zero SessionKeys
+					dst.Keys = zero
 				}
 			}
 
@@ -1655,6 +1702,20 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_state.pending_requests",
 	"mac_state.ping_slot_periodicity",
 	"mac_state.queued_join_accept",
+	"mac_state.queued_join_accept.keys",
+	"mac_state.queued_join_accept.keys.app_s_key",
+	"mac_state.queued_join_accept.keys.app_s_key.kek_label",
+	"mac_state.queued_join_accept.keys.app_s_key.key",
+	"mac_state.queued_join_accept.keys.f_nwk_s_int_key",
+	"mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+	"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+	"mac_state.queued_join_accept.keys.nwk_s_enc_key",
+	"mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
+	"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+	"mac_state.queued_join_accept.keys.s_nwk_s_int_key",
+	"mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+	"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+	"mac_state.queued_join_accept.keys.session_key_id",
 	"mac_state.queued_join_accept.payload",
 	"mac_state.queued_join_accept.request",
 	"mac_state.queued_join_accept.request.cf_list",
@@ -2617,6 +2678,20 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.pending_requests",
 	"end_device.mac_state.ping_slot_periodicity",
 	"end_device.mac_state.queued_join_accept",
+	"end_device.mac_state.queued_join_accept.keys",
+	"end_device.mac_state.queued_join_accept.keys.app_s_key",
+	"end_device.mac_state.queued_join_accept.keys.app_s_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.app_s_key.key",
+	"end_device.mac_state.queued_join_accept.keys.f_nwk_s_int_key",
+	"end_device.mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+	"end_device.mac_state.queued_join_accept.keys.nwk_s_enc_key",
+	"end_device.mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+	"end_device.mac_state.queued_join_accept.keys.s_nwk_s_int_key",
+	"end_device.mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+	"end_device.mac_state.queued_join_accept.keys.session_key_id",
 	"end_device.mac_state.queued_join_accept.payload",
 	"end_device.mac_state.queued_join_accept.request",
 	"end_device.mac_state.queued_join_accept.request.cf_list",
@@ -2967,6 +3042,20 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.pending_requests",
 	"end_device.mac_state.ping_slot_periodicity",
 	"end_device.mac_state.queued_join_accept",
+	"end_device.mac_state.queued_join_accept.keys",
+	"end_device.mac_state.queued_join_accept.keys.app_s_key",
+	"end_device.mac_state.queued_join_accept.keys.app_s_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.app_s_key.key",
+	"end_device.mac_state.queued_join_accept.keys.f_nwk_s_int_key",
+	"end_device.mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+	"end_device.mac_state.queued_join_accept.keys.nwk_s_enc_key",
+	"end_device.mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+	"end_device.mac_state.queued_join_accept.keys.s_nwk_s_int_key",
+	"end_device.mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+	"end_device.mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+	"end_device.mac_state.queued_join_accept.keys.session_key_id",
 	"end_device.mac_state.queued_join_accept.payload",
 	"end_device.mac_state.queued_join_accept.request",
 	"end_device.mac_state.queued_join_accept.request.cf_list",
@@ -3470,6 +3559,20 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.mac_state.pending_requests",
 	"device.mac_state.ping_slot_periodicity",
 	"device.mac_state.queued_join_accept",
+	"device.mac_state.queued_join_accept.keys",
+	"device.mac_state.queued_join_accept.keys.app_s_key",
+	"device.mac_state.queued_join_accept.keys.app_s_key.kek_label",
+	"device.mac_state.queued_join_accept.keys.app_s_key.key",
+	"device.mac_state.queued_join_accept.keys.f_nwk_s_int_key",
+	"device.mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+	"device.mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+	"device.mac_state.queued_join_accept.keys.nwk_s_enc_key",
+	"device.mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
+	"device.mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+	"device.mac_state.queued_join_accept.keys.s_nwk_s_int_key",
+	"device.mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+	"device.mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+	"device.mac_state.queued_join_accept.keys.session_key_id",
 	"device.mac_state.queued_join_accept.payload",
 	"device.mac_state.queued_join_accept.request",
 	"device.mac_state.queued_join_accept.request.cf_list",

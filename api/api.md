@@ -1813,6 +1813,7 @@ This is used internally by the Network Server and is read only.
 | ----- | ---- | ----- | ----------- |
 | payload | [bytes](#bytes) |  | Payload of the join-accept received from Join Server. |
 | request | [JoinRequest](#ttn.lorawan.v3.JoinRequest) |  | JoinRequest sent to Join Server. |
+| keys | [SessionKeys](#ttn.lorawan.v3.SessionKeys) |  | Network session keys associated with the join. |
 
 
 
@@ -4758,7 +4759,6 @@ The UplinkMessageProcessor service processes uplink messages.
 | app_s_key | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) |  | Encrypted Application Session Key (if Join Server sent it to Network Server). |
 | invalidated_downlinks | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) | repeated | Downlink messages in the queue that got invalidated because of the session change. |
 | pending_session | [bool](#bool) |  | Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a rejoin-request. |
-| session_started_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Server time when the session started. |
 
 
 

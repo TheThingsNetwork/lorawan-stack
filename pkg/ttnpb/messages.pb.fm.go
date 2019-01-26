@@ -644,7 +644,6 @@ var ApplicationJoinAcceptFieldPathsNested = []string{
 	"invalidated_downlinks",
 	"pending_session",
 	"session_key_id",
-	"session_started_at",
 }
 
 var ApplicationJoinAcceptFieldPathsTopLevel = []string{
@@ -652,7 +651,6 @@ var ApplicationJoinAcceptFieldPathsTopLevel = []string{
 	"invalidated_downlinks",
 	"pending_session",
 	"session_key_id",
-	"session_started_at",
 }
 
 func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ...string) error {
@@ -707,16 +705,6 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 			} else {
 				var zero bool
 				dst.PendingSession = zero
-			}
-		case "session_started_at":
-			if len(subs) > 0 {
-				return fmt.Errorf("'session_started_at' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.SessionStartedAt = src.SessionStartedAt
-			} else {
-				var zero time.Time
-				dst.SessionStartedAt = zero
 			}
 
 		default:
@@ -1141,7 +1129,6 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.join_accept.invalidated_downlinks",
 	"up.join_accept.pending_session",
 	"up.join_accept.session_key_id",
-	"up.join_accept.session_started_at",
 	"up.location_solved",
 	"up.location_solved.attributes",
 	"up.location_solved.location",

@@ -109,9 +109,6 @@ func (this *ApplicationJoinAccept) Validate() error {
 			}
 		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.SessionStartedAt)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("SessionStartedAt", err)
-	}
 	return nil
 }
 func (this *ApplicationDownlink) Validate() error {

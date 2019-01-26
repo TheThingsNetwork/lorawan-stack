@@ -150,6 +150,9 @@ func (this *MACState_JoinAccept) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Request)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("Request", err)
 	}
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Keys)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("Keys", err)
+	}
 	return nil
 }
 

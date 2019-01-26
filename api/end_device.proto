@@ -229,6 +229,8 @@ message MACState {
     bytes payload = 1 [(validator.field) = { length_gt: 11, length_lt: 29 }];
     // JoinRequest sent to Join Server.
     JoinRequest request = 2 [(gogoproto.nullable) = false];
+    // Network session keys associated with the join.
+    SessionKeys keys = 3 [(gogoproto.nullable) = false];
   }
   // Queued join-accept.
   // Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled.
