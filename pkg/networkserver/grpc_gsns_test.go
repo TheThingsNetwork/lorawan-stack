@@ -23,6 +23,7 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/band"
@@ -1708,8 +1709,10 @@ func handleJoinTest() func(t *testing.T) {
 					if ses := tc.Device.Session; ses != nil {
 						a.So(req.req.DevAddr, should.NotResemble, ses.DevAddr)
 					}
+					a.So(req.req.CorrelationIDs, should.HaveLength, 1)
 
 					expectedRequest.DevAddr = req.req.DevAddr
+					expectedRequest.CorrelationIDs = req.req.CorrelationIDs
 					a.So(req.req, should.Resemble, expectedRequest)
 
 					req.ch <- resp
@@ -1736,27 +1739,15 @@ func handleJoinTest() func(t *testing.T) {
 						ret, err := devReg.GetByID(authorizedCtx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 						if !a.So(err, should.BeNil) ||
 							!a.So(ret, should.NotBeNil) ||
-							!a.So(ret.PendingSession, should.NotBeNil) {
-							t.FailNow()
-						}
-
-						a.So(ret.PendingSession.StartedAt, should.HappenBetween, start, time.Now())
-						a.So(ret.EndDeviceIdentifiers.DevAddr, should.Resemble, &ret.PendingSession.DevAddr)
-						if tc.Device.Session != nil {
-							a.So(ret.PendingSession.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
-						}
-
-						if !a.So(ret.RecentUplinks, should.NotBeEmpty) {
+							!a.So(ret.RecentUplinks, should.NotBeEmpty) {
 							t.FailNow()
 						}
 
 						pb.MACState.RxWindowsAvailable = true
-						pb.MACState.QueuedJoinAccept = resp.RawPayload
-						pb.EndDeviceIdentifiers.DevAddr = ret.EndDeviceIdentifiers.DevAddr
-						pb.PendingSession = &ttnpb.Session{
-							DevAddr:     *ret.EndDeviceIdentifiers.DevAddr,
-							SessionKeys: *keys,
-							StartedAt:   ret.PendingSession.StartedAt,
+						pb.MACState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
+							Payload: resp.RawPayload,
+							Request: *deepcopy.Copy(expectedRequest).(*ttnpb.JoinRequest),
+							Keys:    *keys,
 						}
 						pb.CreatedAt = ret.CreatedAt
 						pb.UpdatedAt = ret.UpdatedAt
@@ -1789,15 +1780,23 @@ func handleJoinTest() func(t *testing.T) {
 						t.FailNow()
 					}
 
+					if !a.So(up, should.NotBeNil) {
+						t.Fatal("<nil> AS uplink received")
+					}
 					a.So(up.CorrelationIDs, should.NotBeEmpty)
 					a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
-						CorrelationIDs:       up.CorrelationIDs,
-						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
+						CorrelationIDs: up.CorrelationIDs,
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: pb.EndDeviceIdentifiers.ApplicationIdentifiers,
+							DeviceID:               pb.EndDeviceIdentifiers.DeviceID,
+							DevEUI:                 pb.EndDeviceIdentifiers.DevEUI,
+							JoinEUI:                pb.EndDeviceIdentifiers.JoinEUI,
+							DevAddr:                &expectedRequest.DevAddr,
+						},
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:              resp.SessionKeys.AppSKey,
-							SessionKeyID:         pb.PendingSession.SessionKeys.SessionKeyID,
+							SessionKeyID:         resp.SessionKeys.SessionKeyID,
 							InvalidatedDownlinks: tc.Device.QueuedApplicationDownlinks,
-							SessionStartedAt:     pb.PendingSession.StartedAt,
 						}},
 					})
 
@@ -1840,9 +1839,13 @@ func handleJoinTest() func(t *testing.T) {
 
 					select {
 					case req := <-handleJoinCh:
-						a.So(req.req.DevAddr, should.NotResemble, pb.PendingSession.DevAddr)
+						if ses := tc.Device.Session; ses != nil {
+							a.So(req.req.DevAddr, should.NotResemble, ses.DevAddr)
+						}
+						a.So(req.req.CorrelationIDs, should.HaveLength, 1)
 
 						expectedRequest.DevAddr = req.req.DevAddr
+						expectedRequest.CorrelationIDs = req.req.CorrelationIDs
 						a.So(req.req, should.Resemble, expectedRequest)
 
 						resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
@@ -1881,9 +1884,8 @@ func handleJoinTest() func(t *testing.T) {
 								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey:          resp.SessionKeys.AppSKey,
-								SessionKeyID:     pb.PendingSession.SessionKeys.SessionKeyID,
-								SessionStartedAt: up.GetJoinAccept().SessionStartedAt,
+								AppSKey:      resp.SessionKeys.AppSKey,
+								SessionKeyID: resp.SessionKeys.SessionKeyID,
 							}},
 						})
 
@@ -1895,7 +1897,7 @@ func handleJoinTest() func(t *testing.T) {
 					select {
 					case req := <-downlinkAddCh:
 						a.So(req.ctx, should.HaveParentContext, ctx)
-						a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+						a.So(req.devID, should.Resemble, tc.Device.EndDeviceIdentifiers)
 						a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
 
 					case <-time.After(Timeout):

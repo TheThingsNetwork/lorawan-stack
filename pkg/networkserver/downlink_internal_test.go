@@ -2170,7 +2170,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:        ttnpb.CLASS_A,
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
-						QueuedJoinAccept:   []byte("testJoinAccept"),
+						QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
+							Payload: []byte("testJoinAccept"),
+						},
 					},
 					MACSettings: &ttnpb.MACSettings{},
 					RecentUplinks: []*ttnpb.UplinkMessage{
@@ -2287,8 +2289,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				ret, paths, err := f(CopyEndDevice(pb))
 				a.So(err, should.BeNil)
 				a.So(paths, should.HaveSameElementsDeep, []string{
+					"ids.dev_addr",
+					"mac_state.pending_join_request",
 					"mac_state.queued_join_accept",
 					"mac_state.rx_windows_available",
+					"pending_session",
 					"recent_downlinks",
 				})
 				if !a.So(ret, should.NotBeNil) || !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
@@ -2302,6 +2307,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
 
 				expected := CopyEndDevice(pb)
+				expected.MACState.PendingJoinRequest = &expected.MACState.QueuedJoinAccept.Request
+				expected.PendingSession = &ttnpb.Session{
+					DevAddr:     expected.MACState.QueuedJoinAccept.Request.DevAddr,
+					SessionKeys: expected.MACState.QueuedJoinAccept.Keys,
+				}
 				expected.MACState.PendingApplicationDownlink = nil
 				expected.MACState.PendingRequests = nil
 				expected.MACState.QueuedJoinAccept = nil

@@ -532,7 +532,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 
 					switch {
-					case len(dev.MACState.QueuedJoinAccept) > 0:
+					case dev.MACState.QueuedJoinAccept != nil:
 						// Join-accept downlink for Class A/B/C in Rx1/Rx2
 						req.Rx1Delay = ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second)
 						req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
@@ -551,21 +551,29 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							))),
 							req,
 							dev.EndDeviceIdentifiers,
-							dev.MACState.QueuedJoinAccept,
+							dev.MACState.QueuedJoinAccept.Payload,
 							downlinkPathsFromRecentUplinks(dev.RecentUplinks...)...,
 						)
 						if err != nil {
 							scheduleErr = true
 						} else {
-							dev.MACState.QueuedJoinAccept = nil
 							dev.MACState.RxWindowsAvailable = false
+							dev.MACState.PendingJoinRequest = &dev.MACState.QueuedJoinAccept.Request
+							dev.PendingSession = &ttnpb.Session{
+								DevAddr:     dev.MACState.QueuedJoinAccept.Request.DevAddr,
+								SessionKeys: dev.MACState.QueuedJoinAccept.Keys,
+							}
+							dev.MACState.QueuedJoinAccept = nil
 							dev.RecentDownlinks = append(dev.RecentDownlinks, down)
 							if len(dev.RecentDownlinks) > recentDownlinkCount {
 								dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
 							}
 							return dev, []string{
+								"ids.dev_addr",
+								"mac_state.pending_join_request",
 								"mac_state.queued_join_accept",
 								"mac_state.rx_windows_available",
+								"pending_session",
 								"recent_downlinks",
 							}, nil
 						}
@@ -702,7 +710,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 					}
 				}
-				if len(dev.MACState.QueuedJoinAccept) > 0 {
+				if dev.MACState.QueuedJoinAccept != nil {
 					return nil, nil, errSchedule
 				}
 
