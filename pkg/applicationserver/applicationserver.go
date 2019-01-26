@@ -402,7 +402,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 					SessionKeyID: joinAccept.SessionKeyID,
 					AppSKey:      &appSKey,
 				},
-				StartedAt: time.Now().UTC(), // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+				StartedAt: time.Now().UTC(),
 			}
 			if joinAccept.PendingSession {
 				dev.PendingSession = session
