@@ -85,8 +85,8 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
 	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && GO111MODULE=off go get -u github.com/mattn/goveralls; fi
-	@$(log) "Getting gometalinter" && GO111MODULE=off go get -u github.com/alecthomas/gometalinter
-	@$(log) "Getting gometalinter linters" && GO111MODULE=off $(GO_METALINTER) -i -u --no-vendored-linters
+	@$(log) "Getting gometalinter" && go get -u github.com/alecthomas/gometalinter
+	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
 
 go.min-version: $(MAGE)
 	@$(MAGE) go:checkVersion
