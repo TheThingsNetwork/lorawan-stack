@@ -790,7 +790,6 @@ where the user or organization is collaborator on.
 | network_server_address | [string](#string) |  | The address of the external Network Server where to link to. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. Leave empty when linking to an internal Network Server. |
 | api_key | [string](#string) |  | API key to use when linking to an external Network Server. |
 | default_formatters | [MessagePayloadFormatters](#ttn.lorawan.v3.MessagePayloadFormatters) |  |  |
-| allow_insecure | [bool](#bool) |  | In true, no TLS is being used. If false, the connection to an external Network Server will be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 
 
 

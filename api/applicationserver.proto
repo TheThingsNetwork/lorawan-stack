@@ -35,10 +35,6 @@ message ApplicationLink {
   // API key to use when linking to an external Network Server.
   string api_key = 2 [(gogoproto.customname) = "APIKey"];
   MessagePayloadFormatters default_formatters = 3;
-  // In true, no TLS is being used.
-  // If false, the connection to an external Network Server will be established with transport layer security (TLS).
-  // Custom certificate authorities may be configured out-of-band.
-  bool allow_insecure = 4;
 }
 
 message GetApplicationLinkRequest {

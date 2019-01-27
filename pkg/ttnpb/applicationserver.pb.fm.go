@@ -9,7 +9,6 @@ import (
 )
 
 var ApplicationLinkFieldPathsNested = []string{
-	"allow_insecure",
 	"api_key",
 	"default_formatters",
 	"default_formatters.down_formatter",
@@ -20,7 +19,6 @@ var ApplicationLinkFieldPathsNested = []string{
 }
 
 var ApplicationLinkFieldPathsTopLevel = []string{
-	"allow_insecure",
 	"api_key",
 	"default_formatters",
 	"network_server_address",
@@ -69,16 +67,6 @@ func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) err
 				} else {
 					dst.DefaultFormatters = nil
 				}
-			}
-		case "allow_insecure":
-			if len(subs) > 0 {
-				return fmt.Errorf("'allow_insecure' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.AllowInsecure = src.AllowInsecure
-			} else {
-				var zero bool
-				dst.AllowInsecure = zero
 			}
 
 		default:
@@ -143,7 +131,6 @@ var SetApplicationLinkRequestFieldPathsNested = []string{
 	"application_ids.application_id",
 	"field_mask",
 	"link",
-	"link.allow_insecure",
 	"link.api_key",
 	"link.default_formatters",
 	"link.default_formatters.down_formatter",
