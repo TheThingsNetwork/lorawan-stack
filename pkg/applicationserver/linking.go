@@ -114,7 +114,7 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 	link.callOpts = []grpc.CallOption{
 		grpc.PerRPCCredentials(rpcmetadata.MD{
 			ID:            ids.ApplicationID,
-			AuthType:      "Key",
+			AuthType:      "Bearer",
 			AuthValue:     link.APIKey,
 			AllowInsecure: as.AllowInsecureForCredentials(),
 		}),
