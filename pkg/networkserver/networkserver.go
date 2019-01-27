@@ -259,7 +259,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			if err = as.Send(up); err != nil {
 				return true, err
 			}
-			if err = as.RecvMsg(ttnpb.Empty); err != nil {
+			if _, err = as.Recv(); err != nil {
 				return true, err
 			}
 			return true, nil
