@@ -2,10 +2,12 @@
 
 Thank you for your interest in building this thing together with us. We're really happy with our active community and are glad that you're a part of it. There are many ways to contribute to our project, but given the fact that you're on Github looking at the code for The Things Network Stack for LoRaWAN, you're probably here for one of the following reasons:
 
-* **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please give a detailed description of the functionality you would want, and why it would be nice to have it. Also let us know if you can help us build it.
-* **Reporting an issue**: If you notice that a component of the Things Network Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. For really sensitive issues, you can [contact us directly](#security-issues).
-* **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) that you would like to work on, let us know by commenting in the issue. 
+* **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections.
+* **Reporting an issue**: If you notice that a component of the Things Network Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections. For sensitive (security) issues, you can [contact us directly](#security-issues).
+* **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) that you would like to work on, let the other contributors know by commenting in the issue.
 * **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand better how to work with our stack, and will prevent making mistakes and introducing bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. More general documentation lives in [our `docs` repo](https://github.com/TheThingsNetwork/docs), that is published to our [official documentation pages](https://www.thethingsnetwork.org/docs).
+
+Although The Things Network forums and community Slack are great ways to communicate with other community members, please use GitHub issues and pull requests to discuss matters related to the code base.
 
 If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment. We also have some guidelines that describe how to make contributions that are consistent our way of working.
 
@@ -30,6 +32,8 @@ All branches shall have one of these names.
 A fix, feature or issue branch should be **small and focused** and should be scoped to a **single specific task**. Do not combine new features and refactoring of existing code.
 
 ### Pull requests and rebasing
+
+Pull requests shall close or reference issues. Please file an issue first before submitting a pull request. When submitting a pull request, please fill out all the sections in the pull request template.
 
 + **Before** a reviewer is assigned, rebasing the branch to reduce the number of commits is highly advised. We recommend self-reviewing your own pull request: making the [commit](#commit) history clean, checking for typos or incoherences, and making sure Continuous Integration passes.
 
@@ -169,7 +173,7 @@ In case both of the words have an implementation-specific meaning, the variable 
 | Application Server                                      | as      |
 | Identity Server                                         | is      |
 
-In case one of the words specifies the meaning of the variable in a specific language construct context, the variable name is the combination of abbrevations of the words. 
+In case one of the words specifies the meaning of the variable in a specific language construct context, the variable name is the combination of abbrevations of the words.
 
 #### Well-known variable names
 
@@ -233,7 +237,7 @@ We do our best to make all text that could be visible to users available for tra
 
 ### Backend Translations
 
-In our Go we make enum descriptions, error messages and event descriptions available for translation. Enum descriptions are defined in `pkg/ttnpb/i18n.go`. Error messages and event descriptions are defined with `errors.Define(...)` and `events.Define(...)` respectively. 
+In our Go we make enum descriptions, error messages and event descriptions available for translation. Enum descriptions are defined in `pkg/ttnpb/i18n.go`. Error messages and event descriptions are defined with `errors.Define(...)` and `events.Define(...)` respectively.
 
 These messages are then collected in the `config/messages.json` file, which will be processed in the frontend build process, but may also be used by other (native) user interfaces. When you define new enums, errors or events, or when you change them, the messages need to be updated into the `config/messages.json` file. This is done by running `make messages`. If you forget to do so, this will cause a CI failure.
 
@@ -251,3 +255,7 @@ We do our utmost best to build secure systems, but we're human too, so we someti
 - Hylke Visser - [keybase.io/htdvisser](https://keybase.io/htdvisser) `A115FF80DC8A2270`
 
 Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.
+
+## Legal
+
+The Things Network Stack for LoRaWAN is Apache 2.0 licensed.
