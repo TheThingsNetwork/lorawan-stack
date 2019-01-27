@@ -43,9 +43,7 @@ func init() {
 		case strings.HasPrefix(k, "RIGHT_ORGANIZATION_"):
 			AllOrganizationRights.Rights = append(AllOrganizationRights.Rights, Right(v))
 		}
-		if strings.HasSuffix(k, "_READ") ||
-			strings.HasSuffix(k, "_INFO") ||
-			strings.HasSuffix(k, "_LINK") {
+		if strings.HasSuffix(k, "_READ") || strings.HasSuffix(k, "_INFO") {
 			AllClusterRights.Rights = append(AllClusterRights.Rights, Right(v))
 		}
 		AllRights.Rights = append(AllRights.Rights, Right(v))
