@@ -76,6 +76,7 @@ func TestLink(t *testing.T) {
 	}
 	test.Must(nil, c.Start())
 	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_NETWORK_SERVER)
 
 	// Expect app1 to be linked through the registry.
 	{
