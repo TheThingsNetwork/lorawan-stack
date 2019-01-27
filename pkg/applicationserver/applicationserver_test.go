@@ -168,6 +168,9 @@ func TestApplicationServer(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_JOIN_SERVER)
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
+	// Delay for the AS-NS link to establish.
+	time.Sleep(timeout)
+
 	for _, ptc := range []struct {
 		Protocol         string
 		ValidAuth        func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool
@@ -417,7 +420,7 @@ func TestApplicationServer(t *testing.T) {
 				},
 				{
 					Name: "InvalidIDAndKey",
-					ID:   ttnpb.ApplicationIdentifiers{ApplicationID: "invalid-gateway"},
+					ID:   ttnpb.ApplicationIdentifiers{ApplicationID: "invalid-application"},
 					Key:  "invalid-key",
 				},
 			} {
