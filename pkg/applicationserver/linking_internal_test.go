@@ -21,5 +21,5 @@ import (
 )
 
 func init() {
-	linkBackoff = []time.Duration{1 * test.Delay}
+	linkBackoff = []time.Duration{(1 << 5) * test.Delay}
 }
