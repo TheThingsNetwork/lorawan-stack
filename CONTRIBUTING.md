@@ -237,11 +237,17 @@ We do our best to make all text that could be visible to users available for tra
 
 ### Backend Translations
 
-In our Go we make enum descriptions, error messages and event descriptions available for translation. Enum descriptions are defined in `pkg/ttnpb/i18n.go`. Error messages and event descriptions are defined with `errors.Define(...)` and `events.Define(...)` respectively.
+In the API, the enum descriptions, error messages and event descriptions available for translation. Enum descriptions are defined in `pkg/ttnpb/i18n.go`. Error messages and event descriptions are defined with `errors.Define(...)` and `events.Define(...)` respectively.
 
-These messages are then collected in the `config/messages.json` file, which will be processed in the frontend build process, but may also be used by other (native) user interfaces. When you define new enums, errors or events, or when you change them, the messages need to be updated into the `config/messages.json` file. This is done by running `make messages`. If you forget to do so, this will cause a CI failure.
+These messages are then collected in the `config/messages.json` file, which will be processed in the frontend build process, but may also be used by other (native) user interfaces. When you define new enums, errors or events or when you change them, the messages need to be updated into the `config/messages.json` file.
 
-Adding translations of messages in other languages than English is a matter of adding key/value pairs to `translations` in `config/messages.json`.
+```sh
+make messages
+```
+
+If you forget to do so, this will cause a CI failure.
+
+Adding translations of messages to other languages than English is a matter of adding key/value pairs to `translations` in `config/messages.json`.
 
 ### Frontend Translations
 
