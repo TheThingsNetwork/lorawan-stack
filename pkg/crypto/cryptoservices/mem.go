@@ -39,19 +39,17 @@ func NewMemory(nwkKey, appKey *types.AES128Key) NetworkApplication {
 var errNoNwkKey = errors.DefineCorruption("no_nwk_key", "no NwkKey specified")
 
 func (d *mem) getNwkKey(version ttnpb.MACVersion) (types.AES128Key, error) {
-	switch version {
-	case ttnpb.MAC_V1_1:
+	switch {
+	case version.Compare(ttnpb.MAC_V1_1) >= 0:
 		if d.nwkKey == nil {
 			return types.AES128Key{}, errNoNwkKey
 		}
 		return *d.nwkKey, nil
-	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+	default:
 		if d.appKey == nil {
 			return types.AES128Key{}, errNoAppKey
 		}
 		return *d.appKey, nil
-	default:
-		panic("This statement is unreachable. Please version check.")
 	}
 }
 
@@ -79,14 +77,12 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version t
 	if err != nil {
 		return [4]byte{}, err
 	}
-	switch version {
-	case ttnpb.MAC_V1_1:
+	switch {
+	case version.Compare(ttnpb.MAC_V1_1) >= 0:
 		jsIntKey := crypto.DeriveJSIntKey(key, *dev.DevEUI)
 		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *dev.JoinEUI, dn, payload)
-	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-		return crypto.ComputeLegacyJoinAcceptMIC(key, payload)
 	default:
-		panic("This statement is unreachable. Please version check.")
+		return crypto.ComputeLegacyJoinAcceptMIC(key, payload)
 	}
 }
 
@@ -99,7 +95,7 @@ func (d *mem) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, versi
 }
 
 func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
-	if version != ttnpb.MAC_V1_1 {
+	if version.Compare(ttnpb.MAC_V1_1) < 0 {
 		panic("This statement is unreachable. Please version check.")
 	}
 	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
@@ -122,8 +118,8 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
 		return NwkSKeys{}, errNoDevEUI
 	}
-	switch version {
-	case ttnpb.MAC_V1_1:
+	switch {
+	case version.Compare(ttnpb.MAC_V1_1) >= 0:
 		if d.nwkKey == nil {
 			return NwkSKeys{}, errNoNwkKey
 		}
@@ -133,16 +129,13 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 			NwkSEncKey:  crypto.DeriveNwkSEncKey(*d.nwkKey, jn, *dev.JoinEUI, dn),
 		}, nil
 
-	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+	default:
 		if d.appKey == nil {
 			return NwkSKeys{}, errNoAppKey
 		}
 		return NwkSKeys{
 			FNwkSIntKey: crypto.DeriveLegacyNwkSKey(*d.appKey, jn, nid, dn),
 		}, nil
-
-	default:
-		panic("This statement is unreachable. Fix version check.")
 	}
 }
 
@@ -166,13 +159,11 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 		return types.AES128Key{}, errNoAppKey
 	}
 
-	switch version {
-	case ttnpb.MAC_V1_1:
+	switch {
+	case version.Compare(ttnpb.MAC_V1_1) >= 0:
 		return crypto.DeriveAppSKey(*d.appKey, jn, *dev.JoinEUI, dn), nil
-	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-		return crypto.DeriveLegacyAppSKey(*d.appKey, jn, nid, dn), nil
 	default:
-		panic("This statement is unreachable. Fix version check.")
+		return crypto.DeriveLegacyAppSKey(*d.appKey, jn, nid, dn), nil
 	}
 }
 
