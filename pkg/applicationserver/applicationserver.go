@@ -253,7 +253,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				EndDeviceIdentifiers: ids,
 				Downlinks:            items,
 			}
-			_, err = op(client, ctx, req, link.connCallOpts...)
+			_, err = op(client, ctx, req, link.callOpts...)
 			if err != nil {
 				for _, item := range items {
 					registerDropDownlink(ctx, ids, item, err)
@@ -308,7 +308,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	}
 	<-link.connReady
 	client := ttnpb.NewAsNsClient(link.conn)
-	res, err := client.DownlinkQueueList(ctx, &ids, link.connCallOpts...)
+	res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -472,13 +472,13 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 				// downlink already, the Network Server will trigger the DownlinkQueueInvalidated event. Therefore, this
 				// recalculation may result in another recalculation.
 				client := ttnpb.NewAsNsClient(link.conn)
-				res, err := client.DownlinkQueueList(ctx, &ids, link.connCallOpts...)
+				res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
 				if err != nil {
 					log.WithError(err).Warn("Failed to list downlink queue for recalculation; clearing the downlink queue")
 					req := &ttnpb.DownlinkQueueRequest{
 						EndDeviceIdentifiers: ids,
 					}
-					_, err = client.DownlinkQueueReplace(ctx, req, link.connCallOpts...)
+					_, err = client.DownlinkQueueReplace(ctx, req, link.callOpts...)
 					if err != nil {
 						log.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
 						events.Publish(evtInvalidQueueDataDown(ctx, ids, err))
@@ -528,7 +528,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
 	client := ttnpb.NewAsNsClient(link.conn)
-	res, err := client.DownlinkQueueList(ctx, &ids, link.connCallOpts...)
+	res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
 	if err != nil {
 		log.WithError(err).Warn("Failed to list the downlink queue for inserting nacked downlink message")
 		registerDropDownlink(ctx, ids, msg, err)
@@ -597,7 +597,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			req := &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			}
-			if _, err := client.DownlinkQueueReplace(ctx, req, link.connCallOpts...); err != nil {
+			if _, err := client.DownlinkQueueReplace(ctx, req, link.callOpts...); err != nil {
 				log.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
 				events.Publish(evtInvalidQueueDataDown(ctx, dev.EndDeviceIdentifiers, err))
 			} else {
@@ -667,6 +667,6 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		Downlinks:            valid,
 	}
-	_, err = client.DownlinkQueueReplace(ctx, req, link.connCallOpts...)
+	_, err = client.DownlinkQueueReplace(ctx, req, link.callOpts...)
 	return err
 }

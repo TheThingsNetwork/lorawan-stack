@@ -40,7 +40,6 @@ func TestLink(t *testing.T) {
 
 	mask := []string{
 		"network_server_address",
-		"allow_insecure",
 		"api_key",
 		"default_formatters",
 	}
@@ -53,13 +52,18 @@ func TestLink(t *testing.T) {
 	defer redisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: redisClient}
 	linkRegistry.Set(ctx, app1, mask, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-		return &ttnpb.ApplicationLink{}, mask, nil
+		return &ttnpb.ApplicationLink{
+			APIKey: "secret",
+		}, mask, nil
 	})
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			Cluster: config.Cluster{
 				NetworkServer: nsAddr,
+			},
+			GRPC: config.GRPC{
+				AllowInsecureForCredentials: true,
 			},
 		},
 	})
@@ -85,11 +89,14 @@ func TestLink(t *testing.T) {
 
 	// app2: expect no link, set link, expect link, delete link and expect link to be gone.
 	for _, link := range []ttnpb.ApplicationLink{
-		{}, // Cluster-local Network Server.
 		{
-			NetworkServerAddress: nsAddr, // External Network Server.
+			// Cluster-local Network Server.
+			APIKey: "secret",
+		},
+		{
+			// External Network Server.
+			NetworkServerAddress: nsAddr,
 			APIKey:               "secret",
-			AllowInsecure:        true,
 		},
 	} {
 		ctx := rights.NewContext(ctx, rights.Rights{

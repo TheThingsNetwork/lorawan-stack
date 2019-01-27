@@ -24,6 +24,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -159,17 +160,26 @@ func startMockNS(ctx context.Context) (*mockNS, string) {
 	return ns, lis.Addr().String()
 }
 
-func (ns *mockNS) LinkApplication(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
+func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error {
+	ctx := stream.Context()
+	ids := ttnpb.ApplicationIdentifiers{
+		ApplicationID: rpcmetadata.FromIncomingContext(ctx).ID,
+	}
+	if err := ids.ValidateContext(ctx); err != nil {
+		return err
+	}
+
 	select {
-	case ns.linkCh <- *ids:
+	case ns.linkCh <- ids:
 	default:
 	}
 	defer func() {
 		select {
-		case ns.unlinkCh <- *ids:
+		case ns.unlinkCh <- ids:
 		default:
 		}
 	}()
+
 	for {
 		select {
 		case <-stream.Context().Done():
@@ -279,6 +289,7 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 	for _, auth := range auths {
 		if auth == authorization[0] {
 			res.Rights = append(res.Rights,
+				ttnpb.RIGHT_APPLICATION_LINK,
 				ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 				ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,

@@ -38,7 +38,6 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 			"network_server_address",
 			"api_key",
 			"default_formatters",
-			"allow_insecure",
 		},
 		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
 			as.startLinkTask(ctx, ids, target)
@@ -71,10 +70,10 @@ type link struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	conn         *grpc.ClientConn
-	connName     string
-	connCallOpts []grpc.CallOption
-	connReady    chan struct{}
+	conn      *grpc.ClientConn
+	connName  string
+	connReady chan struct{}
+	callOpts  []grpc.CallOption
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
@@ -91,7 +90,7 @@ var (
 func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, link *link) error {
 	if link.NetworkServerAddress != "" {
 		options := rpcclient.DefaultDialOptions(ctx)
-		if link.AllowInsecure {
+		if as.AllowInsecureForCredentials() {
 			options = append(options, grpc.WithInsecure())
 		}
 		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress, options...)
@@ -100,13 +99,6 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 		}
 		link.conn = conn
 		link.connName = link.NetworkServerAddress
-		link.connCallOpts = []grpc.CallOption{
-			grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:      "Key",
-				AuthValue:     link.APIKey,
-				AllowInsecure: link.AllowInsecure,
-			}),
-		}
 		go func() {
 			<-ctx.Done()
 			conn.Close()
@@ -118,9 +110,14 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 		}
 		link.conn = ns.Conn()
 		link.connName = ns.Name()
-		link.connCallOpts = []grpc.CallOption{
-			as.WithClusterAuth(),
-		}
+	}
+	link.callOpts = []grpc.CallOption{
+		grpc.PerRPCCredentials(rpcmetadata.MD{
+			ID:            ids.ApplicationID,
+			AuthType:      "Key",
+			AuthValue:     link.APIKey,
+			AllowInsecure: as.AllowInsecureForCredentials(),
+		}),
 	}
 	close(link.connReady)
 	return nil
@@ -153,7 +150,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	client := ttnpb.NewAsNsClient(l.conn)
 	logger := log.FromContext(ctx).WithField("network_server", l.connName)
 	logger.Debug("Linking")
-	stream, err := client.LinkApplication(ctx, &ids, l.connCallOpts...)
+	stream, err := client.LinkApplication(ctx, l.callOpts...)
 	if err != nil {
 		logger.WithError(err).Warn("Linking failed")
 		return err
