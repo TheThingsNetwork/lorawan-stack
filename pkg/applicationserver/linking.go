@@ -179,11 +179,23 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))
 		up.CorrelationIDs = append(up.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 		registerReceiveUp(ctx, up, l.connName)
-		if err := as.handleUp(ctx, up, l); err != nil {
+
+		handleUpErr := as.handleUp(ctx, up, l)
+		if err := stream.Send(ttnpb.Empty); err != nil {
+			if errors.IsCanceled(err) {
+				logger.Debug("Unlinked")
+			} else {
+				logger.WithError(err).Warn("Link failed")
+			}
+			return err
+		}
+
+		if handleUpErr != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
 			registerDropUp(ctx, up, err)
 			continue
 		}
+
 		switch p := up.Up.(type) {
 		case *ttnpb.ApplicationUp_JoinAccept:
 			p.JoinAccept.AppSKey = nil

@@ -194,6 +194,9 @@ func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error
 			if err := stream.Send(up); err != nil {
 				return err
 			}
+			if _, err := stream.Recv(); err != nil {
+				return err
+			}
 		}
 	}
 }
