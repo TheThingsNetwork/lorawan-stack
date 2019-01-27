@@ -53,8 +53,8 @@ func (m *MessageDescriptor) SetSource(skip uint) {
 		panic("could not determine source of message")
 	}
 	m.Description.Package = filepath.Dir(file)
-	if strings.Contains(m.Description.Package, "go.thethings.network/lorawan-stack/") {
-		split := strings.Split(m.Description.Package, "go.thethings.network/lorawan-stack/")
+	if strings.Contains(m.Description.Package, "lorawan-stack/") {
+		split := strings.Split(m.Description.Package, "lorawan-stack/")
 		m.Description.Package = split[len(split)-1]
 	}
 	m.Description.File = filepath.Base(file)
