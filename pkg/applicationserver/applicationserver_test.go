@@ -102,11 +102,12 @@ func TestApplicationServer(t *testing.T) {
 	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
 	linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
+			APIKey: registeredApplicationKey,
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
 				UpFormatter:   registeredApplicationFormatter,
 				DownFormatter: registeredApplicationFormatter,
 			},
-		}, []string{"default_formatters"}, nil
+		}, []string{"api_key", "default_formatters"}, nil
 	})
 
 	webhooksRedisClient, webhooksFlush := test.NewRedis(t, "applicationserver_test", "webhooks")
