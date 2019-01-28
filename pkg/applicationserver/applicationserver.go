@@ -548,7 +548,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 				"session",
 			},
 			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				if err := as.recalculateDownlinkQueue(ctx, dev, nil, queue, msg.FCnt, link); err != nil {
+				if err := as.recalculateDownlinkQueue(ctx, dev, nil, queue, msg.FCnt+1, link); err != nil {
 					return nil, nil, err
 				}
 				return dev, []string{"session"}, nil

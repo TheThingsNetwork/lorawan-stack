@@ -854,13 +854,13 @@ func TestApplicationServer(t *testing.T) {
 								{ // The nacked item is inserted first.
 									SessionKeyID: []byte{0x33},
 									FPort:        11,
-									FCnt:         1,
+									FCnt:         2,
 									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 								},
 								{
 									SessionKeyID: []byte{0x33},
 									FPort:        22,
-									FCnt:         2,
+									FCnt:         3,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 								},
 							})
@@ -907,7 +907,7 @@ func TestApplicationServer(t *testing.T) {
 										KEKLabel: "test",
 									},
 								},
-								LastAFCntDown: 2,
+								LastAFCntDown: 3,
 								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
@@ -926,13 +926,13 @@ func TestApplicationServer(t *testing.T) {
 								{
 									SessionKeyID: []byte{0x33},
 									FPort:        11,
-									FCnt:         1,
+									FCnt:         2,
 									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 								},
 								{
 									SessionKeyID: []byte{0x33},
 									FPort:        22,
-									FCnt:         2,
+									FCnt:         3,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 								},
 							})
