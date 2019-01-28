@@ -1196,6 +1196,15 @@
       "file": "applications.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_application_link_api_key": {
+    "translations": {
+      "en": "no application link API key set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "applications_link.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_client_id": {
     "translations": {
       "en": "no client ID set"
@@ -1505,6 +1514,15 @@
   "error:pkg/applicationserver:no_app_s_key": {
     "translations": {
       "en": "no AppSKey"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:no_device_session": {
+    "translations": {
+      "en": "no device session; check device activation"
     },
     "description": {
       "package": "pkg/applicationserver",

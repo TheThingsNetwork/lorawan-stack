@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -31,6 +32,8 @@ var (
 	selectApplicationLinkFlags = util.FieldMaskFlags(&ttnpb.ApplicationLink{})
 	setApplicationLinkFlags    = util.FieldFlags(&ttnpb.ApplicationLink{})
 )
+
+var errNoApplicationLinkAPIKey = errors.DefineInvalidArgument("no_application_link_api_key", "no application link API key set")
 
 var (
 	applicationsLinkCommand = &cobra.Command{
@@ -83,6 +86,9 @@ var (
 			var link ttnpb.ApplicationLink
 			if err := util.SetFields(&link, setApplicationLinkFlags); err != nil {
 				return err
+			}
+			if link.APIKey == "" {
+				return errNoApplicationLinkAPIKey
 			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerAddress)
