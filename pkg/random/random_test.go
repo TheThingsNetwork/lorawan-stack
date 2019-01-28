@@ -16,8 +16,10 @@ package random
 
 import (
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestPseudoRandom(t *testing.T) {
@@ -66,5 +68,17 @@ func BenchmarkRead(b *testing.B) {
 	p := make([]byte, 100)
 	for i := 0; i < b.N; i++ {
 		Read(p)
+	}
+}
+
+func TestJitter(t *testing.T) {
+	a := assertions.New(t)
+	d := time.Duration(424242)
+	p := 0.1
+	for i := 0; i < 100; i++ {
+		// Jitter of 10%
+		t := Jitter(d, p)
+		df := float64(d)
+		a.So(t, should.BeBetweenOrEqual, df-df*p, df+df*p)
 	}
 }
