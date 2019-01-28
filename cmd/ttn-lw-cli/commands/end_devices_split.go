@@ -68,6 +68,7 @@ func getEndDevicePathFromNS(pathParts ...string) bool {
 	case
 		"supports_class_b",
 		"supports_class_c",
+		"default_class",
 		"lorawan_version",
 		"lorawan_phy_version",
 		"frequency_plan_id",
@@ -121,6 +122,7 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 	case
 		"supports_class_b",
 		"supports_class_c",
+		"default_class",
 		"lorawan_version",
 		"lorawan_phy_version",
 		"frequency_plan_id",
