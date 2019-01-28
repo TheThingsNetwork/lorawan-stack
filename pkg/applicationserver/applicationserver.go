@@ -196,7 +196,7 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 
 	uid := unique.ID(ctx, ids)
 	logger := log.FromContext(ctx).WithField("application_uid", uid)
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("application_conn:%s", events.NewCorrelationID()))
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID()))
 
 	l, err := as.getLink(ctx, ids)
 	if err != nil {
