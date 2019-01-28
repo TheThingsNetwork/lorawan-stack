@@ -61,8 +61,6 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
 func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) ([]byte, *ttnpb.ApplicationDownlink, error) {
-	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
-
 	if dev.MACState == nil {
 		return nil, nil, errUnknownMACState
 	}
@@ -70,6 +68,9 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 	if dev.Session == nil {
 		return nil, nil, errEmptySession
 	}
+
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+	logger := log.FromContext(ctx)
 
 	// NOTE: len(MHDR) + len(MIC) = 1 + 4 = 5
 	if maxDownLen < 5 || maxUpLen < 5 {
@@ -170,10 +171,7 @@ outer:
 			FCnt: dev.Session.LastNFCntDown + 1,
 		},
 	}
-	logger = logger.WithFields(log.Fields(
-		"ack", pld.FHDR.FCtrl.Ack,
-		"f_cnt", pld.FHDR.FCnt,
-	))
+	logger = logger.WithField("ack", pld.FHDR.FCtrl.Ack)
 
 	var appDown *ttnpb.ApplicationDownlink
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
@@ -193,14 +191,18 @@ outer:
 			pld.FPort = down.FPort
 			pld.FRMPayload = down.FRMPayload
 			if down.Confirmed {
+				mType = ttnpb.MType_CONFIRMED_DOWN
+
 				dev.MACState.PendingApplicationDownlink = down
 				dev.Session.LastConfFCntDown = pld.FCnt
-
-				mType = ttnpb.MType_CONFIRMED_DOWN
 			}
 		}
 	}
-	logger = logger.WithField("f_port", pld.FPort)
+	logger = logger.WithFields(log.Fields(
+		"f_cnt", pld.FHDR.FCnt,
+		"f_port", pld.FPort,
+		"m_type", mType,
+	))
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
