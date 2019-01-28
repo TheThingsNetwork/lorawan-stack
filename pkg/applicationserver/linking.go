@@ -53,7 +53,10 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 	as.StartTask(ctx, "link", func(ctx context.Context) error {
 		err := as.link(ctx, ids, target)
 		switch {
-		case errors.IsFailedPrecondition(err), errors.IsUnauthenticated(err), errors.IsPermissionDenied(err):
+		case errors.IsFailedPrecondition(err),
+			errors.IsUnauthenticated(err),
+			errors.IsPermissionDenied(err),
+			errors.IsInvalidArgument(err):
 			log.FromContext(ctx).WithError(err).Warn("Failed to link")
 			return nil
 		case errors.IsCanceled(err), errors.IsAlreadyExists(err):
