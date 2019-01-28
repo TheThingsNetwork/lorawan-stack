@@ -456,7 +456,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		dev, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
 			[]string{
 				"frequency_plan_id",
+				"last_dev_status_received_at",
 				"lorawan_phy_version",
+				"mac_settings",
 				"mac_state",
 				"queued_application_downlinks",
 				"recent_downlinks",

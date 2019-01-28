@@ -266,7 +266,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"last_dev_status_received_at",
 					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -692,7 +694,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"last_dev_status_received_at",
 					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -1107,7 +1111,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"last_dev_status_received_at",
 					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -1687,7 +1693,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"last_dev_status_received_at",
 					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
@@ -2271,7 +2279,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(devID, should.Equal, DeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"last_dev_status_received_at",
 					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
