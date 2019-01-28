@@ -20,7 +20,7 @@ import (
 	"encoding/base64"
 	"io"
 	"math/big"
-	mathRand "math/rand"
+	mathrand "math/rand"
 	"time"
 )
 
@@ -38,7 +38,7 @@ type TTNRandom struct {
 }
 
 func init() {
-	mathRand.Seed(time.Now().UTC().UnixNano())
+	mathrand.Seed(time.Now().UTC().UnixNano())
 }
 
 // New returns a new Random, in most cases you can also just use the global funcs.
@@ -89,6 +89,6 @@ func (r *TTNRandom) String(n int) string {
 // With d=100 and p=0.1, the duration returned will be in [90,110].
 func Jitter(d time.Duration, p float64) time.Duration {
 	df := float64(d)
-	v := time.Duration(mathrand.Int63n(int64(df*p*2))-int64(df*p))
+	v := time.Duration(mathrand.Int63n(int64(df*p*2)) - int64(df*p))
 	return d + v
 }

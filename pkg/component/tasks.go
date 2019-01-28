@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/random"
 )
 
 // TaskFunc is the task function.
@@ -61,7 +62,7 @@ func (c *Component) RegisterTask(id string, fn TaskFunc, restart TaskRestart, ba
 }
 
 // StartTask starts the specified task function, optionally with restart policy and backoff.
-func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, jitter float64, backoff ...time.Duration) {
 	logger := log.FromContext(ctx).WithField("task_id", id)
 	if len(backoff) == 0 {
 		backoff = defaultTaskBackoff[:]
@@ -92,13 +93,17 @@ func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, resta
 			if bi >= len(backoff) {
 				bi = len(backoff) - 1
 			}
-			time.Sleep(backoff[bi])
+			s := backoff[bi]
+			if jitter != 0 {
+				s = random.Jitter(backoff[bi], jitter)
+			}
+			time.Sleep(s)
 		}
 	}()
 }
 
 func (c *Component) startTasks() {
 	for _, t := range c.tasks {
-		c.StartTask(c.ctx, t.id, t.fn, t.restart, t.backoff...)
+		c.StartTask(c.ctx, t.id, t.fn, t.restart, 0.1, t.backoff...)
 	}
 }

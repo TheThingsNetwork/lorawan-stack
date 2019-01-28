@@ -50,7 +50,6 @@ var linkBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * 
 
 func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) {
 	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
-	// TODO: Add jitter to the backoff (https://github.com/TheThingsIndustries/lorawan-stack/issues/1227)
 	as.StartTask(ctx, "link", func(ctx context.Context) error {
 		err := as.link(ctx, ids, target)
 		switch {
@@ -62,7 +61,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 		default:
 			return err
 		}
-	}, component.TaskRestartOnFailure, linkBackoff...)
+	}, component.TaskRestartOnFailure, 0.1, linkBackoff...)
 }
 
 type link struct {
