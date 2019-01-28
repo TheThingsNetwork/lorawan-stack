@@ -390,6 +390,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a := assertions.New(t)
 				expected := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
 				expected.RootKeys = &ttnpb.RootKeys{
+					RootKeyID: registeredDevice.RootKeys.RootKeyID,
 					NwkKey: &ttnpb.KeyEnvelope{
 						Key: registeredNwkKey,
 					},
