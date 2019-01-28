@@ -36,12 +36,14 @@ import (
 func TestGetTrust(t *testing.T) {
 	a := assertions.New(t)
 
+	s := new(CUPSServer)
+
 	for _, addr := range []string{
 		"thethingsnetwork.org:443",
 		"https://thethingsnetwork.org:443",
 		"https://thethingsnetwork.org",
 	} {
-		cert, err := getTrust(addr)
+		cert, err := s.getTrust(addr)
 		a.So(err, should.BeNil)
 		a.So(cert, should.NotBeNil)
 	}
@@ -163,9 +165,12 @@ func mockGateway() *ttnpb.Gateway {
 }
 
 var (
-	mockFallbackAuth = grpc.PerRPCCredentials(nil)
-	mockGatewayEUI   = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
-	mockErrNotFound  = grpc.Errorf(codes.NotFound, "not found")
+	mockFallbackAuth     = grpc.PerRPCCredentials(nil)
+	mockFallbackAuthFunc = func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+		return mockFallbackAuth
+	}
+	mockGatewayEUI  = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
+	mockErrNotFound = grpc.Errorf(codes.NotFound, "not found")
 )
 
 func TestCUPSServer(t *testing.T) {
@@ -281,9 +286,10 @@ func TestCUPSServer(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(res.CUPSURI, should.Equal, "https://thethingsnetwork.org:443")
 				a.So(res.LNSURI, should.Equal, "wss://thethingsnetwork.org:443")
-				a.So(bytes.Contains(res.CUPSCredentials, []byte("FAKE CERTIFICATE CONTENTS")), should.BeTrue)
+				a.So(bytes.Contains(res.CUPSCredentials, []byte("FAKE CERTIFICATE CONTENTS")), should.BeFalse)
 				a.So(bytes.Contains(res.CUPSCredentials, []byte("KEYCONTENTS")), should.BeTrue)
 				a.So(bytes.Contains(res.LNSCredentials, []byte("KEYCONTENTS")), should.BeTrue)
+				a.So(bytes.Equal(res.CUPSCredentials, res.LNSCredentials), should.BeTrue)
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				a.So(s.opts.Update, should.NotContain, mockFallbackAuth)
@@ -299,7 +305,7 @@ func TestCUPSServer(t *testing.T) {
 				tt.StoreSetup(store)
 			}
 			s := NewCUPSServer(store, store, append([]Option{
-				WithFallbackAuth(mockFallbackAuth),
+				WithFallbackAuth(mockFallbackAuthFunc),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(updateInfoRequest))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

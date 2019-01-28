@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc"
@@ -40,7 +41,8 @@ type CUPSServer struct {
 	registerUnknown       bool
 	defaultOwner          ttnpb.OrganizationOrUserIdentifiers
 
-	trust *x509.Certificate
+	rootCAs *x509.CertPool
+	trust   *x509.Certificate
 
 	signers map[uint32]crypto.Signer
 }
@@ -87,6 +89,14 @@ func WithTrust(cert *x509.Certificate) Option {
 	}
 }
 
+// WithRootCAs configures the CUPS server with the given Root CAs that will be used
+// to lookup CUPS/LNS Root CAs.
+func WithRootCAs(pool *x509.CertPool) Option {
+	return func(s *CUPSServer) {
+		s.rootCAs = pool
+	}
+}
+
 // WithSigner configures the CUPS server with a firmware signer.
 func WithSigner(keyCRC uint32, signer crypto.Signer) Option {
 	return func(s *CUPSServer) {
@@ -124,7 +134,15 @@ func getContext(c echo.Context) context.Context {
 	return metadata.NewIncomingContext(ctx, md)
 }
 
-func getTrust(address string) (*x509.Certificate, error) {
+var errNoTrust = errors.DefineInternal("no_trust", "no trusted certificate configured")
+
+func (s *CUPSServer) getTrust(address string) (*x509.Certificate, error) {
+	if address == "" {
+		if s.trust == nil {
+			return nil, errNoTrust
+		}
+		return s.trust, nil
+	}
 	if strings.Contains(address, "//") {
 		url, err := url.Parse(address)
 		if err != nil {
@@ -135,7 +153,7 @@ func getTrust(address string) (*x509.Certificate, error) {
 	if _, _, err := net.SplitHostPort(address); err != nil {
 		address = net.JoinHostPort(address, "443")
 	}
-	conn, err := tls.Dial("tcp", address, nil)
+	conn, err := tls.Dial("tcp", address, &tls.Config{RootCAs: s.rootCAs})
 	if err != nil {
 		return nil, err
 	}
