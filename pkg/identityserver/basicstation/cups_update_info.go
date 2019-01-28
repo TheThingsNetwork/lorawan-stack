@@ -165,7 +165,11 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 			return err
 		}
 		gtw.Attributes[cupsCredentialsIDAttribute] = apiKey.ID
-		creds, err := TokenCredentials(s.trust, apiKey.Key)
+		trust, err := s.getTrust(gtw.Attributes[cupsURIAttribute])
+		if err != nil {
+			return err
+		}
+		creds, err := TokenCredentials(trust, apiKey.Key)
 		if err != nil {
 			return err
 		}
@@ -185,7 +189,7 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 			return err
 		}
 		gtw.Attributes[lnsCredentialsIDAttribute] = apiKey.ID
-		trust, err := getTrust(gtw.GatewayServerAddress)
+		trust, err := s.getTrust(gtw.GatewayServerAddress)
 		if err != nil {
 			return err
 		}
