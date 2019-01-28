@@ -365,6 +365,10 @@ var (
 				return nil
 			}
 			var device ttnpb.EndDevice
+			if ttnpb.HasAnyField(ttnpb.TopLevelFields(paths), "root_keys") {
+				device.SupportsJoin = true
+				paths = append(paths, "supports_join")
+			}
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
 			}
