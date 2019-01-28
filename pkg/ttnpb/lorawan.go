@@ -18,7 +18,6 @@ import (
 	"strconv"
 
 	"github.com/blang/semver"
-	"github.com/gogo/protobuf/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
@@ -59,23 +58,6 @@ func (v MACVersion) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
-// MarshalJSON implements json.Marshaler interface.
-func (v MACVersion) MarshalJSON() ([]byte, error) {
-	txt, err := v.MarshalText()
-	if err != nil {
-		return nil, err
-	}
-	return []byte("\"" + string(txt) + "\""), nil
-}
-
-// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v MACVersion) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	if m.EnumsAsInts {
-		return []byte("\"" + strconv.Itoa(int(v)) + "\""), nil
-	}
-	return v.MarshalJSON()
-}
-
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *MACVersion) UnmarshalText(b []byte) error {
 	switch string(b) {
@@ -95,16 +77,6 @@ func (v *MACVersion) UnmarshalText(b []byte) error {
 		return errCouldNotParse("MACVersion")(string(b))
 	}
 	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *MACVersion) UnmarshalJSON(b []byte) error {
-	return v.UnmarshalText(b[1 : len(b)-1])
-}
-
-// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
-func (v *MACVersion) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
-	return v.UnmarshalJSON(b)
 }
 
 // Compare compares MACVersions v to o:
@@ -166,23 +138,6 @@ func (v PHYVersion) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
-// MarshalJSON implements json.Marshaler interface.
-func (v PHYVersion) MarshalJSON() ([]byte, error) {
-	txt, err := v.MarshalText()
-	if err != nil {
-		return nil, err
-	}
-	return []byte("\"" + string(txt) + "\""), nil
-}
-
-// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v PHYVersion) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	if m.EnumsAsInts {
-		return []byte("\"" + strconv.Itoa(int(v)) + "\""), nil
-	}
-	return v.MarshalJSON()
-}
-
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *PHYVersion) UnmarshalText(b []byte) error {
 	switch string(b) {
@@ -206,16 +161,6 @@ func (v *PHYVersion) UnmarshalText(b []byte) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *PHYVersion) UnmarshalJSON(b []byte) error {
-	return v.UnmarshalText(b[1 : len(b)-1])
-}
-
-// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
-func (v *PHYVersion) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
-	return v.UnmarshalJSON(b)
-}
-
 // String implements fmt.Stringer.
 func (v DataRateIndex) String() string {
 	return strconv.Itoa(int(v))
@@ -224,16 +169,6 @@ func (v DataRateIndex) String() string {
 // MarshalText implements encoding.TextMarshaler interface.
 func (v DataRateIndex) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
-}
-
-// MarshalJSON implements json.Marshaler interface.
-func (v DataRateIndex) MarshalJSON() ([]byte, error) {
-	return v.MarshalText()
-}
-
-// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v DataRateIndex) MarshalJSONPB(_ *jsonpb.Marshaler) ([]byte, error) {
-	return v.MarshalJSON()
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
@@ -250,14 +185,4 @@ func (v *DataRateIndex) UnmarshalText(b []byte) error {
 	}
 	*v = DataRateIndex(i)
 	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *DataRateIndex) UnmarshalJSON(b []byte) error {
-	return v.UnmarshalText(b)
-}
-
-// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
-func (v *DataRateIndex) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
-	return v.UnmarshalJSON(b)
 }
