@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages_test
+package basicstation_test
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstation/messages"
+	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -29,7 +29,7 @@ func TestMarshalEUI(t *testing.T) {
 	a := assertions.New(t)
 
 	{
-		eui := messages.EUI{
+		eui := basicstation.EUI{
 			EUI64: types.EUI64{0xaa, 0xbb, 0x00, 0x01, 0x02, 0x03, 0x42, 0xff},
 		}
 		data, err := json.Marshal(eui)
@@ -38,7 +38,7 @@ func TestMarshalEUI(t *testing.T) {
 	}
 
 	{
-		eui := messages.EUI{
+		eui := basicstation.EUI{
 			Prefix: "ROUTER",
 			EUI64:  types.EUI64{0xaa, 0xbb, 0x00, 0x01, 0x02, 0x03, 0x42, 0xff},
 		}
@@ -48,7 +48,7 @@ func TestMarshalEUI(t *testing.T) {
 	}
 
 	{
-		eui := messages.EUI{
+		eui := basicstation.EUI{
 			Prefix: "muxs",
 			EUI64:  types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 		}
@@ -138,7 +138,7 @@ func TestUnmarshalEUI(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			var eui messages.EUI
+			var eui basicstation.EUI
 			err := json.Unmarshal([]byte(tc.Input), &eui)
 			if tc.OK {
 				a.So(err, should.BeNil)
