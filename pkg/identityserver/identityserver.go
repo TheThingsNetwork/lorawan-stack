@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
 )
 
@@ -137,7 +138,9 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}, is.config.OAuth)
 
 	cupsOpts := []basicstation.Option{
-		basicstation.WithFallbackAuth(is.Component.WithClusterAuth()),
+		basicstation.WithFallbackAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+			return is.Component.WithClusterAuth()
+		}),
 	}
 	if tlsConfig, err := is.Component.GetBaseConfig(is.Component.Context()).TLS.Config(is.Component.Context()); err == nil {
 		cupsOpts = append(cupsOpts, basicstation.WithRootCAs(tlsConfig.RootCAs))

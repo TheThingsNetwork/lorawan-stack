@@ -68,7 +68,7 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 	md := rpcmetadata.FromIncomingContext(ctx)
 
 	var (
-		authorization   = s.fallbackAuth
+		authorization   grpc.CallOption
 		cupsCredentials = c.Request().Header.Get(echo.HeaderAuthorization)
 	)
 
@@ -81,6 +81,13 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 			authorization = grpc.PerRPCCredentials(md)
 			cupsCredentials = ""
 		}
+	}
+
+	if authorization == nil && s.fallbackAuth != nil {
+		authorization = s.fallbackAuth(ctx, req.Router.EUI64, cupsCredentials)
+	}
+	if authorization == nil {
+		return errUnauthenticated
 	}
 
 	var gtw *ttnpb.Gateway

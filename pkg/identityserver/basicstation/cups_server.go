@@ -26,6 +26,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -35,7 +36,7 @@ import (
 type CUPSServer struct {
 	gatewayRegistry ttnpb.GatewayRegistryClient
 	gatewayAccess   ttnpb.GatewayAccessClient
-	fallbackAuth    grpc.CallOption
+	fallbackAuth    func(context.Context, types.EUI64, string) grpc.CallOption
 
 	requireExplicitEnable bool
 	registerUnknown       bool
@@ -53,9 +54,9 @@ type Option func(s *CUPSServer)
 // WithFallbackAuth sets fallback auth for gateways that don't provide TTN auth.
 // When this auth method is used, the CUPS server will look up the _cups_credentials
 // attribute in the gateway registry.
-func WithFallbackAuth(auth grpc.CallOption) Option {
+func WithFallbackAuth(fallback func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption) Option {
 	return func(s *CUPSServer) {
-		s.fallbackAuth = auth
+		s.fallbackAuth = fallback
 	}
 }
 
