@@ -15,11 +15,9 @@
 package basicstation
 
 import (
-	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/sha512"
-	"crypto/tls"
 	"fmt"
 	"hash/crc32"
 	"net/http"
@@ -35,33 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
-
-type CUPSServer struct {
-	gatewayRegistry ttnpb.GatewayRegistryClient
-	gatewayAccess   ttnpb.GatewayAccessClient
-	fallbackAuth    grpc.CallOption
-
-	requireExplicitEnable bool
-	registerUnknown       bool
-	defaultOwner          ttnpb.OrganizationOrUserIdentifiers
-
-	trust *tls.Certificate
-
-	signers map[uint32]crypto.Signer
-}
-
-func getContext(c echo.Context) context.Context {
-	ctx := c.Request().Context()
-	md := metadata.New(map[string]string{
-		"authorization": c.Request().Header.Get(echo.HeaderAuthorization),
-	})
-	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	return metadata.NewIncomingContext(ctx, md)
-}
 
 const (
 	cupsAttribute               = "_cups"
@@ -153,6 +125,10 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 		return err
 	}
 
+	if gtw.Attributes == nil {
+		gtw.Attributes = make(map[string]string)
+	}
+
 	if s.requireExplicitEnable {
 		if cups, _ := strconv.ParseBool(gtw.Attributes[cupsAttribute]); !cups {
 			return errCUPSNotEnabled.WithAttributes("gateway_uid", unique.ID(ctx, gtw.GatewayIdentifiers))
@@ -166,21 +142,13 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 		}
 	}
 
-	if gtw.Attributes == nil {
-		gtw.Attributes = make(map[string]string)
-	}
-	gtw.Attributes[cupsLastSeenAttribute] = time.Now().UTC().Format(time.RFC3339)
-	gtw.Attributes[cupsStationAttribute] = req.Station
-	gtw.Attributes[cupsModelAttribute] = req.Model
-	gtw.Attributes[cupsPackageAttribute] = req.Package
-
 	res := UpdateInfoResponse{}
 
 	if cupsURI := gtw.Attributes[cupsURIAttribute]; cupsURI != "" && cupsURI != req.CUPSURI {
 		res.CUPSURI = cupsURI
 	}
 	if gtw.GatewayServerAddress != "" && gtw.GatewayServerAddress != req.LNSURI {
-		res.LNSURI = gtw.GatewayServerAddress
+		res.LNSURI = gtw.GatewayServerAddress // TODO: Clean / Format.
 	}
 	if gtw.Attributes[cupsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10) {
 		apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
@@ -217,7 +185,7 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 			return err
 		}
 		gtw.Attributes[lnsCredentialsIDAttribute] = apiKey.ID
-		trust, err := s.getTrust(gtw.GatewayServerAddress)
+		trust, err := getTrust(gtw.GatewayServerAddress)
 		if err != nil {
 			return err
 		}
@@ -257,6 +225,11 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 			}
 		}
 	}
+
+	gtw.Attributes[cupsLastSeenAttribute] = time.Now().UTC().Format(time.RFC3339)
+	gtw.Attributes[cupsStationAttribute] = req.Station
+	gtw.Attributes[cupsModelAttribute] = req.Model
+	gtw.Attributes[cupsPackageAttribute] = req.Package
 
 	gtw, err = s.gatewayRegistry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
