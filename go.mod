@@ -57,11 +57,10 @@ require (
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/kr/pty v1.1.3 // indirect
-	github.com/labstack/echo v3.3.5+incompatible
+	github.com/labstack/echo v0.0.0-20190126223945-739700bf4ef7
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.0.0
 	github.com/magefile/mage v1.8.0
-	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.4
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
@@ -97,17 +96,15 @@ require (
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/stripe/safesql v0.0.0-20171221195208-cddf355596fe // indirect
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
 	github.com/walle/lll v0.0.0-20160702150637-8b13b3fbf731 // indirect
 	go.opencensus.io v0.18.0
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
 	gocloud.dev v0.9.0
-	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
+	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
 	golang.org/x/image v0.0.0-20190118043309-183bebdce1b2 // indirect
 	golang.org/x/net v0.0.0-20190119204137-ed066c81e75e
 	golang.org/x/oauth2 v0.0.0-20190115181402-5dab4167f31c
-	golang.org/x/sys v0.0.0-20190121090251-770c60269bf0 // indirect
+	golang.org/x/sys v0.0.0-20190124100055-b90733256f2e // indirect
 	golang.org/x/tools v0.0.0-20190121143147-24cd39ecf745 // indirect
 	google.golang.org/genproto v0.0.0-20190111180523-db91494dd46c
 	google.golang.org/grpc v1.18.0
