@@ -90,12 +90,24 @@ func TestEvents(t *testing.T) {
 
 func TestUnmarshalJSON(t *testing.T) {
 	a := assertions.New(t)
-	evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), "data")
-	json, err := json.Marshal(evt)
-	a.So(err, should.BeNil)
-	evt2, err := events.UnmarshalJSON(json)
-	a.So(err, should.BeNil)
-	a.So(evt2, should.Resemble, evt)
+	{
+		evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), "data")
+		json, err := json.Marshal(evt)
+		a.So(err, should.BeNil)
+		evt2, err := events.UnmarshalJSON(json)
+		a.So(err, should.BeNil)
+		a.So(evt2, should.Resemble, evt)
+	}
+
+	{
+		var fieldmask []string
+		evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), fieldmask)
+		json, err := json.Marshal(evt)
+		a.So(err, should.BeNil)
+		evt2, err := events.UnmarshalJSON(json)
+		a.So(err, should.BeNil)
+		a.So(evt2.Data(), should.BeNil)
+	}
 }
 
 func Example() {

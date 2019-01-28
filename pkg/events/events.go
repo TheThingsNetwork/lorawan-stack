@@ -177,7 +177,9 @@ func Proto(e Event) (*ttnpb.Event, error) {
 			if err != nil {
 				return nil, err
 			}
-			pb.Data, err = types.MarshalAny(value)
+			if _, isNull := value.Kind.(*types.Value_NullValue); !isNull {
+				pb.Data, err = types.MarshalAny(value)
+			}
 		}
 		if err != nil {
 			return nil, err
