@@ -135,6 +135,8 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			fs.Float64(name, 0, "")
 		case reflect.Slice:
 			switch t.Elem().Kind() {
+			case reflect.Bool:
+				fs.BoolSlice(name, nil, "")
 			case reflect.String:
 				fs.StringSlice(name, nil, "")
 			case reflect.Int32:
