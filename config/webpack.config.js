@@ -70,6 +70,10 @@ export default {
         target: 'http://localhost:1885',
         bypass: () => false,
       },
+      '/api': {
+        target: 'http://localhost:1885',
+        bypass: () => false,
+      },
     },
     historyApiFallback: true,
   },
