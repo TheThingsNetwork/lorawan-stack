@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -30,10 +31,9 @@ message ApplicationLink {
   // The address of the external Network Server where to link to.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
-  // Leave empty when linking to an internal Network Server.
+  // Leave empty when linking to a cluster Network Server.
   string network_server_address = 1;
-  // API key to use when linking to an external Network Server.
-  string api_key = 2 [(gogoproto.customname) = "APIKey"];
+  string api_key = 2 [(gogoproto.customname) = "APIKey", (validator.field) = {string_not_empty: true}];
   MessagePayloadFormatters default_formatters = 3;
 }
 

@@ -787,8 +787,8 @@ where the user or organization is collaborator on.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| network_server_address | [string](#string) |  | The address of the external Network Server where to link to. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. Leave empty when linking to an internal Network Server. |
-| api_key | [string](#string) |  | API key to use when linking to an external Network Server. |
+| network_server_address | [string](#string) |  | The address of the external Network Server where to link to. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. Leave empty when linking to a cluster Network Server. |
+| api_key | [string](#string) |  |  |
 | default_formatters | [MessagePayloadFormatters](#ttn.lorawan.v3.MessagePayloadFormatters) |  |  |
 
 

@@ -5336,11 +5336,10 @@
       "properties": {
         "network_server_address": {
           "type": "string",
-          "description": "The address of the external Network Server where to link to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nLeave empty when linking to an internal Network Server."
+          "description": "The address of the external Network Server where to link to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nLeave empty when linking to a cluster Network Server."
         },
         "api_key": {
-          "type": "string",
-          "description": "API key to use when linking to an external Network Server."
+          "type": "string"
         },
         "default_formatters": {
           "$ref": "#/definitions/v3MessagePayloadFormatters"
