@@ -205,7 +205,7 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	sub := io.NewSubscription(ctx, protocol, &ids)
 	l.subscribeCh <- sub
 	go func() {
-		<-ctx.Done()
+		<-sub.Context().Done()
 		l.unsubscribeCh <- sub
 	}()
 	logger.Info("Application subscribed")
