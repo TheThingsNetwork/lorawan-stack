@@ -212,7 +212,10 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	return sub, nil
 }
 
-var errDeviceNotFound = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
+var (
+	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
+	errNoDeviceSession = errors.DefineFailedPrecondition("no_device_session", "no device session; check device activation")
+)
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
@@ -234,6 +237,9 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
+			}
+			if dev.Session == nil {
+				return nil, nil, errNoDeviceSession
 			}
 			for _, item := range items {
 				registerReceiveDownlink(ctx, ids, item)
@@ -295,7 +301,10 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	if dev.Session == nil || dev.Session.AppSKey == nil {
+	if dev.Session == nil {
+		return nil, errNoDeviceSession
+	}
+	if dev.Session.AppSKey == nil {
 		return nil, errNoAppSKey
 	}
 	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
