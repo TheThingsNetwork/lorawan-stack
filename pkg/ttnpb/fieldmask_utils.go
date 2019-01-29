@@ -14,7 +14,11 @@
 
 package ttnpb
 
-import "strings"
+import (
+	"strings"
+
+	"go.thethings.network/lorawan-stack/pkg/errors"
+)
 
 // TopLevelFields returns the unique top level fields of the given paths.
 func TopLevelFields(paths []string) []string {
@@ -77,4 +81,30 @@ func FlattenPaths(paths, flatten []string) []string {
 		}
 	}
 	return res
+}
+
+var errMissingField = errors.Define("missing_field", "field {field} is missing")
+
+// RequireFields returns nil if the given requested paths contain all of the given fields and error otherwise.
+// The requested fields (i.e. `a.b`) may be of a higher level than the search path (i.e. `a.b.c`).
+func RequireFields(requested []string, search ...string) error {
+	for _, s := range search {
+		if !HasAnyField(requested, s) {
+			return errMissingField.WithAttributes("field", s)
+		}
+	}
+	return nil
+}
+
+var errProhibitedField = errors.Define("prohibited_field", "field {field} is prohibited")
+
+// ProhibitFields returns nil if the given requested paths contain none of the given fields and error otherwise.
+// The requested fields (i.e. `a.b`) may be of a higher level than the search path (i.e. `a.b.c`).
+func ProhibitFields(requested []string, search ...string) error {
+	for _, s := range search {
+		if HasAnyField(requested, s) {
+			return errProhibitedField.WithAttributes("field", s)
+		}
+	}
+	return nil
 }
