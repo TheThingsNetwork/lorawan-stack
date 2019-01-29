@@ -58,7 +58,7 @@ class Marshaler {
     const totalCount = parseInt(headers['x-total-count'])
 
     if (isNaN(totalCount)) {
-      return { [entity]: [], totalCount: 0 }
+      return { [entity]: list, totalCount: list.length }
     }
 
     const transformedList = transform ? list.map(transform) : list
