@@ -86,8 +86,9 @@ func TestUsersPermissionNotRequired(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
-				UserIdentifiers: userID,
-				Password:        "test password",
+				UserIdentifiers:     userID,
+				PrimaryEmailAddress: "test-user@example.com",
+				Password:            "test password",
 			},
 		})
 

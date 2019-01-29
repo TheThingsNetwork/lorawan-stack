@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
 var (
@@ -88,19 +89,32 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, errInvitationTokenRequired
 	}
 
+	if err := validate.Email(req.User.PrimaryEmailAddress); err != nil {
+		return nil, err
+	}
+	if err := validateContactInfo(req.User.ContactInfo); err != nil {
+		return nil, err
+	}
+
+	if !createdByAdmin {
+		req.User.PrimaryEmailAddressValidatedAt = nil
+		cleanContactInfo(req.User.ContactInfo)
+	}
 	var primaryEmailAddressFound bool
 	for _, contactInfo := range req.User.ContactInfo {
-		if !createdByAdmin {
-			contactInfo.ValidatedAt = nil
-		}
 		if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
 			primaryEmailAddressFound = true
+			if contactInfo.ValidatedAt != nil {
+				req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
+				break
+			}
 		}
 	}
 	if !primaryEmailAddressFound {
 		req.User.ContactInfo = append(req.User.ContactInfo, &ttnpb.ContactInfo{
 			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
 			Value:         req.User.PrimaryEmailAddress,
+			ValidatedAt:   req.User.PrimaryEmailAddressValidatedAt,
 		})
 	}
 
@@ -147,7 +161,6 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		}
 
 		if len(req.ContactInfo) > 0 {
-			cleanContactInfo(req.ContactInfo)
 			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.EntityIdentifiers(), req.ContactInfo)
 			if err != nil {
 				return err
@@ -248,27 +261,30 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
 
-	for _, path := range req.FieldMask.Paths {
-		switch path {
-		case "password", "password_updated_at":
-			return nil, errUpdateUserPasswordRequest
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "password", "password_updated_at") {
+		return nil, errUpdateUserPasswordRequest
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
+		if err := validate.Email(req.User.PrimaryEmailAddress); err != nil {
+			return nil, err
 		}
+	}
+	if err := validateContactInfo(req.User.ContactInfo); err != nil {
+		return nil, err
 	}
 
 	if !updatedByAdmin {
 		for _, path := range req.FieldMask.Paths {
 			switch path {
-			case "primary_email_address",
+			case "primary_email_address_validated_at",
 				"require_password_update",
 				"state", "admin",
 				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}
 		}
-
-		for _, contactInfo := range req.User.ContactInfo {
-			contactInfo.ValidatedAt = nil
-		}
+		cleanContactInfo(req.User.ContactInfo)
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
@@ -284,22 +300,42 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
-			// TODO: if updating primary_email_address, get existing contact info and set primary_email_address_validated_at
-			// depending on existing contact info. Until then, the primary email address can only be updated by admins.
-			req.PrimaryEmailAddressValidatedAt = nil
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
+		updatingContactInfo := ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info")
+		var contactInfo []*ttnpb.ContactInfo
+		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address")
+		if updatingContactInfo || updatingPrimaryEmailAddress {
+			if updatingContactInfo {
+				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.EntityIdentifiers(), req.ContactInfo)
+				if err != nil {
+					return err
+				}
+				contactInfo = usr.ContactInfo
+			}
+			if updatingPrimaryEmailAddress {
+				if !updatingContactInfo {
+					contactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, req.User.EntityIdentifiers())
+					if err != nil {
+						return err
+					}
+				}
+				req.PrimaryEmailAddressValidatedAt = nil
+				if !ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address_validated_at") {
+					req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
+				}
+				for _, contactInfo := range contactInfo {
+					if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+						req.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
+						break
+					}
+				}
+			}
 		}
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, &req.User, &req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
-			cleanContactInfo(req.ContactInfo)
-			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.EntityIdentifiers(), req.ContactInfo)
-			if err != nil {
-				return err
-			}
+		if updatingContactInfo {
+			usr.ContactInfo = contactInfo
 		}
 		return nil
 	})

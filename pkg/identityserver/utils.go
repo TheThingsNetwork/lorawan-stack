@@ -19,6 +19,7 @@ import (
 	"strconv"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/validate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -27,6 +28,18 @@ func cleanContactInfo(info []*ttnpb.ContactInfo) {
 	for _, info := range info {
 		info.ValidatedAt = nil
 	}
+}
+
+func validateContactInfo(info []*ttnpb.ContactInfo) error {
+	for _, info := range info {
+		if info.ContactMethod != ttnpb.CONTACT_METHOD_EMAIL {
+			continue
+		}
+		if err := validate.Email(info.Value); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func setTotalHeader(ctx context.Context, total uint64) {
