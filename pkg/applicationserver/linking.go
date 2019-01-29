@@ -90,9 +90,10 @@ var (
 )
 
 func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, link *link) error {
+	var allowInsecure bool
 	if link.NetworkServerAddress != "" {
 		options := rpcclient.DefaultDialOptions(ctx)
-		if as.AllowInsecureForCredentials() {
+		if allowInsecure = as.AllowInsecureForCredentials(); allowInsecure {
 			options = append(options, grpc.WithInsecure())
 		}
 		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress, options...)
@@ -106,6 +107,7 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 			conn.Close()
 		}()
 	} else {
+		allowInsecure = !as.ClusterTLS()
 		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
 		if ns == nil {
 			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, ids))
@@ -118,7 +120,7 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 			ID:            ids.ApplicationID,
 			AuthType:      "Bearer",
 			AuthValue:     link.APIKey,
-			AllowInsecure: as.AllowInsecureForCredentials(),
+			AllowInsecure: allowInsecure,
 		}),
 	}
 	close(link.connReady)
