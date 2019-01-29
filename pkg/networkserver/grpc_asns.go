@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -93,18 +94,28 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		return nil, err
 	}
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev == nil {
-			return nil, nil, errDeviceNotFound
-		}
-		dev.QueuedApplicationDownlinks = req.Downlinks
-		return dev, []string{"queued_application_downlinks"}, nil
-	})
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{
+		"queued_application_downlinks",
+		"mac_state.device_class",
+	},
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if dev == nil {
+				return nil, nil, errDeviceNotFound
+			}
+			dev.QueuedApplicationDownlinks = req.Downlinks
+			return dev, []string{"queued_application_downlinks"}, nil
+		})
 	if err != nil {
 		return nil, err
 	}
 
-	if dev.MACState != nil && dev.MACState.DeviceClass == ttnpb.CLASS_C {
+	logger = logger.WithFields(log.Fields(
+		"device_class", dev.MACState.DeviceClass,
+		"queue_length", len(dev.QueuedApplicationDownlinks),
+	))
+	logger.Debug("Replaced application downlink queue")
+	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.QueuedApplicationDownlinks) > 0 {
+		logger.WithField("device_class", dev.MACState.DeviceClass).Debug("Adding downlink task...")
 		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, time.Now())
 	}
 	return ttnpb.Empty, nil
@@ -116,18 +127,29 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		return nil, err
 	}
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{"queued_application_downlinks"}, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev == nil {
-			return nil, nil, errDeviceNotFound
-		}
-		dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
-		return dev, []string{"queued_application_downlinks"}, nil
-	})
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
+		[]string{
+			"queued_application_downlinks",
+			"mac_state.device_class",
+		},
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if dev == nil {
+				return nil, nil, errDeviceNotFound
+			}
+			dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
+			return dev, []string{"queued_application_downlinks"}, nil
+		})
 	if err != nil {
 		return nil, err
 	}
 
-	if dev.MACState != nil && dev.MACState.DeviceClass == ttnpb.CLASS_C {
+	logger = logger.WithFields(log.Fields(
+		"device_class", dev.MACState.DeviceClass,
+		"queue_length", len(dev.QueuedApplicationDownlinks),
+	))
+	logger.Debug("Pushed application downlink to queue")
+	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A {
+		logger.Debug("Adding downlink task...")
 		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, time.Now())
 	}
 	return ttnpb.Empty, nil

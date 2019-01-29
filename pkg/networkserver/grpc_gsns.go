@@ -826,6 +826,8 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"pending_session",
 			"queued_application_downlinks",
 			"recent_uplinks",
+			"supports_class_b",
+			"supports_class_c",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var paths []string
