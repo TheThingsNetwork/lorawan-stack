@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"bytes"
 	"context"
 	"time"
 
@@ -32,6 +33,13 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	return ns.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, req.FieldMask.Paths)
 }
 
+func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
+	return key != nil &&
+		key.KEKLabel == "" &&
+		len(key.Key) == 16 &&
+		!bytes.Equal(key.Key, bytes.Repeat([]byte{0}, 16))
+}
+
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
@@ -40,20 +48,99 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		paths := req.FieldMask.Paths
-		if dev == nil && !req.Device.SupportsJoin {
-			if req.Device.Session == nil {
-				return nil, nil, errEmptySession
-			}
-			if err := resetMACState(&req.Device, ns.FrequencyPlans); err != nil {
-				return nil, nil, err
-			}
-			if req.Device.MACState.DeviceClass != ttnpb.CLASS_A {
-				addDownlinkTask = len(req.Device.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters)
-			}
-			paths = append(paths, "mac_state")
-		} else if ttnpb.HasAnyField(paths, "mac_state.device_class") && dev.MACState.DeviceClass == ttnpb.CLASS_A && req.Device.MACState.DeviceClass != ttnpb.CLASS_A {
-			addDownlinkTask = true
+		if dev != nil {
+			addDownlinkTask = ttnpb.HasAnyField(paths, "mac_state.device_class") && req.Device.MACState.DeviceClass != ttnpb.CLASS_A ||
+				ttnpb.HasAnyField(paths, "queued_application_downlinks") && len(req.Device.QueuedApplicationDownlinks) > 0
+			return &req.Device, paths, nil
 		}
+
+		if ttnpb.HasAnyField(paths, "version_ids") {
+			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+		}
+
+		if !ttnpb.HasAnyField(paths, "mac_settings.adr_margin") {
+			// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+			// paths = append(paths, "mac_settings.adr_margin")
+		}
+
+		if !ttnpb.HasAllFields(paths,
+			"default_class",
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"lorawan_version",
+			"mac_settings.adr_margin",
+			"mac_settings.use_adr",
+			"resets_f_cnt",
+			"resets_join_nonces",
+			"supports_class_b",
+			"supports_class_c",
+			"supports_join",
+			"uses_32_bit_f_cnt",
+		) {
+			return nil, nil, errInvalidFieldMask
+		}
+
+		if req.Device.MACSettings == nil {
+			return nil, nil, errNoMACSettings
+		}
+
+		if req.Device.SupportsJoin {
+			return &req.Device, paths, nil
+		}
+
+		if !ttnpb.HasAllFields(paths,
+			"session.dev_addr",
+			"session.keys.f_nwk_s_int_key.key",
+		) {
+			return nil, nil, errInvalidFieldMask
+		}
+		if req.Device.Session == nil {
+			return nil, nil, errEmptySession
+		}
+
+		if !validABPSessionKey(req.Device.Session.FNwkSIntKey) {
+			return nil, nil, errInvalidFNwkSIntKey
+		}
+
+		if req.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if !ttnpb.HasAllFields(paths,
+				"session.keys.nwk_s_enc_key.key",
+				"session.keys.s_nwk_s_int_key.key",
+			) {
+				return nil, nil, errInvalidFieldMask
+			}
+
+			if !validABPSessionKey(req.Device.Session.SNwkSIntKey) {
+				return nil, nil, errInvalidSNwkSIntKey
+			}
+
+			if !validABPSessionKey(req.Device.Session.NwkSEncKey) {
+				return nil, nil, errInvalidNwkSEncKey
+			}
+		} else {
+			if ttnpb.HasAnyField(paths,
+				"session.keys.nwk_s_enc_key.key",
+				"session.keys.s_nwk_s_int_key.key",
+			) {
+				return nil, nil, errInvalidFieldMask
+			}
+			// TODO: Encrypt (https://github.com/TheThingsIndustries/lorawan-stack/issues/1562)
+			req.Device.Session.SNwkSIntKey = req.Device.Session.FNwkSIntKey
+			req.Device.Session.NwkSEncKey = req.Device.Session.FNwkSIntKey
+			paths = append(paths, "session.keys.s_nwk_s_int_key", "session.keys.nwk_s_enc_key")
+		}
+		req.Device.Session.StartedAt = time.Now().UTC()
+		paths = append(paths, "session.started_at")
+
+		if err := resetMACState(&req.Device, ns.FrequencyPlans); err != nil {
+			return nil, nil, err
+		}
+		if req.Device.MACState.DeviceClass != ttnpb.CLASS_A {
+			addDownlinkTask = len(req.Device.QueuedApplicationDownlinks) > 0 ||
+				!req.Device.MACState.CurrentParameters.Equal(req.Device.MACState.DesiredParameters)
+		}
+		paths = append(paths, "mac_state")
+
 		return &req.Device, paths, nil
 	})
 	if err != nil {
