@@ -70,7 +70,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidADRMargin
 		}
 
-		if !ttnpb.HasAllFields(paths,
+		if err := ttnpb.RequireFields(paths,
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",
@@ -81,8 +81,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"supports_class_c",
 			"supports_join",
 			"uses_32_bit_f_cnt",
-		) {
-			return nil, nil, errInvalidFieldMask
+		); err != nil {
+			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
 		if ttnpb.HasAnyField(paths, "supports_class_b") {
@@ -109,11 +109,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return &req.Device, paths, nil
 		}
 
-		if !ttnpb.HasAllFields(paths,
+		if err := ttnpb.RequireFields(paths,
 			"session.dev_addr",
 			"session.keys.f_nwk_s_int_key.key",
-		) {
-			return nil, nil, errInvalidFieldMask
+		); err != nil {
+			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 		if req.Device.Session == nil {
 			return nil, nil, errEmptySession
@@ -124,11 +124,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if req.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-			if !ttnpb.HasAllFields(paths,
+			if err := ttnpb.RequireFields(paths,
 				"session.keys.nwk_s_enc_key.key",
 				"session.keys.s_nwk_s_int_key.key",
-			) {
-				return nil, nil, errInvalidFieldMask
+			); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 
 			if !validABPSessionKey(req.Device.Session.SNwkSIntKey) {
@@ -139,11 +139,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, nil, errInvalidNwkSEncKey
 			}
 		} else {
-			if ttnpb.HasAnyField(paths,
+			if err := ttnpb.ProhibitFields(paths,
 				"session.keys.nwk_s_enc_key.key",
 				"session.keys.s_nwk_s_int_key.key",
-			) {
-				return nil, nil, errInvalidFieldMask
+			); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			// TODO: Encrypt (https://github.com/TheThingsIndustries/lorawan-stack/issues/1562)
 			req.Device.Session.SNwkSIntKey = req.Device.Session.FNwkSIntKey
