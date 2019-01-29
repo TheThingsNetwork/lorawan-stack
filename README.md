@@ -36,7 +36,12 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
   - [x] ACLs
 - GRPC APIs
 - HTTP APIs
-- Web Interface
+- Command-Line Interface
+  - [x] Create account and login
+  - [x] Application management and traffic
+  - [x] End device management, status and traffic
+  - [x] Gateway management and status
+- Web Interface (Console)
   - [x] Create account and login
   - [ ] Application management and traffic
   - [ ] End device management, status and traffic
