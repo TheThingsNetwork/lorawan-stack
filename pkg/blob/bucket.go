@@ -61,15 +61,13 @@ func (c Config) getLocal(_ context.Context, bucket string) (*blob.Bucket, error)
 		return nil, err
 	}
 	_, err = os.Stat(bucketPath)
-	if err != nil {
-		_, err = os.Stat(c.Local.Directory)
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(bucketPath, 0755)
 		if err != nil {
 			return nil, errConfig.WithCause(err)
 		}
-		err = os.Mkdir(bucketPath, 0755)
-		if err != nil {
-			return nil, errConfig.WithCause(err)
-		}
+	} else if err != nil {
+		return nil, err
 	}
 	return fileblob.OpenBucket(bucketPath, nil)
 }

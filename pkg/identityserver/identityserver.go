@@ -56,7 +56,11 @@ type Config struct {
 	AuthCache struct {
 		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
 	} `name:"auth-cache"`
-	OAuth oauth.Config `name:"oauth"`
+	OAuth          oauth.Config `name:"oauth"`
+	ProfilePicture struct {
+		Bucket    string `name:"bucket" description:"Bucket used for storing profile pictures"`
+		BucketURL string `name:"bucket-url" description:"Base URL for public bucket access"`
+	} `name:"profile-picture"`
 }
 
 // IdentityServer implements the Identity Server component.

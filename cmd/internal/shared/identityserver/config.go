@@ -15,6 +15,7 @@
 package identityserver
 
 import (
+	"path"
 	"time"
 
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
@@ -47,4 +48,6 @@ func init() {
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinLength = 8
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinUppercase = 1
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinDigits = 1
+	DefaultIdentityServerConfig.ProfilePicture.Bucket = "profile_pictures"
+	DefaultIdentityServerConfig.ProfilePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "profile_pictures")
 }

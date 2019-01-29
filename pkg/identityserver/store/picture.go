@@ -14,27 +14,14 @@
 
 package store
 
-import (
-	"fmt"
-	"time"
-
-	"github.com/lib/pq"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 // Picture model.
 type Picture struct {
 	Model
 	SoftDelete // Filter on deleted_at not being NULL to clean up storage bucket.
 
-	OriginalLocation string `gorm:"type:VARCHAR"`
-
-	Original []byte `gorm:"type:BYTEA"`
-	MIMEType string `gorm:"type:VARCHAR"`
-
-	ResizedAt *time.Time
-	Sizes     pq.Int64Array `gorm:"type:INT ARRAY"`
-	Extension string        `gorm:"type:VARCHAR"`
+	Data []byte `gorm:"type:BYTEA"`
 }
 
 func init() {
@@ -42,33 +29,11 @@ func init() {
 }
 
 func (p Picture) toPB() *ttnpb.Picture {
-	pb := &ttnpb.Picture{
-		Sizes: map[uint32]string{},
-	}
-	if p.OriginalLocation != "" {
-		pb.Sizes[0] = p.OriginalLocation
-	} else if p.ResizedAt == nil && len(p.Original) > 0 {
-		pb.Embedded = &ttnpb.Picture_Embedded{
-			MimeType: p.MIMEType,
-			Data:     p.Original,
-		}
-	}
-	for _, size := range p.Sizes {
-		pb.Sizes[uint32(size)] = fmt.Sprintf("%s/%d.%s", p.ID, size, p.Extension)
-	}
+	pb := &ttnpb.Picture{}
+	pb.Unmarshal(p.Data)
 	return pb
 }
 
 func (p *Picture) fromPB(pb *ttnpb.Picture) {
-	p.OriginalLocation = pb.Sizes[0]
-	p.Sizes = make(pq.Int64Array, 0, len(pb.Sizes))
-	for size := range pb.Sizes {
-		if size != 0 {
-			p.Sizes = append(p.Sizes, int64(size))
-		}
-	}
-	if pb.Embedded != nil {
-		p.Original = pb.Embedded.Data
-		p.MIMEType = pb.Embedded.MimeType
-	}
+	p.Data, _ = pb.Marshal()
 }

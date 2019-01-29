@@ -15,8 +15,9 @@
 package identityserver
 
 import (
-	"bytes"
 	"context"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/types"
@@ -26,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/picture"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -49,8 +49,6 @@ var (
 	errPasswordStrengthDigits    = errors.DefineInvalidArgument("password_strength_digits", "need at least `{n}` digit(s)")
 	errPasswordStrengthSpecial   = errors.DefineInvalidArgument("password_strength_special", "need at least `{n}` special character(s)")
 )
-
-const maxProfilePictureStoredDimensions = 1024
 
 func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password string) error {
 	requirements := is.configFromContext(ctx).UserRegistration.PasswordRequirements
@@ -78,39 +76,6 @@ func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password
 		return errPasswordStrengthSpecial.WithAttributes("n", requirements.MinSpecial)
 	}
 	return nil
-}
-
-func (is *IdentityServer) preprocessUserProfilePicture(usr *ttnpb.User) (err error) {
-	if usr.ProfilePicture == nil {
-		return
-	}
-	var original string
-	if len(usr.ProfilePicture.Sizes) > 0 {
-		original = usr.ProfilePicture.Sizes[0]
-		if original == "" {
-			var max uint32
-			for size, url := range usr.ProfilePicture.Sizes {
-				if size > max {
-					max = size
-					original = url
-				}
-			}
-		}
-	}
-	if usr.ProfilePicture.Embedded != nil && len(usr.ProfilePicture.Embedded.Data) > 0 {
-		usr.ProfilePicture, err = picture.MakeSquare(bytes.NewBuffer(usr.ProfilePicture.Embedded.Data), maxProfilePictureStoredDimensions)
-		if err != nil {
-			return err
-		}
-		// TODO: Upload to blob store, set original to path (https://github.com/TheThingsIndustries/lorawan-stack/issues/393).
-	}
-	if original != "" {
-		usr.ProfilePicture.Sizes = map[uint32]string{0: original}
-	} else {
-		usr.ProfilePicture.Sizes = nil
-	}
-	// TODO: Schedule background processing (https://github.com/TheThingsIndustries/lorawan-stack/issues/393).
-	return
 }
 
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
@@ -158,9 +123,12 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		req.User.Admin = false
 	}
 
-	if err = is.preprocessUserProfilePicture(&req.User); err != nil {
-		return nil, err
+	if req.User.ProfilePicture != nil {
+		if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
+			return nil, err
+		}
 	}
+	defer func() { is.setFullProfilePictureURL(ctx, usr) }()
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if req.InvitationToken != "" {
@@ -220,6 +188,11 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 			return nil, err
 		}
 	}
+
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
+		defer func() { is.setFullProfilePictureURL(ctx, usr) }()
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		usr, err = store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &req.FieldMask)
 		if err != nil {
@@ -243,6 +216,20 @@ var (
 	errUpdateUserPasswordRequest = errors.DefineInvalidArgument("password_in_update", "can not update password with regular user update request")
 	errUpdateUserAdminField      = errors.DefinePermissionDenied("user_update_admin_field", "only admins can update the `{field}` field")
 )
+
+func (is *IdentityServer) setFullProfilePictureURL(ctx context.Context, usr *ttnpb.User) {
+	bucketURL := is.configFromContext(ctx).ProfilePicture.BucketURL
+	if bucketURL == "" {
+		return
+	}
+	if usr != nil && usr.ProfilePicture != nil {
+		for size, file := range usr.ProfilePicture.Sizes {
+			if !strings.Contains(file, "://") {
+				usr.ProfilePicture.Sizes[size] = path.Join(bucketURL, file)
+			}
+		}
+	}
+}
 
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_BASIC); err != nil {
@@ -273,8 +260,16 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		}
 	}
 
-	if err = is.preprocessUserProfilePicture(&req.User); err != nil {
-		return nil, err
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "profile_picture") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "profile_picture")
+		}
+		if req.User.ProfilePicture != nil {
+			if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
+				return nil, err
+			}
+		}
+		defer func() { is.setFullProfilePictureURL(ctx, usr) }()
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {

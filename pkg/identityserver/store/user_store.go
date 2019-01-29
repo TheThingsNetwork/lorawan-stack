@@ -139,8 +139,23 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldProfilePictureID := userModel.Attributes, userModel.ProfilePictureID
+	oldAttributes, oldProfilePicture := userModel.Attributes, userModel.ProfilePicture
 	columns := userModel.fromPB(usr, fieldMask)
+	newProfilePicture := userModel.ProfilePicture
+	if newProfilePicture != oldProfilePicture {
+		if oldProfilePicture != nil {
+			if err = s.db.Delete(oldProfilePicture).Error; err != nil {
+				return nil, err
+			}
+		}
+		if newProfilePicture != nil {
+			if err = s.db.Create(newProfilePicture).Error; err != nil {
+				return nil, err
+			}
+			userModel.ProfilePictureID, userModel.ProfilePicture = &newProfilePicture.ID, nil
+			columns = append(columns, "profile_picture_id")
+		}
+	}
 	if len(columns) > 0 {
 		query = s.db.Model(&userModel).Select(columns).Updates(&userModel)
 		if query.Error != nil {
@@ -152,11 +167,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 			return nil, err
 		}
 	}
-	if oldProfilePictureID != nil && userModel.ProfilePictureID != oldProfilePictureID {
-		if err = s.db.Where(Picture{Model: Model{ID: *oldProfilePictureID}}).Delete(&Picture{}).Error; err != nil {
-			return nil, err
-		}
-	}
+	userModel.ProfilePicture = newProfilePicture
 	updated = &ttnpb.User{}
 	userModel.toPB(updated, fieldMask)
 	return updated, nil

@@ -77,6 +77,9 @@ var DefaultEventsConfig = config.Events{
 // DefaultBlobConfig is the default config for the blob store.
 var DefaultBlobConfig = config.Blob{
 	Provider: "local",
+	Local: config.BlobConfigLocal{
+		Directory: "./public/blob",
+	},
 }
 
 // DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.

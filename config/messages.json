@@ -1853,6 +1853,24 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/blob:missing_config": {
+    "translations": {
+      "en": "missing blob store configuration"
+    },
+    "description": {
+      "package": "pkg/blob",
+      "file": "bucket.go"
+    }
+  },
+  "error:pkg/blob:unknown_provider": {
+    "translations": {
+      "en": "unknown blob store provider `{provider}`"
+    },
+    "description": {
+      "package": "pkg/blob",
+      "file": "bucket.go"
+    }
+  },
   "error:pkg/cluster:peer_connection": {
     "translations": {
       "en": "connection to peer `{name}` on `{address}` failed"
@@ -2715,6 +2733,15 @@
     "description": {
       "package": "pkg/identityserver/blacklist",
       "file": "blacklist.go"
+    }
+  },
+  "error:pkg/identityserver/picture:original_not_found": {
+    "translations": {
+      "en": "original picture not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/picture",
+      "file": "picture.go"
     }
   },
   "error:pkg/identityserver/store:access_token_not_found": {

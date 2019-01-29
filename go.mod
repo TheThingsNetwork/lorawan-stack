@@ -34,6 +34,7 @@ require (
 	github.com/golang/gddo v0.0.0-20181116215533-9bd4a3295021
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1 // indirect
 	github.com/golang/protobuf v1.2.0
+	github.com/google/wire v0.2.1 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc // indirect
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
