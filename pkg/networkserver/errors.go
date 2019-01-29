@@ -36,6 +36,8 @@ var (
 	errFCntTooHigh               = errors.DefineInvalidArgument("f_cnt_too_high", "FCnt is too high")
 	errGatewayServerNotFound     = errors.DefineNotFound("gateway_server_not_found", "Gateway Server not found")
 	errInvalidChannelIndex       = errors.DefineInvalidArgument("channel_index", "invalid channel index")
+	errInvalidClassBTimeout      = errors.DefineInvalidArgument("class_b_timeout", "invalid class B timeout")
+	errInvalidClassCTimeout      = errors.DefineInvalidArgument("class_c_timeout", "invalid class C timeout")
 	errInvalidConfiguration      = errors.DefineInvalidArgument("configuration", "invalid configuration")
 	errInvalidDataRate           = errors.DefineInvalidArgument("data_rate", "invalid data rate")
 	errInvalidFieldMask          = errors.DefineInvalidArgument("field_mask", "invalid field mask")

@@ -84,6 +84,26 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errNoMACSettings
 		}
 
+		if ttnpb.HasAnyField(paths, "supports_class_b") {
+			if !ttnpb.HasAllFields(paths, "mac_settings.class_b_timeout") {
+				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+				return nil, nil, errInvalidFieldMask
+			}
+			if dev.MACSettings.ClassBTimeout == 0 {
+				return nil, nil, errInvalidClassBTimeout
+			}
+		}
+
+		if ttnpb.HasAnyField(paths, "supports_class_c") {
+			if !ttnpb.HasAllFields(paths, "mac_settings.class_c_timeout") {
+				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+				return nil, nil, errInvalidFieldMask
+			}
+			if dev.MACSettings.ClassCTimeout == 0 {
+				return nil, nil, errInvalidClassCTimeout
+			}
+		}
+
 		if req.Device.SupportsJoin {
 			return &req.Device, paths, nil
 		}
