@@ -14,10 +14,12 @@ RUN chmod 755 /bin/ttn-*
 
 EXPOSE 1700/udp 1882 8882 1883 8883 1884 8884 1885 8885
 
-VOLUME ["/srv/ttn-lorawan/device-repository", "/srv/ttn-lorawan/blob", "/srv/ttn-lorawan/frequency-plans"]
+RUN mkdir /srv/ttn-lorawan/public/blob
+
+VOLUME ["/srv/ttn-lorawan/device-repository", "/srv/ttn-lorawan/public/blob", "/srv/ttn-lorawan/frequency-plans"]
 
 ENV TTN_LW_AS_DEVICE_REPOSITORY_DIRECTORY=/srv/ttn-lorawan/device-repository \
-    TTN_LW_BLOB_LOCAL_DIRECTORY=/srv/ttn-lorawan/blob \
+    TTN_LW_BLOB_LOCAL_DIRECTORY=/srv/ttn-lorawan/public/blob \
     TTN_LW_FREQUENCY_PLANS_DIRECTORY=/srv/ttn-lorawan/frequency-plans \
     TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable \
     TTN_LW_REDIS_ADDRESS=redis:6379
