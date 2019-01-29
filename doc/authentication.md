@@ -25,7 +25,7 @@ To use this method, you first need an **OAuth client registration**:
 
 - The **client ID** uniquely identifies the OAuth client. Its restrictions are the same as for any other ID in TTN.
 - The **description** is shown to the user when you request authorization.
-- The **scope** indicates what actions your OAuth client is allowed to perform. This is shown to the user when you request authorization. You can select the actions your OAuth client needs on registration, a full list can also be found in our [source code](https://github.com/TheThingsIndustries/ttn/blob/ttn-master/api/rights.proto).
+- The **scope** indicates what actions your OAuth client is allowed to perform. This is shown to the user when you request authorization. You can select the actions your OAuth client needs on registration, a full list can also be found in our [source code](https://github.com/TheThingsNetwork/lorawan-stack/blob/master/api/rights.proto).
 - The **redirect URI** is where the user is redirected after authorizing your OAuth client.
 - The **client secret** is issued when your OAuth client Registration is accepted by a network admin.
 
