@@ -57,10 +57,9 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 		closeCh:                    make(chan struct{}),
 	}
 
-	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
-	defer events.Publish(evtEndApplicationLink(ctx, ids, err))
-
 	uid := unique.ID(ctx, ids)
+
+	logger := log.FromContext(ctx).WithField("application_uid", uid)
 
 	ns.applicationServersMu.Lock()
 	cl, ok := ns.applicationServers[uid]
@@ -68,10 +67,16 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	if ok {
 		if err := cl.Close(); err != nil {
 			ns.applicationServersMu.Unlock()
+			logger.WithError(err).Warn("Failed to link application")
 			return err
 		}
 	}
 	ns.applicationServersMu.Unlock()
+
+	logger.Debug("Linked application")
+
+	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
+	defer events.Publish(evtEndApplicationLink(ctx, ids, err))
 
 	select {
 	case <-ctx.Done():
@@ -94,6 +99,8 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		return nil, err
 	}
 
+	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
+
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{
 		"queued_application_downlinks",
 		"mac_state.device_class",
@@ -106,6 +113,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 			return dev, []string{"queued_application_downlinks"}, nil
 		})
 	if err != nil {
+		logger.WithError(err).Warn("Failed to replace application downlink queue")
 		return nil, err
 	}
 
@@ -127,6 +135,8 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		return nil, err
 	}
 
+	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
+
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"queued_application_downlinks",
@@ -140,6 +150,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			return dev, []string{"queued_application_downlinks"}, nil
 		})
 	if err != nil {
+		logger.WithError(err).Warn("Failed to push application downlink to queue")
 		return nil, err
 	}
 
