@@ -24,29 +24,29 @@ sudo ln -s /usr/local/go/bin/* /usr/local/bin
 
 ### Cloning the repository
 
-We use [Go 1.11 Modules](https://github.com/golang/go/wiki/Modules) for dependency management. This means that it is recommended to clone your fork of the repository anywhere outside `$GOPATH`.
-
 If you are unfamiliar with forking projects on GitHub or cloning them locally, please [see the GitHub documentation](https://help.github.com/articles/fork-a-repo/).
 
 ### Getting started
 
-As most of the tasks will be managed by `make` we will first initialize the tooling. You might want to run these commands from time to time:
+As most of the tasks will be managed by `make` we will first initialize the tooling. You might want to run this commands from time to time:
 
 ```sh
 make init
 ```
 
-For convenience, you can initialize the development database with some defaults:
+For convenience, you can initialize the development databases with some defaults.
+
+>Note: this requires [Docker Desktop](https://www.docker.com/products/docker-desktop).
 
 ```sh
 make dev.stack.init
 ```
 
-### External dependencies
+This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
 
-We rely on a number of external dependencies such as databases. You can either install these on your machine or run them in [Docker](https://www.docker.com).
+### Managing the development databases
 
-We provide easy start-up methods if you have Docker installed:
+You can also use the following commands to start, stop and erase databases.
 
 ```bash
 make dev.databases.start # Starts all databases in a Docker container
@@ -69,13 +69,13 @@ Redis is an in-memory data store that we use as a database for "hot" data.
 
 You can use `make dev.databases.redis-cli` to enter a Redis-CLI shell.
 
-#### Testing
+### Testing
 
 ```sh
 make test
 ```
 
-#### Building
+### Building
 
 You can build the stack with the following command:
 
@@ -85,7 +85,7 @@ make clean build-all
 
 This will compile the front-end in `public`, and the binaries in `release`. There is a single binary for the server, `ttn-lw-stack`, as well as a binary for the command-line interface `ttn-lw-cli`. The single binary contains all components start one or multiple components. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
 
-Note that the operating system and architecture is appended to the binary name, i.e. on macOS, you will find `release/ttn-lw-stack-darwin-amd64`.
+>Note: The operating system and architecture is appended to the binary name, i.e. on macOS, you will find `release/ttn-lw-stack-darwin-amd64`.
 
 #### API
 
@@ -106,6 +106,7 @@ make protos.clean protos
 ```
 .
 ├── .editorconfig       configuration for your editor, see editorconfig.org
+├── CODEOWNERS          maintainers of folders who are required to approve pull requests
 ├── CONTRIBUTING.md     guidelines for contributing: branching, commits, code style, etc.
 ├── DEVELOPMENT.md      guide for setting up your development environment
 ├── docker-compose.yml  deployment file (including databases) for Docker Compose
