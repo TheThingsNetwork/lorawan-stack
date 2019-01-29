@@ -306,8 +306,8 @@ var (
 					}
 					paths = append(paths,
 						"root_keys.root_key_id",
-						"root_keys.app_key",
-						"root_keys.nwk_key",
+						"root_keys.app_key.key",
+						"root_keys.nwk_key.key",
 					)
 				}
 			}

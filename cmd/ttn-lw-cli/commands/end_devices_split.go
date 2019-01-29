@@ -149,7 +149,7 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 			"started_at":
 			return true
 		case "keys":
-			if len(pathParts) == 2 {
+			if len(pathParts) < 4 {
 				return false // Only set specific fields.
 			}
 			switch pathParts[2] {
@@ -157,7 +157,7 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 				"f_nwk_s_int_key",
 				"nwk_s_enc_key",
 				"s_nwk_s_int_key":
-				return true
+				return pathParts[3] == "key"
 			}
 		}
 	}
@@ -210,13 +210,13 @@ func setEndDevicePathToAS(pathParts ...string) bool {
 			"last_a_f_cnt_down":
 			return true
 		case "keys":
-			if len(pathParts) == 2 {
+			if len(pathParts) < 4 {
 				return false // Only set specific fields.
 			}
 			switch pathParts[2] {
 			case
 				"app_s_key":
-				return true
+				return pathParts[3] == "key"
 			}
 		}
 	}
