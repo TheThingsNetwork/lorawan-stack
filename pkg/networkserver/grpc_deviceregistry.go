@@ -58,9 +58,16 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
 
+		if req.Device.MACSettings == nil {
+			return nil, nil, errNoMACSettings
+		}
+
 		if !ttnpb.HasAnyField(paths, "mac_settings.adr_margin") {
 			// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			// paths = append(paths, "mac_settings.adr_margin")
+			req.Device.MACSettings.ADRMargin = 15
+			paths = append(paths, "mac_settings.adr_margin")
+		} else if req.Device.MACSettings.ADRMargin == 0 {
+			return nil, nil, errInvalidADRMargin
 		}
 
 		if !ttnpb.HasAllFields(paths,
@@ -68,7 +75,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",
-			"mac_settings.adr_margin",
 			"mac_settings.use_adr",
 			"resets_f_cnt",
 			"resets_join_nonces",
@@ -80,26 +86,22 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask
 		}
 
-		if req.Device.MACSettings == nil {
-			return nil, nil, errNoMACSettings
-		}
-
 		if ttnpb.HasAnyField(paths, "supports_class_b") {
-			if !ttnpb.HasAllFields(paths, "mac_settings.class_b_timeout") {
+			if !ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") {
 				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-				return nil, nil, errInvalidFieldMask
-			}
-			if dev.MACSettings.ClassBTimeout == 0 {
+				dev.MACSettings.ClassBTimeout = 5 * time.Minute
+				paths = append(paths, "mac_settings.class_b_timeout")
+			} else if dev.MACSettings.ClassBTimeout == 0 {
 				return nil, nil, errInvalidClassBTimeout
 			}
 		}
 
 		if ttnpb.HasAnyField(paths, "supports_class_c") {
-			if !ttnpb.HasAllFields(paths, "mac_settings.class_c_timeout") {
+			if !ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") {
 				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-				return nil, nil, errInvalidFieldMask
-			}
-			if dev.MACSettings.ClassCTimeout == 0 {
+				dev.MACSettings.ClassCTimeout = 5 * time.Minute
+				paths = append(paths, "mac_settings.class_c_timeout")
+			} else if dev.MACSettings.ClassCTimeout == 0 {
 				return nil, nil, errInvalidClassCTimeout
 			}
 		}
