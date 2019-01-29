@@ -17,8 +17,10 @@ package identityserver
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/oklog/ulid"
@@ -34,6 +36,20 @@ const maxProfilePictureStoredDimensions = 1024
 var profilePictureDimensions = []int{64, 128, 256, 512}
 
 var profilePictureRand = rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano())))
+
+func fillGravatar(ctx context.Context, usr *ttnpb.User) (err error) {
+	if usr == nil || usr.ProfilePicture != nil || usr.PrimaryEmailAddress == "" {
+		return nil
+	}
+	hash := md5.Sum([]byte(strings.ToLower(strings.TrimSpace(usr.PrimaryEmailAddress))))
+	usr.ProfilePicture = &ttnpb.Picture{
+		Sizes: map[uint32]string{},
+	}
+	for _, size := range profilePictureDimensions {
+		usr.ProfilePicture.Sizes[uint32(size)] = fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=%d&d=404", hash, size)
+	}
+	return nil
+}
 
 func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *ttnpb.User) (err error) {
 	// External pictures, consider only largest.

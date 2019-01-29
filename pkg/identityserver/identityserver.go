@@ -58,8 +58,9 @@ type Config struct {
 	} `name:"auth-cache"`
 	OAuth          oauth.Config `name:"oauth"`
 	ProfilePicture struct {
-		Bucket    string `name:"bucket" description:"Bucket used for storing profile pictures"`
-		BucketURL string `name:"bucket-url" description:"Base URL for public bucket access"`
+		UseGravatar bool   `name:"use-gravatar" description:"Use Gravatar fallback for users without profile picture"`
+		Bucket      string `name:"bucket" description:"Bucket used for storing profile pictures"`
+		BucketURL   string `name:"bucket-url" description:"Base URL for public bucket access"`
 	} `name:"profile-picture"`
 }
 

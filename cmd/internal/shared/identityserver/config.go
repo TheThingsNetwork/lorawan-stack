@@ -50,4 +50,5 @@ func init() {
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinDigits = 1
 	DefaultIdentityServerConfig.ProfilePicture.Bucket = "profile_pictures"
 	DefaultIdentityServerConfig.ProfilePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "profile_pictures")
+	DefaultIdentityServerConfig.ProfilePicture.UseGravatar = true
 }

@@ -190,6 +190,17 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
+		if is.configFromContext(ctx).ProfilePicture.UseGravatar {
+			if !ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
+				req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address")
+				defer func() {
+					if usr != nil {
+						usr.PrimaryEmailAddress = ""
+					}
+				}()
+			}
+			defer func() { fillGravatar(ctx, usr) }()
+		}
 		defer func() { is.setFullProfilePictureURL(ctx, usr) }()
 	}
 
