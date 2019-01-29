@@ -2,7 +2,7 @@
   "name": "ttn-lw",
   "version": "3.0.0-pre",
   "description": "The Things Network Stack for LoRaWAN JavaScript SDK",
-  "url": "https://github.com/TheThingsIndustries/lorawan-stack/tree/ttn-master/sdk/js",
+  "url": "https://github.com/TheThingsNetwork/lorawan-stack/tree/master/sdk/js",
   "main": "dist/index.js",
   "license": "Apache-2.0",
   "private": false,
