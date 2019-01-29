@@ -88,7 +88,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(paths, "supports_class_b") {
 			if !ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") {
 				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-				req.Device.MACSettings.ClassBTimeout = 5 * time.Minute
+				req.Device.MACSettings.ClassBTimeout = time.Minute
 				paths = append(paths, "mac_settings.class_b_timeout")
 			} else if req.Device.MACSettings.ClassBTimeout == 0 {
 				return nil, nil, errInvalidClassBTimeout
@@ -98,7 +98,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(paths, "supports_class_c") {
 			if !ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") {
 				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-				req.Device.MACSettings.ClassCTimeout = 5 * time.Minute
+				req.Device.MACSettings.ClassCTimeout = 10 * time.Second
 				paths = append(paths, "mac_settings.class_c_timeout")
 			} else if req.Device.MACSettings.ClassCTimeout == 0 {
 				return nil, nil, errInvalidClassCTimeout

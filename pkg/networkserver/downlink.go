@@ -242,7 +242,7 @@ outer:
 		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
 		break
 
-	case dev.MACState.LastConfirmedDownlinkAt != nil && dev.MACState.LastConfirmedDownlinkAt.Add(classCTimeout).After(time.Now()):
+	case dev.MACState.LastConfirmedDownlinkAt != nil && dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout).After(time.Now()):
 		return nil, nil, errScheduleTooSoon
 
 	default:

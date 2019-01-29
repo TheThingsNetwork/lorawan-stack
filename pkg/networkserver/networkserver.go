@@ -39,10 +39,6 @@ const (
 
 	// fOptsCapacity is the maximum length of FOpts in bytes.
 	fOptsCapacity = 15
-
-	// classCTimeout represents the time interval, within which class C
-	// device should acknowledge the downlink or answer MAC command.
-	classCTimeout = 5 * time.Minute
 )
 
 func timePtr(t time.Time) *time.Time {
