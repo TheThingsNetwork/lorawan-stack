@@ -179,7 +179,6 @@ var (
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
 	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_payload}` at data rate index `{data_rate_index}`")
-	errDownlinkChannel  = errors.DefineInvalidArgument("downlink_channel", "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
 
@@ -262,23 +261,6 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 					"data_rate_index", rx.dataRateIndex,
 				)
 			}
-			var found bool
-			var channelIndex int
-			for i, ch := range c.fp.DownlinkChannels {
-				if ch.Frequency == rx.frequency &&
-					rx.dataRateIndex >= ttnpb.DataRateIndex(ch.MinDataRate) &&
-					rx.dataRateIndex <= ttnpb.DataRateIndex(ch.MaxDataRate) {
-					channelIndex = i
-					found = true
-					break
-				}
-			}
-			if !found {
-				return errDownlinkChannel.WithAttributes(
-					"frequency", rx.frequency,
-					"data_rate_index", rx.dataRateIndex,
-				)
-			}
 			var maxEIRP float32
 			if c.fp.MaxEIRP != nil {
 				maxEIRP = *c.fp.MaxEIRP
@@ -286,10 +268,9 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				maxEIRP = band.DefaultMaxEIRP
 			}
 			settings := ttnpb.TxSettings{
-				DataRateIndex:       rx.dataRateIndex,
-				Frequency:           rx.frequency,
-				TxPower:             int32(maxEIRP),
-				GatewayChannelIndex: uint32(channelIndex),
+				DataRateIndex: rx.dataRateIndex,
+				Frequency:     rx.frequency,
+				TxPower:       int32(maxEIRP),
 			}
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)

@@ -2492,15 +2492,6 @@
       "file": "io.go"
     }
   },
-  "error:pkg/gatewayserver/io:downlink_channel": {
-    "translations": {
-      "en": "no downlink channel with frequency `{frequency}` Hz and data rate index `{data_rate_index}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io",
-      "file": "io.go"
-    }
-  },
   "error:pkg/gatewayserver/io:downlink_path": {
     "translations": {
       "en": "invalid downlink path"
