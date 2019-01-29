@@ -3599,6 +3599,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver:adr_margin": {
+    "translations": {
+      "en": "invalid ADR margin"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:channel_index": {
     "translations": {
       "en": "invalid channel index"
@@ -3611,6 +3620,24 @@
   "error:pkg/networkserver:cid_out_of_range": {
     "translations": {
       "en": "CID must be in range from {min} to {max}"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:class_b_timeout": {
+    "translations": {
+      "en": "invalid class B timeout"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:class_c_timeout": {
+    "translations": {
+      "en": "invalid class C timeout"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -3770,9 +3797,45 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:field_mask": {
+    "translations": {
+      "en": "invalid field mask"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:gateway_server_not_found": {
     "translations": {
       "en": "Gateway Server not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:invalid_f_nwk_s_int_key": {
+    "translations": {
+      "en": "invalid FNwkSIntKey"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:invalid_nwk_s_enc_key": {
+    "translations": {
+      "en": "invalid NwkSEncKey"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:invalid_s_nwk_s_int_key": {
+    "translations": {
+      "en": "invalid SNwkSIntKey"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -3809,6 +3872,24 @@
   "error:pkg/networkserver:no_downlink_path": {
     "translations": {
       "en": "no downlink path available"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:no_frequency_plan": {
+    "translations": {
+      "en": "no frequency plan specified"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:no_mac_settings": {
+    "translations": {
+      "en": "no mac settings specified"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -4229,6 +4310,15 @@
       "file": "identifiers_validators.go"
     }
   },
+  "error:pkg/ttnpb:missing_field": {
+    "translations": {
+      "en": "field {field} is missing"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "fieldmask_utils.go"
+    }
+  },
   "error:pkg/ttnpb:missing_identifiers": {
     "translations": {
       "en": "missing identifiers"
@@ -4254,6 +4344,15 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "lorawan.go"
+    }
+  },
+  "error:pkg/ttnpb:prohibited_field": {
+    "translations": {
+      "en": "field {field} is prohibited"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "fieldmask_utils.go"
     }
   },
   "error:pkg/ttnpb:raw_payload": {
