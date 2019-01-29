@@ -76,6 +76,12 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 	case "Time", "Duration":
 		return true
 	}
+	if t.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" {
+		switch t.Name() {
+		case "Picture":
+			return true
+		}
+	}
 	return false
 }
 
@@ -90,7 +96,7 @@ func isSelectableField(name string) bool {
 func isSettableField(name string) bool {
 	switch name {
 	case "attributes", "contact_info", "password_updated_at", "temporary_password_created_at",
-		"temporary_password_expires_at", "antennas":
+		"temporary_password_expires_at", "antennas", "profile_picture":
 		return false
 	}
 	return true

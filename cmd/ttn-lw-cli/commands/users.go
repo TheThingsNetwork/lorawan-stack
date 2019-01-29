@@ -29,8 +29,9 @@ import (
 )
 
 var (
-	selectUserFlags = util.FieldMaskFlags(&ttnpb.User{})
-	setUserFlags    = util.FieldFlags(&ttnpb.User{})
+	selectUserFlags     = util.FieldMaskFlags(&ttnpb.User{})
+	setUserFlags        = util.FieldFlags(&ttnpb.User{})
+	profilePictureFlags = &pflag.FlagSet{}
 )
 
 func userIDFlags() *pflag.FlagSet {
@@ -161,6 +162,13 @@ var (
 				}
 			}
 
+			if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
+				user.ProfilePicture, err = readPicture(profilePicture)
+				if err != nil {
+					return err
+				}
+			}
+
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
 				return err
@@ -184,7 +192,7 @@ var (
 			if usrID == nil {
 				return errNoUserID
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setUserFlags, attributesFlags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setUserFlags, attributesFlags(), profilePictureFlags)
 			if len(paths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
@@ -195,6 +203,13 @@ var (
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
 			user.UserIdentifiers = *usrID
+			if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
+				user.ProfilePicture, err = readPicture(profilePicture)
+				if err != nil {
+					return err
+				}
+				paths = append(paths, "profile_picture")
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
@@ -287,6 +302,8 @@ var (
 )
 
 func init() {
+	profilePictureFlags.String("profile_picture", "", "upload the profile picture from this file")
+
 	usersSearchCommand.Flags().AddFlagSet(searchFlags())
 	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
 	usersCommand.AddCommand(usersSearchCommand)
@@ -296,10 +313,12 @@ func init() {
 	usersCreateCommand.Flags().AddFlagSet(userIDFlags())
 	usersCreateCommand.Flags().AddFlagSet(setUserFlags)
 	usersCreateCommand.Flags().AddFlagSet(attributesFlags())
+	usersCreateCommand.Flags().AddFlagSet(profilePictureFlags)
 	usersCommand.AddCommand(usersCreateCommand)
 	usersUpdateCommand.Flags().AddFlagSet(userIDFlags())
 	usersUpdateCommand.Flags().AddFlagSet(setUserFlags)
 	usersUpdateCommand.Flags().AddFlagSet(attributesFlags())
+	usersUpdateCommand.Flags().AddFlagSet(profilePictureFlags)
 	usersCommand.AddCommand(usersUpdateCommand)
 	usersUpdatePasswordCommand.Flags().AddFlagSet(userIDFlags())
 	usersUpdatePasswordCommand.Flags().String("old", "", "")
