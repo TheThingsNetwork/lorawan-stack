@@ -179,7 +179,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 
-	// TODO: Send welcome email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// TODO: Send welcome email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 
 	if _, err := is.requestContactInfoValidation(ctx, req.UserIdentifiers.EntityIdentifiers()); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
@@ -344,7 +344,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, req.FieldMask.Paths))
 
-	// TODO: Send emails (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If user state changed (approved, rejected, flagged, suspended)
 	// - If primary email address changed
 
@@ -418,7 +418,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateMask))
-	// TODO: Send password update email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// TODO: Send password update email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	return ttnpb.Empty, nil
 }
 
@@ -456,7 +456,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateTemporaryPasswordFieldMask))
-	// TODO: Send temporary password email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// TODO: Send temporary password email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	return ttnpb.Empty, nil
 }
 

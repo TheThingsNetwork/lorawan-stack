@@ -87,7 +87,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			oauth2.FinishAuthorizeRequest(resp, req, ar)
 			return s.output(c, resp)
 		case ttnpb.STATE_REQUESTED:
-			// TODO: Allow if user is collaborator (https://github.com/TheThingsIndustries/lorawan-stack/issues/1414).
+			// TODO: Allow if user is collaborator (https://github.com/TheThingsNetwork/lorawan-stack/issues/49).
 			resp.SetError(osin.E_INVALID_CLIENT, "OAuth client is not yet approved")
 			oauth2.FinishAuthorizeRequest(resp, req, ar)
 			return s.output(c, resp)

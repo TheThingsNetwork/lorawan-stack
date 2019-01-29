@@ -50,7 +50,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		}
 		paths = append(paths, "provisioner_id", "provisioning_data")
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
+	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
 	dev, err := srv.JS.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, paths)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound
@@ -129,7 +129,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 			return nil, err
 		}
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
+	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
 	return srv.JS.devices.SetByEUI(ctx, *req.Device.JoinEUI, *req.Device.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil && !dev.ApplicationIdentifiers.Equal(req.Device.ApplicationIdentifiers) {
 			return nil, nil, errInvalidIdentifiers

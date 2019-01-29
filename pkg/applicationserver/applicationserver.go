@@ -334,7 +334,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
-	// TODO: Lookup Join Server (https://github.com/TheThingsIndustries/lorawan-stack/issues/244)
+	// TODO: Lookup Join Server (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
 	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
 	if js == nil {
 		return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
@@ -511,7 +511,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 		return err
 	}
-	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsIndustries/lorawan-stack/issues/1221)
+	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsNetwork/lorawan-stack/issues/37)
 	return nil
 }
 
@@ -642,7 +642,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
-		// TODO: Cache unwrapped keys (https://github.com/TheThingsIndustries/lorawan-stack/issues/1218)
+		// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
 		oldAppSKey, err := cryptoutil.UnwrapAES128Key(*oldSession.AppSKey, as.KeyVault)
 		if err != nil {
 			logger.WithError(err).Warn("Dropping downlink message; failed to unwrap AppSKey for decryption")

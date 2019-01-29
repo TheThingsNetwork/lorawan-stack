@@ -302,7 +302,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 						Score:  score,
 					})
 				}
-				// TODO: Keep the minimum value in the set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1380)
+				// TODO: Keep the minimum value in the set (https://github.com/TheThingsNetwork/lorawan-stack/issues/43)
 				p.ZAddNX(WaitingTaskKey(ks[i]), zs...)
 				p.XAck(ret.Stream, group, toAck...)
 			}

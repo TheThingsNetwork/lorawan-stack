@@ -265,7 +265,7 @@ outer:
 
 		var fNwkSIntKey types.AES128Key
 		if dev.matchedSession.FNwkSIntKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 			panic("unsupported")
 		}
 		copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
@@ -287,7 +287,7 @@ outer:
 
 			var sNwkSIntKey types.AES128Key
 			if dev.matchedSession.SNwkSIntKey.KEKLabel != "" {
-				// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+				// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 				panic("unsupported")
 			}
 			copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
@@ -405,7 +405,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 		var key types.AES128Key
 		if ses.NwkSEncKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 			panic("unsupported")
 		}
 		copy(key[:], ses.NwkSEncKey.Key[:])
@@ -677,7 +677,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		})
 	if err != nil && !handleErr {
 		logger.WithError(err).Error("Failed to update device in registry")
-		// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
+		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 		registerDropDataUplink(ctx, &matched.EndDeviceIdentifiers, up, err)
 	}
 	if err != nil {
@@ -876,7 +876,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		})
 	if err != nil && !resetErr {
 		logger.WithError(err).Error("Failed to update device in registry")
-		// TODO: Retry transaction. (https://github.com/TheThingsIndustries/lorawan-stack/issues/1163)
+		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 	}
 	if err != nil {
 		return err

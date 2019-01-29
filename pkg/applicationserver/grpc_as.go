@@ -29,7 +29,7 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
+	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
 	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
 }
 
@@ -38,7 +38,7 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsIndustries/lorawan-stack/issues/1226)
+	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
 	// Get all the fields here for starting the link task.
 	link, err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {

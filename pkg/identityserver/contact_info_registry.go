@@ -81,7 +81,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		if err != nil {
 			return nil, err
 		}
-		// TODO: Send validation email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+		// TODO: Send validation email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 		for _, validation := range emailValidations {
 			pendingContactInfo = append(pendingContactInfo, validation.ContactInfo...)
 			validation.Token = "" // Unset tokens after sending emails

@@ -49,7 +49,7 @@ func keyToBytes(k types.AES128Key) []byte {
 
 // HandleJoin is called by the Network Server to join a device.
 func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
-	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsIndustries/lorawan-stack/issues/244)
+	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -320,7 +320,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 // GetNwkSKeys returns the NwkSKeys associated with session keys identified by the supplied request.
 func (srv nsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
-	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsIndustries/lorawan-stack/issues/244)
+	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}

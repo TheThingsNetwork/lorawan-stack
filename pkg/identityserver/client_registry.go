@@ -245,7 +245,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		return nil, err
 	}
 	events.Publish(evtUpdateClient(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
-	// TODO: Send emails (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If client state changed (approved, rejected, flagged, suspended)
 	return cli, nil
 }

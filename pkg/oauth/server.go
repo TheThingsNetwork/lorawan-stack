@@ -89,7 +89,7 @@ func NewServer(ctx context.Context, store Store, config Config) Server {
 
 	s.osinConfig = &osin.ServerConfig{
 		AuthorizationExpiration: int32((5 * time.Minute).Seconds()),
-		AccessExpiration:        int32(time.Hour.Seconds()), // TODO: Make configurable and dependent on session expiration (https://github.com/TheThingsIndustries/lorawan-stack/issues/1411).
+		AccessExpiration:        int32(time.Hour.Seconds()),
 		TokenType:               "bearer",
 		AllowedAuthorizeTypes: osin.AllowedAuthorizeType{
 			osin.CODE,

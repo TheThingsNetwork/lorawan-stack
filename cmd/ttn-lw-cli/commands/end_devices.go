@@ -262,7 +262,7 @@ var (
 					if device.ProvisionerID != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
-					// TODO: Generate DevAddr in cluster NetID (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					// TODO: Generate DevAddr in cluster NetID (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					devAddr, err := generateDevAddr(types.NetID{})
 					if err != nil {
 						return err
@@ -298,7 +298,7 @@ var (
 					if device.ProvisionerID != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
-					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsIndustries/lorawan-stack/issues/1392).
+					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					device.RootKeys = &ttnpb.RootKeys{
 						RootKeyID: "ttn-lw-cli-generated",
 						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},

@@ -67,7 +67,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 	}
 	key.Key = token
 	events.Publish(evtCreateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
-	// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+	// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	return key, nil
 }
 
@@ -111,7 +111,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	key.Key = ""
 	if len(req.Rights) > 0 {
 		events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
-		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+		// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	} else {
 		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
 	}
@@ -140,7 +140,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
-		// TODO: Send notification email (https://github.com/TheThingsIndustries/lorawan-stack/issues/1395).
+		// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	} else {
 		events.Publish(evtDeleteApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
 	}

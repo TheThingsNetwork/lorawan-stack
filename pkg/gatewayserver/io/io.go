@@ -117,7 +117,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	}
 	for _, md := range up.RxMetadata {
 		if md.AntennaIndex != 0 {
-			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsIndustries/lorawan-stack/issues/1406)
+			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48)
 			md.DownlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
 			continue
 		}

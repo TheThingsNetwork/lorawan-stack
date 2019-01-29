@@ -211,7 +211,7 @@ outer:
 
 		var key types.AES128Key
 		if dev.Session.NwkSEncKey.KEKLabel != "" {
-			// TODO: (https://github.com/TheThingsIndustries/lorawan-stack/issues/271)
+			// TODO: (https://github.com/TheThingsNetwork/lorawan-stack/issues/5)
 			panic("unsupported")
 		}
 		copy(key[:], dev.Session.NwkSEncKey.Key[:])
@@ -268,7 +268,7 @@ outer:
 		return nil, nil, errUnknownSNwkSIntKey
 	}
 	if dev.Session.SNwkSIntKey.KEKLabel != "" {
-		// TODO: https://github.com/TheThingsIndustries/lorawan-stack/issues/271
+		// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 		panic("unsupported")
 	}
 	copy(key[:], dev.Session.SNwkSIntKey.Key[:])
@@ -478,7 +478,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					return dev, nil, nil
 
 				case dev.MACState.DeviceClass == ttnpb.CLASS_B && !dev.MACState.RxWindowsAvailable:
-					// TODO: Support Class B (https://github.com/TheThingsIndustries/lorawan-stack/issues/833).
+					// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19).
 					logger.Warn("Class B downlink task scheduled, but Rx windows are not available")
 					return dev, nil, nil
 				}
