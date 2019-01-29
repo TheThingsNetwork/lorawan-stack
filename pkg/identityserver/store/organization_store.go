@@ -46,10 +46,10 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *ty
 	for _, column := range modelColumns {
 		organizationColumns = append(organizationColumns, "organizations."+column)
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids.organization_id":
-			// accounts.uid is always selected
+		case "ids", "created_at", "updated_at":
+			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
 		default:

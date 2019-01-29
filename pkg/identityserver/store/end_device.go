@@ -140,23 +140,21 @@ func init() {
 
 // fieldmask path to column name in devices table.
 var deviceColumnNames = map[string][]string{
-	"ids.device_id":                      {"device_id"},
-	"ids.application_ids.application_id": {"application_id"},
-	"ids.join_eui":                       {"join_eui"},
-	"ids.dev_eui":                        {"dev_eui"},
-	attributesField:                      {},
-	nameField:                            {nameField},
-	descriptionField:                     {descriptionField},
-	versionIDsField:                      {"brand_id", "model_id", "hardware_version", "firmware_version"},
-	brandIDField:                         {"brand_id"},
-	modelIDField:                         {"model_id"},
-	hardwareVersionField:                 {"hardware_version"},
-	firmwareVersionField:                 {"firmware_version"},
-	networkServerAddressField:            {networkServerAddressField},
-	applicationServerAddressField:        {applicationServerAddressField},
-	joinServerAddressField:               {joinServerAddressField},
-	serviceProfileIDField:                {serviceProfileIDField},
-	locationsField:                       {},
+	"ids.join_eui":                {"join_eui"},
+	"ids.dev_eui":                 {"dev_eui"},
+	attributesField:               {},
+	nameField:                     {nameField},
+	descriptionField:              {descriptionField},
+	versionIDsField:               {"brand_id", "model_id", "hardware_version", "firmware_version"},
+	brandIDField:                  {"brand_id"},
+	modelIDField:                  {"model_id"},
+	hardwareVersionField:          {"hardware_version"},
+	firmwareVersionField:          {"firmware_version"},
+	networkServerAddressField:     {networkServerAddressField},
+	applicationServerAddressField: {applicationServerAddressField},
+	joinServerAddressField:        {joinServerAddressField},
+	serviceProfileIDField:         {serviceProfileIDField},
+	locationsField:                {},
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) {

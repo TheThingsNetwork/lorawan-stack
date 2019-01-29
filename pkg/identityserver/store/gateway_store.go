@@ -42,8 +42,10 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 	}
 	var gatewayColumns []string
 	var notFoundPaths []string
-	for _, path := range fieldMask.Paths {
+	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
+		case "ids", "created_at", "updated_at":
+			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
 		case antennasField:

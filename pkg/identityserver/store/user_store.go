@@ -46,10 +46,10 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 	for _, column := range modelColumns {
 		userColumns = append(userColumns, "users."+column)
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids.user_id":
-			// accounts.uid is always selected
+		case "ids", "created_at", "updated_at":
+			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
 		case profilePictureField:
