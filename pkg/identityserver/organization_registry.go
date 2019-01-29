@@ -220,7 +220,6 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 		return nil, err
 	}
 	events.Publish(evtDeleteOrganization(ctx, ids, nil))
-	// TODO: Invalidate cached rights of members (https://github.com/TheThingsIndustries/lorawan-stack/issues/1393).
 	return ttnpb.Empty, nil
 }
 

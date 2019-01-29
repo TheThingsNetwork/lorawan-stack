@@ -40,7 +40,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
-						// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+						// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 					},
 				},
 			},
@@ -62,7 +62,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 						{},
 						{},
 						{},
-						// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+						// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 					},
 				},
 			},

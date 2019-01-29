@@ -918,7 +918,7 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessa
 			registerDropRejoinRequest(ctx, nil, up, err)
 		}
 	}()
-	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
+	// TODO: Implement https://github.com/TheThingsNetwork/lorawan-stack/issues/8
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 

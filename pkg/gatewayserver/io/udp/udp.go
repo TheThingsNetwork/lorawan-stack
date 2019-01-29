@@ -299,7 +299,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		if err := state.io.HandleTxAck(msg.TxAcknowledgment); err != nil {
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
 		}
-		// TODO: Send event to NS (https://github.com/TheThingsIndustries/lorawan-stack/issues/1017)
+		// TODO: Send event to NS (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
 	}
 
 	return nil
@@ -329,7 +329,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 			tx, err := encoding.FromDownlinkMessage(down)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to marshal downlink message")
-				// TODO: Report to Network Server: https://github.com/TheThingsIndustries/lorawan-stack/issues/1017
+				// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
 				break
 			}
 			downlinkPath := state.lastDownlinkPath.Load().(downlinkPath)
@@ -351,7 +351,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				logger.Debug("Writing downlink message")
 				if err := s.write(packet); err != nil {
 					logger.WithError(err).Warn("Failed to write downlink message")
-					// TODO: Report to Network Server: https://github.com/TheThingsIndustries/lorawan-stack/issues/1017
+					// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
 				}
 			}
 			canImmediate := atomic.LoadUint32(&state.receivedTxAck) == 1

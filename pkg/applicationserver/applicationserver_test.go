@@ -517,7 +517,7 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.HaveLength, 0)
@@ -563,7 +563,7 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.HaveLength, 0)
@@ -623,7 +623,7 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
@@ -908,7 +908,7 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 3,
-								StartedAt:     dev.Session.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44},
@@ -920,7 +920,7 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt, // TODO: Use join-accept start time (https://github.com/TheThingsIndustries/lorawan-stack/issues/1225)
+								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{

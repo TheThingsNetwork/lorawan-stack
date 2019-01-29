@@ -233,8 +233,6 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
-
-	// TODO: Test field mask application once implemented (https://github.com/TheThingsIndustries/lorawan-stack/issues/1212)
 }
 
 func TestSessionKeyRegistries(t *testing.T) {

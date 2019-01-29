@@ -181,7 +181,6 @@ outer:
 
 		if len(down.FRMPayload) > int(maxDownLen) {
 			logger.Warn("Application downlink present, but the payload is too long, skipping...")
-			// TODO: Inform AS that payload is too long(https://github.com/TheThingsIndustries/lorawan-stack/issues/377)
 			if !needsDownlink && len(cmdBuf) == 0 {
 				return nil, nil, errNoDownlink
 			}
@@ -311,7 +310,7 @@ type downlinkPath struct {
 func downlinkPathsFromMetadata(mds ...*ttnpb.RxMetadata) []downlinkPath {
 	mds = append(mds[:0:0], mds...)
 	sort.SliceStable(mds, func(i, j int) bool {
-		// TODO: Improve the sorting algorithm (https://github.com/TheThingsIndustries/ttn/issues/729)
+		// TODO: Improve the sorting algorithm (https://github.com/TheThingsNetwork/lorawan-stack/issues/13)
 		return mds[i].SNR > mds[j].SNR
 	})
 	head := make([]downlinkPath, 0, len(mds))

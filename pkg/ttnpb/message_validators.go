@@ -23,7 +23,6 @@ import (
 )
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-// TODO: Adapt to generated validators (https://github.com/TheThingsIndustries/lorawan-stack/issues/1335)
 func (s TxSettings) ValidateContext(ctx context.Context) error {
 	if s.GetDataRateIndex() > math.MaxUint8 {
 		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
@@ -94,7 +93,6 @@ func (cmd *MACCommand) ValidateContext(context.Context) error {
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-// TODO: Move to generated validators (https://github.com/TheThingsIndustries/lorawan-stack/issues/1335)
 func (cid MACCommandIdentifier) Validate() error {
 	if cid < 0x00 || cid > 0xff {
 		return errExpectedBetween("CID", "0x00", "0xFF")(fmt.Sprintf("0x%X", int32(cid)))

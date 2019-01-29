@@ -113,7 +113,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errUnknownAppEUI
 	case !match:
 		// TODO: Determine the cluster containing the device.
-		// https://github.com/TheThingsIndustries/ttn/issues/244
+		// https://github.com/TheThingsNetwork/lorawan-stack/issues/4
 		return nil, errForwardJoinRequest
 	}
 
@@ -265,24 +265,24 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			sessionKeys := ttnpb.SessionKeys{
 				SessionKeyID: skID[:],
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 					Key:      nwkSKeys.FNwkSIntKey[:],
 					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
-					// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					// TODO: Encrypt key with AS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 					Key:      appSKey[:],
 					KEKLabel: "",
 				},
 			}
 			if req.SelectedMACVersion == ttnpb.MAC_V1_1 {
 				sessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{
-					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 					Key:      nwkSKeys.SNwkSIntKey[:],
 					KEKLabel: "",
 				}
 				sessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{
-					// TODO: Encrypt key with NS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 					Key:      nwkSKeys.NwkSEncKey[:],
 					KEKLabel: "",
 				}

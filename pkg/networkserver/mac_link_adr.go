@@ -128,8 +128,6 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		n++
 
 		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
-			// TODO: Handle NACK, modify desired state
-			// (https://github.com/TheThingsIndustries/ttn/issues/834)
 			return nil
 		}
 

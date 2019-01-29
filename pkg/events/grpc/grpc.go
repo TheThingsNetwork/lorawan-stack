@@ -107,7 +107,6 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	defer srv.filter.Unsubscribe(ctx, &req.Identifiers, handler)
 
 	if req.Tail > 0 || req.After != nil {
-		// TODO: Get event tail from buffer (https://github.com/TheThingsIndustries/lorawan-stack/issues/1213)
 		warning.Add(ctx, "Historical events not implemented")
 	}
 

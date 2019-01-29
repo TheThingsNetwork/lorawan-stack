@@ -64,8 +64,6 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
-			// TODO: Handle NACK, modify desired state
-			// (https://github.com/TheThingsIndustries/ttn/issues/834)
 			return nil
 		}
 

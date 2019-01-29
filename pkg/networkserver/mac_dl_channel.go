@@ -68,8 +68,6 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		if !pld.ChannelIndexAck || !pld.FrequencyAck {
-			// TODO: Handle NACK, modify desired state
-			// (https://github.com/TheThingsIndustries/ttn/issues/834)
 			return nil
 		}
 

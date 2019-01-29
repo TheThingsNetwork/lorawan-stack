@@ -261,7 +261,6 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 		return nil, err
 	}
 	events.Publish(evtDeleteClient(ctx, ids, nil))
-	// TODO: Invalidate cached rights of members (https://github.com/TheThingsIndustries/lorawan-stack/issues/1393).
 	return ttnpb.Empty, nil
 }
 

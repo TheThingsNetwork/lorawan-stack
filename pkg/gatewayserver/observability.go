@@ -61,7 +61,6 @@ var gsMetrics = &messageMetrics{
 			Name:      "status_received_total",
 			Help:      "Total number of received gateway statuses",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{gatewayID},
 	),
 	uplinkReceived: metrics.NewContextualCounterVec(
@@ -70,7 +69,6 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_received_total",
 			Help:      "Total number of received uplinks",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{gatewayID},
 	),
 	uplinkForwarded: metrics.NewContextualCounterVec(
@@ -95,7 +93,6 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_sent_total",
 			Help:      "Total number of sent downlinks",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{gatewayID},
 	),
 	downlinkTxSucceeded: metrics.NewContextualCounterVec(
@@ -104,7 +101,6 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_tx_success_total",
 			Help:      "Total number of successfully emitted downlinks",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{gatewayID},
 	),
 	downlinkTxFailed: metrics.NewContextualCounterVec(
@@ -113,7 +109,6 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_tx_failed_total",
 			Help:      "Total number of unsuccessfully emitted downlinks",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{gatewayID},
 	),
 }

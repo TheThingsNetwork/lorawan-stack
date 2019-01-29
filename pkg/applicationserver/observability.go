@@ -84,7 +84,6 @@ var asMetrics = &messageMetrics{
 			Name:      "uplink_forwarded_total",
 			Help:      "Total number of forwarded uplinks (join-accepts and data)",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{applicationID},
 	),
 	uplinkDropped: metrics.NewContextualCounterVec(
@@ -101,7 +100,6 @@ var asMetrics = &messageMetrics{
 			Name:      "downlink_received_total",
 			Help:      "Total number of received downlinks",
 		},
-		// TODO: Remove label (https://github.com/TheThingsIndustries/lorawan-stack/issues/1039)
 		[]string{applicationID},
 	),
 	downlinkForwarded: metrics.NewContextualCounterVec(

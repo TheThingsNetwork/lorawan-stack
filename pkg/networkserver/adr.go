@@ -20,7 +20,7 @@ import (
 )
 
 // TODO: The values for BW250 and BW500 need to be verified
-// (https://github.com/TheThingsIndustries/ttn/issues/876)
+// (https://github.com/TheThingsNetwork/lorawan-stack/issues/21)
 
 var demodulationFloor = map[uint32]map[uint32]float32{
 	6: {

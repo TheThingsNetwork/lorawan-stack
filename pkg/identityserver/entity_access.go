@@ -181,7 +181,6 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	if user != nil {
 		if user.Admin {
-			// TODO: Limit the rights of admins (https://github.com/TheThingsIndustries/lorawan-stack/issues/1394).
 			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights)
 		}
 

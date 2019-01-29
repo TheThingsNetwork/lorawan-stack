@@ -1922,7 +1922,7 @@ func handleJoinTest() func(t *testing.T) {
 
 func handleRejoinTest() func(t *testing.T) {
 	return func(t *testing.T) {
-		// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
+		// TODO: Implement https://github.com/TheThingsNetwork/lorawan-stack/issues/8
 	}
 }
 
