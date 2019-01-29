@@ -57,6 +57,10 @@ var (
 
 // UpdateInfo implements the CUPS update-info handler.
 func (s *CUPSServer) UpdateInfo(c echo.Context) error {
+	if c.Request().Header.Get(echo.HeaderContentType) == "" {
+		c.Request().Header.Set(echo.HeaderContentType, "application/json")
+	}
+
 	var req UpdateInfoRequest
 	if err := c.Bind(&req); err != nil {
 		return err
