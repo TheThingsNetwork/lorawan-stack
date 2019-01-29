@@ -66,6 +66,7 @@ const Header = function ({
   dropdownItems = defaultDropdownItems(handleLogout),
   navigationEntries = defaultNavigationEntries,
   user,
+  searchable,
   handleSearchRequest = () => null,
   ...rest
 }) {
@@ -85,7 +86,7 @@ const Header = function ({
               <NavigationBar className={styles.navList} entries={navigationEntries} />
             </div>
             <div className={styles.right}>
-              <Input icon="search" onEnter={handleSearchRequest} />
+              { searchable && <Input icon="search" onEnter={handleSearchRequest} /> }
               <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} userId={user.ids.user_id} />
             </div>
           </React.Fragment>
@@ -135,6 +136,8 @@ Header.propTypes = {
   * A handler for when the user used the search input
   */
   handleSearchRequest: PropTypes.func,
+  /** A flag identifying whether the header should display the search input */
+  searchable: PropTypes.bool,
 }
 
 export default Header
