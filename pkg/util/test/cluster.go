@@ -32,6 +32,7 @@ type MockCluster struct {
 	GetPeerFunc            func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer
 	ClaimIDsFunc           func(ctx context.Context, ids ttnpb.Identifiers) error
 	UnclaimIDsFunc         func(ctx context.Context, ids ttnpb.Identifiers) error
+	TLSFunc                func() bool
 	AuthFunc               func() grpc.CallOption
 	WithVerifiedSourceFunc func(ctx context.Context) context.Context
 }
@@ -82,6 +83,14 @@ func (m MockCluster) UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) erro
 		return nil
 	}
 	return m.UnclaimIDsFunc(ctx, ids)
+}
+
+// TLS calls TLSFunc if s et and returns false otherwise.
+func (m MockCluster) TLS() bool {
+	if m.TLSFunc == nil {
+		return false
+	}
+	return m.TLSFunc()
 }
 
 // Auth calls AuthFunc if set and returns grpc.EmptyCallOption{} otherwise.

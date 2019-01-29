@@ -26,6 +26,8 @@ import (
 // HookName is the name of the hook used to verify the identity of incoming calls within a cluster.
 var HookName = "cluster-hook"
 
+func (c *cluster) TLS() bool { return c.tls }
+
 func (c *cluster) WithVerifiedSource(ctx context.Context) context.Context {
 	return clusterauth.VerifySource(ctx, c.keys)
 }

@@ -58,6 +58,8 @@ type Cluster interface {
 	// The specified context ctx may already be done before calling this function.
 	UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
 
+	// TLS returns whether the cluster uses TLS for cluster connections.
+	TLS() bool
 	// Auth returns a gRPC CallOption that can be used to identify the component within the cluster.
 	Auth() grpc.CallOption
 	// WithVerifiedSource verifies if the caller providing this context is a component from the cluster, and returns a

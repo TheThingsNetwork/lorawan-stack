@@ -29,6 +29,11 @@ func (c *Component) initCluster() (err error) {
 	return nil
 }
 
+// ClusterTLS returns whether the cluster uses TLS for cluster connections.
+func (c *Component) ClusterTLS() bool {
+	return c.cluster.TLS()
+}
+
 // GetPeers returns cluster peers with the given role and the given tags.
 // See package ../cluster for more information.
 func (c *Component) GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []cluster.Peer {
