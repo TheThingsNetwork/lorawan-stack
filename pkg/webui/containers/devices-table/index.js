@@ -71,7 +71,6 @@ export default class DevicesTable extends React.Component {
         searchItemsAction={this.searchDevicesList}
         itemPathPrefix="/devices"
         baseDataSelector={this.baseDataSelector}
-        searchable
         {...this.props}
       />
     )
