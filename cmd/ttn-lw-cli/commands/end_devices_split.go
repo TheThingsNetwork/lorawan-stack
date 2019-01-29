@@ -28,15 +28,15 @@ import (
 func getEndDevicePathFromIS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"name",
-		"description",
-		"attributes",
-		"version_ids",
-		"service_profile_id",
-		"network_server_address",
 		"application_server_address",
+		"attributes",
+		"description",
 		"join_server_address",
-		"locations":
+		"locations",
+		"name",
+		"network_server_address",
+		"service_profile_id",
+		"version_ids":
 		return true
 	}
 	return false
@@ -47,15 +47,15 @@ func getEndDevicePathFromIS(pathParts ...string) bool {
 func setEndDevicePathToIS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"name",
-		"description",
-		"attributes",
-		"version_ids",
-		"service_profile_id",
-		"network_server_address",
 		"application_server_address",
+		"attributes",
+		"description",
 		"join_server_address",
-		"locations":
+		"locations",
+		"name",
+		"network_server_address",
+		"service_profile_id",
+		"version_ids":
 		return true
 	}
 	return false
@@ -66,26 +66,27 @@ func setEndDevicePathToIS(pathParts ...string) bool {
 func getEndDevicePathFromNS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"supports_class_b",
-		"supports_class_c",
+		"battery_percentage",
 		"default_class",
-		"lorawan_version",
-		"lorawan_phy_version",
-		"frequency_plan_id",
 		"default_mac_parameters",
-		"min_frequency",
-		"max_frequency",
-		"resets_f_cnt",
-		"uses_32_bit_f_cnt",
-		"supports_join",
+		"downlink_margin",
+		"frequency_plan_id",
+		"last_dev_status_received_at",
+		"lorawan_phy_version",
+		"lorawan_version",
 		"mac_settings",
 		"mac_state",
-		"last_dev_status_received_at",
+		"max_frequency",
+		"min_frequency",
 		"power_state",
-		"battery_percentage",
-		"downlink_margin",
+		"recent_downlinks",
 		"recent_uplinks",
-		"recent_downlinks":
+		"resets_f_cnt",
+		"resets_join_nonces",
+		"supports_class_b",
+		"supports_class_c",
+		"supports_join",
+		"uses_32_bit_f_cnt":
 		return true
 	case "session":
 		if len(pathParts) == 1 {
@@ -120,20 +121,20 @@ func getEndDevicePathFromNS(pathParts ...string) bool {
 func setEndDevicePathToNS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"supports_class_b",
-		"supports_class_c",
 		"default_class",
-		"lorawan_version",
-		"lorawan_phy_version",
-		"frequency_plan_id",
 		"default_mac_parameters",
-		"min_frequency",
+		"frequency_plan_id",
+		"lorawan_phy_version",
+		"lorawan_version",
+		"mac_settings",
 		"max_frequency",
+		"min_frequency",
 		"resets_f_cnt",
 		"resets_join_nonces",
-		"uses_32_bit_f_cnt",
+		"supports_class_b",
+		"supports_class_c",
 		"supports_join",
-		"mac_settings":
+		"uses_32_bit_f_cnt":
 		return true
 	case "session":
 		if len(pathParts) == 1 {
@@ -142,9 +143,9 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 		switch pathParts[1] {
 		case
 			"dev_addr",
+			"last_conf_f_cnt_down",
 			"last_f_cnt_up",
 			"last_n_f_cnt_down",
-			"last_conf_f_cnt_down",
 			"started_at":
 			return true
 		case "keys":
@@ -154,8 +155,8 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 			switch pathParts[2] {
 			case
 				"f_nwk_s_int_key",
-				"s_nwk_s_int_key",
-				"nwk_s_enc_key":
+				"nwk_s_enc_key",
+				"s_nwk_s_int_key":
 				return true
 			}
 		}
@@ -168,8 +169,8 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 func getEndDevicePathFromAS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"queued_application_downlinks",
-		"formatters":
+		"formatters",
+		"queued_application_downlinks":
 		return true
 	case "session":
 		if len(pathParts) == 1 {
@@ -227,16 +228,16 @@ func setEndDevicePathToAS(pathParts ...string) bool {
 func getEndDevicePathFromJS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"resets_join_nonces",
-		"root_keys",
-		"net_id",
 		"last_dev_nonce",
-		"used_dev_nonces",
 		"last_join_nonce",
 		"last_rj_count_0",
 		"last_rj_count_1",
+		"net_id",
 		"provisioner_id",
-		"provisioning_data":
+		"provisioning_data",
+		"resets_join_nonces",
+		"root_keys",
+		"used_dev_nonces":
 		return true
 	}
 	return false
@@ -247,18 +248,18 @@ func getEndDevicePathFromJS(pathParts ...string) bool {
 func setEndDevicePathToJS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"network_server_address",
 		"application_server_address",
-		"resets_join_nonces",
-		"root_keys",
-		"net_id",
 		"last_dev_nonce",
-		"used_dev_nonces",
 		"last_join_nonce",
 		"last_rj_count_0",
 		"last_rj_count_1",
+		"net_id",
+		"network_server_address",
 		"provisioner_id",
-		"provisioning_data":
+		"provisioning_data",
+		"resets_join_nonces",
+		"root_keys",
+		"used_dev_nonces":
 		return true
 	}
 	return false
