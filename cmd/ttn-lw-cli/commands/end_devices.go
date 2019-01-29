@@ -236,7 +236,6 @@ var (
 				device.NetworkServerAddress = config.NetworkServerAddress
 				device.ApplicationServerAddress = config.ApplicationServerAddress
 				device.JoinServerAddress = config.JoinServerAddress
-				device.DefaultClass = ttnpb.CLASS_A
 				device.Uses32BitFCnt = true
 				device.MACSettings = &ttnpb.MACSettings{
 					UseADR:    true,
@@ -244,13 +243,14 @@ var (
 				}
 				paths = append(paths,
 					"application_server_address",
-					"default_class",
 					"join_server_address",
 					"mac_settings.adr_margin",
 					"mac_settings.use_adr",
 					"network_server_address",
 					"resets_f_cnt",
 					"resets_join_nonces",
+					"supports_class_b",
+					"supports_class_c",
 					"uses_32_bit_f_cnt",
 				)
 			}
