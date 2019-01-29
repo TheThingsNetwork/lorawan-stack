@@ -42,6 +42,8 @@ type CUPSServer struct {
 	registerUnknown       bool
 	defaultOwner          ttnpb.OrganizationOrUserIdentifiers
 
+	allowCUPSURIUpdate bool
+
 	rootCAs *x509.CertPool
 	trust   *x509.Certificate
 
@@ -78,6 +80,14 @@ func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers) Option {
 		} else {
 			s.registerUnknown, s.defaultOwner = false, ttnpb.OrganizationOrUserIdentifiers{}
 		}
+	}
+}
+
+// WithAllowCUPSURIUpdate configures the CUPS server to allow updates of the CUPS
+// Server URI.
+func WithAllowCUPSURIUpdate(allow bool) Option {
+	return func(s *CUPSServer) {
+		s.allowCUPSURIUpdate = allow
 	}
 }
 
@@ -137,6 +147,42 @@ func getContext(c echo.Context) context.Context {
 
 var errNoTrust = errors.DefineInternal("no_trust", "no trusted certificate configured")
 
+// parseAddress parses a CUPS or LNS address.
+//
+// It supports the typical format "host:port" (port being optional).
+// It allows schemes "http://host:port" to be present.
+// If schemes http/https/ws/wss are used, the port is inferred if not present.
+func parseAddress(address string) (scheme, host, port string, err error) {
+	if address == "" {
+		return
+	}
+	if strings.Contains(address, "://") {
+		url, err := url.Parse(address)
+		if err != nil {
+			return "", "", "", err
+		}
+		scheme, address = url.Scheme, url.Host
+	}
+	if strings.Contains(address, ":") {
+		host, port, err = net.SplitHostPort(address)
+		if err != nil {
+			host = address
+			err = nil
+		}
+	} else {
+		host = address
+	}
+	if port == "" {
+		switch scheme {
+		case "http", "ws":
+			port = "80"
+		case "https", "wss":
+			port = "443"
+		}
+	}
+	return
+}
+
 func (s *CUPSServer) getTrust(address string) (*x509.Certificate, error) {
 	if address == "" {
 		if s.trust == nil {
@@ -144,17 +190,14 @@ func (s *CUPSServer) getTrust(address string) (*x509.Certificate, error) {
 		}
 		return s.trust, nil
 	}
-	if strings.Contains(address, "//") {
-		url, err := url.Parse(address)
-		if err != nil {
-			return nil, err
-		}
-		address = url.Host
+	_, host, port, err := parseAddress(address)
+	if err != nil {
+		return nil, err
 	}
-	if _, _, err := net.SplitHostPort(address); err != nil {
-		address = net.JoinHostPort(address, "443")
+	if port == "" {
+		port = "443"
 	}
-	conn, err := tls.Dial("tcp", address, &tls.Config{RootCAs: s.rootCAs})
+	conn, err := tls.Dial("tcp", net.JoinHostPort(host, port), &tls.Config{RootCAs: s.rootCAs})
 	if err != nil {
 		return nil, err
 	}
