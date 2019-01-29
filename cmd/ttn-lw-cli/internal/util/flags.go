@@ -15,6 +15,7 @@
 package util
 
 import (
+	"encoding"
 	"encoding/hex"
 	"fmt"
 	"reflect"
@@ -289,6 +290,8 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) error {
 	return nil
 }
 
+var textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+
 func setField(rv reflect.Value, path []string, v reflect.Value) error {
 	rt := rv.Type()
 	vt := v.Type()
@@ -311,10 +314,18 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 					if valueMap := enumValues(ft); valueMap != nil {
 						if enumValue, ok := valueMap[v.String()]; ok {
 							field.SetInt(int64(enumValue))
-						} else {
-							return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+							break
 						}
 					}
+
+					if reflect.PtrTo(ft).Implements(textUnmarshalerType) {
+						fv := reflect.New(ft)
+						if err := fv.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String())); err == nil {
+							field.SetInt(fv.Elem().Int())
+							break
+						}
+					}
+					return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
 				case ft.PkgPath() == "time" && ft.Name() == "Time" && vt.Kind() == reflect.String:
 					var t time.Time
 					var err error
