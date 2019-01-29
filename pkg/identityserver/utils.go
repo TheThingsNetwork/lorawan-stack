@@ -30,6 +30,7 @@ func cleanContactInfo(info []*ttnpb.ContactInfo) {
 	}
 }
 
+// TODO: Move this logic to validators in API boundary (https://github.com/TheThingsNetwork/lorawan-stack/issues/69).
 func validateContactInfo(info []*ttnpb.ContactInfo) error {
 	for _, info := range info {
 		if info.ContactMethod != ttnpb.CONTACT_METHOD_EMAIL {
