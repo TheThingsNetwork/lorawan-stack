@@ -130,6 +130,7 @@ func setEndDevicePathToNS(pathParts ...string) bool {
 		"min_frequency",
 		"max_frequency",
 		"resets_f_cnt",
+		"resets_join_nonces",
 		"uses_32_bit_f_cnt",
 		"supports_join",
 		"mac_settings":

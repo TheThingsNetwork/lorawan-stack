@@ -222,6 +222,15 @@ var (
 				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
 			}
 
+			var macVersion ttnpb.MACVersion
+			s, err := setEndDeviceFlags.GetString("lorawan_version")
+			if err != nil {
+				return err
+			}
+			if err := macVersion.UnmarshalText([]byte(s)); err != nil {
+				return err
+			}
+
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
 			if setDefaults {
 				device.NetworkServerAddress = config.NetworkServerAddress
@@ -234,10 +243,18 @@ var (
 					ADRMargin: 15,
 				}
 				paths = append(paths,
-					"network_server_address", "application_server_address", "join_server_address",
-					"default_class", "uses_32_bit_f_cnt", "mac_settings",
+					"application_server_address",
+					"default_class",
+					"join_server_address",
+					"mac_settings.adr_margin",
+					"mac_settings.use_adr",
+					"network_server_address",
+					"resets_f_cnt",
+					"resets_join_nonces",
+					"uses_32_bit_f_cnt",
 				)
 			}
+
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
 				device.SupportsJoin = false
 				paths = append(paths, "supports_join")
@@ -250,25 +267,29 @@ var (
 					if err != nil {
 						return err
 					}
+					device.DevAddr = &devAddr
 					device.Session = &ttnpb.Session{
 						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: generateKey(16),
 							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							SNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							NwkSEncKey:   &ttnpb.KeyEnvelope{Key: generateKey(16)},
 							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey(16)},
 						},
 					}
-					device.DevAddr = &devAddr
 					paths = append(paths,
 						"session.keys.session_key_id",
-						"session.keys.f_nwk_s_int_key",
-						"session.keys.s_nwk_s_int_key",
-						"session.keys.nwk_s_enc_key",
-						"session.keys.app_s_key",
+						"session.keys.f_nwk_s_int_key.key",
+						"session.keys.app_s_key.key",
 						"session.dev_addr",
 					)
+					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey(16)}
+						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey(16)}
+						paths = append(paths,
+							"session.keys.s_nwk_s_int_key.key",
+							"session.keys.nwk_s_enc_key.key",
+						)
+					}
 				}
 			} else {
 				device.SupportsJoin = true
@@ -294,6 +315,7 @@ var (
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
 			}
+
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			if devID != nil {
 				if devID.DeviceID != "" {
