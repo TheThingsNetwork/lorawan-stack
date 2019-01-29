@@ -68,7 +68,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 	}
 
 	dev.MACState = &ttnpb.MACState{
-		DeviceClass:    dev.DefaultClass,
+		DeviceClass:    ttnpb.CLASS_A,
 		LoRaWANVersion: dev.LoRaWANVersion,
 		CurrentParameters: ttnpb.MACParameters{
 			ADRAckDelay:      uint32(band.ADRAckDelay),
@@ -80,6 +80,12 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 			Rx2DataRateIndex: band.DefaultRx2Parameters.DataRateIndex,
 			Rx2Frequency:     band.DefaultRx2Parameters.Frequency,
 		},
+	}
+	if dev.SupportsClassB {
+		dev.MACState.DeviceClass = ttnpb.CLASS_B
+	}
+	if dev.SupportsClassC {
+		dev.MACState.DeviceClass = ttnpb.CLASS_C
 	}
 
 	// NOTE: dev.MACState.CurrentParameters must not contain pointer values at this point.
