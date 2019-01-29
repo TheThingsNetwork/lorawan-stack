@@ -6215,10 +6215,6 @@
           "format": "boolean",
           "description": "Whether the device supports class C.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
-        "default_class": {
-          "$ref": "#/definitions/v3Class",
-          "description": "Default device class. Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
-        },
         "lorawan_version": {
           "$ref": "#/definitions/v3MACVersion",
           "description": "LoRaWAN MAC version. Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
