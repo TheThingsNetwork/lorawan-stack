@@ -46,6 +46,9 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			return nil, err
 		}
 	}
+	if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
+		return nil, err
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).CreateGateway(ctx, &req.Gateway)
 		if err != nil {
@@ -201,6 +204,9 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 
 func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
+		return nil, err
+	}
+	if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {

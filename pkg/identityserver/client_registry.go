@@ -51,6 +51,10 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		}
 	}
 
+	if err := validateContactInfo(req.Client.ContactInfo); err != nil {
+		return nil, err
+	}
+
 	secret := req.Client.Secret
 	if secret == "" {
 		secret, err = auth.GenerateKey(ctx)
@@ -212,6 +216,9 @@ var (
 
 func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
 	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+		return nil, err
+	}
+	if err := validateContactInfo(req.Client.ContactInfo); err != nil {
 		return nil, err
 	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)

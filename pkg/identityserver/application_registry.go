@@ -46,6 +46,9 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 			return nil, err
 		}
 	}
+	if err := validateContactInfo(req.Application.ContactInfo); err != nil {
+		return nil, err
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		app, err = store.GetApplicationStore(db).CreateApplication(ctx, &req.Application)
 		if err != nil {
@@ -181,6 +184,9 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 
 func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (app *ttnpb.Application, err error) {
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+		return nil, err
+	}
+	if err := validateContactInfo(req.Application.ContactInfo); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {

@@ -47,6 +47,9 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
 		return nil, errNestedOrganizations
 	}
+	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
+		return nil, err
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		org, err = store.GetOrganizationStore(db).CreateOrganization(ctx, &req.Organization)
 		if err != nil {
@@ -180,6 +183,9 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 
 func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (org *ttnpb.Organization, err error) {
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
+		return nil, err
+	}
+	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
