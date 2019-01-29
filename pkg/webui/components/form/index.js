@@ -92,8 +92,22 @@ const formRender = ({ children, ...rest }) => function (props) {
   )
 }
 
-const Form = ({ children, error, info, horizontal, submitEnabledWhenInvalid, ...rest }) => (
-  <Formik {...rest} render={formRender({ children, error, info, horizontal, submitEnabledWhenInvalid })} />
+const Form = ({
+  children,
+  error,
+  info,
+  horizontal,
+  submitEnabledWhenInvalid,
+  validateOnBlur = true,
+  validateOnChange = false,
+  ...rest
+}) => (
+  <Formik
+    {...rest}
+    validateOnBlur={validateOnBlur}
+    validateOnChange={validateOnChange}
+    render={formRender({ children, error, info, horizontal, submitEnabledWhenInvalid })}
+  />
 )
 
 function recursiveMap (children, fn) {
