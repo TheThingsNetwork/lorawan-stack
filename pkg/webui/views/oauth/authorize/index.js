@@ -19,6 +19,7 @@ import { defineMessages } from 'react-intl'
 import api from '../../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
+import ErrorMessage from '../../../lib/components/error-message'
 import Modal from '../../../components/modal'
 import Icon from '../../../components/icon'
 import Message from '../../../lib/components/message'
@@ -45,8 +46,12 @@ export default class Authorize extends PureComponent {
   }
 
   render () {
-    const { env: { page_data: { client, user }}, location } = this.props
+    const { env: { page_data: { client, user, error }}, location } = this.props
     const { redirect_uri } = Query.parse(location.search)
+
+    if (error) {
+      return <ErrorMessage content={error} />
+    }
 
     const redirectUri = redirect_uri || client.redirect_uris[0]
     const clientName = capitalize(client.ids.client_id)
