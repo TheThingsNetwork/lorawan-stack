@@ -24,9 +24,11 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -456,7 +458,15 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateTemporaryPasswordFieldMask))
-	// TODO: Send temporary password email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+		return &emails.TemporaryPassword{
+			Data:              data,
+			TemporaryPassword: temporaryPassword,
+		}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send temporary password email")
+	}
 	return ttnpb.Empty, nil
 }
 
