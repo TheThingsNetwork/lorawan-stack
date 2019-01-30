@@ -28,7 +28,7 @@ const consoleLogic = createLogic({
 
     try {
       try {
-        const isConsole = window.APP_ROOT = '/console'
+        const isConsole = window.APP_ROOT === '/console'
 
         let result
         if (isConsole) {

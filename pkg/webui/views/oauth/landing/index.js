@@ -32,11 +32,11 @@ export default class OAuth extends React.PureComponent {
   }
 
   render () {
-    const { user = {}} = this.props
+    const { user = { ids: {}}} = this.props
 
     return (
       <WithAuth>
-        <div>You are logged in as {user.user_id}. <Button message="Logout" onClick={this.handleLogout} /></div>
+        <div>You are logged in as {user.ids.user_id}. <Button message="Logout" onClick={this.handleLogout} /></div>
       </WithAuth>
     )
   }

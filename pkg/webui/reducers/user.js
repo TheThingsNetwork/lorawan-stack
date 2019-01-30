@@ -34,7 +34,7 @@ const user = function (state = defaultState, action) {
   case GET_USER_ME_SUCCESS:
     return Object.assign({}, state, {
       fetching: false,
-      user: action.userData,
+      user: action.userData.user,
     })
   case GET_USER_ME_FAILURE:
     return Object.assign({}, state, {
