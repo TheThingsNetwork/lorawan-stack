@@ -200,7 +200,7 @@ func TestOAuthFlow(t *testing.T) {
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
 			Body:         loginFormData{"json", "user", "pass"},
-			ExpectedCode: http.StatusOK,
+			ExpectedCode: http.StatusNoContent,
 		},
 		{
 			Name: "GET me with auth",
@@ -309,7 +309,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:       "POST",
 			Path:         "/oauth/api/auth/logout",
-			ExpectedCode: http.StatusOK,
+			ExpectedCode: http.StatusNoContent,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "DeleteSession")
