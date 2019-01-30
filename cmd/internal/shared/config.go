@@ -118,7 +118,7 @@ var DefaultServiceBase = config.ServiceBase{
 var DefaultPublicURL = "http://localhost:1885"
 
 // DefaultAssetsBaseURL is the default public URL where the assets are served.
-var DefaultAssetsBaseURL = DefaultPublicURL + DefaultHTTPConfig.Static.Mount
+var DefaultAssetsBaseURL = DefaultHTTPConfig.Static.Mount
 
 // DefaultOAuthPublicURL is the default public URL where OAuth is served.
 var DefaultOAuthPublicURL = DefaultPublicURL + "/oauth"
