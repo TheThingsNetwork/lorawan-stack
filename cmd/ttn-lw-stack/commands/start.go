@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -34,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
 	nsredis "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/redis"
+	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
@@ -51,7 +53,7 @@ var (
 				JoinServer        bool
 				Console           bool
 			}
-			startAll := len(args) == 0
+			startDefault := len(args) == 0
 			for _, arg := range args {
 				switch strings.ToLower(arg) {
 				case "is", "identityserver":
@@ -67,13 +69,20 @@ var (
 				case "console":
 					start.Console = true
 				case "all":
-					startAll = true
+					start.IdentityServer = true
+					start.GatewayServer = true
+					start.NetworkServer = true
+					start.ApplicationServer = true
+					start.JoinServer = true
+					start.Console = true
 				default:
 					return errUnknownComponent.WithAttributes("component", arg)
 				}
 			}
 
 			logger.Info("Setting up core component")
+
+			var rootRedirect web.Registerer
 
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
@@ -85,7 +94,7 @@ var (
 				return err
 			}
 
-			if start.IdentityServer || startAll {
+			if start.IdentityServer || startDefault {
 				logger.Info("Setting up Identity Server")
 				is, err := identityserver.New(c, &config.IS)
 				if err != nil {
@@ -95,9 +104,10 @@ var (
 					Redis:     config.Redis,
 					Namespace: []string{"is", "cache"},
 				}))
+				rootRedirect = web.Redirect("/", http.StatusFound, config.IS.OAuth.UI.CanonicalURL)
 			}
 
-			if start.GatewayServer || startAll {
+			if start.GatewayServer || startDefault {
 				logger.Info("Setting up Gateway Server")
 				gs, err := gatewayserver.New(c, &config.GS)
 				if err != nil {
@@ -106,7 +116,7 @@ var (
 				_ = gs
 			}
 
-			if start.NetworkServer || startAll {
+			if start.NetworkServer || startDefault {
 				logger.Info("Setting up Network Server")
 				config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 					Redis:     config.Redis,
@@ -124,7 +134,7 @@ var (
 				ns.Component.RegisterTask("queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 			}
 
-			if start.ApplicationServer || startAll {
+			if start.ApplicationServer || startDefault {
 				logger.Info("Setting up Application Server")
 				config.AS.Links = &asredis.LinkRegistry{Redis: redis.New(&redis.Config{
 					Redis:     config.Redis,
@@ -147,7 +157,7 @@ var (
 				_ = as
 			}
 
-			if start.JoinServer || startAll {
+			if start.JoinServer || startDefault {
 				logger.Info("Setting up Join Server")
 				config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
 					Redis:     config.Redis,
@@ -164,13 +174,18 @@ var (
 				_ = js
 			}
 
-			if start.Console || startAll {
+			if start.Console {
 				logger.Info("Setting up Console")
 				console, err := console.New(c, config.Console)
 				if err != nil {
 					return shared.ErrInitializeConsole.WithCause(err)
 				}
 				_ = console
+				rootRedirect = web.Redirect("/", http.StatusFound, config.Console.UI.CanonicalURL)
+			}
+
+			if rootRedirect != nil {
+				c.RegisterWeb(rootRedirect)
 			}
 
 			logger.Info("Starting...")
