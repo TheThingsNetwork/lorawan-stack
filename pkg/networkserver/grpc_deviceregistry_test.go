@@ -17,344 +17,539 @@ package networkserver_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-type getByIDFuncKey struct{}
-type setByIDFuncKey struct{}
-
-var registeredDevice = &ttnpb.EndDevice{
-	EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "foo-application",
-		},
-		DeviceID: "foo-device",
-		JoinEUI:  eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-		DevEUI:   eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-	},
-	RootKeys: &ttnpb.RootKeys{
-		RootKeyID: "test",
-		NwkKey: &ttnpb.KeyEnvelope{
-			KEKLabel: "test",
-			Key:      []byte{0x1, 0x2},
-		},
-		AppKey: &ttnpb.KeyEnvelope{
-			KEKLabel: "test",
-			Key:      []byte{0x3, 0x4},
-		},
-	},
-}
-
 func TestDeviceRegistryGet(t *testing.T) {
+	type getByIDCallKey struct{}
+
+	ids := ttnpb.EndDeviceIdentifiers{
+		DeviceID: DeviceID,
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: ApplicationID,
+		},
+	}
+
 	for _, tc := range []struct {
 		Name             string
 		ContextFunc      func(context.Context) context.Context
 		GetByIDFunc      func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
-		DeviceRequest    *ttnpb.GetEndDeviceRequest
+		Request          *ttnpb.GetEndDeviceRequest
+		Device           *ttnpb.EndDevice
 		ErrorAssertion   func(*testing.T, error) bool
 		ContextAssertion func(context.Context) bool
 	}{
 		{
-			Name: "Permission denied",
+			Name: "No device read rights",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, registeredDevice.ApplicationIdentifiers): nil,
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
 					},
 				})
 			},
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByIDFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers)
-				a.So(devID, should.Equal, registeredDevice.EndDeviceIdentifiers.DeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return registeredDevice, nil
+				test.MustTFromContext(ctx).Fatal("GetByIDFunc must not be called")
+				panic("Unreachable")
 			},
-			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+			Request: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: ids,
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				}},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
-			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByIDFuncKey{}), should.Equal, 0)
-			},
-		},
-		{
-			Name: "Get without key",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, registeredDevice.ApplicationIdentifiers): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-						),
+					Paths: []string{
+						"test",
 					},
-				})
-			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByIDFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers)
-				a.So(devID, should.Equal, registeredDevice.EndDeviceIdentifiers.DeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return registeredDevice, nil
-			},
-			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
 				},
 			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByIDFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, getByIDCallKey{}), should.Equal, 0)
+			},
+		},
+
+		{
+			Name: "Valid request",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							},
+						},
+					},
+				})
+			},
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+				defer test.MustIncrementContextCounter(ctx, getByIDCallKey{}, 1)
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ids.ApplicationIdentifiers)
+				a.So(devID, should.Equal, DeviceID)
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"test",
+				})
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+				}, nil
+			},
+			Request: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: ids,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"test",
+					},
+				},
+			},
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+			},
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, getByIDCallKey{}), should.Equal, 1)
 			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := test.ContextWithCounter(tc.ContextFunc(test.ContextWithT(test.Context(), t)), getByIDFuncKey{})
-			reg := &MockDeviceRegistry{
-				GetByIDFunc: tc.GetByIDFunc,
-			}
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:             reg,
+					Devices: &MockDeviceRegistry{
+						GetByIDFunc: tc.GetByIDFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
+
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithCounter(ctx, getByIDCallKey{})
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
 			test.Must(nil, ns.Start())
 			defer ns.Close()
-			dev, err := ns.Get(ctx, tc.DeviceRequest)
-			a.So(tc.ContextAssertion(ctx), should.BeTrue)
+
+			req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
+
+			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(test.Context(), req)
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				a.So(dev, should.BeNil)
-				return
+			} else {
+				a.So(err, should.BeNil)
+				a.So(dev, should.Resemble, tc.Device)
 			}
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, registeredDevice)
+			a.So(req, should.Resemble, tc.Request)
 		})
 	}
 }
 
 func TestDeviceRegistrySet(t *testing.T) {
+	type setByIDCallKey struct{}
+
+	ids := ttnpb.EndDeviceIdentifiers{
+		DeviceID: DeviceID,
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: ApplicationID,
+		},
+	}
+
 	for _, tc := range []struct {
 		Name             string
 		ContextFunc      func(context.Context) context.Context
 		SetByIDFunc      func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		DeviceRequest    *ttnpb.SetEndDeviceRequest
+		Request          *ttnpb.SetEndDeviceRequest
+		Device           *ttnpb.EndDevice
 		ErrorAssertion   func(*testing.T, error) bool
 		ContextAssertion func(context.Context) bool
 	}{
 		{
-			Name: "Permission denied",
+			Name: "No device write rights",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, registeredDevice.ApplicationIdentifiers): nil,
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
 					},
 				})
 			},
-			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: *registeredDevice,
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Fatal("SetByIDFunc must not be called")
+				panic("Unreachable")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByIDFuncKey{}, 1)
-				a.So(appID, should.Resemble, registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers)
-				a.So(devID, should.Equal, registeredDevice.EndDeviceIdentifiers.DeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				dev, fieldmask, err := cb(registeredDevice)
-				if dev != nil {
-					a.So(fieldmask, should.HaveSameElementsDeep, []string{"ids"})
-				}
-				return dev, err
+			Request: &ttnpb.SetEndDeviceRequest{
+				Device: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+					SupportsJoin:         true,
+					MACSettings:          &ttnpb.MACSettings{},
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"frequency_plan_id",
+						"lorawan_phy_version",
+						"lorawan_version",
+						"mac_settings.use_adr",
+						"resets_f_cnt",
+						"resets_join_nonces",
+						"supports_class_b",
+						"supports_class_c",
+						"supports_join",
+						"uses_32_bit_f_cnt",
+					},
+				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDFuncKey{}), should.Equal, 0)
+				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 0)
 			},
 		},
+
 		{
-			Name: "Set without keys",
+			Name: "Create OTAA device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, registeredDevice.ApplicationIdentifiers): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-						),
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
 					},
 				})
 			},
-			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: *registeredDevice,
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ids.ApplicationIdentifiers)
+				a.So(devID, should.Equal, DeviceID)
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"lorawan_phy_version",
+					"lorawan_version",
+					"mac_settings.use_adr",
+					"resets_f_cnt",
+					"resets_join_nonces",
+					"supports_class_b",
+					"supports_class_c",
+					"supports_join",
+					"uses_32_bit_f_cnt",
+				})
+
+				dev, sets, err := f(nil)
+				a.So(err, should.BeNil)
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"lorawan_phy_version",
+					"lorawan_version",
+					"mac_settings.adr_margin",
+					"mac_settings.class_b_timeout",
+					"mac_settings.class_c_timeout",
+					"mac_settings.use_adr",
+					"resets_f_cnt",
+					"resets_join_nonces",
+					"supports_class_b",
+					"supports_class_c",
+					"supports_join",
+					"uses_32_bit_f_cnt",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+					SupportsJoin:         true,
+					MACSettings: &ttnpb.MACSettings{
+						ADRMargin:     15,
+						ClassBTimeout: time.Minute,
+						ClassCTimeout: 10 * time.Second,
+					},
+				})
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+					SupportsJoin:         true,
+					MACSettings: &ttnpb.MACSettings{
+						ADRMargin:     15,
+						ClassBTimeout: time.Minute,
+						ClassCTimeout: 10 * time.Second,
+					},
+				}, nil
+			},
+			Request: &ttnpb.SetEndDeviceRequest{
+				Device: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+					SupportsJoin:         true,
+					MACSettings:          &ttnpb.MACSettings{},
+				},
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
+					Paths: []string{
+						"frequency_plan_id",
+						"lorawan_phy_version",
+						"lorawan_version",
+						"mac_settings.use_adr",
+						"resets_f_cnt",
+						"resets_join_nonces",
+						"supports_class_b",
+						"supports_class_c",
+						"supports_join",
+						"uses_32_bit_f_cnt",
+					},
 				},
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByIDFuncKey{}, 1)
-				a.So(appID, should.Resemble, registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers)
-				a.So(devID, should.Equal, registeredDevice.EndDeviceIdentifiers.DeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				dev, fieldmask, err := cb(registeredDevice)
-				if dev != nil {
-					a.So(fieldmask, should.HaveSameElementsDeep, []string{"ids"})
-				}
-				return dev, err
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				SupportsJoin:         true,
+				MACSettings: &ttnpb.MACSettings{
+					ADRMargin:     15,
+					ClassBTimeout: time.Minute,
+					ClassCTimeout: 10 * time.Second,
+				},
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
 			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := test.ContextWithCounter(tc.ContextFunc(test.ContextWithT(test.Context(), t)), setByIDFuncKey{})
-			reg := &MockDeviceRegistry{
-				SetByIDFunc: tc.SetByIDFunc,
-			}
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:             reg,
+					Devices: &MockDeviceRegistry{
+						SetByIDFunc: tc.SetByIDFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
+
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithCounter(ctx, setByIDCallKey{})
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
 			test.Must(nil, ns.Start())
 			defer ns.Close()
-			dev, err := ns.Set(ctx, tc.DeviceRequest)
-			a.So(tc.ContextAssertion(ctx), should.BeTrue)
+
+			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
+
+			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(test.Context(), req)
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				a.So(dev, should.BeNil)
-				return
+			} else {
+				a.So(err, should.BeNil)
+				a.So(dev, should.Resemble, tc.Device)
 			}
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, registeredDevice)
+			a.So(req, should.Resemble, tc.Request)
 		})
 	}
 }
 
 func TestDeviceRegistryDelete(t *testing.T) {
+	type setByIDCallKey struct{}
+
+	ids := ttnpb.EndDeviceIdentifiers{
+		DeviceID: DeviceID,
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: ApplicationID,
+		},
+	}
 
 	for _, tc := range []struct {
 		Name             string
 		ContextFunc      func(context.Context) context.Context
 		SetByIDFunc      func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		Device           *ttnpb.EndDeviceIdentifiers
+		Request          *ttnpb.EndDeviceIdentifiers
 		ErrorAssertion   func(*testing.T, error) bool
 		ContextAssertion func(context.Context) bool
 	}{
 		{
-			Name: "Permission denied",
+			Name: "No device write rights",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, registeredDevice.ApplicationIdentifiers): nil,
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
 					},
 				})
 			},
-			Device: &registeredDevice.EndDeviceIdentifiers,
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByIDFuncKey{}, 1)
-				a.So(appID, should.Resemble, registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers)
-				a.So(devID, should.Equal, registeredDevice.EndDeviceIdentifiers.DeviceID)
-				a.So(paths, should.BeNil)
-				dev, _, err := cb(registeredDevice)
-				return dev, err
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Fatal("SetByIDFunc must not be called")
+				panic("Unreachable")
 			},
+			Request: deepcopy.Copy(&ids).(*ttnpb.EndDeviceIdentifiers),
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
 			},
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDFuncKey{}), should.Equal, 0)
+				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 0)
 			},
 		},
+
 		{
-			Name: "Delete",
+			Name: "Non-existing device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, registeredDevice.ApplicationIdentifiers): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-						),
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
 					},
 				})
 			},
-			Device: &registeredDevice.EndDeviceIdentifiers,
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByIDFuncKey{}, 1)
-				a.So(appID, should.Resemble, registeredDevice.EndDeviceIdentifiers.ApplicationIdentifiers)
-				a.So(devID, should.Equal, registeredDevice.EndDeviceIdentifiers.DeviceID)
-				a.So(paths, should.BeNil)
-				dev, _, err := cb(registeredDevice)
-				return dev, err
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(appID, should.Resemble, ids.ApplicationIdentifiers)
+				a.So(devID, should.Equal, DeviceID)
+				a.So(gets, should.BeNil)
+
+				dev, sets, err := f(nil)
+				a.So(err, should.BeNil)
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, nil
 			},
+			Request: deepcopy.Copy(&ids).(*ttnpb.EndDeviceIdentifiers),
 			ContextAssertion: func(ctx context.Context) bool {
 				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDFuncKey{}), should.Equal, 1)
+				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
+			},
+		},
+
+		{
+			Name: "Existing device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ids.ApplicationIdentifiers): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					},
+				})
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ids.ApplicationIdentifiers)
+				a.So(devID, should.Equal, DeviceID)
+				a.So(paths, should.BeNil)
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ids,
+				})
+				a.So(err, should.BeNil)
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, nil
+			},
+			Request: deepcopy.Copy(&ids).(*ttnpb.EndDeviceIdentifiers),
+			ContextAssertion: func(ctx context.Context) bool {
+				a := assertions.New(test.MustTFromContext(ctx))
+				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
 			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := test.ContextWithCounter(tc.ContextFunc(test.ContextWithT(test.Context(), t)), setByIDFuncKey{})
-			reg := &MockDeviceRegistry{
-				SetByIDFunc: tc.SetByIDFunc,
-			}
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:             reg,
+					Devices: &MockDeviceRegistry{
+						SetByIDFunc: tc.SetByIDFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
+
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithCounter(ctx, setByIDCallKey{})
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
 			test.Must(nil, ns.Start())
 			defer ns.Close()
-			dev, err := ns.Delete(ctx, tc.Device)
-			a.So(tc.ContextAssertion(ctx), should.BeTrue)
+
+			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
+
+			res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(test.Context(), req)
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-				a.So(dev, should.BeNil)
-				return
+				a.So(res, should.BeNil)
+			} else {
+				a.So(err, should.BeNil)
+				a.So(res, should.Resemble, ttnpb.Empty)
 			}
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, ttnpb.Empty)
+			a.So(req, should.Resemble, tc.Request)
 		})
 	}
 }
