@@ -25,10 +25,14 @@ cache:
   - $HOME/.cache/yarn
   - $GOPATH/pkg/mod
 before_install:
-- sudo rm /usr/local/bin/docker-compose
-- curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
-- chmod +x docker-compose
-- sudo mv docker-compose /usr/local/bin
+- |
+  if [[ $RUNTYPE == go.test.amd64 || $RUNTYPE == go.test.386 ]]
+  then
+    sudo rm /usr/local/bin/docker-compose
+    curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
+    chmod +x docker-compose
+    sudo mv docker-compose /usr/local/bin
+  fi
 - if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then openssl aes-256-cbc -K $encrypted_fc3d5d829302_key -iv $encrypted_fc3d5d829302_iv -in pkg/blob/testdata/gcloud.json.enc -out pkg/blob/testdata/gcloud.json -d; fi
 install: true
 script:
